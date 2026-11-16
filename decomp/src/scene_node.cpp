@@ -170,6 +170,7 @@ struct Node
     int M_1019b050(int value);
     int M_1019b0c0(int value, int except1, int except2);
     int M_1019b1b0(unsigned int bits);
+    int M_1019bca0(Node **keep, int count);
 };
 
 
@@ -691,5 +692,19 @@ int Node::M_1019b1b0(unsigned int bits)
     flags &= ~bits;
     for (int i = 0; i < childCount; i++)
         children[i]->M_1019b1b0(bits);
+    return 1;
+}
+int Node::M_1019bca0(Node **keep, int count)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if (this == keep[i])
+            break;
+    }
+    if (i == count && m_028c != 0)
+        M_10191210();
+    for (int k = 0; k < childCount; k++)
+        children[k]->M_1019bca0(keep, count);
     return 1;
 }

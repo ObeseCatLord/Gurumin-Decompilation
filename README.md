@@ -1,4 +1,4 @@
-﻿# Gurumin (PC, JP 2006) — reverse engineering, modding tools and matching decompilation
+# Gurumin (PC, JP 2006) — reverse engineering, modding tools and matching decompilation
 
 Work-in-progress study of `bin\APP.dll` from the Japanese PC release of Gurumin, aimed at making the game easier
 to mod, with a byte-matching decompilation growing alongside. No game files are included; point the tools at
@@ -22,7 +22,8 @@ your own copy.
 ## Decompilation (`decomp/`)
 VS .NET 2003 (`decomp/env.bat`), flags `/O2 /Ob1 /Gy /GS`, byte compare against APP.dll:
 `decomp\build.bat <file.cpp>`, `decomp\build_all.bat`. The original was built with VS .NET 2002 (cl 13.00.9466);
-functions that 13.10 cannot reproduce are listed in `decomp/open.tsv`. Notes and findings: `NOTES.md`.
+functions that 13.10 cannot reproduce are listed in `decomp/open.tsv`. The comparer reports MATCH (bytes identical,
+relocations masked), EQUIV (identical instruction stream; only cl 13.00 encoding quirks such as `[esp+0]` with a disp8 differ) or DIFF. Notes and findings: `NOTES.md`.
 
 ## Ghidra
 `re\run_ghidra_export.bat` (APP.dll), `re\run_ghidra_packs.bat` (packs.dll); exports land in `re\export\` (local only).

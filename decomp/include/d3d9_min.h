@@ -7,7 +7,7 @@ struct IDirect3DDevice9
     virtual long __stdcall AddRef() = 0;
     virtual long __stdcall Release() = 0;
     virtual long __stdcall TestCooperativeLevel() = 0;
-    virtual long __stdcall GetAvailableTextureMem() = 0;
+    virtual unsigned int __stdcall GetAvailableTextureMem() = 0;
     virtual long __stdcall EvictManagedResources() = 0;
     virtual long __stdcall GetDirect3D() = 0;
     virtual long __stdcall GetDeviceCaps() = 0;

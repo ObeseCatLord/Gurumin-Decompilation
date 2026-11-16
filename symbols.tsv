@@ -111,3 +111,8 @@ address	name	evidence
 101437f0	Input_Shutdown	unacquires/releases the DirectInput8 keyboard, mouse and joystick devices and the IDirectInput8 object
 10145970	Font_Release	frees font glyph buffers and DeleteObject on the three GDI fonts
 10145380	Font_GlyphWidth	SJIS code -> glyph width from the font table (row = (code-0x8141)*72)
+10147700	BufferPool_Clear	clears the 0x5a0-entry vertex/index buffer pools (0x10f0d5e0 VB, 0x10f1c7f0 IB, sizes 0x10f1e670/0x10f628e8)
+10147760	BufferPool_ReleaseDynamic	releases dynamic VB/IB pools (device lost)
+10148280	BufferPool_ReleaseAll	releases all four buffer pools
+101484b0	TexCache_Invalidate	releases one cached texture and marks it for reload
+10148520	TexCache_Free	releases one cached texture and frees the slot

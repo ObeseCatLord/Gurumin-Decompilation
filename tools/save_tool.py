@@ -2,6 +2,10 @@ r"""save_tool.py - decode/encode Gurumin save files (SaveData\gdataNN.sav). Veri
 
   save_tool.py decode <gdataNN.sav> [out.bin]    -> game state (312,204 bytes in the saves tested)
   save_tool.py encode <state.bin> <gdataNN.sav> [--key N]
+  save_tool.py info   <gdataNN.sav>             map, position, block sizes
+  save_tool.py thumb  <gdataNN.sav> [out.png]   the 256x256 load-menu thumbnail (needs Pillow)
+
+Body layout: docs/SAVE_FORMAT.md.
 
 Format (APP.dll 0x10011240 reader, written through 0x1005cdc0 -> 0x1003b2c0):
   u32 magic   9999 (scrambled) or 0x36b1 (old: 0x30000 plain bytes follow)
@@ -64,6 +68,17 @@ def main():
         key = int(sys.argv[sys.argv.index("--key") + 1]) if "--key" in sys.argv else 0x273
         open(dst, "wb").write(encode(open(src, "rb").read(), dst, key))
         print("%s -> %s" % (src, dst))
+    elif mode == "info":
+        plain, ok = decode(open(src, "rb").read(), src)
+        map_id, = struct.unpack_from("<i", plain, 0x30000)
+        x, y, z = struct.unpack_from("<3f", plain, 0x30004)
+        print("checksum %s, body %d bytes, map %d, position (%.2f, %.2f, %.2f)" % ("ok" if ok else "BAD", len(plain), map_id, x, y, z))
+    elif mode == "thumb":
+        from PIL import Image
+        plain, ok = decode(open(src, "rb").read(), src)
+        dst = sys.argv[3] if len(sys.argv) > 3 else os.path.splitext(src)[0] + ".png"
+        Image.frombytes("RGB", (256, 256), plain[:0x30000]).save(dst)
+        print("wrote", dst)
     else:
         sys.exit(__doc__)
 

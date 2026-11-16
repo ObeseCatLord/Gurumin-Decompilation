@@ -1,0 +1,14 @@
+body_offset	bytes	destination	note
+0x30004	4	local_23c	
+0x30008	4	local_250	
+0x3000c	4	local_258	
+0x30014	4	DAT_104bfd18	
+0x3016c	392	DAT_10daaae8	block copy
+0x302f4	16384	DAT_10c62edc	block copy
+0x342f4	128	DAT_103150c0	block copy
+0x34374	4	local_254	
+0x3437c	4	DAT_10202464	
+0x34380	4	DAT_10202468	
+0x34384	4	DAT_1020246c	
+0x34388	4	DAT_10202470	
+0x3438c	98304	DAT_1049f200	block copy

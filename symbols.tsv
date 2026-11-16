@@ -32,7 +32,7 @@ address	name	evidence
 101a58a0	It3_ParseChunks	compares chunk tags INFO/RTY2/LIG3/KAN3/INFS/MAT4/VPA2/CHID/MAN2/BONE/CAME/CDLO
 101a4a60	It3_ScanChunks	pre-pass over INFO/MAN2 chunks
 101455d0	Font_Init	ddfont8.dat, MS P Gothic, m_lpFont
-1013b700	Game_SaveLoad	demo.sav, %s.sav, %s.dat, CONFIG
+1013b700	Game_Startup	reads every gurumin.def key (docs/config_keys.tsv), loads packs.dll, demo.sav/%s.sav
 10166950	Character_Load	"chara %d"
 101602d0	File_Checksum	sum/xor (seed 0xcc82) over a file in dwords
 1000beb0	TestDat_Load	parses test.dat (debug)
@@ -55,3 +55,12 @@ address	name	evidence
 10148310	TexCache_Clear	clears the 512-entry texture cache arrays (0x10f1bff0 textures, 0x10f0cd40 ages)
 10148350	TexCache_ReleaseAll	Release() every cached texture, subtract sizes from 0x10f0ff80
 101483f0	TexCache_Age	increments every cache entry's age
+101b2670	Packs_Load	LoadLibrary ./bin/packs.dll; ExecPack ExecUnpack BMPUnpack BMPPack BMPSave BMPLoad SaveJpeg MMV3
+1015fe70	Config_GetInt	GetPrivateProfileIntA(section, key, 0, file) -> *out
+1015fe20	Config_SetInt	WritePrivateProfileStringA(section, key, itoa(value), file)
+10161920	Texture_FindByName	_stricmp over 1600 names at 0x10ffe5f8
+10161070	Texture_BindStage0	binds texture slot (0x118d0ba8 + i*0x38) to stage 0, -1 unbinds
+101610b0	Texture_BindStage1	stage 1 variant
+101610f0	Texture_ClearNames	clears the 1600-entry name tables
+10160890	MmvPlayer_ctor	MMV player object constructor
+1015d090	ImeContext_ctor	IME (Japanese input) wrapper; methods 0x1015d0a0..0x1015d4e0

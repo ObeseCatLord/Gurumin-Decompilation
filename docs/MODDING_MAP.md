@@ -11,11 +11,11 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 | Scripts and game tables | `bin\map.itm` | `tools/itm_tool.py decode/encode` | Text: `#VERSION`, ~25 `#...Table` sections, ~820 `#Script:NNNNN` blocks. See ITM_FORMAT.md. |
 | Per-area scripts and dialogue | `3ddata\*.itm` (text ones) | `tools/itm_tool.py` | Same scrambling, keyed by file name. |
 | Some textures | `3ddata\*.itm` (BMP ones), `images\*.itm` | `tools/itm_tool.py` | Scrambled BMP; the texture loader (0x10173550) also accepts plain `.bmp`. |
-| Textures | `3ddata\*.iti` | (todo: `tools/iti_tool.py`) | 16-byte header `type, width, height, size` + JPEG; type 888/666 add a raw RGB block, 889 a second JPEG (alpha), 0/1 raw. |
+| Textures | `3ddata\*.iti` | `tools/iti_tool.py decode/encode` | `u32 type, width, height`. Type 0 raw RGB, 1 raw RGB + grey alpha, 888 JPEG + raw RGB copy, 889 JPEG colour + JPEG alpha + raw RGB + raw alpha, 666/667 packed by packs.dll `BMPUnpack` (not decoded yet). 1,022/1,097 JP files decode; encoding writes raw type 0/1, which the loader reads without packs.dll. Search order: every directory in the slot table 0x10202b40, then `./NAME.itp`, `./data/NAME.itp`. |
 | Models / animation | `3ddata\*.it3` | `tools/it3_chunks.py` (lister) | Flat list of tagged chunks `tag[4] size[u32] data`; nodes start with `INFO` (140 bytes). Tags: INFO RTY2 LIG3 INFS CHID KAN3 MAT4 VPA2 MAN2 ... parsed by 0x101a58a0. |
 | Movies | `*.mmv` | none yet | Custom "MV" format, opened by 0x10160a90 (`.\bin\%s.MMV`). |
 | Music | `bgm\*.de2`, ogg | none yet | `#BGMTable` in map.txt gives file, extension and loop points; played by 0x1003aef0. |
-| Settings | `bin\gurumin.def` | text | `[CONFIG]`, `[KEYCONFIG]`. |
+| Settings | `bin\gurumin.def` | text | `[CONFIG]`, `[KEYCONFIG]`; read once in `Game_Startup` 0x1013b700 via `Config_GetInt` 0x1015fe70. Key → global map: `docs/config_keys.tsv` (e.g. FULLSCREEN 0x10f65514, TEXD 0x1101d844 = skip the JPEG decoder, VSYNC 0x10f654a8). |
 | Saves | `SaveData\gdata%02d.sav` | none yet | Menus at 0x10064630 / 0x10112140; save code 0x1013b700. |
 
 ## Script system
@@ -48,3 +48,8 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 | 0x10daab84 | per-character records × 0x188 |
 | 0x1020b430 | per-character state × 0x40 |
 | 0x10860df0 | 64 effect slots × 0xfc |
+
+## packs.dll
+`Packs_Load` (0x101b2670) loads `./bin/packs.dll` (else `packs.dll`) and resolves `ExecPack`, `ExecUnpack`, `BMPUnpack`,
+`BMPPack`, `BMPSave`, `BMPLoad` (JPEG .iti decoding), `SaveJpeg` (screenshots) and `MMV3` (movies) into 0x11b1bb68..0x11b1bb84.
+A replacement packs.dll with the same exports is a clean place to add PNG textures or modern video.

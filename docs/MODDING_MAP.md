@@ -63,3 +63,14 @@ A replacement packs.dll with the same exports is a clean place to add PNG textur
 - `Render_Present` 0x1015c960 ends the frame (EndScene + Present). Frame pacing: `timeGetTime()+16` deadlines at 0x10f654d8.
 - Present parameters at 0x10f0ff84 are the place to change resolution, windowed mode, refresh rate or vsync before
   `Reset`/`CreateDevice`.
+
+## Resolution and device creation
+- `gurumin.def` `RESOLUTION` is read in `Game_Startup` (switch at 0x1013bc96): 0-2 = 640×480, 3-4 = 800×600,
+  5-6 = 1280×960; the second number per pair sets 0x10f654ec (256/512/1024, a texture-size budget). Width/height land
+  in **0x10202b24 / 0x10202b28** (copied to 0x10202b2c/30). Only 4:3 modes exist; widescreen needs these values
+  patched or set before device creation, plus projection changes.
+- `Render_CreateDevice` 0x10148b00: `Direct3DCreate9(32)`, adapter mode check, sizes the window so the client area is
+  width×height, fills D3DPRESENT_PARAMETERS at 0x10f0ff84 (BackBufferWidth/Height = resolution, Windowed =
+  !FULLSCREEN, SwapEffect = COPY, EnableAutoDepthStencil with D16, PresentationInterval = ONE, or IMMEDIATE when
+  `VSYNC` is set), then `CreateDevice` (HAL; hardware vertex processing when `HDVS`, falling back to software).
+- A "Trident Video Accelerator Cyber-XP4" adapter string disables HDVS (old driver workaround).

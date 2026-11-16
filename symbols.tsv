@@ -87,3 +87,4 @@ address	name	evidence
 1015c850	Frame_PumpAndRecover	PeekMessage loop (WM_QUIT -> quit flag 0x10f6552c), waits while inactive, TestCooperativeLevel; on DEVICENOTRESET: lost-device release, IDirect3DDevice9::Reset(&0x10f0ff84), restore; then BeginScene
 1014b2a0	Render_OnLostDevice	releases default-pool resources before Reset
 1013fbb0	Render_OnResetDevice	restores render state after Reset
+10148b00	Render_CreateDevice	Direct3DCreate9, fills present parameters 0x10f0ff84 from 0x10202b24/28, sizes the window, CreateDevice with HW/SW vertex processing fallbacks

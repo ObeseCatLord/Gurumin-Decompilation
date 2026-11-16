@@ -25,6 +25,12 @@ struct KeyPair
 struct TextureRef;
 extern "C" int FUN_10169c00(TextureRef *texture);
 
+struct MeshData
+{
+    void M_10150a90();
+};
+extern "C" int FUN_10169990(MeshData *mesh);
+
 struct Keys
 {
     void M_101ad690();
@@ -61,10 +67,12 @@ struct KeyPair;
 struct Node
 {
     char pad_0000[0x64];
-    int m_0064;
-    char pad_0068[8];
+    int packCount;
+    PackHeader *packs;
+    KeyPair *indexLists;
     KeyPair *m_0070;
-    char pad_0074[0x2c];
+    char pad_0074[0x28];
+    struct MeshData *mesh;
     int m_00a0;
     int pad_00a4;
     int m_00a8;
@@ -132,6 +140,8 @@ struct Node
     void M_10191210();
     int M_10191990(const int *values, int count);
     Node *M_10191cc0(unsigned int mask, int nth, int *counter);
+    void M_101911b0(PackHeader *packs, int count);
+    void ReleaseMesh();
 };
 
 
@@ -393,8 +403,8 @@ int Node::M_101a8760()
 
 int Node::M_101ab980()
 {
-    if (m_0070 != 0 && m_0064 != 0)
-        M_101911e0(m_0070, m_0064);
+    if (m_0070 != 0 && packCount != 0)
+        M_101911e0(m_0070, packCount);
     for (int i = 0; i < childCount; i++)
         children[i]->M_1019e120();
     return 0;
@@ -460,4 +470,22 @@ Node *Node::M_10191cc0(unsigned int mask, int nth, int *counter)
         }
     }
     return 0;
+}
+void Node::ReleaseMesh()
+{
+    if (mesh != 0 && FUN_10169990(mesh) == 0)
+    {
+        mesh->M_10150a90();
+        DAT_11b1ba40(mesh);
+        mesh = 0;
+        M_101911b0(packs, packCount);
+        M_101911e0(indexLists, packCount);
+        if (packs != 0)
+            DAT_11b1ba40(packs);
+        packs = 0;
+        if (indexLists != 0)
+            DAT_11b1ba40(indexLists);
+        indexLists = 0;
+        packCount = 0;
+    }
 }

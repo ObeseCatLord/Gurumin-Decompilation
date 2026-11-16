@@ -1,4 +1,4 @@
-﻿"""xref_en.py : carry symbols.tsv names from the JP APP.dll to the Steam EN game.exe by shared string references.
+"""xref_en.py : carry symbols.tsv names from the JP APP.dll to the Steam EN game.exe by shared string references.
 
 For every named JP function, take the strings it references (decomp/strings.tsv). Find each string's bytes in the EN
 exe, then the EN functions referencing that address (re/export/game_en_steam.exe/data_refs.tsv). A JP function maps
@@ -26,7 +26,17 @@ for r in csv.DictReader(open(os.path.join(ROOT, "decomp", "strings.tsv"), encodi
 
 # EN string addresses
 en_data = {name: sec for name, sec in en.sections.items() if name in (".rdata", ".data")}
+_cache = {}
+
+
 def find_en(text):
+    if text in _cache:
+        return _cache[text]
+    _cache[text] = hits = _find_en(text)
+    return hits
+
+
+def _find_en(text):
     raw = text.replace("\\t", "\t").replace("\\r", "\r").replace("\\n", "\n").encode("cp932", "replace") + b"\0"
     hits = []
     for name, (va, vs, rawoff, rs) in en_data.items():
@@ -44,8 +54,10 @@ for line in open(os.path.join(en_export, "data_refs.tsv"), encoding="utf-8", err
     if len(c) >= 3 and c[1]:
         refs[int(c[2], 16)].add(c[1].split("@")[-1] if "@" in c[1] else c[1])
 
+ALL = "--all" in sys.argv
+targets = {k: symbols.get(k, "") for k in jp_strings} if ALL else symbols
 out = []
-for jp, name in sorted(symbols.items()):
+for jp, name in sorted(targets.items()):
     votes = collections.Counter()
     strings = jp_strings.get(jp, set())
     for s in strings:
@@ -58,10 +70,17 @@ for jp, name in sorted(symbols.items()):
     if len(best) > 1 and best[0][1] == best[1][1]:
         continue
     conf = "high" if best[0][1] >= 3 else ("medium" if best[0][1] == 2 else "low")
-    out.append((best[0][0], name, jp, best[0][1], len(strings), conf))
+    out.append([best[0][0], name, jp, best[0][1], len(strings), conf])
 
-with open(os.path.join(ROOT, "docs", "symbols_en.tsv"), "w", encoding="utf-8") as f:
+# an EN function claimed by several JP functions keeps only the strongest claim
+claims = collections.defaultdict(list)
+for r in out:
+    claims[r[0]].append(r)
+out = [max(rs, key=lambda r: r[3]) for rs in claims.values() if len(rs) == 1 or sorted(r[3] for r in rs)[-1] > sorted(r[3] for r in rs)[-2]]
+out.sort(key=lambda r: r[2])
+
+with open(os.path.join(ROOT, "docs", "jp_en_map.tsv" if ALL else "symbols_en.tsv"), "w", encoding="utf-8") as f:
     f.write("en_function\tname\tjp_address\tshared_strings\tjp_strings\tconfidence\n")
     for r in out:
-        f.write("%s\t%s\t%s\t%d\t%d\t%s\n" % r)
-print(len(out), "of", len(symbols), "names mapped")
+        f.write("%s\t%s\t%s\t%d\t%d\t%s\n" % tuple(r))
+print(len(out), "of", len(targets), "functions mapped", collections.Counter(r[5] for r in out))

@@ -74,3 +74,11 @@ A replacement packs.dll with the same exports is a clean place to add PNG textur
   !FULLSCREEN, SwapEffect = COPY, EnableAutoDepthStencil with D16, PresentationInterval = ONE, or IMMEDIATE when
   `VSYNC` is set), then `CreateDevice` (HAL; hardware vertex processing when `HDVS`, falling back to software).
 - A "Trident Video Accelerator Cyber-XP4" adapter string disables HDVS (old driver workaround).
+
+## Steam English game.exe
+The Steam release (`game.exe`, VS2013, 2015) contains the same game code as APP.dll in one executable (image base
+0x400000, not relocated). `tools/xref_en.py` maps JP functions to EN functions by the strings they reference:
+`docs/symbols_en.tsv` (named functions; e.g. MapData_Load 0x607110, Script_RegisterGameBuiltins 0x644db0,
+Game_Startup 0x609f70, Texture_LoadIti 0x736f60, It3_ParseChunks 0x755ef0) and `docs/jp_en_map.tsv` (every JP
+function with strings: 121 of 420 mapped, 78 with ≥3 shared strings). Low-confidence rows share one string only.
+Ghidra export: `re/run_ghidra_en.bat`.

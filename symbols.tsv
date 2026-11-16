@@ -120,4 +120,4 @@ address	name	evidence
 101608c0	MmvPlayer_dtor	closes the movie file and frees the frame buffers
 101609b0	MmvPlayer_Close	same without destroying the object
 10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (tools/de2_header.py)
-101450b0	Font_DrawGlyph	draws one Shift-JIS glyph from ddfont8.dat into a 512-wide ARGB4444 surface
+101453e0	Font_DrawGlyph	draws one Shift-JIS glyph from ddfont8.dat into a 512-wide ARGB4444 surface

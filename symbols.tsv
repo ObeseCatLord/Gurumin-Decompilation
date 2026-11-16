@@ -75,3 +75,12 @@ address	name	evidence
 101b24e0	File_ReadPackedImage	u32 size + BMPUnpack (wavelet) into RGB buffer
 101b22f0	File_Close	closes the File object
 100106e0	Save_Write	writes gdataNN.sav: thumbnail + state blocks, key = rand(), ItmDescramble-compatible scrambling
+10173480	Texture_ReleaseAll	releases every registered texture and clears both name tables
+101734d0	Texture_OnLostDevice	calls TextureObject::Release (0x10169df0) on every registered texture
+10173510	Texture_OnResetDevice	recreates every registered texture (0x10169e10)
+10169df0	TextureObject_Release	releases the D3D texture if present
+10169e10	TextureObject_Restore	recreates the D3D texture from width/height/format
+10169990	MeshCache_Release	decrements a mesh refcount; frees the name slot at 0
+10169970	MeshCache_AddRef	increments a mesh refcount
+101b20e0	Mem_Alloc	allocator behind the function pointer 0x11b0b938 (size, tag)
+10188fb0	Texture_ReloadMissing	reloads (0x10174c70) every named texture whose D3D object is gone

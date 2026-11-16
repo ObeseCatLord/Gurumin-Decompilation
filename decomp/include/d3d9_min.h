@@ -20,7 +20,7 @@ struct IDirect3DDevice9
     virtual long __stdcall GetSwapChain() = 0;
     virtual long __stdcall GetNumberOfSwapChains() = 0;
     virtual long __stdcall Reset() = 0;
-    virtual long __stdcall Present() = 0;
+    virtual long __stdcall Present(const void *source, const void *dest, void *window, const void *dirty) = 0;
     virtual long __stdcall GetBackBuffer() = 0;
     virtual long __stdcall GetRasterStatus() = 0;
     virtual long __stdcall SetDialogBoxMode() = 0;
@@ -68,7 +68,7 @@ struct IDirect3DDevice9
     virtual long __stdcall SetClipStatus() = 0;
     virtual long __stdcall GetClipStatus() = 0;
     virtual long __stdcall GetTexture() = 0;
-    virtual long __stdcall SetTexture() = 0;
+    virtual long __stdcall SetTexture(unsigned long stage, void *texture) = 0;
     virtual long __stdcall GetTextureStageState() = 0;
     virtual long __stdcall SetTextureStageState() = 0;
     virtual long __stdcall GetSamplerState() = 0;
@@ -122,4 +122,11 @@ struct IDirect3DDevice9
     virtual long __stdcall DrawTriPatch() = 0;
     virtual long __stdcall DeletePatch() = 0;
     virtual long __stdcall CreateQuery() = 0;
+};
+
+struct IUnknownLike
+{
+    virtual long __stdcall QueryInterface() = 0;
+    virtual unsigned long __stdcall AddRef() = 0;
+    virtual unsigned long __stdcall Release() = 0;
 };

@@ -3,6 +3,14 @@ Relocation fields are masked; DIR32 targets that name FUN_/DAT_xxxxxxxx are chec
 import re, struct, sys
 from gimg import Image
 img = Image()
+import os
+NAMED = {}
+_named = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "obj_symbols.tsv")
+if os.path.exists(_named):
+    for _line in open(_named).read().splitlines():
+        if _line and not _line.startswith("#"):
+            _n, _a = _line.split("\t")[:2]
+            NAMED[_n] = int(_a, 16)
 ADDR = re.compile(r"^(?:_|\?)?(?:FUN|DAT|M)_([0-9a-fA-F]{8})(?:@|$)")
 
 def parse(path):
@@ -39,9 +47,12 @@ def main():
         if not s or s[3] != 0x20 or s[4] != 2 or s[2] <= 0:
             continue
         m = ADDR.match(s[0])
-        if not m:
+        if m:
+            va = int(m.group(1), 16)
+        elif s[0] in NAMED:
+            va = NAMED[s[0]]
+        else:
             continue
-        va = int(m.group(1), 16)
         data, rel = secs[s[2] - 1]
         orig = img.read(va, len(data))
         mask = bytearray(len(data))

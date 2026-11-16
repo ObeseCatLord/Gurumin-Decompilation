@@ -43,17 +43,19 @@ struct KeyTrack
     int MarkAll();
     int LastFrame();
     int HasFrame(int frame);
+    int AddKey(int frame, float x, float y, float z, float w);
+    int CopyFrom(const KeyTrack *source);
 };
 
 struct KeyBank
 {
-    int m_0000;
-    char pad_0004[0x1fc];
+    int m_0000[0x80];
     Vec4 m_0200[0x80];
-    char pad_0a00[0x80];
+    char flags[0x80];
     int m_0a80;
     KeyBank();
     void Clear();
+    int CopyTo(KeyTrack *target);
 };
 
 struct Matrix4
@@ -106,7 +108,7 @@ int IndexList::CopyFrom(const IndexList *source)
 void KeyBank::Clear()
 {
     m_0a80 = 0;
-    m_0000 = 0;
+    m_0000[0] = 0;
     float zero = 0;
     m_0200[0].Fill(zero);
 }
@@ -226,4 +228,27 @@ Vec4 TransformPoint(const Vec4 &point, const Matrix4 &matrix)
     result.Copy(point);
     result.Transform(matrix);
     return result;
+}
+int KeyTrack::CopyFrom(const KeyTrack *source)
+{
+    Free();
+    Init();
+    for (int i = 0; i < source->count; i++)
+    {
+        AddKey(source->frames[i], source->values[i].x, source->values[i].y, source->values[i].z, source->values[i].w);
+        flags[i] = source->flags[i];
+    }
+    return 1;
+}
+
+int KeyBank::CopyTo(KeyTrack *target)
+{
+    target->Free();
+    target->Init();
+    for (int i = 0; i < m_0a80; i++)
+    {
+        target->AddKey(m_0000[i], m_0200[i].x, m_0200[i].y, m_0200[i].z, m_0200[i].w);
+        target->flags[i] = flags[i];
+    }
+    return 0;
 }

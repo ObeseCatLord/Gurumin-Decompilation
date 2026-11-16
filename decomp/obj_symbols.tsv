@@ -64,3 +64,5 @@
 ?ReleaseMesh@Node@@QAEXXZ	101913f0
 ?SetPosition@Vertex@@QAEXMMM@Z	101acea0
 ?Set@Vertex@@QAEXMMMMMMMMMMMM@Z	101acf10
+?CopyFrom@KeyTrack@@QAEHPBU1@@Z	101ade10
+?CopyTo@KeyBank@@QAEHPAUKeyTrack@@@Z	101af450

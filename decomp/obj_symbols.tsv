@@ -54,3 +54,5 @@
 ?GetResultString@ImeContext@@QAEHPAD@Z	1015d2e0
 ?GetCompositionString@ImeContext@@QAEHPAD@Z	1015d360
 ?LoadCandidates@ImeContext@@QAEKXZ	1015d430
+??1MmvPlayer@@QAE@XZ	101608c0
+?Close@MmvPlayer@@QAEXXZ	101609b0

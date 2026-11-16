@@ -8,18 +8,23 @@ struct ClipRect
     int bottom;
 };
 
-struct MmvDecoder
+struct MovieFile
 {
-    char data[0x28];
-    MmvDecoder();
+    void *handle;
+    char name[0x20];
+    MovieFile();
+    ~MovieFile();
+    void Close();
 };
 
 struct MmvPlayer
 {
     char pad_0000[0x10];
     int m_0010;
-    char pad_0014[4];
-    MmvDecoder decoder;
+    char isOpen;
+    char pad_0015[3];
+    MovieFile file;
+    void *m_003c;
     short width;
     short height;
     char pad_0044[6];
@@ -32,6 +37,8 @@ struct MmvPlayer
     void *frame;
 
     MmvPlayer();
+    ~MmvPlayer();
+    void Close();
     int M_10160960(const ClipRect *clip);
     int M_10160df0();
     int M_10160f00();
@@ -45,6 +52,7 @@ struct TextureSlot
     void M_1014b6e0();
 };
 
+extern "C" void (*DAT_11b1ba40)(void *);
 extern "C" void __stdcall FUN_1014f120(int, int, int width, int height, int pitch, void *pixels, void *palette);
 extern "C" void FUN_10143b50(void);
 extern "C" void FUN_10143b80(void);
@@ -61,6 +69,35 @@ MmvPlayer::MmvPlayer()
     frame = 0;
     m_004a = 0;
     m_004c = 0;
+}
+
+MmvPlayer::~MmvPlayer()
+{
+    if (isOpen && m_003c != 0)
+        file.Close();
+    isOpen = 0;
+    m_004b = 0;
+    if (m_0250 != 0)
+        DAT_11b1ba40((void *)m_0250);
+    if (frame != 0 && m_004a)
+        DAT_11b1ba40(frame);
+}
+
+void MmvPlayer::Close()
+{
+    if (m_004b)
+    {
+        if (isOpen && m_003c != 0)
+            file.Close();
+        isOpen = 0;
+        if (m_0250 != 0)
+            DAT_11b1ba40((void *)m_0250);
+        if (frame != 0 && m_004a)
+            DAT_11b1ba40(frame);
+        m_0250 = 0;
+        frame = 0;
+        m_004b = 0;
+    }
 }
 
 int MmvPlayer::M_10160960(const ClipRect *clip)

@@ -119,3 +119,4 @@ address	name	evidence
 10160a20	Mmv_DecodeFrameRle	hand-written asm: 8-bit frame delta RLE (0xFC n = skip n pixels, 0xFD n v = n copies of v, else literal)
 101608c0	MmvPlayer_dtor	closes the movie file and frees the frame buffers
 101609b0	MmvPlayer_Close	same without destroying the object
+10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (tools/de2_header.py)

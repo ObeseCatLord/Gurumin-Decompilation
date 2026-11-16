@@ -18,3 +18,4 @@ address	status	reason
 1016c300	open	control-flow layout of a three-way flag test differs (two source shapes tried)
 1017b1c0	open	lazy-create getter: original duplicates the 'return scene->m_1c' tail (reloading through ecx), VS2003 merges it
 101992f0	open	walk to the root: original keeps the next pointer in edx, VS2003 in ecx (two loop shapes tried)
+101a2370	skip	caller keeps 'this' in edx across a call (callee known not to touch edx): inter-procedural register allocation, likely /GL+LTCG in the original

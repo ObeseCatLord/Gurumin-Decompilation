@@ -13,6 +13,12 @@ struct NodeSaved
     void M_10166870();
 };
 
+struct KeyPair
+{
+    int data[2];
+    void M_101ad0e0();
+};
+
 struct Keys
 {
     void M_101ad690();
@@ -44,9 +50,15 @@ struct IndexList
     void M_101ad1b0();
 };
 
+struct KeyPair;
+
 struct Node
 {
-    char pad_0000[0xa0];
+    char pad_0000[0x64];
+    int m_0064;
+    char pad_0068[8];
+    KeyPair *m_0070;
+    char pad_0074[0x2c];
     int m_00a0;
     int pad_00a4;
     int m_00a8;
@@ -95,13 +107,21 @@ struct Node
     int M_1019b210(unsigned int bits);
     int M_1019b230(int value);
     int M_1019b300(int a, int b);
+    int M_1019d680();
+    void M_1019d600();
+    void M_1019d6a0();
+    int M_101a8760();
+    void M_101911e0(KeyPair *pairs, int count);
+    void M_1019e120();
+    int M_101ab980();
+    int M_10191a30(const char *name, int *value);
+    int M_10191c30(const char *name, int *value);
+    int M_10191aa0(const char *name, int *value);
+    int M_10191b60(const char *name, int *value);
+    int M_1019ece0(const char *name, int value);
+    int M_1019ed10(const char *name, int value);
 };
 
-struct KeyPair
-{
-    int data[2];
-    void M_101ad0e0();
-};
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" void (*DAT_11b1ba40)(void *);
@@ -326,4 +346,44 @@ extern "C" IndexList *__stdcall FUN_1019c360(int count)
     for (int i = 0; i < count; i++)
         lists[i].M_101ad1b0();
     return lists;
+}
+int Node::M_1019d680()
+{
+    flags &= ~0x8000;
+    if (parent != 0)
+        parent->M_1019d680();
+    return 0;
+}
+
+int Node::M_1019ece0(const char *name, int value)
+{
+    int result = value;
+    if (*name == '@')
+        return M_10191c30(name + 1, &result);
+    return M_10191a30(name, &result);
+}
+
+int Node::M_1019ed10(const char *name, int value)
+{
+    int result = value;
+    if (*name == '@')
+        return M_10191b60(name + 1, &result);
+    return M_10191aa0(name, &result);
+}
+
+
+int Node::M_101a8760()
+{
+    M_1019d600();
+    M_1019d6a0();
+    return 0;
+}
+
+int Node::M_101ab980()
+{
+    if (m_0070 != 0 && m_0064 != 0)
+        M_101911e0(m_0070, m_0064);
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_1019e120();
+    return 0;
 }

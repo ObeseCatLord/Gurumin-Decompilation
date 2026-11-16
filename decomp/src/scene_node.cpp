@@ -7,7 +7,8 @@ struct Matrix
 
 struct NodeSaved
 {
-    char pad_0000[0x24];
+    char pad_0000[0x20];
+    int m_0020;
     Matrix matrix;
     char pad_0064[0x34];
     int m_0098[8];
@@ -24,6 +25,12 @@ struct KeyPair
 
 struct TextureRef;
 extern "C" int FUN_10169c00(TextureRef *texture);
+
+struct GlyphState
+{
+    char pad_0000[0x5618];
+    int m_5618;
+};
 
 struct MeshData
 {
@@ -72,7 +79,8 @@ struct Node
     PackHeader *packs;
     KeyPair *indexLists;
     KeyPair *m_0070;
-    char pad_0074[0x28];
+    char pad_0074[0x24];
+    void *m_0098;
     struct MeshData *mesh;
     int m_00a0;
     int pad_00a4;
@@ -93,13 +101,16 @@ struct Node
     int m_0294;
     char pad_0298[0x10];
     struct Extra *m_02a8;
-    char pad_02ac[0x4a0];
+    char pad_02ac[0x45c];
+    struct GlyphState *m_0708;
+    char pad_070c[0x40];
     Node *parent;
     int childCount;
     char pad_0754[0x1000];
     Node *children[0x40];
     NodeSaved *saved;
-    int pad_1858;
+    unsigned char m_1858;
+    char pad_1859[3];
     int m_185c;
     int m_1860;
     char pad_1864[0x34];
@@ -154,11 +165,33 @@ struct Node
     int M_10194630(char value, unsigned int mask);
     int M_101946b0(char value, unsigned int mask);
     int M_10194730(char value, unsigned int mask);
+    int M_101948f0(void *target);
+    int M_10194ee0();
+    int M_1019b050(int value);
+    int M_1019b0c0(int value, int except1, int except2);
+    int M_1019b1b0(unsigned int bits);
 };
 
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" void (*DAT_11b1ba40)(void *);
+extern "C" char DAT_11b07118[];
+extern "C" int DAT_11b002c0;
+extern "C" int DAT_11b044e0;
+extern "C" int DAT_11b044e4;
+extern "C" int DAT_11b044e8;
+extern "C" int DAT_11b044ec;
+extern "C" int DAT_11b044f4;
+extern "C" int DAT_10203474;
+extern "C" int DAT_11b044f8;
+extern "C" int DAT_11b04500;
+extern "C" int DAT_10203478;
+extern "C" int DAT_11b04504;
+extern "C" int DAT_1020347c;
+extern "C" char DAT_11b04508;
+extern "C" int DAT_11b0450c;
+extern "C" int DAT_11b04510;
+extern "C" char DAT_11b04514;
 extern "C" int DAT_11b002b8;
 extern "C" int DAT_11b044dc;
 extern "C" int DAT_11b044d0;
@@ -567,4 +600,96 @@ int Node::M_10194730(char value, unsigned int mask)
     for (int i = 0; i < childCount; i++)
         children[i]->M_10194730(value, mask);
     return 0;
+}
+
+int Node::M_101948f0(void *target)
+{
+    if (saved != 0)
+    {
+        if (target != 0)
+            m_0098 = target;
+        else
+            m_0098 = DAT_11b07118;
+        if ((flags & 0x400000) != 0)
+        {
+            if (saved->m_0020 == 2)
+            {
+                saved->m_0020 = 1;
+                return 1;
+            }
+        }
+        else
+        {
+            M_101947f0();
+            M_10194870();
+            M_101948c0();
+            M_10194830();
+            saved->M_10166870();
+            flags |= 0x400000;
+        }
+    }
+    return 1;
+}
+
+int Node::M_10194ee0()
+{
+    if (m_1858 != 0)
+    {
+        m_1858++;
+        if (m_1858 - 1 >= childCount)
+            m_1858 = 1;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10194ee0();
+    return 0;
+}
+
+extern "C" void FUN_101997f0(void)
+{
+    DAT_11b002c0 = 0;
+    DAT_11b044d0 = 0;
+    DAT_11b044dc = 0;
+    DAT_11b044e0 = 0;
+    DAT_11b044e4 = 0;
+    DAT_11b044e8 = 0;
+    DAT_11b044ec = 0;
+    DAT_11b044f4 = 0;
+    DAT_10203474 = 1;
+    DAT_11b044f8 = 0;
+    DAT_11b04500 = 0;
+    DAT_10203478 = 300;
+    DAT_11b04504 = 0;
+    DAT_1020347c = 1;
+    DAT_11b04508 = 0;
+    DAT_11b0450c = 0;
+    DAT_11b04510 = 0;
+    DAT_11b04514 = 0;
+}
+
+int Node::M_1019b050(int value)
+{
+    if (value == 8 && m_0708 != 0 && m_0708->m_5618 != 0)
+        m_00a0 = 0;
+    else
+        m_00a0 = value;
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_1019b050(value);
+    return 1;
+}
+
+int Node::M_1019b0c0(int value, int except1, int except2)
+{
+    if ((except1 == -1 || m_00a0 != except1) && (except2 == -1 || m_00a0 != except2))
+        m_00a0 = value;
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_1019b0c0(value, except1, except2);
+    return 1;
+}
+
+int Node::M_1019b1b0(unsigned int bits)
+{
+    flags &= ~bits;
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_1019b1b0(bits);
+    return 1;
 }

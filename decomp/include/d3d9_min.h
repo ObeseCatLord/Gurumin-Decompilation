@@ -60,8 +60,8 @@ struct IDirect3DDevice9
     virtual long __stdcall GetLightEnable() = 0;
     virtual long __stdcall SetClipPlane() = 0;
     virtual long __stdcall GetClipPlane() = 0;
-    virtual long __stdcall SetRenderState() = 0;
-    virtual long __stdcall GetRenderState() = 0;
+    virtual long __stdcall SetRenderState(unsigned long state, unsigned long value) = 0;
+    virtual long __stdcall GetRenderState(unsigned long state, unsigned long *value) = 0;
     virtual long __stdcall CreateStateBlock() = 0;
     virtual long __stdcall BeginStateBlock() = 0;
     virtual long __stdcall EndStateBlock() = 0;
@@ -69,10 +69,10 @@ struct IDirect3DDevice9
     virtual long __stdcall GetClipStatus() = 0;
     virtual long __stdcall GetTexture() = 0;
     virtual long __stdcall SetTexture(unsigned long stage, void *texture) = 0;
-    virtual long __stdcall GetTextureStageState() = 0;
-    virtual long __stdcall SetTextureStageState() = 0;
-    virtual long __stdcall GetSamplerState() = 0;
-    virtual long __stdcall SetSamplerState() = 0;
+    virtual long __stdcall GetTextureStageState(unsigned long stage, unsigned long type, unsigned long *value) = 0;
+    virtual long __stdcall SetTextureStageState(unsigned long stage, unsigned long type, unsigned long value) = 0;
+    virtual long __stdcall GetSamplerState(unsigned long sampler, unsigned long type, unsigned long *value) = 0;
+    virtual long __stdcall SetSamplerState(unsigned long sampler, unsigned long type, unsigned long value) = 0;
     virtual long __stdcall ValidateDevice() = 0;
     virtual long __stdcall SetPaletteEntries() = 0;
     virtual long __stdcall GetPaletteEntries() = 0;

@@ -105,3 +105,6 @@ Ghidra export: `re/run_ghidra_en.bat`.
   0x104c0230 in memory (or patch the check) rather than editing system.sav.
 Adding a costume therefore needs: a model `<base><N>.it3` (+ its .iti textures), an id the checks above let through
 (or a patched check), and a way to select it (the closet scripts in map.txt).
+- Render state goes through three cached setters: `Render_SetRenderState` 0x1013ef30, `Render_SetTextureStageState`
+  0x1013ef90 and `Render_SetSamplerState` 0x1013f000 (each skips the call when the cached value matches). Hooking the sampler
+  setter is the simplest way to force anisotropic filtering or clamp/mip settings.

@@ -104,3 +104,7 @@ address	name	evidence
 100e2440	Enemy_UpdateAI_C	re-pick with 0x10026c50
 100e24d0	Enemy_UpdateAI_D	re-pick with Enemy_PickAction_60_10_30
 100e1c40	Enemy_IsBusy	non-zero = skip AI this frame (stunned, dying, ...)
+1013ef30	Render_SetRenderState	cached IDirect3DDevice9::SetRenderState (cache 0x10f623d0)
+1013ef90	Render_SetTextureStageState	cached SetTextureStageState (cache 0x10f08d40[stage][type])
+1013f000	Render_SetSamplerState	cached SetSamplerState (cache 0x10f141e0[sampler][type]); hook here to force anisotropic filtering
+1015d510	Ime_IsOpen	ImeContext::IsOpen on the global IME object 0x10f68124

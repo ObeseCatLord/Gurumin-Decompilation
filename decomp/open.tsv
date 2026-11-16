@@ -30,3 +30,4 @@ address	status	reason
 100e2110	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 100e2440	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 100e24d0	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
+1013e6f0	open	from an unoptimised (/Od) translation unit (ebp frame, int3 padding); VS2003 /Od assigns the stack slots in a different order (all 12 declaration orders tried) - decomp/src_od/

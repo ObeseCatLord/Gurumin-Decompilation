@@ -29,9 +29,17 @@ struct AnimModel
     AnimTrack trackA;
     char pad_0d44[0xc];
     AnimTrack trackB;
-    char pad_17e8[4];
+    char pad_17e8;
+    char m_17e9;
+    char pad_17ea[2];
     AnimTrack trackC;
-    char pad_2284[0x7c];
+    char pad_2284[4];
+    char m_2288;
+    char pad_2289[3];
+    int m_228c;
+    int m_2290;
+    int m_2294;
+    char pad_2298[0x68];
     Motion *motion1;
     Motion *motion2;
 
@@ -44,6 +52,7 @@ struct AnimModel
     int M_10161be0(int a, int b);
     void M_10161f30();
     int M_10161f60(int a, int b);
+    int M_101628b0(int a, int b, int c, char d);
 };
 
 extern "C" int DAT_10faaa88[0x100];
@@ -130,5 +139,17 @@ int AnimModel::M_10161f60(int a, int b)
 {
     trackB.m_00c = a;
     trackB.m_010 = b;
+    return 0;
+}
+
+int AnimModel::M_101628b0(int a, int b, int c, char d)
+{
+    if (m_17e9 == 0)
+    {
+        m_2288 = d;
+        m_228c = a;
+        m_2290 = b;
+        m_2294 = c;
+    }
     return 0;
 }

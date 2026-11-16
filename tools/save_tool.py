@@ -4,6 +4,8 @@ r"""save_tool.py - decode/encode Gurumin save files (SaveData\gdataNN.sav). Veri
   save_tool.py encode <state.bin> <gdataNN.sav> [--key N]
   save_tool.py info   <gdataNN.sav>             map, position, block sizes
   save_tool.py thumb  <gdataNN.sav> [out.png]   the 256x256 load-menu thumbnail (needs Pillow)
+  save_tool.py set    <gdataNN.sav> field=value...  fields: money, hp, hp_max, costume, map (writes in place,
+                                                 keeps a .bak copy)
 
 Body layout: docs/SAVE_FORMAT.md.
 
@@ -54,6 +56,10 @@ def encode(plain, path, key=0):
     return struct.pack("<II", 9999, key) + body + struct.pack("<III", len(plain), s, x)
 
 
+FIELDS = {"money": 0x3016c + 0xb8, "hp": 0x3016c + 4, "hp_max": 0x3016c + 8,
+          "costume": 0x302f4 + 0x2714, "map": 0x30000}
+
+
 def main():
     if len(sys.argv) < 3:
         sys.exit(__doc__)
@@ -73,8 +79,22 @@ def main():
         map_id, = struct.unpack_from("<i", plain, 0x30000)
         x, y, z = struct.unpack_from("<3f", plain, 0x30004)
         hp, hp_max = struct.unpack_from("<ii", plain, 0x3016c + 4)
-        money, = struct.unpack_from("<i", plain, 0x3016c + 0xb8)
-        print("checksum %s, body %d bytes, map %d, position (%.2f, %.2f, %.2f), HP %d/%d, money %d" % ("ok" if ok else "BAD", len(plain), map_id, x, y, z, hp, hp_max, money))
+        money, = struct.unpack_from("<i", plain, FIELDS["money"])
+        costume, = struct.unpack_from("<i", plain, FIELDS["costume"])
+        print("checksum %s, body %d bytes, map %d, position (%.2f, %.2f, %.2f), HP %d/%d, money %d, costume %d" % ("ok" if ok else "BAD", len(plain), map_id, x, y, z, hp, hp_max, money, costume))
+    elif mode == "set":
+        data = open(src, "rb").read()
+        plain, ok = decode(data, src)
+        if not ok:
+            sys.exit("checksum mismatch, not touching the file")
+        body = bytearray(plain)
+        for arg in sys.argv[3:]:
+            name, value = arg.split("=")
+            struct.pack_into("<i", body, FIELDS[name], int(value, 0))
+        key, = struct.unpack_from("<I", data, 4)
+        open(src + ".bak", "wb").write(data)
+        open(src, "wb").write(encode(bytes(body), src, key))
+        print("updated", src, "(backup:", src + ".bak)")
     elif mode == "thumb":
         from PIL import Image
         plain, ok = decode(open(src, "rb").read(), src)

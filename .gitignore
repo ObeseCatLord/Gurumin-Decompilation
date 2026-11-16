@@ -11,3 +11,5 @@ __pycache__/
 *.pyc
 Save Files/
 re/export_new/
+tools/native/*.exe
+tools/native/*.obj

@@ -8,7 +8,7 @@ your own copy.
 | Tool | Does |
 |---|---|
 | `itm_tool.py decode/encode` | `.itm` scripts/tables/BMPs (map.itm, 3ddata\*.itm) ↔ plain text. 2,511 files round-trip. |
-| `iti_tool.py decode/encode/info` | `.iti` textures ↔ PNG (types 0/1/888/889; writes raw type 0/1). |
+| `iti_tool.py decode/encode/info` | `.iti` textures ↔ PNG (all types; 666/667 via your packs.dll and tools/native/iti_unpack.c; writes raw type 0/1). |
 | `it3_tool.py info/obj` | `.it3` model node list; OBJ export with normals/UVs. All 945 JP models decode. |
 | `gpack.py` | Python port of packs.dll `ExecUnpack` (used by .it3 meshes). |
 | `mmv_tool.py info/frames/gif` | `.mmv` movies → PNG frames or GIF. |

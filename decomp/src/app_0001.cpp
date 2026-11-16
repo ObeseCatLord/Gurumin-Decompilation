@@ -93,23 +93,21 @@ typedef void (*CursorCallback)(int x, int y);
 
 int Obj::ReportCursor()
 {
-    if (changed != 0)
-    {
-        POINT cursor;
-        GetCursorPos(&cursor);
-        POINT origin;
-        origin.x = 0;
-        origin.y = 0;
-        ClientToScreen((HWND)m_001c, &origin);
-        RECT client;
-        GetClientRect((HWND)m_001c, &client);
-        if (client.right != 0 && client.bottom != 0)
-        {
-            cursor.x = (cursor.x - origin.x) * 640 / client.right;
-            cursor.y = (cursor.y - origin.y) * 480 / client.bottom;
-            if (m_0038 != 0)
-                ((CursorCallback)m_0038)(cursor.x, cursor.y);
-        }
-    }
+    POINT cursor;
+    POINT origin;
+    RECT client;
+    if (changed == 0)
+        return 0;
+    GetCursorPos(&cursor);
+    origin.x = 0;
+    origin.y = 0;
+    ClientToScreen((HWND)m_001c, &origin);
+    GetClientRect((HWND)m_001c, &client);
+    if (client.right == 0 || client.bottom == 0)
+        return 0;
+    cursor.x = (cursor.x - origin.x) * 640 / client.right;
+    cursor.y = (cursor.y - origin.y) * 480 / client.bottom;
+    if (m_0038 != 0)
+        ((CursorCallback)m_0038)(cursor.x, cursor.y);
     return 0;
 }

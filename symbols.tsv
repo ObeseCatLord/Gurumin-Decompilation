@@ -92,3 +92,5 @@ address	name	evidence
 10016580	Movie_PlayToTexture	opens an .mmv into the movie player at 0x10f08ab0 and renders it into the texture slot 0x10202478
 10017b10	Script_UnpackVar	decodes a packed script global (low nibble type 1; bits 5-12 and 13-20)
 1003b6e0	Costume_LoadPlayerModel	validates the costume id 0x10c655f0 against unlock bits 0x104c0230 and loads <base>[N|a|a1|a2].it3
+101603c0	SystemSav_ReadRecord	reads record N of system.sav (machine-bound: computer name + file times, XOR-scrambled, checksum at 0xff8); -1 on tamper
+1015fea0	SystemSav_WriteRecord	writes record N of system.sav

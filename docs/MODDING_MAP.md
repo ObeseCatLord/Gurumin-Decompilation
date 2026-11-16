@@ -94,7 +94,11 @@ Ghidra export: `re/run_ghidra_en.bat`.
   returns 2 (Jan 1-3), 8→0x40, 9→0x80, 10→0x20, 11→0x100, 12→0x200.
 - model file: costume 0 = base name (with 0x10c66cc0 set: `<base>a.it3`), 11 = `<base>a1.it3`, 12 = `<base>a2.it3`,
   others `<base><N>.it3` (base name from 0x10daac4d, e.g. char02b).
-- `system.sav` has 0x1ff at offset 0x200 in the save tested, which looks like these unlock bits (bits 0-8) - not
-  confirmed yet.
+- The unlock bits live in **record 0x80 of `system.sav`** (`SystemSav_ReadRecord` 0x101603c0 / `SystemSav_WriteRecord`
+  0x1015fea0, read in Game_Startup). `system.sav` (16 KB) is bound to the PC: it is XOR-scrambled with a key built
+  from the inverted computer name and the file's timestamps and carries a checksum at 0xff8. If the check fails the
+  game zeroes the unlock bits, deletes and rewrites the file and drops a random value into the anti-tamper table
+  0x104c0270. A save copied from another PC therefore loses its unlocks. Easiest unlock route for mods: set
+  0x104c0230 in memory (or patch the check) rather than editing system.sav.
 Adding a costume therefore needs: a model `<base><N>.it3` (+ its .iti textures), an id the checks above let through
 (or a patched check), and a way to select it (the closet scripts in map.txt).

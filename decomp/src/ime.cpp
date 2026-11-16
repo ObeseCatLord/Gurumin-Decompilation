@@ -157,3 +157,9 @@ extern "C" int FUN_1015d500(int value)
     DAT_10f66bbc = value;
     return 1;
 }
+extern "C" ImeContext DAT_10f68124;
+
+extern "C" int FUN_1015d510(void)
+{
+    return DAT_10f68124.IsOpen();
+}

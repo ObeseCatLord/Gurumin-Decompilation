@@ -37,3 +37,7 @@
 ?GetTranslation@Matrix4@@QAE?AUVec4@@XZ	101ade80
 ?SetTranslation@Matrix4@@QAEXMMMM@Z	101adef0
 ?ResetRotation@Matrix4@@QAEXXZ	101adf10
+?SetIdentity@Matrix4@@QAEXXZ	101ae7a0
+?SetRotationTransposed@Matrix4@@QAEXABU1@@Z	101ae7e0
+??0KeyBank@@QAE@XZ	101af420
+?TransformPoint@@YA?AUVec4@@ABU1@ABUMatrix4@@@Z	101ae250

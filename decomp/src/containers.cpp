@@ -9,6 +9,8 @@ struct Vec4
     float w;
     Vec4();
     void Fill(const float &value);
+    void Copy(const Vec4 &other);
+    void Transform(const struct Matrix4 &matrix);
 };
 
 struct VertexPack
@@ -47,9 +49,10 @@ struct KeyBank
 {
     int m_0000;
     char pad_0004[0x1fc];
-    Vec4 m_0200;
-    char pad_0210[0x870];
+    Vec4 m_0200[0x80];
+    char pad_0a00[0x80];
     int m_0a80;
+    KeyBank();
     void Clear();
 };
 
@@ -59,6 +62,8 @@ struct Matrix4
     Vec4 GetTranslation();
     void SetTranslation(float x, float y, float z, float w);
     void ResetRotation();
+    void SetIdentity();
+    void SetRotationTransposed(const Matrix4 &source);
 };
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
@@ -103,7 +108,7 @@ void KeyBank::Clear()
     m_0a80 = 0;
     m_0000 = 0;
     float zero = 0;
-    m_0200.Fill(zero);
+    m_0200[0].Fill(zero);
 }
 
 void KeyTrack::Free()
@@ -189,4 +194,36 @@ void Matrix4::ResetRotation()
     m[4] = 0;
     m[2] = 0;
     m[1] = 0;
+}
+
+void Matrix4::SetIdentity()
+{
+    m[12] = m[13] = m[14] = m[8] = m[9] = m[11] = m[4] = m[6] = m[7] = m[1] = m[2] = m[3] = 0.0f;
+    m[0] = m[5] = m[10] = m[15] = 1.0f;
+}
+
+void Matrix4::SetRotationTransposed(const Matrix4 &source)
+{
+    m[0] = source.m[0];
+    m[4] = source.m[1];
+    m[8] = source.m[2];
+    m[1] = source.m[4];
+    m[5] = source.m[5];
+    m[9] = source.m[6];
+    m[2] = source.m[8];
+    m[6] = source.m[9];
+    m[10] = source.m[10];
+}
+
+KeyBank::KeyBank()
+{
+    Clear();
+}
+
+Vec4 TransformPoint(const Vec4 &point, const Matrix4 &matrix)
+{
+    Vec4 result;
+    result.Copy(point);
+    result.Transform(matrix);
+    return result;
 }

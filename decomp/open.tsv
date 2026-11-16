@@ -21,3 +21,5 @@ address	status	reason
 101a2370	skip	caller keeps 'this' in edx across a call (callee known not to touch edx): inter-procedural register allocation, likely /GL+LTCG in the original
 101ad730	open	original zeroes eax once and stores it (xor eax,eax); VS2003 stores immediates and orders the local differently
 101ade80	open	return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
+101af420	skip	constructor keeps the array pointer in edx across Vec4::Vec4 calls (callee known not to touch edx) - inter-procedural register allocation
+101ae250	equiv	[esp] encoding only

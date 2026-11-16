@@ -74,3 +74,4 @@ address	name	evidence
 101b2450	File_ReadPacked	u32 size + ExecUnpack into caller buffer
 101b24e0	File_ReadPackedImage	u32 size + BMPUnpack (wavelet) into RGB buffer
 101b22f0	File_Close	closes the File object
+100106e0	Save_Write	writes gdataNN.sav: thumbnail + state blocks, key = rand(), ItmDescramble-compatible scrambling

@@ -35,7 +35,7 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 - Fonts: 0x101455d0 (`ddfont8.dat`, MS P Gothic).
 - Screenshots: 0x10137b10 writes `capture\capture%05d.jpg`.
 - **Anti-debug:** 0x1000eb90 calls `IsDebuggerPresent` (looked up at run time) and, when a debugger is attached,
-  overwrites a random entry of the 16-int table at 0x104c0270 with `rand()`. Patch it to return early before debugging.
+  overwrites a random entry of the 16-int table at 0x104c0270 with `rand()`. **Consequence:** the main loop in`n  Game_Startup posts WM_CLOSE whenever any entry is non-zero (checked on about 12 of every 570 frames), and`n  Screenshot_Capture sets the quit flag - the game closes itself a few seconds later. A failed system.sav check feeds`n  the same table. Patch 0x1000eb90 to return early (and zero the table) before debugging or editing system.sav.
 
 ## Globals worth knowing
 | Address | What |

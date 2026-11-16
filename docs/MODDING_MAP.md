@@ -16,7 +16,7 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 | Movies | `*.mmv` | none yet | Custom "MV" format, opened by 0x10160a90 (`.\bin\%s.MMV`). |
 | Music | `bgm\*.de2`, ogg | none yet | `#BGMTable` in map.txt gives file, extension and loop points; played by 0x1003aef0. |
 | Settings | `bin\gurumin.def` | text | `[CONFIG]`, `[KEYCONFIG]`; read once in `Game_Startup` 0x1013b700 via `Config_GetInt` 0x1015fe70. Key → global map: `docs/config_keys.tsv` (e.g. FULLSCREEN 0x10f65514, TEXD 0x1101d844 = skip the JPEG decoder, VSYNC 0x10f654a8). |
-| Saves | `SaveData\gdataNN.sav` (NN = page×7 + slot) | `tools/save_tool.py` (untested, no saves on hand) | magic 9999 + key, body = 0x30000-byte state scrambled with the .itm cipher keyed by the file name shifted by the key byte, + sum/xor. Reader 0x10011240, slot info 0x10010d10, writer 0x1005cdc0 → 0x1003b2c0. |
+| Saves | `SaveData\gdataNN.sav` (NN = page×7 + slot) | `tools/save_tool.py` (7 real saves decode and re-encode byte-identically) | magic 9999 + key, body = game state (312,204 bytes) scrambled with the .itm cipher keyed by the file name shifted by the key byte, then body length + sum/xor. `system.sav` is 16 KB unscrambled flags. Reader 0x10011240, slot info 0x10010d10, writer 0x1005cdc0 → 0x1003b2c0. |
 
 ## Script system
 - Scripts are C-like (`int main() { ... }`), compiled when the map is loaded (compiler 0x100ed9b0 / 0x10089a10).

@@ -9,3 +9,5 @@ decomp/strings.tsv
 decomp/triage.tsv
 __pycache__/
 *.pyc
+Save Files/
+re/export_new/

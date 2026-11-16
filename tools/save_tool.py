@@ -1,6 +1,6 @@
-﻿r"""save_tool.py - decode/encode Gurumin save files (SaveData\gdataNN.sav). UNTESTED: no save files were available.
+r"""save_tool.py - decode/encode Gurumin save files (SaveData\gdataNN.sav). Verified on 7 real saves (decode + byte-identical re-encode).
 
-  save_tool.py decode <gdataNN.sav> [out.bin]    -> 0x30000-byte game state
+  save_tool.py decode <gdataNN.sav> [out.bin]    -> game state (312,204 bytes in the saves tested)
   save_tool.py encode <state.bin> <gdataNN.sav> [--key N]
 
 Format (APP.dll 0x10011240 reader, written through 0x1005cdc0 -> 0x1003b2c0):
@@ -8,7 +8,7 @@ Format (APP.dll 0x10011240 reader, written through 0x1005cdc0 -> 0x1003b2c0):
   u32 key
   body        scrambled with the .itm algorithm (tools/itm_tool.py); the name that keys it is the file's base name
               (e.g. "gdata00") with characters 0, 2, 4 and 6 increased by the low byte of `key`, then upper-cased
-  u32 ?       (reader adds 0x30000 to it and ignores it)
+  u32 length  of the body (the JP 0x10011240 reader copies only the first 0x30000 bytes)
   u32 sum, u32 xor   checksums of the plain body, as in .itm files
 """
 import os, struct, sys
@@ -47,7 +47,7 @@ def decode(data, path):
 def encode(plain, path, key=0):
     s, x = itm_tool.checksums(plain)
     body = itm_tool.xor_not(plain, keystream_for(key_name(path, key), len(plain)))
-    return struct.pack("<II", 9999, key) + body + struct.pack("<III", 0, s, x)
+    return struct.pack("<II", 9999, key) + body + struct.pack("<III", len(plain), s, x)
 
 
 def main():
@@ -61,7 +61,7 @@ def main():
         print("%s -> %s (%d bytes, checksum %s)" % (src, dst, len(plain), "ok" if ok else "MISMATCH"))
     elif mode == "encode":
         dst = sys.argv[3]
-        key = int(sys.argv[sys.argv.index("--key") + 1]) if "--key" in sys.argv else 0
+        key = int(sys.argv[sys.argv.index("--key") + 1]) if "--key" in sys.argv else 0x273
         open(dst, "wb").write(encode(open(src, "rb").read(), dst, key))
         print("%s -> %s" % (src, dst))
     else:

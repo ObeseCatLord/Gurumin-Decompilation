@@ -8,129 +8,129 @@ in 0x10037850 and handled at 0x10005a70. Scripts are the `#Script:NNNNN` blocks 
 
 ## Game built-ins
 
-| id | signature |
-|---:|---|
-| 11000 (0x2af8) | `int Message(int,string,string,string,string)` |
-| 11100 (0x2b5c) | `int ShopStart()` |
-| 11101 (0x2b5d) | `int ShopItem(int)` |
-| 11102 (0x2b5e) | `int ShopEnd()` |
-| 11103 (0x2b5f) | `int SelStart(int)` |
-| 11104 (0x2b60) | `int SelText(string,int)` |
-| 11105 (0x2b61) | `int SelEnd()` |
-| 11106 (0x2b62) | `int ShopEnd2()` |
-| 12000 (0x2ee0) | `int Recover(int,int,float,float,float)` |
-| 12003 (0x2ee3) | `int Wait(int)` |
-| 12004 (0x2ee4) | `int WaitD(int)` |
-| 12222 (0x2fbe) | `int GetCf(int)` |
-| 12800 (0x3200) | `int SE(int)` |
-| 12900 (0x3264) | `int LoadMap(int)` |
-| 12901 (0x3265) | `int CharPos(int,int,int,int)` |
-| 12902 (0x3266) | `int MapEnable(int)` |
-| 12903 (0x3267) | `int Lock()` |
-| 12904 (0x3268) | `int Unlock()` |
-| 12905 (0x3269) | `int Walk(int,int,int)` |
-| 12906 (0x326a) | `int Black(int,int,int)` |
-| 12907 (0x326b) | `int Look(int,int)` |
-| 12908 (0x326c) | `int BGM(int)` |
-| 12909 (0x326d) | `int Event(int)` |
-| 12910 (0x326e) | `int Visible(int,int)` |
-| 12911 (0x326f) | `int MapEvent(int)` |
-| 12912 (0x3270) | `int WMessage(string,string)` |
-| 12913 (0x3271) | `int Scop(int)` |
-| 12914 (0x3272) | `int PlayMovie(string,int)` |
-| 12915 (0x3273) | `int CrossFade()` |
-| 12916 (0x3274) | `int Kaifuku()` |
-| 12917 (0x3275) | `int RCharEffect(int,int)` |
-| 12918 (0x3276) | `int Blur(int,int,int)` |
-| 12919 (0x3277) | `int MMV(string)` |
-| 12920 (0x3278) | `int Soubi(int)` |
-| 12921 (0x3279) | `int StatusUp(int)` |
-| 12922 (0x327a) | `int Camera(int,int,int,int)` |
-| 12923 (0x327b) | `int SetRoll(int,int)` |
-| 12924 (0x327c) | `int GetItem(int)` |
-| 12930 (0x3282) | `int Walk2(int,int,int,int)` |
-| 12931 (0x3283) | `int Mes(string)` |
-| 12932 (0x3284) | `int Menu(int)` |
-| 12933 (0x3285) | `int SetMapColor(int,float,float,float)` |
-| 12934 (0x3286) | `int PostScr(int)` |
-| 12935 (0x3287) | `int LockCommand(int)` |
-| 12938 (0x328a) | `int GetMP()` |
-| 12939 (0x328b) | `int SaveMap()` |
-| 12940 (0x328c) | `int RestoreMap()` |
-| 12941 (0x328d) | `int LVUP(int)` |
-| 12942 (0x328e) | `int SetSavePos()` |
-| 12945 (0x3291) | `int ResetFade()` |
-| 12946 (0x3292) | `int GetGP()` |
-| 12947 (0x3293) | `int SetGP(int)` |
-| 12950 (0x3296) | `int KaguTest(int,int)` |
-| 12951 (0x3297) | `int KaguTest2(int,int,string)` |
-| 12952 (0x3298) | `int White(int,int,int)` |
-| 12953 (0x3299) | `int YukaKesi(int,int)` |
-| 12954 (0x329a) | `int REffect(int,int,int,int)` |
-| 12955 (0x329b) | `int SendEvent(int)` |
-| 12956 (0x329c) | `int LiftEnable(int)` |
-| 12957 (0x329d) | `int Special(int)` |
-| 12958 (0x329e) | `int Lift2C(int)` |
-| 12959 (0x329f) | `int Door2C(int)` |
-| 12960 (0x32a0) | `int TekiStop(int)` |
-| 12961 (0x32a1) | `int GetCharPos(int,int&,int&,int&)` |
-| 12962 (0x32a2) | `int LiftEnable2(int,int)` |
-| 12963 (0x32a3) | `int Getbt15(int)` |
-| 12964 (0x32a4) | `int Scop2(int,int,string)` |
-| 12965 (0x32a5) | `int SaveCamera()` |
-| 12966 (0x32a6) | `int RestoreCamera()` |
-| 12967 (0x32a7) | `int Miss()` |
-| 12968 (0x32a8) | `int Reset()` |
-| 12969 (0x32a9) | `int SetSavePos2(int,int,int,int)` |
-| 12990 (0x32be) | `int GAMEOVER(int)` |
-| 13000 (0x32c8) | `int Wait2(int)` |
-| 13001 (0x32c9) | `int Takara2C(int)` |
-| 13002 (0x32ca) | `int WaitC(int)` |
-| 13100 (0x332c) | `int Demo(string)` |
-| 13101 (0x332d) | `int LoadMapB(int)` |
-| 13102 (0x332e) | `string StageName(int)` |
-| 13103 (0x332f) | `string StageMMV(int)` |
-| 13104 (0x3330) | `int ReloadChar()` |
-| 13110 (0x3336) | `int PlayMMV3(string,int)` |
-| 13111 (0x3337) | `int PlayAVI(string,int)` |
-| 13112 (0x3338) | `int Fill(int,float)` |
-| 13113 (0x3339) | `int Custom()` |
-| 13114 (0x333a) | `string Custom2(int)` |
-| 13115 (0x333b) | `int Custom3(int)` |
-| 13116 (0x333c) | `int Ksk(int)` |
-| 13117 (0x333d) | `int SetWaku(int)` |
-| 13118 (0x333e) | `int Kabe(string)` |
-| 13119 (0x333f) | `int Mouse(int)` |
-| 13120 (0x3340) | `int PlayMovie2(string,int)` |
-| 13121 (0x3341) | `string Type(int)` |
+| id | signature | name meaning (unverified) |
+|---:|---|---|
+| 11000 (0x2af8) | `int Message(int,string,string,string,string)` |  |
+| 11100 (0x2b5c) | `int ShopStart()` |  |
+| 11101 (0x2b5d) | `int ShopItem(int)` |  |
+| 11102 (0x2b5e) | `int ShopEnd()` |  |
+| 11103 (0x2b5f) | `int SelStart(int)` |  |
+| 11104 (0x2b60) | `int SelText(string,int)` |  |
+| 11105 (0x2b61) | `int SelEnd()` |  |
+| 11106 (0x2b62) | `int ShopEnd2()` |  |
+| 12000 (0x2ee0) | `int Recover(int,int,float,float,float)` | restore HP/DP |
+| 12003 (0x2ee3) | `int Wait(int)` |  |
+| 12004 (0x2ee4) | `int WaitD(int)` |  |
+| 12222 (0x2fbe) | `int GetCf(int)` |  |
+| 12800 (0x3200) | `int SE(int)` |  |
+| 12900 (0x3264) | `int LoadMap(int)` |  |
+| 12901 (0x3265) | `int CharPos(int,int,int,int)` |  |
+| 12902 (0x3266) | `int MapEnable(int)` |  |
+| 12903 (0x3267) | `int Lock()` | lock player control |
+| 12904 (0x3268) | `int Unlock()` | unlock player control |
+| 12905 (0x3269) | `int Walk(int,int,int)` |  |
+| 12906 (0x326a) | `int Black(int,int,int)` | fade to black |
+| 12907 (0x326b) | `int Look(int,int)` |  |
+| 12908 (0x326c) | `int BGM(int)` |  |
+| 12909 (0x326d) | `int Event(int)` |  |
+| 12910 (0x326e) | `int Visible(int,int)` |  |
+| 12911 (0x326f) | `int MapEvent(int)` |  |
+| 12912 (0x3270) | `int WMessage(string,string)` | two-line message |
+| 12913 (0x3271) | `int Scop(int)` | scop = shovel? (drill/scope weapon) |
+| 12914 (0x3272) | `int PlayMovie(string,int)` |  |
+| 12915 (0x3273) | `int CrossFade()` |  |
+| 12916 (0x3274) | `int Kaifuku()` | kaifuku = heal |
+| 12917 (0x3275) | `int RCharEffect(int,int)` | character effect |
+| 12918 (0x3276) | `int Blur(int,int,int)` |  |
+| 12919 (0x3277) | `int MMV(string)` | play .mmv movie |
+| 12920 (0x3278) | `int Soubi(int)` | soubi = equip |
+| 12921 (0x3279) | `int StatusUp(int)` | raise a status value |
+| 12922 (0x327a) | `int Camera(int,int,int,int)` |  |
+| 12923 (0x327b) | `int SetRoll(int,int)` |  |
+| 12924 (0x327c) | `int GetItem(int)` | give item |
+| 12930 (0x3282) | `int Walk2(int,int,int,int)` |  |
+| 12931 (0x3283) | `int Mes(string)` | short message |
+| 12932 (0x3284) | `int Menu(int)` |  |
+| 12933 (0x3285) | `int SetMapColor(int,float,float,float)` |  |
+| 12934 (0x3286) | `int PostScr(int)` | post-process screen effect |
+| 12935 (0x3287) | `int LockCommand(int)` |  |
+| 12938 (0x328a) | `int GetMP()` | MP |
+| 12939 (0x328b) | `int SaveMap()` | remember map state |
+| 12940 (0x328c) | `int RestoreMap()` | restore map state |
+| 12941 (0x328d) | `int LVUP(int)` | level up |
+| 12942 (0x328e) | `int SetSavePos()` |  |
+| 12945 (0x3291) | `int ResetFade()` |  |
+| 12946 (0x3292) | `int GetGP()` | GP = money? |
+| 12947 (0x3293) | `int SetGP(int)` | GP = money? |
+| 12950 (0x3296) | `int KaguTest(int,int)` | kagu = furniture |
+| 12951 (0x3297) | `int KaguTest2(int,int,string)` | kagu = furniture |
+| 12952 (0x3298) | `int White(int,int,int)` | fade to white |
+| 12953 (0x3299) | `int YukaKesi(int,int)` | yuka kesi = erase floor |
+| 12954 (0x329a) | `int REffect(int,int,int,int)` | effect |
+| 12955 (0x329b) | `int SendEvent(int)` |  |
+| 12956 (0x329c) | `int LiftEnable(int)` |  |
+| 12957 (0x329d) | `int Special(int)` | special event |
+| 12958 (0x329e) | `int Lift2C(int)` | lift (elevator) |
+| 12959 (0x329f) | `int Door2C(int)` | door |
+| 12960 (0x32a0) | `int TekiStop(int)` | teki = enemy |
+| 12961 (0x32a1) | `int GetCharPos(int,int&,int&,int&)` |  |
+| 12962 (0x32a2) | `int LiftEnable2(int,int)` |  |
+| 12963 (0x32a3) | `int Getbt15(int)` | bt = battle |
+| 12964 (0x32a4) | `int Scop2(int,int,string)` | see Scop |
+| 12965 (0x32a5) | `int SaveCamera()` |  |
+| 12966 (0x32a6) | `int RestoreCamera()` |  |
+| 12967 (0x32a7) | `int Miss()` | lose a life / fail |
+| 12968 (0x32a8) | `int Reset()` |  |
+| 12969 (0x32a9) | `int SetSavePos2(int,int,int,int)` |  |
+| 12990 (0x32be) | `int GAMEOVER(int)` | game over |
+| 13000 (0x32c8) | `int Wait2(int)` |  |
+| 13001 (0x32c9) | `int Takara2C(int)` | takara = treasure |
+| 13002 (0x32ca) | `int WaitC(int)` |  |
+| 13100 (0x332c) | `int Demo(string)` | run demo |
+| 13101 (0x332d) | `int LoadMapB(int)` |  |
+| 13102 (0x332e) | `string StageName(int)` | #StageName text |
+| 13103 (0x332f) | `string StageMMV(int)` | #StageName movie |
+| 13104 (0x3330) | `int ReloadChar()` |  |
+| 13110 (0x3336) | `int PlayMMV3(string,int)` | play .mmv movie |
+| 13111 (0x3337) | `int PlayAVI(string,int)` | play .avi movie |
+| 13112 (0x3338) | `int Fill(int,float)` |  |
+| 13113 (0x3339) | `int Custom()` | costume/customisation |
+| 13114 (0x333a) | `string Custom2(int)` | costume/customisation |
+| 13115 (0x333b) | `int Custom3(int)` | costume/customisation |
+| 13116 (0x333c) | `int Ksk(int)` | ksk: abbreviation, unknown |
+| 13117 (0x333d) | `int SetWaku(int)` | waku = frame/border |
+| 13118 (0x333e) | `int Kabe(string)` | kabe = wall |
+| 13119 (0x333f) | `int Mouse(int)` |  |
+| 13120 (0x3340) | `int PlayMovie2(string,int)` |  |
+| 13121 (0x3341) | `string Type(int)` |  |
 
 ## Library built-ins
 
-| id | signature |
-|---:|---|
-| 10100 (0x2774) | `float sin(float)` |
-| 10101 (0x2775) | `float cos(float)` |
-| 10102 (0x2776) | `float tan(float)` |
-| 10103 (0x2777) | `float atan(float)` |
-| 10104 (0x2778) | `float atan2(float,float)` |
-| 10105 (0x2779) | `float sqrt(float)` |
-| 10106 (0x277a) | `int rand()` |
-| 10107 (0x277b) | `int abs(int)` |
-| 10108 (0x277c) | `float fabs(float)` |
-| 10109 (0x277d) | `float itof(int)` |
-| 10110 (0x277e) | `int ftoi(float)` |
-| 10111 (0x277f) | `float asin(float)` |
-| 10112 (0x2780) | `float acos(float)` |
-| 10113 (0x2781) | `float sinh(float)` |
-| 10114 (0x2782) | `float cosh(float)` |
-| 10115 (0x2783) | `float tanh(float)` |
-| 10116 (0x2784) | `float pow(float,float)` |
-| 10117 (0x2785) | `float ceil(float)` |
-| 10118 (0x2786) | `float floor(float)` |
-| 10119 (0x2787) | `float exp(float)` |
-| 10120 (0x2788) | `float log(float)` |
-| 10121 (0x2789) | `float log10(float)` |
-| 10122 (0x278a) | `float _max(float,float)` |
-| 10123 (0x278b) | `float _min(float,float)` |
-| 10124 (0x278c) | `int strcmp(string,string)` |
+| id | signature | name meaning (unverified) |
+|---:|---|---|
+| 10100 (0x2774) | `float sin(float)` |  |
+| 10101 (0x2775) | `float cos(float)` |  |
+| 10102 (0x2776) | `float tan(float)` |  |
+| 10103 (0x2777) | `float atan(float)` |  |
+| 10104 (0x2778) | `float atan2(float,float)` |  |
+| 10105 (0x2779) | `float sqrt(float)` |  |
+| 10106 (0x277a) | `int rand()` |  |
+| 10107 (0x277b) | `int abs(int)` |  |
+| 10108 (0x277c) | `float fabs(float)` |  |
+| 10109 (0x277d) | `float itof(int)` |  |
+| 10110 (0x277e) | `int ftoi(float)` |  |
+| 10111 (0x277f) | `float asin(float)` |  |
+| 10112 (0x2780) | `float acos(float)` |  |
+| 10113 (0x2781) | `float sinh(float)` |  |
+| 10114 (0x2782) | `float cosh(float)` |  |
+| 10115 (0x2783) | `float tanh(float)` |  |
+| 10116 (0x2784) | `float pow(float,float)` |  |
+| 10117 (0x2785) | `float ceil(float)` |  |
+| 10118 (0x2786) | `float floor(float)` |  |
+| 10119 (0x2787) | `float exp(float)` |  |
+| 10120 (0x2788) | `float log(float)` |  |
+| 10121 (0x2789) | `float log10(float)` |  |
+| 10122 (0x278a) | `float _max(float,float)` |  |
+| 10123 (0x278b) | `float _min(float,float)` |  |
+| 10124 (0x278c) | `int strcmp(string,string)` |  |
 

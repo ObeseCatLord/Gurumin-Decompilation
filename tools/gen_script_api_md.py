@@ -1,6 +1,20 @@
-﻿"""gen_script_api_md.py : docs/script_api.tsv -> docs/SCRIPT_API.md"""
+"""gen_script_api_md.py : docs/script_api.tsv -> docs/SCRIPT_API.md"""
 import csv, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GLOSS = {
+    "Kaifuku": "kaifuku = heal", "Soubi": "soubi = equip", "KaguTest": "kagu = furniture", "KaguTest2": "kagu = furniture",
+    "YukaKesi": "yuka kesi = erase floor", "TekiStop": "teki = enemy", "Takara2C": "takara = treasure", "Kabe": "kabe = wall",
+    "Scop": "scop = shovel? (drill/scope weapon)", "Scop2": "see Scop", "Getbt15": "bt = battle", "Ksk": "ksk: abbreviation, unknown",
+    "SetWaku": "waku = frame/border", "Black": "fade to black", "White": "fade to white", "Lock": "lock player control",
+    "Unlock": "unlock player control", "Mes": "short message", "WMessage": "two-line message", "LVUP": "level up",
+    "GetGP": "GP = money?", "SetGP": "GP = money?", "GetMP": "MP", "Lift2C": "lift (elevator)", "Door2C": "door",
+    "RCharEffect": "character effect", "REffect": "effect", "PostScr": "post-process screen effect", "Recover": "restore HP/DP",
+    "Miss": "lose a life / fail", "GAMEOVER": "game over", "SaveMap": "remember map state", "RestoreMap": "restore map state",
+    "PlayMMV3": "play .mmv movie", "PlayAVI": "play .avi movie", "MMV": "play .mmv movie", "StatusUp": "raise a status value",
+    "GetItem": "give item", "Special": "special event", "Custom": "costume/customisation", "Custom2": "costume/customisation",
+    "Custom3": "costume/customisation", "Demo": "run demo", "StageName": "#StageName text", "StageMMV": "#StageName movie",
+}
+
 rows = list(csv.DictReader(open(os.path.join(ROOT, "docs", "script_api.tsv"), encoding="utf-8"), delimiter="\t"))
 with open(os.path.join(ROOT, "docs", "SCRIPT_API.md"), "w", encoding="utf-8") as f:
     f.write("# Script built-ins (APP.dll)\n\n")
@@ -10,8 +24,9 @@ with open(os.path.join(ROOT, "docs", "SCRIPT_API.md"), "w", encoding="utf-8") as
             "in 0x10037850 and handled at 0x10005a70. Scripts are the `#Script:NNNNN` blocks of `bin\\map.itm` and the\n"
             "`3ddata\\*.itm` files (decrypt with `tools/itm_tool.py`).\n\n")
     for title, handler in (("Game built-ins", "FUN_10138280"), ("Library built-ins", "LAB_10005a70")):
-        f.write("## %s\n\n| id | signature |\n|---:|---|\n" % title)
+        f.write("## %s\n\n| id | signature | name meaning (unverified) |\n|---:|---|---|\n" % title)
         for r in sorted((r for r in rows if r["handler"] == handler), key=lambda r: int(r["id"])):
-            f.write("| %s (0x%x) | `%s` |\n" % (r["id"], int(r["id"]), r["signature"]))
+            name = r["signature"].split("(")[0].split()[-1]
+            f.write("| %s (0x%x) | `%s` | %s |\n" % (r["id"], int(r["id"]), r["signature"], GLOSS.get(name, "")))
         f.write("\n")
 print("ok")

@@ -20,7 +20,8 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 
 ## Script system
 - Scripts are C-like (`int main() { ... }`), compiled when the map is loaded (compiler 0x100ed9b0 / 0x10089a10).
-- 118 built-ins: SCRIPT_API.md. Game built-ins go through one switch (0x10138280), so a new built-in can be added by
+- 118 built-ins: SCRIPT_API.md (with name glosses). `tools/builtin_cases.py` dumps each built-in's handler code from the
+  decompiler output to re/export/builtins.txt (local only) to check what a call does. Game built-ins go through one switch (0x10138280), so a new built-in can be added by
   hooking `Script_RegisterGameBuiltins` (0x1013ad90) to register another signature with a new id and hooking the switch.
 
 ## Code map (names in `symbols.tsv`, applied to Ghidra by `re/apply_symbols.bat`)

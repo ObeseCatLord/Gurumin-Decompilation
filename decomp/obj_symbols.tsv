@@ -75,3 +75,4 @@
 ??1Matrix4@@QAE@XZ	1013eda0
 ?Query@CollisionWorld@@QAEHPAUMatrix4@@PAUVec4@@H1PAHHH@Z	101a1640
 ?Collision_ProbePoint@@YAHMMMH@Z	1000ff80
+?FreeAll@ResourceBanks@@QAEHXZ	10007d50

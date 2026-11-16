@@ -19,6 +19,9 @@ struct KeyPair
     void M_101ad0e0();
 };
 
+struct TextureRef;
+extern "C" int FUN_10169c00(TextureRef *texture);
+
 struct Keys
 {
     void M_101ad690();
@@ -72,7 +75,9 @@ struct Node
     char pad_0120[0xa8];
     int m_01c8;
     Matrix matrix;
-    char pad_020c[0x88];
+    char pad_020c[0x80];
+    struct TextureRef *m_028c;
+    void *m_0290;
     int m_0294;
     char pad_0298[0x10];
     struct Extra *m_02a8;
@@ -120,6 +125,8 @@ struct Node
     int M_10191b60(const char *name, int *value);
     int M_1019ece0(const char *name, int value);
     int M_1019ed10(const char *name, int value);
+    int M_10191920(Node **list, int *count);
+    void M_10191210();
 };
 
 
@@ -386,4 +393,32 @@ int Node::M_101ab980()
     for (int i = 0; i < childCount; i++)
         children[i]->M_1019e120();
     return 0;
+}
+int Node::M_10191920(Node **list, int *count)
+{
+    if ((flags & 0x4000) != 0)
+    {
+        list[*count] = this;
+        if (*count < 7)
+            (*count)++;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10191920(list, count);
+    return 1;
+}
+
+void Node::M_10191210()
+{
+    if (FUN_10169c00(m_028c) == 0)
+    {
+        DAT_11b1ba40(m_028c);
+        m_028c = 0;
+        if (m_0290 != 0)
+            DAT_11b1ba40(m_0290);
+        m_0290 = 0;
+        m_0294 = 0;
+    }
+    m_0290 = 0;
+    m_0294 = 0;
+    m_028c = 0;
 }

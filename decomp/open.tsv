@@ -8,3 +8,4 @@ address	status	reason
 10047400	open	VS2003 hoists the common 'push eax' above the branch; original duplicates it in both arms
 10148930	open	identical instructions; original encodes 'lea edx,[esp]' with a zero disp8 (8d 54 24 00), VS2003 uses the short form (8d 14 24) - encoder difference of cl 13.00
 1015cac0	open	same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
+1015fe20	open	/GS: original (cl 13.00) xors the cookie with the return address and tail-jumps to __security_check_cookie; 13.10 (SP1: xor esp; Toolkit: no xor) cannot reproduce. Every function with a local array is affected.

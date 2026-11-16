@@ -16,7 +16,7 @@ struct ImeContext
     HWND window;
     HIMC context;
     int pad_0008;
-    void *buffer;
+    CANDIDATELIST *buffer;
 
     ImeContext();
     int Release();
@@ -26,6 +26,12 @@ struct ImeContext
     int GetConversion(DWORD *conversion, DWORD *sentence);
     int SetConversion(const DWORD *conversion, const DWORD *sentence);
     LONG GetCompositionValue();
+    LONG M_1015d400();
+    DWORD GetSelection();
+    const char *GetCandidate(int index);
+    DWORD GetPageStart();
+    DWORD GetCount();
+    DWORD GetPageSize();
 };
 
 int StateArrays::M_1015caa0(int value, int index)
@@ -100,4 +106,54 @@ LONG ImeContext::GetCompositionValue()
     if (ImmGetCompositionStringA(context, 0x20, value, sizeof(value)) == 0)
         return 0;
     return value[1];
+}
+
+LONG ImeContext::M_1015d400()
+{
+    ImmGetCompositionStringA(context, 0x100, 0, 0);
+    return ImmGetCompositionStringA(context, 0x80, 0, 0);
+}
+
+DWORD ImeContext::GetSelection()
+{
+    if (buffer == 0)
+        return 0;
+    return buffer->dwSelection;
+}
+
+const char *ImeContext::GetCandidate(int index)
+{
+    CANDIDATELIST *list = buffer;
+    if (list == 0)
+        return 0;
+    return (const char *)list + list->dwOffset[index];
+}
+
+DWORD ImeContext::GetPageStart()
+{
+    if (buffer == 0)
+        return 0;
+    return buffer->dwPageStart;
+}
+
+DWORD ImeContext::GetCount()
+{
+    if (buffer == 0)
+        return 0;
+    return buffer->dwCount;
+}
+
+DWORD ImeContext::GetPageSize()
+{
+    if (buffer == 0)
+        return 0;
+    return buffer->dwPageSize;
+}
+
+extern "C" int DAT_10f66bbc;
+
+extern "C" int FUN_1015d500(int value)
+{
+    DAT_10f66bbc = value;
+    return 1;
 }

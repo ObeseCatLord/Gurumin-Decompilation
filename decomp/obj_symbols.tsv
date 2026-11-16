@@ -9,3 +9,9 @@
 ?GetConversion@ImeContext@@QAEHPAK0@Z	1015d140
 ?SetConversion@ImeContext@@QAEHPBK0@Z	1015d160
 ?GetCompositionValue@ImeContext@@QAEJXZ	1015d3d0
+?M_1015d400@ImeContext@@QAEJXZ	1015d400
+?GetSelection@ImeContext@@QAEKXZ	1015d490
+?GetCandidate@ImeContext@@QAEPBDH@Z	1015d4a0
+?GetPageStart@ImeContext@@QAEKXZ	1015d4c0
+?GetCount@ImeContext@@QAEKXZ	1015d4d0
+?GetPageSize@ImeContext@@QAEKXZ	1015d4e0

@@ -51,3 +51,6 @@
 ?Shutdown@Input@@QAEHXZ	101437f0
 ?Release@FontSet@@QAEHXZ	10145970
 ?Release@SurfaceSet@@QAEXXZ	101488b0
+?GetResultString@ImeContext@@QAEHPAD@Z	1015d2e0
+?GetCompositionString@ImeContext@@QAEHPAD@Z	1015d360
+?LoadCandidates@ImeContext@@QAEKXZ	1015d430

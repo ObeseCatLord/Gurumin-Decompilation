@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <imm.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct StateArrays
 {
@@ -32,6 +33,9 @@ struct ImeContext
     DWORD GetPageStart();
     DWORD GetCount();
     DWORD GetPageSize();
+    int GetResultString(char *out);
+    int GetCompositionString(char *out);
+    DWORD LoadCandidates();
 };
 
 int StateArrays::M_1015caa0(int value, int index)
@@ -162,4 +166,47 @@ extern "C" ImeContext DAT_10f68124;
 extern "C" int FUN_1015d510(void)
 {
     return DAT_10f68124.IsOpen();
+}
+
+int ImeContext::GetResultString(char *out)
+{
+    *out = 0;
+    LONG length = ImmGetCompositionStringA(context, GCS_RESULTSTR, 0, 0);
+    if (length == 0)
+        return 0;
+    char *text = (char *)operator new(length + 1);
+    ImmGetCompositionStringA(context, GCS_RESULTSTR, text, length);
+    text[length] = 0;
+    strcpy(out, text);
+    free(text);
+    return 1;
+}
+
+int ImeContext::GetCompositionString(char *out)
+{
+    *out = 0;
+    LONG length = ImmGetCompositionStringA(context, GCS_COMPSTR, 0, 0);
+    if (length == 0)
+        return 0;
+    char *text = (char *)operator new(length + 1);
+    ImmGetCompositionStringA(context, GCS_COMPSTR, text, length);
+    text[length] = 0;
+    strcpy(out, text);
+    free(text);
+    return 1;
+}
+
+DWORD ImeContext::LoadCandidates()
+{
+    if (buffer != 0)
+    {
+        free(buffer);
+        buffer = 0;
+    }
+    DWORD size = ImmGetCandidateListA(context, 0, 0, 0);
+    if (size == 0)
+        return 0;
+    buffer = (CANDIDATELIST *)operator new(size);
+    ImmGetCandidateListA(context, 0, buffer, size);
+    return buffer->dwCount;
 }

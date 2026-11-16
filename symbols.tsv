@@ -88,3 +88,6 @@ address	name	evidence
 1014b2a0	Render_OnLostDevice	releases default-pool resources before Reset
 1013fbb0	Render_OnResetDevice	restores render state after Reset
 10148b00	Render_CreateDevice	Direct3DCreate9, fills present parameters 0x10f0ff84 from 0x10202b24/28, sizes the window, CreateDevice with HW/SW vertex processing fallbacks
+1001d850	SeasonalEvent	GetLocalTime: 1 on Christmas (Dec 25, or Dec 24 after 18:00), 2 on Jan 1-3, else 0
+10016580	Movie_PlayToTexture	opens an .mmv into the movie player at 0x10f08ab0 and renders it into the texture slot 0x10202478
+10017b10	Script_UnpackVar	decodes a packed script global (low nibble type 1; bits 5-12 and 13-20)

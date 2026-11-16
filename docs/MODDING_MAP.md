@@ -84,3 +84,4 @@ function with strings: 121 of 420 mapped, 78 with ≥3 shared strings). Low-conf
 (`docs/jp_en_map_full.tsv`: 129 pairs, 33 of them call-graph inferred - check those before relying on them; the EN
 build inlines more, e.g. Texture_ReleaseAll → 0x740fe0 also does VRAM accounting).
 Ghidra export: `re/run_ghidra_en.bat`.
+- **Seasonal easter egg:** 0x1001d850 reads the PC clock and returns 1 on Christmas (Dec 25, or Dec 24 after 18:00) and 2 on January 1-3; hook it to force the seasonal content.

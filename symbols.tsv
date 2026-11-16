@@ -36,3 +36,14 @@ address	name	evidence
 10166950	Character_Load	"chara %d"
 101602d0	File_Checksum	sum/xor (seed 0xcc82) over a file in dwords
 1000beb0	TestDat_Load	parses test.dat (debug)
+1013ed20	Render_BeginScene	EndScene if a scene is open, then IDirect3DDevice9::BeginScene on the device at 0x10f1fcf0
+1013ed60	Render_EndScene	IDirect3DDevice9::EndScene if a scene is open
+1013eeb0	FrameTimer_Reset	timeGetTime() -> 0x10f654d8
+1013eee0	FrameTimer_ResetNext	timeGetTime()+16 -> 0x10f654d8 (60 fps frame budget)
+1013f950	SetDataDir	copies the data directory to 0x10f627d0, strips a trailing backslash
+1013f8f0	SetStringSlot	strcpy into 256-byte slot table 0x10202b40
+1000eb90	AntiDebug_Check	IsDebuggerPresent via GetProcAddress; corrupts table 0x104c0270 if a debugger is attached
+1000cb90	Caption_Set	copies text to 0x1020e0f8, starts caption fade
+1000cbe0	Caption_Fade	fades caption alpha 0..15
+10017aa0	Enemy_FindByKind	searches enemy kind table 0x10219ec0 for slots 0x5c..0x7f
+10017ad0	Enemy_FindById	character slots 0x5c..0x7f whose kind is F/M/N and id matches

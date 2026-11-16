@@ -35,3 +35,16 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 - Screenshots: 0x10137b10 writes `capture\capture%05d.jpg`.
 - **Anti-debug:** 0x1000eb90 calls `IsDebuggerPresent` (looked up at run time) and, when a debugger is attached,
   overwrites a random entry of the 16-int table at 0x104c0270 with `rand()`. Patch it to return early before debugging.
+
+## Globals worth knowing
+| Address | What |
+|---|---|
+| 0x104b7200 | the main `Game` object (thiscall `this` for most 0x1000xxxx methods; flag array at +0x3ee694, named entries at +0x95e14) |
+| 0x10f1fcf0 | `IDirect3DDevice9*` used for all rendering (BeginScene/EndScene wrappers 0x1013ed20/0x1013ed60) |
+| 0x10f6547c | "scene open" flag |
+| 0x10f654d8 | frame timer deadline (`timeGetTime()+16`) |
+| 0x10f627d0 | data directory (set by 0x1013f950) |
+| 0x10db6ed8 | 128 characters × 0x249c bytes (id at +0, model object at +0x10, position Vec3 at +0x2368); slots 0x5c..0x7f are enemies |
+| 0x10daab84 | per-character records × 0x188 |
+| 0x1020b430 | per-character state × 0x40 |
+| 0x10860df0 | 64 effect slots × 0xfc |

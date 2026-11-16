@@ -6,7 +6,8 @@ r"""it3_tool.py - inspect Gurumin .it3 models and export their geometry.
 Format (APP.dll It3_ParseChunks 0x101a58a0): a flat list of chunks `tag[4] u32 size data[size]`.
 Each INFO chunk starts a node: name[64], float matrix[16] (row-major 4x4), u32 flags, f32, u32.
 CHID = parent name[64], u32 child count, child names[count][64] (leaf nodes have no CHID; the hierarchy comes from\nthe child lists). Matrices are row-vector style: world = local * parent world, translation in elements 12..14.\nFollowing chunks belong to that node (RTY2 render type, LIG3 lighting, KAN3/KAN2/KANI key animation,
-MAN2/MANI, MAT2/3/4/MATE materials, VPA2/VPAC meshes, CHID children, BONE/BON2, CAME, CDLO, IKNG, PLU2/PLUG, INFS).
+MAN2/MANI, MAT2/3/4/MATE materials (MAT4: u32 count, ExecUnpack data of count*0x180-byte records, texture name at +0x40,
+second texture at +0x100; pack k of the node's mesh uses material k), VPA2/VPAC meshes, CHID children, BONE/BON2, CAME, CDLO, IKNG, PLU2/PLUG, INFS).
 VPA2: u32 packCount; per pack: u32 vertexCount, 0x70-byte pack header, then (if vertexCount)
 u32 packedSize + ExecUnpack data of vertexCount*0x70 bytes, then u32 ?, u32 indexCount,
 (if indexCount) u32 packedSize + ExecUnpack data of indexCount u32 indices (triangle list).
@@ -63,6 +64,11 @@ def nodes(d):
             cur["chunks"].append((tag, len(body)))
             if tag == "VPA2":
                 cur["packs"] = read_vpa2(body)
+            elif tag == "MAT4":
+                count, size = struct.unpack_from("<II", body, 0)
+                raw = gpack.unpack(body[8:8 + size]) if count else b""
+                cur["materials"] = [raw[i * 0x180 + 0x40:i * 0x180 + 0x80].split(b"\0")[0].decode("cp932", "replace")
+                                    for i in range(count)]
             elif tag == "CHID" and len(body) >= 68:
                 count, = struct.unpack_from("<I", body, 64)
                 cur["children"] = [body[68 + 64 * i:132 + 64 * i].split(b"\0")[0].decode("cp932", "replace")
@@ -111,13 +117,21 @@ def main():
         node_list = nodes(d)
         worlds = world_matrices(node_list)
         local = "--local" in sys.argv
+        mtl = os.path.splitext(dst)[0] + ".mtl"
+        textures = set()
         with open(dst, "w") as f:
+            f.write("mtllib %s\n" % os.path.basename(mtl))
             for n in node_list:
                 m = worlds[n["name"]]
+                mats = n.get("materials", [])
                 for k, (vc, verts, idx) in enumerate(n["packs"]):
                     if not vc:
                         continue
                     f.write("o %s_%d\n" % (n["name"].replace(" ", "_"), k))
+                    tex = mats[k] if k < len(mats) else (mats[0] if mats else "")
+                    if tex:
+                        textures.add(tex)
+                        f.write("usemtl %s\n" % tex)
                     for i in range(vc):
                         v = struct.unpack_from("<14f", verts, i * 0x70)
                         p, nn = v[0:3], v[4:7]
@@ -129,7 +143,10 @@ def main():
                         a, b, c = base + idx[i], base + idx[i + 1], base + idx[i + 2]
                         f.write("f %d/%d/%d %d/%d/%d %d/%d/%d\n" % (a, a, a, b, b, b, c, c, c))
                     base += vc
-        print("wrote", dst)
+        with open(mtl, "w") as f:
+            for tex in sorted(textures):
+                f.write("newmtl %s\nKd 1 1 1\nmap_Kd %s.png\n\n" % (tex, tex))
+        print("wrote", dst, "and", mtl, "- convert the textures with iti_tool.py decode <name>.iti")
     else:
         sys.exit(__doc__)
 

@@ -54,3 +54,12 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 `Packs_Load` (0x101b2670) loads `./bin/packs.dll` (else `packs.dll`) and resolves `ExecPack`, `ExecUnpack`, `BMPUnpack`,
 `BMPPack`, `BMPSave`, `BMPLoad` (JPEG .iti decoding), `SaveJpeg` (screenshots) and `MMV3` (movies) into 0x11b1bb68..0x11b1bb84.
 A replacement packs.dll with the same exports is a clean place to add PNG textures or modern video.
+
+## Frame loop and device loss (modern-hardware fixes)
+- `Frame_PumpAndRecover` 0x1015c850 runs once per frame: Windows message pump (WM_QUIT sets 0x10f6552c), then spins while
+  the window is inactive (0x10f65530 / 0x10f656a0 both 0) or `TestCooperativeLevel` returns D3DERR_DEVICELOST.
+  On D3DERR_DEVICENOTRESET it calls 0x1014b2a0, `Texture_OnLostDevice` 0x101734d0, `IDirect3DDevice9::Reset` with the
+  present parameters at **0x10f0ff84**, 0x1013fbb0, `Texture_OnResetDevice` 0x10173510, then `Render_BeginScene`.
+- `Render_Present` 0x1015c960 ends the frame (EndScene + Present). Frame pacing: `timeGetTime()+16` deadlines at 0x10f654d8.
+- Present parameters at 0x10f0ff84 are the place to change resolution, windowed mode, refresh rate or vsync before
+  `Reset`/`CreateDevice`.

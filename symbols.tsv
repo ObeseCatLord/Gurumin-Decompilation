@@ -84,3 +84,6 @@ address	name	evidence
 10169970	MeshCache_AddRef	increments a mesh refcount
 101b20e0	Mem_Alloc	allocator behind the function pointer 0x11b0b938 (size, tag)
 10188fb0	Texture_ReloadMissing	reloads (0x10174c70) every named texture whose D3D object is gone
+1015c850	Frame_PumpAndRecover	PeekMessage loop (WM_QUIT -> quit flag 0x10f6552c), waits while inactive, TestCooperativeLevel; on DEVICENOTRESET: lost-device release, IDirect3DDevice9::Reset(&0x10f0ff84), restore; then BeginScene
+1014b2a0	Render_OnLostDevice	releases default-pool resources before Reset
+1013fbb0	Render_OnResetDevice	restores render state after Reset

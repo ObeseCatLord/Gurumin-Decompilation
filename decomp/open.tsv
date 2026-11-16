@@ -35,3 +35,5 @@ address	status	reason
 101619a0	open	loop unrolling factor: cl 13.00 unrolls this pointer loop by 8, VS2003 by 4
 1016a090	open	register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)
 100014b0	open	ReportCursor: original pushes edi before the first test and shares one epilogue; VS2003 shrink-wraps the push and duplicates the return tail
+100020d0	open	loop over 0x100 ints unrolled by 8 (cl 13.00); VS2003 unrolls by 4
+1000e870	open	AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue

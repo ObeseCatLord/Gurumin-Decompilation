@@ -42,6 +42,16 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
   Game_Startup posts WM_CLOSE whenever any entry is non-zero (checked on about 12 of every 570 frames), and
   Screenshot_Capture sets the quit flag - the game closes itself a few seconds later. A failed system.sav check feeds
   the same table. Patch 0x1000eb90 to return early (and zero the table) before debugging or editing system.sav.
+- **Anti-cheat (memory editing):** `AntiTamper_Store` 0x1000e750 keeps a shadow copy `guard[i] = ~value + i*0x41`
+  in the int table 0x104684b0 for: [0] player +0x1c (0x10daab04), [1] player +0x20 (0x10daab08), [2] HP
+  (0x10daaaec), [3] max HP (0x10daaaf0), [4] money (0x10daaba0), [5] 0x10c6670c, [6] 0x10c64ad4, [7] 0x10c64ad8,
+  [8] 0x10c635f8, [9] costume id 0x10c655f0. `AntiTamper_StoreArrays` 0x1000e810 adds guard[10+i] =
+  `~(signed char)b[i] + 0x14 + i*0x41` for the 80 bytes at 0x103150c0 and guard[100+i] = `~w[i] + 6500 + 2i` for the
+  15 ints at 0x10c66144. `AntiTamper_Check` 0x1000e870 (called each frame from 0x1011d810) compares them (the arrays
+  only when frame counter 0x104bf890 % 30 is 0 or 14) and feeds the 0x104c0270 table on a mismatch, so the game
+  closes. The game calls the store functions itself after every legitimate change (save load, shops, scripts).
+  **A trainer or mod that writes one of these values must call 0x1000e750 / 0x1000e810 afterwards** (both take no
+  arguments and return 0), or write the matching guard entry. Source: `decomp/src/anti_tamper.cpp`.
 
 ## Globals worth knowing
 | Address | What |

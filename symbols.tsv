@@ -122,3 +122,9 @@ address	name	evidence
 10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (tools/de2_header.py)
 101453e0	Font_DrawGlyph	draws one Shift-JIS glyph from ddfont8.dat into a 512-wide ARGB4444 surface
 10191e50	Node_TagElements	marks nodes whose name starts with fire (1) / thun (2) in byte +0x1898, recursively
+1000e750	AntiTamper_Store	stores ~value+i*0x41 shadows of HP/max HP/money etc. in 0x104684b0 (matched)
+1000e810	AntiTamper_StoreArrays	shadows of 0x103150c0 bytes and 0x10c66144 ints (matched)
+1000e870	AntiTamper_Check	compares shadows, feeds 0x104c0270 table on mismatch
+10001110	Mouse_GetState	copies buttons/position (matched)
+10001450	Mouse_UpdateMoved	sets moved flag when position changes (matched)
+100014b0	Mouse_ReportCursor	cursor in 640x480 client coords to callback

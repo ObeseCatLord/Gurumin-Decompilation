@@ -108,3 +108,14 @@ Adding a costume therefore needs: a model `<base><N>.it3` (+ its .iti textures),
 - Render state goes through three cached setters: `Render_SetRenderState` 0x1013ef30, `Render_SetTextureStageState`
   0x1013ef90 and `Render_SetSamplerState` 0x1013f000 (each skips the call when the cached value matches). Hooking the sampler
   setter is the simplest way to force anisotropic filtering or clamp/mip settings.
+
+## Sound architecture
+- APP.dll does not play audio itself. `SoundArc_Init` 0x10001ee0 starts **soundarc.dll**, which despite the name is an
+  executable image (base 0x400000) that runs as its own tray-icon process (Shell_NotifyIconA, hidden window).
+- APP.dll talks to it with `SendMessage(wnd, WM_USER, code, value)` (0x10001570..0x10001f30) and text commands; the
+  strings in soundarc show the command set: `Play(%d,%s,%d,%d,%d,%d)`, `PlayB`, `PlayFade`, `PlayFadeEx`, `PlayFadeB`,
+  `PlayFadeBEx`, `PlaySE(%s,...)`, `PlaySEB`.
+- soundarc loads **sound3d.dll** (LoadLibrary) for the actual playback and `.de2` decoding (not analysed yet).
+- Sound problems on modern Windows (no music, music out of sync) are therefore most likely in soundarc/sound3d; the
+  game itself only checks the `.de2` header (see Music row above).
+Ghidra export of soundarc: `re/run_ghidra_soundarc.bat`.

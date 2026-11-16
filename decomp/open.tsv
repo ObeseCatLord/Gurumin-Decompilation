@@ -4,3 +4,5 @@ address	status	reason
 1000ed20	open	original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 1000f490	open	original keeps a redundant 'test eax,eax' after 'dec eax' (13.00 peephole); VS2003 uses dec flags
 10015910	open	settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
+10034c80	open	two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
+10047400	open	VS2003 hoists the common 'push eax' above the branch; original duplicates it in both arms

@@ -26,9 +26,20 @@ class Image:
                 return self.data[o:o + min(size, start + rsize - va)]
         return b""
 
+TRIAGE = os.path.join(ROOT, "decomp", "triage.tsv")
+
 def inventory():
     inv = {}
     for line in open(FUNCS, encoding="utf-8", errors="replace").read().splitlines()[1:]:
         c = line.split("\t")
-        inv[int(c[0], 16)] = (c[1], int(c[2]))
+        try:
+            inv[int(c[0], 16)] = (c[1], int(c[2]))
+        except (ValueError, IndexError):
+            pass
+    if os.path.exists(TRIAGE):
+        for line in open(TRIAGE).read().splitlines()[1:]:
+            c = line.split("\t")
+            a = int(c[0], 16)
+            if a not in inv:
+                inv[a] = ("FUN_%08x" % a, int(c[1]))
     return inv

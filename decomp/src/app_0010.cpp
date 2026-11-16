@@ -1,28 +1,6 @@
 #include <stdlib.h>
+#include "world.h"
 #include "game.h"
-
-struct CharModel
-{
-    void M_1017b0e0(int motion, int a, int b, float speed);
-    int M_1017aeb0(const char *path);
-};
-
-struct Character
-{
-    int id;
-    char pad_0004[0xc];
-    CharModel model;
-    char pad_0011[0x2357];
-    char m_2368[0x134];
-};
-
-struct CharSlot
-{
-    int m_0000;
-    char pad_0004[0x41];
-    char m_0045;
-    char pad_0046[0x142];
-};
 
 struct NamedPath
 {
@@ -34,15 +12,12 @@ extern "C" int DAT_104c01b0;
 extern "C" short DAT_10447338[0x44c];
 extern "C" int FUN_10001b40(void);
 extern "C" char DAT_1020e0f8[];
-extern "C" int DAT_10210d30[];
-extern "C" CharSlot DAT_10daabe4[];
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" NamedPath DAT_10b314c8[];
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 extern "C" int DAT_104c0198;
 extern "C" int DAT_104c00d0;
 extern "C" int DAT_1049f0f0;
-extern "C" char *DAT_1032d5b8[];
+extern "C" Vec3 *DAT_1032d5b8[];
 extern "C" char DAT_1021bbc0[];
 extern "C" int DAT_10c66590;
 extern "C" int DAT_10c66594;
@@ -74,7 +49,7 @@ extern "C" int FUN_10011f80(int index)
 {
     if (DAT_10210d30[index] != 0)
         return 1;
-    DAT_10daabe4[index].m_0045 = 1;
+    DAT_10daab84[index].m_00a5 = 1;
     return 0;
 }
 
@@ -89,12 +64,12 @@ extern "C" int FUN_10012100(int value)
 
 extern "C" int FUN_100121e0(int index)
 {
-    return DAT_10db6ed8[index].model.M_1017aeb0(FUN_1013f8a0(DAT_10b314c8[DAT_10daabe4[index].m_0000].path, 0));
+    return DAT_10db6ed8[index].model.M_1017aeb0(FUN_1013f8a0(DAT_10b314c8[DAT_10daab84[index].m_0060].path, 0));
 }
 
 extern "C" int FUN_100143c0(int index)
 {
-    DAT_1032d5b8[DAT_1049f0f0] = DAT_10db6ed8[index].m_2368;
+    DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ed8[index].m_2368;
     DAT_1021bbc0[DAT_1049f0f0] = 0;
     DAT_1049f0f0++;
     return 1;

@@ -94,3 +94,8 @@ address	name	evidence
 1003b6e0	Costume_LoadPlayerModel	validates the costume id 0x10c655f0 against unlock bits 0x104c0230 and loads <base>[N|a|a1|a2].it3
 101603c0	SystemSav_ReadRecord	reads record N of system.sav (machine-bound: computer name + file times, XOR-scrambled, checksum at 0xff8); -1 on tamper
 1015fea0	SystemSav_WriteRecord	writes record N of system.sav
+10026af0	Enemy_PickAction_40_25_35	random action for enemy slot: state 0/1/2 with 40/25/35 % (CharState +0 at 0x1020b430)
+10026b70	Enemy_PickAction_60_20_20	60/20/20 %
+10026bf0	Enemy_PickAction_65_35	65/35 %
+10026c80	Enemy_PickAction_60_10_30	60/10/30 %
+10026d00	Enemy_PickAction_20_60_20	20/60/20 %

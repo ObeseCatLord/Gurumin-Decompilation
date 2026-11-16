@@ -9,7 +9,10 @@ struct NodeSaved
 {
     char pad_0000[0x24];
     Matrix matrix;
-    char pad_0064[0x78];
+    char pad_0064[0x34];
+    int m_0098[8];
+    int m_00b8;
+    char pad_00bc[0x20];
     void M_10166870();
 };
 
@@ -127,6 +130,8 @@ struct Node
     int M_1019ed10(const char *name, int value);
     int M_10191920(Node **list, int *count);
     void M_10191210();
+    int M_10191990(const int *values, int count);
+    Node *M_10191cc0(unsigned int mask, int nth, int *counter);
 };
 
 
@@ -421,4 +426,38 @@ void Node::M_10191210()
     m_0290 = 0;
     m_0294 = 0;
     m_028c = 0;
+}
+int Node::M_10191990(const int *values, int count)
+{
+    if ((flags & 0x1000) != 0)
+    {
+        for (int i = 0; i < count; i++)
+            saved->m_0098[i] = values[i];
+        saved->m_00b8 = count;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10191990(values, count);
+    return 1;
+}
+
+Node *Node::M_10191cc0(unsigned int mask, int nth, int *counter)
+{
+    int local = 0;
+    if (counter == 0)
+        counter = &local;
+    if ((flags & mask) == mask)
+    {
+        if (++*counter > nth)
+            return this;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        if (children[i] != 0)
+        {
+            Node *found = children[i]->M_10191cc0(mask, nth, counter);
+            if (found != 0)
+                return found;
+        }
+    }
+    return 0;
 }

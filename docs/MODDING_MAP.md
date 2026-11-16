@@ -33,3 +33,5 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 - Input: DirectInput 8; mouse helper object (0x10001090 cursor, 0x10001110 state, 0x10001450 moved-flag).
 - Fonts: 0x101455d0 (`ddfont8.dat`, MS P Gothic).
 - Screenshots: 0x10137b10 writes `capture\capture%05d.jpg`.
+- **Anti-debug:** 0x1000eb90 calls `IsDebuggerPresent` (looked up at run time) and, when a debugger is attached,
+  overwrites a random entry of the 16-int table at 0x104c0270 with `rand()`. Patch it to return early before debugging.

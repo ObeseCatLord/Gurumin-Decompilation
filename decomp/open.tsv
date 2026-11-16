@@ -1,0 +1,6 @@
+address	status	reason
+1000da40	open	float: (float)int spilled via fstp [esp+8]/reload; VS2003 keeps it on the FPU stack (likely 13.00 vs 13.10)
+10001ee0	open	if/else of two sprintf calls: original jumps to a shared tail, VS2003 duplicates the tail
+1000ed20	open	original decrements the global in eax; VS2003 copies to ecx first (scheduling)
+1000f490	open	original keeps a redundant 'test eax,eax' after 'dec eax' (13.00 peephole); VS2003 uses dec flags
+10015910	open	settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants

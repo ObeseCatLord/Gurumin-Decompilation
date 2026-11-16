@@ -252,3 +252,51 @@ int KeyBank::CopyTo(KeyTrack *target)
     }
     return 0;
 }
+struct MotionList
+{
+    int m_0000;
+    int m_0004;
+    int count;
+    int items[0x7f];
+    int m_0208;
+    int entryCount;
+    char names[0x40][0x20];
+    int ids[0x40];
+    int values[0x40];
+    int extras[0x40];
+    int Insert(int position, int value, int tag);
+    int AddEntry(int id, int value, const char *name, int extra);
+};
+
+int MotionList::Insert(int position, int value, int tag)
+{
+    m_0208 = tag;
+    if (count < position)
+        return 0;
+    if (count > 0x7f)
+        return 0;
+    if (position == -1)
+    {
+        items[count] = value;
+        count++;
+        return 1;
+    }
+    for (int i = count; i >= position; i--)
+        items[i + 1] = items[i];
+    items[position] = value;
+    count++;
+    return 1;
+}
+
+int MotionList::AddEntry(int id, int value, const char *name, int extra)
+{
+    if (entryCount > 0x3f)
+        return 0;
+    ids[entryCount] = id;
+    values[entryCount] = value;
+    strncpy(names[entryCount], name, 0x1f);
+    names[entryCount][0x1f] = 0;
+    extras[entryCount] = extra;
+    entryCount++;
+    return 1;
+}

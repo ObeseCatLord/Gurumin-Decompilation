@@ -32,3 +32,5 @@ address	status	reason
 100e24d0	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 1013e6f0	open	from an unoptimised (/Od) translation unit (ebp frame, int3 padding); VS2003 /Od assigns the stack slots in a different order (all 12 declaration orders tried) - decomp/src_od/
 10160960	open	frame blit clamp: register allocation of the two min() results differs
+101619a0	open	loop unrolling factor: cl 13.00 unrolls this pointer loop by 8, VS2003 by 4
+1016a090	open	register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)

@@ -53,6 +53,7 @@ struct AnimModel
     void M_10161f30();
     int M_10161f60(int a, int b);
     int M_101628b0(int a, int b, int c, char d);
+    int M_10161a90(int frame, int a, int b, int c, char flag);
 };
 
 extern "C" int DAT_10faaa88[0x100];
@@ -151,5 +152,14 @@ int AnimModel::M_101628b0(int a, int b, int c, char d)
         m_2290 = b;
         m_2294 = c;
     }
+    return 0;
+}
+int AnimModel::M_10161a90(int frame, int a, int b, int c, char flag)
+{
+    trackC.keys.flags[trackC.keys.Add(frame, a, b, c, 0)] = flag;
+    if (trackC.last < frame + 1)
+        trackC.last = frame + 1;
+    if (trackC.first > frame)
+        trackC.first = frame;
     return 0;
 }

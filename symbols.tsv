@@ -1,0 +1,38 @@
+address	name	evidence
+10001570	SoundArc_GetWindow	returns HWND used for SendMessage to soundarc (0x10001b40)
+10001b40	SoundArc_Message221	SendMessageA(wnd,0x400,0x221,0)
+10001b70	SoundArc_Message227	SendMessageA(wnd,0x400,0x227,param)
+10001ee0	SoundArc_Init	formats ".\soundarc.dll" / "%s\soundarc.dll"
+10002440	MapData_Load	opens bin\map.itm, descrambles, parses #...Table sections
+101615d0	ItmDescramble	key "GURUguruMinmIN_", sum/xor check (docs/ITM_FORMAT.md)
+10161120	Path_GetBaseName	copies the file name without directory and extension
+1013f910	MakeDataPath	sprintf("%s\\%s", base dir, name) into 4 rotating buffers
+10036ca0	Script_RegisterBuiltin	(signature, id, handler) called 118 times
+10037850	Script_InitLibrary	registers sin/cos/sqrt/rand/strcmp... (handler 0x10005a70)
+10005a70	Script_LibraryBuiltin	handler for the library built-ins
+1013ad90	Script_RegisterGameBuiltins	registers Message/Shop*/Wait/LoadMap/... (93)
+10138280	Script_GameBuiltin	handler switch for the game built-ins
+100ed9b0	Script_CompileStatement	errors for goto/for/while/switch/return in scripts
+10089a10	Script_CompileCall	argument count/type/reference checks
+100cb0c0	Game_LoadData	loads effects.efx, logo.mmv, bin\map.txt (map.itm), render textures
+1003aef0	Bgm_Play	builds "bgm\%s.de2"; index 0..0x40
+10064630	Menu_SaveLoad	save/load/quit confirmation texts, gdata%02d.sav
+10112140	Menu_Main	main menu, shop, sound config, name entry, gdata%02d.sav
+10137b10	Screenshot_Capture	"%s\capture\capture%05d.jpg"
+100144c0	Ability_GetDescription	returns ability effect strings (attack x1.2, ...)
+1013dfb0	GuruMain	DLL export called by game.exe
+101b2a28	sprintf	CRT
+101b3304	fopen	CRT (_fsopen wrapper)
+101b2310	File_Open	File object: stores base name, fopen(path, mode); 15 loader callers
+10173550	Texture_LoadBmp	"%s\images\%s.bmp", "%s\%s.itm" (scrambled BMP), error "texture missing"
+10174ce0	Texture_LoadIti	"%s\%s.iti", ./data/%s.itp
+10160a90	Mmv_Open	".\bin\%s.MMV", MMV_ALL / MMV_DIB
+101abe30	Model_LoadIt3	error "no 3D data", load-time log
+101abd60	Model_LoadIt3Alt	error "no 3D data"
+101a58a0	It3_ParseChunks	compares chunk tags INFO/RTY2/LIG3/KAN3/INFS/MAT4/VPA2/CHID/MAN2/BONE/CAME/CDLO
+101a4a60	It3_ScanChunks	pre-pass over INFO/MAN2 chunks
+101455d0	Font_Init	ddfont8.dat, MS P Gothic, m_lpFont
+1013b700	Game_SaveLoad	demo.sav, %s.sav, %s.dat, CONFIG
+10166950	Character_Load	"chara %d"
+101602d0	File_Checksum	sum/xor (seed 0xcc82) over a file in dwords
+1000beb0	TestDat_Load	parses test.dat (debug)

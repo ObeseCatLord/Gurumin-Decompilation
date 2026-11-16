@@ -1,0 +1,11 @@
+# game binaries and anything derived from them stay local
+re/bin/
+re/project/
+re/export/
+re/*.log
+re/*_stdout.txt
+decomp/build/
+decomp/strings.tsv
+decomp/triage.tsv
+__pycache__/
+*.pyc

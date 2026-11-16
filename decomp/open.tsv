@@ -11,3 +11,4 @@ address	status	reason
 1015fe20	open	/GS: original (cl 13.00) xors the cookie with the return address and tail-jumps to __security_check_cookie; 13.10 (SP1: xor esp; Toolkit: no xor) cannot reproduce. Every function with a local array is affected.
 10166870	open	same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
 10169720	open	memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
+10169e10	open	register choice: original pushes the last argument from edx, VS2003 from ecx

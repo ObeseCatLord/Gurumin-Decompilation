@@ -10,7 +10,8 @@ MAN2/MANI, MAT2/3/4/MATE materials, VPA2/VPAC meshes, CHID children, BONE/BON2, 
 VPA2: u32 packCount; per pack: u32 vertexCount, 0x70-byte pack header, then (if vertexCount)
 u32 packedSize + ExecUnpack data of vertexCount*0x70 bytes, then u32 ?, u32 indexCount,
 (if indexCount) u32 packedSize + ExecUnpack data of indexCount u32 indices (triangle list).
-Vertex = 28 floats (0x70 bytes); floats 0..2 are the position, float 3 is 1.0. The other fields are not identified yet.
+Vertex = 28 floats (0x70 bytes), per the vertex initialiser 0x101acf10: 0-3 position xyzw (w=1), 4-6 normal (7 = 1),
+8-11 colour RGBA (0..1), 12-13 texture UV, 14-23 skinning data (bone indices suspected in 14-15/20-21), 24-27 blend weights.
 """
 import os, struct, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -84,10 +85,11 @@ def main():
                         continue
                     f.write("o %s_%d\n" % (n["name"].replace(" ", "_"), k))
                     for i in range(vc):
-                        x, y, z = struct.unpack_from("<3f", verts, i * 0x70)
-                        f.write("v %g %g %g\n" % (x, y, z))
+                        v = struct.unpack_from("<14f", verts, i * 0x70)
+                        f.write("v %g %g %g\nvn %g %g %g\nvt %g %g\n" % (v[0], v[1], v[2], v[4], v[5], v[6], v[12], 1 - v[13]))
                     for i in range(0, len(idx) - 2, 3):
-                        f.write("f %d %d %d\n" % (base + idx[i], base + idx[i + 1], base + idx[i + 2]))
+                        a, b, c = base + idx[i], base + idx[i + 1], base + idx[i + 2]
+                        f.write("f %d/%d/%d %d/%d/%d %d/%d/%d\n" % (a, a, a, b, b, b, c, c, c))
                     base += vc
         print("wrote", dst)
     else:

@@ -108,3 +108,6 @@ address	name	evidence
 1013ef90	Render_SetTextureStageState	cached SetTextureStageState (cache 0x10f08d40[stage][type])
 1013f000	Render_SetSamplerState	cached SetSamplerState (cache 0x10f141e0[sampler][type]); hook here to force anisotropic filtering
 1015d510	Ime_IsOpen	ImeContext::IsOpen on the global IME object 0x10f68124
+101437f0	Input_Shutdown	unacquires/releases the DirectInput8 keyboard, mouse and joystick devices and the IDirectInput8 object
+10145970	Font_Release	frees font glyph buffers and DeleteObject on the three GDI fonts
+10145380	Font_GlyphWidth	SJIS code -> glyph width from the font table (row = (code-0x8141)*72)

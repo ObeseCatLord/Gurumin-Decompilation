@@ -1,0 +1,138 @@
+#include <string.h>
+
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
+struct Fader
+{
+    void M_101acc20(const Vec4 &value);
+};
+
+struct Node
+{
+    char data[0x18a0];
+    void M_1019e9a0();
+};
+
+extern "C" int DAT_1101de1c;
+extern "C" void FUN_10194360(const Vec4 *, const Vec4 *, int, int, int);
+extern "C" Fader DAT_10f65688;
+extern "C" Fader DAT_10f668e8;
+extern "C" void FUN_1016ac90(int, int, int *);
+extern "C" int DAT_10fabe88;
+extern "C" int DAT_1101d8a0;
+extern "C" int DAT_11018738;
+extern "C" int DAT_1101d89c;
+extern "C" int DAT_1101d8a8;
+extern "C" int DAT_1101de24;
+extern "C" int DAT_10ff1df0;
+extern "C" float DAT_10203448;
+extern "C" float DAT_1020344c;
+extern "C" int DAT_1101d894;
+extern "C" int DAT_1101ddec;
+extern "C" char DAT_1101d9c0[4][0x100];
+extern "C" int DAT_1101ddc0[4];
+extern "C" char DAT_1101d8b8[0x100];
+extern "C" int DAT_1101d9b8;
+extern "C" int DAT_1101ddf4;
+extern "C" int DAT_1101ddf0;
+extern "C" int DAT_1101d890;
+extern "C" int DAT_10ff1df8[0x47e];
+extern "C" Node DAT_111be9c8[0x47e];
+
+extern "C" int FUN_1016a8c0(void)
+{
+    DAT_1101de1c = 1;
+    return 0;
+}
+
+extern "C" int FUN_1016a8d0(void)
+{
+    DAT_1101de1c = 2;
+    return 0;
+}
+
+extern "C" int FUN_1016a8e0(void)
+{
+    DAT_1101de1c = 0;
+    return 0;
+}
+
+extern "C" int FUN_1016ac50(const Vec4 *eye, const Vec4 *target, int a, int b)
+{
+    FUN_10194360(eye, target, a, b, 0);
+    DAT_10f65688.M_101acc20(*eye);
+    DAT_10f668e8.M_101acc20(*target);
+    return 0;
+}
+
+extern "C" int FUN_1016af50(int value)
+{
+    int result;
+    DAT_10fabe88 = 0;
+    result = 0;
+    DAT_1101d8a0 = 0;
+    DAT_11018738 = -1;
+    FUN_1016ac90(value, value, &result);
+    DAT_1101d89c = result;
+    DAT_1101d8a8 = 10;
+    return 0;
+}
+
+extern "C" int FUN_1016b010(int mode)
+{
+    DAT_1101de24 = mode;
+    if (mode == 0)
+    {
+        DAT_10ff1df0 = 0;
+        DAT_10203448 = 1.0f;
+        DAT_1020344c = 1.0f;
+        DAT_1101d894 = 0;
+        DAT_1101ddec = 0;
+    }
+    return 0;
+}
+
+extern "C" int FUN_1016b1e0(int index, const char *text)
+{
+    int slot = index > 0 ? index : 0;
+    if (slot > 3)
+        slot = 3;
+    strcpy(DAT_1101d9c0[slot], text);
+    DAT_1101ddc0[slot] = 0;
+    return 0;
+}
+
+extern "C" int FUN_1016b230(const char *text)
+{
+    strcpy(DAT_1101d8b8, text);
+    DAT_1101d9b8 = 0;
+    return 0;
+}
+
+extern "C" int FUN_1016c300(void)
+{
+    if (DAT_1101ddf4 != 0 || (DAT_1101de24 != 0 ? DAT_1101de24 != 5 : DAT_10ff1df0 != 0) || DAT_1101ddf0 != 1)
+        return 1;
+    return DAT_1101d890 != 0;
+}
+
+extern "C" int FUN_1016fab0(void)
+{
+    for (int i = 0; i < 0x47e; i++)
+    {
+        if (DAT_10ff1df8[i] != 0)
+            DAT_111be9c8[i].M_1019e9a0();
+    }
+    return 0;
+}
+
+extern "C" void FUN_1016faf0(void)
+{
+    memset(DAT_10ff1df8, 0, sizeof(DAT_10ff1df8));
+}

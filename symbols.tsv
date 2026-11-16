@@ -99,3 +99,8 @@ address	name	evidence
 10026bf0	Enemy_PickAction_65_35	65/35 %
 10026c80	Enemy_PickAction_60_10_30	60/10/30 %
 10026d00	Enemy_PickAction_20_60_20	20/60/20 %
+100e2080	Enemy_UpdateAI_A	per-type AI: state 0/1/2 actions, re-pick with Enemy_PickAction_40_25_35 when idle
+100e2110	Enemy_UpdateAI_B	re-pick with Enemy_PickAction_60_20_20
+100e2440	Enemy_UpdateAI_C	re-pick with 0x10026c50
+100e24d0	Enemy_UpdateAI_D	re-pick with Enemy_PickAction_60_10_30
+100e1c40	Enemy_IsBusy	non-zero = skip AI this frame (stunned, dying, ...)

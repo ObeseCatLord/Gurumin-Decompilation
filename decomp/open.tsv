@@ -26,3 +26,7 @@ address	status	reason
 10001090	open	SetCursorPos scaling: same arithmetic, original sums in edx/ecx in a different order
 100114a0	open	register choice for the first load (ecx vs eax) and 1.0f kept in eax across the branch
 100158b0	open	VS2003 hoists the shared 'push 0x20' above the branch (same as 0x10047400)
+100e2080	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
+100e2110	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
+100e2440	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
+100e24d0	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates

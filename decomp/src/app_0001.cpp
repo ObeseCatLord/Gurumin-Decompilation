@@ -11,16 +11,25 @@ extern "C" int __stdcall FUN_10001000(int, int, int)
 
 struct Obj
 {
-    int pad0;
+    char m_0000;
+    char m_0001;
+    char m_0002;
+    char m_0003;
     int m_0004;
     int m_0008;
-    int pad_000c[4];
+    int pad_000c[2];
+    int m_0014;
+    int changed;
     int m_001c;
-    int pad_0020[6];
+    int lastX;
+    int lastY;
+    int pad_0028[4];
     int m_0038;
     int m_003c;
     int m_0040;
     int M_10001010(int p, int q, int r);
+    int GetState(Point *pos, char *a, char *b, char *c, int *d, char *e);
+    int UpdateChanged();
 };
 
 int Obj::M_10001010(int p, int q, int r)
@@ -45,4 +54,35 @@ extern "C" int __stdcall FUN_10001050(const Point *pt, int x, int y, int width, 
     if (pt->x > x + width || pt->y > y + height)
         return 0;
     return 1;
+}
+
+int Obj::GetState(Point *pos, char *a, char *b, char *c, int *d, char *e)
+{
+    if (a != 0)
+        *a = m_0000;
+    if (b != 0)
+        *b = m_0001;
+    if (c != 0)
+        *c = m_0002;
+    if (d != 0)
+        *d = m_0014;
+    if (e != 0)
+        *e = m_0003;
+    if (pos != 0)
+    {
+        pos->x = m_0004;
+        pos->y = m_0008;
+    }
+    return 1;
+}
+
+int Obj::UpdateChanged()
+{
+    Point pos;
+    GetState(&pos, 0, 0, 0, 0, 0);
+    if (pos.x != lastX || pos.y != lastY)
+        changed = 1;
+    lastX = pos.x;
+    lastY = pos.y;
+    return changed;
 }

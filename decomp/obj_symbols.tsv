@@ -68,3 +68,5 @@
 ?CopyTo@KeyBank@@QAEHPAUKeyTrack@@@Z	101af450
 ?Insert@MotionList@@QAEHHHH@Z	101ad550
 ?AddEntry@MotionList@@QAEHHHPBDH@Z	101ad6a0
+?GetState@Obj@@QAEHPAUPoint@@PAD11PAH1@Z	10001110
+?UpdateChanged@Obj@@QAEHXZ	10001450

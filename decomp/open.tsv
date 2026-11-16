@@ -23,3 +23,4 @@ address	status	reason
 101ade80	open	return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 101af420	skip	constructor keeps the array pointer in edx across Vec4::Vec4 calls (callee known not to touch edx) - inter-procedural register allocation
 101ae250	equiv	[esp] encoding only
+10001090	open	SetCursorPos scaling: same arithmetic, original sums in edx/ecx in a different order

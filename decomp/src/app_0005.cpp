@@ -1,3 +1,5 @@
+#include <windows.h>
+
 extern "C" char DAT_1020e0f8[];
 extern "C" int DAT_104bf8d4;
 extern "C" int DAT_104bf8d8;
@@ -13,12 +15,27 @@ struct Tracker
     char pad_000c[8];
     int m_0014;
     int m_0018;
-    char pad_001c[4];
+    HWND window;
     int m_0020;
     int m_0024;
     int M_10001110(int *pos, char *a, char *b, char *c, int *d, char *e);
+    int M_10001090(int x, int y);
+    int M_10001440();
     int M_10001450();
+    int M_100014a0();
 };
+
+int Tracker::M_10001090(int x, int y)
+{
+    POINT origin;
+    origin.x = 0;
+    origin.y = 0;
+    ClientToScreen(window, &origin);
+    RECT client;
+    GetClientRect(window, &client);
+    SetCursorPos(client.right * x / 640 + origin.x, client.bottom * y / 480 + origin.y);
+    return 0;
+}
 
 int Tracker::M_10001110(int *pos, char *a, char *b, char *c, int *d, char *e)
 {
@@ -40,6 +57,11 @@ int Tracker::M_10001110(int *pos, char *a, char *b, char *c, int *d, char *e)
     return 1;
 }
 
+int Tracker::M_10001440()
+{
+    return m_0018;
+}
+
 int Tracker::M_10001450()
 {
     int pos[2];
@@ -49,6 +71,12 @@ int Tracker::M_10001450()
     m_0020 = pos[0];
     m_0024 = pos[1];
     return m_0018;
+}
+
+int Tracker::M_100014a0()
+{
+    m_0018 = 0;
+    return 0;
 }
 
 extern "C" int FUN_1000cb90(const char *text)

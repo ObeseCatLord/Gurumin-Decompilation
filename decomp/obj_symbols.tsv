@@ -71,3 +71,7 @@
 ?GetState@Obj@@QAEHPAUPoint@@PAD11PAH1@Z	10001110
 ?UpdateChanged@Obj@@QAEHXZ	10001450
 ?ReportCursor@Obj@@QAEHXZ	100014b0
+??0Matrix4@@QAE@XZ	101ae770
+??1Matrix4@@QAE@XZ	1013eda0
+?Query@CollisionWorld@@QAEHPAUMatrix4@@PAUVec4@@H1PAHHH@Z	101a1640
+?Collision_ProbePoint@@YAHMMMH@Z	1000ff80

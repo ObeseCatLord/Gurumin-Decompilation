@@ -80,5 +80,7 @@ The Steam release (`game.exe`, VS2013, 2015) contains the same game code as APP.
 0x400000, not relocated). `tools/xref_en.py` maps JP functions to EN functions by the strings they reference:
 `docs/symbols_en.tsv` (named functions; e.g. MapData_Load 0x607110, Script_RegisterGameBuiltins 0x644db0,
 Game_Startup 0x609f70, Texture_LoadIti 0x736f60, It3_ParseChunks 0x755ef0) and `docs/jp_en_map.tsv` (every JP
-function with strings: 121 of 420 mapped, 78 with ≥3 shared strings). Low-confidence rows share one string only.
+function with strings: 121 of 420 mapped, 78 with ≥3 shared strings). Low-confidence rows share one string only. `tools/xref_propagate.py` grows the map through the call graph
+(`docs/jp_en_map_full.tsv`: 129 pairs, 33 of them call-graph inferred - check those before relying on them; the EN
+build inlines more, e.g. Texture_ReleaseAll → 0x740fe0 also does VRAM accounting).
 Ghidra export: `re/run_ghidra_en.bat`.

@@ -1,0 +1,130 @@
+en_address	jp_address	name	how
+00607110	10002440	MapData_Load	strings
+005f2970	10007fd0		strings
+005d84b0	100094e0		strings
+00680210	10011f80		callee of 101148b0
+00640520	10012510		strings
+006df7c0	100135b0		strings
+00646bb0	100154c0		strings
+006e0910	10016ec0		caller of 101a82d0
+00631480	10018100		strings
+005a80e0	100182a0		strings
+006aa070	1001a990		strings
+0063bc80	1001d2d0		strings
+005dc610	10021e70		strings
+006b23d0	10023900		caller of 101011b0
+005ad010	1002d4e0		strings
+006dea00	10034920		strings
+005ec5d0	100364a0		strings
+00643b20	100366c0		strings
+00644300	10036ca0	Script_RegisterBuiltin	callee of 10037850
+005f4b40	10037090		strings
+005ec290	10037470		caller of 100caf90
+00646750	10037560		caller of 10037090
+005f2660	10037850	Script_InitLibrary	strings
+00603180	1003b6e0		strings
+006cd640	100404e0		strings
+005ee980	10049ec0		strings
+006435d0	1004cf20		strings
+0063d5d0	1004ed60		strings
+005c2c40	1004f250		strings
+0063e180	1004f4f0		strings
+0063dc20	1004f8b7		strings
+0063c610	10054d50		strings
+0063c4f0	10054f30		strings
+00639500	10055ca0		strings
+005a9fe0	10057ee0		caller of 10012510
+00628750	10058790		strings
+00637160	1005def0		strings
+005a1460	1005ecb0		strings
+005a8320	1005f750		strings
+006dc5d0	1005fc00		strings
+006cf480	100615f0		strings
+006355e0	10064630	Menu_SaveLoad	strings
+005b8590	10065450		strings
+00668330	10070200		strings
+005bb080	10078060		strings
+006e24d0	10079470		strings
+00639730	1007a370		strings
+0063a170	1007ad20		caller of 1002d4e0
+005f52a0	1007dab0		strings
+0064dbb0	1007f1e0		strings
+005b8d90	10089210		strings
+005e4390	10089a10	Script_CompileCall	strings
+005c8130	10092af0		caller of 1003b6e0
+005c3430	10093cc0		strings
+0069ba20	10099b30		strings
+0069d8a0	1009d490		strings
+006998e0	1009e2d0		caller of 10099b30
+005f7cd0	1009e380		strings
+006a98c0	100a8ac0		caller of 1001a990
+006a7c50	100aa820		strings
+006d2280	100b6740		caller of 100615f0
+005b1a60	100ba2a0		caller of 10065450
+006a3d30	100bcb30		caller of 1001d2d0
+00635480	100bd960		caller of 1007dab0
+006bd090	100bdad0		strings
+006b4c30	100c39c0		strings
+005eb360	100caf90		caller of 10089a10
+005f2cd0	100cb0c0	Game_LoadData	strings
+006d6ef0	100cc2a0		strings
+006b33f0	100d2110		caller of 100aa820
+006883a0	100d24a0		strings
+006d1b40	100dfcf0		caller of 100b6740
+006752a0	100e25f0		strings
+0066e780	100e7280		strings
+00645bb0	100ed510		caller of 100364a0
+005e3d30	100ed9b0	Script_CompileStatement	strings
+006c3850	100edea0		strings
+005b49d0	100f5a80		strings
+006a0950	100f9670		strings
+006b16e0	100fb7b0		strings
+005fd1b0	100fedd0		strings
+005ff130	101011b0		strings
+00680280	10104640		strings
+0067a380	1010c650		strings
+0062e480	10112140	Menu_Main	caller of 10021e70
+00699840	101148b0		caller of 100d24a0
+0062cb70	10114950		strings
+006e1700	10115cd0		caller of 10112140
+005b9bf0	10116550		strings
+00631890	1011a060		strings
+0060cb10	1011d810		strings
+0060c750	10137b10	Screenshot_Capture	caller of 100cb0c0
+005e87d0	10138280	Script_GameBuiltin	strings
+00644db0	1013ad90	Script_RegisterGameBuiltins	strings
+00609f70	1013b700	Game_Startup	strings
+005ee890	1013dfb0	GuruMain	caller of 1013b700
+0079cd80	1013fbb0	Render_OnResetDevice	strings
+007a1b50	101455d0	Font_Init	strings
+007a3f20	1014f520		callee of 10169e40
+007a45b0	10150bb0		strings
+007a2510	1015c450		strings
+007a3ad0	1015c730		strings
+007a8f90	10160a90	Mmv_Open	strings
+0071c410	10169c60		strings
+007a3e50	10169e40		callee of 10173480
+00740fe0	10173480	Texture_ReleaseAll	callee of 10175e70
+00737ac0	10173550	Texture_LoadBmp	strings
+00736f60	10174ce0	Texture_LoadIti	strings
+00740c30	10175e70		caller of 1015c730
+00738f80	1017aeb0		caller of 101abd60
+007343a0	1017c160		strings
+0070c120	1017cc90		strings
+0076a290	10191500		callee of 101abc30
+0076d630	1019afa0		caller of 10150bb0
+0074ddc0	1019b350		strings
+0075ad30	1019c8d0		strings
+0076d540	101a2290		strings
+0076b780	101a3000		strings
+007587c0	101a4a60	It3_ScanChunks	strings
+00755ef0	101a58a0	It3_ParseChunks	strings
+0074f580	101a82d0		strings
+0074ebb0	101abc30		strings
+00759100	101abd60	Model_LoadIt3Alt	caller of 101a4a60
+007584f0	101abe30	Model_LoadIt3	strings
+007fc4f1	101ba400		strings
+008135cc	101be5e9		caller of 101c2cf0
+0081e14e	101c2cf0		strings
+0081555f	101ce7dc		strings
+008194b1	crtmessageboxa		strings

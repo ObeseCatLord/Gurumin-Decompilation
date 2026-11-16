@@ -24,3 +24,5 @@ address	status	reason
 101af420	skip	constructor keeps the array pointer in edx across Vec4::Vec4 calls (callee known not to touch edx) - inter-procedural register allocation
 101ae250	equiv	[esp] encoding only
 10001090	open	SetCursorPos scaling: same arithmetic, original sums in edx/ecx in a different order
+100114a0	open	register choice for the first load (ecx vs eax) and 1.0f kept in eax across the branch
+100158b0	open	VS2003 hoists the shared 'push 0x20' above the branch (same as 0x10047400)

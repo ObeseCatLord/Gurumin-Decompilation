@@ -12,6 +12,7 @@ your own copy.
 | `it3_tool.py info/obj` | `.it3` model node list; OBJ export with normals/UVs. All 945 JP models decode. |
 | `gpack.py` | Python port of packs.dll `ExecUnpack` (used by .it3 meshes). |
 | `mmv_tool.py info/frames/gif` | `.mmv` movies → PNG frames or GIF. |
+| `de2_tool.py info/decode/encode` | `.de2` music ↔ WAV (MS ADPCM; encoding untested in game). |
 | `save_tool.py decode/encode/info/thumb` | `SaveData\gdataNN.sav` ↔ raw state; thumbnail extract. |
 | `script_api.py`, `gen_script_api_md.py` | script built-in list → `docs/SCRIPT_API.md`. |
 | `config_keys.py`, `save_layout.py` | gurumin.def key map, save body map (from the decompiler output). |

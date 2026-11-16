@@ -19,3 +19,5 @@ address	status	reason
 1017b1c0	open	lazy-create getter: original duplicates the 'return scene->m_1c' tail (reloading through ecx), VS2003 merges it
 101992f0	open	walk to the root: original keeps the next pointer in edx, VS2003 in ecx (two loop shapes tried)
 101a2370	skip	caller keeps 'this' in edx across a call (callee known not to touch edx): inter-procedural register allocation, likely /GL+LTCG in the original
+101ad730	open	original zeroes eax once and stores it (xor eax,eax); VS2003 stores immediates and orders the local differently
+101ade80	open	return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary

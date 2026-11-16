@@ -25,3 +25,15 @@
 ??0Vec4@@QAE@MMMM@Z	101ac9a0
 ?Set@Vec4@@QAEXMMMM@Z	101ac9c0
 ?Fill@Vec4@@QAEXABM@Z	101acc40
+?SetVertexCount@VertexPack@@QAEHH@Z	101acff0
+?Resize@IndexList@@QAEHH@Z	101ad110
+?CopyFrom@IndexList@@QAEHPBU1@@Z	101ad160
+?Clear@KeyBank@@QAEXXZ	101ad730
+?Free@KeyTrack@@QAEXXZ	101ad9f0
+?Init@KeyTrack@@QAEXXZ	101adb40
+?MarkAll@KeyTrack@@QAEHXZ	101adb80
+?LastFrame@KeyTrack@@QAEHXZ	101adc90
+?HasFrame@KeyTrack@@QAEHH@Z	101adcb0
+?GetTranslation@Matrix4@@QAE?AUVec4@@XZ	101ade80
+?SetTranslation@Matrix4@@QAEXMMMM@Z	101adef0
+?ResetRotation@Matrix4@@QAEXXZ	101adf10

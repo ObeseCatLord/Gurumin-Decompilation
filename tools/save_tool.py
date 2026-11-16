@@ -72,7 +72,9 @@ def main():
         plain, ok = decode(open(src, "rb").read(), src)
         map_id, = struct.unpack_from("<i", plain, 0x30000)
         x, y, z = struct.unpack_from("<3f", plain, 0x30004)
-        print("checksum %s, body %d bytes, map %d, position (%.2f, %.2f, %.2f)" % ("ok" if ok else "BAD", len(plain), map_id, x, y, z))
+        hp, hp_max = struct.unpack_from("<ii", plain, 0x3016c + 4)
+        money, = struct.unpack_from("<i", plain, 0x3016c + 0xb8)
+        print("checksum %s, body %d bytes, map %d, position (%.2f, %.2f, %.2f), HP %d/%d, money %d" % ("ok" if ok else "BAD", len(plain), map_id, x, y, z, hp, hp_max, money))
     elif mode == "thumb":
         from PIL import Image
         plain, ok = decode(open(src, "rb").read(), src)

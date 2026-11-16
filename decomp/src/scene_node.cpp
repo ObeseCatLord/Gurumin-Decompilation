@@ -66,7 +66,8 @@ struct KeyPair;
 
 struct Node
 {
-    char pad_0000[0x64];
+    char name[0x40];
+    char pad_0040[0x24];
     int packCount;
     PackHeader *packs;
     KeyPair *indexLists;
@@ -101,7 +102,13 @@ struct Node
     int pad_1858;
     int m_185c;
     int m_1860;
-    char pad_1864[0x3c];
+    char pad_1864[0x34];
+    char element;
+    char pad_1899;
+    char m_189a;
+    char m_189b;
+    char m_189c;
+    char pad_189d[3];
 
     void M_10191d50();
     void M_10191d90();
@@ -142,6 +149,11 @@ struct Node
     Node *M_10191cc0(unsigned int mask, int nth, int *counter);
     void M_101911b0(PackHeader *packs, int count);
     void ReleaseMesh();
+    int M_10191e50();
+    int M_10193cb0(int from, int to);
+    int M_10194630(char value, unsigned int mask);
+    int M_101946b0(char value, unsigned int mask);
+    int M_10194730(char value, unsigned int mask);
 };
 
 
@@ -488,4 +500,71 @@ void Node::ReleaseMesh()
         indexLists = 0;
         packCount = 0;
     }
+}
+int Node::M_10191e50()
+{
+    if (_strnicmp(name, "fire", 4) == 0)
+        element = 1;
+    if (_strnicmp(name, "thun", 4) == 0)
+        element |= 2;
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10191e50();
+    return 0;
+}
+
+int Node::M_10193cb0(int from, int to)
+{
+    if (from == m_00a0)
+        m_00a0 = to;
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10193cb0(from, to);
+    return 0;
+}
+
+int Node::M_10194630(char value, unsigned int mask)
+{
+    if ((flags & mask) != 0)
+    {
+        if ((flags & 0x400) != 0)
+            m_189c = value;
+        if ((flags & 0x200) != 0)
+            m_189c = value;
+        if ((flags & 0x800) != 0)
+            m_189c = value;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10194630(value, mask);
+    return 0;
+}
+
+int Node::M_101946b0(char value, unsigned int mask)
+{
+    if ((flags & mask) != 0)
+    {
+        if ((flags & 0x400) != 0)
+            m_189a = value;
+        if ((flags & 0x200) != 0)
+            m_189a = value;
+        if ((flags & 0x800) != 0)
+            m_189a = value;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_101946b0(value, mask);
+    return 0;
+}
+
+int Node::M_10194730(char value, unsigned int mask)
+{
+    if ((flags & mask) != 0)
+    {
+        if ((flags & 0x400) != 0)
+            m_189b = value;
+        if ((flags & 0x200) != 0)
+            m_189b = value;
+        if ((flags & 0x800) != 0)
+            m_189b = value;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10194730(value, mask);
+    return 0;
 }

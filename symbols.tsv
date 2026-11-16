@@ -121,3 +121,4 @@ address	name	evidence
 101609b0	MmvPlayer_Close	same without destroying the object
 10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (tools/de2_header.py)
 101453e0	Font_DrawGlyph	draws one Shift-JIS glyph from ddfont8.dat into a 512-wide ARGB4444 surface
+10191e50	Node_TagElements	marks nodes whose name starts with fire (1) / thun (2) in byte +0x1898, recursively

@@ -91,3 +91,4 @@ address	name	evidence
 1001d850	SeasonalEvent	GetLocalTime: 1 on Christmas (Dec 25, or Dec 24 after 18:00), 2 on Jan 1-3, else 0
 10016580	Movie_PlayToTexture	opens an .mmv into the movie player at 0x10f08ab0 and renders it into the texture slot 0x10202478
 10017b10	Script_UnpackVar	decodes a packed script global (low nibble type 1; bits 5-12 and 13-20)
+1003b6e0	Costume_LoadPlayerModel	validates the costume id 0x10c655f0 against unlock bits 0x104c0230 and loads <base>[N|a|a1|a2].it3

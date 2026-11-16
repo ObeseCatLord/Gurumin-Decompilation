@@ -85,3 +85,16 @@ function with strings: 121 of 420 mapped, 78 with ≥3 shared strings). Low-conf
 build inlines more, e.g. Texture_ReleaseAll → 0x740fe0 also does VRAM accounting).
 Ghidra export: `re/run_ghidra_en.bat`.
 - **Seasonal easter egg:** 0x1001d850 reads the PC clock and returns 1 on Christmas (Dec 25, or Dec 24 after 18:00) and 2 on January 1-3; hook it to force the seasonal content.
+
+## Costumes (outfits)
+`Costume_LoadPlayerModel` 0x1003b6e0 picks Parin's model:
+- costume id: **0x10c655f0** (inside the script-globals block, so it is saved: body offset 0x302f4 + 0x2714 = 0x32a08).
+- unlock bits: **0x104c0230**. Before loading, a costume whose bit is clear is reset to 0:
+  1→bit 0x1, 2→0x2, 3→0x4, 4→0x8, 5→0x10, 6 needs 0x17 (all of 1,2,3,5), 7 only when `SeasonalEvent()` (0x1001d850)
+  returns 2 (Jan 1-3), 8→0x40, 9→0x80, 10→0x20, 11→0x100, 12→0x200.
+- model file: costume 0 = base name (with 0x10c66cc0 set: `<base>a.it3`), 11 = `<base>a1.it3`, 12 = `<base>a2.it3`,
+  others `<base><N>.it3` (base name from 0x10daac4d, e.g. char02b).
+- `system.sav` has 0x1ff at offset 0x200 in the save tested, which looks like these unlock bits (bits 0-8) - not
+  confirmed yet.
+Adding a costume therefore needs: a model `<base><N>.it3` (+ its .iti textures), an id the checks above let through
+(or a patched check), and a way to select it (the closet scripts in map.txt).

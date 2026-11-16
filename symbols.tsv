@@ -47,3 +47,11 @@ address	name	evidence
 1000cbe0	Caption_Fade	fades caption alpha 0..15
 10017aa0	Enemy_FindByKind	searches enemy kind table 0x10219ec0 for slots 0x5c..0x7f
 10017ad0	Enemy_FindById	character slots 0x5c..0x7f whose kind is F/M/N and id matches
+1015c960	Render_Present	ends the scene and calls IDirect3DDevice9::Present (frame flip); best per-frame hook
+1015c9b0	Render_PresentSimple	EndScene + Present without the pre-present pass
+10143b50	Render_UnbindTexture0	SetTexture(0, NULL) once
+10143b80	Render_UnbindTexture1	SetTexture(1, NULL) once
+101446b0	Render_UnbindTextures	SetTexture(0..3, NULL)
+10148310	TexCache_Clear	clears the 512-entry texture cache arrays (0x10f1bff0 textures, 0x10f0cd40 ages)
+10148350	TexCache_ReleaseAll	Release() every cached texture, subtract sizes from 0x10f0ff80
+101483f0	TexCache_Age	increments every cache entry's age

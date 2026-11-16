@@ -1,3 +1,11 @@
 # mangled name<TAB>address, for functions whose names carry no address (constructors, operators)
 ??0IntPair@@QAE@XZ	10143bb0
 ??0Record2c@@QAE@XZ	10148880
+??0ImeContext@@QAE@XZ	1015d090
+?Release@ImeContext@@QAEHXZ	1015d0a0
+?Attach@ImeContext@@QAEHPAUHWND__@@@Z	1015d0e0
+?IsOpen@ImeContext@@QAEHXZ	1015d110
+?SetOpen@ImeContext@@QAEHH@Z	1015d120
+?GetConversion@ImeContext@@QAEHPAK0@Z	1015d140
+?SetConversion@ImeContext@@QAEHPBK0@Z	1015d160
+?GetCompositionValue@ImeContext@@QAEJXZ	1015d3d0

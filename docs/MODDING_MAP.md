@@ -119,3 +119,15 @@ Adding a costume therefore needs: a model `<base><N>.it3` (+ its .iti textures),
 - Sound problems on modern Windows (no music, music out of sync) are therefore most likely in soundarc/sound3d; the
   game itself only checks the `.de2` header (see Music row above).
 Ghidra export of soundarc: `re/run_ghidra_soundarc.bat`.
+
+## .de2 music files
+```
+u32 sum, u32 xor        name-keyed check words (tools/de2_header.py)
+u32 audio length        bytes from the RIFF tag to the end of the file (approximately; 5,420,468 for bgm01)
+u32 block length ^ xor  length of the block that follows
+block                   timing/sync data read by Bgm_Play into 0x102564a8 (mostly non-zero; used for BGMDOUKI = music sync?)
+RIFF/WAVE               fmt = PCM 44.1 kHz stereo 16-bit, but the 'data' chunk is compressed about 4:1 by a custom
+                        codec (starts with its own header: 0x5000, 0x13e20, ...); its size field gives the decoded size.
+```
+The codec is in sound3d.dll (not analysed yet), so a replacement track cannot be written yet without that decoder/
+encoder - unless sound3d accepts plain PCM in the same container, which is untested.

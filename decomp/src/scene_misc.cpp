@@ -22,6 +22,10 @@ struct Scene
     void M_1016a020(void *owner);
     void M_1016a100(int a, int b, int c, int d, int e, int f);
     int M_1016a260(int layer, int slot, int x, int y);
+    int M_1016a220(int a, int slot, int value);
+    int M_1016a2a0(int layer, int slot, int value);
+    char pad_0000[0xbec];
+    int m_0bec;
 };
 
 struct SceneOwner
@@ -30,6 +34,9 @@ struct SceneOwner
     Scene *scene;
     int M_1017af40(int a, int b, int c, int d, int e, int f);
     int M_1017afb0(int layer, int slot, int x, int y);
+    int M_1017b020(int a, int slot, int value);
+    int M_1017b080(int layer, int slot, int value);
+    int M_1017b160();
 };
 
 struct GlyphCache
@@ -143,4 +150,39 @@ extern "C" int __stdcall FUN_1016fa40(int index)
         DAT_10ff1df8[index] = 1;
     }
     return 0;
+}
+
+int SceneOwner::M_1017b020(int a, int slot, int value)
+{
+    if (scene == 0)
+    {
+        scene = (Scene *)DAT_11b0b938(0x7c84, "");
+        scene->M_10169f90();
+        scene->M_1016a020(this);
+    }
+    scene->M_1016a220(a, slot, value);
+    return 1;
+}
+
+int SceneOwner::M_1017b080(int layer, int slot, int value)
+{
+    if (scene == 0)
+    {
+        scene = (Scene *)DAT_11b0b938(0x7c84, "");
+        scene->M_10169f90();
+        scene->M_1016a020(this);
+    }
+    scene->M_1016a2a0(layer, slot, value);
+    return 1;
+}
+
+int SceneOwner::M_1017b160()
+{
+    if (scene == 0)
+    {
+        scene = (Scene *)DAT_11b0b938(0x7c84, "");
+        scene->M_10169f90();
+        scene->M_1016a020(this);
+    }
+    return scene->m_0bec == 1;
 }

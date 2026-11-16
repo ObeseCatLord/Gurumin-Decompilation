@@ -53,6 +53,8 @@ struct Selection
     int M_10172aa0();
     void M_101733f0();
     int M_10173450(int id, int unused);
+    void M_10172ac0(int a, int count);
+    int M_10188eb0(int id, int a, int count);
 };
 
 struct Scene
@@ -200,4 +202,18 @@ extern "C" void __stdcall FUN_101911b0(PackHeader *packs, int count)
             packs++;
         }
     }
+}
+
+extern "C" int DAT_10ff1dec;
+
+int Selection::M_10188eb0(int id, int a, int count)
+{
+    DAT_10ff1dec++;
+    if (m_0010 != 0 && m_0010 != id)
+        M_101733f0();
+    m_0010 = id;
+    if (m_0008 + count >= m_0004)
+        M_101733f0();
+    M_10172ac0(a, count);
+    return 0;
 }

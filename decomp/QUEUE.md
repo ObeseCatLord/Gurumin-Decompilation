@@ -7,11 +7,12 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (53)
+## 1. Walls to retry (54)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
 - [ ] `100014b0` 159 — ReportCursor: only the push edi position differs (original before the first test, VS2003 after it: shrink-wrapping)
+- [ ] `100016c0` 256 — sound play: identical apart from cross-jumping; the original merges the two position branches only at the code-5 SendMessage, cl 13.00 here already at code 4 (code 4 hoisted out, branches swapped tried)
 - [ ] `10008910` 275 — Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
 - [ ] `100091d0` 239 — Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
@@ -128,16 +129,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (243)
+## 3. Medium functions (251-800 bytes) (237)
 
-- [ ] `101642c0` 252 bytes (loops 1, calls 7)
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
-- [ ] `101641b0` 255 bytes (loops 1, calls 7)
-- [ ] `100016c0` 256 bytes (calls 13)
-- [ ] `10163d60` 257 bytes (float, calls 8)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
-- [ ] `1005f530` 259 bytes (calls 6)
-- [ ] `1005f640` 259 bytes (calls 6)
 - [ ] `100bcb30` 259 bytes (calls 17)
 - [ ] `10034810` 260 bytes (float, calls 3)
 - [ ] `10002330` 262 bytes (loops 6)

@@ -11,6 +11,7 @@ struct Vec4
     Vec4();
     void Copy(const Vec4 &source);
     Vec4 operator-(const Vec4 &other) const;
+    Vec4 operator+(const Vec4 &other) const;
     float LengthSquared3();  // 0x101ac6a0
     void Fill(const float &value);
 };
@@ -29,6 +30,7 @@ struct LoadedModel
 {
     char pad_0000[0xa8];
     int m_00a8;               // non-zero while the model takes part in collision
+    LoadedModel *Find(const char *name, int flags);  // Node::Find 0x1019ece0
 };
 
 extern "C" LoadedModel *DAT_10faaa88[0x100];
@@ -39,24 +41,48 @@ extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, LoadedModel *other, int o
                                       int *hitCount, int *hitIds, Vec4 *hits, int *hitOther, int mode, int a, int b,
                                       int c, int flags);
 
+// Collision node of a model (scene_node.cpp Node); 0x1019f340 tests a moving model against it.
+struct CollisionNode
+{
+    int M_1019f340(int mask, Matrix4 *world, int a, int b, int *out5, Vec4 *probe, int probeCount, int *hitCount,
+                   Vec4 *hitPoint, Vec4 *hitNormal, int limit, int *out12, int c, int d, int e);
+};
+
+extern "C" int DAT_11b002c0;    // collision filter of the current test (the model's m_0070)
+extern "C" char DAT_11b002c8;   // 1 while a model-against-world test runs
+
 struct AnimModel
 {
-    char pad_0000[0x84];
+    char pad_0000[0x70];
+    int m_0070;                  // 0x70: collision filter
+    char pad_0074[0x10];
     unsigned char speedDivisor;  // 0x84: slows every motion of this model down (0 = no division)
-    char pad_0085[0x217];
+    char pad_0085[0x1c3];
+    float holdWeight;            // 0x248: blend weight while holding (at most 0.9)
+    char pad_024c[0x50];
     float scale;
-    char pad_02a0[0x1ffc];
+    char pad_02a0[4];
+    char holdState;              // 0x2a4: 0 = free, 1 = holding, 2 = released
+    char pad_02a5[0x1ff7];
     int m_229c;                  // 0x229c: blend frames, 8 when unset
     char pad_22a0[0x4c];
     LoadedModel *root;           // 0x22ec: this model's own entry in the model table
-    char pad_22f0[0x38];
+    char pad_22f0[0x18];
+    CollisionNode *collider;     // 0x2308: the map collision this model moves against
+    char pad_230c[0xc];
+    int m_2318;
+    int m_231c;
+    char pad_2320[8];
     Matrix4 world;               // 0x2328: world matrix (translation = position)
     char pad_2368[4];
     float motionSpeed;           // 0x236c: current motion playback speed (at most 60)
     char pad_2370[0x18];
     int m_2388;                  // 0x2388: 1 once a speed change is pending
     int m_238c;
-    char pad_2390[0x18];
+    int m_2390;                  // 0x2390: limit for map collision tests
+    char pad_2394[4];
+    Vec4 holdOffset;             // 0x2398: position relative to the held model
+
     Vec4 push;                   // 0x23a8: movement impulse applied by the next update
     Vec4 velocity;               // 0x23b8: current movement
     char pad_23c8[0x10];
@@ -86,6 +112,9 @@ struct AnimModel
     int IsClear(const Vec4 *offset);
     int IsClearAny(const Vec4 *offset);
     int IsClearFlagged(const Vec4 *offset);
+    int IsClearOfMap(const Vec4 *offset);
+    int IsClearOfMapLimited(const Vec4 *offset);
+    int Hold(int on, float amount, AnimModel *other);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -354,4 +383,82 @@ int AnimModel::IsClearFlagged(const Vec4 *offset)
             return 0;
     }
     return 1;
+}
+
+// 1 when the model, moved by `offset` (0 = not moved), does not touch the map collision of kind 0x4000000.
+int AnimModel::IsClearOfMap(const Vec4 *offset)
+{
+    if (collider == 0)
+        return 1;
+    Vec4 probe[2];
+    if (offset != 0)
+        probe[0].Copy(*offset);
+    else
+        probe[0].Fill(0);
+    probe[1].Fill(0);
+    Vec4 hitPoint;
+    Vec4 hitNormal;
+    int out5;
+    int out12;
+    DAT_11b002c0 = m_0070;
+    DAT_11b002c8 = 1;
+    int hitCount = 0;
+    int hit = collider->M_1019f340(0x4000000, &world, m_231c, m_2318, &out5, probe, 1, &hitCount, &hitPoint, &hitNormal, 0,
+                                   &out12, 0, 0, 0);
+    DAT_11b002c8 = 0;
+    DAT_11b002c0 = 0;
+    return hit == 0;
+}
+
+// Same as IsClearOfMap against all collision kinds, with the model's limit m_2390.
+int AnimModel::IsClearOfMapLimited(const Vec4 *offset)
+{
+    if (collider == 0)
+        return 1;
+    Vec4 probe[2];
+    if (offset != 0)
+        probe[0].Copy(*offset);
+    else
+        probe[0].Fill(0);
+    probe[1].Fill(0);
+    Vec4 hitPoint;
+    Vec4 hitNormal;
+    int out5;
+    int out12;
+    DAT_11b002c0 = m_0070;
+    DAT_11b002c8 = 1;
+    int hitCount = 0;
+    int hit = collider->M_1019f340(-1, &world, m_231c, m_2318, &out5, probe, 1, &hitCount, &hitPoint, &hitNormal, m_2390,
+                                   &out12, 0, 0, 0);
+    DAT_11b002c8 = 0;
+    DAT_11b002c0 = 0;
+    return hit == 0;
+}
+
+// Starts or continues holding on to model `other` (on = 1): on the first call the offset to `other` is recorded
+// (only for models with a "Bip01 Spine" bone), then the hold weight grows by `amount` up to 0.9. With on = 0 a
+// running hold is marked released. Returns 0.
+int AnimModel::Hold(int on, float amount, AnimModel *other)
+{
+    if (on != 0)
+    {
+        if (holdState == 0)
+        {
+            holdOffset.Fill(0);
+            if (root != 0 && root->Find("Bip01 Spine", 0) != 0)
+            {
+                holdOffset.Copy(other->holdOffset + other->world.GetTranslation());
+                holdOffset.Copy(holdOffset - world.GetTranslation());
+            }
+        }
+        float weight = amount + holdWeight;
+        holdWeight = weight;
+        if (weight > 0.9f)
+            holdWeight = 0.9f;
+        holdState = 1;
+        return 0;
+    }
+    if (holdState == 1)
+        holdState = 2;
+    return 0;
 }

@@ -53,3 +53,4 @@ address	status	reason
 10163e90	open	AnimModel::IsClear (and 101640b0, 10163f90): frame identical; the original builds every argument in edx and loads root into ecx before the compare, cl 13.00 here alternates ecx/edx (compare order, local pointer, nested if tried)
 101640b0	open	see 10163e90
 10163f90	open	see 10163e90
+100016c0	open	sound play: identical apart from cross-jumping; the original merges the two position branches only at the code-5 SendMessage, cl 13.00 here already at code 4 (code 4 hoisted out, branches swapped tried)

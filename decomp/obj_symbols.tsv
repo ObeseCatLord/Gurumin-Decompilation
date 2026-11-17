@@ -203,3 +203,6 @@ _Vec3_Length	101ae890
 ?IsClearAny@AnimModel@@QAEHPBUVec4@@@Z	101640b0
 ?IsClearFlagged@AnimModel@@QAEHPBUVec4@@@Z	10163f90
 ?Reserve@KeyTrack@@QAEXH@Z	101ada30
+?IsClearOfMap@AnimModel@@QAEHPBUVec4@@@Z	101642c0
+?IsClearOfMapLimited@AnimModel@@QAEHPBUVec4@@@Z	101641b0
+?Hold@AnimModel@@QAEHHMPAU1@@Z	10163d60

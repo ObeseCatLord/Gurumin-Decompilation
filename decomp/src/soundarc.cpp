@@ -101,3 +101,41 @@ extern "C" int FUN_10001f30(void)
     return 1;
 }
 
+
+// Plays sound file `file` once (command 0x203): argument 0 = `channel`, 1..3 = the position (*x, *y, *z, or 0 for a
+// sound without position), 4 = `pan`, 5 = `volume`; the file name goes over as WM_COPYDATA (0x100 bytes).
+// Returns 0. Not byte-identical yet: the original shares only the code-5 call between the two branches, ours also
+// the code-4 call (see open.tsv).
+extern "C" int FUN_100016c0(const char *file, const LPARAM *x, const LPARAM *y, const LPARAM *z, LPARAM pan,
+                            LPARAM channel, LPARAM volume)
+{
+    if (DAT_1020aee4 == 0)
+        return 0;
+    HWND wnd = FUN_10001570();
+    if (wnd != 0)
+    {
+        SendMessageA(wnd, 0x400, 0, channel);
+        if (x != 0)
+        {
+            SendMessageA(wnd, 0x400, 1, *x);
+            SendMessageA(wnd, 0x400, 2, *y);
+            SendMessageA(wnd, 0x400, 3, *z);
+            SendMessageA(wnd, 0x400, 4, pan);
+        }
+        else
+        {
+            SendMessageA(wnd, 0x400, 1, 0);
+            SendMessageA(wnd, 0x400, 2, 0);
+            SendMessageA(wnd, 0x400, 3, 0);
+            SendMessageA(wnd, 0x400, 4, pan);
+        }
+        SendMessageA(wnd, 0x400, 5, volume);
+        COPYDATASTRUCT data;
+        data.dwData = 0;
+        data.lpData = (void *)file;
+        data.cbData = 0x100;
+        SendMessageA(wnd, WM_COPYDATA, 0, (LPARAM)&data);
+        SendMessageA(wnd, 0x400, 0x203, 0);
+    }
+    return 0;
+}

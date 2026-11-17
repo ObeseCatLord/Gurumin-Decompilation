@@ -51,3 +51,4 @@ address	status	reason
 10148410	open	free-slot search over 0x200 ints unrolled by 8 (cl 13.00)
 10161200	open	Bmp_FlipVertical: VS2003 turns the step-3 inner loop into a precomputed trip count (mul 0xaaaaaaab); cl 13.00 keeps the index compare
 101489c0	open	RenderWindow::RegisterWindowClass: zero kept in edi for the five zero fields and LoadCursor's argument (cl 13.00)
+1014b390	open	Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores

@@ -1,5 +1,15 @@
 #pragma once
 
+struct D3DVIEWPORT9_
+{
+    unsigned long X;
+    unsigned long Y;
+    unsigned long Width;
+    unsigned long Height;
+    float MinZ;
+    float MaxZ;
+};
+
 // IDirect3DDevice9 in vtable order (the VS2003 SDK has no d3d9.h). Parameters are filled in as methods get used.
 struct IDirect3DDevice9
 {
@@ -40,9 +50,9 @@ struct IDirect3DDevice9
     virtual long __stdcall StretchRect() = 0;
     virtual long __stdcall ColorFill() = 0;
     virtual long __stdcall CreateOffscreenPlainSurface() = 0;
-    virtual long __stdcall SetRenderTarget() = 0;
+    virtual long __stdcall SetRenderTarget(unsigned long index, void *surface) = 0;
     virtual long __stdcall GetRenderTarget() = 0;
-    virtual long __stdcall SetDepthStencilSurface() = 0;
+    virtual long __stdcall SetDepthStencilSurface(void *surface) = 0;
     virtual long __stdcall GetDepthStencilSurface() = 0;
     virtual long __stdcall BeginScene() = 0;
     virtual long __stdcall EndScene() = 0;
@@ -50,7 +60,7 @@ struct IDirect3DDevice9
     virtual long __stdcall SetTransform() = 0;
     virtual long __stdcall GetTransform() = 0;
     virtual long __stdcall MultiplyTransform() = 0;
-    virtual long __stdcall SetViewport() = 0;
+    virtual long __stdcall SetViewport(const struct D3DVIEWPORT9_ *viewport) = 0;
     virtual long __stdcall GetViewport() = 0;
     virtual long __stdcall SetMaterial() = 0;
     virtual long __stdcall GetMaterial() = 0;

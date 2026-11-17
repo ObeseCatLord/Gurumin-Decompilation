@@ -60,3 +60,53 @@ extern "C" void FUN_10034fe0(void)
     memset(DAT_1042dea8, 0, sizeof(DAT_1042dea8));
     memset(DAT_102199b8, 0, sizeof(DAT_102199b8));
 }
+
+// Per-character attachment matrices (6 per character slot) for kind-0x58 characters.
+extern "C" Matrix4 DAT_108687f8[0x80 * 6];
+
+// The parts of world.h used here (CharSlot kind, CharState slot values).
+struct KindSlot
+{
+    int kind;
+    char pad_0004[0x184];
+};
+
+struct SlotValues
+{
+    int m_0000;
+    int values[6];
+    char pad_001c[0x24];
+};
+
+extern "C" KindSlot DAT_10daab84[0x80];
+extern "C" SlotValues DAT_1020b430[0x80];
+
+// Finds the first free attachment slot among the kind-0x58 characters 0x5c..0x7b, stores `matrix` there with the
+// four values a..d in its fourth column, records `value` for the slot and returns the character and slot index in
+// *outChar and *outSlot. Returns 1, or 0 when no slot is free.
+extern "C" int FUN_1001c410(int value, const Matrix4 *matrix, int *outChar, int *outSlot, float a, float b, float c,
+                            float d)
+{
+    for (int i = 0x5c; i < 0x7c; i++)
+    {
+        if (DAT_10daab84[i].kind == 0x58)
+        {
+            for (int j = 1; j < 7; j++)
+            {
+                if (DAT_1020b430[i].values[j - 1] == 0)
+                {
+                    DAT_108687f8[i * 6 + j] = *matrix;
+                    DAT_108687f8[i * 6 + j].m[3] = a;
+                    DAT_108687f8[i * 6 + j].m[7] = b;
+                    DAT_108687f8[i * 6 + j].m[11] = c;
+                    DAT_108687f8[i * 6 + j].m[15] = d;
+                    DAT_1020b430[i].values[j - 1] = value;
+                    *outChar = i;
+                    *outSlot = j - 1;
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}

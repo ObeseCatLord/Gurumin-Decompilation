@@ -576,3 +576,6 @@ address	name	evidence
 101acbc0	Vec4::operator/	x/y/z divided by an integer (decomp/src/vec4.cpp)
 1019d6a0	Node::ClearSpecialPassOnLinks	matched decompiled source (decomp/obj_symbols.tsv)
 101a2370	Node::StartProximityPass	matched decompiled source (decomp/obj_symbols.tsv)
+10169660	NodeExtra::Init	matched decompiled source (decomp/obj_symbols.tsv)
+100fc3e0	Script_RunQueued	runs the queued event scripts (decomp/src/script_queue.cpp)
+1001c410	AttachSlot_Store	stores a matrix in a free attachment slot of a kind-0x58 character (decomp/src/group_tables.cpp)

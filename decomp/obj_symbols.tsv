@@ -198,3 +198,4 @@ _Vec3_Length	101ae890
 ??KVec4@@QBE?AU0@ABH@Z	101acbc0
 ?ClearSpecialPassOnLinks@Node@@QAEHXZ	1019d6a0
 ?StartProximityPass@Node@@QAEHPAMPAUMatrix@@HMH@Z	101a2370
+?Init@NodeExtra@@QAEXXZ	10169660

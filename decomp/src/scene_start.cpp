@@ -10,6 +10,18 @@ struct Vec4
     void Copy(const Vec4 &source);
 };
 
+struct Matrix4
+{
+    float m[16];
+    Vec4 GetTranslation();  // 0x101ade80
+};
+
+// Effect manager (0x10daaa80, char_effects.cpp); M_10184170 clears all running effects.
+struct EffectManager
+{
+    int M_10184170();
+};
+
 typedef int (*SceneCallback)(int code, int value);
 
 // The world object (world_frame.cpp: WorldRenderer); only the members used here.
@@ -65,4 +77,54 @@ extern "C" void FUN_100cc1d0(const char *characterFile, int value)
     DAT_104c00e0 = 0;
     DAT_104c0108 = 0;
     DAT_10db9380 = 1;
+}
+
+extern "C" EffectManager DAT_10daaa80;
+extern "C" void FUN_100123d0(void);              // Chars_ReloadModels
+extern "C" int FUN_1015c9e0(int mode);           // Screen_StartTransition (0 = end the transition)
+extern "C" int FUN_10001b40(void);               // SoundArc_Message221
+extern "C" int DAT_104c01b0;
+extern "C" short DAT_10447338[0x44c];
+extern "C" int DAT_104c0228;
+extern "C" unsigned char DAT_104c022c;           // write index of the position history
+extern "C" unsigned char DAT_104c022d;
+extern "C" Vec4 DAT_10802ad8[16];                // recent player positions (ring of 16)
+extern "C" Matrix4 DAT_10db9210;                 // the player's world matrix (character 0)
+extern "C" Vec4 DAT_11af3e28;                    // camera position
+extern "C" Vec4 DAT_118e6c78;                    // camera target
+
+// Finishes a pending scene start (DAT_104bfeb0) unless a cut-scene runs: reloads the character models, ends the
+// screen transition, clears the effects, resets the per-object sound table (when DAT_104c01b0 is clear), fills the
+// position history with the player's position and restores the player and camera vectors saved by the scene start.
+extern "C" void FUN_1003a6c0(void)
+{
+    if (DAT_104bfeb0 != 0 && DAT_104bfe6c == 0)
+    {
+        FUN_100123d0();
+        FUN_1015c9e0(0);
+        DAT_10daaa80.M_10184170();
+        DAT_104bfeb0 = 0;
+        DAT_104c00e0 = 0;
+        DAT_104c0108 = 0;
+        if (DAT_104c01b0 == 0)
+        {
+            for (int i = 0; i < 0x44c; i++)
+                DAT_10447338[i] = -11;
+            if (FUN_10001b40() != 0)
+                FUN_10001b40();
+        }
+        DAT_10db9380 = 1;
+        DAT_104c0228 = 0;
+        DAT_104c022c = 0;
+        DAT_104c022d = 0;
+        for (int i = 0; i < 16; i++)
+        {
+            DAT_10802ad8[DAT_104c022c].Copy(DAT_10db9210.GetTranslation());
+            DAT_104c022c = (DAT_104c022c + 1) & 0xf;
+        }
+        DAT_118e69e8.Copy(DAT_10da9150);
+        DAT_118e6cb8.Copy(DAT_10868818);
+        DAT_11af3e28.Copy(DAT_10da9150);
+        DAT_118e6c78.Copy(DAT_10868818);
+    }
 }

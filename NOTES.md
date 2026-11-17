@@ -171,6 +171,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   compiler cannot see, the slot is never reused for later temporaries. With Vec3_Dot / Vec3_LengthSquared defined in
   vec4.cpp, the segment-distance functions (0x101acd90, 0x101af260) put their last temporary in the dead direction
   vector and match. A frame that is 0x10 too big is a hint to move the callees in.
+- **Inline budget**: within one function cl 13.00 expands an inline method only a few times, then calls the
+  out-of-line copy. Game::TestScriptFlag (0x100022b0, now inline in game.h) is expanded 3 times and called once in
+  ForEachActiveTrigger (0x100552f0), expanded twice and called twice in RaiseGameOverEvents (0x10054a60). A known
+  function called "sometimes" after identical inline code is an inline helper.
 - Texture_Load (0x1001e1a0) is also an inline helper: functions that load a fixed texture expand it, including
   three `strlen` loops over the literal (0x10050460). `include/texture_load.h` holds it as `LoadTexture`.
 

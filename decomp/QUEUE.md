@@ -128,17 +128,14 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (224)
+## 3. Medium functions (251-800 bytes) (221)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
 - [ ] `100bcb30` 259 bytes (calls 17)
 - [ ] `10001980` 263 bytes (calls 13)
-- [ ] `10010310` 263 bytes (float, calls 8)
 - [ ] `1015c850` 270 bytes Frame_PumpAndRecover (loops 3, calls 12)
-- [ ] `1003a6c0` 271 bytes (loops 1, calls 11)
 - [ ] `10150a90` 273 bytes (calls 13)
-- [ ] `100165e0` 275 bytes (calls 3)
 - [ ] `10184170` 276 bytes (loops 3, calls 1)
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `10164af0` 284 bytes (loops 2)

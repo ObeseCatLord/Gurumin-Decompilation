@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (47)
+## 1. Walls to retry (48)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -32,6 +32,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10145380` 87 — FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)
 - [ ] `1014b390` 233 — Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores
 - [ ] `1015cac0` 20 — same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
+- [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
 - [ ] `10160960` 75 — frame blit clamp: register allocation of the two min() results differs
 - [ ] `10161120` 213 — Path_GetBaseName: register allocation (original reads buffer[0] before the pushes and zeroes out[] with esi); memset and do/while forms tried
@@ -59,7 +60,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad920` 179 — Spline (Hermite): the original multiplies t3 by -2.0 for the c term; cl 13.00 turns it into -(t3 + t3) and shares that with the b term (forms with 2.0f*, a separate h01 local and a -2 local tried)
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (79)
+## 2. Small functions (30-250 bytes) (75)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
@@ -71,10 +72,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10169660` 185 bytes (calls 10)
 - [ ] `101aec90` 185 bytes (float, calls 1)
 - [ ] `1014f060` 186 bytes (loops 1, calls 4)
-- [ ] `1015fb20` 187 bytes (loops 1, calls 1)
-- [ ] `10012450` 188 bytes (calls 8)
-- [ ] `1003e650` 188 bytes (float, loops 3, calls 1)
-- [ ] `101628f0` 188 bytes (float, calls 1)
 - [ ] `10191aa0` 188 bytes (loops 1, calls 2)
 - [ ] `101af360` 188 bytes (float, calls 9)
 - [ ] `1016b340` 189 bytes (float, calls 5)

@@ -11,6 +11,7 @@ struct Vec4
     Vec4();
     void Copy(const Vec4 &source);
     Vec4 operator-(const Vec4 &other) const;
+    float LengthSquared3();  // 0x101ac6a0
 };
 
 struct Matrix4
@@ -37,7 +38,10 @@ struct AnimModel
     char pad_2370[0x18];
     int m_2388;                  // 0x2388: 1 once a speed change is pending
     int m_238c;
-    char pad_2390[0x48];
+    char pad_2390[0x18];
+    Vec4 push;                   // 0x23a8: movement impulse applied by the next update
+    Vec4 velocity;               // 0x23b8: current movement
+    char pad_23c8[0x10];
     float m_23d8;
     float m_23dc;
     int m_23e0;
@@ -60,6 +64,7 @@ struct AnimModel
     int MoveTowards(float x, float y, int mode);
     int SnapHeadingToSide();
     int ScreenPosition(int *x, int *y, const Matrix4 &viewProjection);
+    int Push(float x, float y, float z);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -223,5 +228,30 @@ int AnimModel::ScreenPosition(int *x, int *y, const Matrix4 &viewProjection)
     position.y = (2.0f - (position.y + 1.0f)) * 240.0f;
     *x = (int)position.x;
     *y = (int)position.y;
+    return 0;
+}
+
+// Gives the model a movement impulse (x, y, z). While a speed change is pending (m_238c == 1) the impulse is 0.7 of
+// the value (x and y also scaled by the model scale), or 1.4 of it when the model is nearly at rest (squared speed
+// below 1). Otherwise only x and y are set, at 0.55. Returns 0.
+int AnimModel::Push(float x, float y, float z)
+{
+    if (m_238c == 1)
+    {
+        push.x = x * scale * 0.7f;
+        push.y = y * scale * 0.7f;
+        push.z = z * 0.7f;
+        if (velocity.LengthSquared3() < 1.0f)
+        {
+            push.x = x * 1.4f;
+            push.y = y * 1.4f;
+            push.z = z * 1.4f;
+        }
+    }
+    else
+    {
+        push.x = x * 0.55f;
+        push.y = y * 0.55f;
+    }
     return 0;
 }

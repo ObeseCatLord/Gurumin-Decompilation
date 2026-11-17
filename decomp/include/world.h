@@ -64,13 +64,26 @@ struct CharState
     int m_003c;
 };
 
+// Four floats with the Vec4 setter (0x101ac9c0); world.h users define their own Vec4, so it has its own name here.
+struct Float4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    void Set(float x, float y, float z, float w);
+};
+
 struct EffectSlot
 {
     int id;
     int value;
     int pad_0008;
     int type;
-    char pad_0010[0xdc];
+    int m_0010;
+    char pad_0014[8];
+    char name[0xc0];          // 0x1c: model or motion name
+    Float4 position;          // 0xdc
     int m_00ec;
     int active;
     char pad_00f4[8];

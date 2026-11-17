@@ -210,3 +210,27 @@ DWORD ImeContext::LoadCandidates()
     ImmGetCandidateListA(context, 0, buffer, size);
     return buffer->dwCount;
 }
+extern "C" int DAT_10f67000;     // 1 while text input (IME composition) is active
+extern "C" int DAT_10f66df0;     // 1 once input has finished
+extern "C" int DAT_10f66bc8;     // 1 when the IME conversion mode was changed and must be restored
+extern "C" DWORD DAT_10f66dd8;   // saved conversion mode
+extern "C" DWORD DAT_10f66bb8;   // saved sentence mode
+extern "C" char *DAT_10f66ef8;   // caller's buffer that receives the entered text (may be 0)
+extern "C" char DAT_10f66df8[];  // the text entered so far
+
+// Ends text input (name entry): marks input as finished, restores the IME conversion mode saved when input
+// started, closes the IME and copies the entered text into the caller's buffer.
+extern "C" int FUN_1015fd30(void)
+{
+    DAT_10f67000 = 0;
+    DAT_10f66df0 = 1;
+    if (DAT_10f66bc8 != 0)
+    {
+        DAT_10f68124.SetConversion(&DAT_10f66dd8, &DAT_10f66bb8);
+        DAT_10f66bc8 = 0;
+    }
+    DAT_10f68124.SetOpen(0);
+    if (DAT_10f66ef8 != 0)
+        strcpy(DAT_10f66ef8, DAT_10f66df8);
+    return 0;
+}

@@ -2,9 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Callback the host installs to receive parser messages: (1, message text) for errors, (5000, text offset) for
+// the position of the error in the script text.
+typedef void (*ParserCallback)(int code, int value);
+
 struct ListBank
 {
-    char pad_0000[0xc];
+    int pad_0000;
+    int pad_0004;
+    ParserCallback callback;  // 0x08: message callback (may be 0)
     char m_000c[8][0x80][0x10];
     char m_400c[8][0x80];
     int m_440c[8][0x100];
@@ -12,7 +18,11 @@ struct ListBank
     char m_e80c[8][0x80];
     char pad_ec0c[0x1b9d0];
     int m_2a5dc[8];
-    char pad_2a5fc[0xbd30];
+    char pad_2a5fc[0x4004];
+    char text[0x7d04];        // 0x2e600: script text being parsed
+    char *cursor[8];          // 0x36304: read position in `text`, one per nesting level
+    int depth;                // 0x36324: current nesting level
+    int pad_36328;
     int m_3632c;
     int pad_36330;
     char m_36334[0x10][0x20];
@@ -24,6 +34,8 @@ struct ListBank
     int M_100049e0(const char *text);
     int M_10004a30(const char *text, int *value);
     int M_10004aa0(const char *text, float *value);
+    int ReportError(const char *message);
+    int FreeAll();
 };
 
 int ListBank::M_10004680(int group)
@@ -114,4 +126,19 @@ int ListBank::M_10004aa0(const char *text, float *value)
     }
     *value = (float)atof(text);
     return 1;
+}
+
+// Reports a script parse error: sets the error flag (m_3632c, which makes the readers above fail from now on),
+// prints the message, passes it and the error's offset in the script text to the host callback, and frees all
+// script buffers (ScriptBuffers_FreeAll 0x10007d50). Returns 0.
+int ListBank::ReportError(const char *message)
+{
+    m_3632c = 1;
+    printf("%s\n", message);
+    if (callback != 0)
+        callback(1, (int)message);
+    if (callback != 0)
+        callback(5000, cursor[depth] - text);
+    FreeAll();
+    return 0;
 }

@@ -12,6 +12,7 @@ struct ResourceBanks
     int counts[8];
     char pad_2a5fc[0xbd28];
     int m_36324;
+    int FreeBank(int bank);
     int FreeAll();
 };
 
@@ -36,6 +37,22 @@ int ResourceBanks::FreeAll()
                 items[bank][i] = 0;
                 borrowed[bank][i] = 0;
             }
+        }
+    }
+    return 0;
+}
+
+// Frees the buffers of one bank (the per-bank version of FreeAll). Borrowed buffers are kept untouched here.
+int ResourceBanks::FreeBank(int bank)
+{
+    counts[bank] = 0;
+    for (int i = 0; i < 0x80; i++)
+    {
+        if (borrowed[bank][i] == 0)
+        {
+            if (items[bank][i] != 0)
+                free(items[bank][i]);
+            items[bank][i] = 0;
         }
     }
     return 0;

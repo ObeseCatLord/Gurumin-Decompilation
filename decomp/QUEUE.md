@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (39)
+## 1. Walls to retry (40)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -37,6 +37,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101615d0` 264 — ItmDescramble: same register residue as 0x101614c0
 - [ ] `101649c0` 213 — lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
 - [ ] `10166870` 52 — same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
+- [ ] `10167390` 104 — AnimModel timed value setup: the rounded int-to-float temporary lands in the id parameter slot in ours, the value slot in the original
 - [ ] `10169720` 40 — memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 - [ ] `10169e10` 35 — register choice: original pushes the last argument from edx, VS2003 from ecx
 - [ ] `1016a090` 97 — register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)
@@ -51,7 +52,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (167)
+## 2. Small functions (30-250 bytes) (158)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c00` 82 bytes (loops 1)
@@ -64,15 +65,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101acaa0` 95 bytes (float, calls 1)
 - [ ] `101acbc0` 95 bytes (float, calls 1)
 - [ ] `1001d8b0` 97 bytes (calls 1)
-- [ ] `10174c70` 97 bytes (calls 1)
-- [ ] `1013f9a0` 98 bytes (loops 1, calls 3)
-- [ ] `1015fd30` 99 bytes (loops 1, calls 2)
-- [ ] `1016afa0` 99 bytes (float, calls 1)
-- [ ] `100359c0` 100 bytes (calls 4)
-- [ ] `10034fe0` 102 bytes (loops 3)
-- [ ] `1013e470` 103 bytes
-- [ ] `10007ce0` 104 bytes (loops 1, calls 1)
-- [ ] `10167390` 104 bytes (float)
 - [ ] `101ae820` 107 bytes Cross (float, calls 1)
 - [ ] `10034f70` 108 bytes (float, loops 1)
 - [ ] `1014f520` 108 bytes (calls 3)
@@ -814,7 +806,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (227)
+## 6. Naming: matched functions without a readable name (232)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
@@ -906,6 +898,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `10026c50` 35 bytes (src/app_0012.cpp)
 - [ ] `100286b0` 17 bytes (src/app_0012.cpp)
 - [ ] `100347d0` 54 bytes (src/app_0012.cpp)
+- [ ] `10034fe0` 102 bytes (src/group_tables.cpp)
 - [ ] `100364a0` 183 bytes (src/type_parse.cpp)
 - [ ] `1003b260` 88 bytes (src/save_slot.cpp)
 - [ ] `1003b670` 111 bytes (src/engine_base.cpp)
@@ -921,6 +914,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1013eed0` 6 bytes (src/engine_base.cpp)
 - [ ] `1013ef00` 38 bytes (src/engine_1013e.cpp)
 - [ ] `1013f8a0` 72 bytes (src/path_format.cpp)
+- [ ] `1013f9a0` 98 bytes (src/colour_fades.cpp)
 - [ ] `1013faf0` 17 bytes (src/engine_1013e.cpp)
 - [ ] `10145a10` 51 bytes (src/engine_10143.cpp)
 - [ ] `10146d90` 22 bytes (src/engine_10143.cpp)
@@ -939,6 +933,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1015d500` 15 bytes (src/ime.cpp)
 - [ ] `1015fa90` 37 bytes (src/menu_list.cpp)
 - [ ] `1015fac0` 94 bytes (src/menu_list.cpp)
+- [ ] `1015fd30` 99 bytes (src/ime.cpp)
 - [ ] `10160360` 93 bytes (src/file_check.cpp)
 - [ ] `10161050` 17 bytes (src/mmv_texreg.cpp)
 - [ ] `101618f0` 41 bytes (src/mmv_texreg.cpp)
@@ -980,6 +975,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1016a8e0` 13 bytes (src/camera.cpp)
 - [ ] `1016ac50` 59 bytes (src/camera.cpp)
 - [ ] `1016af50` 69 bytes (src/camera.cpp)
+- [ ] `1016afa0` 99 bytes (src/colour_fades.cpp)
 - [ ] `1016b230` 36 bytes (src/camera.cpp)
 - [ ] `1016fa40` 107 bytes (src/scene_misc.cpp)
 - [ ] `1016fab0` 50 bytes (src/camera.cpp)
@@ -989,6 +985,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `10172a80` 21 bytes (src/texture_mgr.cpp)
 - [ ] `10172aa0` 21 bytes (src/texture_mgr.cpp)
 - [ ] `10173450` 48 bytes (src/texture_mgr.cpp)
+- [ ] `10174c70` 97 bytes (src/texture_mgr.cpp)
 - [ ] `10175e70` 16 bytes (src/texture_mgr.cpp)
 - [ ] `1017af40` 107 bytes (src/scene_misc.cpp)
 - [ ] `1017afb0` 97 bytes (src/scene_misc.cpp)
@@ -1062,8 +1059,8 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/camera.cpp`: 11 of 11 functions without a comment, no header
 - [ ] `src/containers.cpp`: 25 of 25 functions without a comment, no header
 - [ ] `src/engine_10143.cpp`: 9 of 9 functions without a comment, no header
-- [ ] `src/ime.cpp`: 21 of 21 functions without a comment, no header
-- [ ] `src/listbank.cpp`: 7 of 7 functions without a comment, no header
+- [ ] `src/ime.cpp`: 21 of 22 functions without a comment, no header
+- [ ] `src/listbank.cpp`: 7 of 8 functions without a comment, no header
 - [ ] `src/menu_textures.cpp`: 2 of 3 functions without a comment, no header
 - [ ] `src/mesh_cache.cpp`: 12 of 12 functions without a comment, no header
 - [ ] `src/mmv_texreg.cpp`: 10 of 10 functions without a comment, no header
@@ -1072,9 +1069,9 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/scene_misc.cpp`: 9 of 9 functions without a comment, no header
 - [ ] `src/scene_node.cpp`: 54 of 54 functions without a comment, no header
 - [ ] `src/texcache.cpp`: 10 of 10 functions without a comment, no header
-- [ ] `src/texture_mgr.cpp`: 14 of 14 functions without a comment, no header
+- [ ] `src/texture_mgr.cpp`: 14 of 15 functions without a comment, no header
 - [ ] `src/visibility.cpp`: 2 of 2 functions without a comment, no header
-- [ ] `src/window_create.cpp`: 4 of 4 functions without a comment, no header
+- [ ] `src/window_create.cpp`: 4 of 5 functions without a comment, no header
 
 ## 8. Structures and globals
 

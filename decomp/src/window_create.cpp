@@ -1,5 +1,6 @@
 #define _WIN32_WINNT 0x0400
 #include <windows.h>
+#include <string.h>
 #include <imm.h>
 
 typedef void (*WindowCallback)();
@@ -22,6 +23,7 @@ struct RenderWindow
     int wheelDelta;
     int middleCapture;
     HICON icon;
+    RenderWindow();
     void RegisterWindowClass(HINSTANCE instance);
     void Create(HINSTANCE instance);
 };
@@ -30,6 +32,16 @@ extern "C" RenderWindow *DAT_10f1a860;
 extern "C" int DAT_10f65514;
 extern "C" int DAT_10202b24;
 extern "C" int DAT_10202b28;
+
+// Constructor: no window yet, no icon, and the window title and class name both set to "Kernel Class"
+// (the game changes the title later).
+RenderWindow::RenderWindow()
+{
+    icon = 0;
+    strcpy(title, "Kernel Class");
+    strcpy(className, "Kernel Class");
+    window = 0;
+}
 
 void RenderWindow::Create(HINSTANCE instance)
 {

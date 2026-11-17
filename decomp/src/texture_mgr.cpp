@@ -92,7 +92,7 @@ extern "C" char DAT_10f8dbb8[1600][0x40];
 extern "C" char DAT_10fa6db8[1600];
 extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
-extern "C" void FUN_10174c70(int index, int flag);
+extern "C" int FUN_10174c70(int slot, int force);
 
 Transform::Transform()
 {
@@ -228,4 +228,21 @@ int Selection::AddQuad(int id, float x0, float y0, float z0, float u0, float v0,
         M_101733f0();
     M_10172cb0(x0, y0, z0, u0, v0, x1, y1, z1, u1, v1, x2, y2, u2, v2, colour, a, b);
     return 0;
+}
+extern "C" char DAT_10fdeb90[1600];  // reference count per texture slot
+
+// Releases one reference to texture slot `slot`. The texture is unloaded (and its name cleared, freeing the slot)
+// when the count reaches zero or when `force` is set. Returns the remaining count, or -1 for an unused slot.
+extern "C" int FUN_10174c70(int slot, int force)
+{
+    if (slot == -1 || DAT_10ffe5f8[slot][0] == 0)
+        return -1;
+    char refs = --DAT_10fdeb90[slot];
+    if (force != 0 || refs == 0)
+    {
+        DAT_10fdeb90[slot] = 0;
+        DAT_118d0ba8[slot].M_10169e40();
+        DAT_10ffe5f8[slot][0] = 0;
+    }
+    return DAT_10fdeb90[slot];
 }

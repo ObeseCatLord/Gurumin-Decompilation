@@ -44,3 +44,4 @@ address	status	reason
 101acb60	skip	Vec4 / divisor: same edx-across-call IPRA as 0x101acb00
 10164aa0	skip	global 0x10804bf8 reset: clears a 16-entry array of 0x249c-byte records at +0xecd4 and a field at +0x313e8 that falls inside the last record; layout not understood yet
 10145380	open	FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)
+10167390	open	AnimModel timed value setup: the rounded int-to-float temporary lands in the id parameter slot in ours, the value slot in the original

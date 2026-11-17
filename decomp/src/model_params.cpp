@@ -17,9 +17,11 @@ struct AnimModel
     int m_3998;
     float m_399c;
     float m_39a0;
+    int m_39a4;
     int M_101627d0(float x, float y, int mode);
     int M_101629b0(float y, float x);
     void M_10167400();
+    int M_10167390(int id, int value, int frames);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -48,4 +50,23 @@ void AnimModel::M_10167400()
         if (--m_3998 == 0)
             m_39a0 = m_399c;
     }
+}
+
+// Starts a timed change of the value at m_39a0 towards `value` over `frames` frames (0 = set at once),
+// remembering `id` in m_39a4. M_10167400 advances it each frame.
+int AnimModel::M_10167390(int id, int value, int frames)
+{
+    m_39a4 = id;
+    m_399c = value;
+    if (frames == 0)
+    {
+        m_39a0 = value;
+        m_399c = value;
+        m_3994 = 0;
+        m_3998 = 0;
+        return 0;
+    }
+    m_3998 = frames;
+    m_3994 = (value - m_39a0) / frames;
+    return 0;
 }

@@ -253,3 +253,6 @@ address	name	evidence
 101adec0	Matrix4::Translate	named in the decompiled source (decomp/obj_symbols.tsv)
 101ae710	Matrix4::SetRotationZ	named in the decompiled source (decomp/obj_symbols.tsv)
 101ae890	Vec3_Length	named in the decompiled source (decomp/obj_symbols.tsv)
+10007ce0	ResourceBanks::FreeBank	matched decompiled source (decomp/obj_symbols.tsv)
+1013e470	RenderWindow::RenderWindow	matched decompiled source (decomp/obj_symbols.tsv)
+100359c0	ListBank::ReportError	matched decompiled source (decomp/obj_symbols.tsv)

@@ -139,3 +139,7 @@ _Vec3_LengthSquared	101ac220
 ?Translate@Matrix4@@QAEXMMM@Z	101adec0
 ?SetRotationZ@Matrix4@@QAEXM@Z	101ae710
 _Vec3_Length	101ae890
+?FreeBank@ResourceBanks@@QAEHH@Z	10007ce0
+??0RenderWindow@@QAE@XZ	1013e470
+?ReportError@ListBank@@QAEHPBD@Z	100359c0
+?FreeAll@ListBank@@QAEHXZ	10007d50

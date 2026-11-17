@@ -6,7 +6,7 @@
 
 struct TokenReader
 {
-    int M_100359c0(const char *message);
+    int ReportError(const char *message);  // 0x100359c0 (ListBank::ReportError; same object as ListBank)
     int M_10035d20(int source, char *word);
     char M_100364a0(int source);
 };
@@ -21,7 +21,7 @@ char TokenReader::M_100364a0(int source)
     char word[256];
     if (M_10035d20(source, word) == 0)
     {
-        M_100359c0(DAT_101d7f08);
+        ReportError(DAT_101d7f08);
         return 0;
     }
     if (strcmp(word, "int") == 0)
@@ -30,7 +30,7 @@ char TokenReader::M_100364a0(int source)
         return 1;
     if (strcmp(word, "string") == 0)
         return 2;
-    M_100359c0(DAT_101d7ee4);
+    ReportError(DAT_101d7ee4);
     return 0;
 }
 

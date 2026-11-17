@@ -1,5 +1,4 @@
 address	status	reason
-1000da40	open	float: (float)int spilled via fstp [esp+8]/reload; VS2003 keeps it on the FPU stack (likely 13.00 vs 13.10)
 1000ed20	open	original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 10015910	open	settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
 10034c80	open	two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
@@ -38,3 +37,4 @@ address	status	reason
 10034920	skip	costume texture switch: compiler-merged case tails and an uninitialised default path; not attempted yet
 10199880	open	RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 1015fbf0	open	Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
+1001b7b0	open	char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores

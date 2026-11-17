@@ -13,6 +13,9 @@ struct CharModel
     int M_1017aeb0(const char *path);
     void M_101630b0(float value);
     void M_10162610(float x, float y, float z);
+    void M_10161b60();
+    int M_10161b90(int frame, float value);
+    int M_10161be0(int a, int b);
 };
 
 struct Character
@@ -20,7 +23,9 @@ struct Character
     int id;
     char pad_0004[0xc];
     CharModel model;
-    char pad_0011[0x2357];
+    char pad_0011[0x22eb];
+    int m_22fc;
+    char pad_2300[0x68];
     Vec3 m_2368;
     char pad_2374[0x28];
     int m_239c;
@@ -30,7 +35,10 @@ struct Character
 struct CharSlot
 {
     int m_0000;
-    char pad_0004[0x38];
+    int m_0004;
+    int pad_0008;
+    int m_000c;
+    char pad_0010[0x2c];
     int m_003c;
     char pad_0040[0x20];
     int m_0060;

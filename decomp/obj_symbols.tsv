@@ -110,3 +110,5 @@
 ?SetFlags@Node@@QAEXI@Z	1019b130
 ?ClearFlags@Node@@QAEXI@Z	1019b1b0
 ?WindowProc@RenderWindow@@UAGJPAUHWND__@@IIJ@Z	1013e4f0
+_acosf	10001f60
+_atan2f	10001f80

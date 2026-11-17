@@ -82,6 +82,8 @@ struct Game
     int M_10008460(int id);
     int M_10008770(int id, int value);
     int M_100087b0(int id, int count);
+    int M_100087f0(int x, int y, int w, int h, int frame, float alpha);
+    int M_10008880(int x, int y, int w, int h, int frame, float alpha);
     int M_10002060(const char *name);
     int M_100083e0(int id);
     int M_10008650(int id, int value);

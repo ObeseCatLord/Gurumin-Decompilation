@@ -115,3 +115,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `tools/sbs.py <obj> <symbol>` prints ours and the original side by side. From Git Bash set `MSYS_NO_PATHCONV=1`,
   or `/Op`-style flags are rewritten into paths.
 
+- Float code now matches routinely under 13.00 + /Op. Patterns: an int-to-float assignment written plainly
+  (`global = value;`) and repeated in a branch gives the original's single rounded temporary (0x1000da40 family);
+  `if (cond) continue;` reproduces the NaN-aware `test ah,5 / jnp` of a negated float compare (0x100123d0); accessing
+  `array[index].field` directly instead of through a local reference or pointer gives `lea reg,[reg+addr]`
+  where a local gives `add reg,addr` (0x10016500, 0x1001a390). math.h's inline `acosf`/`atan2f` were emitted
+  out of line (0x10001f60, 0x10001f80, symbols `_acosf`/`_atan2f`).

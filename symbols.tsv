@@ -610,3 +610,4 @@ address	name	evidence
 100165e0	Player_SetHeadTracking	turns the player head tracking on/off with rotation limits (decomp/src/head_look.cpp)
 10010310	Sound_PlayAt	plays a positional sound effect (decomp/src/sound_play.cpp)
 1003a6c0	Scene_Finish	finishes a pending scene start (decomp/src/scene_start.cpp)
+10001980	SoundArc_PlayFileLooped	plays a looping sound file through soundarc.dll (decomp/src/soundarc.cpp)

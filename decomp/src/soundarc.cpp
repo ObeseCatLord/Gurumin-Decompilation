@@ -139,3 +139,39 @@ extern "C" int FUN_100016c0(const char *file, const LPARAM *x, const LPARAM *y, 
     }
     return 0;
 }
+
+// Same as FUN_100016c0 for a looping sound (command 0x204); returns soundarc's answer to the play command.
+// Not byte-identical yet: same cross-jumping difference as FUN_100016c0.
+extern "C" LRESULT FUN_10001980(const char *file, const LPARAM *x, const LPARAM *y, const LPARAM *z, LPARAM pan,
+                            LPARAM channel, LPARAM volume)
+{
+    if (DAT_1020aee4 == 0)
+        return 0;
+    HWND wnd = FUN_10001570();
+    if (wnd != 0)
+    {
+        SendMessageA(wnd, 0x400, 0, channel);
+        if (x != 0)
+        {
+            SendMessageA(wnd, 0x400, 1, *x);
+            SendMessageA(wnd, 0x400, 2, *y);
+            SendMessageA(wnd, 0x400, 3, *z);
+            SendMessageA(wnd, 0x400, 4, pan);
+        }
+        else
+        {
+            SendMessageA(wnd, 0x400, 1, 0);
+            SendMessageA(wnd, 0x400, 2, 0);
+            SendMessageA(wnd, 0x400, 3, 0);
+            SendMessageA(wnd, 0x400, 4, pan);
+        }
+        SendMessageA(wnd, 0x400, 5, volume);
+        COPYDATASTRUCT data;
+        data.dwData = 0;
+        data.lpData = (void *)file;
+        data.cbData = 0x100;
+        SendMessageA(wnd, WM_COPYDATA, 0, (LPARAM)&data);
+        return SendMessageA(wnd, 0x400, 0x204, 0);
+    }
+    return 0;
+}

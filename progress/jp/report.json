@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 3.3439,
+  "fuzzy_match_percent": 3.3527,
   "total_code": "1720206",
   "matched_code": "52061",
   "matched_code_percent": 3.0264,
@@ -6915,16 +6915,16 @@
   {
    "name": "app/soundarc",
    "measures": {
-    "fuzzy_match_percent": 79.1822,
-    "total_code": "538",
+    "fuzzy_match_percent": 72.0374,
+    "total_code": "801",
     "matched_code": "282",
-    "matched_code_percent": 52.4164,
+    "matched_code_percent": 35.206,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 6,
+    "total_functions": 7,
     "matched_functions": 5,
-    "matched_functions_percent": 83.3333,
+    "matched_functions_percent": 71.4286,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -6935,8 +6935,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "538",
-     "fuzzy_match_percent": 79.1822
+     "size": "801",
+     "fuzzy_match_percent": 72.0374
     }
    ],
    "functions": [
@@ -6986,6 +6986,14 @@
      "fuzzy_match_percent": 56.25,
      "metadata": {
       "virtual_address": "268441280"
+     }
+    },
+    {
+     "name": "_FUN_10001980",
+     "size": "263",
+     "fuzzy_match_percent": 57.4219,
+     "metadata": {
+      "virtual_address": "268441984"
      }
     }
    ],
@@ -8640,13 +8648,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1658716",
+    "total_code": "1658453",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 632,
+    "total_functions": 631,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -8659,7 +8667,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1658716",
+     "size": "1658453",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -8678,14 +8686,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268440944"
-     }
-    },
-    {
-     "name": "FUN_10001980",
-     "size": "263",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268441984"
      }
     },
     {

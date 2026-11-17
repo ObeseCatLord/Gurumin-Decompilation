@@ -183,7 +183,7 @@ struct Node
     void M_10191e10();
     int M_101944d0();
     int M_10194f40(float *position, Matrix *matrix, int a, float radius, int b, int depth);
-    int M_101a2370(float *position, Matrix *matrix, int a, float radius, int b);
+    int StartProximityPass(float *position, Matrix *matrix, int a, float radius, int b);
     void M_10194510();
     int M_101947b0();
     int M_101947f0();
@@ -205,7 +205,7 @@ struct Node
     Node *FindRecursive(const char *name, int *skip);
     Node *FindPrefixRecursive(const char *prefix, int *skip);
     int M_1019e830(int a, int b);
-    int M_1019d6a0();
+    int ClearSpecialPassOnLinks();
     int M_101a8760();
     void M_101911e0(KeyPair *pairs, int count);
     void M_1019e120();
@@ -319,7 +319,7 @@ int Node::M_101944d0()
 // Starts a proximity pass over the subtree: clears m_00a8 everywhere, remembers `radius` and runs the recursive
 // pass M_10194f40 from depth 0. Returns 1. (It sits here, after M_101944d0, because the compiler keeps `this` in
 // edx across that call only when it can see M_101944d0's body.)
-int Node::M_101a2370(float *position, Matrix *matrix, int a, float radius, int b)
+int Node::StartProximityPass(float *position, Matrix *matrix, int a, float radius, int b)
 {
     M_101944d0();
     DAT_11b044f8 = radius;
@@ -535,7 +535,7 @@ int Node::M_1019d680()
 // Follow-up of the special pass marking: clears the marker (0x8000) again on nodes in matrix states 0x2000 or
 // 0x1000, clears it on every node a skinned node depends on (and their ancestors), and recurses into the children.
 // Returns 1.
-int Node::M_1019d6a0()
+int Node::ClearSpecialPassOnLinks()
 {
     if (flags & 0x2000)
         flags &= ~0x8000;
@@ -547,7 +547,7 @@ int Node::M_1019d6a0()
             m_0708->links[i]->M_1019d680();
     }
     for (int i = 0; i < childCount; i++)
-        children[i]->M_1019d6a0();
+        children[i]->ClearSpecialPassOnLinks();
     return 1;
 }
 
@@ -572,11 +572,11 @@ int Node::M_1019ed10(const char *name, int value)
 }
 
 
-// Runs the special pass marking (M_1019d600) and the follow-up pass (M_1019d6a0).
+// Runs the special pass marking (M_1019d600) and the follow-up pass (ClearSpecialPassOnLinks).
 int Node::M_101a8760()
 {
     M_1019d600();
-    M_1019d6a0();
+    ClearSpecialPassOnLinks();
     return 0;
 }
 

@@ -100,7 +100,7 @@ struct SceneOwner
 struct ModelNode
 {
     void M_10194510();
-    int M_101a2370(float *position, Matrix4 *matrix, int a, float radius, int b);
+    int StartProximityPass(float *position, Matrix4 *matrix, int a, float radius, int b);
     void Load(const char *path, int flags);            // 0x101abd60
     ModelNode *Find(const char *name, int index);       // 0x1019ece0
 };
@@ -330,7 +330,7 @@ int SceneOwner::LoadModel(const char *path)
 }
 
 // Updates this model's collision: refreshes the node tree (M_10194510) and collides the model's position and radius
-// with an identity-like work matrix (Node::M_101a2370, scene_node.cpp).
+// with an identity-like work matrix (Node::StartProximityPass, scene_node.cpp).
 // Returns 0.
 int SceneOwner::UpdateCollision()
 {
@@ -338,6 +338,6 @@ int SceneOwner::UpdateCollision()
     if (root != 0)
         root->M_10194510();
     m_2384 = 0;
-    root->M_101a2370(position, &matrix, 0, radius, 0);
+    root->StartProximityPass(position, &matrix, 0, radius, 0);
     return 0;
 }

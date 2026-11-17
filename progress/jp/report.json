@@ -5913,7 +5913,7 @@
      }
     },
     {
-     "name": "?M_101a2370@Node@@QAEHPAMPAUMatrix@@HMH@Z",
+     "name": "?StartProximityPass@Node@@QAEHPAMPAUMatrix@@HMH@Z",
      "size": "54",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -6081,7 +6081,7 @@
      }
     },
     {
-     "name": "?M_1019d6a0@Node@@QAEHXZ",
+     "name": "?ClearSpecialPassOnLinks@Node@@QAEHXZ",
      "size": "163",
      "fuzzy_match_percent": 100.0,
      "metadata": {

@@ -167,6 +167,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Whether a callee is *defined* in the same translation unit changes stack-slot sharing: with Cross defined in
   vec_math.cpp, PlaneFromTriangle (0x101af360) gave the Cross return temporary its own slot (frame 0x10 too big);
   in vec_ops.cpp, where Cross is only declared, it matches. Use this as evidence of the original file split.
+- Same-file knowledge also decides **stack-slot reuse**: when a local vector's address is passed to a function the
+  compiler cannot see, the slot is never reused for later temporaries. With Vec3_Dot / Vec3_LengthSquared defined in
+  vec4.cpp, the segment-distance functions (0x101acd90, 0x101af260) put their last temporary in the dead direction
+  vector and match. A frame that is 0x10 too big is a hint to move the callees in.
 - Texture_Load (0x1001e1a0) is also an inline helper: functions that load a fixed texture expand it, including
   three `strlen` loops over the literal (0x10050460). `include/texture_load.h` holds it as `LoadTexture`.
 

@@ -74,17 +74,9 @@ inline float LengthSquared(float x, float y, float z)
     return x * x + y * y + z * z;
 }
 
-// Dot product of the x/y/z parts of two vectors (free function, cdecl).
-extern "C" float Vec3_Dot(const Vec3 *a, const Vec3 *b)
-{
-    return a->x * b->x + a->y * b->y + a->z * b->z;
-}
-
-// Squared length of a Vec3 (free function, cdecl).
-extern "C" float Vec3_LengthSquared(const Vec3 *v)
-{
-    return LengthSquared(v->x, v->y, v->z);
-}
+// Defined in vec4.cpp (they must sit in the same file as the functions that pass them local vectors).
+extern "C" float Vec3_Dot(const Vec3 *a, const Vec3 *b);
+extern "C" float Vec3_LengthSquared(const Vec3 *v);
 
 // Length of the x/y part only (distance on the ground plane from the origin).
 float Vec4::Length2D()

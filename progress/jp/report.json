@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 3.2054,
+  "fuzzy_match_percent": 3.2075,
   "total_code": "1720206",
-  "matched_code": "49464",
-  "matched_code_percent": 2.8755,
+  "matched_code": "49970",
+  "matched_code_percent": 2.9049,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 517,
-  "matched_functions_percent": 42.6568,
+  "matched_functions": 519,
+  "matched_functions_percent": 42.8218,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 116,
-  "complete_units": 80
+  "complete_units": 81
  },
  "units": [
   {
@@ -7631,31 +7631,47 @@
   {
    "name": "app/vec4",
    "measures": {
-    "fuzzy_match_percent": 98.0538,
-    "total_code": "1821",
-    "matched_code": "1315",
-    "matched_code_percent": 72.2131,
+    "fuzzy_match_percent": 100.0,
+    "total_code": "1909",
+    "matched_code": "1909",
+    "matched_code_percent": 100.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 17,
-    "matched_functions": 15,
-    "matched_functions_percent": 88.2353,
-    "complete_code": "0",
-    "complete_code_percent": 0.0,
+    "total_functions": 19,
+    "matched_functions": 19,
+    "matched_functions_percent": 100.0,
+    "complete_code": "1909",
+    "complete_code_percent": 100.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 0
+    "complete_units": 1
    },
    "sections": [
     {
      "name": ".text",
-     "size": "1821",
-     "fuzzy_match_percent": 98.0538
+     "size": "1909",
+     "fuzzy_match_percent": 100.0
     }
    ],
    "functions": [
+    {
+     "name": "_Vec3_Dot",
+     "size": "29",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270189056"
+     }
+    },
+    {
+     "name": "_Vec3_LengthSquared",
+     "size": "59",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270189088"
+     }
+    },
     {
      "name": "??0Vec4@@QAE@XZ",
      "size": "16",
@@ -7747,7 +7763,7 @@
     {
      "name": "?DistanceSquaredToSegment@Vec4@@QAEMABU1@0@Z",
      "size": "263",
-     "fuzzy_match_percent": 93.3824,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270192016"
      }
@@ -7755,7 +7771,7 @@
     {
      "name": "?DistanceToSegment@Vec4@@QAEMABU1@0AAU1@@Z",
      "size": "243",
-     "fuzzy_match_percent": 92.5781,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270201440"
      }
@@ -7794,23 +7810,23 @@
     }
    ],
    "metadata": {
-    "complete": false,
+    "complete": true,
     "source_path": "decomp/src/vec4.cpp"
    }
   },
   {
    "name": "app/vec_math",
    "measures": {
-    "fuzzy_match_percent": 99.6764,
-    "total_code": "2887",
-    "matched_code": "2633",
-    "matched_code_percent": 91.2019,
+    "fuzzy_match_percent": 99.6662,
+    "total_code": "2799",
+    "matched_code": "2545",
+    "matched_code_percent": 90.9253,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 28,
-    "matched_functions": 26,
-    "matched_functions_percent": 92.8571,
+    "total_functions": 26,
+    "matched_functions": 24,
+    "matched_functions_percent": 92.3077,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -7821,27 +7837,11 @@
    "sections": [
     {
      "name": ".text",
-     "size": "2887",
-     "fuzzy_match_percent": 99.6764
+     "size": "2799",
+     "fuzzy_match_percent": 99.6662
     }
    ],
    "functions": [
-    {
-     "name": "_Vec3_Dot",
-     "size": "29",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "270189056"
-     }
-    },
-    {
-     "name": "_Vec3_LengthSquared",
-     "size": "59",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "270189088"
-     }
-    },
     {
      "name": "?Length2D@Vec4@@QAEMXZ",
      "size": "57",

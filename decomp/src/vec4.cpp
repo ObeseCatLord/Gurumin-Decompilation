@@ -1,4 +1,6 @@
-// Vec4 constructors, setters and arithmetic operators (0x101ac990..0x101acc40). The default constructor zeroes all four
+// Vec4 constructors, setters and arithmetic operators (0x101ac990..0x101acc40), plus the vector helpers that call them.
+// Placement matters: the compiler only reuses the stack slots of local vectors passed to Vec3_Dot/Vec3_LengthSquared
+// when it can see those functions do not keep the pointer, so they live here too. The default constructor zeroes all four
 // components. The operators that return a new vector construct it with Vec4() first; because Vec4() is defined in
 // this file, the compiler knows it leaves edx alone and keeps `this` in edx across the call (this is why these
 // operators only match when they live here).
@@ -29,8 +31,23 @@ struct Vec4
     float DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b);
 };
 
-extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b);       // 0x101ac200 (x/y/z only)
-extern "C" float Vec3_LengthSquared(const Vec4 *v);            // 0x101ac220 (x/y/z only)
+// Dot product of the x/y/z parts of two vectors (free function, cdecl; 0x101ac200).
+extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b)
+{
+    return a->x * b->x + a->y * b->y + a->z * b->z;
+}
+
+// x*x + y*y + z*z: an inline helper whose float arguments are spilled right to left (see vec_math.cpp).
+inline float LengthSquared(float x, float y, float z)
+{
+    return x * x + y * y + z * z;
+}
+
+// Squared length of the x/y/z part (free function, cdecl; 0x101ac220).
+extern "C" float Vec3_LengthSquared(const Vec4 *v)
+{
+    return LengthSquared(v->x, v->y, v->z);
+}
 extern "C" float Vec3_Length(const Vec4 *v);                   // 0x101ae890 (x/y/z only)
 
 // Zero vector.
@@ -144,7 +161,6 @@ Vec4 Vec4::operator/(const int &divisor) const
 
 // Squared distance from this point to the segment a-b (x/y/z): the point is projected onto the line and the
 // projection is clamped to the segment's ends. A segment of zero length counts as the point a.
-// Not byte-identical yet: the original's frame is 0x10 smaller (its last temporary reuses `direction`'s slot).
 float Vec4::DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b)
 {
     Vec4 direction = b - a;
@@ -159,7 +175,6 @@ float Vec4::DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b)
 }
 
 // Distance from this point to the segment a-b (x/y/z); the closest point of the segment is stored in `closest`.
-// Not byte-identical yet: same frame-slot difference as DistanceSquaredToSegment (see open.tsv).
 float Vec4::DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest)
 {
     Vec4 direction = b - a;

@@ -54,5 +54,3 @@ address	status	reason
 10163f90	open	see 10163e90
 100016c0	open	sound play: identical apart from cross-jumping; the original merges the two position branches only at the code-5 SendMessage, cl 13.00 here already at code 4 (code 4 hoisted out, branches swapped tried)
 10165020	open	bubble sort: ours stores count-1 in the dead parameter slot, the original in a separate local; a named local makes cl 13.00 unroll the inner loop by 4 (local inside/outside the loop, early return tried)
-101acd90	open	DistanceSquaredToSegment: code identical, frame 0x30 vs 0x40 - the original puts the last operator- temporary in the dead direction vector; reusing the variable adds a copy
-101af260	open	Vec4::DistanceToSegment: code identical apart from the frame; the original writes a + direction*t into the dead direction vector (named point/assignment forms tried)

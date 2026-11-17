@@ -256,3 +256,6 @@ address	name	evidence
 10007ce0	ResourceBanks::FreeBank	matched decompiled source (decomp/obj_symbols.tsv)
 1013e470	RenderWindow::RenderWindow	matched decompiled source (decomp/obj_symbols.tsv)
 100359c0	ListBank::ReportError	matched decompiled source (decomp/obj_symbols.tsv)
+1014b670	TextureObject::BindStage0	matched decompiled source (decomp/obj_symbols.tsv)
+1014b6e0	TextureObject::BindStage1	matched decompiled source (decomp/obj_symbols.tsv)
+1014f520	TextureObject::Release	matched decompiled source (decomp/obj_symbols.tsv)

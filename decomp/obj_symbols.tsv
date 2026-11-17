@@ -143,3 +143,7 @@ _Vec3_Length	101ae890
 ??0RenderWindow@@QAE@XZ	1013e470
 ?ReportError@ListBank@@QAEHPBD@Z	100359c0
 ?FreeAll@ListBank@@QAEHXZ	10007d50
+?DecodeFrameRle@MmvPlayer@@QAEXH@Z	10160a20
+?BindStage0@TextureObject@@QAEHXZ	1014b670
+?BindStage1@TextureObject@@QAEHXZ	1014b6e0
+?Release@TextureObject@@QAEHXZ	1014f520

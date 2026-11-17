@@ -34,7 +34,8 @@ struct MmvPlayer
     char pad_004d;
     char m_004e[0x202];
     int m_0250;
-    void *frame;
+    void *frame;           // 0x254: decoded 8-bit frame (palette indexes), updated in place
+    unsigned char *data;   // 0x258: compressed data of the current frame
 
     MmvPlayer();
     ~MmvPlayer();
@@ -43,6 +44,7 @@ struct MmvPlayer
     int M_10160df0();
     int M_10160f00();
     int M_10161050();
+    void DecodeFrameRle(int count);
 };
 
 struct TextureSlot
@@ -169,4 +171,57 @@ extern "C" int FUN_10161920(const char *name)
             return i;
     }
     return -1;
+}
+
+// Mmv_DecodeFrameRle: applies one frame's RLE data (`count` bytes at `data`) to the previous frame in `frame`.
+// Codes (docs/MODDING_MAP.md, tools/mmv_tool.py):
+//   0xFC n     skip n pixels (they keep the previous frame's colour)
+//   0xFD n v   n pixels of palette index v
+//   other b    one pixel of palette index b
+// Written in inline assembly in the original (frame pointer, `or cl,cl` tests), so it is here too.
+void MmvPlayer::DecodeFrameRle(int count)
+{
+    MmvPlayer *self = this;
+    unsigned char *source = data;
+    unsigned char *dest = (unsigned char *)frame;
+    __asm
+    {
+        mov edi, source
+        mov esi, dest
+        mov edx, count
+        xor ecx, ecx
+        xor ebx, ebx
+    next_code:
+        mov cl, [edi]
+        cmp cl, 0xfc
+        je skip_run
+        cmp cl, 0xfd
+        jne single_pixel
+        sub edx, 3
+        mov cl, [edi + 1]
+        mov bl, [edi + 2]
+        add edi, 2
+    fill_loop:
+        mov [esi], bl
+        dec cl
+        inc esi
+        or cl, cl
+        jne fill_loop
+        inc edi
+        jmp done_code
+    skip_run:
+        mov cl, [edi + 1]
+        add edi, 2
+        sub edx, 2
+        add esi, ecx
+        jmp done_code
+    single_pixel:
+        mov [esi], cl
+        dec edx
+        inc edi
+        inc esi
+    done_code:
+        or edx, edx
+        jne next_code
+    }
 }

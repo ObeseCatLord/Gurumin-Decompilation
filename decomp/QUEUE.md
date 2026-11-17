@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (40)
+## 1. Walls to retry (41)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -40,6 +40,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10167390` 104 — AnimModel timed value setup: the rounded int-to-float temporary lands in the id parameter slot in ours, the value slot in the original
 - [ ] `10169720` 40 — memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 - [ ] `10169e10` 35 — register choice: original pushes the last argument from edx, VS2003 from ecx
+- [ ] `1016a020` 109 — Playback bind to an owner's root node: same register residue as 0x1016a090 (original: ecx = -1, eax = 0, then a second zero in edi)
 - [ ] `1016a090` 97 — register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)
 - [ ] `1016b010` 53 — original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 - [ ] `1016b1e0` 73 — original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
@@ -52,7 +53,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (158)
+## 2. Small functions (30-250 bytes) (153)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c00` 82 bytes (loops 1)
@@ -67,11 +68,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001d8b0` 97 bytes (calls 1)
 - [ ] `101ae820` 107 bytes Cross (float, calls 1)
 - [ ] `10034f70` 108 bytes (float, loops 1)
-- [ ] `1014f520` 108 bytes (calls 3)
-- [ ] `1016a020` 109 bytes (calls 1)
-- [ ] `1014b670` 110 bytes (calls 3)
-- [ ] `1014b6e0` 110 bytes (calls 3)
-- [ ] `10160a20` 110 bytes Mmv_DecodeFrameRle (loops 2)
 - [ ] `10191a30` 112 bytes (loops 1, calls 2)
 - [ ] `1019d600` 114 bytes (loops 1, calls 1)
 - [ ] `101ad1c0` 115 bytes (calls 4)
@@ -1063,7 +1059,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/listbank.cpp`: 7 of 8 functions without a comment, no header
 - [ ] `src/menu_textures.cpp`: 2 of 3 functions without a comment, no header
 - [ ] `src/mesh_cache.cpp`: 12 of 12 functions without a comment, no header
-- [ ] `src/mmv_texreg.cpp`: 10 of 10 functions without a comment, no header
+- [ ] `src/mmv_texreg.cpp`: 10 of 11 functions without a comment, no header
 - [ ] `src/model_misc.cpp`: 10 of 10 functions without a comment, no header
 - [ ] `src/save_slot.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/scene_misc.cpp`: 9 of 9 functions without a comment, no header

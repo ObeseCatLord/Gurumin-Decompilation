@@ -60,6 +60,7 @@ struct Playback
     int pad_7c7c;
     SceneNode *m_7c80;
     int M_1016a090(SceneNode *node);
+    int M_1016a020(struct SceneOwner *owner);
 };
 
 extern "C" NodeLink *DAT_10faaa88[0x100];
@@ -118,6 +119,37 @@ int Playback::M_1016a090(SceneNode *node)
     if (node != 0)
     {
         int frames = node->M_10199340();
+        if (frames > 8)
+        {
+            m_7c70 = frames;
+            return 1;
+        }
+    }
+    m_7c70 = 0;
+    return 1;
+}
+
+// Object that owns a scene (texture_mgr.cpp: SceneOwner::M_1017b1c0 creates the Scene and binds it here).
+struct SceneOwner
+{
+    char pad_0000[0x22ec];
+    SceneNode *root;  // 0x22ec: root node of the owner's model
+};
+
+// Same as M_1016a090, binding the playback to `owner`'s root node.
+int Playback::M_1016a020(SceneOwner *owner)
+{
+    m_001c = -1;
+    m_7c78 = -1;
+    m_0018 = 0;
+    m_0020 = 0;
+    m_0024 = 0;
+    m_7c74 = 0;
+    m_0bec = 0;
+    m_7c80 = owner->root;
+    if (owner->root != 0)
+    {
+        int frames = owner->root->M_10199340();
         if (frames > 8)
         {
             m_7c70 = frames;

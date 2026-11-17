@@ -4,11 +4,16 @@ name: Progress report
 # objdiff-format report is generated locally with
 #   python decomp/tools/build_all.py --report progress/jp/report.json --version jp
 # and committed. This job publishes it as the artifact `<VERSION>_report` that ByteMatch reads from CI runs on master.
+# The README meter progress/<VERSION>/progress.svg is written by the same command; this job regenerates it from the
+# report and commits it if it is out of date.
 # The report contains only function names, addresses, sizes and match percentages (no game bytes).
 on:
   push:
     branches: [master]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   report:
@@ -20,6 +25,17 @@ jobs:
 
       - name: Check the report
         run: python3 -c "import json; r=json.load(open('progress/${VERSION}/report.json')); m=r['measures']; print(m['matched_functions'], 'of', m['total_functions'], 'functions,', m['matched_code_percent'], '% of code matched')"
+
+      - name: Refresh the README progress meter
+        run: |
+          python3 decomp/tools/progress_svg.py progress/${VERSION}/report.json progress/${VERSION}/progress.svg
+          if ! git diff --quiet -- progress/${VERSION}/progress.svg; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add progress/${VERSION}/progress.svg
+            git commit -m "Update progress meter"
+            git push
+          fi
 
       - name: Upload report
         uses: actions/upload-artifact@v4

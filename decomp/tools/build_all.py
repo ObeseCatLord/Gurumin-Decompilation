@@ -3,7 +3,7 @@
 usage: python tools/build_all.py [--report progress/jp/report.json] [--version jp]
 
 --report writes an objdiff-format progress report (function names, addresses, sizes and match percentages only)
-for ByteMatch / decomp.dev. Functions not yet decompiled are listed in the unit "app/unmatched" at 0 %.
+for ByteMatch / decomp.dev, plus progress.svg (README meter) next to it. Functions not yet decompiled are listed in the unit "app/unmatched" at 0 %.
 Percentages: MATCH = 100, EQUIV (cl 13.00 encoding quirks only) = 99, DIFF = share of identical bytes, capped at 98.
 """
 import csv, glob, json, os, re, subprocess, sys
@@ -130,6 +130,8 @@ def main():
         os.makedirs(os.path.dirname(os.path.abspath(report_path)), exist_ok=True)
         with open(report_path, "w", encoding="utf-8", newline="\n") as f:
             json.dump(report, f, indent=1)
+        subprocess.run([sys.executable, os.path.join(here, "progress_svg.py"), report_path,
+                        os.path.join(os.path.dirname(os.path.abspath(report_path)), "progress.svg")], check=True)
         print("report (%s): %d of %d functions, %.2f%% of code matched, fuzzy %.2f%%" % (
             version, total["matched_functions"], total["total_functions"], total["matched_code_percent"],
             total["fuzzy_match_percent"]))

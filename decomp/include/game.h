@@ -56,6 +56,9 @@ struct Game
     int M_10008650(int id, int value);
     int M_100086b0(int id, int a, int b, int c, int d);
     int M_10008710(int id, int a, int b, int c);
+    int M_100084b0(int id, int x, int y, int width, int height);
+    int M_10008330(int id, int value);
+    int M_1000b2c0(int id, const char *label, int value);
 };
 
 inline int Game::FindSlot(int id)

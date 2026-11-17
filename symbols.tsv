@@ -128,3 +128,13 @@ address	name	evidence
 10001110	Mouse_GetState	copies buttons/position (matched)
 10001450	Mouse_UpdateMoved	sets moved flag when position changes (matched)
 100014b0	Mouse_ReportCursor	cursor in 640x480 client coords to callback
+10010520	Dialog_YesNo	menu 0x216 with Yes (param 2) / No (param 3, default) (matched)
+100105e0	Dialog_NoYes	same with No listed first (matched)
+10010480	Bgm_StartStream	switches between the two soundarc streams, optional 2000 ms fade (matched)
+10001a90	SoundArc_PlayStream	wparam 0-4 parameters, path via WM_COPYDATA, then 0x207 (matched)
+10001ba0	SoundArc_StopStream	message 0x201 (matched)
+10001bf0	SoundArc_FadeStream	message 0x212 with fade time (matched)
+100017c0	SoundArc_Message235	nine parameters + id, message 0x235 (matched)
+10001890	SoundArc_SetSoundPosition	position and velocity pointers, message 0x267 (matched)
+1000ff80	Collision_ProbePoint	collision query at a point (matched)
+10007d50	ScriptBuffers_FreeAll	frees 8x128 script buffers (matched)

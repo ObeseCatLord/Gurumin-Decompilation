@@ -9,7 +9,31 @@ struct GameNamedEntry
 
 struct Game
 {
-    char pad_0000[0x8c];
+    int m_0000;
+    int m_0004;
+    int texMenu1;
+    int texMenu4;
+    int m_0010;
+    int texMenu2;
+    int texMenu5;
+    int texBalloon5;
+    int texBalloon6;
+    int texFrame;
+    int m_0028;
+    int texMap01;
+    int texMap02;
+    int texUdChip;
+    int texWaku01;
+    int texWaku02;
+    int texWaku03;
+    int texWaku04;
+    int texIcon01;
+    int texWaku05;
+    char pad_0050[0x2c];
+    int texBalloon7;
+    int texMenu15;
+    int texMenu14;
+    int m_0088;
     int m_008c[3];
     int m_0098[3];
     int m_00a4[3];
@@ -31,18 +55,25 @@ struct Game
     int m_01d0[3];
     char m_01dc[0x258];
     char m_0434[0x258];
-    char pad_068c[0x5728];
+    char pad_068c[4];
+    int m_0690;
+    char pad_0694[0x5720];
     int m_5db4[3][0x82];
-    char pad_63cc[0x1288];
+    char pad_63cc[0xc30];
+    int m_6ffc;
+    char pad_7000[0x654];
     int m_7654[3];
     void (*m_7660)(int);
-    char pad_7664[0x8e7b0];
+    int m_7664;
+    char pad_7668[0x8e7ac];
     GameNamedEntry m_95e14[0x100];
     int m_a4614;
     char pad_a4618[0x34a07c];
     int m_3ee694[4000];
 
     int FindSlot(int id);
+    void M_10007f20();
+    int LoadMenuTextures(int value);
     int M_100022b0(int index);
     int M_10002300(int index, int value);
     int M_10007ee0();

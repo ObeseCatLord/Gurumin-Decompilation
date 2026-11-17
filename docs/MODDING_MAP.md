@@ -90,6 +90,27 @@ A replacement packs.dll with the same exports is a clean place to add PNG textur
   !FULLSCREEN, SwapEffect = COPY, EnableAutoDepthStencil with D16, PresentationInterval = ONE, or IMMEDIATE when
   `VSYNC` is set), then `CreateDevice` (HAL; hardware vertex processing when `HDVS`, falling back to software).
 - A "Trident Video Accelerator Cyber-XP4" adapter string disables HDVS (old driver workaround).
+- `RenderWindow_Create` 0x10148a40 (matched, `decomp/src/window_create.cpp`) creates the window with `WS_POPUP`
+  when the fullscreen flag 0x10f65514 is set and `WS_OVERLAPPEDWINDOW` otherwise, at width×height from
+  0x10202b24/28. A borderless-window mod can change the style constant here (0x80000000 = WS_POPUP is pushed at
+  0x10148a95/0x10148a9a in the fullscreen branch).
+
+## Menu and HUD images
+`Game::LoadMenuTextures` 0x10007fd0 (matched, `decomp/src/menu_textures.cpp`) loads the 2D interface images through
+`Texture_LoadBmp(path, alphaPath, 0)`; the texture ids land in the Game object (0x104b7200 + offset). Replace the
+files (`images\*.bmp` or their scrambled `.itm`) to reskin the menus; the second name is the alpha mask.
+
+| Game offset | Image (alpha) | | Game offset | Image (alpha) |
+|---|---|---|---|---|
+| +0x08 | menu1 (menu1a) | | +0x34 | UD_chip |
+| +0x0c | menu4 | | +0x38 | waku01 (WAKU01A) |
+| +0x14 | menu2 | | +0x3c | waku02 (WAKU02A) |
+| +0x18 | menu5 | | +0x40 | waku03 (WAKU03A) |
+| +0x1c | fukida5p (fukida5a) | | +0x44 | waku04 |
+| +0x20 | fukida6p (fukida6a) | | +0x48 | ico01 (ico01a) |
+| +0x24 | futi | | +0x4c | waku05 |
+| +0x2c | map01 | | +0x7c | fukida7p (fukida7a) |
+| +0x30 | map02 | | +0x84 / +0x80 | menu14 / menu15 |
 
 ## Steam English game.exe
 The Steam release (`game.exe`, VS2013, 2015) contains the same game code as APP.dll in one executable (image base

@@ -104,3 +104,4 @@
 ?SetPosition@PathMover@@QAEXMMM@Z	10162610
 ?Create@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	10148a40
 ?RegisterWindowClass@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	101489c0
+?LoadMenuTextures@Game@@QAEHH@Z	10007fd0

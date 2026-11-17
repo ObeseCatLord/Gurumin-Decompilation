@@ -228,16 +228,6 @@ int KeyTrack::HasFrame(int frame)
     return 0;
 }
 
-// Returns the translation row as a vector (w copied from m[15]). Not byte-identical yet.
-Vec4 Matrix4::GetTranslation()
-{
-    Vec4 result;
-    result.x = m[12];
-    result.y = m[13];
-    result.z = m[14];
-    return result;
-}
-
 // Sets the translation row.
 void Matrix4::SetTranslation(float x, float y, float z, float w)
 {

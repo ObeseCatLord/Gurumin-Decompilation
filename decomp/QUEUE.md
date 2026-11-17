@@ -66,9 +66,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad760` 185 — KeyBank::Insert: original keeps frame in ebp and the count in ecx for the whole function; VS2003 picks edi/ecx and stores x through the FPU (register allocation)
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ad920` 179 — Spline (Hermite): the original multiplies t3 by -2.0 for the c term; cl 13.00 turns it into -(t3 + t3) and shares that with the b term (forms with 2.0f*, a separate h01 local and a -2 local tried)
-- [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
+- [ ] `101af260` 243 — Vec4::DistanceToSegment: code identical apart from the frame; the original writes a + direction*t into the dead direction vector (named point/assignment forms tried)
 
-## 2. Small functions (30-250 bytes) (60)
+## 2. Small functions (30-250 bytes) (59)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
@@ -125,13 +125,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014bb70` 240 bytes (calls 15)
 - [ ] `1003ac20` 242 bytes (float, calls 4)
 - [ ] `10162c50` 242 bytes (loops 1, calls 6)
-- [ ] `101af260` 243 bytes (float, calls 13)
 - [ ] `10024e80` 245 bytes (float, calls 2)
 - [ ] `100249c0` 246 bytes (float, calls 8)
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (230)
+## 3. Medium functions (251-800 bytes) (229)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
@@ -142,7 +141,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1015c850` 270 bytes Frame_PumpAndRecover (loops 3, calls 12)
 - [ ] `1003a6c0` 271 bytes (loops 1, calls 11)
 - [ ] `10150a90` 273 bytes (calls 13)
-- [ ] `101adf40` 273 bytes (float, calls 1)
 - [ ] `100165e0` 275 bytes (calls 3)
 - [ ] `10184170` 276 bytes (loops 3, calls 1)
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)

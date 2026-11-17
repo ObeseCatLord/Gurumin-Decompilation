@@ -599,3 +599,5 @@ address	name	evidence
 101ac200	Vec3_Dot	matched decompiled source (decomp/obj_symbols.tsv)
 101acd90	Vec4::DistanceSquaredToSegment	matched decompiled source (decomp/obj_symbols.tsv)
 10191ec0	Node::CollectNearSegment	matched decompiled source (decomp/obj_symbols.tsv)
+101af260	Vec4::DistanceToSegment	matched decompiled source (decomp/obj_symbols.tsv)
+101adf40	TransformCoord	matched decompiled source (decomp/obj_symbols.tsv)

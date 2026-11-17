@@ -16,7 +16,10 @@ struct Vec4
     Vec4();
     Vec4(float x, float y, float z, float w);
     void Set(float x, float y, float z, float w);
+    void Copy(const Vec4 &source);
     void Fill(const float &value);
+    float Distance(const Vec4 &other);   // 0x101ac590 (vec_math.cpp)
+    float DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest);
     Vec4 operator+(const Vec4 &other) const;
     Vec4 operator-(const Vec4 &other) const;
     Vec4 operator*(const Vec4 &other) const;
@@ -28,6 +31,7 @@ struct Vec4
 
 extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b);       // 0x101ac200 (x/y/z only)
 extern "C" float Vec3_LengthSquared(const Vec4 *v);            // 0x101ac220 (x/y/z only)
+extern "C" float Vec3_Length(const Vec4 *v);                   // 0x101ae890 (x/y/z only)
 
 // Zero vector.
 Vec4::Vec4()
@@ -54,6 +58,15 @@ void Vec4::Set(float nx, float ny, float nz, float nw)
     y = ny;
     z = nz;
     w = nw;
+}
+
+// Copies all four components of `source`.
+void Vec4::Copy(const Vec4 &source)
+{
+    x = source.x;
+    y = source.y;
+    z = source.z;
+    w = source.w;
 }
 
 // Sets all four components to the same value.
@@ -143,6 +156,70 @@ float Vec4::DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b)
     if (t > 1.0f)
         return Vec3_LengthSquared(&(b - *this));
     return Vec3_LengthSquared(&(a + direction.Scaled(t) - *this));
+}
+
+// Distance from this point to the segment a-b (x/y/z); the closest point of the segment is stored in `closest`.
+// Not byte-identical yet: same frame-slot difference as DistanceSquaredToSegment (see open.tsv).
+float Vec4::DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest)
+{
+    Vec4 direction = b - a;
+    float t = (Vec3_Dot(this, &direction) - Vec3_Dot(&a, &direction)) / Vec3_LengthSquared(&direction);
+    if (t < 0.0f)
+    {
+        closest.Copy(a);
+        return Distance(a);
+    }
+    if (t > 1.0f)
+    {
+        closest.Copy(b);
+        return Distance(b);
+    }
+    closest.Copy(a + direction.Scaled(t));
+    return Vec3_Length(&(closest - *this));
+}
+
+// Row-major 4x4 matrix (vec_math.cpp); the translation is in m[12..14].
+struct Matrix4
+{
+    float m[16];
+    Vec4 GetTranslation();
+};
+
+// 0x101ade80. Returns the translation row as a vector (w stays 0).
+Vec4 Matrix4::GetTranslation()
+{
+    Vec4 result;
+    result.x = m[12];
+    result.y = m[13];
+    result.z = m[14];
+    return result;
+}
+
+// Transforms `point` (as x, y, z, 1) by `matrix` and divides by the resulting w (perspective projection). When w is
+// not positive (behind the camera) the result is negated, so callers can still tell the side.
+Vec4 TransformCoord(const Vec4 &point, const Matrix4 &matrix)
+{
+    float v[4];  // the transformed x, y, z, w
+    v[0] = point.x * matrix.m[0] + point.y * matrix.m[4] + point.z * matrix.m[8] + matrix.m[12];
+    v[1] = point.x * matrix.m[1] + point.y * matrix.m[5] + point.z * matrix.m[9] + matrix.m[13];
+    v[2] = point.x * matrix.m[2] + point.y * matrix.m[6] + point.z * matrix.m[10] + matrix.m[14];
+    v[3] = point.x * matrix.m[3] + point.y * matrix.m[7] + point.z * matrix.m[11] + matrix.m[15];
+    Vec4 result;
+    if (v[3] > 0.0f)
+    {
+        result.x = v[0] / v[3];
+        result.y = v[1] / v[3];
+        result.z = v[2] / v[3];
+        result.w = v[3];
+    }
+    else
+    {
+        result.x = -(v[0] / v[3]);
+        result.y = -(v[1] / v[3]);
+        result.z = -(v[2] / v[3]);
+        result.w = -v[3];
+    }
+    return result;
 }
 
 // Fixed key-frame bank (containers.cpp). Its constructor lives here, next to Vec4(), for the same reason as the

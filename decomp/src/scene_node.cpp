@@ -13,8 +13,8 @@ struct Vec4
     float y;
     float z;
     float w;
-    // 0x101af260: distance from this point to the segment from-to (mode as in the proximity pass).
-    float DistanceToSegment(const Vec4 *from, const Vec4 *to, int mode);
+    // 0x101af260 (vec4.cpp): distance from this point to the segment from-to; the closest point goes to *closest.
+    float DistanceToSegment(const Vec4 *from, const Vec4 *to, Vec4 *closest);
 };
 
 struct Matrix
@@ -230,7 +230,7 @@ struct Node
     int FindRecursiveStripped(const char *name, int *skip);
     int BuildMesh(int recurse, int flags);
     int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
-                           int mode);
+                           Vec4 *closest);
     int FindPrefixRecursiveStripped(const char *prefix, int *skip);
     int M_1019ece0(const char *name, int value);
     int M_1019ed10(const char *name, int value);
@@ -346,10 +346,11 @@ int Node::StartProximityPass(float *position, Matrix *matrix, int a, float radiu
 
 // Finds the collision nodes (flag 0x400, active m_00a8) in the subtree that lie near the segment from-to: within
 // `range` plus 0.578 of their bounds radius. Bones are skipped unless DAT_11b04510 is set. Each hit is appended to
-// `found` (when given) and counted in *foundCount; without a list the search stops at the first hit. Returns 1
+// `found` (when given) and counted in *foundCount; without a list the search stops at the first hit. *closest
+// receives the closest segment point of the last node tested. Returns 1
 // when a node was found.
 int Node::CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
-                             int mode)
+                             Vec4 *closest)
 {
     if (DAT_11b04510 != 0 || m_0704 == 0)
     {
@@ -357,14 +358,14 @@ int Node::CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float
         {
             for (int i = 0; i < childCount; i++)
             {
-                int hit = children[i]->CollectNearSegment(unused, from, to, range, found, foundCount, mode);
+                int hit = children[i]->CollectNearSegment(unused, from, to, range, found, foundCount, closest);
                 if (hit != 0 && found == 0)
                     return hit;
             }
         }
         else if (m_00a8 != 0)
         {
-            if (worldMatrix.GetTranslation().DistanceToSegment(from, to, mode) < boundsRadius * 0.578f + range)
+            if (worldMatrix.GetTranslation().DistanceToSegment(from, to, closest) < boundsRadius * 0.578f + range)
             {
                 if (found != 0)
                 {

@@ -211,4 +211,7 @@ _Vec3_Length	101ae890
 ?ReadWordInLine@Game@@QAEHXZ	10002330
 _Vec3_Dot	101ac200
 ?DistanceSquaredToSegment@Vec4@@QAEMABU1@0@Z	101acd90
-?CollectNearSegment@Node@@QAEHHPBUVec4@@0MPAPAU1@PAHH@Z	10191ec0
+?CollectNearSegment@Node@@QAEHHPBUVec4@@0MPAPAU1@PAHPAU2@@Z	10191ec0
+?Copy@Vec4@@QAEXABU1@@Z	101acc20
+?DistanceToSegment@Vec4@@QAEMABU1@0AAU1@@Z	101af260
+?TransformCoord@@YA?AUVec4@@ABU1@ABUMatrix4@@@Z	101adf40

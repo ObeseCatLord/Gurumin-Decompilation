@@ -71,7 +71,11 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   results on all other functions so far. Flags now `/O2 /Ob1 /Gy /GS` (`/Ob1` proven: non-`inline` callees are not inlined).
   Status: 113 matched, 10 open (`decomp/open.tsv`: 13.00 codegen/encoder/GS walls). A cl 13.00.9466 would clear most of them.
 - Recurring cl 13.00 walls (see decomp/open.tsv): **any [esp] memory operand is encoded with a zero disp8** (`89 44 24 00` vs VS2003 `89 04 24`), so every function that touches a local at `[esp+0]` differs by one byte per access; /GS prologue/epilogue; occasional register/schedule choices. 13.10 cannot fix these from source. Current: ~157 matched, 25 open.
-- **Inter-procedural register allocation** shows up in several functions (0x10161970, 0x101a2370, 0x101af420): the caller keeps a value in edx across a call to a callee known not to touch edx. That suggests /GL + /LTCG (available since VS .NET 2002) or intra-module IPRA; VS2003 per-file compilation cannot reproduce it. Marked `skip` in open.tsv.
+- **Callee register knowledge inside one file** (corrected 2026-11-17): the caller keeps a value in edx across a call
+  when the callee is *defined earlier in the same translation unit* and the compiler can see it leaves edx alone.
+  This is ordinary cl 13.00 behaviour, not /GL. Place such functions after their callee in one file: the Vec4
+  operators next to `Vec4()` in vec4.cpp (0x101ac9e0..0x101acbc0), KeyBank's constructor there too (0x101af420),
+  Node::M_1019d6a0 after M_1019d680 and Node::M_101a2370 after M_101944d0 in scene_node.cpp.
 - **/GX (C++ EH) is on in the original**: destructors with EH state frames match byte for byte with `/GX` and nothing regresses, so flags are now `/O2 /Ob1 /Gy /GS /GX`.
 - Functions with an EH frame (`push -1 / push handler / fs:[0]`) must be written with **C++ linkage**: under /GX an `extern \"C\"` function is assumed not to throw and gets no frame. Map the mangled name to the address in `decomp/obj_symbols.tsv`.
 - Another recurring 13.00 habit: when 0 is stored several times it is kept in a callee-saved register (`xor ebx,ebx`); VS2003 stores immediates. Seen in the enemy AI updaters 0x100e2080.. (source otherwise identical).
@@ -90,7 +94,8 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   Retry the open "zero/1.0f in a register" entries with loops.
 - EH state stores that the original leaves out before a call (0x101728c0: no state update before `ModelState()`)
   match when that callee is declared `throw()`. The original compiler evidently knew the callee could not throw,
-  which fits whole-program /GL+LTCG (see the IPRA note). Use `throw()` on such declarations only where the
+  probably because the callee was defined in the same file (see the callee note above). Use `throw()` on such
+  declarations only where the
   original shows the missing state store.
 - Callee-saved push placement follows the early exits: a test written as its own `if (x == 0) return 0;` before the rest keeps the push after it (0x1015c9e0). Where the original pushes *before* the first test (0x100014b0, 0x10199be0) no spelling has been found yet.
 
@@ -138,8 +143,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   copies z, y, x). Chained assignments store right to left (`a = b = c = 0` stores c first), which explains odd store
   orders (0x101ae770). Stores otherwise keep source order, so write them in the original's order (0x101ae710).
 - Vec4 operators that return by value (0x101ac9e0 +, 0x101acb00 *, 0x101acb60 /) keep `this` in edx across the
-  `Vec4()` constructor call: inter-procedural register allocation, so the original was built with /GL + /LTCG.
-  Possible future lever: compile such files with /GL, link them into a test DLL with /LTCG and compare the linked code.
+  `Vec4()` constructor call because `Vec4()` is defined in the same file (vec4.cpp); they all match there.
 - An empty `switch` case still counts when the compiler picks the split value if its body is not empty in the source
   (WindowProc's `case WM_KEYDOWN:` with a dead `if`).
 - /Od translation units (src_od/) are built with `/Od /Oi`: strcpy expands inline there (0x1013e6f0). build_all includes them.

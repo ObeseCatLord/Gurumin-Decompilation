@@ -281,12 +281,6 @@ void Matrix4::SetRotationTransposed(const Matrix4 &source)
     m[10] = source.m[10];
 }
 
-// 0x101af420. Constructor: an empty bank (see the IPRA note in open.tsv).
-KeyBank::KeyBank()
-{
-    Clear();
-}
-
 // Returns `point` transformed by `matrix`.
 Vec4 TransformPoint(const Vec4 &point, const Matrix4 &matrix)
 {

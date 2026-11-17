@@ -39,7 +39,8 @@ struct GlyphState
 {
     char pad_0000[0xc4];
     Matrix m_00c4;
-    char pad_0104[0x1104];
+    char pad_0104[0x1004];
+    Node *links[0x40];          // 0x1108: nodes this skinned node depends on (m_5618 of them)
     Node *bones[0x44];
     char pad_1318[0x1100];
     Matrix bindPose[0x44];
@@ -181,6 +182,8 @@ struct Node
     void M_10191dd0();
     void M_10191e10();
     int M_101944d0();
+    int M_10194f40(float *position, Matrix *matrix, int a, float radius, int b, int depth);
+    int M_101a2370(float *position, Matrix *matrix, int a, float radius, int b);
     void M_10194510();
     int M_101947b0();
     int M_101947f0();
@@ -202,7 +205,7 @@ struct Node
     Node *FindRecursive(const char *name, int *skip);
     Node *FindPrefixRecursive(const char *prefix, int *skip);
     int M_1019e830(int a, int b);
-    void M_1019d6a0();
+    int M_1019d6a0();
     int M_101a8760();
     void M_101911e0(KeyPair *pairs, int count);
     void M_1019e120();
@@ -244,7 +247,7 @@ extern "C" int DAT_11b044e8;
 extern "C" int DAT_11b044ec;
 extern "C" int DAT_11b044f4;
 extern "C" int DAT_10203474;
-extern "C" int DAT_11b044f8;
+extern "C" float DAT_11b044f8;  // radius of the current proximity pass (used by M_10194f40)
 extern "C" int DAT_11b04500;
 extern "C" int DAT_10203478;
 extern "C" int DAT_11b04504;
@@ -309,6 +312,18 @@ int Node::M_101944d0()
     m_00a8 = 0;
     for (int i = 0; i < childCount; i++)
         children[i]->M_101944d0();
+    return 1;
+}
+
+
+// Starts a proximity pass over the subtree: clears m_00a8 everywhere, remembers `radius` and runs the recursive
+// pass M_10194f40 from depth 0. Returns 1. (It sits here, after M_101944d0, because the compiler keeps `this` in
+// edx across that call only when it can see M_101944d0's body.)
+int Node::M_101a2370(float *position, Matrix *matrix, int a, float radius, int b)
+{
+    M_101944d0();
+    DAT_11b044f8 = radius;
+    M_10194f40(position, matrix, a, radius, b, 0);
     return 1;
 }
 
@@ -515,6 +530,25 @@ int Node::M_1019d680()
     if (parent != 0)
         parent->M_1019d680();
     return 0;
+}
+
+// Follow-up of the special pass marking: clears the marker (0x8000) again on nodes in matrix states 0x2000 or
+// 0x1000, clears it on every node a skinned node depends on (and their ancestors), and recurses into the children.
+// Returns 1.
+int Node::M_1019d6a0()
+{
+    if (flags & 0x2000)
+        flags &= ~0x8000;
+    if (flags & 0x1000)
+        flags &= ~0x8000;
+    if (m_0708 != 0 && m_0708->m_5618 != 0)
+    {
+        for (int i = 0; i < m_0708->m_5618; i++)
+            m_0708->links[i]->M_1019d680();
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_1019d6a0();
+    return 1;
 }
 
 // Node::Find: the index-th node called `name` in the subtree; a leading '@' turns it into a prefix search

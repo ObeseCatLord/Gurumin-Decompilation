@@ -31,8 +31,6 @@ struct Vec4
     float DistanceSquared(const Vec4 &other);
     float Distance(const Vec4 &other);
     float DistanceZWeighted(const Vec4 &other);
-    Vec4 Scaled(const float &scale);
-    Vec4 Divided(const float &divisor);
     void Normalize();
     void RotateZ(float angle);
     void RotateY(float angle);
@@ -160,28 +158,6 @@ int Vec4::InBox(const Box2 *box)
     if (x < box->min.x || x > box->max.x || y < box->min.y || y > box->max.y || z < box->min.z || z > box->max.z)
         return 0;
     return 1;
-}
-
-// Returns this vector times `scale` (x/y/z; the result's w stays 0).
-// Not byte-identical yet: the original keeps `this` in edx across the Vec4() constructor call (whole-program
-// register allocation, see NOTES.md and open.tsv).
-Vec4 Vec4::Scaled(const float &scale)
-{
-    Vec4 result;
-    result.x = scale * x;
-    result.y = y * scale;
-    result.z = z * scale;
-    return result;
-}
-
-// Returns this vector divided by `divisor` (x/y/z; w stays 0). Same register difference as Scaled.
-Vec4 Vec4::Divided(const float &divisor)
-{
-    Vec4 result;
-    result.x = x / divisor;
-    result.y = y / divisor;
-    result.z = z / divisor;
-    return result;
 }
 
 // Length of a Vec3 (free function, cdecl).

@@ -193,3 +193,6 @@ _Vec3_Length	101ae890
 ?Write16@TextureObject@@QAEHHHHHHPBX@Z	1014f060
 ?QuatMultiply@@YA?AUVec4@@ABU1@0@Z	101aec90
 ?PlaneFromTriangle@@YA?AUPlane@@ABUVec4@@00@Z	101af360
+??HVec4@@QBE?AU0@ABU0@@Z	101ac9e0
+??DVec4@@QBE?AU0@ABU0@@Z	101acaa0
+??KVec4@@QBE?AU0@ABH@Z	101acbc0

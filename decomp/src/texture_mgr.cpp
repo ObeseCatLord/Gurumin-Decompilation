@@ -330,7 +330,7 @@ int SceneOwner::LoadModel(const char *path)
 }
 
 // Updates this model's collision: refreshes the node tree (M_10194510) and collides the model's position and radius
-// with an identity-like work matrix (M_101a2370; whole-program register allocation keeps that one from matching).
+// with an identity-like work matrix (Node::M_101a2370, scene_node.cpp).
 // Returns 0.
 int SceneOwner::UpdateCollision()
 {

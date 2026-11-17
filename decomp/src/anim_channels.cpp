@@ -59,8 +59,8 @@ struct Matrix4
     ~Matrix4();
 };
 
-// Declared throw(): the original leaves out the EH state update before this constructor, which only fits a
-// compiler that knew it cannot throw (whole-program optimisation).
+// Declared throw(): the original leaves out the EH state update before this constructor, so its compiler knew it
+// cannot throw (most likely because the constructor was defined in the same file, see NOTES.md).
 struct ModelState
 {
     char pad_0000[0x30];

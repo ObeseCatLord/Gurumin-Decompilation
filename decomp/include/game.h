@@ -1,5 +1,13 @@
 #pragma once
 
+// Per-window item table: 0x80 item values, then the pointer that receives the chosen result.
+struct GameMenuItems
+{
+    int values[0x80];
+    int *result;
+    int m_0204;
+};
+
 struct GameNamedEntry
 {
     int value;
@@ -72,7 +80,8 @@ struct Game : Object
     char m_0434[0x258];
     char pad_068c[4];
     int m_0690;
-    char pad_0694[0x5720];
+    char pad_0694[0x5108];
+    GameMenuItems m_579c[3];    // 0x579c: per-window item values and result pointer
     int m_5db4[3][0x82];
     char pad_63cc[0xc30];
     int m_6ffc;
@@ -120,7 +129,7 @@ struct Game : Object
     int M_100086b0(int id, int a, int b, int c, int d);
     int M_10008710(int id, int a, int b, int c);
     int M_100084b0(int id, int x, int y, int width, int height);
-    int M_10008330(int id, int value);
+    int M_10008330(int id, int *result);
     int M_1000b2c0(int id, const char *label, int value);
 };
 

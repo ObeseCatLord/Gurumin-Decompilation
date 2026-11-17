@@ -11,8 +11,8 @@ struct Vec4
 
 extern "C" Vec4 DAT_118e69e8;   // player position
 extern "C" Vec4 DAT_118e6cb8;   // player velocity
-extern "C" Vec4 DAT_11af3e28;   // movement input direction
-extern "C" Vec4 DAT_118e6c78;   // knock-back vector
+extern "C" Vec4 DAT_11af3e28;   // camera position (camera_orbit.cpp)
+extern "C" Vec4 DAT_118e6c78;   // camera target
 extern "C" int DAT_1101d888;
 extern "C" int DAT_1101d898;
 extern "C" int DAT_1101de18;
@@ -22,7 +22,8 @@ extern "C" char DAT_10fabe8c;
 extern "C" char DAT_10faaa80;
 extern "C" int DAT_10203444;    // ground height cache, -100 = unknown
 
-// Zeroes the player's movement vectors and the related per-frame state. Returns 0.
+// Zeroes the player position and velocity, the camera position and target, and the related per-frame state.
+// Returns 0.
 extern "C" int FUN_1016a8f0(void)
 {
     DAT_118e69e8.Fill(0.0f);

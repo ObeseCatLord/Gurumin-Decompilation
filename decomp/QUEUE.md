@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (45)
+## 1. Walls to retry (46)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -52,33 +52,17 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
 - [ ] `101ac300` 146 — Vec4::RotateZ: the cos/sin results pair with the other coordinate in the second product (three source orders give the same code)
+- [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
 - [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
 - [ ] `101ad760` 185 — KeyBank::Insert: original keeps frame in ebp and the count in ecx for the whole function; VS2003 picks edi/ecx and stores x through the FPU (register allocation)
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (125)
+## 2. Small functions (30-250 bytes) (108)
 
 - [ ] `1000cf80` 33 bytes
-- [ ] `10017c00` 82 bytes (loops 1)
 - [ ] `10148960` 82 bytes (calls 3)
-- [ ] `10008330` 83 bytes (loops 1)
 - [ ] `1004f860` 87 bytes (calls 1)
-- [ ] `101ac6e0` 92 bytes Vec4::InBox (float)
-- [ ] `101ac9e0` 95 bytes (float, calls 1)
-- [ ] `101aca40` 95 bytes Vec4::Transformed (float, calls 1)
-- [ ] `101acaa0` 95 bytes (float, calls 1)
-- [ ] `101acbc0` 95 bytes (float, calls 1)
-- [ ] `1001d8b0` 97 bytes (calls 1)
-- [ ] `101ae820` 107 bytes Cross (float, calls 1)
-- [ ] `10034f70` 108 bytes (float, loops 1)
-- [ ] `101ad1c0` 115 bytes (calls 4)
-- [ ] `10062750` 116 bytes (calls 4)
-- [ ] `101148b0` 117 bytes (float, calls 4)
-- [ ] `101ad240` 119 bytes (float, calls 2)
-- [ ] `10162ea0` 120 bytes (float, calls 7)
-- [ ] `10142700` 131 bytes (float, calls 3)
-- [ ] `1016bdf0` 132 bytes (float, calls 7)
 - [ ] `10169f90` 136 bytes (loops 1)
 - [ ] `101ae1c0` 139 bytes (float, calls 6)
 - [ ] `1015c6a0` 142 bytes (calls 4)

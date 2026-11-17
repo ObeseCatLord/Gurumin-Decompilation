@@ -6,6 +6,7 @@
 // fixed 0x80-key version used while loading. Flag 4 marks a key as a motion frame key.
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 struct Vec4
@@ -48,6 +49,14 @@ struct IndexList
     int Resize(int newCount);
     int CopyFrom(const IndexList *source);
     int Free();
+};
+
+// List of 16-byte index spans (tagged "m_indexSP" in the allocator).
+struct IndexSpanList
+{
+    int count;
+    void *spans;
+    int Resize(int newCount);
 };
 
 struct KeyTrack
@@ -446,4 +455,18 @@ int KeyTrack::Insert(int frame, float x, float y, float z, float w)
     if (count + 16 > m_0000)
         Reserve(16);
     return i;
+}
+// Reallocates the span buffer for `newCount` 16-byte spans (contents are not kept). The allocation is tagged
+// "m_indexSP(count)" for the engine's memory report. Returns 1.
+int IndexSpanList::Resize(int newCount)
+{
+    char tag[64];
+    if (spans != 0)
+        DAT_11b1ba40(spans);
+    spans = 0;
+    sprintf(tag, "m_indexSP(%d)", newCount);
+    void *buffer = DAT_11b0b938(newCount * 16, tag);
+    count = newCount;
+    spans = buffer;
+    return 1;
 }

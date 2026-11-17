@@ -57,7 +57,7 @@ extern "C" char DAT_10315350[0x80];
 // Respawns an enemy in the first enemy slot that is free or finished (FUN_10011cd0): resets the model's node
 // states (0xfe and 0x2f with all bits), restores the slot's counter, clears the busy and spawn flags, sets
 // m_0d5c to 1 and places the model with (a, b, c). Returns the slot, or -1 when none is available.
-extern "C" int FUN_10011d40(int a, int b, int c)
+extern "C" int FUN_10011d40(float a, float b, float c)
 {
     int i = FUN_10011cd0();
     if (i >= 0)

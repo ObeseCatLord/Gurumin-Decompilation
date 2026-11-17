@@ -87,12 +87,12 @@
 ??0SceneNode@@QAE@XZ	1019ebc0
 ?UpdateVisibleCells@VisNode@@QAEHXZ	10199be0
 ?Copy@Vec4@@QAEXABU1@@Z	101acc20
-?InBox@Vec4@@QAEHPBUVisBox@@@Z	101ac6e0
+?InBox@Vec4@@QAEHPBUBox2@@@Z	101ac6e0
 ?CopyFrom@VertexPack@@QAEHPBU1@@Z	101ad040
 ?Insert@KeyBank@@QAEHHMMMM@Z	101ad760
 ?Insert@KeyTrack@@QAEHHMMMM@Z	101adbb0
-?CrossTransformed@@YA?AUVec4@@ABU1@ABUMatrix4@@0@Z	101ae8b0
-?Transformed@Vec4@@QBE?AU1@ABUMatrix4@@@Z	101aca40
+?TriangleNormal@@YA?AUVec4@@ABU1@00@Z	101ae8b0
+??GVec4@@QBE?AU0@ABU0@@Z	101aca40
 ?Cross@@YA?AUVec4@@ABU1@0@Z	101ae820
 ?CreateChildCopies@Node@@QAEHXZ	101abb70
 ?AddQuad@Selection@@QAEHHMMMMMMMMMMMMMMHHH@Z	10188f10
@@ -165,3 +165,7 @@ _Vec3_Length	101ae890
 ?RotateZ@Vec4@@QAEXM@Z	101ac300
 ?SnapAngle@@YAMMH@Z	1016c340
 ?AddMotionSpeed@AnimModel@@QAEHM@Z	101630b0
+?Resize@IndexSpanList@@QAEHH@Z	101ad1c0
+?Distance@Plane@@QAEMPBUVec4@@@Z	101ad240
+?FaceAway@AnimModel@@QAEHABUVec4@@@Z	10162ea0
+?Rumble@Input@@QAEHMH@Z	10142700

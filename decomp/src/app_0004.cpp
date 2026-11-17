@@ -106,3 +106,15 @@ int Latch::M_1000b9c0()
     return 1;
 }
 
+
+// Sets the pointer that receives menu `id`'s chosen result and clears it. 0 when the menu is not open.
+int Game::M_10008330(int id, int *result)
+{
+    int slot = FindSlot(id);
+    if (slot == 3)
+        return 0;
+    m_579c[slot].result = result;
+    if (result != 0)
+        *result = 0;
+    return 1;
+}

@@ -26,6 +26,7 @@ struct Vec4
     float Distance2D(Vec4 other);
     float LengthSquared3();
     int InRect(const struct Box2 *box);
+    int InBox(const struct Box2 *box);
     int InBoxMargin(const struct Box2 *box, float margin);
     float DistanceSquared(const Vec4 &other);
     float Distance(const Vec4 &other);
@@ -51,6 +52,7 @@ struct Plane
     float c;
     float d;
     int IntersectRay(Vec4 *out, const Vec4 *origin, const Vec4 *direction);
+    float Distance(const Vec4 *point);
 };
 
 struct Matrix4
@@ -142,6 +144,14 @@ float Vec4::DistanceZWeighted(const Vec4 &other)
 int Vec4::InRect(const Box2 *box)
 {
     if (x < box->min.x || x > box->max.x || y < box->min.y || y > box->max.y)
+        return 0;
+    return 1;
+}
+
+// 1 if the point lies inside the box (x, y and z; edges included), else 0. Same NaN-safe early exit as InRect.
+int Vec4::InBox(const Box2 *box)
+{
+    if (x < box->min.x || x > box->max.x || y < box->min.y || y > box->max.y || z < box->min.z || z > box->max.z)
         return 0;
     return 1;
 }
@@ -263,4 +273,21 @@ float SnapAngle(float radians, int step)
     }
     int snapped = ((int)degrees - step / 2) / step * step;
     return snapped * 3.1415f / 180.0f;
+}
+
+// Cross product a x b (x/y/z; the result's w stays 0).
+Vec4 Cross(const Vec4 &a, const Vec4 &b)
+{
+    Vec4 result;
+    result.x = a.y * b.z - a.z * b.y;
+    result.y = a.z * b.x - a.x * b.z;
+    result.z = a.x * b.y - a.y * b.x;
+    return result;
+}
+
+// Distance from `point` to the plane (always positive; the plane normal need not be unit length).
+// Not byte-identical yet: the original multiplies z, y, x in that order (see open.tsv).
+float Plane::Distance(const Vec4 *point)
+{
+    return (float)fabs((point->x * a + point->y * b + point->z * c + d) / sqrt(LengthSquared(a, b, c)));
 }

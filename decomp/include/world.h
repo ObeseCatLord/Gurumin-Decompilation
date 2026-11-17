@@ -10,7 +10,8 @@ struct Vec3
 struct CharModel
 {
     void M_1017b0e0(int motion, int a, int b, float speed);
-    int M_10162420(int a, int b, int c);
+    int M_10162420(float x, float y, float z);  // places the model at (x, y, z)
+    int M_1017b9b0(const char *path);
     int M_1017aeb0(const char *path);
     void M_101630b0(float value);
     void M_10162610(float x, float y, float z);

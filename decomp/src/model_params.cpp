@@ -2,6 +2,23 @@
 
 #include <math.h>
 
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    Vec4();
+    void Copy(const Vec4 &source);
+    Vec4 operator-(const Vec4 &other) const;
+};
+
+struct Matrix4
+{
+    float m[16];
+    Vec4 GetTranslation();
+};
+
 struct AnimModel
 {
     char pad_0000[0x84];
@@ -10,7 +27,9 @@ struct AnimModel
     float scale;
     char pad_02a0[0x1ffc];
     int m_229c;                  // 0x229c: blend frames, 8 when unset
-    char pad_22a0[0xcc];
+    char pad_22a0[0x88];
+    Matrix4 world;               // 0x2328: world matrix (translation = position)
+    char pad_2368[4];
     float motionSpeed;           // 0x236c: current motion playback speed (at most 60)
     char pad_2370[0x18];
     int m_2388;                  // 0x2388: 1 once a speed change is pending
@@ -29,6 +48,7 @@ struct AnimModel
     int m_39a4;
     int M_101627d0(float x, float y, int mode);
     int M_101629b0(float y, float x);
+    int FaceAway(const Vec4 &point);
     void M_10167400();
     int M_10167390(int id, int value, int frames);
     int AddMotionSpeed(float speed);
@@ -48,6 +68,17 @@ int AnimModel::M_101629b0(float y, float x)
 {
     heading = (float)atan2(y, x) + 3.1415f;
     return 1;
+}
+
+// Turns the model away from `point`: heading = atan2(dx, dy) of the vector from `point` to the model.
+int AnimModel::FaceAway(const Vec4 &point)
+{
+    Vec4 delta;
+    Vec4 unused;  // constructed but never used (the original has it too)
+    delta.Copy(world.GetTranslation());
+    delta.Copy(delta - point);
+    heading = (float)atan2(delta.x, delta.y);
+    return 0;
 }
 
 // Advances a timed value: adds the step to the current value each frame and snaps to the target when the

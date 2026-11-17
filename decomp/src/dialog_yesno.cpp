@@ -14,7 +14,7 @@ extern "C" int FUN_1000cb90(const char *text);
 extern "C" int FUN_10010520(const char *message, int yesValue, int noValue)
 {
     DAT_104b7200.M_100084b0(0x216, 0x100, 0x90, 0x7c, 0x60);
-    DAT_104b7200.M_10008330(0x216, noValue);
+    DAT_104b7200.M_10008330(0x216, (int *)noValue);  // the original passes the same value as the result pointer
     FUN_1000cb30("");
     FUN_1000cb90(message);
     int slot = DAT_104b7200.FindSlot(0x216);
@@ -29,7 +29,7 @@ extern "C" int FUN_10010520(const char *message, int yesValue, int noValue)
 extern "C" int FUN_100105e0(const char *message, int yesValue, int noValue)
 {
     DAT_104b7200.M_100084b0(0x216, 0x100, 0x90, 0x7c, 0x60);
-    DAT_104b7200.M_10008330(0x216, noValue);
+    DAT_104b7200.M_10008330(0x216, (int *)noValue);  // the original passes the same value as the result pointer
     FUN_1000cb30("");
     FUN_1000cb90(message);
     int slot = DAT_104b7200.FindSlot(0x216);

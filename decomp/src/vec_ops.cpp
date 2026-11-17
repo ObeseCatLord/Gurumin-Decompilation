@@ -1,6 +1,4 @@
-// Vector helper built on Vec4::Transformed and Cross.
-
-struct Matrix4;
+// Vector helper built on Vec4 subtraction and Cross.
 
 struct Vec4
 {
@@ -10,19 +8,20 @@ struct Vec4
     float w;
     Vec4();
     void Copy(const Vec4 &source);
-    Vec4 Transformed(const Matrix4 &matrix) const;
+    Vec4 operator-(const Vec4 &other) const;  // 0x101aca40 (component-wise difference, w included)
 };
 
 Vec4 Cross(const Vec4 &a, const Vec4 &b);
 
-// 0x101ae8b0: transforms `a` and `b` by `matrix` and returns their cross product.
-Vec4 CrossTransformed(const Vec4 &a, const Matrix4 &matrix, const Vec4 &b)
+// 0x101ae8b0: the normal of the triangle (origin, a, b): the cross product of the edges a - origin and b - origin
+// (not normalised).
+Vec4 TriangleNormal(const Vec4 &a, const Vec4 &origin, const Vec4 &b)
 {
-    Vec4 tb;
-    Vec4 ta;
+    Vec4 edgeB;
+    Vec4 edgeA;
     Vec4 result;
-    ta.Copy(a.Transformed(matrix));
-    tb.Copy(b.Transformed(matrix));
-    result.Copy(Cross(ta, tb));
+    edgeA.Copy(a - origin);
+    edgeB.Copy(b - origin);
+    result.Copy(Cross(edgeA, edgeB));
     return result;
 }

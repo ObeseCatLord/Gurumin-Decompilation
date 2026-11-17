@@ -38,3 +38,5 @@ address	status	reason
 10199880	open	RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 1015fbf0	open	Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
 1001b7b0	open	char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
+10008910	open	Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
+100091d0	open	Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)

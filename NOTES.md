@@ -121,3 +121,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `array[index].field` directly instead of through a local reference or pointer gives `lea reg,[reg+addr]`
   where a local gives `add reg,addr` (0x10016500, 0x1001a390). math.h's inline `acosf`/`atan2f` were emitted
   out of line (0x10001f60, 0x10001f80, symbols `_acosf`/`_atan2f`).
+- /GS functions match like any other under 13.00 (0x10169780, 0x1013e0c0, 0x1005cdc0).
+- **Functions with an EH frame need C++ linkage.** Under /GX (= /EHsc) a function *defined* `extern "C"` is
+  treated as unable to throw, so its EH frame disappears. Name it `FUN_xxxxxxxx` without `extern "C"`
+  (compare_obj and build_all accept the mangled `?FUN_xxxxxxxx@@...` names); declare C++ callees the same way.
+- GameFile (0x101ad9e0 ctor, 0x101b2570 dtor -> File_Close) is 0x28 bytes: `FILE *handle; char name[0x24];`
+  (Save_LoadSlot's frame). Save_LoadSlot builds one and never uses it.

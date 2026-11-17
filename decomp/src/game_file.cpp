@@ -3,7 +3,7 @@
 struct GameFile
 {
     FILE *handle;
-    char name[0x100];
+    char name[0x24];
     GameFile();
 };
 

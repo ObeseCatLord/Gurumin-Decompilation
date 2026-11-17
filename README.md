@@ -32,7 +32,7 @@ Notes and findings: `NOTES.md`.
 ## Ghidra
 `re\run_ghidra_export.bat` (APP.dll), `re\run_ghidra_packs.bat` (packs.dll); exports land in `re\export\` (local only).
 
-**Progress (2026-11-17):** 359 of 1,212 game functions in APP.dll match (29.6 %). By size that is 30,912 of
-1,720,206 code bytes (1.8 %): the matched functions are the small ones, and a few huge functions (the model loader at
+**Progress (2026-11-17):** 366 of 1,212 game functions in APP.dll match (30.2 %). By size that is 32,144 of
+1,720,206 code bytes (1.9 %): the matched functions are the small ones, and a few huge functions (the model loader at
 0x1017cc90 alone is 29,886 bytes) hold most of the code. `python decomp/tools/build_all.py` prints
 the current figures; `decomp/tools/todo.py` lists what is left.

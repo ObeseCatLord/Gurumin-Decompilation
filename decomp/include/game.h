@@ -61,7 +61,12 @@ struct Game
     int m_5db4[3][0x82];
     char pad_63cc[0xc30];
     int m_6ffc;
-    char pad_7000[0x654];
+    char pad_7000[0x630];
+    int m_7630;
+    int m_7634;
+    int m_7638;
+    int m_763c;
+    char pad_7640[0x14];
     int m_7654[3];
     void (*m_7660)(int);
     int m_7664;
@@ -84,6 +89,9 @@ struct Game
     int M_100087b0(int id, int count);
     int M_100087f0(int x, int y, int w, int h, int frame, float alpha);
     int M_10008880(int x, int y, int w, int h, int frame, float alpha);
+    int M_10008910(int x, int y, int lit, int rows, int a, int b, int color);
+    int M_10008fa0(int x, int y, int color, int frame);
+    int M_100091d0(const char *text, int x, int y);
     int M_10002060(const char *name);
     int M_100083e0(int id);
     int M_10008650(int id, int value);

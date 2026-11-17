@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -19,8 +20,10 @@ struct ListBank
     int M_10004680(int group);
     int M_100046d0(const char *text, int group, int value, char flag);
     int M_100048f0(const char *name, int *index);
+    int M_10004950(char *buffer, void *value, char type);
     int M_100049e0(const char *text);
     int M_10004a30(const char *text, int *value);
+    int M_10004aa0(const char *text, float *value);
 };
 
 int ListBank::M_10004680(int group)
@@ -60,6 +63,18 @@ int ListBank::M_100048f0(const char *name, int *index)
     return 0;
 }
 
+int ListBank::M_10004950(char *buffer, void *value, char type)
+{
+    if (type == 0)
+        sprintf(buffer, "%d", *(int *)value);
+    else if (type == 1)
+        sprintf(buffer, "%f", *(float *)value);
+    else if (type == 2)
+        sprintf(buffer, "%s", (char *)value);
+    buffer[0xff] = 0;
+    return 1;
+}
+
 int ListBank::M_100049e0(const char *text)
 {
     int length = strlen(text);
@@ -84,5 +99,19 @@ int ListBank::M_10004a30(const char *text, int *value)
             return 0;
     }
     *value = atol(text);
+    return 1;
+}
+
+int ListBank::M_10004aa0(const char *text, float *value)
+{
+    int length = strlen(text);
+    for (int i = 0; i < length; i++)
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (text[i] != '+' && text[i] != '-' && text[i] != '.' && (text[i] < '0' || text[i] > '9'))
+            return 0;
+    }
+    *value = (float)atof(text);
     return 1;
 }

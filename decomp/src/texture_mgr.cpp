@@ -1,3 +1,5 @@
+// Texture manager, triangle batches (Selection = TriangleBatch in tri_batch.cpp), model owners and helpers.
+
 struct TextureObject
 {
     char pad_0000[0x34];
@@ -123,10 +125,12 @@ extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" int FUN_10174c70(int slot, int force);
 
+// Constructor: the member constructors do the work.
 Transform::Transform()
 {
 }
 
+// Sets the batch's vertex buffer and capacity.
 int Selection::M_10172a80(int a, int b)
 {
     m_0000 = a;
@@ -134,6 +138,7 @@ int Selection::M_10172a80(int a, int b)
     return 1;
 }
 
+// Empties the batch and forgets its texture.
 int Selection::M_10172aa0()
 {
     m_0008 = 0;
@@ -142,6 +147,7 @@ int Selection::M_10172aa0()
     return 1;
 }
 
+// Switches the batch to texture `id`, flushing the queued triangles when the texture changes.
 int Selection::M_10173450(int id, int unused)
 {
     if (current != -1)
@@ -155,6 +161,7 @@ int Selection::M_10173450(int id, int unused)
     return 0;
 }
 
+// Unloads every texture slot and clears both name tables. Returns 1.
 int TextureManager::M_10173480()
 {
     for (int i = 0; i < 1600; i++)
@@ -169,6 +176,7 @@ int TextureManager::M_10173480()
     return 1;
 }
 
+// Runs M_10169df0 on every loaded texture (re-create after a device reset).
 int TextureManager::M_101734d0()
 {
     for (int i = 0; i < 1600; i++)
@@ -179,6 +187,7 @@ int TextureManager::M_101734d0()
     return 1;
 }
 
+// Runs M_10169e10 on every loaded texture (restore the texture data).
 int TextureManager::M_10173510()
 {
     for (int i = 0; i < 1600; i++)
@@ -189,12 +198,14 @@ int TextureManager::M_10173510()
     return 1;
 }
 
+// Unloads all textures and releases the IME state (M_1015c730).
 void TextureManager::M_10175e70()
 {
     M_10173480();
     M_1015c730();
 }
 
+// Returns the playback's current frame, creating the playback object on first use.
 int SceneOwner::M_1017b1c0()
 {
     if (scene == 0)
@@ -206,12 +217,14 @@ int SceneOwner::M_1017b1c0()
     return scene->m_001c;
 }
 
+// Advances the animation one step and returns its state.
 int Animator::M_10184160()
 {
     M_101687e0();
     return M_101692c0();
 }
 
+// After a map change: unloads every texture that was not marked as kept and has no Direct3D texture.
 extern "C" int FUN_10188fb0(void)
 {
     for (int i = 0; i < 1600; i++)
@@ -222,6 +235,7 @@ extern "C" int FUN_10188fb0(void)
     return 0;
 }
 
+// Frees the vertex data of `count` pack headers (VertexPack::FreeVertices on each).
 extern "C" void __stdcall FUN_101911b0(PackHeader *packs, int count)
 {
     if (packs != 0)
@@ -236,6 +250,7 @@ extern "C" void __stdcall FUN_101911b0(PackHeader *packs, int count)
 
 extern "C" int DAT_10ff1dec;
 
+// Queues `count` vertices for texture `id`, flushing first when the texture changes or the buffer is full.
 int Selection::M_10188eb0(int id, int a, int count)
 {
     DAT_10ff1dec++;
@@ -247,6 +262,7 @@ int Selection::M_10188eb0(int id, int a, int count)
     M_10172ac0(a, count);
     return 0;
 }
+// Queues a textured quad (two triangles) given three corners with UVs and a colour.
 int Selection::AddQuad(int id, float x0, float y0, float z0, float u0, float v0, float x1, float y1, float z1, float u1, float v1, float x2, float y2, float u2, float v2, int colour, int a, int b)
 {
     DAT_10ff1dec++;

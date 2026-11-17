@@ -1,3 +1,5 @@
+// Save game helpers (gdataNN.sav in the save folder, see docs/SAVE_FORMAT.md).
+
 #include <stdio.h>
 
 // Save game helpers (gdataNN.sav in the save folder).
@@ -26,11 +28,11 @@ int FUN_1005cdc0(const char *name, int mode)
     return FUN_1003b2c0(path, mode);
 }
 
+extern "C" int FUN_100106e0(const char *path);  // Save_Write
+
 // Writes the save file `name` (e.g. "gdata01.sav") into the save folder.
 // DAT_10f60590 is the save directory prefix (with trailing backslash) set at start-up; Save_Write (0x100106e0)
 // does the actual work (thumbnail + scrambled state blocks, see docs/SAVE_FORMAT.md).
-extern "C" int FUN_100106e0(const char *path);
-
 extern "C" int FUN_1003b260(const char *name)
 {
     char path[256];

@@ -1,3 +1,6 @@
+// Visibility cells. A map is split into up to 64 boxes; each cell lists the cells visible from it, and only
+// the visible cells are drawn. DAT_11afffe8[i] = cell i visible this frame.
+
 #include <string.h>
 
 struct VisBox;
@@ -43,6 +46,8 @@ extern "C" Vec4 DAT_10f66908;
 extern "C" Vec4 DAT_10f668e8;
 extern "C" char DAT_11afffe8[0x40];
 
+// Finds the cell boxes that contain the eye position and marks them and all cells listed as visible from them.
+// Not byte-identical yet (see open.tsv).
 int VisNode::UpdateVisibleCells()
 {
     if (vis != 0)
@@ -69,6 +74,8 @@ int VisNode::UpdateVisibleCells()
 }
 extern "C" VisNode *DAT_10255f08;
 
+// 1 when `pos` lies in a currently visible cell (or the map has no visibility data), else 0. Used to skip
+// updating or drawing objects that cannot be seen.
 extern "C" int FUN_10015860(Vec4 pos)
 {
     VisData *vis = DAT_10255f08->vis;

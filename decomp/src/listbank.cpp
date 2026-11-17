@@ -1,3 +1,7 @@
+// Script parser buffers (ListBank = ResourceBanks = TokenReader: one object). It holds 8 groups of up to 0x80
+// named entries (text, value, flag), the script text being parsed and an error flag (m_3632c) that makes every
+// reader fail once an error was reported.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,6 +42,7 @@ struct ListBank
     int FreeAll();
 };
 
+// Clears group `group`: entries that are not in use lose their values. Returns 1.
 int ListBank::M_10004680(int group)
 {
     m_2a5dc[group] = 0;
@@ -52,6 +57,7 @@ int ListBank::M_10004680(int group)
     return 1;
 }
 
+// Appends entry (`text`, `value`, `flag`) to group `group` and marks it in use. Returns 1.
 int ListBank::M_100046d0(const char *text, int group, int value, char flag)
 {
     m_e80c[group][m_2a5dc[group]] = 1;
@@ -62,6 +68,7 @@ int ListBank::M_100046d0(const char *text, int group, int value, char flag)
     return 1;
 }
 
+// Looks up `name` among the 16 registered keywords (prefix match); stores its index and returns 1, else 0.
 int ListBank::M_100048f0(const char *name, int *index)
 {
     for (int i = 0; i < 0x10; i++)
@@ -75,6 +82,7 @@ int ListBank::M_100048f0(const char *name, int *index)
     return 0;
 }
 
+// Formats a script value into `buffer` (256 bytes): type 0 int (%d), 1 float (%f), 2 string. Returns 1.
 int ListBank::M_10004950(char *buffer, void *value, char type)
 {
     if (type == 0)
@@ -87,6 +95,7 @@ int ListBank::M_10004950(char *buffer, void *value, char type)
     return 1;
 }
 
+// 1 when `text` contains a parenthesis (a function call), 0 otherwise or after an error.
 int ListBank::M_100049e0(const char *text)
 {
     int length = strlen(text);
@@ -100,6 +109,7 @@ int ListBank::M_100049e0(const char *text)
     return 0;
 }
 
+// Parses `text` as an integer when it only holds digits and signs; returns 1 on success.
 int ListBank::M_10004a30(const char *text, int *value)
 {
     int length = strlen(text);
@@ -114,6 +124,7 @@ int ListBank::M_10004a30(const char *text, int *value)
     return 1;
 }
 
+// Parses `text` as a float when it only holds digits, signs and a decimal point; returns 1 on success.
 int ListBank::M_10004aa0(const char *text, float *value)
 {
     int length = strlen(text);

@@ -1029,7 +1029,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `101a8760` 19 bytes (src/scene_node.cpp)
 - [ ] `101ab980` 75 bytes (src/scene_node.cpp)
 
-## 7. Comment pass (17 files)
+## 7. Comment pass (9 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
@@ -1038,19 +1038,11 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/camera.cpp`: 11 of 11 functions without a comment, no header
 - [ ] `src/containers.cpp`: 25 of 25 functions without a comment, no header
 - [ ] `src/engine_10143.cpp`: 9 of 9 functions without a comment, no header
-- [ ] `src/ime.cpp`: 21 of 23 functions without a comment, no header
-- [ ] `src/listbank.cpp`: 7 of 8 functions without a comment, no header
-- [ ] `src/menu_textures.cpp`: 2 of 3 functions without a comment, no header
 - [ ] `src/mesh_cache.cpp`: 12 of 12 functions without a comment, no header
-- [ ] `src/mmv_texreg.cpp`: 10 of 11 functions without a comment, no header
 - [ ] `src/model_misc.cpp`: 10 of 10 functions without a comment, no header
-- [ ] `src/save_slot.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/scene_misc.cpp`: 9 of 9 functions without a comment, no header
 - [ ] `src/scene_node.cpp`: 54 of 58 functions without a comment, no header
 - [ ] `src/texcache.cpp`: 10 of 10 functions without a comment, no header
-- [ ] `src/texture_mgr.cpp`: 14 of 18 functions without a comment, no header
-- [ ] `src/visibility.cpp`: 2 of 2 functions without a comment, no header
-- [ ] `src/window_create.cpp`: 4 of 5 functions without a comment, no header
 
 ## 8. Structures and globals
 

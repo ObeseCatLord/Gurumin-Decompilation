@@ -1,3 +1,5 @@
+// The game window (RenderWindow, global instance DAT_10f65698 / pointer DAT_10f1a860).
+
 #define _WIN32_WINNT 0x0400
 #include <windows.h>
 #include <string.h>
@@ -43,6 +45,9 @@ RenderWindow::RenderWindow()
     window = 0;
 }
 
+// Registers the window class and creates the window at the configured size (DAT_10202b24 x DAT_10202b28):
+// a borderless popup in full screen (DAT_10f65514), a normal overlapped window otherwise. A windowed or
+// borderless mode for modern displays would change this.
 void RenderWindow::Create(HINSTANCE instance)
 {
     middleCapture = 0;
@@ -57,6 +62,8 @@ void RenderWindow::Create(HINSTANCE instance)
         window = CreateWindowExA(0, className, title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, DAT_10202b24, DAT_10202b28, 0, 0, this->instance, 0);
 }
 
+// The Windows procedure registered for the class: stores the RenderWindow pointer in the window's extra data on
+// the first message and forwards every message to RenderWindow::WindowProc.
 extern "C" LRESULT CALLBACK FUN_1013e410(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if (GetWindowLongA(window, 8) == 0)
@@ -64,6 +71,7 @@ extern "C" LRESULT CALLBACK FUN_1013e410(HWND window, UINT message, WPARAM wPara
     return DAT_10f1a860->WindowProc(window, message, wParam, lParam);
 }
 
+// Registers the window class (redraw on resize, arrow cursor, window-colour background, the game icon).
 void RenderWindow::RegisterWindowClass(HINSTANCE instance)
 {
     WNDCLASSEXA wc;
@@ -81,6 +89,10 @@ void RenderWindow::RegisterWindowClass(HINSTANCE instance)
     wc.hIconSm = 0;
     RegisterClassExA(&wc);
 }
+// Handles the messages the game cares about: quit, paint, focus changes (active), IME composition (forwarded
+// to the callbacks set by the text input code), middle-button capture and the mouse wheel; it closes the IME's
+// own window (WM_IME_SETCONTEXT) because the game draws the composition itself. Everything else goes to
+// DefWindowProc. Not byte-identical yet (see open.tsv).
 LRESULT __stdcall RenderWindow::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)

@@ -1,3 +1,6 @@
+// Japanese IME support for text input (the name entry screen). The game reads the composition and candidates
+// itself and draws them with its own font; ImeContext wraps the Imm32 API.
+
 #include <windows.h>
 #include <imm.h>
 #include <stdlib.h>
@@ -38,18 +41,21 @@ struct ImeContext
     DWORD LoadCandidates();
 };
 
+// Stores `value` in slot `index` of the first state array.
 int StateArrays::M_1015caa0(int value, int index)
 {
     m_0020[index] = value;
     return 1;
 }
 
+// Stores `value` in slot `index` of the second state array. Not byte-identical yet (see open.tsv).
 int StateArrays::M_1015cac0(int value, int index)
 {
     m_0040[index] = value;
     return 1;
 }
 
+// Constructor: no window or context yet.
 ImeContext::ImeContext()
 {
     window = 0;
@@ -57,6 +63,7 @@ ImeContext::ImeContext()
     buffer = 0;
 }
 
+// Releases the input context and frees the candidate buffer.
 int ImeContext::Release()
 {
     if (buffer != 0)
@@ -73,6 +80,7 @@ int ImeContext::Release()
     return 1;
 }
 
+// Takes the input context of window `target`.
 int ImeContext::Attach(HWND target)
 {
     Release();
@@ -84,26 +92,31 @@ int ImeContext::Attach(HWND target)
     return 1;
 }
 
+// 1 when the IME is switched on.
 int ImeContext::IsOpen()
 {
     return ImmGetOpenStatus(context) != 0;
 }
 
+// Switches the IME on or off.
 int ImeContext::SetOpen(BOOL open)
 {
     return ImmSetOpenStatus(context, open) != 0;
 }
 
+// Reads the conversion and sentence modes.
 int ImeContext::GetConversion(DWORD *conversion, DWORD *sentence)
 {
     return ImmGetConversionStatus(context, conversion, sentence) != 0;
 }
 
+// Sets the conversion and sentence modes.
 int ImeContext::SetConversion(const DWORD *conversion, const DWORD *sentence)
 {
     return ImmSetConversionStatus(context, *conversion, *sentence) != 0;
 }
 
+// Returns the composition cursor position.
 LONG ImeContext::GetCompositionValue()
 {
     LONG value[2];
@@ -112,12 +125,14 @@ LONG ImeContext::GetCompositionValue()
     return value[1];
 }
 
+// Returns the size of the composition attribute data (GCS_COMPATTR) after querying the clause data.
 LONG ImeContext::M_1015d400()
 {
     ImmGetCompositionStringA(context, 0x100, 0, 0);
     return ImmGetCompositionStringA(context, 0x80, 0, 0);
 }
 
+// Returns the selected candidate.
 DWORD ImeContext::GetSelection()
 {
     if (buffer == 0)
@@ -125,6 +140,7 @@ DWORD ImeContext::GetSelection()
     return buffer->dwSelection;
 }
 
+// Returns candidate string `index` from the loaded candidate list.
 const char *ImeContext::GetCandidate(int index)
 {
     CANDIDATELIST *list = buffer;
@@ -133,6 +149,7 @@ const char *ImeContext::GetCandidate(int index)
     return (const char *)list + list->dwOffset[index];
 }
 
+// Returns the first candidate on the current page.
 DWORD ImeContext::GetPageStart()
 {
     if (buffer == 0)
@@ -140,6 +157,7 @@ DWORD ImeContext::GetPageStart()
     return buffer->dwPageStart;
 }
 
+// Returns the number of candidates.
 DWORD ImeContext::GetCount()
 {
     if (buffer == 0)
@@ -147,6 +165,7 @@ DWORD ImeContext::GetCount()
     return buffer->dwCount;
 }
 
+// Returns the number of candidates per page.
 DWORD ImeContext::GetPageSize()
 {
     if (buffer == 0)
@@ -156,6 +175,7 @@ DWORD ImeContext::GetPageSize()
 
 extern "C" int DAT_10f66bbc;
 
+// Stores the IME option value DAT_10f66bbc. Returns 1.
 extern "C" int FUN_1015d500(int value)
 {
     DAT_10f66bbc = value;
@@ -163,11 +183,13 @@ extern "C" int FUN_1015d500(int value)
 }
 extern "C" ImeContext DAT_10f68124;
 
+// 1 when the game's IME is switched on.
 extern "C" int FUN_1015d510(void)
 {
     return DAT_10f68124.IsOpen();
 }
 
+// Copies the finished (converted) text into `out`.
 int ImeContext::GetResultString(char *out)
 {
     *out = 0;
@@ -182,6 +204,7 @@ int ImeContext::GetResultString(char *out)
     return 1;
 }
 
+// Copies the text being composed into `out`.
 int ImeContext::GetCompositionString(char *out)
 {
     *out = 0;
@@ -196,6 +219,7 @@ int ImeContext::GetCompositionString(char *out)
     return 1;
 }
 
+// Loads the candidate list into the context's buffer and returns its size.
 DWORD ImeContext::LoadCandidates()
 {
     if (buffer != 0)

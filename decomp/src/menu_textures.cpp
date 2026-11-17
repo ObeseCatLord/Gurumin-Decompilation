@@ -1,3 +1,5 @@
+// Game (DAT_104b7200) menu textures, reset and destructor.
+
 #include <string.h>
 #include <stdlib.h>
 #include "game.h"
@@ -7,6 +9,8 @@ extern "C" int FUN_10173550(const char *path, const char *alphaPath, int flags);
 
 #define DATA(name) FUN_1013f8a0(name, 0)
 
+// Loads every menu, balloon, map, frame and icon texture (BMP pairs with an alpha file, see
+// docs/MODDING_MAP.md "Menu and HUD images") into the texture slots stored in the Game fields.
 int Game::LoadMenuTextures(int value)
 {
     m_0690 = 0;
@@ -37,6 +41,8 @@ int Game::LoadMenuTextures(int value)
     return 1;
 }
 
+// Resets the menu state: the three window slots, their item tables, the cursor and counters, and the first
+// 800 bytes of the per-menu settings.
 void Game::M_10007f20()
 {
     m_0000 = 0;

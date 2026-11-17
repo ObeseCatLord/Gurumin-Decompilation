@@ -1,3 +1,6 @@
+// MMV movie player (docs/MODDING_MAP.md, tools/mmv_tool.py) and the texture name registry.
+// Texture slots: DAT_10ffe5f8[1600][0x40] holds each slot's file name (empty = free).
+
 #include <string.h>
 
 struct ClipRect
@@ -63,6 +66,7 @@ extern "C" char DAT_10f8dbb8[1600][0x40];
 extern "C" char DAT_10fa6db8[1600];
 extern "C" TextureSlot DAT_118d0ba8[1600];
 
+// Constructor: nothing open yet.
 MmvPlayer::MmvPlayer()
 {
     m_0010 = 0;
@@ -73,6 +77,7 @@ MmvPlayer::MmvPlayer()
     m_004c = 0;
 }
 
+// Destructor: closes the movie.
 MmvPlayer::~MmvPlayer()
 {
     if (isOpen && m_003c != 0)
@@ -85,6 +90,7 @@ MmvPlayer::~MmvPlayer()
         DAT_11b1ba40(frame);
 }
 
+// Closes the movie file and frees its buffers.
 void MmvPlayer::Close()
 {
     if (m_004b)
@@ -102,6 +108,8 @@ void MmvPlayer::Close()
     }
 }
 
+// Copies the current frame (clipped to `clip`) into the movie texture using the frame's palette.
+// Not byte-identical yet (see open.tsv).
 int MmvPlayer::M_10160960(const ClipRect *clip)
 {
     if (frame != 0)
@@ -113,6 +121,7 @@ int MmvPlayer::M_10160960(const ClipRect *clip)
     return 1;
 }
 
+// Decodes the next frame (looping or one-shot variant depending on m_0010).
 int MmvPlayer::M_10161050()
 {
     if (m_0010 != 0)
@@ -120,6 +129,7 @@ int MmvPlayer::M_10161050()
     return M_10160f00();
 }
 
+// Binds texture slot `index` to stage 0 (a negative index unbinds). Returns the index or -1.
 extern "C" int FUN_10161070(int index)
 {
     if (index < 0)
@@ -132,6 +142,7 @@ extern "C" int FUN_10161070(int index)
     return index;
 }
 
+// Binds texture slot `index` to stage 1 (a negative index unbinds). Returns the index or -1.
 extern "C" int FUN_101610b0(int index)
 {
     if (index < 0)
@@ -144,6 +155,7 @@ extern "C" int FUN_101610b0(int index)
     return index;
 }
 
+// Clears both texture name tables (all slots free). Returns 1.
 extern "C" int FUN_101610f0(void)
 {
     memset(DAT_10ffe5f8, 0, sizeof(DAT_10ffe5f8));
@@ -151,6 +163,7 @@ extern "C" int FUN_101610f0(void)
     return 1;
 }
 
+// Marks every loaded texture slot as kept (DAT_10fa6db8) before a map change.
 extern "C" int FUN_101618f0(void)
 {
     for (int i = 0; i < 1600; i++)
@@ -161,6 +174,7 @@ extern "C" int FUN_101618f0(void)
     return 0;
 }
 
+// Texture_FindByName: returns the slot holding file `name` (case-insensitive), or -1.
 extern "C" int FUN_10161920(const char *name)
 {
     if (*name == 0)

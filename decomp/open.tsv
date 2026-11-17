@@ -38,3 +38,6 @@ address	status	reason
 100020d0	open	loop over 0x100 ints unrolled by 8 (cl 13.00); VS2003 unrolls by 4
 1000e870	open	AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
 10007f20	open	Game reset: zero kept in ebx for all stores (cl 13.00 habit)
+100119d0	open	free-slot search over 0x60 ints unrolled by 8 (cl 13.00)
+10011aa0	open	same unrolled-by-8 slot search as 0x100119d0
+10012130	open	Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical

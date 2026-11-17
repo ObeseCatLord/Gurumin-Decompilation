@@ -32,7 +32,8 @@ abilities, or with the Samurai outfit's abilities).
 - Plan: add an *appearance id* next to the costume id. Model loading (0x1003b6e0 and anything else that picks
   textures, voices or effects by costume) reads the appearance id; ability code keeps reading 0x10c655f0. To do:
   list every reader of 0x10c655f0 and sort it into "look" or "ability". Readers found so far: the scene start
-  (0x100cc1d0, decomp/src/scene_start.cpp) sets world byte 0x10c68974 for costume 6.
+  (0x100cc1d0, decomp/src/scene_start.cpp) sets world byte 0x10c68974 for costume 6; the face animation
+  (0x1000f360, decomp/src/face_anim.cpp) loads the player's face textures with "14" in the name for costume 6.
 - Only costumes the player has unlocked and can pick in the wardrobe may be chosen as an appearance: apply the same
   unlock-bit checks as 0x1003b6e0 (bit table in MODDING_MAP), plus the PSP outfits when their files are present.
 - Expose it as a configurator option and, later, an in-game wardrobe option. Store the appearance id in the mod's

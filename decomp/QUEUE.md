@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (56)
+## 1. Walls to retry (57)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -19,6 +19,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
 - [ ] `1000ed20` 77 — original decrements the global in eax; VS2003 copies to ecx first (scheduling)
+- [ ] `1000f360` 300 — face change: calls match; the original keeps index in esi and frame in edi (ours swapped) and indexes the face tables as flat int arrays [set*0x1c0+frame]
 - [ ] `10012130` 172 — Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
 - [ ] `100143f0` 201 — helmet attach: 8 bytes; when Bip01 Head is missing the original returns through the shared epilogue with eax still 0 from Find, ours emits its own xor eax,eax / epilogue (return 0, return head, result-variable forms tried)
 - [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
@@ -130,7 +131,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (213)
+## 3. Medium functions (251-800 bytes) (211)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
@@ -146,9 +147,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101692c0` 294 bytes (float, calls 4)
 - [ ] `1019c560` 298 bytes (float, loops 2, calls 1)
 - [ ] `101a23b0` 299 bytes (loops 2, calls 7)
-- [ ] `1000f360` 300 bytes (loops 1, calls 5)
 - [ ] `1001b670` 307 bytes (float, loops 2, calls 8)
-- [ ] `1019c1e0` 309 bytes (loops 1, calls 2)
 - [ ] `1014ef20` 311 bytes (loops 2, calls 3)
 - [ ] `10017fc0` 312 bytes (float, loops 1, calls 5)
 - [ ] `1001a450` 315 bytes (float, calls 10)

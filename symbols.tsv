@@ -618,3 +618,5 @@ address	name	evidence
 10169840	ModelNames_Find	finds or adds a model name (decomp/src/path_util.cpp)
 10169ab0	TextureNames_Find	finds or adds a texture name (decomp/src/path_util.cpp)
 1016f900	EffectDefs_Allocate	takes a free effect definition (decomp/src/effect_defs.cpp)
+1000f360	Char_SetFace	shows a face frame and schedules the next (decomp/src/face_anim.cpp)
+1019c1e0	Node::AllocMaterials	matched decompiled source (decomp/obj_symbols.tsv)

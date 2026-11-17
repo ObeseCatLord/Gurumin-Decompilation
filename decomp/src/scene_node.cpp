@@ -86,10 +86,17 @@ struct Extra
     void M_10169660();
 };
 
+// Mesh material (0x180 bytes).
 struct Material
 {
     char name[0x40];
-    char pad_0040[0x140];
+    char textures[4][0x40];      // 0x40: texture file names (empty = none)
+    float colour[3];             // 0x140: r, g, b (1 = white)
+    char pad_014c[0x24];
+    int m_0170;
+    float alpha;                 // 0x174: 0..255
+    int m_0178;
+    unsigned char m_017c[4];
 };
 
 struct PackHeader
@@ -189,6 +196,7 @@ struct Node
     void M_10191500();
     void M_101a2290();
     Node *AddChild(const char *childName, int position);
+    int AllocMaterials(int count);
     int M_101a53b0(Node *source, int a, int b);
     void M_10193d10(int index);
     void M_101913f0();
@@ -453,6 +461,38 @@ Node *Node::AddChild(const char *childName, int position)
     childCount++;
     children[position]->M_101a2290();
     return children[position];
+}
+
+// Replaces the node's material array with `count` blank materials (no name or textures, white, alpha 255).
+// Does nothing for count 0. Returns 0.
+int Node::AllocMaterials(int count)
+{
+    if (count != 0)
+    {
+        if (materialCount != 0)
+            DAT_11b1ba40(materials);
+        materials = (Material *)DAT_11b0b938(count * sizeof(Material), "m_material");
+        for (int i = 0; i < count; i++)
+        {
+            materials[i].name[0] = 0;
+            materials[i].textures[0][0] = 0;
+            materials[i].textures[1][0] = 0;
+            materials[i].textures[2][0] = 0;
+            materials[i].textures[3][0] = 0;
+            materials[i].colour[0] = 1.0f;
+            materials[i].colour[1] = 1.0f;
+            materials[i].colour[2] = 1.0f;
+            materials[i].m_0178 = 0;
+            materials[i].m_017c[0] = 0;
+            materials[i].m_017c[1] = 0;
+            materials[i].m_017c[2] = 0;
+            materials[i].m_017c[3] = 0;
+            materials[i].m_0170 = 0;
+            materials[i].alpha = 255.0f;
+        }
+        materialCount = count;
+    }
+    return 0;
 }
 
 // Allocates the node's saved-state block (0xdc bytes) on first use.

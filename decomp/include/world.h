@@ -30,11 +30,15 @@ struct Character
 struct CharSlot
 {
     int m_0000;
-    char pad_0004[0x5c];
+    char pad_0004[0x38];
+    int m_003c;
+    char pad_0040[0x20];
     int m_0060;
     char pad_0064[0x41];
     char m_00a5;
-    char pad_00a6[0xe2];
+    char m_00a6;
+    char m_00a7;
+    char pad_00a8[0xe0];
 };
 
 struct CharState

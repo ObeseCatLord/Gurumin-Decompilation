@@ -1,3 +1,10 @@
+// Scene nodes: the node tree of every model (0x18a0 bytes per node). A node has a name, flags, a mesh with packed
+// vertex data (packs, index lists, materials), animation plugs, a matrix, a parent and up to 64 named children.
+// Most methods here walk the subtree recursively, applying a change to the node and then to every child.
+//
+// Flags (`flags`, 0xac): 0x4 visible, 0x20 solid wall (wall_flags.cpp), 0x200/0x400/0x800 node kinds that take the
+// colour values, 0x1000/0x2000/0x4000/0x400000 matrix states restored from `saved`, 0x8000 special pass marker.
+
 #include <string.h>
 
 struct Matrix
@@ -247,6 +254,7 @@ extern "C" int DAT_11b044dc;
 extern "C" int DAT_11b044d0;
 extern "C" int DAT_11b002d0[0x80];
 
+// Frees the index buffers of `count` index lists.
 extern "C" void __stdcall FUN_101911e0(KeyPair *pairs, int count)
 {
     if (pairs != 0)
@@ -259,6 +267,7 @@ extern "C" void __stdcall FUN_101911e0(KeyPair *pairs, int count)
     }
 }
 
+// Saves the flags of the whole subtree (m_1860).
 void Node::M_10191d50()
 {
     m_1860 = flags;
@@ -266,6 +275,7 @@ void Node::M_10191d50()
         children[i]->M_10191d50();
 }
 
+// Restores the flags saved by M_10191d50.
 void Node::M_10191d90()
 {
     flags = m_1860;
@@ -273,6 +283,7 @@ void Node::M_10191d90()
         children[i]->M_10191d90();
 }
 
+// Saves the render mode (m_00a0) of the whole subtree.
 void Node::M_10191dd0()
 {
     m_185c = m_00a0;
@@ -280,6 +291,7 @@ void Node::M_10191dd0()
         children[i]->M_10191dd0();
 }
 
+// Restores the render mode saved by M_10191dd0.
 void Node::M_10191e10()
 {
     m_00a0 = m_185c;
@@ -287,6 +299,7 @@ void Node::M_10191e10()
         children[i]->M_10191e10();
 }
 
+// Clears m_00a8 in the whole subtree. Returns 1.
 int Node::M_101944d0()
 {
     m_00a8 = 0;
@@ -295,6 +308,7 @@ int Node::M_101944d0()
     return 1;
 }
 
+// Allocates the node's saved-state block (0xdc bytes) on first use.
 int Node::M_101947b0()
 {
     if (saved == 0)
@@ -305,6 +319,7 @@ int Node::M_101947b0()
     return 1;
 }
 
+// Restores the saved matrix when state 0x1000 is set and clears that state.
 int Node::M_101947f0()
 {
     if (saved != 0 && (flags & 0x1000) != 0)
@@ -315,6 +330,7 @@ int Node::M_101947f0()
     return 1;
 }
 
+// Restores the saved matrix when state 0x400000 is set and clears that state.
 int Node::M_10194830()
 {
     if (saved != 0 && (flags & 0x400000) != 0)
@@ -325,6 +341,7 @@ int Node::M_10194830()
     return 1;
 }
 
+// Restores the saved matrix for state 0x2000, clears it and recomputes the world matrices (M_10194510).
 int Node::M_10194870()
 {
     if (saved != 0 && (flags & 0x2000) != 0)
@@ -336,6 +353,7 @@ int Node::M_10194870()
     return 1;
 }
 
+// Clears state 0x4000 and recomputes the world matrices.
 int Node::M_101948c0()
 {
     if (saved != 0 && (flags & 0x4000) != 0)
@@ -346,6 +364,7 @@ int Node::M_101948c0()
     return 1;
 }
 
+// Undoes every saved state and frees the saved-state block.
 int Node::M_10194980()
 {
     if (saved != 0)
@@ -360,6 +379,7 @@ int Node::M_10194980()
     return 1;
 }
 
+// Allocates the node's 0x80-byte extra block on first use.
 int Node::M_101949d0()
 {
     if (m_02a8 == 0)
@@ -370,6 +390,7 @@ int Node::M_101949d0()
     return 1;
 }
 
+// Returns the root of the tree this node belongs to. Not byte-identical yet (see open.tsv).
 Node *Node::M_101992f0()
 {
     Node *node = this;
@@ -378,6 +399,7 @@ Node *Node::M_101992f0()
     return node;
 }
 
+// Returns the highest ancestor reachable through parents in state 0x1000.
 Node *Node::M_10199310()
 {
     Node *node = this;
@@ -386,6 +408,7 @@ Node *Node::M_10199310()
     return node;
 }
 
+// Returns the last animation frame of the subtree (the highest of the nodes' frame counts).
 int Node::M_10199340()
 {
     int last = m_0294;
@@ -401,6 +424,7 @@ int Node::M_10199340()
     return last;
 }
 
+// Empties the render queue and its extra-data and matrix pools (render_queue.cpp).
 extern "C" void FUN_10199860(void)
 {
     DAT_11b002b8 = 0;
@@ -408,6 +432,7 @@ extern "C" void FUN_10199860(void)
     DAT_11b044d0 = 0;
 }
 
+// Sets flag bits on the whole subtree. Returns 1.
 int Node::M_1019b130(unsigned int bits)
 {
     flags |= bits;
@@ -416,18 +441,21 @@ int Node::M_1019b130(unsigned int bits)
     return 1;
 }
 
+// Sets flag bits on this node only.
 int Node::M_1019b190(unsigned int bits)
 {
     flags |= bits;
     return 1;
 }
 
+// Clears flag bits on this node only.
 int Node::M_1019b210(unsigned int bits)
 {
     flags &= ~bits;
     return 1;
 }
 
+// Sets m_00b8 on the whole subtree.
 int Node::M_1019b230(int value)
 {
     m_00b8 = value;
@@ -436,6 +464,7 @@ int Node::M_1019b230(int value)
     return 1;
 }
 
+// Restarts the two colour plugs (type 0x4ee33 in plug slots 6 and 7) from (a, b).
 int Node::M_1019b300(int a, int b)
 {
     for (int i = 0; i < 2; i++)
@@ -449,11 +478,13 @@ int Node::M_1019b300(int a, int b)
     return 0;
 }
 
+// Clears the node pool table DAT_11b002d0.
 extern "C" void FUN_1019bdb0(void)
 {
     memset(DAT_11b002d0, 0, sizeof(DAT_11b002d0));
 }
 
+// Allocates and initialises `count` pack headers.
 extern "C" PackHeader *__stdcall FUN_1019c320(int count)
 {
     PackHeader *packs = (PackHeader *)DAT_11b0b938(count * sizeof(PackHeader), "");
@@ -465,6 +496,7 @@ extern "C" PackHeader *__stdcall FUN_1019c320(int count)
     return packs;
 }
 
+// Allocates and initialises `count` index lists.
 extern "C" IndexList *__stdcall FUN_1019c360(int count)
 {
     IndexList *lists = (IndexList *)DAT_11b0b938(count * sizeof(IndexList), "");
@@ -472,6 +504,7 @@ extern "C" IndexList *__stdcall FUN_1019c360(int count)
         lists[i].M_101ad1b0();
     return lists;
 }
+// Clears the special pass marker (0x8000) on this node and all its ancestors.
 int Node::M_1019d680()
 {
     flags &= ~0x8000;
@@ -480,6 +513,8 @@ int Node::M_1019d680()
     return 0;
 }
 
+// Node::Find: the index-th node called `name` in the subtree; a leading '@' turns it into a prefix search
+// ("@Spot" finds Spot01, Spot02, ...).
 int Node::M_1019ece0(const char *name, int value)
 {
     int result = value;
@@ -488,6 +523,7 @@ int Node::M_1019ece0(const char *name, int value)
     return M_10191a30(name, &result);
 }
 
+// Like M_1019ece0 with the second pair of finders (M_10191b60 / M_10191aa0).
 int Node::M_1019ed10(const char *name, int value)
 {
     int result = value;
@@ -497,6 +533,7 @@ int Node::M_1019ed10(const char *name, int value)
 }
 
 
+// Runs the special pass marking (M_1019d600) and the follow-up pass (M_1019d6a0).
 int Node::M_101a8760()
 {
     M_1019d600();
@@ -504,6 +541,7 @@ int Node::M_101a8760()
     return 0;
 }
 
+// Frees the extra index lists of this node and runs M_1019e120 on the children.
 int Node::M_101ab980()
 {
     if (m_0070 != 0 && packCount != 0)
@@ -512,6 +550,7 @@ int Node::M_101ab980()
         children[i]->M_1019e120();
     return 0;
 }
+// Collects up to 8 nodes in state 0x4000 from the subtree into `list`.
 int Node::M_10191920(Node **list, int *count)
 {
     if ((flags & 0x4000) != 0)
@@ -525,6 +564,7 @@ int Node::M_10191920(Node **list, int *count)
     return 1;
 }
 
+// Releases the node's shared texture reference and frees its texture data when no one else uses it.
 void Node::M_10191210()
 {
     if (FUN_10169c00(m_028c) == 0)
@@ -540,6 +580,7 @@ void Node::M_10191210()
     m_0294 = 0;
     m_028c = 0;
 }
+// Stores `count` values in the saved block of every node in state 0x1000 in the subtree.
 int Node::M_10191990(const int *values, int count)
 {
     if ((flags & 0x1000) != 0)
@@ -553,6 +594,7 @@ int Node::M_10191990(const int *values, int count)
     return 1;
 }
 
+// Finds the nth node (0-based) in the subtree whose flags contain all bits of `mask`.
 Node *Node::M_10191cc0(unsigned int mask, int nth, int *counter)
 {
     int local = 0;
@@ -574,6 +616,7 @@ Node *Node::M_10191cc0(unsigned int mask, int nth, int *counter)
     }
     return 0;
 }
+// Releases the node's shared mesh and, when it was the last user, frees the mesh, packs and index lists.
 void Node::ReleaseMesh()
 {
     if (mesh != 0 && FUN_10169990(mesh) == 0)
@@ -592,6 +635,7 @@ void Node::ReleaseMesh()
         packCount = 0;
     }
 }
+// Tags nodes named "fire..." with element 1 and "thun..." with element 2 (Gurumin's fire and thunder elements).
 int Node::M_10191e50()
 {
     if (_strnicmp(name, "fire", 4) == 0)
@@ -603,6 +647,7 @@ int Node::M_10191e50()
     return 0;
 }
 
+// Replaces render mode `from` with `to` in the whole subtree.
 int Node::M_10193cb0(int from, int to)
 {
     if (from == m_00a0)
@@ -612,6 +657,7 @@ int Node::M_10193cb0(int from, int to)
     return 0;
 }
 
+// Sets colour value m_189c on the subtree's nodes of kinds 0x200/0x400/0x800 that match `mask`.
 int Node::M_10194630(char value, unsigned int mask)
 {
     if ((flags & mask) != 0)
@@ -628,6 +674,7 @@ int Node::M_10194630(char value, unsigned int mask)
     return 0;
 }
 
+// Sets colour value m_189a the same way.
 int Node::M_101946b0(char value, unsigned int mask)
 {
     if ((flags & mask) != 0)
@@ -644,6 +691,7 @@ int Node::M_101946b0(char value, unsigned int mask)
     return 0;
 }
 
+// Sets colour value m_189b the same way.
 int Node::M_10194730(char value, unsigned int mask)
 {
     if ((flags & mask) != 0)
@@ -660,6 +708,7 @@ int Node::M_10194730(char value, unsigned int mask)
     return 0;
 }
 
+// Enters saved-matrix state 0x400000 with `target` (or the default DAT_11b07118) as the target object.
 int Node::M_101948f0(void *target)
 {
     if (saved != 0)
@@ -689,6 +738,7 @@ int Node::M_101948f0(void *target)
     return 1;
 }
 
+// Advances the cycling child index m_1858 (1..childCount) in the whole subtree (frame-by-frame child swap).
 int Node::M_10194ee0()
 {
     if (m_1858 != 0)
@@ -702,6 +752,7 @@ int Node::M_10194ee0()
     return 0;
 }
 
+// Resets the render queue state and the render options to their defaults (fog distance 300, ...).
 extern "C" void FUN_101997f0(void)
 {
     DAT_11b002c0 = 0;
@@ -724,6 +775,7 @@ extern "C" void FUN_101997f0(void)
     DAT_11b04514 = 0;
 }
 
+// Sets the render mode of the subtree (mode 8 is ignored for nodes with an active glyph cache).
 int Node::M_1019b050(int value)
 {
     if (value == 8 && m_0708 != 0 && m_0708->m_5618 != 0)
@@ -735,6 +787,7 @@ int Node::M_1019b050(int value)
     return 1;
 }
 
+// Sets the render mode of the subtree except for nodes in mode `except1` or `except2` (-1 = no exception).
 int Node::M_1019b0c0(int value, int except1, int except2)
 {
     if ((except1 == -1 || m_00a0 != except1) && (except2 == -1 || m_00a0 != except2))
@@ -744,6 +797,7 @@ int Node::M_1019b0c0(int value, int except1, int except2)
     return 1;
 }
 
+// Clears flag bits on the whole subtree.
 int Node::M_1019b1b0(unsigned int bits)
 {
     flags &= ~bits;
@@ -751,6 +805,7 @@ int Node::M_1019b1b0(unsigned int bits)
         children[i]->M_1019b1b0(bits);
     return 1;
 }
+// Releases the textures of every node in the subtree that is not in the `keep` list.
 int Node::M_1019bca0(Node **keep, int count)
 {
     int i;
@@ -765,6 +820,8 @@ int Node::M_1019bca0(Node **keep, int count)
         children[k]->M_1019bca0(keep, count);
     return 1;
 }
+// Rebuilds the subtree's links after loading: collects linked nodes, rebinds bones, collects the 0x4000
+// nodes and stores the links in their saved blocks.
 int Node::Rebuild()
 {
     int count = 0;
@@ -776,6 +833,7 @@ int Node::Rebuild()
     M_10191870(list, &count);
     return 1;
 }
+// Stores in each linked node (state 0x1000) up to 8 nodes of `list` that share its group.
 int Node::M_10191870(Node **list, int *count)
 {
     if ((flags & 0x1000) != 0 && saved != 0)
@@ -798,6 +856,7 @@ int Node::M_10191870(Node **list, int *count)
         children[i]->M_10191870(list, count);
     return 1;
 }
+// Copies bind poses from a skinned node's glyph/bone cache into its "bip" bones.
 int Node::M_10191770()
 {
     if (m_0708 != 0 && m_0708->m_5618 != 0)
@@ -816,6 +875,7 @@ int Node::M_10191770()
         children[i]->M_10191770();
     return 1;
 }
+// Removes `child` from the child list (destroying it unless `keep`). Returns 0.
 int Node::RemoveChild(Node *child, int keep)
 {
     int i;
@@ -843,6 +903,7 @@ int Node::RemoveChild(Node *child, int keep)
 }
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 
+// Makes private copies of every animation plug's data in the subtree.
 int Node::CopyPlugData()
 {
     for (int i = 0; i < 16; i++)
@@ -861,6 +922,7 @@ int Node::CopyPlugData()
         children[i]->CopyPlugData();
     return 0;
 }
+// Sets `value` on every mesh subset that uses the material called `material`, in the whole subtree.
 int Node::SetMaterialValue(const char *material, int value)
 {
     for (int m = 0; m < materialCount; m++)
@@ -878,6 +940,7 @@ int Node::SetMaterialValue(const char *material, int value)
         children[i]->SetMaterialValue(material, value);
     return 1;
 }
+// Creates 32 child copies of this node (for effects drawn many times, such as particles).
 int Node::CreateChildCopies()
 {
     Node *created[0x20];

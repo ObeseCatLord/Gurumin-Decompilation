@@ -1,3 +1,10 @@
+// Engine containers (0x101ac000-0x101af000): vertex packs, index lists, key-frame tracks and banks, a motion
+// list and matrix helpers. Buffers come from the engine allocator (DAT_11b0b938 = allocate(size, tag),
+// DAT_11b1ba40 = free) or the CRT heap.
+//
+// Key frames: a KeyTrack is a growable list of (frame, Vec4 value, flag) kept sorted by frame; a KeyBank is a
+// fixed 0x80-key version used while loading. Flag 4 marks a key as a motion frame key.
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -86,6 +93,7 @@ struct Matrix4
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" void (*DAT_11b1ba40)(void *);
 
+// Reallocates the vertex buffer for `count` vertices (0x70 bytes each, see vertex.cpp). Returns 1.
 int VertexPack::SetVertexCount(int count)
 {
     if (vertices != 0)
@@ -97,6 +105,7 @@ int VertexPack::SetVertexCount(int count)
     return 1;
 }
 
+// Frees the vertex buffer. Returns 1.
 int VertexPack::FreeVertices()
 {
     if (vertices != 0)
@@ -105,6 +114,7 @@ int VertexPack::FreeVertices()
     return 1;
 }
 
+// Frees the index buffer and sets the count to 0. Returns 1.
 int IndexList::Free()
 {
     if (indices != 0)
@@ -114,6 +124,7 @@ int IndexList::Free()
     return 1;
 }
 
+// Reallocates the index buffer for `newCount` indexes (contents are not kept). Returns 1.
 int IndexList::Resize(int newCount)
 {
     if (indices != 0)
@@ -125,6 +136,7 @@ int IndexList::Resize(int newCount)
     return 1;
 }
 
+// Makes this list a copy of `source`.
 int IndexList::CopyFrom(const IndexList *source)
 {
     count = 0;
@@ -137,6 +149,7 @@ int IndexList::CopyFrom(const IndexList *source)
     return 1;
 }
 
+// Empties the bank, leaving one zero key at frame 0 as the default value.
 void KeyBank::Clear()
 {
     m_0a80 = 0;
@@ -145,6 +158,7 @@ void KeyBank::Clear()
     m_0200[0].Fill(zero);
 }
 
+// Frees the three key arrays (only when they were allocated) and empties the track.
 void KeyTrack::Free()
 {
     if (m_0000 != 0)
@@ -160,6 +174,7 @@ void KeyTrack::Free()
     count = 0;
 }
 
+// Allocates room for 16 keys and empties the track, with a zero default key at frame 0.
 void KeyTrack::Init()
 {
     m_0000 = 0;
@@ -170,6 +185,7 @@ void KeyTrack::Init()
     values->Fill(zero);
 }
 
+// Marks every key as a motion frame key (flag 4).
 int KeyTrack::MarkAll()
 {
     for (int i = 0; i < count; i++)
@@ -177,6 +193,7 @@ int KeyTrack::MarkAll()
     return 0;
 }
 
+// Returns the highest key frame (0 for an empty track).
 int KeyTrack::LastFrame()
 {
     int last = 0;
@@ -189,6 +206,7 @@ int KeyTrack::LastFrame()
     return last;
 }
 
+// 1 when the track has a key exactly at `frame` (the keys are sorted, so the search stops early).
 int KeyTrack::HasFrame(int frame)
 {
     for (int i = 0; i < count; i++)
@@ -201,6 +219,7 @@ int KeyTrack::HasFrame(int frame)
     return 0;
 }
 
+// Returns the translation row as a vector (w copied from m[15]). Not byte-identical yet.
 Vec4 Matrix4::GetTranslation()
 {
     Vec4 result;
@@ -210,6 +229,7 @@ Vec4 Matrix4::GetTranslation()
     return result;
 }
 
+// Sets the translation row.
 void Matrix4::SetTranslation(float x, float y, float z, float w)
 {
     m[12] = x;
@@ -217,6 +237,7 @@ void Matrix4::SetTranslation(float x, float y, float z, float w)
     m[14] = z;
 }
 
+// Sets the upper-left 3x3 block to identity (translation kept).
 void Matrix4::ResetRotation()
 {
     m[10] = 1.0f;
@@ -230,12 +251,14 @@ void Matrix4::ResetRotation()
     m[1] = 0;
 }
 
+// Sets the identity matrix.
 void Matrix4::SetIdentity()
 {
     m[12] = m[13] = m[14] = m[8] = m[9] = m[11] = m[4] = m[6] = m[7] = m[1] = m[2] = m[3] = 0.0f;
     m[0] = m[5] = m[10] = m[15] = 1.0f;
 }
 
+// Copies the transposed rotation part of `source` (the inverse rotation for a pure rotation matrix).
 void Matrix4::SetRotationTransposed(const Matrix4 &source)
 {
     m[0] = source.m[0];
@@ -249,11 +272,13 @@ void Matrix4::SetRotationTransposed(const Matrix4 &source)
     m[10] = source.m[10];
 }
 
+// 0x101af420. Constructor: an empty bank (see the IPRA note in open.tsv).
 KeyBank::KeyBank()
 {
     Clear();
 }
 
+// Returns `point` transformed by `matrix`.
 Vec4 TransformPoint(const Vec4 &point, const Matrix4 &matrix)
 {
     Vec4 result;
@@ -261,6 +286,7 @@ Vec4 TransformPoint(const Vec4 &point, const Matrix4 &matrix)
     result.Transform(matrix);
     return result;
 }
+// Makes this track a copy of `source` (keys, values and flags). Returns 1.
 int KeyTrack::CopyFrom(const KeyTrack *source)
 {
     Free();
@@ -273,6 +299,7 @@ int KeyTrack::CopyFrom(const KeyTrack *source)
     return 1;
 }
 
+// Copies the bank's keys into `target` (a growable track). Returns 0.
 int KeyBank::CopyTo(KeyTrack *target)
 {
     target->Free();
@@ -284,6 +311,7 @@ int KeyBank::CopyTo(KeyTrack *target)
     }
     return 0;
 }
+// List of up to 0x7f motion ids plus up to 64 named entries (id, value, extra).
 struct MotionList
 {
     int m_0000;
@@ -300,6 +328,8 @@ struct MotionList
     int AddEntry(int id, int value, const char *name, int extra);
 };
 
+// Inserts `value` at `position` (-1 = append) and records `tag`. Returns 0 when the position is past the end or
+// the list is full.
 int MotionList::Insert(int position, int value, int tag)
 {
     m_0208 = tag;
@@ -320,6 +350,7 @@ int MotionList::Insert(int position, int value, int tag)
     return 1;
 }
 
+// Adds a named entry (`name`, id, value, extra). Returns 0 when all 64 entries are used.
 int MotionList::AddEntry(int id, int value, const char *name, int extra)
 {
     if (entryCount > 0x3f)
@@ -334,6 +365,7 @@ int MotionList::AddEntry(int id, int value, const char *name, int extra)
 }
 extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);
 
+// Makes this pack a copy of `source` (header fields and vertices).
 int VertexPack::CopyFrom(const VertexPack *source)
 {
     vertexCount = 0;
@@ -357,6 +389,8 @@ int VertexPack::CopyFrom(const VertexPack *source)
     DAT_11b07530(vertices, source->vertices, vertexCount * 0x70);
     return 1;
 }
+// Inserts key (x, y, z, w) at `frame` in frame order, or replaces the value of an existing key at that frame.
+// Returns its index. Not byte-identical yet (see open.tsv).
 int KeyBank::Insert(int frame, float x, float y, float z, float w)
 {
     int i;
@@ -382,6 +416,7 @@ int KeyBank::Insert(int frame, float x, float y, float z, float w)
     m_0a80++;
     return i;
 }
+// Same as KeyBank::Insert for a growable track (grows the arrays when needed).
 int KeyTrack::Insert(int frame, float x, float y, float z, float w)
 {
     int last = count;

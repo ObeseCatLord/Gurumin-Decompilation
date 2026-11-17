@@ -1029,13 +1029,11 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `101a8760` 19 bytes (src/scene_node.cpp)
 - [ ] `101ab980` 75 bytes (src/scene_node.cpp)
 
-## 7. Comment pass (2 files)
+## 7. Comment pass (0 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
-- [ ] `src/containers.cpp`: 25 of 25 functions without a comment, no header
-- [ ] `src/scene_node.cpp`: 54 of 58 functions without a comment, no header
 
 ## 8. Structures and globals
 

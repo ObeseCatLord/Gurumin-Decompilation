@@ -25,7 +25,7 @@ struct BankModel
 
 struct ModelBank
 {
-    Node *lights[0x20];     // 0x0000: light nodes of the scene (@Omni, then @Spot)
+    Node *lights[0x20];     // 0x0000: light nodes of the scene (Omn..., then Spot...)
     int m_0080[0x80];       // 0x0080
     char pad_0280[0x1604];
     int m_1884;             // 0x1884
@@ -53,8 +53,8 @@ int ModelBank::Reset()
     return 1;
 }
 
-// Rebuilds the light list from the scene below `root`: up to 32 nodes named "@Omn" (omni lights) followed by up
-// to 32 named "@Spot" (spot lights). Missing lights are skipped, so the list stays packed. Returns 0 when the bank
+// Rebuilds the light list from the scene below `root`: up to 32 nodes whose names start with "Omn" (omni lights)
+// followed by up to 32 starting with "Spot" (spot lights); the leading '@' makes Node::Find a prefix search. Missing lights are skipped, so the list stays packed. Returns 0 when the bank
 // is not in use, else 1. (The list has 32 entries; with more than 32 lights in total it overruns into m_0080.)
 int ModelBank::CollectLights(Node *root)
 {

@@ -53,3 +53,7 @@ address	status	reason
 101489c0	open	RenderWindow::RegisterWindowClass: zero kept in edi for the five zero fields and LoadCursor's argument (cl 13.00)
 1014b390	open	Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores
 1013e4f0	open	RenderWindow::WindowProc: same cases and bodies; cl 13.00 splits the 9-case switch at 0x10e, VS2003 at 0x10f, and the original shares the DefWindowProc tail
+1000b9f0	open	model effect setup: zero kept in eax, then esi, for pushes and stores (cl 13.00)
+10034920	skip	costume texture switch: compiler-merged case tails and an uninitialised default path; not attempted yet
+10199880	open	RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
+1015fbf0	open	Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)

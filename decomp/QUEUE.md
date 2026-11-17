@@ -57,7 +57,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (127)
+## 2. Small functions (30-250 bytes) (125)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c00` 82 bytes (loops 1)
@@ -91,11 +91,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1013fb10` 154 bytes (float, calls 1)
 - [ ] `1014fd30` 154 bytes (float, loops 1, calls 4)
 - [ ] `101ac3a0` 156 bytes (float, calls 4)
-- [ ] `101630b0` 157 bytes (float)
 - [ ] `1001fff0` 159 bytes (float, loops 1, calls 3)
 - [ ] `101ac440` 159 bytes (float, calls 4)
 - [ ] `1003a7d0` 163 bytes (loops 2, calls 3)
-- [ ] `1019d6a0` 163 bytes (loops 2, calls 2)
 - [ ] `10057b90` 165 bytes (loops 1, calls 1)
 - [ ] `10161c00` 166 bytes (float, calls 2)
 - [ ] `100157b0` 167 bytes (loops 1, calls 4)

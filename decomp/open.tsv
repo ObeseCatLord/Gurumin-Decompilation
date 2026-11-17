@@ -49,3 +49,4 @@ address	status	reason
 100e2560	open	enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 10015710	open	Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
 101ac300	open	Vec4::RotateZ: the cos/sin results pair with the other coordinate in the second product (three source orders give the same code)
+1019d6a0	skip	Node special-pass follow-up: keeps the loop counter in edx across the call to Node::M_1019d680 (callee known not to touch edx) - inter-procedural register allocation

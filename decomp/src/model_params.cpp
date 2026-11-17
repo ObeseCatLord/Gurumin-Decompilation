@@ -4,9 +4,18 @@
 
 struct AnimModel
 {
-    char pad_0000[0x29c];
+    char pad_0000[0x84];
+    unsigned char speedDivisor;  // 0x84: slows every motion of this model down (0 = no division)
+    char pad_0085[0x217];
     float scale;
-    char pad_02a0[0x2138];
+    char pad_02a0[0x1ffc];
+    int m_229c;                  // 0x229c: blend frames, 8 when unset
+    char pad_22a0[0xcc];
+    float motionSpeed;           // 0x236c: current motion playback speed (at most 60)
+    char pad_2370[0x18];
+    int m_2388;                  // 0x2388: 1 once a speed change is pending
+    int m_238c;
+    char pad_2390[0x48];
     float m_23d8;
     float m_23dc;
     int m_23e0;
@@ -22,6 +31,7 @@ struct AnimModel
     int M_101629b0(float y, float x);
     void M_10167400();
     int M_10167390(int id, int value, int frames);
+    int AddMotionSpeed(float speed);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -68,5 +78,24 @@ int AnimModel::M_10167390(int id, int value, int frames)
     }
     m_3998 = frames;
     m_3994 = (value - m_39a0) / frames;
+    return 0;
+}
+
+// Adds `speed` (scaled by 0.961875 and 0.9, and divided by the model's speed divisor when it has one) to the
+// motion playback speed, capped at 60. Used for idle animations (FUN_1001b840 passes 30). Returns 0.
+int AnimModel::AddMotionSpeed(float speed)
+{
+    speed = speed * 0.961875;
+    if (speedDivisor != 0)
+        speed = speed / speedDivisor;
+    m_2388 = 0;
+    m_238c = 0;
+    speed = speed * 0.9f + motionSpeed;
+    motionSpeed = speed;
+    if (m_229c == 0)
+        m_229c = 8;
+    m_2388 = 1;
+    if (speed > 60.0f)
+        motionSpeed = 60.0f;
     return 0;
 }

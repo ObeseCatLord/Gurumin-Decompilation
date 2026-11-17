@@ -164,3 +164,4 @@ _Vec3_Length	101ae890
 ?TransformNormal@@YA?AUVec4@@ABU1@ABUMatrix4@@@Z	101ae130
 ?RotateZ@Vec4@@QAEXM@Z	101ac300
 ?SnapAngle@@YAMMH@Z	1016c340
+?AddMotionSpeed@AnimModel@@QAEHM@Z	101630b0

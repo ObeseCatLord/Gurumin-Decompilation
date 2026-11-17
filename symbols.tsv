@@ -516,3 +516,4 @@ address	name	evidence
 101616e0	Texture_DrawSpritePixels	role from the decompiled source (decomp/src/item_icon.cpp)
 101ac300	Vec4::RotateZ	matched decompiled source (decomp/obj_symbols.tsv)
 1016c340	SnapAngle	matched decompiled source (decomp/obj_symbols.tsv)
+101630b0	AnimModel::AddMotionSpeed	matched decompiled source (decomp/obj_symbols.tsv)

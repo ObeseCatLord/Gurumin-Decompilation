@@ -594,3 +594,5 @@ address	name	evidence
 10160df0	MmvPlayer::ReadFrame	matched decompiled source (decomp/obj_symbols.tsv)
 10034810	SmoothApproach	recursively moves a value 55% towards a target (decomp/src/group_tables.cpp)
 10165020	SortByDepth	bubble sort of float keys with parallel arrays (decomp/src/model_misc.cpp)
+10002190	Game::ReadWord	matched decompiled source (decomp/obj_symbols.tsv)
+10002330	Game::ReadWordInLine	matched decompiled source (decomp/obj_symbols.tsv)

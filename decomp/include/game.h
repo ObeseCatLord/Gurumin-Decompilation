@@ -103,7 +103,11 @@ struct Game : Object
     char pad_39c68[0x5c1ac];
     GameNamedEntry m_95e14[0x100];
     int m_a4614;
-    char pad_a4618[0x34a07c];
+    char pad_a4618[0x349364];
+    char *text;                 // 0x3ed97c: script text being tokenised
+    int pos;                    // 0x3ed980: read position in `text`
+    int end;                    // 0x3ed984: text length
+    char token[0xd0c];          // 0x3ed988: the token read last
     int m_3ee694[4000];
 
     ~Game();
@@ -112,6 +116,8 @@ struct Game : Object
     int LoadMenuTextures(int value);
     int M_100022b0(int index);
     int M_10002300(int index, int value);
+    int ReadWord();
+    int ReadWordInLine();
     int M_10007ee0();
     void M_100082e0();
     int M_10008390(int id, int value);

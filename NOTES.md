@@ -127,3 +127,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   (compare_obj and build_all accept the mangled `?FUN_xxxxxxxx@@...` names); declare C++ callees the same way.
 - GameFile (0x101ad9e0 ctor, 0x101b2570 dtor -> File_Close) is 0x28 bytes: `FILE *handle; char name[0x24];`
   (Save_LoadSlot's frame). Save_LoadSlot builds one and never uses it.
+- `strcmp(word, "literal")` is inlined as `repe cmpsb` with the literal's length including the NUL (0x100364a0);
+  `memcmp` with the same length becomes dword/word compares instead.
+- Pointer loops that end with a signed `jl` against the end address come from index loops (`for (i = 0; i < n; i++)
+  a[i] = ...`), not pointer loops (0x1014b1c0).
+- Local arrays are laid out in declaration order from the top of the frame down: the one declared first sits higher
+  (ItmScramble: `table` declared before `key`).

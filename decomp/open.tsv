@@ -40,3 +40,6 @@ address	status	reason
 1001b7b0	open	char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 10008910	open	Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
 100091d0	open	Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
+10161120	open	Path_GetBaseName: register allocation (original reads buffer[0] before the pushes and zeroes out[] with esi); memset and do/while forms tried
+101614c0	open	ItmScramble: frame and table layout match (table declared before key); original keeps the sum in ebp and the xor in memory, ours the other way round
+101615d0	open	ItmDescramble: same register residue as 0x101614c0

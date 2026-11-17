@@ -112,3 +112,7 @@
 ?WindowProc@RenderWindow@@UAGJPAUHWND__@@IIJ@Z	1013e4f0
 _acosf	10001f60
 _atan2f	10001f80
+?Open@GameFile@@QAEHPBD0@Z	101b2310
+?Read@GameFile@@QAEHPAXHH@Z	101b23a0
+?Close@GameFile@@QAEXXZ	101b22f0
+??1GameFile@@QAE@XZ	101b2570

@@ -1,3 +1,5 @@
+// Small model, view and table helpers.
+
 #include <string.h>
 
 struct Collider
@@ -77,6 +79,7 @@ struct MeshRef
 extern "C" int DAT_10feb3e0[0xc80];
 extern "C" char DAT_10fada90[0xc80][0x20];
 
+// Sets the model's blend value; any non-zero value selects blend mode 0x17, zero turns blending off.
 int ModelObject::M_10162f20(int value)
 {
     m_026c = 0x17;
@@ -86,12 +89,14 @@ int ModelObject::M_10162f20(int value)
     return 0;
 }
 
+// Sets m_231c. Returns 1.
 int ModelObject::M_10163e70(int value)
 {
     m_231c = value;
     return 1;
 }
 
+// Forwards a collision query (a, b) to the model's collider; 0 when it has none.
 int ModelObject::M_10164090(int a, int b)
 {
     if (collider != 0)
@@ -99,12 +104,14 @@ int ModelObject::M_10164090(int a, int b)
     return 0;
 }
 
+// Counts the m_3870 timer down to 0.
 void ModelObject::M_101687c0()
 {
     if (m_3870 != 0)
         m_3870--;
 }
 
+// Resets the rotation limits to +-45 degrees (0.785375 rad) on all three axes. Not byte-identical yet.
 void ViewLimits::M_10166870()
 {
     minimum[0] = -0.785375f;
@@ -117,6 +124,8 @@ void ViewLimits::M_10166870()
     m_0020 = 0;
 }
 
+// Assigns character `character` to slot `slot` with `value` and flags its model as important (motion
+// changes are flagged while applied, see SceneOwner::PlayMotion).
 int CharacterBank::M_10166910(int slot, int character, int value)
 {
     m_eac58[slot] = character;
@@ -125,6 +134,7 @@ int CharacterBank::M_10166910(int slot, int character, int value)
     return 1;
 }
 
+// Clears the five index lists and their counters.
 void SlotLists::M_10169620()
 {
     lists[0].Clear();
@@ -137,6 +147,7 @@ void SlotLists::M_10169620()
     m_006c = 0;
 }
 
+// Clears the shared model name table (0xc80 names) and its reference counts. Not byte-identical yet.
 extern "C" int FUN_10169720(void)
 {
     memset(DAT_10feb3e0, 0, sizeof(DAT_10feb3e0));
@@ -145,6 +156,7 @@ extern "C" int FUN_10169720(void)
     return 0;
 }
 
+// Returns the first free entry of the shared model name table, or -1.
 extern "C" int FUN_10169760(void)
 {
     for (int i = 0; i < 0xc80; i++)
@@ -155,6 +167,7 @@ extern "C" int FUN_10169760(void)
     return -1;
 }
 
+// Adds a reference to a shared model file and returns the new count (see FUN_10169990).
 extern "C" int FUN_10169970(const MeshRef *mesh)
 {
     int index = mesh->index;

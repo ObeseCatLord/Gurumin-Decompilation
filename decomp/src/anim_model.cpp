@@ -1,3 +1,8 @@
+// Animated model key tracks. An AnimModel (the CharModel inside a Character) has three key tracks:
+// track A = motion frame keys (which frame of the motion file plays when), track B = a second timeline, track C =
+// position/colour keys with flags. Each track remembers its first and last key frame and two playback options.
+// Scripts build tracks key by key, then start playback (char_motion.cpp shows a typical sequence).
+
 #include <string.h>
 
 struct KeyList
@@ -58,11 +63,13 @@ struct AnimModel
 
 extern "C" int DAT_10faaa88[0x100];
 
+// Clears the model table DAT_10faaa88 (all 0x100 entries unused).
 extern "C" void FUN_10161980(void)
 {
     memset(DAT_10faaa88, 0, sizeof(DAT_10faaa88));
 }
 
+// Applies material swap `count` to both motion nodes (Node::M_1019e830 with key -1 = all subsets). Returns 1.
 int AnimModel::M_10161a20(int count)
 {
     if (count > 0)
@@ -75,6 +82,7 @@ int AnimModel::M_10161a20(int count)
     return 1;
 }
 
+// Clears track C (no keys; first frame 10000 so the first key always becomes the start).
 void AnimModel::M_10161a60()
 {
     trackC.keys.Clear();
@@ -84,6 +92,7 @@ void AnimModel::M_10161a60()
     trackC.m_00c = 0;
 }
 
+// Adds key (a, b, c) at `frame` to track C and widens its frame range.
 int AnimModel::M_10161af0(int frame, int a, int b, int c)
 {
     trackC.keys.Add(frame, a, b, c, 0);
@@ -94,6 +103,7 @@ int AnimModel::M_10161af0(int frame, int a, int b, int c)
     return 0;
 }
 
+// Sets track C's two playback options (loop mode and speed).
 int AnimModel::M_10161b40(int a, int b)
 {
     trackC.m_00c = a;
@@ -101,6 +111,7 @@ int AnimModel::M_10161b40(int a, int b)
     return 0;
 }
 
+// Clears track A.
 void AnimModel::M_10161b60()
 {
     trackA.keys.Clear();
@@ -110,6 +121,7 @@ void AnimModel::M_10161b60()
     trackA.m_00c = 0;
 }
 
+// Adds a motion key at `frame` to track A (key flag 4 = motion frame) and widens its frame range.
 int AnimModel::M_10161b90(int frame, int value)
 {
     trackA.keys.flags[trackA.keys.Add(frame, value, 0, 0, 0)] = 4;
@@ -120,6 +132,7 @@ int AnimModel::M_10161b90(int frame, int value)
     return 0;
 }
 
+// Sets track A's two playback options (char_motion.cpp: 1 and "loop").
 int AnimModel::M_10161be0(int a, int b)
 {
     trackA.m_00c = a;
@@ -127,6 +140,7 @@ int AnimModel::M_10161be0(int a, int b)
     return 0;
 }
 
+// Clears track B.
 void AnimModel::M_10161f30()
 {
     trackB.keys.Clear();
@@ -136,6 +150,7 @@ void AnimModel::M_10161f30()
     trackB.m_00c = 0;
 }
 
+// Sets track B's two playback options.
 int AnimModel::M_10161f60(int a, int b)
 {
     trackB.m_00c = a;
@@ -143,6 +158,7 @@ int AnimModel::M_10161f60(int a, int b)
     return 0;
 }
 
+// Stores a pending action (a, b, c, flag d) unless the model is locked (m_17e9).
 int AnimModel::M_101628b0(int a, int b, int c, char d)
 {
     if (m_17e9 == 0)
@@ -154,6 +170,7 @@ int AnimModel::M_101628b0(int a, int b, int c, char d)
     }
     return 0;
 }
+// Adds key (a, b, c) at `frame` to track C with key flag `flag`.
 int AnimModel::M_10161a90(int frame, int a, int b, int c, char flag)
 {
     trackC.keys.flags[trackC.keys.Add(frame, a, b, c, 0)] = flag;

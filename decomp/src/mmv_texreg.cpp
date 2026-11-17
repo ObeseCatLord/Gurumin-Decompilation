@@ -25,7 +25,7 @@ struct MovieFile
 struct MmvPlayer
 {
     int frameIndex;        // 0x00: number of the next frame
-    char *base;            // 0x04: whole movie in memory (when not streamed from the file)
+    int start;             // 0x04: offset of the first frame record in `memory`
     int offset;            // 0x08: offset of the next frame record after the header
     int size;              // 0x0c: movie size
     int m_0010;
@@ -42,7 +42,7 @@ struct MmvPlayer
     char m_004c;
     char pad_004d;
     char m_004e[0x202];
-    int m_0250;            // 0x250: header size
+    char *memory;          // 0x250: whole movie in memory (when not streamed from the file)
     void *frame;           // 0x254: decoded 8-bit frame (palette indexes), updated in place
     unsigned char *data;   // 0x258: compressed data of the current frame
 
@@ -51,12 +51,68 @@ struct MmvPlayer
     void Close();
     int M_10160960(const ClipRect *clip);
     void ReadFrame();
-    int M_10160f00();
+    void ReadFrameOnce();
     void M_10161050();
     void DecodeFrameRle(int count);
 };
 
+extern "C" void (*DAT_11b1ba40)(void *);
 extern "C" unsigned char DAT_10f68138[0x25800];  // buffer for one streamed frame record
+
+// Not byte-identical yet: the original keeps 0 in ebx for its compares and stores (see open.tsv).
+// Like ReadFrame for a movie that plays once: after the last frame the in-memory copy is freed or the file closed,
+// then the movie either holds its last frame (m_004c set: state 2) or stops and frees the frame buffer when it
+// owns it (m_004a).
+void MmvPlayer::ReadFrameOnce()
+{
+    if (m_004b == 0)
+        return;
+    if (m_0048 == 6 && frameIndex >= 7)
+        return;
+    if (isOpen == 0)
+    {
+        if (m_004c == 2)
+            return;
+        int length = *(int *)(start + memory + offset);
+        data = (unsigned char *)(start + memory + offset + 4);
+        DecodeFrameRle(length);
+        offset += length + 4;
+        frameIndex++;
+        if (start + offset < size)
+            return;
+        DAT_11b1ba40(memory);
+        memory = 0;
+    }
+    else
+    {
+        if (m_004c == 2)
+            return;
+        int length;
+        file.Read(&length, 1, 4);
+        if (length <= 0x25800 && length > 0)
+        {
+            file.Read(DAT_10f68138, 1, length);
+            data = DAT_10f68138;
+            DecodeFrameRle(length);
+            offset += length + 4;
+            frameIndex++;
+        }
+        else
+            offset += size;
+        if (offset < size)
+            return;
+        file.Close();
+    }
+    if (m_004c != 0)
+    {
+        m_004c = 2;
+        return;
+    }
+    m_004b = 0;
+    if (frame != 0 && m_004a != 0)
+        DAT_11b1ba40(frame);
+    frame = 0;
+}
 
 // Reads the next frame record (a 4-byte length and RLE data) from memory or from the file, decodes it into the frame
 // and advances; after the last frame playback starts again from the first one (the file is rewound to 0x406, just
@@ -67,12 +123,12 @@ void MmvPlayer::ReadFrame()
     {
         if (isOpen == 0)
         {
-            int length = *(int *)(base + m_0250 + offset);
-            data = (unsigned char *)(base + m_0250 + offset + 4);
+            int length = *(int *)(start + memory + offset);
+            data = (unsigned char *)(start + memory + offset + 4);
             DecodeFrameRle(length);
             offset += length + 4;
             frameIndex++;
-            if ((int)(base + offset) >= size)
+            if (start + offset >= size)
             {
                 offset = 0;
                 frameIndex = 0;
@@ -109,7 +165,6 @@ struct TextureSlot
     void M_1014b6e0();
 };
 
-extern "C" void (*DAT_11b1ba40)(void *);
 extern "C" void __stdcall FUN_1014f120(int, int, int width, int height, int pitch, void *pixels, void *palette);
 extern "C" void FUN_10143b50(void);
 extern "C" void FUN_10143b80(void);
@@ -122,7 +177,7 @@ extern "C" TextureSlot DAT_118d0ba8[1600];
 MmvPlayer::MmvPlayer()
 {
     m_0010 = 0;
-    m_0250 = 0;
+    memory = 0;
     m_004b = 0;
     frame = 0;
     m_004a = 0;
@@ -136,8 +191,8 @@ MmvPlayer::~MmvPlayer()
         file.Close();
     isOpen = 0;
     m_004b = 0;
-    if (m_0250 != 0)
-        DAT_11b1ba40((void *)m_0250);
+    if (memory != 0)
+        DAT_11b1ba40(memory);
     if (frame != 0 && m_004a)
         DAT_11b1ba40(frame);
 }
@@ -150,11 +205,11 @@ void MmvPlayer::Close()
         if (isOpen && m_003c != 0)
             file.Close();
         isOpen = 0;
-        if (m_0250 != 0)
-            DAT_11b1ba40((void *)m_0250);
+        if (memory != 0)
+            DAT_11b1ba40(memory);
         if (frame != 0 && m_004a)
             DAT_11b1ba40(frame);
-        m_0250 = 0;
+        memory = 0;
         frame = 0;
         m_004b = 0;
     }
@@ -179,7 +234,7 @@ void MmvPlayer::M_10161050()
     if (m_0010 != 0)
         ReadFrame();
     else
-        M_10160f00();
+        ReadFrameOnce();
 }
 
 // Binds texture slot `index` to stage 0 (a negative index unbinds). Returns the index or -1.

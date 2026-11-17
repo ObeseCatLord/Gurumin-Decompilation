@@ -623,3 +623,4 @@ address	name	evidence
 1001b670	Enemies_WakeNearby	wakes sleeping enemies near a character (decomp/src/char_proximity.cpp)
 101a23b0	Node::BoneMatrix	matched decompiled source (decomp/obj_symbols.tsv)
 10017fc0	FadeNodes_Update	fades map light nodes by owner brightness and viewer distance (decomp/src/node_fade.cpp)
+10160f00	MmvPlayer::ReadFrameOnce	matched decompiled source (decomp/obj_symbols.tsv)

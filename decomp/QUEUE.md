@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (58)
+## 1. Walls to retry (59)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -42,6 +42,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
 - [ ] `10160960` 75 — frame blit clamp: register allocation of the two min() results differs
+- [ ] `10160f00` 326 — MmvPlayer::ReadFrameOnce: identical except the original keeps 0 in ebx (push ebx / xor ebx,ebx) where ours uses immediates - same zero-register residue as the enemy AI updaters
 - [ ] `10161120` 213 — Path_GetBaseName: register allocation (original reads buffer[0] before the pushes and zeroes out[] with esi); memset and do/while forms tried
 - [ ] `10161200` 167 — Bmp_FlipVertical: VS2003 turns the step-3 inner loop into a precomputed trip count (mul 0xaaaaaaab); cl 13.00 keeps the index compare
 - [ ] `101614c0` 259 — ItmScramble: frame and table layout match (table declared before key); original keeps the sum in ebp and the xor in memory, ours the other way round
@@ -132,7 +133,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (208)
+## 3. Medium functions (251-800 bytes) (207)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
@@ -153,7 +154,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10145a50` 321 bytes (loops 2, calls 8)
 - [ ] `1002a340` 325 bytes (float, loops 1, calls 6)
 - [ ] `10188580` 325 bytes (float, loops 4, calls 1)
-- [ ] `10160f00` 326 bytes (calls 7)
 - [ ] `10035d20` 328 bytes (loops 2, calls 1)
 - [ ] `10035fa0` 329 bytes (loops 2, calls 1)
 - [ ] `1001a840` 330 bytes (calls 6)

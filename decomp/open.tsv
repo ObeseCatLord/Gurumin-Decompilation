@@ -58,3 +58,4 @@ address	status	reason
 101acc60	open	DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 1000f360	open	face change: calls match; the original keeps index in esi and frame in edi (ours swapped) and indexes the face tables as flat int arrays [set*0x1c0+frame]
 1001b670	open	enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
+10160f00	open	MmvPlayer::ReadFrameOnce: identical except the original keeps 0 in ebx (push ebx / xor ebx,ebx) where ours uses immediates - same zero-register residue as the enemy AI updaters

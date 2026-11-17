@@ -178,6 +178,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Two short constant loops in a row get **fused** by cl 13.00 (stores interleaved); written-out stores keep the
   original order and let the compiler keep the constant in a register for the earlier loops too (EffectManager::Reset
   0x10184170, effect definitions 0x1016f900: the two five-entry -1 caches).
+- A clamp that tests the upper bound twice (cmp 15 / test / cmp 15 again) is the classic `max(min(x, hi), lo)` macro
+  pair with double evaluation; write the macros inline in the expression (0x10017fc0). `add reg, -5` instead of
+  `sub reg, 5` came from the subtraction inside the macro argument.
 - Texture_Load (0x1001e1a0) is also an inline helper: functions that load a fixed texture expand it, including
   three `strlen` loops over the literal (0x10050460). `include/texture_load.h` holds it as `LoadTexture`.
 

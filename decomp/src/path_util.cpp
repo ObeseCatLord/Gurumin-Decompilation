@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <string.h>
 
+extern "C" char DAT_10ff65f8[][0x20];  // texture names (see mesh_cache.cpp)
 extern "C" char DAT_10fada90[][0x20];
 
 // Creates every directory along `path` (like mkdir -p): cuts the path at each backslash in turn and calls
@@ -34,6 +35,17 @@ extern "C" int FUN_10169780(int index, const char *folder, const char *name)
     strcat(buffer, name);
     buffer[0x1f] = 0;
     strcpy(DAT_10fada90[index], buffer);
+    return 0;
+}
+
+// Same as FUN_10169780 for the 32-byte texture name table DAT_10ff65f8.
+extern "C" int FUN_101699f0(int index, const char *folder, const char *name)
+{
+    char buffer[256];
+    strcpy(buffer, folder);
+    strcat(buffer, name);
+    buffer[0x1f] = 0;
+    strcpy(DAT_10ff65f8[index], buffer);
     return 0;
 }
 

@@ -242,6 +242,54 @@ extern "C" DWORD DAT_10f66bb8;   // saved sentence mode
 extern "C" char *DAT_10f66ef8;   // caller's buffer that receives the entered text (may be 0)
 extern "C" char DAT_10f66df8[];  // the text entered so far
 
+extern "C" char DAT_10f66bd0[];  // composition string
+extern "C" char DAT_10f66cd0[];  // result string
+extern "C" char DAT_10f68008[];
+extern "C" char DAT_10f66ab8[];
+extern "C" int DAT_10f68108;
+extern "C" int DAT_10f669a0;
+extern "C" int DAT_10f66de0;
+extern "C" int DAT_10f66aa8;
+extern "C" int DAT_10f6811c;
+extern "C" int DAT_10f6810c;
+extern "C" int DAT_10f66bc0;
+extern "C" int DAT_10f66ddc;
+extern "C" int DAT_10f66de4;
+extern "C" int DAT_10f66bc4;
+extern "C" int DAT_10f66dd4;
+extern "C" char DAT_10f67008[32][0x80];  // candidate strings
+
+// Prepares text input with `text` as the starting text: maximum length 0x80 (DAT_10f66bbc), the text is copied into
+// the input line and `text` becomes the buffer that receives the result. Clears the composition, result and
+// candidate strings and the input counters, and marks input as active. Returns 0.
+extern "C" int FUN_1015f310(char *text)
+{
+    DAT_10f66bbc = 0x80;
+    strcpy(DAT_10f66df8, text);
+    DAT_10f66ef8 = text;
+    DAT_10f66bd0[0] = 0;
+    DAT_10f66cd0[0] = 0;
+    DAT_10f68008[0] = 0;
+    DAT_10f66ab8[0] = 0;
+    DAT_10f68108 = 0;
+    DAT_10f669a0 = 0;
+    DAT_10f66de0 = 0;
+    DAT_10f66df0 = 0;
+    DAT_10f66aa8 = 0;
+    DAT_10f6811c = 0;
+    DAT_10f66bc8 = 0;
+    DAT_10f6810c = 0;
+    DAT_10f66bc0 = 0;
+    DAT_10f67000 = 1;
+    DAT_10f66ddc = 0;
+    DAT_10f66de4 = 0;
+    DAT_10f66bc4 = 0;
+    DAT_10f66dd4 = 0;
+    for (int i = 0; i < 32; i++)
+        DAT_10f67008[i][0] = 0;
+    return 0;
+}
+
 // Ends text input (name entry): marks input as finished, restores the IME conversion mode saved when input
 // started, closes the IME and copies the entered text into the caller's buffer.
 extern "C" int FUN_1015fd30(void)

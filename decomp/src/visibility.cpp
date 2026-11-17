@@ -14,6 +14,7 @@ struct Vec4
     Vec4();
     void Copy(const Vec4 &source);
     int InBox(const VisBox *box);
+    int InBoxMargin(const VisBox *box, float margin);  // 0x101ac740
 };
 
 struct VisBox
@@ -99,12 +100,15 @@ struct Matrix4
 // The part of a Character record (world.h) used here: its world matrix.
 struct CharacterPlacement
 {
-    char pad_0000[0x2338];
+    char pad_0000[0x80];
+    char *nearCells;         // 0x80: the character's row of DAT_1021d338 (0 = no visibility data)
+    char pad_0084[0x22b4];
     Matrix4 matrix;          // 0x2338: world matrix (translation = position)
     char pad_2378[0x124];
 };
 
 extern "C" CharacterPlacement DAT_10db6ed8[0x80];
+extern "C" char DAT_1021d338[0x80][0x40];  // per character: 1 for each cell box within 75 units
 
 // 1 when character `index` stands in a currently visible cell (or the map has no visibility data), else 0.
 extern "C" int FUN_10015710(int index)
@@ -119,5 +123,27 @@ extern "C" int FUN_10015710(int index)
         if (DAT_11afffe8[i] != 0 && pos.InBox(&vis->boxes[i]))
             return 1;
     }
+    return 0;
+}
+
+// Not byte-identical yet: register choice for the box pointer and the index differs (see open.tsv).
+// Marks the cell boxes within 75 units of character `index` in its row of DAT_1021d338 and points the character's
+// nearCells at that row. Returns 1 when the map has no visibility data (nearCells stays 0), else 0.
+extern "C" int FUN_100157b0(int index)
+{
+    Vec4 pos;
+    int i = 0;
+    DAT_10db6ed8[index].nearCells = 0;
+    if (DAT_10255f08->vis == 0)
+        return 1;
+    pos.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    VisBox *box = DAT_10255f08->vis->boxes;
+    for (; i < 0x40; i++, box++)
+    {
+        DAT_1021d338[index][i] = 0;
+        if (pos.InBoxMargin(box, 75.0f) != 0)
+            DAT_1021d338[index][i] = 1;
+    }
+    DAT_10db6ed8[index].nearCells = DAT_1021d338[index];
     return 0;
 }

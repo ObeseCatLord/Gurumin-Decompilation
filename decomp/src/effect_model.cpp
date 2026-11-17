@@ -8,6 +8,7 @@ struct Vec4
     float w;
     Vec4();                                            // 0x101ac990: zero vector
     void Set(float x, float y, float z, float w);      // 0x101ac9c0
+    void Copy(const Vec4 &source);                     // 0x101acc20
 };
 
 struct Matrix4
@@ -137,6 +138,23 @@ extern "C" int FUN_1003a7d0(const char *path, float x, float y, float z, int sta
     if (slot >= 0)
     {
         DAT_10edbe08[slot].M_1000b9f0(path, 0, start, -1);
+        DAT_10edbe08[slot].AddKey(0, x, y, z);
+        DAT_10edbe08[slot].SetOffset(ox, oy, oz);
+        DAT_10edbe08[slot].m_0030 = 1;
+        return slot;
+    }
+    return -1;
+}
+
+// Same as FUN_1003a7d0 with a colour (r, g, b, a) for the effect.
+extern "C" int FUN_1003a880(const char *path, float x, float y, float z, int start, float ox, float oy, float oz,
+                            const Vec4 &colour)
+{
+    int slot = FindFreeEffectModel();
+    if (slot >= 0)
+    {
+        DAT_10edbe08[slot].M_1000b9f0(path, 0, start, -1);
+        DAT_10edbe08[slot].color.Copy(colour);
         DAT_10edbe08[slot].AddKey(0, x, y, z);
         DAT_10edbe08[slot].SetOffset(ox, oy, oz);
         DAT_10edbe08[slot].m_0030 = 1;

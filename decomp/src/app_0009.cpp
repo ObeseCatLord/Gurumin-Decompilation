@@ -8,12 +8,11 @@ struct Vec4
     float y;
     float z;
     float w;
-};
-
-struct Fader
-{
-    Vec4 M_101ac9e0(const Vec4 &target);
-    void M_101acc20(const Vec4 &color);
+    void Set(float x, float y, float z, float w);
+    void Copy(const Vec4 &source);
+    Vec4 operator+(const Vec4 &other) const;
+    Vec4 operator-(const Vec4 &other) const;
+    Vec4 operator*(const float &scale) const;   // 0x101acb00 (x/y/z only)
 };
 
 extern "C" void FUN_1000f360(int, int);
@@ -23,10 +22,11 @@ extern "C" int DAT_104bfd2c;
 extern "C" int DAT_104bfd30;
 extern "C" int DAT_104bfd5c;
 extern "C" int DAT_1030c568;
-extern "C" int DAT_1042da68;
-extern "C" Fader DAT_10da90d0;
-extern "C" Vec4 DAT_10daa800;
-extern "C" Vec4 DAT_10c67f60;
+// Screen colour fade: the colour moves from DAT_10da90d0 towards DAT_10c67f60 by DAT_10daa800 per frame.
+extern "C" int DAT_1042da68;   // frames left
+extern "C" Vec4 DAT_10da90d0;  // current colour
+extern "C" Vec4 DAT_10daa800;  // step per frame
+extern "C" Vec4 DAT_10c67f60;  // target colour
 extern "C" int DAT_104bfd4c;
 extern "C" char DAT_104c01fc;
 extern "C" int DAT_104bf8c8;
@@ -71,6 +71,20 @@ extern "C" int FUN_1000ec10(void)
     return 1;
 }
 
+// Starts a colour fade to (r, g, b, a) over `frames` frames; one frame or less sets the colour at once.
+extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a)
+{
+    if (frames <= 1)
+    {
+        DAT_10da90d0.Set(r, g, b, a);
+        DAT_1042da68 = 0;
+        return;
+    }
+    DAT_10c67f60.Set(r, g, b, a);
+    DAT_10daa800.Copy((DAT_10c67f60 - DAT_10da90d0) * (1.0f / (float)frames));
+    DAT_1042da68 = frames;
+}
+
 // Advances the colour blend of DAT_10da90d0 by one step, snapping to the target on the last frame.
 // Not byte-identical yet (see open.tsv).
 extern "C" void FUN_1000ed20(void)
@@ -78,9 +92,9 @@ extern "C" void FUN_1000ed20(void)
     if (DAT_1042da68 != 0)
     {
         DAT_1042da68--;
-        DAT_10da90d0.M_101acc20(DAT_10da90d0.M_101ac9e0(DAT_10daa800));
+        DAT_10da90d0.Copy(DAT_10da90d0 + DAT_10daa800);
         if (DAT_1042da68 == 0)
-            DAT_10da90d0.M_101acc20(DAT_10c67f60);
+            DAT_10da90d0.Copy(DAT_10c67f60);
     }
 }
 

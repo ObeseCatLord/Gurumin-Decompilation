@@ -615,3 +615,5 @@ address	name	evidence
 10184170	EffectManager::Reset	matched decompiled source (decomp/obj_symbols.tsv)
 10169e40	MeshInstance::FreeImage	matched decompiled source (decomp/obj_symbols.tsv)
 101acc60	Vec4::DistanceSquaredToSegment2D	matched decompiled source (decomp/obj_symbols.tsv)
+10169840	ModelNames_Find	finds or adds a model name (decomp/src/path_util.cpp)
+10169ab0	TextureNames_Find	finds or adds a texture name (decomp/src/path_util.cpp)

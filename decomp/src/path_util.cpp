@@ -1,6 +1,7 @@
 // File path helpers.
 
 #include <windows.h>
+#include <stdio.h>
 #include <string.h>
 
 extern "C" char DAT_10ff65f8[][0x20];  // texture names (see mesh_cache.cpp)
@@ -47,6 +48,66 @@ extern "C" int FUN_101699f0(int index, const char *folder, const char *name)
     buffer[0x1f] = 0;
     strcpy(DAT_10ff65f8[index], buffer);
     return 0;
+}
+
+extern "C" int DAT_10feb3e0[0xc80];   // reference count of each model name
+extern "C" int DAT_10faae88[0x400];   // reference count of each texture name
+
+// Looks up folder + name (cut to 31 characters) in the model name table. Returns its index when it is there.
+// Otherwise the name is stored in the first free entry (its reference count reset), that index goes to *freeSlot
+// and -1 is returned. A full table is a fatal error: the original then calls fread with null arguments on purpose
+// to crash.
+extern "C" int FUN_10169840(const char *folder, const char *name, int *freeSlot)
+{
+    char buffer[256];
+    strcpy(buffer, folder);
+    strcat(buffer, name);
+    buffer[0x1f] = 0;
+    *freeSlot = -1;
+    for (int i = 0; i < 0xc80; i++)
+    {
+        if (DAT_10fada90[i][0] != 0)
+        {
+            if (strcmp(buffer, DAT_10fada90[i]) == 0)
+                return i;
+        }
+        else if (*freeSlot == -1)
+        {
+            DAT_10feb3e0[i] = 0;
+            *freeSlot = i;
+        }
+    }
+    if (*freeSlot == -1)
+        fread(0, 1, 1, 0);
+    strcpy(DAT_10fada90[*freeSlot], buffer);
+    return -1;
+}
+
+// Same as FUN_10169840 for the texture name table (0x400 entries).
+extern "C" int FUN_10169ab0(const char *folder, const char *name, int *freeSlot)
+{
+    char buffer[256];
+    strcpy(buffer, folder);
+    strcat(buffer, name);
+    buffer[0x1f] = 0;
+    *freeSlot = -1;
+    for (int i = 0; i < 0x400; i++)
+    {
+        if (DAT_10ff65f8[i][0] != 0)
+        {
+            if (strcmp(buffer, DAT_10ff65f8[i]) == 0)
+                return i;
+        }
+        else if (*freeSlot == -1)
+        {
+            DAT_10faae88[i] = 0;
+            *freeSlot = i;
+        }
+    }
+    if (*freeSlot == -1)
+        fread(0, 1, 1, 0);
+    strcpy(DAT_10ff65f8[*freeSlot], buffer);
+    return -1;
 }
 
 // Path_GetBaseName: copies the file name of `path` without folder and extension into `out` (8 bytes are

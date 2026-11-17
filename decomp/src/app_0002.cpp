@@ -78,3 +78,61 @@ extern "C" LRESULT FUN_10001bf0(int stream, int fadeTime)
     }
     return 0;
 }
+extern "C" LRESULT FUN_100017c0(int id, int a, int b, int c, int d, int e, int f, int g, int h, int i)
+{
+    if (DAT_1020aee4 == 0)
+        return 0;
+    HWND wnd = FUN_10001570();
+    if (wnd != 0)
+    {
+        SendMessageA(wnd, 0x400, 0, a);
+        SendMessageA(wnd, 0x400, 1, b);
+        SendMessageA(wnd, 0x400, 2, c);
+        SendMessageA(wnd, 0x400, 3, d);
+        SendMessageA(wnd, 0x400, 4, e);
+        SendMessageA(wnd, 0x400, 5, f);
+        SendMessageA(wnd, 0x400, 6, g);
+        SendMessageA(wnd, 0x400, 7, h);
+        SendMessageA(wnd, 0x400, 8, i);
+        SendMessageA(wnd, 0x400, 9, id);
+        return SendMessageA(wnd, 0x400, 0x235, 0);
+    }
+    return 0;
+}
+
+extern "C" LRESULT FUN_10001890(int stream, const int *x, const int *y, const int *z, const int *dx, const int *dy, const int *dz)
+{
+    if (DAT_1020aee4 == 0)
+        return 0;
+    HWND wnd = FUN_10001570();
+    if (wnd != 0)
+    {
+        SendMessageA(wnd, 0x400, 0, stream);
+        if (x != 0)
+        {
+            SendMessageA(wnd, 0x400, 1, *x);
+            SendMessageA(wnd, 0x400, 2, *y);
+            SendMessageA(wnd, 0x400, 3, *z);
+        }
+        else
+        {
+            SendMessageA(wnd, 0x400, 1, 0);
+            SendMessageA(wnd, 0x400, 2, 0);
+            SendMessageA(wnd, 0x400, 3, 0);
+        }
+        if (dx != 0)
+        {
+            SendMessageA(wnd, 0x400, 4, *dx);
+            SendMessageA(wnd, 0x400, 5, *dy);
+            SendMessageA(wnd, 0x400, 6, *dz);
+        }
+        else
+        {
+            SendMessageA(wnd, 0x400, 4, 0);
+            SendMessageA(wnd, 0x400, 5, 0);
+            SendMessageA(wnd, 0x400, 6, 0);
+        }
+        return SendMessageA(wnd, 0x400, 0x267, 0);
+    }
+    return 0;
+}

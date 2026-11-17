@@ -562,3 +562,6 @@ address	name	evidence
 1015fb20	ImeCandidates_Draw	draws the visible IME candidates (decomp/src/menu_list.cpp)
 1003e650	EffectSlot_StartModel	starts a type-14 effect in a free effect slot (decomp/src/app_0011.cpp)
 10012450	Char_AttachHandModel	attaches or removes the "scop" model on Bip01 R Hand (decomp/src/char_attach.cpp)
+101af080	Vec4::Normalized3	matched decompiled source (decomp/obj_symbols.tsv)
+1016b340	Camera_InputToWorld	turns an input direction into world space for the camera heading (decomp/src/camera_orbit.cpp)
+10054550	Sound_PlayDelayed	queues a sound effect to play after a delay (decomp/src/sound_queue.cpp)

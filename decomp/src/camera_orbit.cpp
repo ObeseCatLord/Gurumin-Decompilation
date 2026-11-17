@@ -1,4 +1,7 @@
-// Camera orbit: turns the camera position (DAT_11af3e28) around its target (DAT_118e6c78) on the ground plane.
+// Camera helpers: orbiting the camera position (DAT_11af3e28) around its target (DAT_118e6c78) on the ground plane
+// and turning input directions into camera space.
+
+#include <math.h>
 
 struct Vec4
 {
@@ -29,5 +32,15 @@ extern "C" int FUN_1016bdf0(float angle)
     offset.y = (DAT_11af3e28 - DAT_118e6c78).Length2D();
     offset.RotateZ(angle);
     DAT_11af3e28.Copy(DAT_118e6c78 + offset);
+    return 0;
+}
+
+// Turns the input direction (x, y) into world space for the current camera heading (the camera looks from its
+// position towards its target) and stores the result in *outX and *outY. Returns 0.
+extern "C" int FUN_1016b340(float *outX, float *outY, float x, float y)
+{
+    float angle = -(float)atan2(DAT_118e6c78.x - DAT_11af3e28.x, DAT_118e6c78.y - DAT_11af3e28.y);
+    *outX = (float)cos(angle) * x - (float)sin(angle) * y;
+    *outY = (float)cos(angle) * y + (float)sin(angle) * x;
     return 0;
 }

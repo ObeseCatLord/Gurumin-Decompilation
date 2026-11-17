@@ -38,6 +38,8 @@ struct Vec4
     void RotateY(float angle);
     void RotateX(float angle);
     void Copy(const Vec4 &source);  // 0x101acc20
+    void Fill(const float &value);  // 0x101acc40
+    Vec4 Normalized3();
 };
 
 // Axis-aligned box given by its minimum and maximum corners.
@@ -350,4 +352,22 @@ void Vec4::Normalize()
         z /= length;
         w /= length;
     }
+}
+
+// Scales x/y/z to unit length in place and returns the normalised vector (w = 0). A zero vector stays as it is and
+// the zero vector is returned.
+Vec4 Vec4::Normalized3()
+{
+    Vec4 result;
+    float length = Vec3_Length((const Vec3 *)this);
+    if (length == 0.0f)
+    {
+        float zero = 0;
+        result.Fill(zero);
+        return result;
+    }
+    x = result.x = x / length;
+    y = result.y = y / length;
+    z = result.z = z / length;
+    return result;
 }

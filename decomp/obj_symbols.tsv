@@ -185,3 +185,5 @@ _Vec3_Length	101ae890
 ?ScreenPosition@AnimModel@@QAEHPAH0ABUMatrix4@@@Z	10162f50
 ?Spline@@YGMMMMMM@Z	101ad920
 ?Push@AnimModel@@QAEHMMM@Z	101628f0
+?Normalized3@Vec4@@QAE?AU1@XZ	101af080
+?PreScanFile@Node@@QAEHPBDH@Z	101abd60

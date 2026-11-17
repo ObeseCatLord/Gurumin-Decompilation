@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (48)
+## 1. Walls to retry (49)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -23,6 +23,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
+- [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2110` 143 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2440` 139 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
@@ -60,7 +61,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad920` 179 — Spline (Hermite): the original multiplies t3 by -2.0 for the c term; cl 13.00 turns it into -(t3 + t3) and shares that with the b term (forms with 2.0f*, a separate h01 local and a -2 local tried)
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (75)
+## 2. Small functions (30-250 bytes) (71)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
@@ -74,13 +75,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014f060` 186 bytes (loops 1, calls 4)
 - [ ] `10191aa0` 188 bytes (loops 1, calls 2)
 - [ ] `101af360` 188 bytes (float, calls 9)
-- [ ] `1016b340` 189 bytes (float, calls 5)
-- [ ] `101af080` 189 bytes (float, calls 3)
 - [ ] `10145060` 190 bytes (loops 1, calls 6)
-- [ ] `10054550` 191 bytes (loops 1, calls 2)
 - [ ] `10024c40` 192 bytes (float, calls 9)
 - [ ] `101ad5c0` 193 bytes (loops 3)
-- [ ] `101abd60` 198 bytes Model_LoadIt3Alt (calls 8)
 - [ ] `100143f0` 201 bytes (calls 9)
 - [ ] `100cc1d0` 202 bytes (calls 7)
 - [ ] `10165140` 202 bytes (float, calls 3)

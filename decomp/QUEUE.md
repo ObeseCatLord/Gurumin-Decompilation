@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (41)
+## 1. Walls to retry (42)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -49,11 +49,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
+- [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
 - [ ] `101ad760` 185 — KeyBank::Insert: original keeps frame in ebp and the count in ecx for the whole function; VS2003 picks edi/ecx and stores x through the FPU (register allocation)
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (148)
+## 2. Small functions (30-250 bytes) (144)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c00` 82 bytes (loops 1)
@@ -73,9 +74,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101148b0` 117 bytes (float, calls 4)
 - [ ] `101ad240` 119 bytes (float, calls 2)
 - [ ] `10162ea0` 120 bytes (float, calls 7)
-- [ ] `10164fa0` 120 bytes (loops 2, calls 2)
-- [ ] `1017c570` 123 bytes (loops 1, calls 1)
-- [ ] `1001d7d0` 124 bytes
 - [ ] `1017cc10` 125 bytes (loops 2, calls 3)
 - [ ] `1013ec90` 126 bytes (loops 1, calls 4)
 - [ ] `10189000` 127 bytes (loops 2, calls 2)
@@ -84,7 +82,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10142700` 131 bytes (float, calls 3)
 - [ ] `101aea50` 131 bytes (float, calls 2)
 - [ ] `1016bdf0` 132 bytes (float, calls 7)
-- [ ] `101ad2c0` 135 bytes (float)
 - [ ] `101ae130` 135 bytes (float, calls 1)
 - [ ] `10169f90` 136 bytes (loops 1)
 - [ ] `1016a8f0` 137 bytes (calls 4)
@@ -797,7 +794,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (234)
+## 6. Naming: matched functions without a readable name (235)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
@@ -885,6 +882,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1001b5b0` 188 bytes (src/char_score.cpp)
 - [ ] `1001b840` 59 bytes (src/app_0011.cpp)
 - [ ] `1001c4c0` 80 bytes (src/app_0012.cpp)
+- [ ] `1001d7d0` 124 bytes (src/app_0012.cpp)
 - [ ] `1001dbd0` 70 bytes (src/app_0012.cpp)
 - [ ] `10026c50` 35 bytes (src/app_0012.cpp)
 - [ ] `100286b0` 17 bytes (src/app_0012.cpp)

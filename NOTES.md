@@ -165,3 +165,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   (type_parse.cpp) are one class (the script parser and its buffer banks); SceneOwner (texture_mgr.cpp) is the
   CharModel inside Character, and its `scene` is the Playback object (model_state.cpp). Merge them into shared headers
   (QUEUE section 8).
+- A pointer chosen in an if-chain and used once afterwards (`p = &a[i].f; ... if (*p > 0) (*p)--;`) gives
+  `add reg, symbol`; the original's `lea reg, [reg + symbol]` into a shared tail comes from repeating the whole
+  statement in every branch and letting the compiler merge the tails (0x1001d7d0).
+- Sums of products are reordered by the compiler regardless of source order; only the grouping (parentheses)
+  steers the evaluation order (Plane::IntersectRay 0x101ad2c0: y + (x + z)).
+- A search loop whose found-branch only `break`s is unrolled by 8; putting the work inside the loop and returning
+  from there keeps the simple loop (ModelBank::Add 0x1017c570).

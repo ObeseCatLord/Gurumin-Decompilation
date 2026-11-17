@@ -147,6 +147,10 @@ _Vec3_Length	101ae890
 ?BindStage0@TextureObject@@QAEHXZ	1014b670
 ?BindStage1@TextureObject@@QAEHXZ	1014b6e0
 ?Release@TextureObject@@QAEHXZ	1014f520
-?Find@Node@@QAEPAU1@PBDPAH@Z	10191a30
+?FindRecursive@Node@@QAEPAU1@PBDPAH@Z	10191a30
 ?InBoxMargin@Vec4@@QAEHPBUBox2@@M@Z	101ac740
 ?PlayMotion@SceneOwner@@QAEXHHHM@Z	1017b0e0
+?Reset@ModelBank@@QAEHXZ	10164aa0
+?CollectLights@ModelBank@@QAEHPAUNode@@@Z	10164fa0
+?Add@ModelBank@@QAEHHH@Z	1017c570
+?IntersectRay@Plane@@QAEHPAUVec4@@PBU2@1@Z	101ad2c0

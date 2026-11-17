@@ -188,7 +188,7 @@ struct Node
     int M_1019b300(int a, int b);
     int M_1019d680();
     int M_1019d600();
-    Node *Find(const char *name, int *skip);
+    Node *FindRecursive(const char *name, int *skip);
     void M_1019d6a0();
     int M_101a8760();
     void M_101911e0(KeyPair *pairs, int count);
@@ -903,7 +903,7 @@ int Node::CreateChildCopies()
 // Finds the node called `name` (case-insensitive) in this node's subtree, depth first, this node first.
 // With `skip` set, the first *skip matches are passed over (and *skip counts down), so repeated calls find the
 // second, third, ... node of that name. Returns 0 when there is no (further) match.
-Node *Node::Find(const char *name, int *skip)
+Node *Node::FindRecursive(const char *name, int *skip)
 {
     if (_stricmp(this->name, name) == 0)
     {
@@ -917,7 +917,7 @@ Node *Node::Find(const char *name, int *skip)
     {
         if (children[i] != 0)
         {
-            Node *found = children[i]->Find(name, skip);
+            Node *found = children[i]->FindRecursive(name, skip);
             if (found != 0)
                 return found;
         }

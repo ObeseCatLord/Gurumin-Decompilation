@@ -93,3 +93,56 @@ extern "C" int FUN_10052480(void)
 
 
 
+
+// One int every 0x40 bytes (laid over the CharState table at 0x1020b430, see world.h); used for the per-kind
+// cooldown counters below.
+struct KindCounter
+{
+    int value;
+    char pad_0004[0x3c];
+};
+
+extern "C" KindCounter DAT_1020b498[0x80];  // cooldown of kind 0x64
+extern "C" KindCounter DAT_1020b49c[0x80];  // cooldown of kind 0x46
+extern "C" KindCounter DAT_1020b410[0x80];  // cooldown of kind 0x69
+extern "C" KindCounter DAT_1020b4b4[0x80];  // cooldown of kind 0x2d
+extern "C" KindCounter DAT_1020b454[0x80];  // cooldown of kind 0x3f
+extern "C" KindCounter DAT_1020b46c[0x80];  // cooldown of kind 0x43
+
+// Counts down the cooldown counter that belongs to character `index`'s kind (six kinds have one; other kinds do
+// nothing). Counters stop at 0. Each branch decrements its own counter; the compiler merges the identical tails.
+extern "C" int FUN_1001d7d0(int index)
+{
+    int kind = DAT_10daab84[index].m_0000;
+    if (kind == 0x64)
+    {
+        if (DAT_1020b498[index].value > 0)
+            DAT_1020b498[index].value--;
+    }
+    else if (kind == 0x46)
+    {
+        if (DAT_1020b49c[index].value > 0)
+            DAT_1020b49c[index].value--;
+    }
+    else if (kind == 0x69)
+    {
+        if (DAT_1020b410[index].value > 0)
+            DAT_1020b410[index].value--;
+    }
+    else if (kind == 0x2d)
+    {
+        if (DAT_1020b4b4[index].value > 0)
+            DAT_1020b4b4[index].value--;
+    }
+    else if (kind == 0x3f)
+    {
+        if (DAT_1020b454[index].value > 0)
+            DAT_1020b454[index].value--;
+    }
+    else if (kind == 0x43)
+    {
+        if (DAT_1020b46c[index].value > 0)
+            DAT_1020b46c[index].value--;
+    }
+    return 0;
+}

@@ -41,6 +41,16 @@ struct Box2
     Vec4 max;
 };
 
+// Plane a*x + b*y + c*z + d = 0, stored in a Vec4 (x = a, y = b, z = c, w = d).
+struct Plane
+{
+    float a;
+    float b;
+    float c;
+    float d;
+    int IntersectRay(Vec4 *out, const Vec4 *origin, const Vec4 *direction);
+};
+
 struct Matrix4
 {
     float m[16];  // row-major; m[12], m[13], m[14] = translation
@@ -185,5 +195,20 @@ int Vec4::InBoxMargin(const Box2 *box, float margin)
     if (box->min.x - margin > x || margin + box->max.x < x || box->min.y - margin > y || margin + box->max.y < y ||
         box->min.z - margin > z || margin + box->max.z < z)
         return 0;
+    return 1;
+}
+
+// Intersects the line origin + t * direction with the plane and stores the point in `out` (x/y/z).
+// Returns 0 (and leaves `out` alone) when the line is parallel to the plane, else 1. t may be negative.
+int Plane::IntersectRay(Vec4 *out, const Vec4 *origin, const Vec4 *direction)
+{
+    // The grouping y + (x + z) reproduces the original's evaluation order (the compiler orders the terms itself).
+    float denominator = direction->y * b + (direction->x * a + direction->z * c);
+    if (denominator == 0.0f)
+        return 0;
+    float t = -((origin->y * b + (origin->x * a + origin->z * c) + d) / denominator);
+    out->x = t * direction->x + origin->x;
+    out->y = t * direction->y + origin->y;
+    out->z = t * direction->z + origin->z;
     return 1;
 }

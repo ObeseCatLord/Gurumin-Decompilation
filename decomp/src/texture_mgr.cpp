@@ -55,6 +55,8 @@ struct Selection
     int M_10173450(int id, int unused);
     void M_10172ac0(int a, int count);
     int M_10188eb0(int id, int a, int count);
+    void M_10172cb0(float x0, float y0, float z0, float u0, float v0, float x1, float y1, float z1, float u1, float v1, float x2, float y2, float u2, float v2, int colour, int a, int b);
+    int AddQuad(int id, float x0, float y0, float z0, float u0, float v0, float x1, float y1, float z1, float u1, float v1, float x2, float y2, float u2, float v2, int colour, int a, int b);
 };
 
 struct Scene
@@ -215,5 +217,16 @@ int Selection::M_10188eb0(int id, int a, int count)
     if (m_0008 + count >= m_0004)
         M_101733f0();
     M_10172ac0(a, count);
+    return 0;
+}
+int Selection::AddQuad(int id, float x0, float y0, float z0, float u0, float v0, float x1, float y1, float z1, float u1, float v1, float x2, float y2, float u2, float v2, int colour, int a, int b)
+{
+    DAT_10ff1dec++;
+    if (m_0010 != 0 && m_0010 != id)
+        M_101733f0();
+    m_0010 = id;
+    if (m_0008 + 6 >= m_0004)
+        M_101733f0();
+    M_10172cb0(x0, y0, z0, u0, v0, x1, y1, z1, u1, v1, x2, y2, u2, v2, colour, a, b);
     return 0;
 }

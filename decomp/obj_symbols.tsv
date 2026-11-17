@@ -109,3 +109,4 @@
 ?Collide@Node@@QAEHHHPAUVec4@@00@Z	101a8e60
 ?SetFlags@Node@@QAEXI@Z	1019b130
 ?ClearFlags@Node@@QAEXI@Z	1019b1b0
+?WindowProc@RenderWindow@@UAGJPAUHWND__@@IIJ@Z	1013e4f0

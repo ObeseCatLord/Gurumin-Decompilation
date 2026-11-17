@@ -52,3 +52,4 @@ address	status	reason
 10161200	open	Bmp_FlipVertical: VS2003 turns the step-3 inner loop into a precomputed trip count (mul 0xaaaaaaab); cl 13.00 keeps the index compare
 101489c0	open	RenderWindow::RegisterWindowClass: zero kept in edi for the five zero fields and LoadCursor's argument (cl 13.00)
 1014b390	open	Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores
+1013e4f0	open	RenderWindow::WindowProc: same cases and bodies; cl 13.00 splits the 9-case switch at 0x10e, VS2003 at 0x10f, and the original shares the DefWindowProc tail

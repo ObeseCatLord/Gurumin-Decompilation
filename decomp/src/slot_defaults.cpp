@@ -5,13 +5,27 @@ extern "C" int DAT_1030b870[0x22];
 
 extern "C" int FUN_100235e0(int mode)
 {
-    int i;
     memset(DAT_1030c908, 0, sizeof(DAT_1030c908));
     memset(DAT_1030b870, 0xff, sizeof(DAT_1030b870));
     if (mode == 0)
     {
-        for (i = 1; i <= 0x11; i++)
-            DAT_1030c908[i] = 1;
+        DAT_1030c908[0x01] = 1;
+        DAT_1030c908[0x02] = 1;
+        DAT_1030c908[0x03] = 1;
+        DAT_1030c908[0x04] = 1;
+        DAT_1030c908[0x05] = 1;
+        DAT_1030c908[0x06] = 1;
+        DAT_1030c908[0x07] = 1;
+        DAT_1030c908[0x08] = 1;
+        DAT_1030c908[0x09] = 1;
+        DAT_1030c908[0x0a] = 1;
+        DAT_1030c908[0x0b] = 1;
+        DAT_1030c908[0x0c] = 1;
+        DAT_1030c908[0x0d] = 1;
+        DAT_1030c908[0x0e] = 1;
+        DAT_1030c908[0x0f] = 1;
+        DAT_1030c908[0x10] = 1;
+        DAT_1030c908[0x11] = 1;
         return 0;
     }
     DAT_1030c908[0x17] = -1;

@@ -67,7 +67,7 @@ typedef void (Callee::*CalleeMethod)();
 
 extern "C" void __stdcall FUN_10004650(char *object, int stride, int count, CalleeMethod method)
 {
-    for (int i = count - 1; i >= 0; i--)
+    while (--count >= 0)
     {
         (((Callee *)object)->*method)();
         object += stride;

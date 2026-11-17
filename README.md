@@ -23,15 +23,16 @@ your own copy.
 `config_keys.tsv`, `save_layout.tsv`. Function names: `symbols.tsv` (apply to Ghidra with `re/apply_symbols.bat`).
 
 ## Decompilation (`decomp/`)
-VS .NET 2003 (`decomp/env.bat`), flags `/O2 /Ob1 /Gy /GS`, byte compare against APP.dll:
-`decomp\build.bat <file.cpp>`, `decomp\build_all.bat`. The original was built with VS .NET 2002 (cl 13.00.9466);
-functions that 13.10 cannot reproduce are listed in `decomp/open.tsv`. The comparer reports MATCH (bytes identical,
-relocations masked), EQUIV (identical instruction stream; only cl 13.00 encoding quirks such as `[esp+0]` with a disp8 differ) or DIFF. Notes and findings: `NOTES.md`.
+VS .NET 2002, cl 13.00.9466: the exact compiler the original was built with (`decomp/env.bat`; set `GURUMIN_VC` to
+another `Vc7` folder to override). Flags `/O2 /Ob1 /Op /Gy /GS /GX`; extra flags for experiments go in `GURUMIN_CFLAGS`.
+`decompuild.bat <file.cpp>`, `decompuild_all.bat`, byte compare against APP.dll. Functions that still differ are
+listed in `decomp/open.tsv` with the reason. The comparer reports MATCH (bytes identical, relocations masked) or DIFF.
+Notes and findings: `NOTES.md`.
 
 ## Ghidra
 `re\run_ghidra_export.bat` (APP.dll), `re\run_ghidra_packs.bat` (packs.dll); exports land in `re\export\` (local only).
 
-**Progress (2026-11-16):** 325 of 1,212 game functions in APP.dll match (26.8 %), plus 5 equivalent. By size that
-is 23,753 of 1,720,206 code bytes (1.4 %): the matched functions are the small ones, and a few huge functions (the
-model loader at 0x1017cc90 alone is 29,886 bytes) hold most of the code. `python decomp/tools/build_all.py` prints
+**Progress (2026-11-17):** 346 of 1,212 game functions in APP.dll match (28.5 %). By size that is 29,312 of
+1,720,206 code bytes (1.7 %): the matched functions are the small ones, and a few huge functions (the model loader at
+0x1017cc90 alone is 29,886 bytes) hold most of the code. `python decomp/tools/build_all.py` prints
 the current figures; `decomp/tools/todo.py` lists what is left.

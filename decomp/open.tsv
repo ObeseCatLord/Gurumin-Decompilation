@@ -1,54 +1,35 @@
 address	status	reason
 1000da40	open	float: (float)int spilled via fstp [esp+8]/reload; VS2003 keeps it on the FPU stack (likely 13.00 vs 13.10)
-10001ee0	open	if/else of two sprintf calls: original jumps to a shared tail, VS2003 duplicates the tail
 1000ed20	open	original decrements the global in eax; VS2003 copies to ecx first (scheduling)
-1000f490	open	original keeps a redundant 'test eax,eax' after 'dec eax' (13.00 peephole); VS2003 uses dec flags
 10015910	open	settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
 10034c80	open	two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
-10047400	open	VS2003 hoists the common 'push eax' above the branch; original duplicates it in both arms
-10148930	equiv	identical instructions; original encodes 'lea edx,[esp]' with a zero disp8 (8d 54 24 00), VS2003 uses the short form (8d 14 24) - encoder difference of cl 13.00
 1015cac0	open	same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
-1015fe20	open	/GS: original (cl 13.00) xors the cookie with the return address and tail-jumps to __security_check_cookie; 13.10 (SP1: xor esp; Toolkit: no xor) cannot reproduce. Every function with a local array is affected.
 10166870	open	same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
 10169720	open	memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 10169e10	open	register choice: original pushes the last argument from edx, VS2003 from ecx
-1016af50	equiv	[esp] operand encoded with a zero disp8 by cl 13.00 (89 44 24 00); otherwise identical
 1016b010	open	original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 1016b1e0	open	original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 1016c300	open	control-flow layout of a three-way flag test differs (two source shapes tried)
-1017b1c0	open	lazy-create getter: original duplicates the 'return scene->m_1c' tail (reloading through ecx), VS2003 merges it
 101992f0	open	walk to the root: original keeps the next pointer in edx, VS2003 in ecx (two loop shapes tried)
 101a2370	skip	caller keeps 'this' in edx across a call (callee known not to touch edx): inter-procedural register allocation, likely /GL+LTCG in the original
-101ad730	open	original zeroes eax once and stores it (xor eax,eax); VS2003 stores immediates and orders the local differently
 101ade80	open	return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 101af420	skip	constructor keeps the array pointer in edx across Vec4::Vec4 calls (callee known not to touch edx) - inter-procedural register allocation
-101ae250	equiv	[esp] encoding only
-10001090	open	SetCursorPos scaling: same arithmetic, original sums in edx/ecx in a different order
-100114a0	open	register choice for the first load (ecx vs eax) and 1.0f kept in eax across the branch
-100158b0	open	VS2003 hoists the shared 'push 0x20' above the branch (same as 0x10047400)
 100e2080	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 100e2110	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 100e2440	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 100e24d0	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 1013e6f0	open	from an unoptimised (/Od) translation unit (ebp frame, int3 padding); VS2003 /Od assigns the stack slots in a different order (all 12 declaration orders tried) - decomp/src_od/
 10160960	open	frame blit clamp: register allocation of the two min() results differs
-101619a0	open	loop unrolling factor: cl 13.00 unrolls this pointer loop by 8, VS2003 by 4
 1016a090	open	register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)
 100014b0	open	ReportCursor: only the push edi position differs (original before the first test, VS2003 after it: shrink-wrapping)
-100020d0	open	loop over 0x100 ints unrolled by 8 (cl 13.00); VS2003 unrolls by 4
 1000e870	open	AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
 10007f20	open	Game reset: zero kept in ebx for all stores (cl 13.00 habit)
-100119d0	open	free-slot search over 0x60 ints unrolled by 8 (cl 13.00)
-10011aa0	open	same unrolled-by-8 slot search as 0x100119d0
 10012130	open	Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
-1001b5b0	open	divide-by-constant sequences end add edx,eax (13.00) vs add eax,edx (13.10); one load scheduled differently
 1019b280	open	Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
 10199be0	open	VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 101ad760	open	KeyBank::Insert: original keeps frame in ebp and the count in ecx for the whole function; VS2003 picks edi/ecx and stores x through the FPU (register allocation)
 101ad820	open	KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
-101adbb0	open	KeyTrack::Insert: identical except the four float parameter stores (original: integer moves; VS2003: fld/fstp)
 101649c0	open	lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
-10148410	open	free-slot search over 0x200 ints unrolled by 8 (cl 13.00)
 10161200	open	Bmp_FlipVertical: VS2003 turns the step-3 inner loop into a precomputed trip count (mul 0xaaaaaaab); cl 13.00 keeps the index compare
 101489c0	open	RenderWindow::RegisterWindowClass: zero kept in edi for the five zero fields and LoadCursor's argument (cl 13.00)
 1014b390	open	Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores

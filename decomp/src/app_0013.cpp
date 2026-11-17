@@ -108,12 +108,12 @@ extern "C" int FUN_100158b0(AnimNode *node, int reverse)
     {
         DAT_104c01e4 = node->m_0294 - 1;
         DAT_104c01e0 = -1;
-        node->M_1019b130(0x20);
-        DAT_10db6f5e = 1;
-        return 0;
     }
-    DAT_104c01e4 = 0;
-    DAT_104c01e0 = 1;
+    else
+    {
+        DAT_104c01e4 = 0;
+        DAT_104c01e0 = 1;
+    }
     node->M_1019b130(0x20);
     DAT_10db6f5e = 1;
     return 0;

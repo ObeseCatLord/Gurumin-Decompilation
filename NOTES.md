@@ -93,3 +93,25 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   which fits whole-program /GL+LTCG (see the IPRA note). Use `throw()` on such declarations only where the
   original shows the missing state store.
 - Callee-saved push placement follows the early exits: a test written as its own `if (x == 0) return 0;` before the rest keeps the push after it (0x1015c9e0). Where the original pushes *before* the first test (0x100014b0, 0x10199be0) no spelling has been found yet.
+
+## 2026-11-17: the original compiler (VS .NET 2002, cl 13.00.9466)
+- The user installed VS .NET 2002 at `E:\Visual StudioNET 2002\`; `cl` reports 13.00.9466 and `link` 7.00.9466, the
+  build in the Rich header. `decomp/env.bat` now uses it by default (`GURUMIN_VC` overrides).
+- With unchanged sources: 334 matched (VS2003: 325 + 5 EQUIV). Every EQUIV (the `[esp+0]` disp8 encoding) and the /GS
+  cookie function (0x1015fe20) match, so **all 190 /GS functions (1.07 MB of the 1.72 MB of code) are now in reach**.
+  Two functions regressed because their source had been bent for VS2003; the plain forms match (0x10004650:
+  `while (--count >= 0)`; 0x100235e0: seventeen separate `= 1` stores instead of a loop, which 13.00 turns into `rep stosd`).
+- **The original used `/Op`** (improve float consistency): with it, three more functions match and none regress
+  (0x100114a0's 1.0f kept in a register, KeyTrack::Insert's float parameters copied with integer moves, KeyBank::Clear).
+  int-to-float conversions are rounded through the parameter's own stack slot (`fild [esp+8]; fstp [esp+8]`).
+  Flags are now `/O2 /Ob1 /Op /Gy /GS /GX`.
+- **Revisit every VS2003-era wall with the plainest source.** Workarounds written for 13.10 now hurt: the lazy-create
+  getter 0x1017b1c0 and the shared-tail functions 0x10047400 / 0x100158b0 match as a plain `if`/`else` followed by the
+  common code. The unroll-by-8 searches (0x100119d0, 0x10011aa0, 0x10148410, 0x100020d0) match as plain `for` loops.
+- The remaining `open.tsv` reasons were written against VS2003; read them as "differs", not as a diagnosis.
+- Still open under 13.00: the enemy AI updaters (0 kept in ebx, also used as the switch base: `sub eax,ebx`), register
+  ties of a few bytes (0x1015cac0, 0x10169e10, 0x101992f0, 0x10034c80), 0x1000da40 (only the reload of the target).
+- Tools: `tools/variants.py <file> <n> [flags]` builds `#if V == k` variants; `tools/pick.py <file> <k>` keeps one;
+  `tools/sbs.py <obj> <symbol>` prints ours and the original side by side. From Git Bash set `MSYS_NO_PATHCONV=1`,
+  or `/Op`-style flags are rewritten into paths.
+

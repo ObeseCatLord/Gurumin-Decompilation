@@ -173,7 +173,6 @@ int SceneOwner::M_1017b1c0()
         scene = (Scene *)DAT_11b0b938(0x7c84, "");
         scene->M_10169f90();
         scene->M_1016a020(this);
-        return scene->m_001c;
     }
     return scene->m_001c;
 }

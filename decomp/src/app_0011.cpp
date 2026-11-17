@@ -48,12 +48,9 @@ extern "C" int FUN_10047400(int index)
 {
     int value = DAT_1020b430[index].m_0004[1];
     if (value == 100)
-    {
         DAT_10255f10[index] = -1;
-        FUN_10043cc0(index);
-        return 0;
-    }
-    DAT_10255f10[index] = value;
+    else
+        DAT_10255f10[index] = value;
     FUN_10043cc0(index);
     return 0;
 }

@@ -99,6 +99,20 @@ extern "C" void FUN_10148280(void)
     memset(DAT_10f1a870, 0, sizeof(DAT_10f1a870));
 }
 
+extern "C" int FUN_10148410(void)
+{
+    int i;
+    for (i = 0; i < 0x200; i++)
+    {
+        if (DAT_10f1fd90[i] == 0)
+            break;
+    }
+    if (i == 0x200)
+        return -1;
+    DAT_10f1fd90[i] = 1;
+    return i;
+}
+
 extern "C" int FUN_101484b0(int index)
 {
     if (index >= 0 && index < 0x200 && DAT_10f1fd90[index] != 0)

@@ -86,7 +86,8 @@ struct Node
     int pad_00a4;
     int m_00a8;
     unsigned int flags;
-    char pad_00b0[8];
+    int pad_00b0;
+    int group;
     int m_00b8;
     char pad_00bc[0x1c];
     int m_00d8[2];
@@ -126,7 +127,7 @@ struct Node
     void M_101ab9d0(Node *root);
     void M_10191770();
     void M_1019eca0();
-    void M_10191870(Node **list, int *count);
+    int M_10191870(Node **list, int *count);
     int Rebuild();
     void M_10191d90();
     void M_10191dd0();
@@ -723,5 +724,27 @@ int Node::Rebuild()
     M_10191770();
     M_1019eca0();
     M_10191870(list, &count);
+    return 1;
+}
+int Node::M_10191870(Node **list, int *count)
+{
+    if ((flags & 0x1000) != 0 && saved != 0)
+    {
+        int linked = 0;
+        for (int i = 0; i < *count; i++)
+        {
+            if (i >= 8)
+                break;
+            Node *other = list[i];
+            if (group == other->group)
+            {
+                saved->m_0098[linked] = (int)other;
+                linked++;
+            }
+        }
+        saved->m_00b8 = linked;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10191870(list, count);
     return 1;
 }

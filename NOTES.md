@@ -153,3 +153,15 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `tools/annotate.py <notes.py>` inserts comment blocks above given signatures.
 - Prefer readable names over placeholders once a function's role is clear; map non-address names to their address in
   `obj_symbols.tsv`, then run `tools/sync_symbols.py` to copy them into `symbols.tsv`.
+- Some engine functions were written in inline assembly (frame pointer plus `or reg,reg` tests a compiler never
+  emits): Mmv_DecodeFrameRle 0x10160a20 matches as an `__asm` block. Locals go in declaration order below ebp; label
+  placement must follow the original jumps exactly. Do not name variables used inside `__asm` `length`, `size` or
+  `type` (MASM operators).
+- Two separate early returns (`if (!p) return x; if (!*p) return x;`) and a combined `||` condition give different
+  block layouts (Node::Find 0x10191a30 needs the separate form).
+- Call arguments that are themselves calls are evaluated before the callee's `this` is loaded only when written
+  into a local first (TextureObject::BindStage0 0x1014b670).
+- Same object, several names: ListBank (listbank.cpp), ResourceBanks (resource_banks.cpp) and TokenReader
+  (type_parse.cpp) are one class (the script parser and its buffer banks); SceneOwner (texture_mgr.cpp) is the
+  CharModel inside Character, and its `scene` is the Playback object (model_state.cpp). Merge them into shared headers
+  (QUEUE section 8).

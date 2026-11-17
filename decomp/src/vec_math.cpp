@@ -26,6 +26,7 @@ struct Vec4
     float Distance2D(Vec4 other);
     float LengthSquared3();
     int InRect(const struct Box2 *box);
+    int InBoxMargin(const struct Box2 *box, float margin);
     float DistanceSquared(const Vec4 &other);
     float Distance(const Vec4 &other);
     float DistanceZWeighted(const Vec4 &other);
@@ -176,4 +177,13 @@ void Matrix4::SetRotationZ(float angle)
     m[5] = c;
     m[10] = 1.0f;
     m[4] = s;
+}
+
+// 1 if the point lies inside the box grown by `margin` on every side (x, y and z; edges included), else 0.
+int Vec4::InBoxMargin(const Box2 *box, float margin)
+{
+    if (box->min.x - margin > x || margin + box->max.x < x || box->min.y - margin > y || margin + box->max.y < y ||
+        box->min.z - margin > z || margin + box->max.z < z)
+        return 0;
+    return 1;
 }

@@ -187,7 +187,8 @@ struct Node
     int M_1019b230(int value);
     int M_1019b300(int a, int b);
     int M_1019d680();
-    void M_1019d600();
+    int M_1019d600();
+    Node *Find(const char *name, int *skip);
     void M_1019d6a0();
     int M_101a8760();
     void M_101911e0(KeyPair *pairs, int count);
@@ -896,5 +897,45 @@ int Node::CreateChildCopies()
         children[i]->m_00a0 = 0xc;
     }
     M_101913f0();
+    return 1;
+}
+
+// Finds the node called `name` (case-insensitive) in this node's subtree, depth first, this node first.
+// With `skip` set, the first *skip matches are passed over (and *skip counts down), so repeated calls find the
+// second, third, ... node of that name. Returns 0 when there is no (further) match.
+Node *Node::Find(const char *name, int *skip)
+{
+    if (_stricmp(this->name, name) == 0)
+    {
+        if (skip == 0)
+            return this;
+        if (*skip == 0)
+            return this;
+        (*skip)--;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        if (children[i] != 0)
+        {
+            Node *found = children[i]->Find(name, skip);
+            if (found != 0)
+                return found;
+        }
+    }
+    return 0;
+}
+
+// Marks this node for the special pass (flag 0x8000) when it is flagged 0x20 or has m_0704 set, unless it or its
+// parent is in one of the excluded modes (flags 0x3e00 / parent 0x3000); otherwise passes the request on to the
+// children. Returns 0 when this node was marked, 1 otherwise.
+int Node::M_1019d600()
+{
+    if ((flags & 0x3e00) == 0 && (parent == 0 || (parent->flags & 0x3000) == 0) && ((flags & 0x20) != 0 || m_0704 != 0))
+    {
+        flags |= 0x8000;
+        return 0;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_1019d600();
     return 1;
 }

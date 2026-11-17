@@ -65,13 +65,19 @@ struct Scene
     int m_001c;
     void M_10169f90();
     void M_1016a020(void *owner);
+    void M_1016a2e0(int motion, int a, int b, float speed);
 };
 
+// Model owner (the CharModel of a Character, see world.h). `scene` is its motion playback object (0x7c84 bytes,
+// Playback in model_state.cpp), created on first use.
 struct SceneOwner
 {
-    char pad_0000[0x298];
-    Scene *scene;
+    char pad_0000[0x265];
+    char important;   // 0x265: motion changes of this model are flagged as important (DAT_11b04508) while applied
+    char pad_0266[0x32];
+    Scene *scene;     // 0x298
     int M_1017b1c0();
+    void PlayMotion(int motion, int a, int b, float speed);
 };
 
 struct Animator
@@ -245,4 +251,22 @@ extern "C" int FUN_10174c70(int slot, int force)
         DAT_10ffe5f8[slot][0] = 0;
     }
     return DAT_10fdeb90[slot];
+}
+
+extern "C" char DAT_11b04508;  // set while an important model changes motion (read by the playback code)
+
+// Starts motion `motion` on this model (0x1017b0e0, CharModel::M_1017b0e0 in other files): creates the playback
+// object on first use, then hands the request to it. `a`/`b` are the playback options (loop mode, blend frames).
+void SceneOwner::PlayMotion(int motion, int a, int b, float speed)
+{
+    if (scene == 0)
+    {
+        scene = (Scene *)DAT_11b0b938(0x7c84, "");
+        scene->M_10169f90();
+        scene->M_1016a020(this);
+    }
+    if (important != 0)
+        DAT_11b04508 = 1;
+    scene->M_1016a2e0(motion, a, b, speed);
+    DAT_11b04508 = 0;
 }

@@ -259,3 +259,6 @@ address	name	evidence
 1014b670	TextureObject::BindStage0	matched decompiled source (decomp/obj_symbols.tsv)
 1014b6e0	TextureObject::BindStage1	matched decompiled source (decomp/obj_symbols.tsv)
 1014f520	TextureObject::Release	matched decompiled source (decomp/obj_symbols.tsv)
+10191a30	Node::Find	matched decompiled source (decomp/obj_symbols.tsv)
+101ac740	Vec4::InBoxMargin	matched decompiled source (decomp/obj_symbols.tsv)
+1017b0e0	SceneOwner::PlayMotion	matched decompiled source (decomp/obj_symbols.tsv)

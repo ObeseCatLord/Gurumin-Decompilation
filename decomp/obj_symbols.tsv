@@ -147,3 +147,6 @@ _Vec3_Length	101ae890
 ?BindStage0@TextureObject@@QAEHXZ	1014b670
 ?BindStage1@TextureObject@@QAEHXZ	1014b6e0
 ?Release@TextureObject@@QAEHXZ	1014f520
+?Find@Node@@QAEPAU1@PBDPAH@Z	10191a30
+?InBoxMargin@Vec4@@QAEHPBUBox2@@M@Z	101ac740
+?PlayMotion@SceneOwner@@QAEXHHHM@Z	1017b0e0

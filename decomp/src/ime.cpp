@@ -234,3 +234,50 @@ extern "C" int FUN_1015fd30(void)
         strcpy(DAT_10f66ef8, DAT_10f66df8);
     return 0;
 }
+
+// IME hooks inside the game window object DAT_10f65698 (RenderWindow, window_create.cpp): WindowProc calls these
+// callbacks on WM_IME_COMPOSITION and sets the two flags.
+typedef void (*ImeCallback)();
+
+struct ImeWindowHooks
+{
+    void *vtable;
+    HWND window;                       // 0x04
+    int active;
+    HINSTANCE instance;
+    int compositionResult;             // 0x10: a result string arrived
+    int compositionEnded;              // 0x14: the composition string changed
+    ImeCallback onCompositionString;   // 0x18
+    ImeCallback onCompositionResult;   // 0x1c
+    ImeCallback onCursorPos;           // 0x20
+    ImeCallback onAttributes;          // 0x24
+};
+
+extern "C" ImeWindowHooks DAT_10f65698;
+extern "C" int DAT_10203428;           // 1 = text input allowed
+extern "C" int DAT_10f68110;
+extern "C" int DAT_10f66998;
+extern "C" char *DAT_10f68118;         // buffer that receives the text (see FUN_1015fd30)
+extern "C" void FUN_1015f3e0();        // reads the composition string
+extern "C" void FUN_1015f400();        // reads the result string
+extern "C" void FUN_1015f490();        // reads the cursor position
+extern "C" void FUN_1015f4b0();        // reads the clause attributes
+
+// Starts text input into `buffer` (name entry): resets the input state, attaches the IME to the game window and
+// installs the four IME callbacks. FUN_1015fd30 ends it. Returns 1.
+extern "C" int FUN_1015fda0(char *buffer)
+{
+    DAT_10f67000 = 0;
+    DAT_10203428 = 1;
+    DAT_10f68110 = 0;
+    DAT_10f66998 = 0;
+    DAT_10f68118 = buffer;
+    DAT_10f68124.Attach(DAT_10f65698.window);
+    DAT_10f65698.compositionEnded = 0;
+    DAT_10f65698.compositionResult = 0;
+    DAT_10f65698.onCompositionString = FUN_1015f3e0;
+    DAT_10f65698.onCompositionResult = FUN_1015f400;
+    DAT_10f65698.onCursorPos = FUN_1015f490;
+    DAT_10f65698.onAttributes = FUN_1015f4b0;
+    return 1;
+}

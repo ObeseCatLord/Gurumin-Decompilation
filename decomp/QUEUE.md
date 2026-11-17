@@ -53,7 +53,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (153)
+## 2. Small functions (30-250 bytes) (148)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c00` 82 bytes (loops 1)
@@ -68,13 +68,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001d8b0` 97 bytes (calls 1)
 - [ ] `101ae820` 107 bytes Cross (float, calls 1)
 - [ ] `10034f70` 108 bytes (float, loops 1)
-- [ ] `10191a30` 112 bytes (loops 1, calls 2)
-- [ ] `1019d600` 114 bytes (loops 1, calls 1)
 - [ ] `101ad1c0` 115 bytes (calls 4)
 - [ ] `10062750` 116 bytes (calls 4)
-- [ ] `1015fda0` 116 bytes (calls 1)
-- [ ] `1017b0e0` 116 bytes (calls 4)
-- [ ] `101ac740` 116 bytes (float)
 - [ ] `101148b0` 117 bytes (float, calls 4)
 - [ ] `101ad240` 119 bytes (float, calls 2)
 - [ ] `10162ea0` 120 bytes (float, calls 7)
@@ -802,7 +797,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (232)
+## 6. Naming: matched functions without a readable name (234)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
@@ -930,6 +925,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1015fa90` 37 bytes (src/menu_list.cpp)
 - [ ] `1015fac0` 94 bytes (src/menu_list.cpp)
 - [ ] `1015fd30` 99 bytes (src/ime.cpp)
+- [ ] `1015fda0` 116 bytes (src/ime.cpp)
 - [ ] `10160360` 93 bytes (src/file_check.cpp)
 - [ ] `10161050` 17 bytes (src/mmv_texreg.cpp)
 - [ ] `101618f0` 41 bytes (src/mmv_texreg.cpp)
@@ -1032,6 +1028,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1019bdb0` 17 bytes (src/scene_node.cpp)
 - [ ] `1019c320` 63 bytes (src/scene_node.cpp)
 - [ ] `1019c360` 58 bytes (src/scene_node.cpp)
+- [ ] `1019d600` 114 bytes (src/scene_node.cpp)
 - [ ] `1019d680` 28 bytes (src/scene_node.cpp)
 - [ ] `1019eca0` 62 bytes (src/node_pool.cpp)
 - [ ] `1019ed10` 41 bytes (src/scene_node.cpp)
@@ -1055,7 +1052,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/camera.cpp`: 11 of 11 functions without a comment, no header
 - [ ] `src/containers.cpp`: 25 of 25 functions without a comment, no header
 - [ ] `src/engine_10143.cpp`: 9 of 9 functions without a comment, no header
-- [ ] `src/ime.cpp`: 21 of 22 functions without a comment, no header
+- [ ] `src/ime.cpp`: 21 of 23 functions without a comment, no header
 - [ ] `src/listbank.cpp`: 7 of 8 functions without a comment, no header
 - [ ] `src/menu_textures.cpp`: 2 of 3 functions without a comment, no header
 - [ ] `src/mesh_cache.cpp`: 12 of 12 functions without a comment, no header
@@ -1063,9 +1060,9 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/model_misc.cpp`: 10 of 10 functions without a comment, no header
 - [ ] `src/save_slot.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/scene_misc.cpp`: 9 of 9 functions without a comment, no header
-- [ ] `src/scene_node.cpp`: 54 of 54 functions without a comment, no header
+- [ ] `src/scene_node.cpp`: 54 of 56 functions without a comment, no header
 - [ ] `src/texcache.cpp`: 10 of 10 functions without a comment, no header
-- [ ] `src/texture_mgr.cpp`: 14 of 15 functions without a comment, no header
+- [ ] `src/texture_mgr.cpp`: 14 of 16 functions without a comment, no header
 - [ ] `src/visibility.cpp`: 2 of 2 functions without a comment, no header
 - [ ] `src/window_create.cpp`: 4 of 5 functions without a comment, no header
 

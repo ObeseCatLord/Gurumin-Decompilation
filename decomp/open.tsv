@@ -44,3 +44,4 @@ address	status	reason
 1001b5b0	open	divide-by-constant sequences end add edx,eax (13.00) vs add eax,edx (13.10); one load scheduled differently
 1019b280	open	Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
 10199be0	open	VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
+101ad760	open	KeyBank::Insert: original keeps frame in ebp and the count in ecx for the whole function; VS2003 picks edi/ecx and stores x through the FPU (register allocation)

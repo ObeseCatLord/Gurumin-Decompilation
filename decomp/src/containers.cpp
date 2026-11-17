@@ -67,6 +67,7 @@ struct KeyBank
     KeyBank();
     void Clear();
     int CopyTo(KeyTrack *target);
+    int Insert(int frame, float x, float y, float z, float w);
 };
 
 struct Matrix4
@@ -335,4 +336,29 @@ int VertexPack::CopyFrom(const VertexPack *source)
     m_0044 = source->m_0044;
     DAT_11b07530(vertices, source->vertices, vertexCount * 0x70);
     return 1;
+}
+int KeyBank::Insert(int frame, float x, float y, float z, float w)
+{
+    int i;
+    for (i = 0; i < m_0a80; i++)
+    {
+        if (m_0000[i] == frame)
+            break;
+        if (m_0000[i] > frame)
+            break;
+    }
+    for (int j = m_0a80 - 1; j >= i; j--)
+    {
+        m_0000[j + 1] = m_0000[j];
+        m_0200[j + 1].Copy(m_0200[j]);
+        flags[j + 1] = flags[j];
+    }
+    m_0200[i].x = x;
+    m_0200[i].y = y;
+    m_0200[i].z = z;
+    m_0200[i].w = w;
+    m_0000[i] = frame;
+    flags[i] = 0;
+    m_0a80++;
+    return i;
 }

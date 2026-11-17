@@ -33,8 +33,11 @@ struct Vec4
     float DistanceZWeighted(const Vec4 &other);
     Vec4 Scaled(const float &scale);
     Vec4 Divided(const float &divisor);
-    void Normalize();  // 0x101ac260: scales all four components to unit length
+    void Normalize();
     void RotateZ(float angle);
+    void RotateY(float angle);
+    void RotateX(float angle);
+    void Copy(const Vec4 &source);  // 0x101acc20
 };
 
 // Axis-aligned box given by its minimum and maximum corners.
@@ -255,10 +258,35 @@ Vec4 TransformNormal(const Vec4 &v, const Matrix4 &matrix)
 // Rotates the vector's x/y part by `angle` radians about the z axis (z and w unchanged).
 void Vec4::RotateZ(float angle)
 {
-    float nx = (float)cos(angle) * x - (float)sin(angle) * y;
-    float ny = (float)cos(angle) * y + (float)sin(angle) * x;
+    float cosX = (float)cos(angle) * x;
+    float nx = cosX - (float)sin(angle) * y;
+    float cosY = (float)cos(angle) * y;
+    float ny = cosY + (float)sin(angle) * x;
     x = nx;
     y = ny;
+}
+
+// Rotates the vector's x/z part by `angle` radians about the y axis (the same 2D rotation as RotateZ applied to
+// (x, -z), so a positive angle turns x towards -z).
+void Vec4::RotateY(float angle)
+{
+    float cosX = (float)cos(angle) * x;
+    float nx = cosX - (float)sin(angle) * (-z);
+    float cosZ = (float)cos(angle) * (-z);
+    float nz = cosZ + (float)sin(angle) * x;
+    x = nx;
+    z = -nz;
+}
+
+// Rotates the vector's y/z part by `angle` radians about the x axis (the 2D rotation applied to (y, -z)).
+void Vec4::RotateX(float angle)
+{
+    float cosY = (float)cos(angle) * y;
+    float ny = cosY - (float)sin(angle) * (-z);
+    float cosZ = (float)cos(angle) * (-z);
+    float nz = cosZ + (float)sin(angle) * y;
+    y = ny;
+    z = -nz;
 }
 
 // Snaps an angle in radians to the nearest multiple of `step` degrees (rounding half away from zero) and returns it
@@ -290,4 +318,36 @@ Vec4 Cross(const Vec4 &a, const Vec4 &b)
 float Plane::Distance(const Vec4 *point)
 {
     return (float)fabs((point->x * a + point->y * b + point->z * c + d) / sqrt(LengthSquared(a, b, c)));
+}
+
+// Tilts `v` by `angle` radians about the horizontal axis at right angles to its heading: turns it to heading 0,
+// rotates about x, and turns it back. Used for pitching directions up or down.
+Vec4 Pitch(const Vec4 &v, float angle)
+{
+    float heading = (float)atan2(v.x, v.y);
+    Vec4 result;
+    result.Copy(v);
+    result.RotateZ(heading);
+    result.RotateX(angle);
+    result.RotateZ(-heading);
+    return result;
+}
+
+// Length of all four components. An inline helper like LengthSquared: its float arguments are spilled to the stack.
+inline float Length4(float x, float y, float z, float w)
+{
+    return (float)sqrt(x * x + y * y + z * z + w * w);
+}
+
+// Scales all four components to unit length; a zero vector is left unchanged.
+void Vec4::Normalize()
+{
+    float length = Length4(x, y, z, w);
+    if (length > 0.0f)
+    {
+        x /= length;
+        y /= length;
+        z /= length;
+        w /= length;
+    }
 }

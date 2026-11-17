@@ -49,6 +49,7 @@ struct AnimModel
     int M_101627d0(float x, float y, int mode);
     int M_101629b0(float y, float x);
     int FaceAway(const Vec4 &point);
+    int FaceAwayFrom(AnimModel *other);
     void M_10167400();
     int M_10167390(int id, int value, int frames);
     int AddMotionSpeed(float speed);
@@ -78,6 +79,18 @@ int AnimModel::FaceAway(const Vec4 &point)
     delta.Copy(world.GetTranslation());
     delta.Copy(delta - point);
     heading = (float)atan2(delta.x, delta.y);
+    return 0;
+}
+
+// Turns the model away from model `other` (heading of the vector from `other` to this model).
+int AnimModel::FaceAwayFrom(AnimModel *other)
+{
+    Vec4 position;
+    Vec4 otherPosition;
+    position.Copy(world.GetTranslation());
+    otherPosition.Copy(other->world.GetTranslation());
+    position.Copy(position - otherPosition);
+    heading = (float)atan2(position.x, position.y);
     return 0;
 }
 

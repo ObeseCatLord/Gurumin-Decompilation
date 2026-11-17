@@ -5,14 +5,21 @@
 // 3-bit coverage. Bits 9..13 of word 3 store the glyph's advance width (see tools/ddfont_tool.py and docs/MODDING_MAP.md).
 // Replacing this font with a TrueType/Unicode one is a roadmap goal (docs/ROADMAP.md); these functions are the hooks.
 
+#include <windows.h>
+#include <string.h>
+
 struct FontRenderer
 {
-    char pad_0000[0x238c];
+    char pad_0000[8];
+    HDC dc;                     // 0x08: memory DC with the Windows font (used when no bitmap font is loaded)
+    char pad_000c[0x2380];
     unsigned short *glyphs;     // 0x238c: normal font (ddfont8.dat), 72 words per glyph
     unsigned short *altGlyphs;  // 0x2390: alternative font (ddfont8s.dat, the small variant), may be missing
     int useAlt;                 // 0x2394: 1 = draw with the alternative font when it is loaded
 
     int GlyphWidth(int x, int y, int color, unsigned short code, int a, int b);
+    int DrawString(int x, int y, int color, const char *text, float a, int b);  // 0x1014f590; returns the width
+    int TextWidth(const char *text, float scale);
 };
 
 // Returns the advance width in pixels of one Shift-JIS character (width bits + 1).
@@ -37,4 +44,20 @@ int FontRenderer::GlyphWidth(int x, int y, int color, unsigned short code, int a
     if (index < 0 || index > 0x108840)  // 0x108840 = 15,048 glyphs * 72 words (end of the table)
         index = 0x1c0;
     return ((font[index + 3] >> 9) & 0x1f) + 1;
+}
+
+// Width in pixels of `text` drawn at `scale`: measured with the bitmap font when one is loaded (the text-draw
+// routine also returns the width), otherwise with the Windows font through GetTextExtentPoint32A.
+int FontRenderer::TextWidth(const char *text, float scale)
+{
+    unsigned short *font = glyphs;
+    if (useAlt == 1 && altGlyphs != 0)
+        font = altGlyphs;
+    if (font == 0)
+    {
+        SIZE size;
+        GetTextExtentPoint32A(dc, text, strlen(text), &size);
+        return (int)((float)size.cx * scale);
+    }
+    return (int)((float)DrawString(0, 0, 0, text, 0, 0) * scale);
 }

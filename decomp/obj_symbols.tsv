@@ -169,3 +169,11 @@ _Vec3_Length	101ae890
 ?Distance@Plane@@QAEMPBUVec4@@@Z	101ad240
 ?FaceAway@AnimModel@@QAEHABUVec4@@@Z	10162ea0
 ?Rumble@Input@@QAEHMH@Z	10142700
+?Init@Playback@@QAEXXZ	10169f90
+?RotateY@Vec4@@QAEXM@Z	101ac3a0
+?RotateX@Vec4@@QAEXM@Z	101ac440
+?Pitch@@YA?AUVec4@@ABU1@M@Z	101ae1c0
+?CopyTo@VideoSurface@@QAEXPAUTexture@@@Z	1015c6a0
+?Normalize@Vec4@@QAEXXZ	101ac260
+?FaceAwayFrom@AnimModel@@QAEHPAU1@@Z	10162e00
+?TextWidth@FontRenderer@@QAEHPBDM@Z	1014fd30

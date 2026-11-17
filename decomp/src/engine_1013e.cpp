@@ -11,9 +11,13 @@ extern "C" int DAT_10f6547c;
 extern "C" DWORD DAT_10f654d8;
 extern "C" int DAT_10f65508;
 extern "C" int DAT_10f65504;
-extern "C" int DAT_10f6549c;
-extern "C" int DAT_10f1fcf8;
-extern "C" int DAT_10f628d0;
+// Frame blend (after-image) strength: rises by the step every other frame up to the limit (see FUN_1013fb10).
+extern "C" float DAT_10f6549c;  // current strength
+extern "C" float DAT_10f1fcf8;  // step per update
+extern "C" float DAT_10f628d0;  // limit
+extern "C" int DAT_10f65498;    // 1 while the frame blend is active
+extern "C" int DAT_10f654f4;    // frame blending allowed by the settings
+extern "C" int DAT_10202b0c;    // number of frame buffers
 extern "C" int DAT_10f6553c;
 extern "C" char DAT_10202b40[][0x100];
 extern "C" int DAT_10f0edf8;
@@ -116,4 +120,26 @@ extern "C" int FUN_1013ec90(void)
         DispatchMessageA(&msg);
     }
     return 1;
+}
+
+// Starts the frame blend (after-image effect): `active` turns it on, and the strength moves towards `target`
+// over `frames` updates (at least 1). The limit is the higher of the current strength and the target. Without
+// blending support (setting off or a single frame buffer) everything stays at 0. Also restarts the frame timer.
+// Returns 0.
+extern "C" int FUN_1013fb10(int active, int target, int frames)
+{
+    DAT_10f65498 = active;
+    float goal = (float)target;
+    DAT_10f628d0 = DAT_10f6549c < goal ? goal : DAT_10f6549c;
+    if (frames < 1)
+        frames = 1;
+    DAT_10f1fcf8 = (goal - DAT_10f6549c) / (float)frames;
+    DAT_10f654d8 = timeGetTime() + 16;
+    if (DAT_10f654f4 == 0 || DAT_10202b0c == 1)
+    {
+        DAT_10f6549c = 0;
+        DAT_10f628d0 = 0;
+        DAT_10f1fcf8 = 0;
+    }
+    return 0;
 }

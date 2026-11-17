@@ -46,12 +46,24 @@ struct ModelState
 
 struct Playback
 {
-    char pad_0000[0x18];
+    int m_0000;
+    int m_0004;
+    float m_0008;             // 0x08: playback speed (1.0)
+    char m_000c;
+    char pad_000d[3];
+    int m_0010;
+    int m_0014;
     int m_0018;
     int m_001c;
     int m_0020;
     int m_0024;
-    char pad_0028[0xbc4];
+    int m_0028;
+    int m_002c[16];
+    int m_006c[16];           // -1 = unused
+    int m_00ac[0x90];
+    char pad_02ec[0x240];
+    int m_052c[0x90];
+    char pad_076c[0x480];
     int m_0bec;
     char pad_0bf0[0x7080];
     int m_7c70;
@@ -59,6 +71,7 @@ struct Playback
     int m_7c78;
     int pad_7c7c;
     SceneNode *m_7c80;
+    void Init();
     int M_1016a090(SceneNode *node);
     int M_1016a020(struct SceneOwner *owner);
 };
@@ -102,6 +115,35 @@ ModelState::ModelState()
     m_0018 = 0;
     m_001c = 0;
     m_0020 = 0;
+}
+
+// Resets a newly allocated playback object: speed 1, no node, all tables cleared and the 16 slot ids at -1.
+void Playback::Init()
+{
+    m_000c = 0;
+    m_0018 = 0;
+    m_001c = -1;
+    m_0020 = 0;
+    m_0004 = 0;
+    m_0024 = 0;
+    m_0008 = 1.0f;
+    m_7c74 = 0;
+    m_0bec = 0;
+    m_7c78 = -1;
+    m_0000 = 0;
+    memset(m_00ac, 0, sizeof(m_00ac));
+    memset(m_052c, 0, sizeof(m_052c));
+    for (int i = 0; i < 16; i++)
+    {
+        m_002c[i] = 0;
+        m_006c[i] = -1;
+    }
+    m_0010 = 0;
+    m_0014 = 0;
+    m_0018 = 0;
+    m_0020 = 0;
+    m_0028 = 0;
+    m_001c = -1;
 }
 
 // Binds the playback to `node` and resets it to the start; the frame count is taken from the node when it has

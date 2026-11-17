@@ -88,3 +88,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `xor eax,eax`) when it fully unrolls a short constant-count loop or expands `memset`; it stores immediates only for
   separately written assignments. 0x100235e0 matched once its fills were written as `memset` and a `for` loop.
   Retry the open "zero/1.0f in a register" entries with loops.
+- EH state stores that the original leaves out before a call (0x101728c0: no state update before `ModelState()`)
+  match when that callee is declared `throw()`. The original compiler evidently knew the callee could not throw,
+  which fits whole-program /GL+LTCG (see the IPRA note). Use `throw()` on such declarations only where the
+  original shows the missing state store.

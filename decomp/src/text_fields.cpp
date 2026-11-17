@@ -1,6 +1,9 @@
+// Text helpers: CSV fields, ability names, OS-dependent paths.
+
 #include <windows.h>
 #include <string.h>
 
+// Holds 256-byte text lines at offset 0x50d30 (loaded from a comma-separated data file).
 struct CsvTable
 {
     char pad_0000[0x50d30];
@@ -8,6 +11,8 @@ struct CsvTable
     int M_101672c0(int line, int field, char *out);
 };
 
+// Copies field number `field` (0-based, separated by commas or line ends) of line `line` into `out`.
+// Returns 1, or -1 when the line has fewer fields.
 int CsvTable::M_101672c0(int line, int field, char *out)
 {
     char buffer[128];
@@ -39,6 +44,8 @@ int CsvTable::M_101672c0(int line, int field, char *out)
 
 extern "C" unsigned int FUN_100144c0(unsigned int flags, char *text);
 
+// Builds the list of ability names for the ability bits in `flags` (Ability_GetDescription 0x100144c0 returns
+// one name and its bit at a time), separated by the Shift-JIS middle dot. Used for the costume description.
 extern "C" int FUN_1003bba0(unsigned int flags, char *out)
 {
     char text[128];
@@ -61,6 +68,8 @@ extern "C" int FUN_1003bba0(unsigned int flags, char *out)
 extern "C" int FUN_1013e260(char *path, int a, int b);
 extern "C" int FUN_1013e170(char *path, int a, int b);
 
+// Builds a per-user data path into `path` with the NT (version 4+) or Windows 9x variant of the folder lookup,
+// then appends `suffix`. Returns -1 when the lookup fails.
 extern "C" int FUN_1013dfc0(char *path, int a, const char *suffix, int b)
 {
     int result;

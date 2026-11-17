@@ -61,3 +61,9 @@ void Game::M_10007f20()
     }
     memset(m_01dc, 0, 200 * sizeof(int));
 }
+
+// Destructor: destroys the 32 menu model node bodies (compiler-generated "eh vector destructor iterator"), then
+// the Object base. Nothing else needs releasing here; textures are freed through the texture manager.
+Game::~Game()
+{
+}

@@ -1,3 +1,5 @@
+// Squash-and-stretch pulse for a character's pose matrix.
+
 #include <stdlib.h>
 #include "world.h"
 
@@ -7,6 +9,7 @@ struct Matrix4
     ~Matrix4();
 };
 
+// Pose object of a character (pointer table DAT_1021bdf8, 0x24 bytes per character); matrix at 0x1cc.
 struct Pose
 {
     char pad_0000[0x1cc];
@@ -22,6 +25,8 @@ struct PoseRef
 extern "C" PoseRef DAT_1021bdf8[0x80];
 extern "C" Matrix4 FUN_101b13c0(float x, float y, float z);
 
+// Advances the pulse step (a 0..7 triangle wave in m_0004[1]) and sets the pose to a scale matrix that
+// widens x/y while flattening z (t = |3 - step| / 3). The step advances by two per call. Returns 0.
 extern "C" int FUN_1001a390(int index)
 {
     if (DAT_1020b430[index].m_0004[1] > 3)

@@ -145,3 +145,11 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - /Od translation units (src_od/) are built with `/Od /Oi`: strcpy expands inline there (0x1013e6f0). build_all includes them.
 - Functions called on freshly allocated memory without a null check are plain methods (`node->Init()`), not placement
   `new` (0x1000b9f0).
+
+## Source style (2026-11-17)
+- Comment generously: a header comment per file, and a comment above every function saying what it does, who calls
+  it and what its fields, constants and magic numbers mean. Comments never change the compiled bytes. The user's
+  rule: "you can never have too many code comments." `decomp/QUEUE.md` section 7 lists files still missing them;
+  `tools/annotate.py <notes.py>` inserts comment blocks above given signatures.
+- Prefer readable names over placeholders once a function's role is clear; map non-address names to their address in
+  `obj_symbols.tsv`, then run `tools/sync_symbols.py` to copy them into `symbols.tsv`.

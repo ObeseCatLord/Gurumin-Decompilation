@@ -1,5 +1,9 @@
+// Scans over the character slots 0x3a..0x7b (the enemy range). Slot kind 3 in DAT_1021f3c0 marks a live enemy.
+// A position (m_2368.x) below -49999 means the character was moved out of the world (retired, see char_retire.cpp).
+
 #include "world.h"
 
+// Per-slot state table at 0x10daaaec, 0x188 bytes per slot (CharSlot in world.h starts 0x98 bytes later).
 struct ActorSlot
 {
     int m_0000;
@@ -11,6 +15,8 @@ struct ActorSlot
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" char DAT_1021f3c0[0x80];
 
+// Clears the `m_0000` counter of every live, active enemy that is still in the world and has no pending
+// action (m_009c == 0). Returns 1.
 extern "C" int FUN_10011c60(void)
 {
     for (int i = 0x3a; i < 0x7c; i++)
@@ -22,6 +28,8 @@ extern "C" int FUN_10011c60(void)
     return 1;
 }
 
+// Returns the first enemy slot that has a model and is either out of the world or finished (counter <= 0 while
+// its state is 2), or -1.
 extern "C" int FUN_10011cd0(void)
 {
     for (int i = 0x3a; i < 0x7c; i++)

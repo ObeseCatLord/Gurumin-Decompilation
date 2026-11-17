@@ -1,3 +1,5 @@
+// HUD overlay drawn during screen fades.
+
 #include "game.h"
 
 struct TextureObject
@@ -15,6 +17,8 @@ extern "C" int DAT_104bff0c;
 extern "C" int DAT_102024a0;
 extern "C" void FUN_1013f070(int, int, int);
 
+// Draws the dark panel (and the texture DAT_102024a0 when one is set) with an alpha of DAT_104bff0c / 15
+// while the HUD is visible (DAT_104bfd78) or the game is in state 0 (DAT_104bf8c0).
 extern "C" void FUN_1000f4d0(void)
 {
     if (DAT_104bfd78 != 0 || DAT_104bf8c0 == 0)

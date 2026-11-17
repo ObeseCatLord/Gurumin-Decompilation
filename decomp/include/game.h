@@ -7,7 +7,22 @@ struct GameNamedEntry
     char name[0xd4];
 };
 
-struct Game
+// Empty engine base class; its destructor is the shared empty function 0x1013eda0.
+struct Object
+{
+    ~Object();
+};
+
+// One scene node body (0x18a0 bytes, destructor 0x10191480, see src/node_dtor.cpp). Game owns 32 of them.
+struct GameNodeBody
+{
+    char data[0x18a0];
+    ~GameNodeBody();
+};
+
+// The game object: global instance DAT_104b7200. Holds menu textures, HUD state, the script variable tables and
+// 32 node bodies for menu models.
+struct Game : Object
 {
     int m_0000;
     int m_0004;
@@ -74,12 +89,15 @@ struct Game
     int m_7654[3];
     void (*m_7660)(int);
     int m_7664;
-    char pad_7668[0x8e7ac];
+    char pad_7668[0x1200];
+    GameNodeBody m_8868[0x20];  // 0x8868: menu model nodes, destroyed in ~Game
+    char pad_39c68[0x5c1ac];
     GameNamedEntry m_95e14[0x100];
     int m_a4614;
     char pad_a4618[0x34a07c];
     int m_3ee694[4000];
 
+    ~Game();
     int FindSlot(int id);
     void M_10007f20();
     int LoadMenuTextures(int value);

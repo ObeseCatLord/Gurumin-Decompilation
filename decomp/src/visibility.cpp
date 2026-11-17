@@ -67,3 +67,18 @@ int VisNode::UpdateVisibleCells()
     }
     return 0;
 }
+extern "C" VisNode *DAT_10255f08;
+
+extern "C" int FUN_10015860(Vec4 pos)
+{
+    VisData *vis = DAT_10255f08->vis;
+    if (vis == 0)
+        return 1;
+    VisBox *box = vis->boxes;
+    for (int i = 0; i < 0x40; i++, box++)
+    {
+        if (DAT_11afffe8[i] != 0 && pos.InBox(box))
+            return 1;
+    }
+    return 0;
+}

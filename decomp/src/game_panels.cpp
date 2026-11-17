@@ -1,3 +1,6 @@
+// Game (DAT_104b7200) drawing helpers for menus and the HUD. Coordinates are 640x480 screen pixels;
+// UV coordinates index the menu texture sheets loaded by Game::LoadMenuTextures.
+
 #include <string.h>
 #include "game.h"
 
@@ -15,6 +18,7 @@ struct TextureObject
 extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" void FUN_1013f070(int, int, int);
 
+// Draws a framed panel at (x, y, w, h): the frame from texMenu14 and the half-transparent fill from texMenu15.
 int Game::M_100087f0(int x, int y, int w, int h, int frame, float alpha)
 {
     FUN_1013f070(2, 0, 0);
@@ -23,6 +27,7 @@ int Game::M_100087f0(int x, int y, int w, int h, int frame, float alpha)
     return 0;
 }
 
+// Same as M_100087f0 with the frame from texMenu4 (the alternative panel style).
 int Game::M_10008880(int x, int y, int w, int h, int frame, float alpha)
 {
     FUN_1013f070(2, 0, 0);
@@ -31,6 +36,8 @@ int Game::M_10008880(int x, int y, int w, int h, int frame, float alpha)
     return 0;
 }
 
+// Stores the cursor position (m_7630/m_7634) and draws the menu cursor (a 32x32 cell of texMenu1) at the
+// previous position (m_7638/m_763c), fading with `frame`.
 int Game::M_10008fa0(int x, int y, int color, int frame)
 {
     m_7630 = x;
@@ -42,6 +49,8 @@ int Game::M_10008fa0(int x, int y, int color, int frame)
     return 1;
 }
 
+// Draws a speech balloon from texWaku01: a top cap (lit or unlit), `rows` middle rows of 32 pixels and a
+// bottom cap, all 160 pixels wide. Not byte-identical yet (see open.tsv).
 int Game::M_10008910(int x, int y, int lit, int rows, int a, int b, int color)
 {
     FUN_1013f070(2, 0, 0);
@@ -57,6 +66,8 @@ int Game::M_10008910(int x, int y, int lit, int rows, int a, int b, int color)
     return 0;
 }
 
+// Draws ASCII `text` with the 8x16 debug font in texMenu1 (32 glyphs per row starting at the space).
+// Not byte-identical yet (see open.tsv).
 int Game::M_100091d0(const char *text, int x, int y)
 {
     int length = strlen(text);

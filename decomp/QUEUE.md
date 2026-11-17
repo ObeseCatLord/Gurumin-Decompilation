@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (38)
+## 1. Walls to retry (39)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -26,6 +26,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e2440` 139 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `1013e4f0` 431 — RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
+- [ ] `10145380` 87 — FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)
 - [ ] `1014b390` 233 — Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores
 - [ ] `1015cac0` 20 — same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
@@ -50,35 +51,16 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (186)
+## 2. Small functions (30-250 bytes) (167)
 
 - [ ] `1000cf80` 33 bytes
-- [ ] `101627d0` 47 bytes (float)
-- [ ] `101a5860` 50 bytes (loops 1, calls 2)
-- [ ] `10167400` 52 bytes (float)
-- [ ] `10172a40` 57 bytes (calls 1)
-- [ ] `101629b0` 58 bytes (float, calls 1)
-- [ ] `1019eca0` 62 bytes (calls 2)
-- [ ] `1013e410` 63 bytes (calls 3)
-- [ ] `1013f8a0` 72 bytes (calls 1)
-- [ ] `10164aa0` 77 bytes (loops 1)
-- [ ] `10015860` 78 bytes (loops 1, calls 1)
-- [ ] `1016fb10` 78 bytes (loops 2)
 - [ ] `10017c00` 82 bytes (loops 1)
 - [ ] `10148960` 82 bytes (calls 3)
-- [ ] `1019b130` 82 bytes (loops 1, calls 1)
 - [ ] `10008330` 83 bytes (loops 1)
-- [ ] `1000c5c0` 84 bytes (loops 1, calls 1)
-- [ ] `10199dc0` 84 bytes (float)
 - [ ] `1004f860` 87 bytes (calls 1)
-- [ ] `10145380` 87 bytes Font_GlyphWidth
-- [ ] `1003b260` 88 bytes (calls 2)
-- [ ] `1000be40` 90 bytes (calls 4)
-- [ ] `10007e80` 92 bytes (calls 2)
-- [ ] `101733f0` 92 bytes (calls 3)
-- [ ] `101ac6e0` 92 bytes (float)
+- [ ] `101ac6e0` 92 bytes Vec4::InBox (float)
 - [ ] `101ac9e0` 95 bytes (float, calls 1)
-- [ ] `101aca40` 95 bytes (float, calls 1)
+- [ ] `101aca40` 95 bytes Vec4::Transformed (float, calls 1)
 - [ ] `101acaa0` 95 bytes (float, calls 1)
 - [ ] `101acbc0` 95 bytes (float, calls 1)
 - [ ] `1001d8b0` 97 bytes (calls 1)
@@ -91,7 +73,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1013e470` 103 bytes
 - [ ] `10007ce0` 104 bytes (loops 1, calls 1)
 - [ ] `10167390` 104 bytes (float)
-- [ ] `101ae820` 107 bytes (float, calls 1)
+- [ ] `101ae820` 107 bytes Cross (float, calls 1)
 - [ ] `10034f70` 108 bytes (float, loops 1)
 - [ ] `1014f520` 108 bytes (calls 3)
 - [ ] `1016a020` 109 bytes (calls 1)
@@ -338,7 +320,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cdf0` 385 bytes (loops 1, calls 1)
 - [ ] `101aed50` 385 bytes (float, calls 14)
 - [ ] `10161cb0` 386 bytes (float, loops 2, calls 5)
-- [ ] `101ac010` 387 bytes (loops 4, calls 12)
+- [ ] `101ac010` 387 bytes Node::Load (loops 4, calls 12)
 - [ ] `1001af10` 394 bytes (float, loops 1, calls 14)
 - [ ] `10024750` 397 bytes (float, calls 13)
 - [ ] `1019d750` 398 bytes (loops 3, calls 4)
@@ -362,7 +344,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100541f0` 430 bytes (float, calls 13)
 - [ ] `1019c3a0` 434 bytes (float, loops 4)
 - [ ] `1000cc30` 436 bytes (float, calls 9)
-- [ ] `10162610` 436 bytes (calls 14)
+- [ ] `10162610` 436 bytes PathMover::SetPosition (calls 14)
 - [ ] `10166f20` 440 bytes (calls 3)
 - [ ] `1015cd70` 442 bytes
 - [ ] `1001b880` 444 bytes (float, calls 11)
@@ -407,7 +389,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10008a30` 528 bytes (float, loops 2, calls 7)
 - [ ] `100092c0` 535 bytes (float, loops 1, calls 6)
 - [ ] `100357a0` 537 bytes (loops 5, calls 1)
-- [ ] `1019e9a0` 539 bytes (loops 4, calls 21)
+- [ ] `1019e9a0` 539 bytes Node::Release (loops 4, calls 21)
 - [ ] `1000c390` 540 bytes (float, loops 1, calls 5)
 - [ ] `1000b2c0` 544 bytes (loops 4)
 - [ ] `1000df10` 544 bytes (float, loops 1, calls 13)
@@ -440,7 +422,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100ba040` 604 bytes (float, loops 1, calls 15)
 - [ ] `1019b630` 604 bytes (loops 1, calls 6)
 - [ ] `10011240` 605 bytes Save_ReadThumbnail (loops 2, calls 24)
-- [ ] `10191500` 608 bytes (loops 1, calls 7)
+- [ ] `10191500` 608 bytes Node::Init (loops 1, calls 7)
 - [ ] `1003aef0` 611 bytes Bgm_Play (calls 20)
 - [ ] `1000b4e0` 613 bytes (loops 4)
 - [ ] `1000b750` 613 bytes (loops 4)
@@ -569,7 +551,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101a53b0` 1174 bytes (loops 13, calls 13)
 - [ ] `101af960` 1176 bytes (float, loops 1, calls 7)
 - [ ] `10023d30` 1181 bytes (loops 10, calls 24)
-- [ ] `101af4c0` 1182 bytes (float, loops 1, calls 7)
+- [ ] `101af4c0` 1182 bytes KeyBank::Sample (float, loops 1, calls 7)
 - [ ] `10011520` 1188 bytes (float, loops 4, calls 8)
 - [ ] `1004d4b0` 1188 bytes (float, loops 3, calls 2)
 - [ ] `100b6290` 1189 bytes (float, loops 1, calls 44)
@@ -667,7 +649,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101886d0` 2012 bytes (loops 5, calls 81)
 - [ ] `10089210` 2033 bytes (float, loops 14, calls 40)
 - [ ] `10021380` 2047 bytes
-- [ ] `101a8e60` 2060 bytes (float, loops 5, calls 47)
+- [ ] `101a8e60` 2060 bytes Node::Collide (float, loops 5, calls 47)
 - [ ] `10147a20` 2131 bytes (loops 7, calls 23)
 - [ ] `1004fbe0` 2142 bytes (float, loops 6, calls 54)
 - [ ] `100144c0` 2146 bytes Ability_GetDescription
@@ -721,7 +703,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100fb7b0` 3089 bytes (float, loops 16, calls 57)
 - [ ] `100b6740` 3098 bytes (float, loops 4, calls 76)
 - [ ] `1001c670` 3125 bytes (float, loops 14, calls 70)
-- [ ] `101a1640` 3132 bytes (float, loops 11, calls 61)
+- [ ] `101a1640` 3132 bytes CollisionWorld::Query (float, loops 11, calls 61)
 - [ ] `100bcce0` 3186 bytes (float, loops 4, calls 79)
 - [ ] `1002f520` 3192 bytes (float, calls 53)
 - [ ] `100ac440` 3233 bytes (float, loops 2, calls 79)
@@ -832,7 +814,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (295)
+## 6. Naming: matched functions without a readable name (227)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
@@ -847,8 +829,6 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `10001c50` 44 bytes (src/soundarc.cpp)
 - [ ] `10001c80` 44 bytes (src/soundarc.cpp)
 - [ ] `10001f30` 43 bytes (src/soundarc.cpp)
-- [ ] `10001f60` 27 bytes (src/math_float.cpp)
-- [ ] `10001f80` 35 bytes (src/math_float.cpp)
 - [ ] `10002060` 108 bytes (src/app_0006.cpp)
 - [ ] `100020d0` 181 bytes (src/flag_list.cpp)
 - [ ] `100022b0` 72 bytes (src/app_0003.cpp)
@@ -861,10 +841,8 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `100049e0` 73 bytes (src/listbank.cpp)
 - [ ] `10004a30` 98 bytes (src/listbank.cpp)
 - [ ] `10004aa0` 103 bytes (src/listbank.cpp)
-- [ ] `10007e10` 112 bytes (src/panel_dtor.cpp)
 - [ ] `10007ee0` 56 bytes (src/app_0004.cpp)
 - [ ] `10007f20` 162 bytes (src/menu_textures.cpp)
-- [ ] `10007fd0` 773 bytes (src/menu_textures.cpp)
 - [ ] `100082e0` 64 bytes (src/app_0004.cpp)
 - [ ] `10008390` 67 bytes (src/app_0004.cpp)
 - [ ] `100083e0` 80 bytes (src/app_0006.cpp)
@@ -882,10 +860,10 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1000be10` 48 bytes (src/app_0008.cpp)
 - [ ] `1000c200` 226 bytes (src/item_icon.cpp)
 - [ ] `1000c340` 69 bytes (src/app_0007.cpp)
+- [ ] `1000c5c0` 84 bytes (src/slot_alloc.cpp)
 - [ ] `1000cb30` 90 bytes (src/app_0007.cpp)
 - [ ] `1000d620` 74 bytes (src/app_0008.cpp)
 - [ ] `1000d670` 49 bytes (src/app_0008.cpp)
-- [ ] `1000d950` 124 bytes (src/mesh_slots.cpp)
 - [ ] `1000d9d0` 69 bytes (src/app_0008.cpp)
 - [ ] `1000da20` 28 bytes (src/app_0008.cpp)
 - [ ] `1000da40` 101 bytes (src/volume_fade.cpp)
@@ -914,6 +892,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `100121e0` 64 bytes (src/app_0010.cpp)
 - [ ] `100123d0` 127 bytes (src/char_motion.cpp)
 - [ ] `100143c0` 47 bytes (src/app_0010.cpp)
+- [ ] `10015860` 78 bytes (src/visibility.cpp)
 - [ ] `100158b0` 94 bytes (src/app_0013.cpp)
 - [ ] `10016500` 123 bytes (src/char_motion.cpp)
 - [ ] `10017b80` 38 bytes (src/app_0011.cpp)
@@ -928,22 +907,21 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `100286b0` 17 bytes (src/app_0012.cpp)
 - [ ] `100347d0` 54 bytes (src/app_0012.cpp)
 - [ ] `100364a0` 183 bytes (src/type_parse.cpp)
-- [ ] `1003a940` 131 bytes (src/ai_pick.cpp)
+- [ ] `1003b260` 88 bytes (src/save_slot.cpp)
 - [ ] `1003b670` 111 bytes (src/engine_base.cpp)
 - [ ] `1003bba0` 192 bytes (src/text_fields.cpp)
 - [ ] `10047400` 62 bytes (src/app_0011.cpp)
 - [ ] `10052480` 52 bytes (src/app_0012.cpp)
 - [ ] `1013dfc0` 246 bytes (src/text_fields.cpp)
 - [ ] `1013e0c0` 161 bytes (src/path_util.cpp)
+- [ ] `1013e410` 63 bytes (src/window_create.cpp)
 - [ ] `1013e6d0` 11 bytes (src/engine_base.cpp)
 - [ ] `1013e6f0` 146 bytes (src/names_od.cpp)
-- [ ] `1013ed90` 3 bytes (src/engine_base.cpp)
-- [ ] `1013eda0` 1 bytes (src/engine_base.cpp)
 - [ ] `1013edb0` 3 bytes (src/engine_base.cpp)
 - [ ] `1013eed0` 6 bytes (src/engine_base.cpp)
 - [ ] `1013ef00` 38 bytes (src/engine_1013e.cpp)
+- [ ] `1013f8a0` 72 bytes (src/path_format.cpp)
 - [ ] `1013faf0` 17 bytes (src/engine_1013e.cpp)
-- [ ] `10143bb0` 16 bytes (src/engine_10143.cpp)
 - [ ] `10145a10` 51 bytes (src/engine_10143.cpp)
 - [ ] `10146d90` 22 bytes (src/engine_10143.cpp)
 - [ ] `10147620` 97 bytes (src/buffer_pool.cpp)
@@ -952,29 +930,12 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `10147a00` 23 bytes (src/engine_10143.cpp)
 - [ ] `101483a0` 66 bytes (src/texcache.cpp)
 - [ ] `10148410` 156 bytes (src/buffer_pool.cpp)
-- [ ] `10148880` 34 bytes (src/texcache.cpp)
-- [ ] `101488b0` 87 bytes (src/buffer_pool.cpp)
 - [ ] `10148910` 15 bytes (src/texcache.cpp)
 - [ ] `10148920` 15 bytes (src/texcache.cpp)
 - [ ] `10148930` 39 bytes (src/texcache.cpp)
 - [ ] `1014b1c0` 209 bytes (src/type_parse.cpp)
 - [ ] `1015caa0` 20 bytes (src/ime.cpp)
-- [ ] `1015d0a0` 62 bytes (src/ime.cpp)
-- [ ] `1015d0e0` 36 bytes (src/ime.cpp)
-- [ ] `1015d110` 16 bytes (src/ime.cpp)
-- [ ] `1015d120` 23 bytes (src/ime.cpp)
-- [ ] `1015d140` 28 bytes (src/ime.cpp)
-- [ ] `1015d160` 32 bytes (src/ime.cpp)
-- [ ] `1015d2e0` 115 bytes (src/ime.cpp)
-- [ ] `1015d360` 111 bytes (src/ime.cpp)
-- [ ] `1015d3d0` 35 bytes (src/ime.cpp)
 - [ ] `1015d400` 41 bytes (src/ime.cpp)
-- [ ] `1015d430` 85 bytes (src/ime.cpp)
-- [ ] `1015d490` 12 bytes (src/ime.cpp)
-- [ ] `1015d4a0` 25 bytes (src/ime.cpp)
-- [ ] `1015d4c0` 12 bytes (src/ime.cpp)
-- [ ] `1015d4d0` 12 bytes (src/ime.cpp)
-- [ ] `1015d4e0` 12 bytes (src/ime.cpp)
 - [ ] `1015d500` 15 bytes (src/ime.cpp)
 - [ ] `1015fa90` 37 bytes (src/menu_list.cpp)
 - [ ] `1015fac0` 94 bytes (src/menu_list.cpp)
@@ -993,14 +954,15 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `10161be0` 25 bytes (src/anim_model.cpp)
 - [ ] `10161f30` 46 bytes (src/anim_model.cpp)
 - [ ] `10161f60` 25 bytes (src/anim_model.cpp)
+- [ ] `101627d0` 47 bytes (src/model_params.cpp)
 - [ ] `101628b0` 55 bytes (src/anim_model.cpp)
+- [ ] `101629b0` 58 bytes (src/model_params.cpp)
 - [ ] `10162f20` 35 bytes (src/model_misc.cpp)
 - [ ] `10163e70` 18 bytes (src/model_misc.cpp)
 - [ ] `10164090` 20 bytes (src/model_misc.cpp)
-- [ ] `10166810` 83 bytes (src/scene_misc.cpp)
-- [ ] `101668b0` 82 bytes (src/model_state.cpp)
 - [ ] `10166910` 56 bytes (src/model_misc.cpp)
 - [ ] `101672c0` 190 bytes (src/text_fields.cpp)
+- [ ] `10167400` 52 bytes (src/model_params.cpp)
 - [ ] `101687c0` 18 bytes (src/model_misc.cpp)
 - [ ] `10169620` 53 bytes (src/model_misc.cpp)
 - [ ] `10169760` 28 bytes (src/model_misc.cpp)
@@ -1008,7 +970,6 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `101699d0` 27 bytes (src/mesh_cache.cpp)
 - [ ] `10169be0` 24 bytes (src/mesh_cache.cpp)
 - [ ] `10169c00` 60 bytes (src/mesh_cache.cpp)
-- [ ] `10169c40` 20 bytes (src/mesh_cache.cpp)
 - [ ] `10169f70` 21 bytes (src/mesh_cache.cpp)
 - [ ] `1016a220` 53 bytes (src/mesh_cache.cpp)
 - [ ] `1016a260` 60 bytes (src/mesh_cache.cpp)
@@ -1023,11 +984,8 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1016fa40` 107 bytes (src/scene_misc.cpp)
 - [ ] `1016fab0` 50 bytes (src/camera.cpp)
 - [ ] `1016faf0` 17 bytes (src/camera.cpp)
-- [ ] `10172780` 107 bytes (src/scene_misc.cpp)
-- [ ] `101727f0` 200 bytes (src/anim_channels.cpp)
-- [ ] `101728c0` 205 bytes (src/anim_channels.cpp)
-- [ ] `10172990` 99 bytes (src/scene_misc.cpp)
-- [ ] `10172a00` 39 bytes (src/texture_mgr.cpp)
+- [ ] `1016fb10` 78 bytes (src/slot_alloc.cpp)
+- [ ] `10172a40` 57 bytes (src/tri_batch.cpp)
 - [ ] `10172a80` 21 bytes (src/texture_mgr.cpp)
 - [ ] `10172aa0` 21 bytes (src/texture_mgr.cpp)
 - [ ] `10173450` 48 bytes (src/texture_mgr.cpp)
@@ -1040,12 +998,9 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1017b1c0` 79 bytes (src/texture_mgr.cpp)
 - [ ] `10184160` 16 bytes (src/texture_mgr.cpp)
 - [ ] `10188eb0` 83 bytes (src/texture_mgr.cpp)
-- [ ] `10189080` 98 bytes (src/world_frame.cpp)
 - [ ] `101911b0` 36 bytes (src/texture_mgr.cpp)
 - [ ] `101911e0` 36 bytes (src/scene_node.cpp)
 - [ ] `10191210` 100 bytes (src/scene_node.cpp)
-- [ ] `101913f0` 138 bytes (src/scene_node.cpp)
-- [ ] `10191480` 125 bytes (src/node_dtor.cpp)
 - [ ] `10191770` 245 bytes (src/scene_node.cpp)
 - [ ] `10191870` 167 bytes (src/scene_node.cpp)
 - [ ] `10191920` 103 bytes (src/scene_node.cpp)
@@ -1073,66 +1028,101 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `10199340` 64 bytes (src/scene_node.cpp)
 - [ ] `101997f0` 105 bytes (src/scene_node.cpp)
 - [ ] `10199860` 18 bytes (src/scene_node.cpp)
+- [ ] `10199dc0` 84 bytes (src/projection.cpp)
 - [ ] `1019b050` 98 bytes (src/scene_node.cpp)
 - [ ] `1019b0c0` 112 bytes (src/scene_node.cpp)
 - [ ] `1019b190` 18 bytes (src/scene_node.cpp)
-- [ ] `1019b1b0` 82 bytes (src/scene_node.cpp)
 - [ ] `1019b210` 28 bytes (src/scene_node.cpp)
 - [ ] `1019b230` 68 bytes (src/scene_node.cpp)
 - [ ] `1019b300` 76 bytes (src/scene_node.cpp)
 - [ ] `1019bca0` 109 bytes (src/scene_node.cpp)
-- [ ] `1019bd10` 157 bytes (src/scene_node.cpp)
 - [ ] `1019bdb0` 17 bytes (src/scene_node.cpp)
 - [ ] `1019c320` 63 bytes (src/scene_node.cpp)
 - [ ] `1019c360` 58 bytes (src/scene_node.cpp)
 - [ ] `1019d680` 28 bytes (src/scene_node.cpp)
-- [ ] `1019ece0` 41 bytes (src/scene_node.cpp)
+- [ ] `1019eca0` 62 bytes (src/node_pool.cpp)
 - [ ] `1019ed10` 41 bytes (src/scene_node.cpp)
+- [ ] `101a5860` 50 bytes (src/node_pool.cpp)
 - [ ] `101a8760` 19 bytes (src/scene_node.cpp)
 - [ ] `101ab980` 75 bytes (src/scene_node.cpp)
-- [ ] `101abb70` 179 bytes (src/scene_node.cpp)
-- [ ] `101ac1a0` 81 bytes (src/scene_node.cpp)
-- [ ] `101ac220` 59 bytes (src/vec_math.cpp)
-- [ ] `101ac500` 57 bytes (src/vec_math.cpp)
-- [ ] `101ac540` 65 bytes (src/vec_math.cpp)
-- [ ] `101ac590` 88 bytes (src/vec_math.cpp)
-- [ ] `101ac5f0` 90 bytes (src/vec_math.cpp)
-- [ ] `101ac650` 69 bytes (src/vec_math.cpp)
-- [ ] `101ac6a0` 55 bytes (src/vec_math.cpp)
-- [ ] `101ac7c0` 66 bytes (src/vec_math.cpp)
-- [ ] `101ac9a0` 32 bytes (src/vec4.cpp)
-- [ ] `101ac9c0` 30 bytes (src/vec4.cpp)
-- [ ] `101acc40` 26 bytes (src/vec4.cpp)
-- [ ] `101acea0` 105 bytes (src/vertex.cpp)
-- [ ] `101acfc0` 34 bytes (src/containers.cpp)
-- [ ] `101acff0` 68 bytes (src/containers.cpp)
-- [ ] `101ad040` 157 bytes (src/containers.cpp)
-- [ ] `101ad0e0` 40 bytes (src/containers.cpp)
-- [ ] `101ad110` 69 bytes (src/containers.cpp)
-- [ ] `101ad160` 74 bytes (src/containers.cpp)
-- [ ] `101ad550` 102 bytes (src/containers.cpp)
-- [ ] `101ad6a0` 136 bytes (src/containers.cpp)
-- [ ] `101ad730` 33 bytes (src/containers.cpp)
-- [ ] `101ad9e0` 9 bytes (src/game_file.cpp)
-- [ ] `101ad9f0` 59 bytes (src/containers.cpp)
-- [ ] `101adb40` 57 bytes (src/containers.cpp)
-- [ ] `101adb80` 34 bytes (src/containers.cpp)
-- [ ] `101adbb0` 219 bytes (src/containers.cpp)
-- [ ] `101adc90` 32 bytes (src/containers.cpp)
-- [ ] `101adcb0` 51 bytes (src/containers.cpp)
-- [ ] `101ade10` 104 bytes (src/containers.cpp)
-- [ ] `101adec0` 33 bytes (src/vec_math.cpp)
-- [ ] `101adef0` 24 bytes (src/containers.cpp)
-- [ ] `101adf10` 34 bytes (src/containers.cpp)
-- [ ] `101ae250` 77 bytes (src/containers.cpp)
-- [ ] `101ae710` 93 bytes (src/vec_math.cpp)
-- [ ] `101ae770` 43 bytes (src/vec_math.cpp)
-- [ ] `101ae7a0` 55 bytes (src/containers.cpp)
-- [ ] `101ae7e0` 59 bytes (src/containers.cpp)
-- [ ] `101ae890` 32 bytes (src/vec_math.cpp)
-- [ ] `101af450` 110 bytes (src/containers.cpp)
 
-## 7. Structures and globals
+## 7. Comment pass (70 files)
+
+Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
+file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
+
+- [ ] `src/ai_pick.cpp`: 6 of 6 functions without a comment, no header
+- [ ] `src/anim_channels.cpp`: 2 of 2 functions without a comment, no header
+- [ ] `src/anim_model.cpp`: 12 of 12 functions without a comment, no header
+- [ ] `src/anti_tamper.cpp`: 4 of 4 functions without a comment, no header
+- [ ] `src/app_0001.cpp`: 6 of 6 functions without a comment, no header
+- [ ] `src/app_0002.cpp`: 8 of 8 functions without a comment, no header
+- [ ] `src/app_0003.cpp`: 3 of 3 functions without a comment, no header
+- [ ] `src/app_0004.cpp`: 8 of 8 functions without a comment, no header
+- [ ] `src/app_0005.cpp`: 6 of 6 functions without a comment, no header
+- [ ] `src/app_0006.cpp`: 5 of 5 functions without a comment, no header
+- [ ] `src/app_0007.cpp`: 2 of 2 functions without a comment, no header
+- [ ] `src/app_0008.cpp`: 7 of 7 functions without a comment, no header
+- [ ] `src/app_0009.cpp`: 8 of 8 functions without a comment, no header
+- [ ] `src/app_0010.cpp`: 9 of 9 functions without a comment, no header
+- [ ] `src/app_0011.cpp`: 5 of 5 functions without a comment, no header
+- [ ] `src/app_0012.cpp`: 6 of 6 functions without a comment, no header
+- [ ] `src/app_0013.cpp`: 5 of 5 functions without a comment, no header
+- [ ] `src/app_0014.cpp`: 3 of 3 functions without a comment, no header
+- [ ] `src/bgm_stream.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/bmp_flip.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/buffer_pool.cpp`: 8 of 8 functions without a comment, no header
+- [ ] `src/camera.cpp`: 11 of 11 functions without a comment, no header
+- [ ] `src/char_score.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/collide_query.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/config_ini.cpp`: 2 of 2 functions without a comment, no header
+- [ ] `src/containers.cpp`: 25 of 25 functions without a comment, no header
+- [ ] `src/dialog_yesno.cpp`: 2 of 2 functions without a comment, no header
+- [ ] `src/enemy_ai.cpp`: 4 of 4 functions without a comment, no header
+- [ ] `src/engine_1013e.cpp`: 9 of 9 functions without a comment, no header
+- [ ] `src/engine_10143.cpp`: 9 of 9 functions without a comment, no header
+- [ ] `src/engine_base.cpp`: 6 of 6 functions without a comment, no header
+- [ ] `src/file_check.cpp`: 2 of 2 functions without a comment, no header
+- [ ] `src/game_file.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/ime.cpp`: 21 of 21 functions without a comment, no header
+- [ ] `src/ime_draw.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/input_font.cpp`: 2 of 2 functions without a comment, no header
+- [ ] `src/inventory.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/listbank.cpp`: 7 of 7 functions without a comment, no header
+- [ ] `src/menu_list.cpp`: 3 of 3 functions without a comment, no header
+- [ ] `src/menu_textures.cpp`: 2 of 3 functions without a comment, no header
+- [ ] `src/mesh_cache.cpp`: 12 of 12 functions without a comment, no header
+- [ ] `src/mesh_slots.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/mmv_texreg.cpp`: 10 of 10 functions without a comment, no header
+- [ ] `src/model_misc.cpp`: 10 of 10 functions without a comment, no header
+- [ ] `src/model_state.cpp`: 3 of 3 functions without a comment, no header
+- [ ] `src/node_ctor.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/node_dtor.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/panel_dtor.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/path_anim.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/render_queue.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/render_reset.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/render_state.cpp`: 3 of 3 functions without a comment, no header
+- [ ] `src/resource_banks.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/save_slot.cpp`: 1 of 2 functions without a comment, no header
+- [ ] `src/scene_misc.cpp`: 9 of 9 functions without a comment, no header
+- [ ] `src/scene_node.cpp`: 54 of 54 functions without a comment, no header
+- [ ] `src/screen_transition.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/slot_defaults.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/soundarc.cpp`: 7 of 7 functions without a comment, no header
+- [ ] `src/texcache.cpp`: 10 of 10 functions without a comment, no header
+- [ ] `src/text_token.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/texture_mgr.cpp`: 14 of 14 functions without a comment, no header
+- [ ] `src/texture_slots.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/vec4.cpp`: 4 of 4 functions without a comment, no header
+- [ ] `src/vec_ops.cpp`: 1 of 1 functions without a comment, no header
+- [ ] `src/vertex.cpp`: 2 of 2 functions without a comment, no header
+- [ ] `src/visibility.cpp`: 2 of 2 functions without a comment, no header
+- [ ] `src/wall_flags.cpp`: 3 of 3 functions without a comment, no header
+- [ ] `src/window_create.cpp`: 4 of 4 functions without a comment, no header
+- [ ] `src/world_frame.cpp`: 1 of 1 functions without a comment, no header
+
+## 8. Structures and globals
 
 - [ ] Merge the per-file copies of `Matrix4`, `TextureObject`, `GameFile`, `ItemInfo` into shared headers in `include/`.
 - [ ] Name the CharSlot / ActorSlot / CharState / Character fields used by matched code (include/world.h).

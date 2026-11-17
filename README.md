@@ -51,6 +51,7 @@ Function names: `symbols.tsv` (apply to Ghidra with `re/apply_symbols.bat`).
   does everything and writes the report and the meter.
 - Helpers: `tools/variants.py` builds `#if V == k` variants of a file, `tools/pick.py` keeps one, `tools/sbs.py` shows
   our code and the original side by side, `tools/asm.py` / `tools/fn.py` show the original's disassembly / Ghidra output.
+- Source style: readable names and plenty of comments (what each function does, its fields and constants).
 - Functions that still differ are listed in `decomp/open.tsv` with the reason; the work queue is `decomp/QUEUE.md`;
   findings and compiler habits are in `NOTES.md`.
 - Ghidra: `re\run_ghidra_export.bat` (APP.dll), `re\run_ghidra_packs.bat` (packs.dll); exports land in `re\export\`

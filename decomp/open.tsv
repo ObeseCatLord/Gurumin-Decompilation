@@ -42,3 +42,5 @@ address	status	reason
 101615d0	open	ItmDescramble: same register residue as 0x101614c0
 101acb00	skip	Vec4 * scale (by value): keeps this in edx across the Vec4() constructor call (callee known not to touch edx) - inter-procedural register allocation
 101acb60	skip	Vec4 / divisor: same edx-across-call IPRA as 0x101acb00
+10164aa0	skip	global 0x10804bf8 reset: clears a 16-entry array of 0x249c-byte records at +0xecd4 and a field at +0x313e8 that falls inside the last record; layout not understood yet
+10145380	open	FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)

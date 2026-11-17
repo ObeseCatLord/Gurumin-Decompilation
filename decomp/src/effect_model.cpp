@@ -1,20 +1,29 @@
+// Effect model: an animated model (node tree + key frames) played at a position, e.g. hit sparks or magic effects.
+
 struct Vec4
 {
     float x;
     float y;
     float z;
     float w;
-    void Set(float x, float y, float z, float w);
+    Vec4();                                            // 0x101ac990 (leaves the members uninitialised)
+    void Set(float x, float y, float z, float w);      // 0x101ac9c0
 };
 
 struct Matrix4
 {
     float m[16];
+    Matrix4();                                         // 0x101ae770
+    ~Matrix4();                                        // 0x1013eda0 (empty, shared with other empty destructors)
 };
 
+// Key-frame bank (containers.cpp); it has a destructor, so constructing it opens an EH state.
 struct KeyBank
 {
-    void Clear();
+    char pad_0000[0xa84];
+    KeyBank();                                         // 0x101af420
+    ~KeyBank();
+    void Clear();                                      // 0x101ad730
 };
 
 struct Node
@@ -39,10 +48,10 @@ struct EffectModel
     int reverseStart;
     int m_0038;
     int m_003c;
-    Matrix4 matrix;
-    KeyBank keys;
-    char pad_0081[0xa83];
-    int m_0b04;
+    Matrix4 matrix;     // 0x40: placement, copied from the world matrix DAT_10db9210 at setup
+    KeyBank keys;       // 0x80
+    int m_0b04;         // 0xb04: frame counter, reset to 0 at setup
+    EffectModel();
     int M_1000b9f0(const char *path, int value, int start, int end);
 };
 
@@ -51,6 +60,14 @@ extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" void (*DAT_11b1ba40)(void *);
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
+// Constructor: only the members with constructors do anything (Vec4/Matrix4/KeyBank); the rest is set by Setup.
+EffectModel::EffectModel()
+{
+}
+
+// Setup: loads the effect model `path` (folder 0 of FUN_1013f8a0) and plays frames start..end.
+// A negative start counts back from the end (stored in reverseStart, start becomes 0); a negative end means
+// "up to the model's last frame" (Node::M_10199340 returns the frame count). Releases any previous model first.
 int EffectModel::M_1000b9f0(const char *path, int value, int start, int end)
 {
     color.Set(1.0f, 1.0f, 1.0f, 1.0f);

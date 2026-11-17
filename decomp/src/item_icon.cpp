@@ -1,5 +1,8 @@
+// Item icons.
+
 #include "game.h"
 
+// Item table at 0x1088e6b0, 0xc0 bytes per item; `icon` indexes the 8x8 icon sheet texIcon01.
 struct ItemInfo
 {
     int type;
@@ -19,6 +22,8 @@ extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" ItemInfo DAT_1088e6b0[];
 extern "C" int DAT_1042e2a8[];
 
+// Draws the icon of the item in inventory slot `slot` as a 16x16 sprite at (x, y), insetting the UVs by 0.002
+// to avoid bleeding from the neighbouring icons.
 extern "C" int FUN_1000c200(int x, int y, int slot, int color)
 {
     int icon = DAT_1088e6b0[DAT_1042e2a8[slot]].icon;

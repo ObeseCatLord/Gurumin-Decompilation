@@ -1,5 +1,10 @@
+// Scrambling of .itm data files (docs/ITM_FORMAT.md, tools/itm_tool.py).
+// The key mixes the 15-character string "GURUguruMinmIN_", a 64-byte table and the upper-cased file name (written
+// into the table at offset 8). A byte sum and an xor (seeded 0xde2f) over the plain bytes check the result.
+
 #include <string.h>
 
+// ItmScramble: scrambles `size` bytes in place and returns their sum and xor (taken before scrambling).
 extern "C" int FUN_101614c0(unsigned char *data, int size, char *name, int *sum, unsigned int *check)
 {
     char table[70] = "!~_Q#xDRgd-d&yfg&'(8)(5(594er2f4asf5f6e5f4s5fvwyjk%fgqTUCFD4568r";
@@ -20,6 +25,7 @@ extern "C" int FUN_101614c0(unsigned char *data, int size, char *name, int *sum,
     return 1;
 }
 
+// ItmDescramble: reverses ItmScramble in place; returns 1 when the sum and xor of the result match.
 extern "C" int FUN_101615d0(unsigned char *data, int size, char *name, int sum, unsigned int check)
 {
     char table[70] = "!~_Q#xDRgd-d&yfg&'(8)(5(594er2f4asf5f6e5f4s5fvwyjk%fgqTUCFD4568r";

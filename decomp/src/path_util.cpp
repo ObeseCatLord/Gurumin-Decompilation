@@ -1,8 +1,12 @@
+// File path helpers.
+
 #include <windows.h>
 #include <string.h>
 
 extern "C" char DAT_10fada90[][0x20];
 
+// Creates every directory along `path` (like mkdir -p): cuts the path at each backslash in turn and calls
+// CreateDirectoryA on the prefix, then on the whole path. Returns 0.
 extern "C" int FUN_1013e0c0(const char *path)
 {
     char buffer[260];
@@ -22,6 +26,7 @@ extern "C" int FUN_1013e0c0(const char *path)
     return 0;
 }
 
+// Stores folder + name (cut to 31 characters) as entry `index` of the 32-byte name table DAT_10fada90.
 extern "C" int FUN_10169780(int index, const char *folder, const char *name)
 {
     char buffer[256];
@@ -32,6 +37,8 @@ extern "C" int FUN_10169780(int index, const char *folder, const char *name)
     return 0;
 }
 
+// Path_GetBaseName: copies the file name of `path` without folder and extension into `out` (8 bytes are
+// cleared first). Not byte-identical yet (see open.tsv).
 extern "C" int FUN_10161120(char *out, const char *path)
 {
     char buffer[256];

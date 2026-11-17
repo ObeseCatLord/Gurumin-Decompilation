@@ -1,3 +1,7 @@
+// BGM volume fades. A fade has a target volume (DAT_104bf8e8), the current volume (DAT_104bf8f0), a per-frame
+// step (DAT_1032d4b0) and a frame counter (DAT_104bf8e4); the per-frame update elsewhere adds the step until the
+// counter runs out. DAT_104bf8ec is the id of the track the fade applies to. Script built-ins call these.
+
 extern "C" float DAT_104bf8e8;
 extern "C" int DAT_104bf8ec;
 extern "C" float DAT_104bf8f0;
@@ -5,6 +9,8 @@ extern "C" float DAT_1032d4b0;
 extern "C" int DAT_104bf8e4;
 extern "C" int DAT_104c02e0;
 
+// Starts a fade of track `id` to `value` over `frames` frames (0 = jump there at once).
+// The int-to-float conversion of `value` is rounded once (/Op) and reused for every store.
 extern "C" int FUN_1000da40(int id, int value, int frames)
 {
     DAT_104bf8e8 = value;
@@ -22,6 +28,7 @@ extern "C" int FUN_1000da40(int id, int value, int frames)
     return 0;
 }
 
+// Same fade for the tracks numbered from 300 (id + 300), also storing a fade mode in DAT_104c02e0.
 extern "C" int FUN_1000dab0(int id, int value, int frames, int mode)
 {
     DAT_104bf8e8 = value;
@@ -40,6 +47,7 @@ extern "C" int FUN_1000dab0(int id, int value, int frames, int mode)
     return 0;
 }
 
+// Same fade for the tracks numbered from 100 (id + 100).
 extern "C" int FUN_1000db30(int id, int value, int frames)
 {
     DAT_104bf8e8 = value;

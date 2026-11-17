@@ -181,6 +181,7 @@ struct Node
     Node *M_101992f0();
     Node *M_10199310();
     int M_10199340();
+    int M_1019b130(unsigned int bits);
     int M_1019b190(unsigned int bits);
     int M_1019b210(unsigned int bits);
     int M_1019b230(int value);
@@ -401,6 +402,14 @@ extern "C" void FUN_10199860(void)
     DAT_11b002b8 = 0;
     DAT_11b044dc = 0;
     DAT_11b044d0 = 0;
+}
+
+int Node::M_1019b130(unsigned int bits)
+{
+    flags |= bits;
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_1019b130(bits);
+    return 1;
 }
 
 int Node::M_1019b190(unsigned int bits)

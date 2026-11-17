@@ -1,3 +1,5 @@
+// Script data parser helpers and the font randomisation table.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +14,8 @@ struct TokenReader
 extern "C" const char DAT_101d7f08[];
 extern "C" const char DAT_101d7ee4[];
 
+// Reads a type name token: returns 0 for "int", 1 for "float", 2 for "string"; reports an error (and returns 0)
+// when the token is missing or unknown.
 char TokenReader::M_100364a0(int source)
 {
     char word[256];
@@ -45,6 +49,8 @@ extern "C" short DAT_10f65558;
 extern "C" int DAT_10f20590[0x10000];
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
+// Loads the 256 KB table fontr.dat into DAT_10f20590, or fills it with rand() when the file is missing.
+// Also stores `value` in DAT_10f65558. C++ linkage: the GameFile local needs an exception frame.
 int FUN_1014b1c0(short value)
 {
     DAT_10f65558 = value;

@@ -72,7 +72,27 @@ def main():
     for a in unnamed:
         out.append("- [ ] `%s` %s bytes (%s)" % (a, funcs[a]["size"], percent[a][1].replace("app/", "src/") + ".cpp"))
 
-    out += ["", "## 7. Structures and globals", "",
+    missing = []
+    for fn in sorted(os.listdir(os.path.join(ROOT, "src"))):
+        if not fn.endswith(".cpp"):
+            continue
+        lines = open(os.path.join(ROOT, "src", fn), encoding="utf-8", errors="replace").read().splitlines()
+        total = bare = 0
+        for i in range(len(lines) - 1):
+            if lines[i + 1] == "{" and re.match(r"^[A-Za-z_].*\)( const)?$", lines[i]) and not lines[i].startswith(("struct", "class")):
+                total += 1
+                if i == 0 or not lines[i - 1].lstrip().startswith("//"):
+                    bare += 1
+        header = lines[0].startswith("//")
+        if bare or not header:
+            missing.append((fn, bare, total, header))
+    out += ["", "## 7. Comment pass (%d files)" % len(missing), "",
+            "Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every",
+            "file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).", ""]
+    for fn, bare, total, header in missing:
+        out.append("- [ ] `src/%s`: %d of %d functions without a comment%s" % (fn, bare, total, "" if header else ", no header"))
+
+    out += ["", "## 8. Structures and globals", "",
             "- [ ] Merge the per-file copies of `Matrix4`, `TextureObject`, `GameFile`, `ItemInfo` into shared headers in `include/`.",
             "- [ ] Name the CharSlot / ActorSlot / CharState / Character fields used by matched code (include/world.h).",
             "- [ ] Name the Game texture and state fields (include/game.h) from LoadMenuTextures and the draw helpers.",

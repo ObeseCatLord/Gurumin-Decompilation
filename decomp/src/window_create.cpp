@@ -45,7 +45,12 @@ void RenderWindow::Create(HINSTANCE instance)
         window = CreateWindowExA(0, className, title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, DAT_10202b24, DAT_10202b28, 0, 0, this->instance, 0);
 }
 
-extern "C" LRESULT CALLBACK FUN_1013e410(HWND, UINT, WPARAM, LPARAM);
+extern "C" LRESULT CALLBACK FUN_1013e410(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if (GetWindowLongA(window, 8) == 0)
+        SetWindowLongA(window, 8, (LONG)DAT_10f1a860);
+    return DAT_10f1a860->WindowProc(window, message, wParam, lParam);
+}
 
 void RenderWindow::RegisterWindowClass(HINSTANCE instance)
 {

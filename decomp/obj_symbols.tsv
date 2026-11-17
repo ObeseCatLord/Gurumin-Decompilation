@@ -105,3 +105,7 @@
 ?Create@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	10148a40
 ?RegisterWindowClass@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	101489c0
 ?LoadMenuTextures@Game@@QAEHH@Z	10007fd0
+?Find@Node@@QAEPAU1@PBDH@Z	1019ece0
+?Collide@Node@@QAEHHHPAUVec4@@00@Z	101a8e60
+?SetFlags@Node@@QAEXI@Z	1019b130
+?ClearFlags@Node@@QAEXI@Z	1019b1b0

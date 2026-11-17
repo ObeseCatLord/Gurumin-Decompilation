@@ -1,3 +1,5 @@
+// Message window animation, per-character key timers, attached meshes and the debugger check.
+
 #include <windows.h>
 #include <stdlib.h>
 
@@ -36,6 +38,7 @@ extern "C" int DAT_104bfe88;
 extern "C" int DAT_1020247c[8];
 extern "C" int DAT_104c0270[0x10];
 
+// Releases and frees the owned mesh node and clears the two counters. Returns 1.
 int MeshOwner::M_1000be10()
 {
     m_0030 = 0;
@@ -49,6 +52,8 @@ int MeshOwner::M_1000be10()
     return 1;
 }
 
+// Animates the message window: opening (state 1) counts 0 -> 15, closing (state 2) counts back to 0, after
+// which the window is hidden (state 0).
 extern "C" int FUN_1000cbe0(void)
 {
     if (DAT_104bf8d4 == 1)
@@ -66,6 +71,8 @@ extern "C" int FUN_1000cbe0(void)
     return 0;
 }
 
+// Shows key prompt `key` over character `index` for `frames` frames (only refreshes the timer when the same
+// prompt is already shown).
 extern "C" int FUN_1000d620(int index, int key, int frames)
 {
     if (DAT_104bf8f8[index] != 0 && DAT_1021d138[index] == key)
@@ -79,6 +86,7 @@ extern "C" int FUN_1000d620(int index, int key, int frames)
     return 0;
 }
 
+// Counts down the key prompt timers of all characters and hides expired prompts.
 extern "C" int FUN_1000d670(void)
 {
     for (int i = 0; i < 0x7c; i++)
@@ -92,6 +100,7 @@ extern "C" int FUN_1000d670(void)
     return 0;
 }
 
+// Releases and frees the meshes of all 64 attached mesh slots. Returns 1.
 extern "C" int FUN_1000d9d0(void)
 {
     for (int i = 0; i < 0x40; i++)
@@ -108,6 +117,7 @@ extern "C" int FUN_1000d9d0(void)
     return 1;
 }
 
+// Pushes `value` into the 8-entry history ring DAT_1020247c.
 extern "C" int FUN_1000da20(int value)
 {
     DAT_1020247c[DAT_104bfe88] = value;
@@ -117,6 +127,8 @@ extern "C" int FUN_1000da20(int value)
 
 typedef BOOL (WINAPI *IsDebuggerPresentProc)(void);
 
+// Anti-debugger check: when IsDebuggerPresent reports a debugger, drops random noise into the anti-tamper
+// table (see anti_tamper.cpp).
 extern "C" int FUN_1000eb90(void)
 {
     HMODULE kernel = LoadLibraryA("KERNEL32.DLL");

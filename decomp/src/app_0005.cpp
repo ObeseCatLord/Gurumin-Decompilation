@@ -1,3 +1,5 @@
+// Mouse input object (see app_0001.cpp) and message text.
+
 #include <windows.h>
 
 extern "C" char DAT_1020e0f8[];
@@ -25,6 +27,7 @@ struct Tracker
     int M_100014a0();
 };
 
+// Moves the Windows cursor to game position (x, y) in 640x480 coordinates, scaled to the client area.
 int Tracker::M_10001090(int x, int y)
 {
     POINT origin;
@@ -37,6 +40,7 @@ int Tracker::M_10001090(int x, int y)
     return 0;
 }
 
+// Same as Obj::GetState: copies the requested parts of the mouse state.
 int Tracker::M_10001110(int *pos, char *a, char *b, char *c, int *d, char *e)
 {
     if (a)
@@ -57,11 +61,13 @@ int Tracker::M_10001110(int *pos, char *a, char *b, char *c, int *d, char *e)
     return 1;
 }
 
+// Returns the changed flag.
 int Tracker::M_10001440()
 {
     return m_0018;
 }
 
+// Same as Obj::UpdateChanged.
 int Tracker::M_10001450()
 {
     int pos[2];
@@ -73,12 +79,15 @@ int Tracker::M_10001450()
     return m_0018;
 }
 
+// Clears the changed flag.
 int Tracker::M_100014a0()
 {
     m_0018 = 0;
     return 0;
 }
 
+// Sets the message window body text (DAT_1020e0f8); a non-empty text reopens the window from the start.
+// Passing 0 clears the text.
 extern "C" int FUN_1000cb90(const char *text)
 {
     if (text != 0)

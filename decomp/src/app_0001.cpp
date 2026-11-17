@@ -1,3 +1,7 @@
+// Mouse input object (the same class appears as Tracker in app_0005.cpp). It keeps the button and wheel state
+// reported by the window (m_0000.. bytes), the cursor position in 640x480 game coordinates (m_0004/m_0008) and the
+// window it belongs to (m_001c). m_0038 is an optional cursor callback.
+
 #include <windows.h>
 
 struct Point
@@ -6,6 +10,7 @@ struct Point
     int y;
 };
 
+// Stub that always returns 1 (an unused input hook).
 extern "C" int __stdcall FUN_10001000(int, int, int)
 {
     return 1;
@@ -35,6 +40,8 @@ struct Obj
     int ReportCursor();
 };
 
+// Init: binds the object to window `p` with cursor callback `q` and user value `r`; clears the position.
+// Returns 0 when the window or callback is missing.
 int Obj::M_10001010(int p, int q, int r)
 {
     if (p == 0)
@@ -50,6 +57,7 @@ int Obj::M_10001010(int p, int q, int r)
     return 1;
 }
 
+// 1 when point `pt` lies inside the rectangle (x, y, width, height), edges included.
 extern "C" int __stdcall FUN_10001050(const Point *pt, int x, int y, int width, int height)
 {
     if (pt->x < x || pt->y < y)
@@ -59,6 +67,7 @@ extern "C" int __stdcall FUN_10001050(const Point *pt, int x, int y, int width, 
     return 1;
 }
 
+// Copies the requested parts of the mouse state (buttons, wheel, position); null pointers are skipped.
 int Obj::GetState(Point *pos, char *a, char *b, char *c, int *d, char *e)
 {
     if (a != 0)
@@ -79,6 +88,7 @@ int Obj::GetState(Point *pos, char *a, char *b, char *c, int *d, char *e)
     return 1;
 }
 
+// Sets the changed flag when the cursor moved since the last call; returns the flag.
 int Obj::UpdateChanged()
 {
     Point pos;
@@ -91,6 +101,9 @@ int Obj::UpdateChanged()
 }
 typedef void (*CursorCallback)(int x, int y);
 
+// When the cursor moved: converts the screen cursor position into 640x480 game coordinates (scaled by the
+// client size, so it works in any window size) and passes it to the cursor callback. Not byte-identical yet
+// (see open.tsv).
 int Obj::ReportCursor()
 {
     POINT cursor;

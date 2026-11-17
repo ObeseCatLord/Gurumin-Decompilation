@@ -1,15 +1,20 @@
+// More soundarc.dll commands (see soundarc.cpp). Arguments go in with codes 0..9, then the command code;
+// strings travel with WM_COPYDATA.
+
 #include <windows.h>
 
 extern "C" int DAT_1020aee4;
 extern "C" void __stdcall FUN_10001170(int, int, int, int, int, int);
 extern "C" HWND FUN_10001570(void);
 
+// Stops all sound (FUN_10001170 with no arguments). Returns 1.
 extern "C" int FUN_10001550(void)
 {
     FUN_10001170(0, 0, 0, 0, 0, 0);
     return 1;
 }
 
+// Command 0x221 (no arguments).
 extern "C" LRESULT FUN_10001b40(void)
 {
     if (DAT_1020aee4 != 0)
@@ -21,6 +26,7 @@ extern "C" LRESULT FUN_10001b40(void)
     return 0;
 }
 
+// Command 0x227: sets the master music attenuation (in 1/100 dB, larger = quieter).
 extern "C" LRESULT FUN_10001b70(LPARAM param)
 {
     if (DAT_1020aee4 != 0)
@@ -33,6 +39,7 @@ extern "C" LRESULT FUN_10001b70(LPARAM param)
 }
 
 
+// Plays file `path` on music stream `stream` with four playback parameters (command 0x207).
 extern "C" int FUN_10001a90(int stream, const char *path, int a, int b, int c, int d)
 {
     HWND window;
@@ -52,6 +59,7 @@ extern "C" int FUN_10001a90(int stream, const char *path, int a, int b, int c, i
     }
     return 0;
 }
+// Command 0x201: stops music stream `stream`.
 extern "C" LRESULT FUN_10001ba0(int stream)
 {
     if (DAT_1020aee4 == 0)
@@ -65,6 +73,7 @@ extern "C" LRESULT FUN_10001ba0(int stream)
     return 0;
 }
 
+// Command 0x212: fades music stream `stream` out over `fadeTime` ms.
 extern "C" LRESULT FUN_10001bf0(int stream, int fadeTime)
 {
     if (DAT_1020aee4 == 0)
@@ -78,6 +87,7 @@ extern "C" LRESULT FUN_10001bf0(int stream, int fadeTime)
     }
     return 0;
 }
+// Command 0x235: plays 3D sound effect `id` with nine parameters (position, volume, pitch, ...).
 extern "C" LRESULT FUN_100017c0(int id, int a, int b, int c, int d, int e, int f, int g, int h, int i)
 {
     if (DAT_1020aee4 == 0)
@@ -100,6 +110,8 @@ extern "C" LRESULT FUN_100017c0(int id, int a, int b, int c, int d, int e, int f
     return 0;
 }
 
+// Command 0x267: moves 3D sound `stream` to position (x, y, z) with velocity (dx, dy, dz); null pointers
+// send zeros.
 extern "C" LRESULT FUN_10001890(int stream, const int *x, const int *y, const int *z, const int *dx, const int *dy, const int *dz)
 {
     if (DAT_1020aee4 == 0)

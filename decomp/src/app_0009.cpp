@@ -1,3 +1,5 @@
+// Screen effects, message timers and sound timers.
+
 #include <string.h>
 
 struct Vec4
@@ -39,6 +41,7 @@ extern "C" int DAT_10447dd8[0x80];
 extern "C" int DAT_104c01b0;
 extern "C" short DAT_10447338[];
 
+// Starts the screen fade-in (state 1).
 extern "C" int FUN_1000ebf0(void)
 {
     DAT_104bfd28 = 1;
@@ -48,6 +51,8 @@ extern "C" int FUN_1000ebf0(void)
     return 0;
 }
 
+// Advances the screen fade: fading in (state 1) for 15 frames then fully shown (state 2, DAT_1030c568 = 1);
+// fading out (state 3) back to 0.
 extern "C" int FUN_1000ec10(void)
 {
     if (DAT_104bfd28 == 1)
@@ -66,6 +71,8 @@ extern "C" int FUN_1000ec10(void)
     return 1;
 }
 
+// Advances the colour blend of DAT_10da90d0 by one step, snapping to the target on the last frame.
+// Not byte-identical yet (see open.tsv).
 extern "C" void FUN_1000ed20(void)
 {
     if (DAT_1042da68 != 0)
@@ -77,6 +84,7 @@ extern "C" void FUN_1000ed20(void)
     }
 }
 
+// Like FUN_1000ed70 (app_0013.cpp) but shows the message in the alternative style (DAT_104c01fc = 1).
 extern "C" int FUN_1000edf0(const char *text, const char *subtext, int frames)
 {
     DAT_104bfd4c = frames;
@@ -91,6 +99,7 @@ extern "C" int FUN_1000edf0(const char *text, const char *subtext, int frames)
     return 1;
 }
 
+// Advances the message window: closes after its display time, animating the fade in/out over 10 frames.
 extern "C" int FUN_1000ee60(void)
 {
     if (++DAT_104bf8d0 > DAT_104bfd4c)
@@ -110,6 +119,7 @@ extern "C" int FUN_1000ee60(void)
     return 1;
 }
 
+// Clears each of the 32 short-lived flags 30 frames after it was set.
 extern "C" int FUN_1000f320(void)
 {
     for (int i = 0; i < 0x20; i++)
@@ -126,6 +136,7 @@ extern "C" int FUN_1000f320(void)
     return 0;
 }
 
+// Counts down the 128 delayed actions and runs each one (FUN_1000f360 with its stored value) when it expires.
 extern "C" int FUN_1000f490(void)
 {
     for (int i = 0; i < 0x80; i++)
@@ -139,6 +150,7 @@ extern "C" int FUN_1000f490(void)
     return 0;
 }
 
+// Stops the looping sound of slot `index` (soundarc command 0x224) unless sound is muted; -11 marks a free slot.
 extern "C" void FUN_100102a0(int index)
 {
     if (DAT_104c01b0 == 0)

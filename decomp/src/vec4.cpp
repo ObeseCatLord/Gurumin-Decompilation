@@ -29,6 +29,7 @@ struct Vec4
     Vec4 Divided(const float &divisor);
     Vec4 operator/(const int &divisor) const;
     float DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b);
+    float DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2);
 };
 
 // Dot product of the x/y/z parts of two vectors (free function, cdecl; 0x101ac200).
@@ -157,6 +158,31 @@ Vec4 Vec4::operator/(const int &divisor) const
     result.y = y / d;
     result.z = z / d;
     return result;
+}
+
+// Squared distance between the points (ax, ay) and (bx, by).
+inline float DistanceSquared2D(float ax, float ay, float bx, float by)
+{
+    float dy = ay - by;
+    float dx = ax - bx;
+    return dx * dx + dy * dy;
+}
+
+// Squared distance on the x/y plane from this point to the segment (x1, y1)-(x2, y2): the point is projected onto
+// the line and the projection is clamped to the ends. A segment of zero length counts as its first point.
+// Not byte-identical yet: the shared "first point" exit is placed in the middle in the original (see open.tsv).
+float Vec4::DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2)
+{
+    if (x1 == x2 && y1 == y2)
+        return DistanceSquared2D(x, y, x1, y1);
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    float t = (dx * x + (dy * y - (dy * y1 + dx * x1))) / (dx * dx + dy * dy);
+    if (t < 0.0f)
+        return DistanceSquared2D(x, y, x1, y1);
+    if (t > 1.0f)
+        return DistanceSquared2D(x, y, x2, y2);
+    return DistanceSquared2D(x, y, t * dx + x1, t * dy + y1);
 }
 
 // Squared distance from this point to the segment a-b (x/y/z): the point is projected onto the line and the

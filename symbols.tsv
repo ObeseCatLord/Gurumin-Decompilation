@@ -613,3 +613,5 @@ address	name	evidence
 10001980	SoundArc_PlayFileLooped	plays a looping sound file through soundarc.dll (decomp/src/soundarc.cpp)
 101abc30	Node::AddChild	matched decompiled source (decomp/obj_symbols.tsv)
 10184170	EffectManager::Reset	matched decompiled source (decomp/obj_symbols.tsv)
+10169e40	MeshInstance::FreeImage	matched decompiled source (decomp/obj_symbols.tsv)
+101acc60	Vec4::DistanceSquaredToSegment2D	matched decompiled source (decomp/obj_symbols.tsv)

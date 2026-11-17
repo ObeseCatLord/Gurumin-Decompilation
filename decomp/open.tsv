@@ -56,3 +56,4 @@ address	status	reason
 10054a60	open	Game::RaiseGameOverEvents: identical except the loop pointer: the original keeps &entry.flags[1] in ebp, cl 13.00 here &entry.flags[0] (pointer and indexed forms tried)
 10001980	open	looping sound play: same cross-jumping residue as 0x100016c0
 10184170	open	EffectManager::Reset: tail (incl. the uninitialised sixth offset) matches; the three -1 slot loops use absolute pointers with signed jl and -1 in eax in the original (index, pointer and unsized-array forms tried)
+101acc60	open	DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)

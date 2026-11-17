@@ -224,3 +224,5 @@ _Vec3_Dot	101ac200
 ?RaiseGameOverEvents@Game@@QAEHXZ	10054a60
 ?AddChild@Node@@QAEPAU1@PBDH@Z	101abc30
 ?Reset@EffectManager@@QAEHXZ	10184170
+?FreeImage@MeshInstance@@QAEXXZ	10169e40
+?DistanceSquaredToSegment2D@Vec4@@QAEMMMMM@Z	101acc60

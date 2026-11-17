@@ -11,12 +11,14 @@ struct IntPair
 struct MeshInstance : IntPair
 {
     char pad_0008[0x18];
-    int m_0020;
-    int m_0024;
+    int m_0020;               // 0x20: image pixels (1 and 2 mark built-in images that are not freed)
+    int m_0024;               // 0x24: second image buffer
     int pad_0028;
-    int m_002c;
-    int m_0030;
+    int m_002c;               // 0x2c: image width
+    int m_0030;               // 0x30: image height
     int m_0034;
+    int Release();            // 0x1014f520 (TextureObject::Release)
+    void FreeImage();
 
     MeshInstance();
     int M_10169df0();
@@ -105,6 +107,34 @@ extern "C" int FUN_10169c00(const TextureRef *texture)
         DAT_10faae88[index] = 0;
     }
     return DAT_10faae88[index];
+}
+
+extern "C" int DAT_1101d874;                     // texture memory in use (bytes)
+extern "C" void (*DAT_11b1ba40)(void *);          // engine free
+
+// Frees the stored image and releases the Direct3D texture. The texture memory counter drops by the size of a
+// 16-bit texture with five mip levels below it.
+void MeshInstance::FreeImage()
+{
+    DAT_1101d874 -= m_002c * m_0030 * 2;
+    DAT_1101d874 -= (m_002c / 2) * (m_0030 / 2) * 2;
+    DAT_1101d874 -= (m_002c / 4) * (m_0030 / 4) * 2;
+    DAT_1101d874 -= (m_002c / 8) * (m_0030 / 8) * 2;
+    DAT_1101d874 -= (m_002c / 16) * (m_0030 / 16) * 2;
+    DAT_1101d874 -= (m_002c / 32) * (m_0030 / 32) * 2;
+    if (m_0020 == 1)
+        m_0020 = 0;
+    if (m_0020 == 2)
+        m_0020 = 0;
+    if (m_0024 != 0)
+        DAT_11b1ba40((void *)m_0024);
+    if (m_0020 != 0)
+        DAT_11b1ba40((void *)m_0020);
+    m_0020 = 0;
+    m_0024 = 0;
+    m_002c = 0;
+    m_0030 = 0;
+    Release();
 }
 
 // Constructor: clears the two size fields (the rest is set when a texture is loaded).

@@ -1,3 +1,5 @@
+// Buffer pool maintenance (see buffer_pool.cpp), a toggle wrapper and frame presentation.
+
 #include "d3d9_min.h"
 
 struct ToggleInterface
@@ -50,6 +52,7 @@ extern "C" int FUN_1013ed60(void);
 extern "C" void FUN_101439e0(void);
 extern "C" void FUN_1014b480(void);
 
+// Clears the buffer pool tables and its VRAM counters without releasing anything (start-up).
 extern "C" void FUN_10148310(void)
 {
     int i;
@@ -63,6 +66,7 @@ extern "C" void FUN_10148310(void)
     DAT_10f0ff80 = 0;
 }
 
+// Releases every pooled surface but keeps the entries reserved (before a device reset).
 extern "C" int FUN_10148350(void)
 {
     for (int i = 0; i < 0x200; i++)
@@ -79,6 +83,7 @@ extern "C" int FUN_10148350(void)
     return 0;
 }
 
+// Releases every pooled surface and frees all entries.
 extern "C" int FUN_101483a0(void)
 {
     DAT_10f0ff80 = 0;
@@ -93,6 +98,7 @@ extern "C" int FUN_101483a0(void)
     return 0;
 }
 
+// Ages every pool entry by one frame (for eviction of unused buffers).
 extern "C" int FUN_101483f0(void)
 {
     for (int i = 0; i < 0x200; i++)
@@ -100,6 +106,7 @@ extern "C" int FUN_101483f0(void)
     return 0;
 }
 
+// Constructor: all fields 0.
 Record2c::Record2c()
 {
     m_0000 = 0;
@@ -114,18 +121,21 @@ Record2c::Record2c()
     m_0028 = 0;
 }
 
+// Switches the held COM object on (SetState(1)).
 void ToggleHolder::M_10148910()
 {
     if (object != 0)
         object->SetState(1);
 }
 
+// Switches the held COM object off (SetState(0)).
 void ToggleHolder::M_10148920()
 {
     if (object != 0)
         object->SetState(0);
 }
 
+// 1 when the held object reports state 0 (or there is none).
 int ToggleHolder::M_10148930()
 {
     int state = 0;
@@ -134,6 +144,8 @@ int ToggleHolder::M_10148930()
     return state == 0;
 }
 
+// Ends the frame: finishes the 2D overlay (FUN_101493f0), ends the Direct3D scene, presents the back buffer and
+// starts the next frame. Returns 0 once the game is quitting.
 extern "C" int FUN_1015c960(void)
 {
     if (DAT_10f6552c != 0)
@@ -148,6 +160,7 @@ extern "C" int FUN_1015c960(void)
     return 1;
 }
 
+// Same as FUN_1015c960 without the overlay pass (used for loading screens).
 extern "C" int FUN_1015c9b0(void)
 {
     if (DAT_10f6552c != 0)

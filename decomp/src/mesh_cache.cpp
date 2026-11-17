@@ -1,3 +1,6 @@
+// Reference counts for shared model and texture files, and texture slot objects.
+// MeshInstance is the same 0x38-byte texture slot object as TextureObject (texture_bind.cpp).
+
 struct IntPair
 {
     int first;
@@ -57,6 +60,8 @@ extern "C" int FUN_1014f520(void);
 extern "C" int __stdcall FUN_1014f1f0(int, int, int, int);
 extern "C" int __stdcall FUN_10143870(int, int, int);
 
+// Releases one reference to a shared model file; the name entry is freed when the count reaches 0.
+// Returns the remaining count.
 extern "C" int FUN_10169990(const MeshRef *mesh)
 {
     int index = mesh->index;
@@ -70,6 +75,7 @@ extern "C" int FUN_10169990(const MeshRef *mesh)
     return DAT_10feb3e0[index];
 }
 
+// 0 when the shared texture name table (0x400 entries) still has a free entry, -1 when it is full.
 extern "C" int FUN_101699d0(void)
 {
     for (int i = 0; i < 0x400; i++)
@@ -80,12 +86,14 @@ extern "C" int FUN_101699d0(void)
     return -1;
 }
 
+// Adds a reference to a shared texture file and returns the new count.
 extern "C" int FUN_10169be0(const TextureRef *texture)
 {
     int index = texture->index;
     return ++DAT_10faae88[index];
 }
 
+// Releases one reference to a shared texture file (freeing the name at 0). Returns the remaining count.
 extern "C" int FUN_10169c00(const TextureRef *texture)
 {
     int index = texture->index;
@@ -99,12 +107,14 @@ extern "C" int FUN_10169c00(const TextureRef *texture)
     return DAT_10faae88[index];
 }
 
+// Constructor: clears the two size fields (the rest is set when a texture is loaded).
 MeshInstance::MeshInstance()
 {
     m_0024 = 0;
     m_0020 = 0;
 }
 
+// Releases the Direct3D texture when one was created (device lost).
 int MeshInstance::M_10169df0()
 {
     if (m_0034 != 0)
@@ -112,6 +122,7 @@ int MeshInstance::M_10169df0()
     return 1;
 }
 
+// Re-creates the Direct3D texture from the stored image (after a device reset).
 int MeshInstance::M_10169e10()
 {
     if (m_0034 != 0)
@@ -119,11 +130,13 @@ int MeshInstance::M_10169e10()
     return 1;
 }
 
+// Updates the texture with `value` (FUN_10143870 on the stored image).
 int MeshInstance::M_10169f70(int value)
 {
     return FUN_10143870(m_002c, m_0030, value);
 }
 
+// Sets layer source `a` and value for slot `slot` (at most 16 slots, values up to 0x8f).
 int LayerTable::M_1016a220(int a, int slot, int value)
 {
     if (value > 0x8f)
@@ -137,6 +150,7 @@ int LayerTable::M_1016a220(int a, int slot, int value)
     return 1;
 }
 
+// Sets the (x, y) offset of slot `slot` in layer `layer`.
 int LayerTable::M_1016a260(int layer, int slot, int x, int y)
 {
     if (layer > 0x8f)
@@ -148,6 +162,7 @@ int LayerTable::M_1016a260(int layer, int slot, int x, int y)
     return 1;
 }
 
+// Sets parameter `slot` (0..7) of layer `layer`.
 int LayerTable::M_1016a2a0(int layer, int slot, int value)
 {
     if (layer > 0x8f)
@@ -158,6 +173,7 @@ int LayerTable::M_1016a2a0(int layer, int slot, int value)
     return 1;
 }
 
+// Sets the scene parameter DAT_1101d884 and resets its timer.
 extern "C" int FUN_1016a8a0(int value)
 {
     DAT_1101d884 = value;

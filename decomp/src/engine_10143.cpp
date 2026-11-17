@@ -1,3 +1,5 @@
+// Texture stage helpers and the material slot table of a mesh.
+
 #include "d3d9_min.h"
 
 struct SlotTable
@@ -39,6 +41,7 @@ extern "C" int DAT_10f6550c;
 extern "C" int DAT_10f65510;
 extern "C" int DAT_10f181e0[0x5a0];
 
+// Unbinds texture stage 0 (only when something is bound).
 extern "C" void FUN_10143b50(void)
 {
     if (DAT_10f6550c != 1)
@@ -48,6 +51,7 @@ extern "C" void FUN_10143b50(void)
     }
 }
 
+// Unbinds texture stage 1 (only when something is bound).
 extern "C" void FUN_10143b80(void)
 {
     if (DAT_10f65510 != 1)
@@ -57,12 +61,14 @@ extern "C" void FUN_10143b80(void)
     }
 }
 
+// Constructor: both values 0.
 IntPair::IntPair()
 {
     first = 0;
     second = 0;
 }
 
+// Unbinds texture stages 0..3. Returns 0.
 extern "C" int FUN_101446b0(void)
 {
     FUN_10143b50();
@@ -72,6 +78,7 @@ extern "C" int FUN_101446b0(void)
     return 0;
 }
 
+// Resets the table: no owner (-1), no entries, all pointers cleared.
 void SlotTable::M_10145a10()
 {
     m_0000 = -1;
@@ -91,6 +98,7 @@ void SlotTable::M_10145a10()
     m_0048 = 0;
 }
 
+// Limits later operations to entries first..last-1.
 int SlotTable::M_10146d90(int first, int last)
 {
     m_003c = first;
@@ -98,6 +106,9 @@ int SlotTable::M_10146d90(int first, int last)
     return 1;
 }
 
+// Replaces the material of every entry in range whose current or original material is `key` (or of all
+// entries when key is -1) with `value`. Node::M_1019e830 runs it over a whole model (texture swaps,
+// e.g. costume colours).
 int SlotTable::M_10147690(int key, int value)
 {
     for (int i = m_003c; i < m_0044 && i < m_0040; i++)
@@ -108,6 +119,7 @@ int SlotTable::M_10147690(int key, int value)
     return 0;
 }
 
+// Sets the material of entry `index` (when in range).
 int SlotTable::M_101476e0(int index, int value)
 {
     if (index < m_0044 && index < m_0040)
@@ -115,6 +127,7 @@ int SlotTable::M_101476e0(int index, int value)
     return 0;
 }
 
+// Ages every texture slot by one frame (DAT_10f181e0, used to evict unused textures).
 extern "C" int FUN_10147a00(void)
 {
     for (int i = 0; i < 0x5a0; i++)

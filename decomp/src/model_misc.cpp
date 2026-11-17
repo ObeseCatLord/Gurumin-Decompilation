@@ -222,3 +222,41 @@ void NodeExtra::Init()
     tracks[3].Insert(0, 1.0f, 1.0f, 1.0f, 1.0f);
     tracks[4].Insert(0, 0, 0, 0, 0);
 }
+
+// Sorts `count` keys into ascending order (bubble sort) and applies every swap to the parallel arrays `a` and `b`
+// (either may be 0) and `c`. Used to sort draw lists by depth. Returns 1. Not byte-identical yet: the original keeps
+// count - 1 in a local of its own without unrolling the loop (see open.tsv).
+extern "C" int FUN_10165020(float *keys, int *a, int *b, int *c, int count)
+{
+    int swapped;
+    do
+    {
+        swapped = 0;
+        for (int i = 0; i < count - 1; i++)
+        {
+            if (keys[i] > keys[i + 1])
+            {
+                float key = keys[i];
+                keys[i] = keys[i + 1];
+                keys[i + 1] = key;
+                if (a != 0)
+                {
+                    int t = a[i];
+                    a[i] = a[i + 1];
+                    a[i + 1] = t;
+                }
+                if (b != 0)
+                {
+                    int t = b[i];
+                    b[i] = b[i + 1];
+                    b[i + 1] = t;
+                }
+                int t = c[i];
+                c[i] = c[i + 1];
+                c[i + 1] = t;
+                swapped = 1;
+            }
+        }
+    } while (swapped);
+    return 1;
+}

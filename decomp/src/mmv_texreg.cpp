@@ -18,25 +18,31 @@ struct MovieFile
     MovieFile();
     ~MovieFile();
     void Close();
+    int Read(void *buffer, int size, int count);   // 0x101b23a0
+    int Seek(int offset, int origin);              // 0x101b2380
 };
 
 struct MmvPlayer
 {
-    char pad_0000[0x10];
+    int frameIndex;        // 0x00: number of the next frame
+    char *base;            // 0x04: whole movie in memory (when not streamed from the file)
+    int offset;            // 0x08: offset of the next frame record after the header
+    int size;              // 0x0c: movie size
     int m_0010;
-    char isOpen;
+    char isOpen;           // 0x14: 1 = frames are streamed from `file`
     char pad_0015[3];
     MovieFile file;
     void *m_003c;
     short width;
     short height;
-    char pad_0044[6];
+    char pad_0044[4];
+    short m_0048;          // 0x48: movie type (type 6 shows only its first 7 frames)
     char m_004a;
     char m_004b;
     char m_004c;
     char pad_004d;
     char m_004e[0x202];
-    int m_0250;
+    int m_0250;            // 0x250: header size
     void *frame;           // 0x254: decoded 8-bit frame (palette indexes), updated in place
     unsigned char *data;   // 0x258: compressed data of the current frame
 
@@ -44,11 +50,57 @@ struct MmvPlayer
     ~MmvPlayer();
     void Close();
     int M_10160960(const ClipRect *clip);
-    int M_10160df0();
+    void ReadFrame();
     int M_10160f00();
-    int M_10161050();
+    void M_10161050();
     void DecodeFrameRle(int count);
 };
+
+extern "C" unsigned char DAT_10f68138[0x25800];  // buffer for one streamed frame record
+
+// Reads the next frame record (a 4-byte length and RLE data) from memory or from the file, decodes it into the frame
+// and advances; after the last frame playback starts again from the first one (the file is rewound to 0x406, just
+// after the header). Movies of type 6 stop after 7 frames. Does nothing while the player is not playing (m_004b).
+void MmvPlayer::ReadFrame()
+{
+    if (m_004b != 0 && (m_0048 != 6 || frameIndex < 7))
+    {
+        if (isOpen == 0)
+        {
+            int length = *(int *)(base + m_0250 + offset);
+            data = (unsigned char *)(base + m_0250 + offset + 4);
+            DecodeFrameRle(length);
+            offset += length + 4;
+            frameIndex++;
+            if ((int)(base + offset) >= size)
+            {
+                offset = 0;
+                frameIndex = 0;
+            }
+        }
+        else
+        {
+            int length;
+            file.Read(&length, 1, 4);
+            if (length <= 0x25800 && length > 0)
+            {
+                file.Read(DAT_10f68138, 1, length);
+                data = DAT_10f68138;
+                DecodeFrameRle(length);
+                offset += length + 4;
+                frameIndex++;
+            }
+            else
+                offset += size;
+            if (offset >= size)
+            {
+                offset = 0;
+                frameIndex = 0;
+                file.Seek(0x406, 0);
+            }
+        }
+    }
+}
 
 struct TextureSlot
 {
@@ -122,11 +174,12 @@ int MmvPlayer::M_10160960(const ClipRect *clip)
 }
 
 // Decodes the next frame (looping or one-shot variant depending on m_0010).
-int MmvPlayer::M_10161050()
+void MmvPlayer::M_10161050()
 {
     if (m_0010 != 0)
-        return M_10160df0();
-    return M_10160f00();
+        ReadFrame();
+    else
+        M_10160f00();
 }
 
 // Binds texture slot `index` to stage 0 (a negative index unbinds). Returns the index or -1.

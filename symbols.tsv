@@ -591,3 +591,6 @@ address	name	evidence
 1005f530	Switch_TurnOn	turns a kind 0x13/0x14 switch on (decomp/src/switches.cpp)
 1005f640	Switch_TurnOff	turns a kind 0x13/0x14 switch back (decomp/src/switches.cpp)
 100016c0	SoundArc_PlayFile	plays a sound file once through soundarc.dll (decomp/src/soundarc.cpp)
+10160df0	MmvPlayer::ReadFrame	matched decompiled source (decomp/obj_symbols.tsv)
+10034810	SmoothApproach	recursively moves a value 55% towards a target (decomp/src/group_tables.cpp)
+10165020	SortByDepth	bubble sort of float keys with parallel arrays (decomp/src/model_misc.cpp)

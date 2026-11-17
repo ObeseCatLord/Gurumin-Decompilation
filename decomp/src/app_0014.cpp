@@ -12,7 +12,7 @@ struct MoviePlayer
     int pad_0000[3];
     int m_000c;
     int M_10160a90(const char *path);
-    int M_10161050();
+    void M_10161050();
     int M_10160960(const TextureObject *target);
 };
 

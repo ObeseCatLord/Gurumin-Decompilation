@@ -206,3 +206,4 @@ _Vec3_Length	101ae890
 ?IsClearOfMap@AnimModel@@QAEHPBUVec4@@@Z	101642c0
 ?IsClearOfMapLimited@AnimModel@@QAEHPBUVec4@@@Z	101641b0
 ?Hold@AnimModel@@QAEHHMPAU1@@Z	10163d60
+?ReadFrame@MmvPlayer@@QAEXXZ	10160df0

@@ -110,3 +110,39 @@ extern "C" int FUN_1001c410(int value, const Matrix4 *matrix, int *outChar, int 
     }
     return 0;
 }
+
+// Moves `current` 55 % of the way towards `target`, halving `steps` each time (as an integer), and repeats until
+// one step or less is left; the result goes to *out. With `first` set, fewer than 2 steps store `current`
+// unchanged. Returns 0.
+extern "C" int FUN_10034810(float target, float current, float *out, float steps, int first)
+{
+    if (first != 0 && steps < 2.0f)
+    {
+        *out = current;
+        return 0;
+    }
+    if (target > current)
+    {
+        current = (target - current) * 0.55f + current;
+        steps = steps * 0.5f;
+        steps = (float)(int)steps;
+        if (steps <= 1.0f)
+        {
+            *out = current;
+            return 0;
+        }
+    }
+    else
+    {
+        current = (current - target) * 0.55f + target;
+        steps = steps * 0.5f;
+        steps = (float)(int)steps;
+        if (steps <= 1.0f)
+        {
+            *out = current;
+            return 0;
+        }
+    }
+    FUN_10034810(target, current, out, steps, 0);
+    return 0;
+}

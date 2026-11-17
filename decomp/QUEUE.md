@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (54)
+## 1. Walls to retry (55)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -46,6 +46,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10163f90` 256 — see 10163e90
 - [ ] `101640b0` 253 — see 10163e90
 - [ ] `101649c0` 213 — lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
+- [ ] `10165020` 272 — bubble sort: ours stores count-1 in the dead parameter slot, the original in a separate local; a named local makes cl 13.00 unroll the inner loop by 4 (local inside/outside the loop, early return tried)
 - [ ] `10166870` 52 — same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
 - [ ] `10167390` 104 — AnimModel timed value setup: the rounded int-to-float temporary lands in the id parameter slot in ours, the value slot in the original
 - [ ] `10169720` 40 — memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
@@ -129,22 +130,19 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (237)
+## 3. Medium functions (251-800 bytes) (234)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
 - [ ] `100bcb30` 259 bytes (calls 17)
-- [ ] `10034810` 260 bytes (float, calls 3)
 - [ ] `10002330` 262 bytes (loops 6)
 - [ ] `10001980` 263 bytes (calls 13)
 - [ ] `10010310` 263 bytes (float, calls 8)
 - [ ] `10191ec0` 263 bytes (float, loops 3, calls 3)
 - [ ] `101acd90` 263 bytes (float, calls 8)
-- [ ] `10160df0` 264 bytes (calls 5)
 - [ ] `10054a60` 270 bytes (loops 1, calls 3)
 - [ ] `1015c850` 270 bytes Frame_PumpAndRecover (loops 3, calls 12)
 - [ ] `1003a6c0` 271 bytes (loops 1, calls 11)
-- [ ] `10165020` 272 bytes (float, loops 2)
 - [ ] `10150a90` 273 bytes (calls 13)
 - [ ] `101adf40` 273 bytes (float, calls 1)
 - [ ] `100165e0` 275 bytes (calls 3)

@@ -1,5 +1,8 @@
+// Game menu state (see app_0006.cpp for the window slots) and helpers.
+
 #include "game.h"
 
+// 1 while any menu window is open or still animating (more than 16 frames into its open animation).
 int Game::M_10007ee0()
 {
     for (int i = 0; i < 3; i++)
@@ -12,6 +15,7 @@ int Game::M_10007ee0()
     return 0;
 }
 
+// Closes all three menu windows and clears their item tables.
 void Game::M_100082e0()
 {
     for (int i = 0; i < 3; i++)
@@ -24,6 +28,7 @@ void Game::M_100082e0()
     }
 }
 
+// Sets menu `id`'s callback value m_7654. 0 when not open.
 int Game::M_10008390(int id, int value)
 {
     int slot = FindSlot(id);
@@ -33,6 +38,7 @@ int Game::M_10008390(int id, int value)
     return 1;
 }
 
+// Marks menu `id` as confirmed (m_00ec). 0 when not open.
 int Game::M_10008460(int id)
 {
     int slot = FindSlot(id);
@@ -42,6 +48,7 @@ int Game::M_10008460(int id)
     return 1;
 }
 
+// Sets menu `id`'s m_0128 value (the first visible line offset).
 int Game::M_10008770(int id, int value)
 {
     int slot = FindSlot(id);
@@ -50,6 +57,7 @@ int Game::M_10008770(int id, int value)
     return 0;
 }
 
+// Sets menu `id`'s last item index (count - 1).
 int Game::M_100087b0(int id, int count)
 {
     int slot = FindSlot(id);
@@ -65,6 +73,8 @@ struct Callee
 
 typedef void (Callee::*CalleeMethod)();
 
+// The compiler's "vector constructor iterator": calls `method` on each of `count` objects spaced `stride`
+// bytes apart (used for arrays of objects with constructors).
 extern "C" void __stdcall FUN_10004650(char *object, int stride, int count, CalleeMethod method)
 {
     while (--count >= 0)
@@ -83,6 +93,7 @@ struct Latch
     int M_1000b9c0();
 };
 
+// Toggles a 30-frame latch when in state 10: 0 -> 30, 30 -> 0.
 int Latch::M_1000b9c0()
 {
     if (m_0014 == 10)

@@ -1,5 +1,13 @@
+// Anti-cheat guards (docs/MODDING_MAP.md "Anti-cheat").
+// The game keeps disguised copies of important values (player stats, money, costume id, inventory counts) in
+// DAT_104684b0: copy[i] = ~value + i * 0x41. Every frame the checker compares the copies with the real values;
+// a mismatch (a memory editor changed a value) drops random noise into the table DAT_104c0270, which later code
+// reads to corrupt the game quietly. Mods that change these values must call AntiTamper_StoreArrays afterwards,
+// or patch the checker.
+
 #include <stdlib.h>
 
+// Player stats record at 0x10daaae8 (hp, max hp, money, two more guarded values).
 struct PlayerRecord
 {
     int m_0000;
@@ -20,8 +28,10 @@ extern "C" int DAT_10c655f0;
 extern "C" int DAT_10c6670c;
 extern "C" int DAT_104684b0[115];
 
+// Disguised copy of `value` stored in guard slot `index`.
 #define GUARD_VALUE(index, value) (~(value) + (index) * 0x41)
 
+// AntiTamper_StoreValues: refreshes the guard copies of the ten single values (slots 0..9).
 extern "C" int FUN_1000e750(void)
 {
     DAT_104684b0[0] = GUARD_VALUE(0, DAT_10daaae8.m_001c);
@@ -40,6 +50,8 @@ extern "C" int FUN_1000e750(void)
 extern "C" char DAT_103150c0[0x50];
 extern "C" int DAT_10c66144[15];
 
+// AntiTamper_StoreArrays: refreshes the copies of the 0x50 inventory counts (slots 10..89) and of 15 more
+// values (slots 100..114). Called after every inventory change.
 extern "C" int FUN_1000e810(void)
 {
     int i;
@@ -56,12 +68,15 @@ extern "C" short DAT_104c034c;
 extern "C" int DAT_11b044f0;
 extern "C" unsigned int DAT_104bf890;
 
+// Penalty: writes a random value into a random entry of the 16-entry noise table.
 inline void TAMPER()
 {
     int noise = rand();
     DAT_104c0270[rand() % 16] = noise;
 }
 
+// AntiTamper_Check: counts frames, penalises an active debugger flag, compares every guard copy with its value
+// (hp and max hp mismatches are also counted in DAT_104c0344) and every 30 frames checks the array copies.
 extern "C" int FUN_1000e870(void)
 {
     DAT_104c034c++;

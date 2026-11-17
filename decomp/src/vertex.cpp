@@ -1,3 +1,6 @@
+// Vertex record (28 floats = 112 bytes): position (x, y, z, 1), normal (+1 pad), colour RGBA, texture
+// coordinates and the remaining blend/texture fields.
+
 struct Vertex
 {
     float v[28];
@@ -5,6 +8,7 @@ struct Vertex
     void Set(float x, float y, float z, float nx, float ny, float nz, float u, float t, float r, float g, float b, float a);
 };
 
+// Sets the position and resets everything else: normal (0, 0, 1), white colour, zero UVs.
 void Vertex::SetPosition(float x, float y, float z)
 {
     v[0] = x;
@@ -37,6 +41,7 @@ void Vertex::SetPosition(float x, float y, float z)
     v[27] = 0;
 }
 
+// Sets position, normal, colour and the first texture coordinates in one call.
 void Vertex::Set(float x, float y, float z, float nx, float ny, float nz, float u, float t, float r, float g, float b, float a)
 {
     v[0] = x;

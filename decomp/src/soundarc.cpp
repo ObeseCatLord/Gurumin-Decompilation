@@ -1,3 +1,7 @@
+// Messages to soundarc.dll, the separate sound process (docs/MODDING_MAP.md "Sound architecture").
+// Every command is SendMessage(soundarc window, WM_USER, code, value); arguments are sent first with codes 0 and 1.
+// DAT_1020aee4 = sound enabled.
+
 #include <windows.h>
 #include <stdio.h>
 
@@ -5,6 +9,7 @@ extern "C" int DAT_1020aee4;
 extern "C" char DAT_1020ade0[];
 extern "C" HWND FUN_10001570(void);
 
+// Command 0x230 with two arguments.
 extern "C" LRESULT FUN_10001660(int first, int second)
 {
     if (DAT_1020aee4 == 0)
@@ -19,6 +24,7 @@ extern "C" LRESULT FUN_10001660(int first, int second)
     return 0;
 }
 
+// Command 0x201: stop stream `value`.
 extern "C" LRESULT FUN_10001ba0(int value)
 {
     if (DAT_1020aee4 == 0)
@@ -32,6 +38,7 @@ extern "C" LRESULT FUN_10001ba0(int value)
     return 0;
 }
 
+// Command 0x212: fade out stream `first` over `second` ms.
 extern "C" LRESULT FUN_10001bf0(int first, int second)
 {
     if (DAT_1020aee4 == 0)
@@ -46,6 +53,7 @@ extern "C" LRESULT FUN_10001bf0(int first, int second)
     return 0;
 }
 
+// Command 0x224 with one value.
 extern "C" LRESULT FUN_10001c50(LPARAM param)
 {
     if (DAT_1020aee4 != 0)
@@ -57,6 +65,7 @@ extern "C" LRESULT FUN_10001c50(LPARAM param)
     return 0;
 }
 
+// Command 0x225 with one value.
 extern "C" LRESULT FUN_10001c80(LPARAM param)
 {
     if (DAT_1020aee4 != 0)
@@ -68,6 +77,8 @@ extern "C" LRESULT FUN_10001c80(LPARAM param)
     return 0;
 }
 
+// SoundArc_Init: remembers where soundarc.dll is (`dir`, or the current folder) and starts it when `enable`.
+// Returns 1 when its window was found or started.
 extern "C" int FUN_10001ee0(int enable, const char *dir)
 {
     if (dir != 0)
@@ -78,6 +89,7 @@ extern "C" int FUN_10001ee0(int enable, const char *dir)
     return FUN_10001570() != 0;
 }
 
+// Shuts the sound process down (WM_CLOSE to its window).
 extern "C" int FUN_10001f30(void)
 {
     if (DAT_1020aee4 != 0)

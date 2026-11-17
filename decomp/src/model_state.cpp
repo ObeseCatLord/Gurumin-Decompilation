@@ -1,3 +1,5 @@
+// Model playback state.
+
 #include <string.h>
 
 struct NodeLink
@@ -62,6 +64,7 @@ struct Playback
 
 extern "C" NodeLink *DAT_10faaa88[0x100];
 
+// Clears the m_00a8 flag of every loaded model in the 0x100-entry model table DAT_10faaa88.
 extern "C" int FUN_101619a0(void)
 {
     for (int i = 0; i < 0x100; i++)
@@ -72,6 +75,7 @@ extern "C" int FUN_101619a0(void)
     return 0;
 }
 
+// Constructor (see anim_channels.cpp for why callers treat it as throw()).
 ModelState::ModelState()
 {
     m_002c = 0;
@@ -99,6 +103,8 @@ ModelState::ModelState()
     m_0020 = 0;
 }
 
+// Binds the playback to `node` and resets it to the start; the frame count is taken from the node when it has
+// more than 8 frames (shorter or missing animations play as 0 frames). Returns 1.
 int Playback::M_1016a090(SceneNode *node)
 {
     m_001c = -1;

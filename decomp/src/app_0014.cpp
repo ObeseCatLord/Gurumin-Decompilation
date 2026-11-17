@@ -1,3 +1,5 @@
+// Movies, packed script variables and the seasonal check.
+
 #include <windows.h>
 
 struct TextureObject
@@ -22,6 +24,8 @@ extern "C" int DAT_104bfe74;
 extern "C" int DAT_104bfe70;
 extern "C" int DAT_10c62edc[0x1000];
 
+// Movie_PlayToTexture: opens movie `name` (folder 0) in the movie player DAT_10f08ab0, decodes the first frame
+// into the texture slot DAT_10202478 and records the movie's frame count. Returns 1.
 extern "C" int FUN_10016580(const char *name)
 {
     DAT_10f08ab0.M_10160a90(FUN_1013f8a0(name, 0));
@@ -32,6 +36,8 @@ extern "C" int FUN_10016580(const char *name)
     return 1;
 }
 
+// Script_UnpackVar: when script global `index` holds a packed pair (low nibble = 1), returns 1 and unpacks
+// bits 5..12 into *low (0..0x80) and bits 13..20 into *high (0..0xff); returns 0 otherwise.
 extern "C" int FUN_10017b10(int index, int *high, int *low)
 {
     int value = DAT_10c62edc[index];
@@ -48,6 +54,8 @@ extern "C" int FUN_10017b10(int index, int *high, int *low)
     return 0;
 }
 
+// 0x1001d850: reads the PC clock. Returns 1 on Christmas (Dec 25, or Dec 24 after 18:00), 2 on January 1-3,
+// else 0. Seasonal content (and costume 7, see MODDING_MAP) depends on it; hook it to force an event.
 int SeasonalEvent()
 {
     SYSTEMTIME now;

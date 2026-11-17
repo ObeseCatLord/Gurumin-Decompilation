@@ -1046,48 +1046,34 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `101a8760` 19 bytes (src/scene_node.cpp)
 - [ ] `101ab980` 75 bytes (src/scene_node.cpp)
 
-## 7. Comment pass (38 files)
+## 7. Comment pass (24 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
 - [ ] `src/anim_model.cpp`: 12 of 12 functions without a comment, no header
-- [ ] `src/anti_tamper.cpp`: 4 of 4 functions without a comment, no header
 - [ ] `src/app_0001.cpp`: 6 of 6 functions without a comment, no header
 - [ ] `src/app_0002.cpp`: 8 of 8 functions without a comment, no header
-- [ ] `src/app_0004.cpp`: 8 of 8 functions without a comment, no header
 - [ ] `src/app_0005.cpp`: 6 of 6 functions without a comment, no header
 - [ ] `src/app_0008.cpp`: 7 of 7 functions without a comment, no header
 - [ ] `src/app_0009.cpp`: 8 of 8 functions without a comment, no header
 - [ ] `src/app_0010.cpp`: 9 of 9 functions without a comment, no header
-- [ ] `src/app_0012.cpp`: 6 of 6 functions without a comment, no header
-- [ ] `src/app_0013.cpp`: 5 of 5 functions without a comment, no header
-- [ ] `src/app_0014.cpp`: 3 of 3 functions without a comment, no header
 - [ ] `src/buffer_pool.cpp`: 8 of 8 functions without a comment, no header
 - [ ] `src/camera.cpp`: 11 of 11 functions without a comment, no header
 - [ ] `src/containers.cpp`: 25 of 25 functions without a comment, no header
-- [ ] `src/enemy_ai.cpp`: 4 of 4 functions without a comment, no header
-- [ ] `src/engine_1013e.cpp`: 9 of 9 functions without a comment, no header
 - [ ] `src/engine_10143.cpp`: 9 of 9 functions without a comment, no header
-- [ ] `src/engine_base.cpp`: 6 of 6 functions without a comment, no header
 - [ ] `src/ime.cpp`: 21 of 21 functions without a comment, no header
-- [ ] `src/input_font.cpp`: 2 of 2 functions without a comment, no header
 - [ ] `src/listbank.cpp`: 7 of 7 functions without a comment, no header
 - [ ] `src/menu_textures.cpp`: 2 of 3 functions without a comment, no header
 - [ ] `src/mesh_cache.cpp`: 12 of 12 functions without a comment, no header
 - [ ] `src/mmv_texreg.cpp`: 10 of 10 functions without a comment, no header
 - [ ] `src/model_misc.cpp`: 10 of 10 functions without a comment, no header
-- [ ] `src/model_state.cpp`: 3 of 3 functions without a comment, no header
-- [ ] `src/render_queue.cpp`: 1 of 1 functions without a comment, no header
 - [ ] `src/save_slot.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/scene_misc.cpp`: 9 of 9 functions without a comment, no header
 - [ ] `src/scene_node.cpp`: 54 of 54 functions without a comment, no header
-- [ ] `src/soundarc.cpp`: 7 of 7 functions without a comment, no header
 - [ ] `src/texcache.cpp`: 10 of 10 functions without a comment, no header
 - [ ] `src/texture_mgr.cpp`: 14 of 14 functions without a comment, no header
-- [ ] `src/vertex.cpp`: 2 of 2 functions without a comment, no header
 - [ ] `src/visibility.cpp`: 2 of 2 functions without a comment, no header
-- [ ] `src/wall_flags.cpp`: 3 of 3 functions without a comment, no header
 - [ ] `src/window_create.cpp`: 4 of 4 functions without a comment, no header
 
 ## 8. Structures and globals

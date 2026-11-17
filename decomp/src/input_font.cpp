@@ -1,3 +1,5 @@
+// DirectInput shutdown and Windows font cleanup.
+
 #include <windows.h>
 
 struct ComObject
@@ -45,6 +47,7 @@ struct FontSet
 extern "C" ComObject *DAT_10f65578;
 extern "C" void (*DAT_11b1ba40)(void *);
 
+// Unacquires and releases the keyboard, mouse and joystick devices and the DirectInput object.
 int Input::Shutdown()
 {
     if (DAT_10f65578 != 0)
@@ -78,6 +81,7 @@ int Input::Shutdown()
     return 0;
 }
 
+// Frees the font buffers, deletes the three GDI fonts and frees the 32 cached glyph bitmaps.
 int FontSet::Release()
 {
     if (buffer != 0)

@@ -1,3 +1,5 @@
+// Message window, sound effects, inventory removal, animation playback.
+
 #include <string.h>
 
 struct AnimNode
@@ -38,6 +40,7 @@ extern "C" int DAT_104c01e4;
 extern "C" int DAT_104c01e0;
 extern "C" char DAT_10db6f5e;
 
+// Opens the message window with `text` (and an optional second line) for `frames` frames.
 extern "C" int FUN_1000ed70(const char *text, const char *subtext, int frames)
 {
     DAT_104bfd4c = frames;
@@ -52,6 +55,7 @@ extern "C" int FUN_1000ed70(const char *text, const char *subtext, int frames)
     return 1;
 }
 
+// Plays sound file `name` from the music folder: looping (FUN_10001980) or once (FUN_100016c0), at `volume`.
 extern "C" void FUN_10010420(const char *name, int, int, int loop, int volume)
 {
     if (loop != 0)
@@ -60,6 +64,8 @@ extern "C" void FUN_10010420(const char *name, int, int, int loop, int volume)
         FUN_100016c0(FUN_1013f910(name), 0, 0, 0, 0, 0, volume);
 }
 
+// Resets the battle/HUD state for a new scene and, when the combo counter reached 0x45 or more, triggers the
+// combo-finish effect (FUN_1000ec70 with full white).
 extern "C" int FUN_100114a0(void)
 {
     DAT_10468128 = 0;
@@ -83,6 +89,8 @@ extern "C" int FUN_100114a0(void)
     return 0;
 }
 
+// Inventory_Remove: takes *amount of item *index. When there are not enough, takes all and returns 0 with
+// *amount = -taken; otherwise returns 1 and clears *amount. Refreshes the anti-tamper copies.
 extern "C" int FUN_100120a0(const int *index, int *amount)
 {
     signed char stock = DAT_103150c0[*index];
@@ -101,6 +109,7 @@ extern "C" int FUN_100120a0(const int *index, int *amount)
     return 1;
 }
 
+// Plays `node`'s animation forwards or backwards (reverse) and remembers it as the current UI animation.
 extern "C" int FUN_100158b0(AnimNode *node, int reverse)
 {
     DAT_104c01dc = node;

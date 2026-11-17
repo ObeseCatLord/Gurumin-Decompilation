@@ -1,3 +1,10 @@
+// Enemy AI updaters, one per enemy kind, called once per frame per enemy.
+// Pattern: skip while the enemy is busy (Enemy_IsBusy 0x100e1c40, e.g. stunned or hit), then run the current
+// behaviour (CharState::m_0000: 0, 1, 2) and mark it finished (-1) when the behaviour function reports done.
+// In the finished/idle state a short delay counter (m_0004[2]) runs and a picker (ai_pick.cpp) chooses the next
+// behaviour. Each updater combines different move functions (walk towards the player, jump, charge, ...).
+// Not byte-identical yet: the original keeps 0 in ebx for the switch and stores (see open.tsv).
+
 #include "world.h"
 
 extern "C" int FUN_100e1c40(int index);
@@ -13,6 +20,7 @@ extern "C" int FUN_100279b0(int index, int a, int b);
 extern "C" int FUN_10027da0(int index, int a);
 extern "C" int FUN_10028360(int index, int a);
 
+// Kind A: 0 = approach within 300 units (FUN_10026d80), 1 = FUN_10027560, 2 = FUN_10028360(2); picker A.
 extern "C" int FUN_100e2080(int index)
 {
     if (FUN_100e1c40(index) != 0)
@@ -45,6 +53,7 @@ extern "C" int FUN_100e2080(int index)
     return 0;
 }
 
+// Kind B: 0 = FUN_10028360(2), 1 = FUN_100279b0(4, 0), 2 = FUN_10027630(0); picker B.
 extern "C" int FUN_100e2110(int index)
 {
     if (FUN_100e1c40(index) != 0)
@@ -77,6 +86,7 @@ extern "C" int FUN_100e2110(int index)
     return 0;
 }
 
+// Kind C (see source for its move set).
 extern "C" int FUN_100e2440(int index)
 {
     if (FUN_100e1c40(index) != 0)
@@ -109,6 +119,7 @@ extern "C" int FUN_100e2440(int index)
     return 0;
 }
 
+// Kind D (see source for its move set).
 extern "C" int FUN_100e24d0(int index)
 {
     if (FUN_100e1c40(index) != 0)

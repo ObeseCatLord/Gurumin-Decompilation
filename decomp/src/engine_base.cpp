@@ -1,3 +1,5 @@
+// Engine base class and small engine entry points.
+
 #include <stdlib.h>
 
 struct Object
@@ -28,30 +30,38 @@ extern "C" int DAT_104c0198;
 extern "C" int DAT_104c00d0;
 extern "C" Character DAT_10db6ed8[0x80];
 
+// Empty base class constructor.
 Object::Object()
 {
 }
 
+// 0x1013eda0: empty destructor. The linker folded every identical empty destructor into this one
+// (Matrix4, Object, ...), which is why many unrelated classes point here.
 Object::~Object()
 {
 }
 
+// Stub that always returns 0 (an engine hook the game does not use).
 extern "C" int FUN_1013edb0(void)
 {
     return 0;
 }
 
+// Stub that always returns 1.
 extern "C" int FUN_1013eed0(void)
 {
     return 1;
 }
 
+// Engine shutdown step: calls the engine library cleanup (0x101b21c0).
 extern "C" int FUN_1013e6d0(void)
 {
     FUN_101b21c0();
     return 1;
 }
 
+// Starts the game-over sequence: plays sound effect 0x355, lowers the music unless muted (DAT_104c01b0),
+// stores `value`, sets the scene timer and plays the player's defeat motion (0x59).
 extern "C" int FUN_1003b670(int value)
 {
     FUN_1003ad20(0x355, 0, 1.0f);

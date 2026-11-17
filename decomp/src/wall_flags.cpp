@@ -1,3 +1,7 @@
+// Map-specific invisible walls. Some maps contain probe nodes named kabe_atari_<dir> ("wall hit", one per
+// compass direction) and wall nodes wall_<dir>; a wall is made solid (node flag 0x20) while the player's
+// movement touches its probe.
+
 struct Vec4
 {
     float x;
@@ -21,6 +25,8 @@ extern "C" Vec4 DAT_118e6cb8;
 extern "C" int DAT_10c62ed0;
 extern "C" int DAT_10c63370;
 
+// Makes `wallName` solid while the player (position DAT_118e69e8, velocity DAT_118e6cb8) touches the probe
+// node `probeName`, and passable otherwise.
 static __forceinline void UpdateWall(const char *probeName, const char *wallName, Vec4 *hit)
 {
     Node *probe = DAT_10255f08->Find(probeName, 0);
@@ -34,6 +40,7 @@ static __forceinline void UpdateWall(const char *probeName, const char *wallName
     }
 }
 
+// Clears the visible flag (4) of node `name`.
 static __forceinline void HideNode(const char *name)
 {
     Node *node = DAT_10255f08->Find(name, 0);
@@ -41,6 +48,8 @@ static __forceinline void HideNode(const char *name)
         node->ClearFlags(4);
 }
 
+// Updates the four walls of the current map. On map 0x18 it also hides the four probe meshes once
+// (DAT_10c63370 remembers that this was done).
 extern "C" int FUN_100182a0(void)
 {
     Vec4 hit;

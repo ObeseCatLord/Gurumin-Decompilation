@@ -1,3 +1,6 @@
+// Queue of nodes to draw this frame (up to 0x40 entries). Each entry stores the node, flags, two vectors,
+// the current light colour and optional 0x80-byte extra data and matrix (each pool holds up to 0x30).
+
 struct Vec4
 {
     float x;
@@ -38,6 +41,9 @@ extern "C" int DAT_10f655c4;
 extern "C" Vec4 DAT_10f66948;
 extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);
 
+// RenderQueue_Push: appends `node` with its parameters. The extra data and matrix are copied into their pools
+// and the entry stores their index (0xff = none). Full queues keep overwriting the last entry.
+// Not byte-identical yet (see open.tsv).
 extern "C" int FUN_10199880(Node *node, const void *extra, const Matrix4 *matrix, const Vec4 *a, const Vec4 *b, char flags)
 {
     DAT_11b00070[DAT_11b044d0] = node;

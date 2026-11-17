@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (50)
+## 1. Walls to retry (53)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -41,6 +41,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161200` 167 — Bmp_FlipVertical: VS2003 turns the step-3 inner loop into a precomputed trip count (mul 0xaaaaaaab); cl 13.00 keeps the index compare
 - [ ] `101614c0` 259 — ItmScramble: frame and table layout match (table declared before key); original keeps the sum in ebp and the xor in memory, ours the other way round
 - [ ] `101615d0` 264 — ItmDescramble: same register residue as 0x101614c0
+- [ ] `10163e90` 253 — AnimModel::IsClear (and 101640b0, 10163f90): frame identical; the original builds every argument in edx and loads root into ecx before the compare, cl 13.00 here alternates ecx/edx (compare order, local pointer, nested if tried)
+- [ ] `10163f90` 256 — see 10163e90
+- [ ] `101640b0` 253 — see 10163e90
 - [ ] `101649c0` 213 — lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
 - [ ] `10166870` 52 — same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
 - [ ] `10167390` 104 — AnimModel timed value setup: the rounded int-to-float temporary lands in the id parameter slot in ours, the value slot in the original
@@ -125,15 +128,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (247)
+## 3. Medium functions (251-800 bytes) (244)
 
 - [ ] `101642c0` 252 bytes (loops 1, calls 7)
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
-- [ ] `10163e90` 253 bytes (loops 3, calls 5)
-- [ ] `101640b0` 253 bytes (loops 3, calls 5)
 - [ ] `101641b0` 255 bytes (loops 1, calls 7)
 - [ ] `100016c0` 256 bytes (calls 13)
-- [ ] `10163f90` 256 bytes (loops 3, calls 5)
 - [ ] `10163d60` 257 bytes (float, calls 8)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
 - [ ] `1005f530` 259 bytes (calls 6)

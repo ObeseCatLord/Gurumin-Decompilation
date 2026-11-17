@@ -12,6 +12,7 @@ struct Vec4
     void Copy(const Vec4 &source);
     Vec4 operator-(const Vec4 &other) const;
     float LengthSquared3();  // 0x101ac6a0
+    void Fill(const float &value);
 };
 
 struct Matrix4
@@ -23,6 +24,21 @@ struct Matrix4
 // 0x101ae060: transforms `point` by `matrix` and divides by w (projection to -1..1 screen space).
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);
 
+// Model table (anim_model.cpp: DAT_10faaa88): the loaded models, each with its collision state in m_00a8.
+struct LoadedModel
+{
+    char pad_0000[0xa8];
+    int m_00a8;               // non-zero while the model takes part in collision
+};
+
+extern "C" LoadedModel *DAT_10faaa88[0x100];
+extern "C" int DAT_10ff19e8[0x100];   // per model: its collision data
+
+// Collision test of a model (world matrix) against another model: 0x10193140 (stdcall, recursive over nodes).
+extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, LoadedModel *other, int otherData, Vec4 *probe, int count,
+                                      int *hitCount, int *hitIds, Vec4 *hits, int *hitOther, int mode, int a, int b,
+                                      int c, int flags);
+
 struct AnimModel
 {
     char pad_0000[0x84];
@@ -31,7 +47,9 @@ struct AnimModel
     float scale;
     char pad_02a0[0x1ffc];
     int m_229c;                  // 0x229c: blend frames, 8 when unset
-    char pad_22a0[0x88];
+    char pad_22a0[0x4c];
+    LoadedModel *root;           // 0x22ec: this model's own entry in the model table
+    char pad_22f0[0x38];
     Matrix4 world;               // 0x2328: world matrix (translation = position)
     char pad_2368[4];
     float motionSpeed;           // 0x236c: current motion playback speed (at most 60)
@@ -65,6 +83,9 @@ struct AnimModel
     int SnapHeadingToSide();
     int ScreenPosition(int *x, int *y, const Matrix4 &viewProjection);
     int Push(float x, float y, float z);
+    int IsClear(const Vec4 *offset);
+    int IsClearAny(const Vec4 *offset);
+    int IsClearFlagged(const Vec4 *offset);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -254,4 +275,83 @@ int AnimModel::Push(float x, float y, float z)
         push.y = y * 0.55f;
     }
     return 0;
+}
+
+// 1 when the model, moved by `offset` (0 = not moved), touches none of the other loaded models (collision test
+// mode -1). Not byte-identical yet (with IsClearAny and IsClearFlagged): the original builds the arguments in edx
+// only, ours alternates ecx and edx (see open.tsv).
+int AnimModel::IsClear(const Vec4 *offset)
+{
+    Vec4 probe[2];
+    if (offset != 0)
+        probe[0].Copy(*offset);
+    else
+    {
+        float zero = 0;
+        probe[0].Fill(zero);
+    }
+    Vec4 hits[0x40];
+    int hitOther = 0;
+    int hitCount = 0;
+    int hitIds[0x40];
+    for (int i = 0; i < 0x100; i++)
+    {
+        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->m_00a8 != 0)
+        {
+            if (FUN_10193140(&world, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther,
+                             -1, 0, 0, 0, 0) != 0)
+                return 0;
+        }
+    }
+    return 1;
+}
+
+// Same as IsClear with collision test mode 0.
+int AnimModel::IsClearAny(const Vec4 *offset)
+{
+    Vec4 probe[2];
+    if (offset != 0)
+        probe[0].Copy(*offset);
+    else
+    {
+        float zero = 0;
+        probe[0].Fill(zero);
+    }
+    Vec4 hits[0x40];
+    int hitOther = 0;
+    int hitCount = 0;
+    int hitIds[0x40];
+    for (int i = 0; i < 0x100; i++)
+    {
+        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->m_00a8 != 0 &&
+            FUN_10193140(&world, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, 0,
+                         0, 0, 0, 0) != 0)
+            return 0;
+    }
+    return 1;
+}
+
+// Same as IsClear, testing only nodes with flag 0x400.
+int AnimModel::IsClearFlagged(const Vec4 *offset)
+{
+    Vec4 probe[2];
+    if (offset != 0)
+        probe[0].Copy(*offset);
+    else
+    {
+        float zero = 0;
+        probe[0].Fill(zero);
+    }
+    Vec4 hits[0x40];
+    int hitOther = 0;
+    int hitCount = 0;
+    int hitIds[0x40];
+    for (int i = 0; i < 0x100; i++)
+    {
+        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->m_00a8 != 0 &&
+            FUN_10193140(&world, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, -1,
+                         0, 0, 0, 0x400) != 0)
+            return 0;
+    }
+    return 1;
 }

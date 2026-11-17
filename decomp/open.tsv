@@ -50,3 +50,6 @@ address	status	reason
 1015fb20	open	IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 10054550	open	delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 100143f0	open	helmet attach: 8 bytes; when Bip01 Head is missing the original returns through the shared epilogue with eax still 0 from Find, ours emits its own xor eax,eax / epilogue (return 0, return head, result-variable forms tried)
+10163e90	open	AnimModel::IsClear (and 101640b0, 10163f90): frame identical; the original builds every argument in edx and loads root into ecx before the compare, cl 13.00 here alternates ecx/edx (compare order, local pointer, nested if tried)
+101640b0	open	see 10163e90
+10163f90	open	see 10163e90

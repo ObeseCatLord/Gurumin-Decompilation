@@ -199,3 +199,6 @@ _Vec3_Length	101ae890
 ?ClearSpecialPassOnLinks@Node@@QAEHXZ	1019d6a0
 ?StartProximityPass@Node@@QAEHPAMPAUMatrix@@HMH@Z	101a2370
 ?Init@NodeExtra@@QAEXXZ	10169660
+?IsClear@AnimModel@@QAEHPBUVec4@@@Z	10163e90
+?IsClearAny@AnimModel@@QAEHPBUVec4@@@Z	101640b0
+?IsClearFlagged@AnimModel@@QAEHPBUVec4@@@Z	10163f90

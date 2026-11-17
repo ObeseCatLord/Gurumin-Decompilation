@@ -10,6 +10,7 @@ struct Vec3
 struct CharModel
 {
     void M_1017b0e0(int motion, int a, int b, float speed);
+    int M_10162420(int a, int b, int c);
     int M_1017aeb0(const char *path);
     void M_101630b0(float value);
     void M_10162610(float x, float y, float z);
@@ -23,8 +24,10 @@ struct Character
     int id;
     char pad_0004[0xc];
     CharModel model;
-    char pad_0011[0x22eb];
-    int m_22fc;
+    char pad_0011[0xd4b];
+    float m_0d5c;             // 0xd5c: 1.0 when spawned (model alpha or scale)
+    char pad_0d60[0x159c];
+    struct RootNode *m_22fc;  // 0x22fc: root node of the model (0x22ec inside CharModel)
     char pad_2300[0x68];
     Vec3 m_2368;
     char pad_2374[0x28];

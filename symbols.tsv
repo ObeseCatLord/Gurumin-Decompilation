@@ -270,3 +270,4 @@ address	name	evidence
 10189000	WorldRenderer::Seek	matched decompiled source (decomp/obj_symbols.tsv)
 10191c30	Node::FindPrefixRecursive	matched decompiled source (decomp/obj_symbols.tsv)
 1017aeb0	SceneOwner::LoadModel	matched decompiled source (decomp/obj_symbols.tsv)
+10162390	SceneOwner::UpdateCollision	matched decompiled source (decomp/obj_symbols.tsv)

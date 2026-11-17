@@ -45,6 +45,7 @@ struct MeshData
 {
     void M_10150a90();
     void M_101476e0(int pack, int value);
+    void M_10147690(int a, int b);
 };
 extern "C" int FUN_10169990(MeshData *mesh);
 
@@ -190,6 +191,7 @@ struct Node
     int M_1019d600();
     Node *FindRecursive(const char *name, int *skip);
     Node *FindPrefixRecursive(const char *prefix, int *skip);
+    int M_1019e830(int a, int b);
     void M_1019d6a0();
     int M_101a8760();
     void M_101911e0(KeyPair *pairs, int count);
@@ -963,4 +965,20 @@ Node *Node::FindPrefixRecursive(const char *prefix, int *skip)
         }
     }
     return 0;
+}
+
+// Runs the mesh pass M_10147690(a, b) on this node's mesh when it has materials and either no packed data
+// (packCount -1 with no packs) or packed data present, then on every child. Returns 1.
+int Node::M_1019e830(int a, int b)
+{
+    if (materialCount != 0)
+    {
+        if (packCount == -1 && packs == 0 && mesh != 0)
+            mesh->M_10147690(a, b);
+        else if (packCount != 0 && packs != 0 && mesh != 0)
+            mesh->M_10147690(a, b);
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_1019e830(a, b);
+    return 1;
 }

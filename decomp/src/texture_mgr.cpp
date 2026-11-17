@@ -29,6 +29,7 @@ struct Matrix4
 {
     float m[16];
     Matrix4();
+    ~Matrix4();  // 0x1013eda0 (empty)
 };
 
 struct Transform
@@ -80,15 +81,24 @@ struct SceneOwner
     unsigned char loadCount;  // 0x2a3: number of models loaded so far (stops counting at 3)
     char pad_02a4[0x2048];
     struct ModelNode *root;   // 0x22ec: root node of the loaded model
-    char pad_22f0[0x1a4];
+    char pad_22f0[0x38];
+    float position[4];        // 0x2328: model position used for collision
+    char pad_2338[0x30];
+    float radius;             // 0x2368: collision radius
+    char pad_236c[0x18];
+    int m_2384;               // 0x2384: collision result, cleared before each update
+    char pad_2388[0x10c];
     int m_2494;               // 0x2494
     int M_1017b1c0();
     void PlayMotion(int motion, int a, int b, float speed);
     int LoadModel(const char *path);
+    int UpdateCollision();
 };
 
 struct ModelNode
 {
+    void M_10194510();
+    int M_101a2370(float *position, Matrix4 *matrix, int a, float radius, int b);
     void Load(const char *path, int flags);            // 0x101abd60
     ModelNode *Find(const char *name, int index);       // 0x1019ece0
 };
@@ -301,4 +311,17 @@ int SceneOwner::LoadModel(const char *path)
     if (scene != 0)
         scene->M_1016a020(this);
     return 1;
+}
+
+// Updates this model's collision: refreshes the node tree (M_10194510) and collides the model's position and radius
+// with an identity-like work matrix (M_101a2370; whole-program register allocation keeps that one from matching).
+// Returns 0.
+int SceneOwner::UpdateCollision()
+{
+    Matrix4 matrix;
+    if (root != 0)
+        root->M_10194510();
+    m_2384 = 0;
+    root->M_101a2370(position, &matrix, 0, radius, 0);
+    return 0;
 }

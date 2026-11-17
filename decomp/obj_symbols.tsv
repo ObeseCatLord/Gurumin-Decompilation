@@ -158,3 +158,4 @@ _Vec3_Length	101ae890
 ?Seek@WorldRenderer@@QAEHH@Z	10189000
 ?FindPrefixRecursive@Node@@QAEPAU1@PBDPAH@Z	10191c30
 ?LoadModel@SceneOwner@@QAEHPBD@Z	1017aeb0
+?UpdateCollision@SceneOwner@@QAEHXZ	10162390

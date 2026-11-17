@@ -25,7 +25,7 @@ your own copy.
 ## Decompilation (`decomp/`)
 VS .NET 2002, cl 13.00.9466: the exact compiler the original was built with (`decomp/env.bat`; set `GURUMIN_VC` to
 another `Vc7` folder to override). Flags `/O2 /Ob1 /Op /Gy /GS /GX`; extra flags for experiments go in `GURUMIN_CFLAGS`.
-`decompuild.bat <file.cpp>`, `decompuild_all.bat`, byte compare against APP.dll. Functions that still differ are
+`decomp\build.bat <file.cpp>`, `decomp\build_all.bat`, byte compare against APP.dll. Functions that still differ are
 listed in `decomp/open.tsv` with the reason. The comparer reports MATCH (bytes identical, relocations masked) or DIFF.
 Notes and findings: `NOTES.md`.
 

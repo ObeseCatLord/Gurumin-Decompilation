@@ -26,9 +26,18 @@ struct KeyPair
 struct TextureRef;
 extern "C" int FUN_10169c00(TextureRef *texture);
 
+struct Node;
+
 struct GlyphState
 {
-    char pad_0000[0x5618];
+    char pad_0000[0xc4];
+    Matrix m_00c4;
+    char pad_0104[0x1104];
+    Node *bones[0x44];
+    char pad_1318[0x1100];
+    Matrix bindPose[0x44];
+    Matrix m_3518[0x44];
+    char pad_4618[0x1000];
     int m_5618;
 };
 
@@ -102,7 +111,9 @@ struct Node
     int m_0294;
     char pad_0298[0x10];
     struct Extra *m_02a8;
-    char pad_02ac[0x45c];
+    char pad_02ac[0x458];
+    char m_0704;
+    char pad_0705[3];
     struct GlyphState *m_0708;
     char pad_070c[0x40];
     Node *parent;
@@ -125,7 +136,7 @@ struct Node
     void M_10191d50();
     void M_1019eeb0(Node *root, Node **list, int *count);
     void M_101ab9d0(Node *root);
-    void M_10191770();
+    int M_10191770();
     void M_1019eca0();
     int M_10191870(Node **list, int *count);
     int Rebuild();
@@ -746,5 +757,23 @@ int Node::M_10191870(Node **list, int *count)
     }
     for (int i = 0; i < childCount; i++)
         children[i]->M_10191870(list, count);
+    return 1;
+}
+int Node::M_10191770()
+{
+    if (m_0708 != 0 && m_0708->m_5618 != 0)
+    {
+        for (int i = 0; i < 0x44; i++)
+        {
+            Node *bone = m_0708->bones[i];
+            if (bone != 0 && bone->m_0704 != 0 && _strnicmp(bone->name, "bip", 3) == 0)
+            {
+                m_0708->bones[i]->m_0708->m_00c4 = m_0708->bindPose[i];
+                m_0708->bones[i]->m_0708->m_3518[0] = m_0708->m_3518[i];
+            }
+        }
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->M_10191770();
     return 1;
 }

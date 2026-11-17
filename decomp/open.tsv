@@ -47,3 +47,4 @@ address	status	reason
 101ad760	open	KeyBank::Insert: original keeps frame in ebp and the count in ecx for the whole function; VS2003 picks edi/ecx and stores x through the FPU (register allocation)
 101ad820	open	KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 101adbb0	open	KeyTrack::Insert: identical except the four float parameter stores (original: integer moves; VS2003: fld/fstp)
+101649c0	open	lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)

@@ -84,3 +84,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   (0x10001ba0, 0x10001bf0). Retry the open "tail duplication" entries with these forms.
 - Anti-tamper stat guards decoded and matched (`src/anti_tamper.cpp`; see MODDING_MAP "Anti-cheat"); the checker
   0x1000e870 is 5 bytes off (edi/ebx swap in one loop). Counter 0x104c034c is a `short`, frame counter 0x104bf890 unsigned.
+- **"Constant kept in a register" is not always a cl 13.00 habit.** VS2003 also loads the constant once (`mov eax,1` /
+  `xor eax,eax`) when it fully unrolls a short constant-count loop or expands `memset`; it stores immediates only for
+  separately written assignments. 0x100235e0 matched once its fills were written as `memset` and a `for` loop.
+  Retry the open "zero/1.0f in a register" entries with loops.

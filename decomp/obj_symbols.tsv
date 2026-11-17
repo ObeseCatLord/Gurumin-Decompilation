@@ -162,3 +162,5 @@ _Vec3_Length	101ae890
 ?FindAll@ListBank@@QAEHPBDPAH@Z	10004850
 ?Nlerp@@YA?AUVec4@@ABU1@0M@Z	101aea50
 ?TransformNormal@@YA?AUVec4@@ABU1@ABUMatrix4@@@Z	101ae130
+?RotateZ@Vec4@@QAEXM@Z	101ac300
+?SnapAngle@@YAMMH@Z	1016c340

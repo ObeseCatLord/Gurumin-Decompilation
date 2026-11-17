@@ -33,6 +33,7 @@ struct Vec4
     Vec4 Scaled(const float &scale);
     Vec4 Divided(const float &divisor);
     void Normalize();  // 0x101ac260: scales all four components to unit length
+    void RotateZ(float angle);
 };
 
 // Axis-aligned box given by its minimum and maximum corners.
@@ -239,4 +240,27 @@ Vec4 TransformNormal(const Vec4 &v, const Matrix4 &matrix)
     result.y = t[1];
     result.z = t[2];
     return result;
+}
+
+// Rotates the vector's x/y part by `angle` radians about the z axis (z and w unchanged).
+void Vec4::RotateZ(float angle)
+{
+    float nx = (float)cos(angle) * x - (float)sin(angle) * y;
+    float ny = (float)cos(angle) * y + (float)sin(angle) * x;
+    x = nx;
+    y = ny;
+}
+
+// Snaps an angle in radians to the nearest multiple of `step` degrees (rounding half away from zero) and returns it
+// in radians again. pi is approximated as 3.1415 here, as everywhere in the game.
+float SnapAngle(float radians, int step)
+{
+    float degrees = radians * 180.0f / 3.1415f;
+    if (degrees >= 0.0f)
+    {
+        int snapped = ((int)degrees + step / 2) / step * step;
+        return snapped * 3.1415f / 180.0f;
+    }
+    int snapped = ((int)degrees - step / 2) / step * step;
+    return snapped * 3.1415f / 180.0f;
 }

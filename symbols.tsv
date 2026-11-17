@@ -513,3 +513,6 @@ address	name	evidence
 10004850	ListBank::FindAll	matched decompiled source (decomp/obj_symbols.tsv)
 101aea50	Nlerp	matched decompiled source (decomp/obj_symbols.tsv)
 101ae130	TransformNormal	matched decompiled source (decomp/obj_symbols.tsv)
+101616e0	Texture_DrawSpritePixels	role from the decompiled source (decomp/src/item_icon.cpp)
+101ac300	Vec4::RotateZ	matched decompiled source (decomp/obj_symbols.tsv)
+1016c340	SnapAngle	matched decompiled source (decomp/obj_symbols.tsv)

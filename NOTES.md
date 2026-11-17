@@ -160,6 +160,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - A float temporary that lands in a dead parameter's stack slot comes from an expression passed straight to a
   `const float &` parameter (`v * (1.0f / frames)`, 0x1000ec70) or from a local assigned after the parameter's
   last use (FrameBlend_Start 0x1013fb10); a named local computed earlier gets its own slot.
+- Whether a callee is *defined* in the same translation unit changes stack-slot sharing: with Cross defined in
+  vec_math.cpp, PlaneFromTriangle (0x101af360) gave the Cross return temporary its own slot (frame 0x10 too big);
+  in vec_ops.cpp, where Cross is only declared, it matches. Use this as evidence of the original file split.
 - Texture_Load (0x1001e1a0) is also an inline helper: functions that load a fixed texture expand it, including
   three `strlen` loops over the literal (0x10050460). `include/texture_load.h` holds it as `LoadTexture`.
 

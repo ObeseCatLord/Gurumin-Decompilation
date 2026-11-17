@@ -40,6 +40,7 @@ struct Vec4
     void Copy(const Vec4 &source);  // 0x101acc20
     void Fill(const float &value);  // 0x101acc40
     Vec4 Normalized3();
+    Vec4 operator-(const Vec4 &other) const;  // 0x101aca40
 };
 
 // Axis-aligned box given by its minimum and maximum corners.
@@ -371,3 +372,16 @@ Vec4 Vec4::Normalized3()
     z = result.z = z / length;
     return result;
 }
+
+// Quaternion product a * b (x, y, z = vector part, w = scalar part): the vector part is a x b + a.w * b + b.w * a,
+// the scalar part a.w * b.w - a . b.
+Vec4 QuatMultiply(const Vec4 &a, const Vec4 &b)
+{
+    Vec4 result;
+    result.x = a.y * b.z - a.z * b.y + a.w * b.x + a.x * b.w;
+    result.y = a.z * b.x - a.x * b.z + a.y * b.w + a.w * b.y;
+    result.z = a.x * b.y - a.y * b.x + a.z * b.w + a.w * b.z;
+    result.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
+    return result;
+}
+

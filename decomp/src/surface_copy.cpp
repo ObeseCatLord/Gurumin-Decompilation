@@ -59,7 +59,7 @@ struct DrawSurface
 
 struct Texture
 {
-    int M_1014f060(int x, int y, int width, int height, int pitch, void *bits);  // copies 16-bit pixels
+    int Write16(int x, int y, int width, int height, int pitch, void *bits);  // 0x1014f060: copies 16-bit pixels
     int M_1014ef20(int x, int y, int width, int height, int pitch, void *bits);  // copies 32-bit pixels
 };
 
@@ -85,7 +85,7 @@ void VideoSurface::CopyTo(Texture *texture)
         surface->Lock(0, &desc, 0x801, 0);
         int pitch = desc.pitch;
         if (pitch / width == 2)
-            texture->M_1014f060(0, 0, width, height, pitch, desc.bits);
+            texture->Write16(0, 0, width, height, pitch, desc.bits);
         else if (pitch / width == 4)
             texture->M_1014ef20(0, 0, width, height, pitch, desc.bits);
         surface->Unlock(0);

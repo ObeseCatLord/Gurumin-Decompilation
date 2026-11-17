@@ -568,3 +568,6 @@ address	name	evidence
 10191aa0	Node::FindRecursiveStripped	matched decompiled source (decomp/obj_symbols.tsv)
 10191b60	Node::FindPrefixRecursiveStripped	matched decompiled source (decomp/obj_symbols.tsv)
 1019afa0	Node::BuildMesh	matched decompiled source (decomp/obj_symbols.tsv)
+1014f060	TextureObject::Write16	matched decompiled source (decomp/obj_symbols.tsv)
+101aec90	QuatMultiply	matched decompiled source (decomp/obj_symbols.tsv)
+101af360	PlaneFromTriangle	matched decompiled source (decomp/obj_symbols.tsv)

@@ -190,3 +190,6 @@ _Vec3_Length	101ae890
 ?FindRecursiveStripped@Node@@QAEHPBDPAH@Z	10191aa0
 ?FindPrefixRecursiveStripped@Node@@QAEHPBDPAH@Z	10191b60
 ?BuildMesh@Node@@QAEHHH@Z	1019afa0
+?Write16@TextureObject@@QAEHHHHHHPBX@Z	1014f060
+?QuatMultiply@@YA?AUVec4@@ABU1@0@Z	101aec90
+?PlaneFromTriangle@@YA?AUPlane@@ABUVec4@@00@Z	101af360

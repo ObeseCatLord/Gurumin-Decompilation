@@ -91,3 +91,6 @@
 ?CopyFrom@VertexPack@@QAEHPBU1@@Z	101ad040
 ?Insert@KeyBank@@QAEHHMMMM@Z	101ad760
 ?Insert@KeyTrack@@QAEHHMMMM@Z	101adbb0
+?CrossTransformed@@YA?AUVec4@@ABU1@ABUMatrix4@@0@Z	101ae8b0
+?Transformed@Vec4@@QBE?AU1@ABUMatrix4@@@Z	101aca40
+?Cross@@YA?AUVec4@@ABU1@0@Z	101ae820

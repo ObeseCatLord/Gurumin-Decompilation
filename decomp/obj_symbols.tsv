@@ -102,3 +102,5 @@
 ?StepPath@PathMover@@QAEHXZ	10175e80
 ?Sample@KeyBank@@QAEHHPAM000H@Z	101af4c0
 ?SetPosition@PathMover@@QAEXMMM@Z	10162610
+?Create@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	10148a40
+?RegisterWindowClass@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	101489c0

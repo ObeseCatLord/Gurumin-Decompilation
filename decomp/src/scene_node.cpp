@@ -77,7 +77,8 @@ struct PackHeader
     int m_000c;
     int m_0010;
     int material;
-    char pad_0018[0x5c];
+    char pad_0018[0x58];
+    int *m_0070;
     void M_101acfa0();
 };
 
@@ -123,7 +124,11 @@ struct Node
     int m_0294;
     char pad_0298[0x10];
     struct Extra *m_02a8;
-    char pad_02ac[0x458];
+    char pad_02ac[0x440];
+    int m_06ec;
+    char pad_06f0[0xc];
+    int m_06fc;
+    char pad_0700[4];
     char m_0704;
     char pad_0705[3];
     struct GlyphState *m_0708;
@@ -153,6 +158,11 @@ struct Node
     int RemoveChild(Node *child, int keep);
     int CopyPlugData();
     int SetMaterialValue(const char *material, int value);
+    void M_10191500();
+    int M_101a53b0(Node *source, int a, int b);
+    void M_10193d10(int index);
+    void M_101913f0();
+    int CreateChildCopies();
     void M_1019eca0();
     int M_10191870(Node **list, int *count);
     int Rebuild();
@@ -853,5 +863,29 @@ int Node::SetMaterialValue(const char *material, int value)
     }
     for (int i = 0; i < childCount; i++)
         children[i]->SetMaterialValue(material, value);
+    return 1;
+}
+int Node::CreateChildCopies()
+{
+    Node *created[0x20];
+    m_06ec = packs->m_0070[2];
+    m_06fc = packs->m_0070[2];
+    m_1858 = 1;
+    for (int i = 0; i < 0x20; i++)
+    {
+        Node *node = (Node *)DAT_11b0b938(0x18a0, "m_child[m_numchild]");
+        created[i] = node;
+        node->M_10191500();
+        node->M_101a53b0(this, 0, 1);
+    }
+    childCount = 0x20;
+    for (int i = 0; i < 0x20; i++)
+    {
+        children[i] = created[i];
+        created[i]->parent = this;
+        children[i]->M_10193d10(i);
+        children[i]->m_00a0 = 0xc;
+    }
+    M_101913f0();
     return 1;
 }

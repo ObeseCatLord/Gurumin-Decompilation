@@ -122,6 +122,12 @@ struct Node
     char pad_189d[3];
 
     void M_10191d50();
+    void M_1019eeb0(Node *root, Node **list, int *count);
+    void M_101ab9d0(Node *root);
+    void M_10191770();
+    void M_1019eca0();
+    void M_10191870(Node **list, int *count);
+    int Rebuild();
     void M_10191d90();
     void M_10191dd0();
     void M_10191e10();
@@ -706,5 +712,16 @@ int Node::M_1019bca0(Node **keep, int count)
         M_10191210();
     for (int k = 0; k < childCount; k++)
         children[k]->M_1019bca0(keep, count);
+    return 1;
+}
+int Node::Rebuild()
+{
+    int count = 0;
+    Node *list[16];
+    M_1019eeb0(this, list, &count);
+    M_101ab9d0(this);
+    M_10191770();
+    M_1019eca0();
+    M_10191870(list, &count);
     return 1;
 }

@@ -51,9 +51,17 @@ def main():
             if (r['fp'] != '0') != want_fp:
                 continue
             rows.append(r)
+    sys.path.insert(0, os.path.join(ROOT, 'tools'))
+    import gimg
+    image = gimg.Image()
+    cookie = b'\xa1\x9c\x34\x20\x10'
+    for r in rows:
+        r['gs'] = cookie in image.read(int(r['address'], 16), int(r['size']))
+    if '--no-gs' in args:
+        rows = [r for r in rows if not r['gs']]
     print(f'{len(rows)} left')
     for r in rows[:limit]:
-        print(r['address'], r['size'], 'calls', r['calls'], 'loops', r['loops'])
+        print(r['address'], r['size'], 'calls', r['calls'], 'loops', r['loops'], 'GS' if r['gs'] else '')
 
 
 if __name__ == '__main__':

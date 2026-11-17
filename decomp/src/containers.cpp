@@ -55,6 +55,7 @@ struct KeyTrack
     int LastFrame();
     int HasFrame(int frame);
     int AddKey(int frame, float x, float y, float z, float w);
+    int Insert(int frame, float x, float y, float z, float w);
     int CopyFrom(const KeyTrack *source);
 };
 
@@ -360,5 +361,35 @@ int KeyBank::Insert(int frame, float x, float y, float z, float w)
     m_0000[i] = frame;
     flags[i] = 0;
     m_0a80++;
+    return i;
+}
+int KeyTrack::Insert(int frame, float x, float y, float z, float w)
+{
+    int last = count;
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if (frames[i] == frame)
+            break;
+        if (frames[i] > frame)
+            break;
+    }
+    for (int j = last - 1; j >= i; j--)
+    {
+        frames[j + 1] = frames[j];
+        values[j + 1].Copy(values[j]);
+        flags[j + 1] = flags[j];
+    }
+    if (count + 16 > m_0000)
+        Reserve(16);
+    frames[i] = frame;
+    values[i].x = x;
+    values[i].y = y;
+    values[i].z = z;
+    values[i].w = w;
+    flags[i] = 0;
+    count++;
+    if (count + 16 > m_0000)
+        Reserve(16);
     return i;
 }

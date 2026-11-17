@@ -45,3 +45,5 @@ address	status	reason
 1019b280	open	Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
 10199be0	open	VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 101ad760	open	KeyBank::Insert: original keeps frame in ebp and the count in ecx for the whole function; VS2003 picks edi/ecx and stores x through the FPU (register allocation)
+101ad820	open	KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
+101adbb0	open	KeyTrack::Insert: identical except the four float parameter stores (original: integer moves; VS2003: fld/fstp)

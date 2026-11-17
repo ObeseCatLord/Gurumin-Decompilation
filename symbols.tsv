@@ -510,3 +510,4 @@ address	name	evidence
 1000db30	Bgm_FadeGroup100	role from the decompiled source (decomp/src/volume_fade.cpp)
 100182a0	Map_UpdateWalls	role from the decompiled source (decomp/src/wall_flags.cpp)
 1013e410	Window_StaticProc	role from the decompiled source (decomp/src/window_create.cpp)
+10004850	ListBank::FindAll	matched decompiled source (decomp/obj_symbols.tsv)

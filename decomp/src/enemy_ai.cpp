@@ -151,3 +151,39 @@ extern "C" int FUN_100e24d0(int index)
     }
     return 0;
 }
+
+extern "C" int FUN_10026d00(int index);
+
+// Kind E: 0 = FUN_10027630(0), 1 = FUN_10028360(2), 2 = FUN_100279b0(0, 1); picker E. Same register residue as the
+// other updaters.
+extern "C" int FUN_100e2560(int index)
+{
+    if (FUN_100e1c40(index) != 0)
+        return 0;
+    int done;
+    switch (DAT_1020b430[index].m_0000)
+    {
+    case 0:
+        done = FUN_10027630(index, 0);
+        break;
+    case 1:
+        done = FUN_10028360(index, 2);
+        break;
+    case 2:
+        done = FUN_100279b0(index, 0, 1);
+        break;
+    default:
+        if (++DAT_1020b430[index].m_0004[2] > 0)
+        {
+            DAT_1020b430[index].m_0004[2] = 0;
+            FUN_10026d00(index);
+        }
+        return 0;
+    }
+    if (done != 0)
+    {
+        DAT_1020b430[index].m_0004[2] = 0;
+        DAT_1020b430[index].m_0000 = -1;
+    }
+    return 0;
+}

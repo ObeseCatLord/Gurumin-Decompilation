@@ -89,3 +89,35 @@ extern "C" int FUN_10015860(Vec4 pos)
     }
     return 0;
 }
+
+struct Matrix4
+{
+    float m[16];
+    Vec4 GetTranslation();  // 0x101ade80
+};
+
+// The part of a Character record (world.h) used here: its world matrix.
+struct CharacterPlacement
+{
+    char pad_0000[0x2338];
+    Matrix4 matrix;          // 0x2338: world matrix (translation = position)
+    char pad_2378[0x124];
+};
+
+extern "C" CharacterPlacement DAT_10db6ed8[0x80];
+
+// 1 when character `index` stands in a currently visible cell (or the map has no visibility data), else 0.
+extern "C" int FUN_10015710(int index)
+{
+    Vec4 pos;
+    if (DAT_10255f08->vis == 0)
+        return 1;
+    pos.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    VisData *vis = DAT_10255f08->vis;
+    for (int i = 0; i < 0x40; i++)
+    {
+        if (DAT_11afffe8[i] != 0 && pos.InBox(&vis->boxes[i]))
+            return 1;
+    }
+    return 0;
+}

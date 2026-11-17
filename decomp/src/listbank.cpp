@@ -20,7 +20,10 @@ struct ListBank
     int m_440c[8][0x100];
     char pad_640c[0x8400];
     char m_e80c[8][0x80];
-    char pad_ec0c[0x1b9d0];
+    char names[0xdce][0x20];  // 0xec0c: names of the declared script variables
+    char pad_2a5cc[8];
+    int nameCount;            // 0x2a5d4: number of entries in `names`
+    int pad_2a5d8;
     int m_2a5dc[8];
     char pad_2a5fc[0x4004];
     char text[0x7d04];        // 0x2e600: script text being parsed
@@ -39,6 +42,7 @@ struct ListBank
     int M_10004a30(const char *text, int *value);
     int M_10004aa0(const char *text, float *value);
     int ReportError(const char *message);
+    int FindAll(const char *name, int *out);
     int FreeAll();
 };
 
@@ -152,4 +156,19 @@ int ListBank::ReportError(const char *message)
         callback(5000, cursor[depth] - text);
     FreeAll();
     return 0;
+}
+
+// Collects the index of every declared name equal to `name` (case-sensitive) into `out` and returns how many were
+// found; stops with 0 once a parse error was reported.
+int ListBank::FindAll(const char *name, int *out)
+{
+    int found = 0;
+    for (int i = 0; i < nameCount; i++)
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (strcmp(name, names[i]) == 0)
+            out[found++] = i;
+    }
+    return found;
 }

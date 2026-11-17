@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (42)
+## 1. Walls to retry (44)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -18,6 +18,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
 - [ ] `1000ed20` 77 — original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 - [ ] `10012130` 172 — Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
+- [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
 - [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
@@ -25,6 +26,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e2110` 143 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2440` 139 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
+- [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 - [ ] `1013e4f0` 431 — RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `10145380` 87 — FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)
 - [ ] `1014b390` 233 — Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores
@@ -54,7 +56,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (135)
+## 2. Small functions (30-250 bytes) (132)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c00` 82 bytes (loops 1)
@@ -82,12 +84,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ae1c0` 139 bytes (float, calls 6)
 - [ ] `101616e0` 141 bytes (float, calls 1)
 - [ ] `1015c6a0` 142 bytes (calls 4)
-- [ ] `100e2560` 143 bytes (calls 5)
 - [ ] `101af140` 143 bytes (float, calls 8)
 - [ ] `101af1d0` 143 bytes (float, calls 8)
-- [ ] `10004850` 145 bytes (loops 2)
 - [ ] `101ac300` 146 bytes (float, calls 4)
-- [ ] `10015710` 148 bytes (loops 1, calls 4)
 - [ ] `100246b0` 148 bytes (calls 4)
 - [ ] `101ac260` 149 bytes (float, calls 1)
 - [ ] `1001e1a0` 150 bytes (loops 3, calls 5)

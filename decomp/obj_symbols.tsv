@@ -160,3 +160,5 @@ _Vec3_Length	101ae890
 ?LoadModel@SceneOwner@@QAEHPBD@Z	1017aeb0
 ?UpdateCollision@SceneOwner@@QAEHXZ	10162390
 ?FindAll@ListBank@@QAEHPBDPAH@Z	10004850
+?Nlerp@@YA?AUVec4@@ABU1@0M@Z	101aea50
+?TransformNormal@@YA?AUVec4@@ABU1@ABUMatrix4@@@Z	101ae130

@@ -32,6 +32,7 @@ struct Vec4
     float DistanceZWeighted(const Vec4 &other);
     Vec4 Scaled(const float &scale);
     Vec4 Divided(const float &divisor);
+    void Normalize();  // 0x101ac260: scales all four components to unit length
 };
 
 // Axis-aligned box given by its minimum and maximum corners.
@@ -211,4 +212,31 @@ int Plane::IntersectRay(Vec4 *out, const Vec4 *origin, const Vec4 *direction)
     out->y = t * direction->y + origin->y;
     out->z = t * direction->z + origin->z;
     return 1;
+}
+
+// Interpolates between `a` and `b` (all four components) by `t` and normalises the result: a normalised lerp,
+// used to blend rotations stored as quaternions.
+Vec4 Nlerp(const Vec4 &a, const Vec4 &b, float t)
+{
+    Vec4 result;
+    result.x = (b.x - a.x) * t + a.x;
+    result.y = (b.y - a.y) * t + a.y;
+    result.z = (b.z - a.z) * t + a.z;
+    result.w = (b.w - a.w) * t + a.w;
+    result.Normalize();
+    return result;
+}
+
+// Transforms direction `v` by the rotation part of `matrix` (no translation); the result's w is 0.
+Vec4 TransformNormal(const Vec4 &v, const Matrix4 &matrix)
+{
+    float t[4];
+    t[0] = matrix.m[8] * v.z + matrix.m[4] * v.y + v.x * matrix.m[0];
+    t[1] = matrix.m[9] * v.z + matrix.m[5] * v.y + matrix.m[1] * v.x;
+    t[2] = matrix.m[10] * v.z + matrix.m[6] * v.y + matrix.m[2] * v.x;
+    Vec4 result;
+    result.x = t[0];
+    result.y = t[1];
+    result.z = t[2];
+    return result;
 }

@@ -9,8 +9,8 @@ struct TextureObject
 {
     IUnknownLike *texture;   // 0x00: Direct3D texture
     IUnknownLike *texture2;  // 0x04: second surface (e.g. the alpha or palette part), may be 0
-    int frame;               // 0x08
-    int frameCount;          // 0x0c
+    int width;               // 0x08: texture width in pixels
+    int height;              // 0x0c: texture height in pixels
     int pad_0010;
     int poolIndex;           // 0x14: buffer pool index of the frames
     int pad_0018;
@@ -25,8 +25,8 @@ extern "C" IDirect3DDevice9 *DAT_10f1fcf0;      // the Direct3D device
 extern "C" TextureObject *DAT_10f6550c;         // texture bound to stage 0 (1 = none/unknown)
 extern "C" TextureObject *DAT_10f65510;         // texture bound to stage 1 (1 = none/unknown)
 extern "C" int DAT_10f141d4;                    // number of texture switches this frame (statistics)
-extern "C" void *FUN_10148590(int poolIndex, IUnknownLike *texture, int frame, int frameCount, int slot);
-extern "C" int FUN_10148520(int poolIndex, int frame, int frameCount);
+extern "C" void *FUN_10148590(int poolIndex, IUnknownLike *texture, int width, int height, int slot);
+extern "C" int FUN_10148520(int poolIndex, int width, int height);
 
 // Binds this texture to stage 0 unless it is bound there already. Returns 1.
 int TextureObject::BindStage0()
@@ -36,7 +36,7 @@ int TextureObject::BindStage0()
         DAT_10f141d4++;
         if (poolSlot != 0)
         {
-            void *pooled = FUN_10148590(poolIndex, texture, frame, frameCount, poolSlot);
+            void *pooled = FUN_10148590(poolIndex, texture, width, height, poolSlot);
             DAT_10f1fcf0->SetTexture(0, pooled);
             DAT_10f6550c = this;
             return 1;
@@ -55,7 +55,7 @@ int TextureObject::BindStage1()
         DAT_10f141d4++;
         if (poolSlot != 0)
         {
-            void *pooled = FUN_10148590(poolIndex, texture, frame, frameCount, poolSlot);
+            void *pooled = FUN_10148590(poolIndex, texture, width, height, poolSlot);
             DAT_10f1fcf0->SetTexture(1, pooled);
             DAT_10f65510 = this;
             return 1;
@@ -73,7 +73,7 @@ int TextureObject::Release()
     if (texture != 0)
     {
         if (poolSlot != 0)
-            FUN_10148520(poolIndex, frame, frameCount);
+            FUN_10148520(poolIndex, width, height);
         texture->Release();
     }
     if (texture2 != 0)
@@ -82,8 +82,8 @@ int TextureObject::Release()
         DAT_10f6550c = (TextureObject *)1;
     if (DAT_10f65510 == this)
         DAT_10f65510 = (TextureObject *)1;
-    frame = 0;
-    frameCount = 0;
+    width = 0;
+    height = 0;
     poolSlot = 0;
     texture = 0;
     texture2 = 0;

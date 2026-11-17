@@ -56,7 +56,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (132)
+## 2. Small functions (30-250 bytes) (129)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c00` 82 bytes (loops 1)
@@ -77,12 +77,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad240` 119 bytes (float, calls 2)
 - [ ] `10162ea0` 120 bytes (float, calls 7)
 - [ ] `10142700` 131 bytes (float, calls 3)
-- [ ] `101aea50` 131 bytes (float, calls 2)
 - [ ] `1016bdf0` 132 bytes (float, calls 7)
-- [ ] `101ae130` 135 bytes (float, calls 1)
 - [ ] `10169f90` 136 bytes (loops 1)
 - [ ] `101ae1c0` 139 bytes (float, calls 6)
-- [ ] `101616e0` 141 bytes (float, calls 1)
 - [ ] `1015c6a0` 142 bytes (calls 4)
 - [ ] `101af140` 143 bytes (float, calls 8)
 - [ ] `101af1d0` 143 bytes (float, calls 8)
@@ -784,10 +781,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (0)
+## 6. Naming: matched functions without a readable name (1)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
+- [ ] `101616e0` 141 bytes (src/item_icon.cpp)
 
 ## 7. Comment pass (0 files)
 

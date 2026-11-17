@@ -172,3 +172,6 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   steers the evaluation order (Plane::IntersectRay 0x101ad2c0: y + (x + z)).
 - A search loop whose found-branch only `break`s is unrolled by 8; putting the work inside the loop and returning
   from there keeps the simple loop (ModelBank::Add 0x1017c570).
+- A function's stack frame size reveals the type of its locals: three floats computed into a 16-byte constructor-less
+  local is a `float t[4]` (TransformNormal 0x101ae130), not a Vec3 or separate floats.
+- TextureObject +0x08/+0x0c are the texture width and height in pixels (FUN_101616e0 divides pixel UVs by them).

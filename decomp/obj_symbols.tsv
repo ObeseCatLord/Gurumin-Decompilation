@@ -230,3 +230,4 @@ _Vec3_Dot	101ac200
 ?BoneMatrix@Node@@QAE?AUMatrix4@@HH@Z	101a23b0
 ?ReadFrameOnce@MmvPlayer@@QAEXXZ	10160f00
 ?CompileText@ListBank@@QAEHXZ	100f9520
+?SkipBlock@ListBank@@QAEHPAPADPAHH@Z	10035a30

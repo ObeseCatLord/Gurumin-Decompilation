@@ -118,7 +118,7 @@ struct Node
     char pad_070c[0x40];
     Node *parent;
     int childCount;
-    char pad_0754[0x1000];
+    char childNames[0x40][0x40];
     Node *children[0x40];
     NodeSaved *saved;
     unsigned char m_1858;
@@ -137,6 +137,8 @@ struct Node
     void M_1019eeb0(Node *root, Node **list, int *count);
     void M_101ab9d0(Node *root);
     int M_10191770();
+    void M_1019e9a0();
+    int RemoveChild(Node *child, int keep);
     void M_1019eca0();
     int M_10191870(Node **list, int *count);
     int Rebuild();
@@ -776,4 +778,29 @@ int Node::M_10191770()
     for (int i = 0; i < childCount; i++)
         children[i]->M_10191770();
     return 1;
+}
+int Node::RemoveChild(Node *child, int keep)
+{
+    int i;
+    for (i = 0; i < childCount; i++)
+    {
+        if (child == children[i])
+            break;
+    }
+    if (i == childCount)
+        return 0;
+    if (keep == 0)
+    {
+        children[i]->M_1019e9a0();
+        DAT_11b1ba40(children[i]);
+    }
+    int j;
+    for (j = i; j < childCount - 1; j++)
+    {
+        children[j] = children[j + 1];
+        strcpy(childNames[j], childNames[j + 1]);
+    }
+    childCount--;
+    children[j] = 0;
+    return 0;
 }

@@ -1,3 +1,5 @@
+// IME candidate list layout.
+
 struct MenuText
 {
     char text[0x80];
@@ -14,6 +16,7 @@ extern "C" int DAT_10f66de8;
 extern "C" int DAT_10f66dd0;
 extern "C" MenuText DAT_10f67008[];
 
+// Number of candidates shown on the current page (at most 9).
 inline int VisibleLines()
 {
     int remaining = DAT_10f66aac - DAT_10f66ab0 * DAT_10f66de8 - DAT_10f66dd0;
@@ -22,11 +25,13 @@ inline int VisibleLines()
     return remaining;
 }
 
+// Returns the number of visible candidates.
 extern "C" int FUN_1015fa90(void)
 {
     return VisibleLines();
 }
 
+// Returns the width in pixels of the widest visible candidate.
 extern "C" int FUN_1015fac0(TextRenderer *renderer)
 {
     int widest = 0;

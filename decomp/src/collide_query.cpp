@@ -1,3 +1,5 @@
+// Collision queries against the world (DAT_10255f08).
+
 struct Vec4
 {
     float x;
@@ -23,6 +25,7 @@ struct CollisionWorld
 
 extern "C" CollisionWorld *DAT_10255f08;
 
+// 0x1000ff80: 1 when the point (x, y, z) touches world collision of the kinds in `mask`.
 int Collision_ProbePoint(float x, float y, float z, int mask)
 {
     Matrix4 matrix;

@@ -1,3 +1,5 @@
+// Vector helper built on Vec4::Transformed and Cross.
+
 struct Matrix4;
 
 struct Vec4
@@ -13,6 +15,7 @@ struct Vec4
 
 Vec4 Cross(const Vec4 &a, const Vec4 &b);
 
+// 0x101ae8b0: transforms `a` and `b` by `matrix` and returns their cross product.
 Vec4 CrossTransformed(const Vec4 &a, const Matrix4 &matrix, const Vec4 &b)
 {
     Vec4 tb;

@@ -1,5 +1,9 @@
+// Data file checks and record reads.
+
 #include <stdio.h>
 
+// Computes a file's check values: the sum and the xor (seeded 0xcc82) of all its 32-bit words. Used to detect
+// modified data files. Returns 0 when the file cannot be opened.
 extern "C" int FUN_101602d0(const char *path, int *sum, unsigned int *check)
 {
     FILE *file = fopen(path, "rb");
@@ -23,6 +27,7 @@ extern "C" int FUN_101602d0(const char *path, int *sum, unsigned int *check)
     return 1;
 }
 
+// Reads record `index` (two 32-bit values) from a table of 8-byte records starting at offset `base` of `path`.
 extern "C" int FUN_10160360(const char *path, int base, int index, void *first, void *second)
 {
     FILE *file = fopen(path, "rb");

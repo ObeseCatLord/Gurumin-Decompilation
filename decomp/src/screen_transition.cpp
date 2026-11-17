@@ -1,3 +1,5 @@
+// Screen transitions (fades between scenes).
+
 #include <windows.h>
 #include <mmsystem.h>
 
@@ -15,6 +17,8 @@ extern "C" int FUN_1013ed60(void);
 extern "C" int FUN_101439e0(void);
 extern "C" int FUN_1014b480(void);
 
+// Starts (mode != 0) or ends (mode 0) a transition: swaps the double-buffered capture target, records the mode,
+// resets the frame timer to now + 16 ms and redraws the frame once. Ignored while disabled or busy.
 extern "C" int FUN_1015c9e0(int mode)
 {
     if (DAT_10203344 == 0)

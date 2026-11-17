@@ -21,7 +21,7 @@ struct Vec4
     float y;
     float z;
     float w;
-    Vec4();  // 0x101ac990: does nothing (members stay uninitialised)
+    Vec4();  // 0x101ac990: zero vector
     float Length2D();
     float Distance2D(Vec4 other);
     float LengthSquared3();
@@ -133,7 +133,7 @@ int Vec4::InRect(const Box2 *box)
     return 1;
 }
 
-// Returns this vector times `scale` (x/y/z; the result's w is left uninitialised).
+// Returns this vector times `scale` (x/y/z; the result's w stays 0).
 // Not byte-identical yet: the original keeps `this` in edx across the Vec4() constructor call (whole-program
 // register allocation, see NOTES.md and open.tsv).
 Vec4 Vec4::Scaled(const float &scale)
@@ -145,7 +145,7 @@ Vec4 Vec4::Scaled(const float &scale)
     return result;
 }
 
-// Returns this vector divided by `divisor` (x/y/z; w uninitialised). Same register difference as Scaled.
+// Returns this vector divided by `divisor` (x/y/z; w stays 0). Same register difference as Scaled.
 Vec4 Vec4::Divided(const float &divisor)
 {
     Vec4 result;

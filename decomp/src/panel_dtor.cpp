@@ -1,3 +1,5 @@
+// Destructor of a menu panel object that owns four resources (each with its own destructor).
+
 struct Resource
 {
     char data[0x10];
@@ -17,6 +19,7 @@ struct Panel
     ~Panel();
 };
 
+// Empty body: the compiler destroys the four Resource members in reverse order.
 Panel::~Panel()
 {
 }

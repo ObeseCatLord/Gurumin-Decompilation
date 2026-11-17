@@ -1,3 +1,5 @@
+// Direct3D texture slots (0x5a0 slots; several surface tables per slot, see buffer_pool.cpp).
+
 #include "d3d9_min.h"
 
 extern "C" IUnknownLike *DAT_10f1a870[0x5a0];
@@ -8,6 +10,8 @@ extern "C" int DAT_10f1e670[0x5a0];
 extern "C" int DAT_10f628e8[0x5a0];
 extern "C" int DAT_10f1a86c;
 
+// Releases every Direct3D surface held by texture slot `slot` and subtracts the slot's two sizes from the
+// VRAM total DAT_10f1a86c. Returns 0 for an invalid slot, 1 otherwise.
 extern "C" int FUN_101477c0(int slot)
 {
     if (slot < 0)

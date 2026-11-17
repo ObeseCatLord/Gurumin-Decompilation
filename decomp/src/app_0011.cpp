@@ -1,3 +1,5 @@
+// Effect slots and enemy helpers.
+
 #include <stdlib.h>
 #include "world.h"
 
@@ -5,6 +7,7 @@ extern "C" int DAT_10255f10[];
 extern "C" int FUN_1013f880(void);
 extern "C" void FUN_10043cc0(int);
 
+// Returns the first free effect slot (of 0x40), or -1.
 extern "C" int FUN_10017b80(void)
 {
     for (int i = 0; i < 0x40; i++)
@@ -15,6 +18,7 @@ extern "C" int FUN_10017b80(void)
     return -1;
 }
 
+// Returns the value of the active type-10 effect with `id`, or -1.
 extern "C" int FUN_10017bb0(int id)
 {
     for (int i = 0; i < 0x40; i++)
@@ -25,6 +29,8 @@ extern "C" int FUN_10017bb0(int id)
     return -1;
 }
 
+// Random idle animation: a 1 % chance per call to play the idle motion (speed 30) on character `index`
+// when it has one (m_239c).
 extern "C" int FUN_1001b840(int index)
 {
     if (DAT_10db6ed8[index].m_239c != 0)
@@ -35,6 +41,8 @@ extern "C" int FUN_1001b840(int index)
     return 0;
 }
 
+// Starts character `index`'s defeat sequence unless it is already busy (DAT_10210d30); returns 1 when busy.
+// Not byte-identical yet (see open.tsv).
 extern "C" int FUN_10034c80(int index)
 {
     if (DAT_10210d30[index] != 0)
@@ -44,6 +52,8 @@ extern "C" int FUN_10034c80(int index)
     return 0;
 }
 
+// Stores the character's formation number as its group (100 means "no group" = -1) and refreshes the group
+// links (FUN_10043cc0).
 extern "C" int FUN_10047400(int index)
 {
     int value = DAT_1020b430[index].m_0004[1];

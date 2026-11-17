@@ -1,3 +1,6 @@
+// Constructors of the animation containers. The bodies are empty: all the work is done by the member
+// constructors (Vec4, KeyTrack, Matrix4, ModelState), which the compiler calls in declaration order.
+
 struct Vec4
 {
     float x;
@@ -7,6 +10,7 @@ struct Vec4
     Vec4();
 };
 
+// One animated channel: `count` key frames with frame numbers, values and per-key flags (containers.cpp).
 struct KeyTrack
 {
     int m_0000;
@@ -17,6 +21,7 @@ struct KeyTrack
     KeyTrack();
 };
 
+// Eight base values plus twelve key tracks (position, rotation, scale, colour, ... per node).
 struct AnimChannels
 {
     Vec4 m_0000;
@@ -42,6 +47,7 @@ struct AnimChannels
     AnimChannels();
 };
 
+// 0x101727f0.
 AnimChannels::AnimChannels()
 {
 }
@@ -53,12 +59,15 @@ struct Matrix4
     ~Matrix4();
 };
 
+// Declared throw(): the original leaves out the EH state update before this constructor, which only fits a
+// compiler that knew it cannot throw (whole-program optimisation).
 struct ModelState
 {
     char pad_0000[0x30];
     ModelState() throw();
 };
 
+// A placed model: bounding vectors, three matrices (world, local, previous) and its animation state.
 struct ModelInstance
 {
     char pad_0000[0x24];
@@ -79,6 +88,7 @@ struct ModelInstance
     ModelInstance();
 };
 
+// 0x101728c0.
 ModelInstance::ModelInstance()
 {
 }

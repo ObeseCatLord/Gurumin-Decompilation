@@ -1,3 +1,5 @@
+// Objects that move along a key-framed path.
+
 struct KeyBank
 {
     int Sample(int frame, float *x, float *y, float *z, float *w, int flags);
@@ -17,6 +19,8 @@ struct PathMover
     int StepPath();
 };
 
+// While playing: samples the path at the current frame, moves the object there and advances one frame. At the
+// end frame it loops back to startFrame, or stops on the last frame when not looping.
 int PathMover::StepPath()
 {
     if (playing != 0)

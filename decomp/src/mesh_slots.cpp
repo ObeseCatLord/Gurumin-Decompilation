@@ -1,3 +1,5 @@
+// Attached mesh slots (see ai_pick.cpp for the slot table).
+
 struct Matrix
 {
     float m[16];
@@ -17,6 +19,7 @@ struct MeshSlot
 extern "C" MeshSlot DAT_10edbe08[0x40];
 extern "C" char DAT_108392d8[];
 
+// Updates every used mesh slot with the world matrix DAT_108392d8. The identity matrix is unused.
 int ResetMeshSlots()
 {
     Matrix identity;

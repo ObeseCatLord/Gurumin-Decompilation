@@ -6,7 +6,7 @@ struct Vec4
     float y;
     float z;
     float w;
-    Vec4();                                            // 0x101ac990 (leaves the members uninitialised)
+    Vec4();                                            // 0x101ac990: zero vector
     void Set(float x, float y, float z, float w);      // 0x101ac9c0
 };
 

@@ -1,8 +1,13 @@
+// Equipment and slot defaults.
+
 #include <string.h>
 
 extern "C" int DAT_1030c908[0x22];
 extern "C" int DAT_1030b870[0x22];
 
+// Resets the two 0x22-entry slot tables. Mode 0 (new game) enables slots 1..0x11; any other mode sets the
+// special layout (slots 0x17, 0x18, 0x1f disabled, 0x19..0x1e set to the ids 0x6f4..0x6fa).
+// Written as separate stores: a loop would compile to `rep stosd` under cl 13.00.
 extern "C" int FUN_100235e0(int mode)
 {
     memset(DAT_1030c908, 0, sizeof(DAT_1030c908));

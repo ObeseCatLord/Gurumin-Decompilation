@@ -1,3 +1,5 @@
+// Direct3D state reset.
+
 #include <string.h>
 #include "d3d9_min.h"
 
@@ -16,6 +18,9 @@ extern "C" int DAT_10202b34;
 extern "C" int DAT_10202b38;
 extern "C" void FUN_10143b50(void);
 
+// Render_ResetState: unbinds the textures of stages 0..3, resets the cached stage states, and when an off-screen
+// target was active (DAT_10f654cc) restores the back buffer, depth buffer and full-screen viewport.
+// Not byte-identical yet (see open.tsv).
 extern "C" void FUN_1014b390(void)
 {
     DAT_10f6548c = 0;

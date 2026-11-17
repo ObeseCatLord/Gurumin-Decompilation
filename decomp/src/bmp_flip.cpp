@@ -1,3 +1,5 @@
+// Bmp_FlipVertical: swaps the rows of a 24-bit (BGR) image in place so the bottom-up BMP row order becomes
+// top-down. Not byte-identical yet (see open.tsv).
 extern "C" int FUN_10161200(unsigned char *pixels, int width, int height)
 {
     unsigned char *top = pixels;

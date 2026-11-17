@@ -1,3 +1,5 @@
+// Script resource banks: 8 banks of up to 0x80 allocated buffers.
+
 #include <stdlib.h>
 
 struct ResourceBanks
@@ -13,6 +15,8 @@ struct ResourceBanks
     int FreeAll();
 };
 
+// Frees every buffer in every bank, except buffers marked as borrowed (owned elsewhere), which are only
+// forgotten. Clears the counts.
 int ResourceBanks::FreeAll()
 {
     m_36324 = 0;

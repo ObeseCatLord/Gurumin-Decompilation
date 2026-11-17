@@ -1,3 +1,5 @@
+// Unpacking of a character's packed parameter (CharSlot::m_003c, set from the map data).
+
 #include "world.h"
 
 extern "C" char DAT_1030ce38[0x80];
@@ -8,6 +10,10 @@ extern "C" int DAT_1021f440[0x80];
 extern "C" int DAT_10daaaf8[];
 extern "C" int DAT_10daaafc[];
 
+// Splits the packed value: digits from 100000 up go to the formation number (CharState m_0004[1]), the
+// middle four digits (value / 10 % 10000) to CharState m_003c. When those middle digits are not zero the
+// character is switched to kind 0x62, remembering its original kind, colour (m_00a7) and two slot values the
+// first time so they can be restored later.
 extern "C" int FUN_1001b5b0(int index)
 {
     int value = DAT_10daab84[index].m_003c;

@@ -1,3 +1,5 @@
+// Screen overlays and message text.
+
 #include <string.h>
 
 struct Renderer
@@ -18,6 +20,7 @@ extern "C" int DAT_104bf8d4;
 extern "C" int DAT_104bf8d8;
 extern "C" char DAT_10210ae8[];
 
+// Draws the full-screen overlay quad (texture slot DAT_104c0140) with additive blending.
 extern "C" int FUN_1000c340(void)
 {
     FUN_1013f070(9, 0, 0);
@@ -27,6 +30,8 @@ extern "C" int FUN_1000c340(void)
     return 1;
 }
 
+// Sets the message window title text (DAT_10210ae8); passing 0 closes the window (state 2).
+// Opening it the first time resets its animation counter.
 extern "C" int FUN_1000cb30(const char *text)
 {
     if (DAT_104bf8d4 != 1)

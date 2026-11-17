@@ -1,3 +1,4 @@
+// Item table at 0x1088e6b0 (0xc0 bytes per item). type 4 = stackable consumable.
 struct ItemInfo
 {
     int type;
@@ -9,6 +10,10 @@ extern "C" char DAT_103150c0[0x50];
 extern "C" char DAT_1042de28[0x50];
 extern "C" int FUN_1000e810(void);
 
+// Inventory_Add: adds *count of item *item. Most items stack to 3; item 0x10 and type-4 items stack to 99.
+// When the stack is full the excess stays in *count and 0 is returned; otherwise *count and *item are cleared
+// and 1 is returned. Marks the item as obtained (DAT_1042de28) and refreshes the anti-tamper copies
+// (AntiTamper_StoreArrays 0x1000e810). Not byte-identical yet (see open.tsv).
 extern "C" int FUN_10012130(int *item, int *count)
 {
     int id = *item;

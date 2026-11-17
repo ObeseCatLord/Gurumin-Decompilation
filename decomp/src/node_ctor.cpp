@@ -1,3 +1,5 @@
+// Scene node constructor.
+
 struct Matrix4
 {
     float m[16];
@@ -35,6 +37,7 @@ struct SceneNode
     void M_10191500();
 };
 
+// Member constructors run first (matrices and vectors), then Init (0x10191500) fills in the defaults.
 SceneNode::SceneNode()
 {
     M_10191500();

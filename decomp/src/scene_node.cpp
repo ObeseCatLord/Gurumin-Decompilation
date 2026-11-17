@@ -98,11 +98,12 @@ struct Node
     int pad_00b0;
     int group;
     int m_00b8;
-    char pad_00bc[0x1c];
-    int m_00d8[2];
-    char pad_00e0[0x38];
-    struct Channel *m_0118[2];
-    char pad_0120[0xa8];
+    char pad_00bc[4];
+    int plugType[16];
+    struct Channel *plugs[16];
+    int plugTypeCopy[16];
+    void *plugData[16];
+    char pad_01c0[8];
     int m_01c8;
     Matrix matrix;
     char pad_020c[0x80];
@@ -139,6 +140,7 @@ struct Node
     int M_10191770();
     void M_1019e9a0();
     int RemoveChild(Node *child, int keep);
+    int CopyPlugData();
     void M_1019eca0();
     int M_10191870(Node **list, int *count);
     int Rebuild();
@@ -403,10 +405,10 @@ int Node::M_1019b300(int a, int b)
 {
     for (int i = 0; i < 2; i++)
     {
-        if (m_00d8[i] != 0 && m_00d8[i] == 0x4ee33)
+        if (plugType[6 + i] != 0 && plugType[6 + i] == 0x4ee33)
         {
-            m_0118[i]->keys.M_101ad690();
-            m_0118[i]->keys.M_101ad5c0(0, a, b);
+            plugs[6 + i]->keys.M_101ad690();
+            plugs[6 + i]->keys.M_101ad5c0(0, a, b);
         }
     }
     return 0;
@@ -802,5 +804,25 @@ int Node::RemoveChild(Node *child, int keep)
     }
     childCount--;
     children[j] = 0;
+    return 0;
+}
+extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
+
+int Node::CopyPlugData()
+{
+    for (int i = 0; i < 16; i++)
+    {
+        if (plugs[i] != 0)
+        {
+            int size = *(int *)plugs[i];
+            if (plugData[i] != 0)
+                DAT_11b1ba40(plugData[i]);
+            plugData[i] = DAT_11b0b938(size, "->m_plugdata[g]");
+            memcpy(plugData[i], plugs[i], size);
+            plugTypeCopy[i] = plugType[i];
+        }
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->CopyPlugData();
     return 0;
 }

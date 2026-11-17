@@ -178,3 +178,25 @@ int Game::RaiseGameOverEvents()
     }
     return 0;
 }
+
+// Finds the map entry for `map` that applies now (its map is 9999 or the current map, and all four script flags
+// pass) and copies its name, file and title strings and its value out (the three unused arguments are ignored).
+// Returns 1, or 0 when there is none.
+int Game::FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value)
+{
+    for (int i = 0; i < m_a4614; i++)
+    {
+        GameNamedEntry *entry = &m_95e14[i];
+        if (entry->map == map && (entry->map == 9999 || entry->map == currentMap) &&
+            TestScriptFlag(entry->flags[0]) && TestScriptFlag(entry->flags[1]) && TestScriptFlag(entry->flags[2]) &&
+            TestScriptFlag(entry->flags[3]))
+        {
+            strcpy(name, m_95e14[i].name);
+            strcpy(file, m_95e14[i].file);
+            strcpy(title, m_95e14[i].title);
+            *value = m_95e14[i].value;
+            return 1;
+        }
+    }
+    return 0;
+}

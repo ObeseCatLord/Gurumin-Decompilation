@@ -626,3 +626,4 @@ address	name	evidence
 10160f00	MmvPlayer::ReadFrameOnce	matched decompiled source (decomp/obj_symbols.tsv)
 100f9520	ListBank::CompileText	matched decompiled source (decomp/obj_symbols.tsv)
 10035a30	ListBank::SkipBlock	matched decompiled source (decomp/obj_symbols.tsv)
+10054610	Game::FindMapEntry	matched decompiled source (decomp/obj_symbols.tsv)

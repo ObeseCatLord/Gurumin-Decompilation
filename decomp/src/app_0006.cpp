@@ -11,7 +11,7 @@ int Game::M_10002060(const char *name)
     for (int i = 0; i < m_a4614; i++)
     {
         if (_strnicmp(name, m_95e14[i].name, strlen(m_95e14[i].name)) == 0)
-            return m_95e14[i].value;
+            return m_95e14[i].map;
     }
     return -1;
 }

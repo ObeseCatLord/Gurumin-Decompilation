@@ -231,3 +231,4 @@ _Vec3_Dot	101ac200
 ?ReadFrameOnce@MmvPlayer@@QAEXXZ	10160f00
 ?CompileText@ListBank@@QAEHXZ	100f9520
 ?SkipBlock@ListBank@@QAEHPAPADPAHH@Z	10035a30
+?FindMapEntry@Game@@QAEHHPAD00HHHPAH@Z	10054610

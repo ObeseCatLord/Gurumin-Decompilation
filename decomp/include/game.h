@@ -17,11 +17,16 @@ struct GameMenuItems
     int m_0204;
 };
 
+// Map table entry (0xe8 bytes): map number, four script-flag conditions and the map's names.
 struct GameNamedEntry
 {
-    int value;
-    char pad_0004[0x10];
-    char name[0xd4];
+    int map;                    // map number (9999 = any)
+    int flags[4];               // script flags that must pass (see TestScriptFlag)
+    char name[0x20];            // 0x14: map name used by scripts
+    char file[0x20];            // 0x34
+    char title[0x50];           // 0x54
+    int value;                  // 0xa4
+    char pad_00a8[0x40];
 };
 
 // Empty engine base class; its destructor is the shared empty function 0x1013eda0.
@@ -152,6 +157,7 @@ struct Game : Object
     int ForEachActiveTrigger(void (*callback)(GameTrigger *trigger));
     int RegisterEvent(int id);  // 0x100020d0 (flag_list.cpp: FlagOwner::M_100020d0)
     int RaiseGameOverEvents();
+    int FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value);
     int M_10002300(int index, int value);
     int ReadWord();
     int ReadWordInLine();

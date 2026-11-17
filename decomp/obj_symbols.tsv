@@ -209,3 +209,6 @@ _Vec3_Length	101ae890
 ?ReadFrame@MmvPlayer@@QAEXXZ	10160df0
 ?ReadWord@Game@@QAEHXZ	10002190
 ?ReadWordInLine@Game@@QAEHXZ	10002330
+_Vec3_Dot	101ac200
+?DistanceSquaredToSegment@Vec4@@QAEMABU1@0@Z	101acd90
+?CollectNearSegment@Node@@QAEHHPBUVec4@@0MPAPAU1@PAHH@Z	10191ec0

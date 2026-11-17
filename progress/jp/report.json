@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 3.1432,
+  "fuzzy_match_percent": 3.1745,
   "total_code": "1720206",
-  "matched_code": "48816",
-  "matched_code_percent": 2.8378,
+  "matched_code": "49108",
+  "matched_code_percent": 2.8548,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 512,
-  "matched_functions_percent": 42.2442,
+  "matched_functions": 514,
+  "matched_functions_percent": 42.4092,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 116,
-  "complete_units": 81
+  "complete_units": 80
  },
  "units": [
   {
@@ -5951,16 +5951,16 @@
   {
    "name": "app/scene_node",
    "measures": {
-    "fuzzy_match_percent": 99.9233,
-    "total_code": "5904",
-    "matched_code": "5875",
-    "matched_code_percent": 99.5088,
+    "fuzzy_match_percent": 99.9265,
+    "total_code": "6167",
+    "matched_code": "6138",
+    "matched_code_percent": 99.5298,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 63,
-    "matched_functions": 62,
-    "matched_functions_percent": 98.4127,
+    "total_functions": 64,
+    "matched_functions": 63,
+    "matched_functions_percent": 98.4375,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -5971,8 +5971,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "5904",
-     "fuzzy_match_percent": 99.9233
+     "size": "6167",
+     "fuzzy_match_percent": 99.9265
     }
    ],
    "functions": [
@@ -6030,6 +6030,14 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270148464"
+     }
+    },
+    {
+     "name": "?CollectNearSegment@Node@@QAEHHPBUVec4@@0MPAPAU1@PAHH@Z",
+     "size": "263",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270081728"
      }
     },
     {
@@ -7631,28 +7639,28 @@
   {
    "name": "app/vec4",
    "measures": {
-    "fuzzy_match_percent": 100.0,
-    "total_code": "959",
+    "fuzzy_match_percent": 98.5757,
+    "total_code": "1222",
     "matched_code": "959",
-    "matched_code_percent": 100.0,
+    "matched_code_percent": 78.4779,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 12,
+    "total_functions": 13,
     "matched_functions": 12,
-    "matched_functions_percent": 100.0,
-    "complete_code": "959",
-    "complete_code_percent": 100.0,
+    "matched_functions_percent": 92.3077,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 1
+    "complete_units": 0
    },
    "sections": [
     {
      "name": ".text",
-     "size": "959",
-     "fuzzy_match_percent": 100.0
+     "size": "1222",
+     "fuzzy_match_percent": 98.5757
     }
    ],
    "functions": [
@@ -7737,6 +7745,14 @@
      }
     },
     {
+     "name": "?DistanceSquaredToSegment@Vec4@@QAEMABU1@0@Z",
+     "size": "263",
+     "fuzzy_match_percent": 93.3824,
+     "metadata": {
+      "virtual_address": "270192016"
+     }
+    },
+    {
      "name": "?Reserve@KeyTrack@@QAEXH@Z",
      "size": "268",
      "fuzzy_match_percent": 100.0,
@@ -7754,23 +7770,23 @@
     }
    ],
    "metadata": {
-    "complete": true,
+    "complete": false,
     "source_path": "decomp/src/vec4.cpp"
    }
   },
   {
    "name": "app/vec_math",
    "measures": {
-    "fuzzy_match_percent": 99.6731,
-    "total_code": "2858",
-    "matched_code": "2604",
-    "matched_code_percent": 91.1127,
+    "fuzzy_match_percent": 99.6764,
+    "total_code": "2887",
+    "matched_code": "2633",
+    "matched_code_percent": 91.2019,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 27,
-    "matched_functions": 25,
-    "matched_functions_percent": 92.5926,
+    "total_functions": 28,
+    "matched_functions": 26,
+    "matched_functions_percent": 92.8571,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -7781,11 +7797,19 @@
    "sections": [
     {
      "name": ".text",
-     "size": "2858",
-     "fuzzy_match_percent": 99.6731
+     "size": "2887",
+     "fuzzy_match_percent": 99.6764
     }
    ],
    "functions": [
+    {
+     "name": "_Vec3_Dot",
+     "size": "29",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270189056"
+     }
+    },
     {
      "name": "_Vec3_LengthSquared",
      "size": "59",
@@ -8452,13 +8476,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1662272",
+    "total_code": "1661717",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 647,
+    "total_functions": 644,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -8471,7 +8495,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1662272",
+     "size": "1661717",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -12949,14 +12973,6 @@
      }
     },
     {
-     "name": "FUN_10191ec0",
-     "size": "263",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270081728"
-     }
-    },
-    {
      "name": "FUN_10191fd0",
      "size": "549",
      "fuzzy_match_percent": 0.0,
@@ -13437,14 +13453,6 @@
      }
     },
     {
-     "name": "FUN_101ac200",
-     "size": "29",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270189056"
-     }
-    },
-    {
      "name": "FUN_101ac4e0",
      "size": "28",
      "fuzzy_match_percent": 0.0,
@@ -13474,14 +13482,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "270191712"
-     }
-    },
-    {
-     "name": "FUN_101acd90",
-     "size": "263",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270192016"
      }
     },
     {

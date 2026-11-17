@@ -7,9 +7,20 @@
 
 #include <string.h>
 
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    // 0x101af260: distance from this point to the segment from-to (mode as in the proximity pass).
+    float DistanceToSegment(const Vec4 *from, const Vec4 *to, int mode);
+};
+
 struct Matrix
 {
     float m[16];
+    Vec4 GetTranslation();  // 0x101ade80
 };
 
 struct NodeSaved
@@ -128,7 +139,9 @@ struct Node
     char pad_01c0[8];
     int m_01c8;
     Matrix matrix;
-    char pad_020c[0x80];
+    char pad_020c[0x40];
+    Matrix worldMatrix;          // 0x24c: the node's matrix in world space
+
     struct TextureRef *m_028c;
     void *m_0290;
     int m_0294;
@@ -136,7 +149,9 @@ struct Node
     struct Extra *m_02a8;
     char pad_02ac[0x24];
     unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
-    char pad_02d1[0x41b];
+    char pad_02d1[0x40f];
+    float boundsRadius;          // 0x6e0: radius of the node's mesh bounds
+    char pad_06e4[8];
     int m_06ec;
     char pad_06f0[0xc];
     int m_06fc;
@@ -214,6 +229,8 @@ struct Node
     int M_10191c30(const char *name, int *value);
     int FindRecursiveStripped(const char *name, int *skip);
     int BuildMesh(int recurse, int flags);
+    int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
+                           int mode);
     int FindPrefixRecursiveStripped(const char *prefix, int *skip);
     int M_1019ece0(const char *name, int value);
     int M_1019ed10(const char *name, int value);
@@ -325,6 +342,40 @@ int Node::StartProximityPass(float *position, Matrix *matrix, int a, float radiu
     DAT_11b044f8 = radius;
     M_10194f40(position, matrix, a, radius, b, 0);
     return 1;
+}
+
+// Finds the collision nodes (flag 0x400, active m_00a8) in the subtree that lie near the segment from-to: within
+// `range` plus 0.578 of their bounds radius. Bones are skipped unless DAT_11b04510 is set. Each hit is appended to
+// `found` (when given) and counted in *foundCount; without a list the search stops at the first hit. Returns 1
+// when a node was found.
+int Node::CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
+                             int mode)
+{
+    if (DAT_11b04510 != 0 || m_0704 == 0)
+    {
+        if ((flags & 0x400) == 0)
+        {
+            for (int i = 0; i < childCount; i++)
+            {
+                int hit = children[i]->CollectNearSegment(unused, from, to, range, found, foundCount, mode);
+                if (hit != 0 && found == 0)
+                    return hit;
+            }
+        }
+        else if (m_00a8 != 0)
+        {
+            if (worldMatrix.GetTranslation().DistanceToSegment(from, to, mode) < boundsRadius * 0.578f + range)
+            {
+                if (found != 0)
+                {
+                    found[*foundCount] = this;
+                    (*foundCount)++;
+                }
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 // Allocates the node's saved-state block (0xdc bytes) on first use.

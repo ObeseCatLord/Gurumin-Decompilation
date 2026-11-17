@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (55)
+## 1. Walls to retry (56)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -60,6 +60,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
+- [ ] `101acd90` 263 — DistanceSquaredToSegment: code identical, frame 0x30 vs 0x40 - the original puts the last operator- temporary in the dead direction vector; reusing the variable adds a copy
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
 - [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
 - [ ] `101ad760` 185 — KeyBank::Insert: original keeps frame in ebp and the count in ecx for the whole function; VS2003 picks edi/ecx and stores x through the FPU (register allocation)
@@ -130,15 +131,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (232)
+## 3. Medium functions (251-800 bytes) (230)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
 - [ ] `100bcb30` 259 bytes (calls 17)
 - [ ] `10001980` 263 bytes (calls 13)
 - [ ] `10010310` 263 bytes (float, calls 8)
-- [ ] `10191ec0` 263 bytes (float, loops 3, calls 3)
-- [ ] `101acd90` 263 bytes (float, calls 8)
 - [ ] `10054a60` 270 bytes (loops 1, calls 3)
 - [ ] `1015c850` 270 bytes Frame_PumpAndRecover (loops 3, calls 12)
 - [ ] `1003a6c0` 271 bytes (loops 1, calls 11)

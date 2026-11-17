@@ -23,7 +23,11 @@ struct Vec4
     Vec4 Scaled(const float &scale);
     Vec4 Divided(const float &divisor);
     Vec4 operator/(const int &divisor) const;
+    float DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b);
 };
+
+extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b);       // 0x101ac200 (x/y/z only)
+extern "C" float Vec3_LengthSquared(const Vec4 *v);            // 0x101ac220 (x/y/z only)
 
 // Zero vector.
 Vec4::Vec4()
@@ -123,6 +127,22 @@ Vec4 Vec4::operator/(const int &divisor) const
     result.y = y / d;
     result.z = z / d;
     return result;
+}
+
+// Squared distance from this point to the segment a-b (x/y/z): the point is projected onto the line and the
+// projection is clamped to the segment's ends. A segment of zero length counts as the point a.
+// Not byte-identical yet: the original's frame is 0x10 smaller (its last temporary reuses `direction`'s slot).
+float Vec4::DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b)
+{
+    Vec4 direction = b - a;
+    if (direction.x == 0.0f && direction.y == 0.0f && direction.z == 0.0f)
+        return Vec3_LengthSquared(&(a - *this));
+    float t = (Vec3_Dot(this, &direction) - Vec3_Dot(&a, &direction)) / Vec3_LengthSquared(&direction);
+    if (t < 0.0f)
+        return Vec3_LengthSquared(&(a - *this));
+    if (t > 1.0f)
+        return Vec3_LengthSquared(&(b - *this));
+    return Vec3_LengthSquared(&(a + direction.Scaled(t) - *this));
 }
 
 // Fixed key-frame bank (containers.cpp). Its constructor lives here, next to Vec4(), for the same reason as the

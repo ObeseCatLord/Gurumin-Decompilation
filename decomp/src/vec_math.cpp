@@ -74,6 +74,12 @@ inline float LengthSquared(float x, float y, float z)
     return x * x + y * y + z * z;
 }
 
+// Dot product of the x/y/z parts of two vectors (free function, cdecl).
+extern "C" float Vec3_Dot(const Vec3 *a, const Vec3 *b)
+{
+    return a->x * b->x + a->y * b->y + a->z * b->z;
+}
+
 // Squared length of a Vec3 (free function, cdecl).
 extern "C" float Vec3_LengthSquared(const Vec3 *v)
 {

@@ -177,3 +177,9 @@ _Vec3_Length	101ae890
 ?Normalize@Vec4@@QAEXXZ	101ac260
 ?FaceAwayFrom@AnimModel@@QAEHPAU1@@Z	10162e00
 ?TextWidth@FontRenderer@@QAEHPBDM@Z	1014fd30
+?Poll@ToggleHolder@@QAEXXZ	10148960
+?StepTrackA@AnimModel@@QAEHXZ	10161c00
+?PushMotionSpeed@AnimModel@@QAEHM@Z	10163000
+?MoveTowards@AnimModel@@QAEHMMH@Z	10162800
+?SnapHeadingToSide@AnimModel@@QAEHXZ	10162d50
+?ScreenPosition@AnimModel@@QAEHPAH0ABUMatrix4@@@Z	10162f50

@@ -57,25 +57,17 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (96)
+## 2. Small functions (30-250 bytes) (88)
 
 - [ ] `1000cf80` 33 bytes
-- [ ] `10148960` 82 bytes (calls 3)
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `101af140` 143 bytes (float, calls 8)
 - [ ] `101af1d0` 143 bytes (float, calls 8)
-- [ ] `1003a7d0` 163 bytes (loops 2, calls 3)
-- [ ] `10057b90` 165 bytes (loops 1, calls 1)
-- [ ] `10161c00` 166 bytes (float, calls 2)
 - [ ] `100157b0` 167 bytes (loops 1, calls 4)
 - [ ] `10050460` 167 bytes (loops 3, calls 5)
 - [ ] `1019afa0` 168 bytes (loops 1, calls 2)
 - [ ] `1000ec70` 169 bytes (float, calls 5)
 - [ ] `10045b80` 169 bytes (float, calls 6)
-- [ ] `10163000` 169 bytes (float)
-- [ ] `10162d50` 171 bytes (float, loops 2)
-- [ ] `10162800` 172 bytes (float)
-- [ ] `10162f50` 173 bytes (float, calls 7)
 - [ ] `1009e2d0` 175 bytes (loops 11)
 - [ ] `1001c410` 176 bytes (loops 2)
 - [ ] `1003a880` 179 bytes (loops 2, calls 4)
@@ -105,7 +97,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10017c55` 204 bytes (float, calls 8)
 - [ ] `1014f120` 204 bytes (loops 2, calls 3)
 - [ ] `10191b60` 204 bytes (loops 2, calls 2)
-- [ ] `101ae060` 206 bytes (float, calls 1)
+- [ ] `101ae060` 206 bytes Project (float, calls 1)
 - [ ] `10027560` 207 bytes (loops 2, calls 3)
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)

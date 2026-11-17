@@ -11,6 +11,7 @@ struct KeyList
     char flags[0x84];
     void Clear();
     int Add(int frame, int a, int b, int c, int d);
+    int Sample(int frame, float *x, float *y, float *z, float *w, int flags);  // KeyBank::Sample 0x101af4c0
 };
 
 struct AnimTrack
@@ -18,9 +19,16 @@ struct AnimTrack
     KeyList keys;
     int last;
     int first;
-    int m_008;
-    int m_00c;
-    int m_010;
+    int m_008;                // current frame while playing
+    int m_00c;                // 1 while playing
+    int m_010;                // 1 = loop back to `first` at the end
+};
+
+// Playback object of the model (scene_misc.cpp); m_0020 is the frame it shows.
+struct ScenePlayback
+{
+    char pad_0000[0x20];
+    int frame;
 };
 
 struct Motion
@@ -30,7 +38,9 @@ struct Motion
 
 struct AnimModel
 {
-    char pad_0000[0x2ac];
+    char pad_0000[0x298];
+    ScenePlayback *scene;     // 0x298
+    char pad_029c[0x10];
     AnimTrack trackA;
     char pad_0d44[0xc];
     AnimTrack trackB;
@@ -47,6 +57,8 @@ struct AnimModel
     char pad_2298[0x68];
     Motion *motion1;
     Motion *motion2;
+    char pad_2308[0x60];
+    int motionFrame;          // 0x2368: frame of the motion file shown now
 
     int M_10161a20(int count);
     void M_10161a60();
@@ -59,6 +71,7 @@ struct AnimModel
     int M_10161f60(int a, int b);
     int M_101628b0(int a, int b, int c, char d);
     int M_10161a90(int frame, int a, int b, int c, char flag);
+    int StepTrackA();
 };
 
 extern "C" int DAT_10faaa88[0x100];
@@ -178,5 +191,30 @@ int AnimModel::M_10161a90(int frame, int a, int b, int c, char flag)
         trackC.last = frame + 1;
     if (trackC.first > frame)
         trackC.first = frame;
+    return 0;
+}
+// Advances track A by one frame while it plays: samples the motion frame for the current track frame, shows it
+// (also on the playback object) and moves on. At the end the track loops back to its first frame, or stops on the
+// last one. Returns 0.
+int AnimModel::StepTrackA()
+{
+    if (trackA.m_00c != 0)
+    {
+        float frame, y, z, w;
+        trackA.keys.Sample(trackA.m_008, &frame, &y, &z, &w, 0);
+        motionFrame = (int)frame;
+        if (scene != 0)
+            scene->frame = motionFrame;
+        if (++trackA.m_008 >= trackA.last)
+        {
+            if (trackA.m_010 != 0)
+            {
+                trackA.m_008 = trackA.first;
+                return 0;
+            }
+            trackA.m_00c = 0;
+            trackA.m_008--;
+        }
+    }
     return 0;
 }

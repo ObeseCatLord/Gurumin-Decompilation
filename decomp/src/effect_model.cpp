@@ -24,6 +24,7 @@ struct KeyBank
     KeyBank();                                         // 0x101af420
     ~KeyBank();
     void Clear();                                      // 0x101ad730
+    int Insert(int frame, float x, float y, float z, float w);  // 0x101ad760
 };
 
 struct Node
@@ -50,10 +51,26 @@ struct EffectModel
     int m_003c;
     Matrix4 matrix;     // 0x40: placement, copied from the world matrix DAT_10db9210 at setup
     KeyBank keys;       // 0x80
-    int m_0b04;         // 0xb04: frame counter, reset to 0 at setup
+    int changed;        // 0xb04: 1 after a key or the offset was changed, reset to 0 at setup
     EffectModel();
     int M_1000b9f0(const char *path, int value, int start, int end);
+
+    // Adds a position key and marks the effect as changed.
+    void AddKey(int frame, float x, float y, float z)
+    {
+        changed = 1;
+        keys.Insert(frame, x, y, z, 0);
+    }
+
+    // Sets the offset and marks the effect as changed.
+    void SetOffset(float x, float y, float z)
+    {
+        changed = 1;
+        offset.Set(x, y, z, 0);
+    }
 };
+
+extern "C" EffectModel DAT_10edbe08[64];  // effect models placed by scripts (slot free while node == 0)
 
 extern "C" Matrix4 DAT_10db9210;
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
@@ -97,6 +114,33 @@ int EffectModel::M_1000b9f0(const char *path, int value, int start, int end)
         this->end = node->M_10199340();
     node->Rebuild();
     node->M_1019afa0(1, 0);
-    m_0b04 = 0;
+    changed = 0;
     return 1;
+}
+
+// Returns the first free effect model slot, or -1.
+inline int FindFreeEffectModel()
+{
+    for (int i = 0; i < 64; i++)
+    {
+        if (DAT_10edbe08[i].node == 0)
+            return i;
+    }
+    return -1;
+}
+
+// Places effect model `path` at (x, y, z) in a free slot, starting at frame `start` and playing to the end, moved
+// by (ox, oy, oz). Returns the slot, or -1 when all 64 are in use.
+extern "C" int FUN_1003a7d0(const char *path, float x, float y, float z, int start, float ox, float oy, float oz)
+{
+    int slot = FindFreeEffectModel();
+    if (slot >= 0)
+    {
+        DAT_10edbe08[slot].M_1000b9f0(path, 0, start, -1);
+        DAT_10edbe08[slot].AddKey(0, x, y, z);
+        DAT_10edbe08[slot].SetOffset(ox, oy, oz);
+        DAT_10edbe08[slot].m_0030 = 1;
+        return slot;
+    }
+    return -1;
 }

@@ -14,12 +14,28 @@ struct ToggleInterface
     virtual long __stdcall SetState(int state) = 0;
 };
 
+// Second COM object of a ToggleHolder; only its slot 6 (a four-argument query) is used.
+struct PollInterface
+{
+    virtual long __stdcall QueryInterface() = 0;
+    virtual unsigned long __stdcall AddRef() = 0;
+    virtual unsigned long __stdcall Release() = 0;
+    virtual long __stdcall Slot3() = 0;
+    virtual long __stdcall Slot4() = 0;
+    virtual long __stdcall Slot5() = 0;
+    virtual long __stdcall Query(int a, int b, int c, int d) = 0;
+};
+
 struct ToggleHolder
 {
     ToggleInterface *object;
+    int m_0004;
+    int m_0008;
+    PollInterface *poll;      // 0x0c
     void M_10148910();
     void M_10148920();
     int M_10148930();
+    void Poll();
 };
 
 struct Record2c
@@ -169,4 +185,24 @@ extern "C" int FUN_1015c9b0(void)
     DAT_10f1fcf0->Present(0, 0, 0, 0);
     FUN_1014b480();
     return 1;
+}
+
+// While the held object is on, asks the second object for its status and switches the holder off when that fails
+// or returns 0x40003 (finished).
+void ToggleHolder::Poll()
+{
+    if (poll != 0)
+    {
+        int state = 0;
+        if (object != 0)
+        {
+            object->GetState(&state);
+            if (state != 0)
+            {
+                long result = poll->Query(0, 0, 0, 0);
+                if (result < 0 || result == 0x40003)
+                    M_10148920();
+            }
+        }
+    }
 }

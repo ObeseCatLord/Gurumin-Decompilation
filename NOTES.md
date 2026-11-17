@@ -145,6 +145,18 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - /Od translation units (src_od/) are built with `/Od /Oi`: strcpy expands inline there (0x1013e6f0). build_all includes them.
 - Functions called on freshly allocated memory without a null check are plain methods (`node->Init()`), not placement
   `new` (0x1000b9f0).
+- **The compiler picks its own operand order for `+` and `*` of equal-weight terms**; source order and parentheses
+  inside one expression do not steer it. When the original evaluates the "wrong" term first, the first term was a
+  named temporary: `float cosY = cos(a) * y; float ny = cosY + sin(a) * x;` (Vec4::RotateZ/RotateY/RotateX
+  0x101ac300/0x101ac3a0/0x101ac440). Plane::Distance (0x101ad240) still resists because a temporary adds a store there.
+- `-z` as a multiplication operand keeps `fld z; fchs; fmulp` when written `(-z)` (RotateY/RotateX).
+- A min/max assignment whose value is the variable itself (`x = 1 < x ? x : 1`) is folded away; when the original
+  keeps the self-copy, the result went into a new local (`float clamped = ...`, Input::Rumble 0x10142700).
+- Two `return f(..., a, ...)` / `return f(..., 0, ...)` calls in an if/else let the compiler share the pushes of the
+  common arguments, including a pushed 0 that doubles as the second call's argument (Texture_Load 0x1001e1a0); a
+  local or ternary does not.
+- `char` padding arrays inside a local struct turn on the /GS cookie; pad local structs with `unsigned long` arrays
+  (VideoSurface::CopyTo 0x1015c6a0). `DrawText` is a windows.h macro: do not use it as a method name.
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

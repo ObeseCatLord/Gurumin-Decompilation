@@ -19,6 +19,9 @@ struct Matrix4
     Vec4 GetTranslation();
 };
 
+// 0x101ae060: transforms `point` by `matrix` and divides by w (projection to -1..1 screen space).
+Vec4 Project(const Vec4 &point, const Matrix4 &matrix);
+
 struct AnimModel
 {
     char pad_0000[0x84];
@@ -53,6 +56,10 @@ struct AnimModel
     void M_10167400();
     int M_10167390(int id, int value, int frames);
     int AddMotionSpeed(float speed);
+    int PushMotionSpeed(float speed);
+    int MoveTowards(float x, float y, int mode);
+    int SnapHeadingToSide();
+    int ScreenPosition(int *x, int *y, const Matrix4 &viewProjection);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -141,5 +148,80 @@ int AnimModel::AddMotionSpeed(float speed)
     m_2388 = 1;
     if (speed > 60.0f)
         motionSpeed = 60.0f;
+    return 0;
+}
+
+// Gentler version of AddMotionSpeed used every frame while a push continues: a fifth of `speed` (divided by the
+// model's speed divisor) is added only when a speed change is pending (m_238c == 1), the model has no divisor and
+// fewer than 16 blend frames are left. The speed is capped at 60 and the frame counter m_2388 advances. Returns 0.
+int AnimModel::PushMotionSpeed(float speed)
+{
+    speed = speed * 0.2f;
+    if (speedDivisor != 0)
+        speed = speed / speedDivisor;
+    if (m_238c == 1 && speedDivisor == 0)
+    {
+        m_2388 = 0;
+        if (m_229c < 16)
+            motionSpeed = speed * 0.9f + motionSpeed;
+        m_238c = 0;
+        if (m_229c == 0)
+            m_229c = 8;
+    }
+    if (motionSpeed > 60.0f)
+        motionSpeed = 60.0f;
+    m_2388++;
+    return 0;
+}
+
+// Sets the movement offset to the way from the model's position to (x, y), each axis limited to +-40, and the
+// movement mode. Returns 0.
+int AnimModel::MoveTowards(float x, float y, int mode)
+{
+    x = x - world.m[12];
+    y = y - world.m[13];
+    m_23d8 = x;
+    m_23dc = y;
+    m_23e0 = mode;
+    if (x > 40.0f)
+        m_23d8 = 40.0f;
+    if (m_23d8 < -40.0f)
+        m_23d8 = -40.0f;
+    if (y > 40.0f)
+        m_23dc = 40.0f;
+    if (m_23dc < -40.0f)
+        m_23dc = -40.0f;
+    return 0;
+}
+
+// Wraps the heading into 0..2pi (2pi = 6.283 here) and snaps it to the nearer side view: pi/2 when it points into the
+// first half turn, 3pi/2 otherwise (pi = 3.1415). Returns 0.
+int AnimModel::SnapHeadingToSide()
+{
+    while (heading > 6.283f)
+        heading -= 6.283f;
+    while (heading < 0.0f)
+        heading += 6.283f;
+    if (!(heading < 0.0f) && heading < 3.1415f)
+    {
+        heading = 3.1415f / 2;
+        return 0;
+    }
+    heading = 3.1415f * 1.5f;
+    return 0;
+}
+
+// Projects a point 50 units above the model's position to 640x480 screen pixels (y grows downwards) and stores
+// them in *x and *y. Used to place balloons and markers over characters. Returns 0.
+int AnimModel::ScreenPosition(int *x, int *y, const Matrix4 &viewProjection)
+{
+    Vec4 position;
+    position.Copy(world.GetTranslation());
+    position.z += 50.0f;
+    position.Copy(Project(position, viewProjection));
+    position.x = (position.x + 1.0f) * 320.0f;
+    position.y = (2.0f - (position.y + 1.0f)) * 240.0f;
+    *x = (int)position.x;
+    *y = (int)position.y;
     return 0;
 }

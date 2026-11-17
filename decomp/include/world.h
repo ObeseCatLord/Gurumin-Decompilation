@@ -25,7 +25,9 @@ struct Character
     int id;
     char pad_0004[0xc];
     CharModel model;
-    char pad_0011[0xd4b];
+    char pad_0011[0x26f];
+    int m_0280;               // 0x280: node id of the switch this character works (see switches.cpp)
+    char pad_0284[0xad8];
     float m_0d5c;             // 0xd5c: 1.0 when spawned (model alpha or scale)
     char pad_0d60[0x159c];
     struct RootNode *m_22fc;  // 0x22fc: root node of the model (0x22ec inside CharModel)
@@ -46,7 +48,8 @@ struct CharSlot
     int m_003c;
     char pad_0040[0x20];
     int m_0060;
-    char pad_0064[0x41];
+    char pad_0064[0x40];
+    char m_00a4;              // 0xa4: number of switches the character is holding
     char m_00a5;
     char m_00a6;
     char m_00a7;

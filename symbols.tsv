@@ -266,3 +266,7 @@ address	name	evidence
 10164fa0	ModelBank::CollectLights	matched decompiled source (decomp/obj_symbols.tsv)
 1017c570	ModelBank::Add	matched decompiled source (decomp/obj_symbols.tsv)
 101ad2c0	Plane::IntersectRay	matched decompiled source (decomp/obj_symbols.tsv)
+1017cc10	WorldRenderer::Release	matched decompiled source (decomp/obj_symbols.tsv)
+10189000	WorldRenderer::Seek	matched decompiled source (decomp/obj_symbols.tsv)
+10191c30	Node::FindPrefixRecursive	matched decompiled source (decomp/obj_symbols.tsv)
+1017aeb0	SceneOwner::LoadModel	matched decompiled source (decomp/obj_symbols.tsv)

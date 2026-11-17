@@ -54,7 +54,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (144)
+## 2. Small functions (30-250 bytes) (139)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c00` 82 bytes (loops 1)
@@ -74,11 +74,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101148b0` 117 bytes (float, calls 4)
 - [ ] `101ad240` 119 bytes (float, calls 2)
 - [ ] `10162ea0` 120 bytes (float, calls 7)
-- [ ] `1017cc10` 125 bytes (loops 2, calls 3)
-- [ ] `1013ec90` 126 bytes (loops 1, calls 4)
-- [ ] `10189000` 127 bytes (loops 2, calls 2)
-- [ ] `1017aeb0` 129 bytes (calls 5)
-- [ ] `10191c30` 130 bytes (loops 2, calls 2)
 - [ ] `10142700` 131 bytes (float, calls 3)
 - [ ] `101aea50` 131 bytes (float, calls 2)
 - [ ] `1016bdf0` 132 bytes (float, calls 7)
@@ -794,7 +789,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (235)
+## 6. Naming: matched functions without a readable name (236)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
@@ -899,6 +894,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1013e410` 63 bytes (src/window_create.cpp)
 - [ ] `1013e6d0` 11 bytes (src/engine_base.cpp)
 - [ ] `1013e6f0` 146 bytes (src/names_od.cpp)
+- [ ] `1013ec90` 126 bytes (src/engine_1013e.cpp)
 - [ ] `1013edb0` 3 bytes (src/engine_base.cpp)
 - [ ] `1013eed0` 6 bytes (src/engine_base.cpp)
 - [ ] `1013ef00` 38 bytes (src/engine_1013e.cpp)
@@ -1058,9 +1054,9 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/model_misc.cpp`: 10 of 10 functions without a comment, no header
 - [ ] `src/save_slot.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/scene_misc.cpp`: 9 of 9 functions without a comment, no header
-- [ ] `src/scene_node.cpp`: 54 of 56 functions without a comment, no header
+- [ ] `src/scene_node.cpp`: 54 of 57 functions without a comment, no header
 - [ ] `src/texcache.cpp`: 10 of 10 functions without a comment, no header
-- [ ] `src/texture_mgr.cpp`: 14 of 16 functions without a comment, no header
+- [ ] `src/texture_mgr.cpp`: 14 of 17 functions without a comment, no header
 - [ ] `src/visibility.cpp`: 2 of 2 functions without a comment, no header
 - [ ] `src/window_create.cpp`: 4 of 5 functions without a comment, no header
 

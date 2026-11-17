@@ -76,8 +76,21 @@ struct SceneOwner
     char important;   // 0x265: motion changes of this model are flagged as important (DAT_11b04508) while applied
     char pad_0266[0x32];
     Scene *scene;     // 0x298
+    char pad_029c[7];
+    unsigned char loadCount;  // 0x2a3: number of models loaded so far (stops counting at 3)
+    char pad_02a4[0x2048];
+    struct ModelNode *root;   // 0x22ec: root node of the loaded model
+    char pad_22f0[0x1a4];
+    int m_2494;               // 0x2494
     int M_1017b1c0();
     void PlayMotion(int motion, int a, int b, float speed);
+    int LoadModel(const char *path);
+};
+
+struct ModelNode
+{
+    void Load(const char *path, int flags);            // 0x101abd60
+    ModelNode *Find(const char *name, int index);       // 0x1019ece0
 };
 
 struct Animator
@@ -269,4 +282,23 @@ void SceneOwner::PlayMotion(int motion, int a, int b, float speed)
         DAT_11b04508 = 1;
     scene->M_1016a2e0(motion, a, b, speed);
     DAT_11b04508 = 0;
+}
+
+// Loads model file `path` into this model's existing node tree (0x1017aeb0, CharModel::M_1017aeb0 elsewhere).
+// Counts the loads, looks up the biped root "Bip01" (the result is unused in the shipped code), resets m_2494 and
+// rebinds the motion playback to the new model. Returns 0 when the model has no node tree yet.
+int SceneOwner::LoadModel(const char *path)
+{
+    if (root == 0)
+        return 0;
+    root->Load(path, 0);
+    if (loadCount < 3)
+        loadCount++;
+    root->Find("Bip01", 0);
+    ZeroVec unused1;
+    ZeroVec unused2;
+    m_2494 = 0;
+    if (scene != 0)
+        scene->M_1016a020(this);
+    return 1;
 }

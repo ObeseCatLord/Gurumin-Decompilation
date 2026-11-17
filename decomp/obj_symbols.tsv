@@ -154,3 +154,7 @@ _Vec3_Length	101ae890
 ?CollectLights@ModelBank@@QAEHPAUNode@@@Z	10164fa0
 ?Add@ModelBank@@QAEHHH@Z	1017c570
 ?IntersectRay@Plane@@QAEHPAUVec4@@PBU2@1@Z	101ad2c0
+?Release@WorldRenderer@@QAEHXZ	1017cc10
+?Seek@WorldRenderer@@QAEHH@Z	10189000
+?FindPrefixRecursive@Node@@QAEPAU1@PBDPAH@Z	10191c30
+?LoadModel@SceneOwner@@QAEHPBD@Z	1017aeb0

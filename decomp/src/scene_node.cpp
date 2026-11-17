@@ -189,6 +189,7 @@ struct Node
     int M_1019d680();
     int M_1019d600();
     Node *FindRecursive(const char *name, int *skip);
+    Node *FindPrefixRecursive(const char *prefix, int *skip);
     void M_1019d6a0();
     int M_101a8760();
     void M_101911e0(KeyPair *pairs, int count);
@@ -938,4 +939,28 @@ int Node::M_1019d600()
     for (int i = 0; i < childCount; i++)
         children[i]->M_1019d600();
     return 1;
+}
+
+// Like FindRecursive, but matches nodes whose name starts with `prefix` (case-insensitive), e.g. "@Spot" finds
+// "@Spot01" and "@Spot02".
+Node *Node::FindPrefixRecursive(const char *prefix, int *skip)
+{
+    if (_strnicmp(name, prefix, strlen(prefix)) == 0)
+    {
+        if (skip == 0)
+            return this;
+        if (*skip == 0)
+            return this;
+        (*skip)--;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        if (children[i] != 0)
+        {
+            Node *found = children[i]->FindPrefixRecursive(prefix, skip);
+            if (found != 0)
+                return found;
+        }
+    }
+    return 0;
 }

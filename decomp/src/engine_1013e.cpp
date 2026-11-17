@@ -93,3 +93,27 @@ extern "C" int FUN_1013faf0(void)
     DAT_10f654d8 = timeGetTime() + 16;
     return 0;
 }
+
+extern "C" int DAT_10f6552c;  // set when Windows asked the game to quit (WM_QUIT)
+
+// Pumps the Windows message queue: handles at most 30 pending messages per call so a flood of input cannot stall
+// the frame. Returns 0 (and sets the quit flag) when WM_QUIT arrives, else 1.
+extern "C" int FUN_1013ec90(void)
+{
+    MSG msg;
+    int count = 0;
+    while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE))
+    {
+        if (count >= 30)
+            break;
+        count++;
+        if (msg.message == WM_QUIT)
+        {
+            DAT_10f6552c = 1;
+            return 0;
+        }
+        TranslateMessage(&msg);
+        DispatchMessageA(&msg);
+    }
+    return 1;
+}

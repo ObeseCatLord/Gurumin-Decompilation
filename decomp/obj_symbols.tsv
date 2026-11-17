@@ -222,3 +222,5 @@ _Vec3_Dot	101ac200
 ?TestScriptFlag@Game@@QAEHH@Z	100022b0
 ?ForEachActiveTrigger@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z	100552f0
 ?RaiseGameOverEvents@Game@@QAEHXZ	10054a60
+?AddChild@Node@@QAEPAU1@PBDH@Z	101abc30
+?Reset@EffectManager@@QAEHXZ	10184170

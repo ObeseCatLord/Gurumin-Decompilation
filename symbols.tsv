@@ -611,3 +611,5 @@ address	name	evidence
 10010310	Sound_PlayAt	plays a positional sound effect (decomp/src/sound_play.cpp)
 1003a6c0	Scene_Finish	finishes a pending scene start (decomp/src/scene_start.cpp)
 10001980	SoundArc_PlayFileLooped	plays a looping sound file through soundarc.dll (decomp/src/soundarc.cpp)
+101abc30	Node::AddChild	matched decompiled source (decomp/obj_symbols.tsv)
+10184170	EffectManager::Reset	matched decompiled source (decomp/obj_symbols.tsv)

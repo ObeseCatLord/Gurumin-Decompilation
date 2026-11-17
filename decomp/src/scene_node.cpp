@@ -114,7 +114,8 @@ struct KeyPair;
 struct Node
 {
     char name[0x40];
-    char pad_0040[0x24];
+    char folder[0x10];           // 0x40: texture folder of the model, inherited by children
+    char m_0050[0x14];           // 0x50: second inherited name
     int packCount;
     PackHeader *packs;
     KeyPair *indexLists;
@@ -186,6 +187,8 @@ struct Node
     int CopyPlugData();
     int SetMaterialValue(const char *material, int value);
     void M_10191500();
+    void M_101a2290();
+    Node *AddChild(const char *childName, int position);
     int M_101a53b0(Node *source, int a, int b);
     void M_10193d10(int index);
     void M_101913f0();
@@ -417,6 +420,39 @@ int Node::ReleaseSavedStates()
     for (int i = 0; i < childCount; i++)
         children[i]->ReleaseSavedStates();
     return 1;
+}
+
+// Creates a child node called `childName` ("none" for 0) at `position` in the child list (appended when the
+// position is negative or past the end). The child inherits the folder names, starts in render mode 8 with flag
+// 0x40 and is prepared by M_101a2290. Returns the child, or 0 when this node already has 64 children.
+Node *Node::AddChild(const char *childName, int position)
+{
+    if (childCount > 0x3f)
+        return 0;
+    Node *child = (Node *)DAT_11b0b938(0x18a0, "m_child[m_numchild]");
+    child->M_10191500();
+    child->parent = this;
+    strcpy(child->folder, folder);
+    strcpy(child->m_0050, m_0050);
+    child->m_00a0 = 8;
+    child->flags = 0x40;
+    if (childName == 0)
+        strcpy(child->name, "none");
+    else
+        strcpy(child->name, childName);
+    if (position >= childCount || position < 0)
+    {
+        children[childCount] = child;
+        childCount++;
+        children[childCount - 1]->M_101a2290();
+        return children[childCount - 1];
+    }
+    for (int i = childCount - 1; i >= position; i--)
+        children[i + 1] = children[i];
+    children[position] = child;
+    childCount++;
+    children[position]->M_101a2290();
+    return children[position];
 }
 
 // Allocates the node's saved-state block (0xdc bytes) on first use.

@@ -74,6 +74,7 @@ struct KeyTrack
     int HasFrame(int frame);
     int AddKey(int frame, float x, float y, float z, float w);
     int Insert(int frame, float x, float y, float z, float w);
+    int Set(int frame, float x, float y, float z, float w);
     int CopyFrom(const KeyTrack *source);
 };
 
@@ -413,6 +414,45 @@ int KeyTrack::Insert(int frame, float x, float y, float z, float w)
         Reserve(16);
     return i;
 }
+
+// Sets the key at `frame` to (x, y, z, w): an existing key at that frame gets the new value (returns 1); otherwise a
+// new key is inserted in frame order like Insert (returns its index), growing the arrays when needed.
+int KeyTrack::Set(int frame, float x, float y, float z, float w)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if (frames[i] == frame)
+        {
+            values[i].x = x;
+            values[i].y = y;
+            values[i].z = z;
+            values[i].w = w;
+            return 1;
+        }
+        if (frames[i] > frame)
+            break;
+    }
+    for (int j = count - 1; j >= i; j--)
+    {
+        frames[j + 1] = frames[j];
+        values[j + 1].Copy(values[j]);
+        flags[j + 1] = flags[j];
+    }
+    if (count + 16 > m_0000)
+        Reserve(16);
+    frames[i] = frame;
+    values[i].x = x;
+    values[i].y = y;
+    values[i].z = z;
+    values[i].w = w;
+    flags[i] = 0;
+    count++;
+    if (count + 16 > m_0000)
+        Reserve(16);
+    return i;
+}
+
 // Reallocates the span buffer for `newCount` 16-byte spans (contents are not kept). The allocation is tagged
 // "m_indexSP(count)" for the engine's memory report. Returns 1.
 int IndexSpanList::Resize(int newCount)

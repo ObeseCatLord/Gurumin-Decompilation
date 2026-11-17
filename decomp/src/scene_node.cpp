@@ -199,7 +199,14 @@ struct Node
     int M_101944d0();
     int M_10194f40(float *position, Matrix *matrix, int a, float radius, int b, int depth);
     int StartProximityPass(float *position, Matrix *matrix, int a, float radius, int b);
-    void M_10194510();
+    int ReleaseSavedStates();
+    // Puts the saved matrix back when the saved block holds one, and marks the block empty.
+    void RestoreSavedMatrix()
+    {
+        if (saved->m_0020 != 0)
+            matrix = saved->matrix;
+        saved->m_0020 = 0;
+    }
     int M_101947b0();
     int M_101947f0();
     int M_10194830();
@@ -379,6 +386,39 @@ int Node::CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float
     return 0;
 }
 
+// Releases the saved matrix states of the whole subtree: states 0x1000, 0x2000 and 0x400000 put their saved
+// matrix back, state 0x4000 just empties the block, and the temporary states 0x40000/0x80000 are cleared and free
+// the saved block (M_10194980). Returns 1.
+int Node::ReleaseSavedStates()
+{
+    if (saved != 0)
+    {
+        if (flags & 0x1000)
+            RestoreSavedMatrix();
+        if (flags & 0x4000)
+            saved->m_0020 = 0;
+        if (flags & 0x2000)
+            RestoreSavedMatrix();
+        if (flags & 0x400000)
+            RestoreSavedMatrix();
+        if (flags & 0x40000)
+        {
+            flags &= ~0x40000;
+            RestoreSavedMatrix();
+            M_10194980();
+        }
+        else if (flags & 0x80000)
+        {
+            flags &= ~0x80000;
+            RestoreSavedMatrix();
+            M_10194980();
+        }
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->ReleaseSavedStates();
+    return 1;
+}
+
 // Allocates the node's saved-state block (0xdc bytes) on first use.
 int Node::M_101947b0()
 {
@@ -412,25 +452,25 @@ int Node::M_10194830()
     return 1;
 }
 
-// Restores the saved matrix for state 0x2000, clears it and recomputes the world matrices (M_10194510).
+// Restores the saved matrix for state 0x2000, clears it and releases the saved states of the subtree.
 int Node::M_10194870()
 {
     if (saved != 0 && (flags & 0x2000) != 0)
     {
         matrix = saved->matrix;
         flags &= ~0x2000;
-        M_10194510();
+        ReleaseSavedStates();
     }
     return 1;
 }
 
-// Clears state 0x4000 and recomputes the world matrices.
+// Clears state 0x4000 and releases the saved states of the subtree.
 int Node::M_101948c0()
 {
     if (saved != 0 && (flags & 0x4000) != 0)
     {
         flags &= ~0x4000;
-        M_10194510();
+        ReleaseSavedStates();
     }
     return 1;
 }

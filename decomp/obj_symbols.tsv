@@ -216,3 +216,5 @@ _Vec3_Dot	101ac200
 ?DistanceToSegment@Vec4@@QAEMABU1@0AAU1@@Z	101af260
 ?TransformCoord@@YA?AUVec4@@ABU1@ABUMatrix4@@@Z	101adf40
 ?Set@KeyBank@@QAEHHMMMM@Z	101ad820
+?Set@KeyTrack@@QAEHHMMMM@Z	101adcf0
+?ReleaseSavedStates@Node@@QAEHXZ	10194510

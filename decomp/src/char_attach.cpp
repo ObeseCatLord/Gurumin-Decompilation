@@ -10,6 +10,7 @@ struct Node
     Node *AddChild(const char *name, int a);                // 0x101abc30
     int Load(const char *path, int a, int b, int c);        // 0x101ac010
     int BuildMesh(int recurse, int flags);
+    int Rebuild();                                          // 0x101ac1a0
     int RemoveChild(Node *child, int keep);                 // 0x101a2f30
 };
 
@@ -53,4 +54,31 @@ extern "C" int FUN_10012450(int index, int attach, const char *name)
             child->parent->RemoveChild(child, 0);
     }
     return 1;
+}
+
+// Replaces the "helmet" child of character `index`'s "Bip01 Head" with model `name` (0 = just remove it). Returns 0
+// when only removing or when the head is missing, else the result of building the new helmet (or the old helmet
+// node when one is still attached). Not byte-identical yet: the original returns the null `head` already in eax
+// through the shared epilogue (see open.tsv).
+extern "C" int FUN_100143f0(int index, const char *name)
+{
+    Node *old = DAT_10db6ed8[index].root->Find("helmet", 0);
+    if (old != 0)
+        old->parent->RemoveChild(old, 0);
+    if (name == 0)
+        return 0;
+    Node *helmet = DAT_10db6ed8[index].root->Find("helmet", 0);
+    if (helmet != 0)
+        return (int)helmet;
+    Node *head = DAT_10db6ed8[index].root->Find("Bip01 Head", 0);
+    if (head != 0)
+    {
+        helmet = head->AddChild(0, 2);
+        helmet->Load(FUN_1013f8a0(name, 0), 0, 0, 0);
+        strcpy(helmet->name, "helmet");
+        helmet->parent = head;
+        helmet->Rebuild();
+        return helmet->BuildMesh(1, 0);
+    }
+    return 0;
 }

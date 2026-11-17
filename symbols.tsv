@@ -579,3 +579,5 @@ address	name	evidence
 10169660	NodeExtra::Init	matched decompiled source (decomp/obj_symbols.tsv)
 100fc3e0	Script_RunQueued	runs the queued event scripts (decomp/src/script_queue.cpp)
 1001c410	AttachSlot_Store	stores a matrix in a free attachment slot of a kind-0x58 character (decomp/src/group_tables.cpp)
+100cc1d0	Scene_Start	starts a scene: saves player position, binds the world, loads the player character (decomp/src/scene_start.cpp)
+100143f0	Char_SetHelmet	replaces the helmet model on Bip01 Head (decomp/src/char_attach.cpp)

@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include "texture_load.h"
+#include "world.h"
 
 // Loads ITI texture `name` from the data folder (the ITI branch of LoadTexture, texture_load.h).
 inline int LoadIti(const char *name)
@@ -27,22 +28,8 @@ struct ActorFace
     char pad_0094[0xf4];
 };
 
-struct CharModel
-{
-    int M_10161a20(int texture);  // AnimModel::ApplyMaterialSwap
-};
-
-// The part of a Character record (world.h) used here.
-struct CharacterModel
-{
-    char pad_0000[0x10];
-    CharModel model;
-    char pad_0011[0x248b];
-};
-
 extern "C" FaceSet DAT_1087664c[0x80];
 extern "C" ActorFace DAT_10daaaec[0x80];
-extern "C" CharacterModel DAT_10db6ed8[0x80];
 extern "C" short DAT_10b314c0;           // last face frame set
 extern "C" int DAT_10c655f0;             // current costume
 extern "C" int DAT_1030c278[0x80];       // frames until the next face change (0 = none)

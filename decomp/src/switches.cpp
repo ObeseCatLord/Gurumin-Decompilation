@@ -18,19 +18,6 @@ struct Vec4
     float w;
 };
 
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();  // 0x101ade80
-};
-
-// The part of a Character record (world.h) used here: its world matrix.
-struct CharacterPlacement
-{
-    char pad_0000[0x2338];
-    Matrix4 matrix;
-    char pad_2378[0x124];
-};
 
 
 
@@ -70,8 +57,6 @@ extern "C" int DAT_10c62edc[0x1000];      // script flags
 extern "C" int DAT_104bfe6c;              // 1 while sounds are muted (cut-scenes)
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);
 
-// The character table (DAT_10db6ed8) seen through its world matrices.
-#define PLACED ((CharacterPlacement *)DAT_10db6ed8)
 
 // Turns the switch in slot `slot` on: kind 0x13 shows frame 1 and plays sound 0x38a, kind 0x14 shows frame 0x1f and
 // plays 0x389. Both set their script flag and switch their gimmick (on for 0x13, off for 0x14). Returns 0.
@@ -85,7 +70,7 @@ extern "C" int FUN_1005f530(int slot)
             DAT_10c62edc[flag] = 1;
         DAT_10874848.M_10055110(DAT_10219ec0[slot], 1);
         if (DAT_104bfe6c == 0)
-            FUN_1003ad20(0x38a, &PLACED[slot].matrix.GetTranslation(), 1.0f);
+            FUN_1003ad20(0x38a, &DAT_10db6ed8[slot].matrix.GetTranslation(), 1.0f);
     }
     if (DAT_1021f3c0[slot] == 0x14)
     {
@@ -95,7 +80,7 @@ extern "C" int FUN_1005f530(int slot)
             DAT_10c62edc[flag] = 1;
         DAT_10874848.M_10055110(DAT_10219ec0[slot], 0);
         if (DAT_104bfe6c == 0)
-            FUN_1003ad20(0x389, &PLACED[slot].matrix.GetTranslation(), 1.0f);
+            FUN_1003ad20(0x389, &DAT_10db6ed8[slot].matrix.GetTranslation(), 1.0f);
     }
     return 0;
 }
@@ -112,7 +97,7 @@ extern "C" int FUN_1005f640(int slot)
             DAT_10c62edc[flag] = 0;
         DAT_10874848.M_10055110(DAT_10219ec0[slot], 1);
         if (DAT_104bfe6c == 0)
-            FUN_1003ad20(0x38c, &PLACED[slot].matrix.GetTranslation(), 1.0f);
+            FUN_1003ad20(0x38c, &DAT_10db6ed8[slot].matrix.GetTranslation(), 1.0f);
     }
     if (DAT_1021f3c0[slot] == 0x14)
     {
@@ -122,7 +107,7 @@ extern "C" int FUN_1005f640(int slot)
             DAT_10c62edc[flag] = 0;
         DAT_10874848.M_10055110(DAT_10219ec0[slot], 0);
         if (DAT_104bfe6c == 0)
-            FUN_1003ad20(0x38b, &PLACED[slot].matrix.GetTranslation(), 1.0f);
+            FUN_1003ad20(0x38b, &DAT_10db6ed8[slot].matrix.GetTranslation(), 1.0f);
     }
     return 0;
 }

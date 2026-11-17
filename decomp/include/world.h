@@ -19,6 +19,7 @@ struct CharMatrix
 struct CharModel
 {
     void M_1017b0e0(int motion, int a, int b, float speed);
+    int M_10161a20(int texture);  // AnimModel::ApplyMaterialSwap
     int M_10162420(float x, float y, float z);  // places the model at (x, y, z)
     int M_1017b9b0(const char *path);
     int M_1017aeb0(const char *path);
@@ -34,7 +35,9 @@ struct Character
     int id;
     char pad_0004[0xc];
     CharModel model;
-    char pad_0011[0x26f];
+    char pad_0011[0x6f];
+    char *nearCells;          // 0x80: row of DAT_1021d338 (map cells near the character), 0 = no visibility data
+    char pad_0084[0x1fc];
     int m_0280;               // 0x280: node id of the switch this character works (see switches.cpp)
     char pad_0284[0xad8];
     float m_0d5c;             // 0xd5c: 1.0 when spawned (model alpha or scale)

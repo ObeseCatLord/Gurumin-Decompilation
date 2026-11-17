@@ -7,6 +7,15 @@ struct Vec3
     float z;
 };
 
+struct Vec4;  // defined by each source file
+
+// A character's world matrix (row-major; the translation m[12..14] is the character's position).
+struct CharMatrix
+{
+    float m[16];
+    Vec4 GetTranslation();  // 0x101ade80 (vec4.cpp: Matrix4::GetTranslation)
+};
+
 struct CharModel
 {
     void M_1017b0e0(int motion, int a, int b, float speed);
@@ -31,9 +40,17 @@ struct Character
     float m_0d5c;             // 0xd5c: 1.0 when spawned (model alpha or scale)
     char pad_0d60[0x159c];
     struct RootNode *m_22fc;  // 0x22fc: root node of the model (0x22ec inside CharModel)
-    char pad_2300[0x68];
-    Vec3 m_2368;
-    char pad_2374[0x28];
+    char pad_2300[0x38];
+    union
+    {
+        CharMatrix matrix;    // 0x2338: world matrix
+        struct
+        {
+            char pad_matrix[0x30];
+            Vec3 m_2368;      // 0x2368: position (the matrix translation)
+        };
+    };
+    char pad_2378[0x24];
     int m_239c;
     char pad_23a0[0xfc];
 };

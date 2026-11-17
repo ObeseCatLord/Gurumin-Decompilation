@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (57)
+## 1. Walls to retry (58)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -25,6 +25,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
 - [ ] `100157b0` 167 — near-cell list: original keeps the index/row pointer in edi and the box pointer in ebx (pushed late); ours swaps them (local row pointer, direct indexing, do/while tried)
 - [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
+- [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
@@ -131,7 +132,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (211)
+## 3. Medium functions (251-800 bytes) (209)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
@@ -146,8 +147,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100caf90` 292 bytes (float, loops 1, calls 6)
 - [ ] `101692c0` 294 bytes (float, calls 4)
 - [ ] `1019c560` 298 bytes (float, loops 2, calls 1)
-- [ ] `101a23b0` 299 bytes (loops 2, calls 7)
-- [ ] `1001b670` 307 bytes (float, loops 2, calls 8)
 - [ ] `1014ef20` 311 bytes (loops 2, calls 3)
 - [ ] `10017fc0` 312 bytes (float, loops 1, calls 5)
 - [ ] `1001a450` 315 bytes (float, calls 10)

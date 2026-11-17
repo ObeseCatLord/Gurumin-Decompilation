@@ -620,3 +620,5 @@ address	name	evidence
 1016f900	EffectDefs_Allocate	takes a free effect definition (decomp/src/effect_defs.cpp)
 1000f360	Char_SetFace	shows a face frame and schedules the next (decomp/src/face_anim.cpp)
 1019c1e0	Node::AllocMaterials	matched decompiled source (decomp/obj_symbols.tsv)
+1001b670	Enemies_WakeNearby	wakes sleeping enemies near a character (decomp/src/char_proximity.cpp)
+101a23b0	Node::BoneMatrix	matched decompiled source (decomp/obj_symbols.tsv)

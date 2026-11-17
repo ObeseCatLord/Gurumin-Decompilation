@@ -227,3 +227,4 @@ _Vec3_Dot	101ac200
 ?FreeImage@MeshInstance@@QAEXXZ	10169e40
 ?DistanceSquaredToSegment2D@Vec4@@QAEMMMMM@Z	101acc60
 ?AllocMaterials@Node@@QAEHH@Z	1019c1e0
+?BoneMatrix@Node@@QAE?AUMatrix4@@HH@Z	101a23b0

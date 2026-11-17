@@ -67,8 +67,7 @@ extern "C" int DAT_11018604[5];
 
 // Stops every effect: rebinds the effect batch to its buffer, clears all effect tables and marks their slots free
 // (-1), and resets the six group offsets. The offset table has only five values in the original; the sixth group
-// gets whatever was on the stack (kept as is). Not byte-identical yet: the original walks the slot tables with
-// pointers and keeps -1 in a register (see open.tsv).
+// gets whatever was on the stack (kept as is).
 int EffectManager::Reset()
 {
     int offsets[6];
@@ -85,10 +84,17 @@ int EffectManager::Reset()
         DAT_11134cc8[i].id = -1;
     for (i = 0; i < 840; i++)
         DAT_118a8888[i].id = -1;
-    for (i = 0; i < 5; i++)
-        DAT_1101d820[i] = -1;
-    for (i = 0; i < 5; i++)
-        DAT_11018604[i] = -1;
+    // The two five-entry lookup caches.
+    DAT_1101d820[0] = -1;
+    DAT_1101d820[1] = -1;
+    DAT_1101d820[2] = -1;
+    DAT_1101d820[3] = -1;
+    DAT_1101d820[4] = -1;
+    DAT_11018604[0] = -1;
+    DAT_11018604[1] = -1;
+    DAT_11018604[2] = -1;
+    DAT_11018604[3] = -1;
+    DAT_11018604[4] = -1;
     offsets[0] = 0;
     offsets[1] = 0x1cc;
     offsets[2] = 0x244;

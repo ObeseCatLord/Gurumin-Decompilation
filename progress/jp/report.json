@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 3.4394,
+  "fuzzy_match_percent": 3.4653,
   "total_code": "1720206",
-  "matched_code": "53244",
-  "matched_code_percent": 3.0952,
+  "matched_code": "53827",
+  "matched_code_percent": 3.1291,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 531,
-  "matched_functions_percent": 43.8119,
+  "matched_functions": 533,
+  "matched_functions_percent": 43.9769,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 118,
-  "complete_units": 80
+  "total_units": 119,
+  "complete_units": 82
  },
  "units": [
   {
@@ -2033,28 +2033,28 @@
   {
    "name": "app/char_effects",
    "measures": {
-    "fuzzy_match_percent": 62.7714,
+    "fuzzy_match_percent": 100.0,
     "total_code": "373",
-    "matched_code": "97",
-    "matched_code_percent": 26.0054,
+    "matched_code": "373",
+    "matched_code_percent": 100.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
     "total_functions": 2,
-    "matched_functions": 1,
-    "matched_functions_percent": 50.0,
-    "complete_code": "0",
-    "complete_code_percent": 0.0,
+    "matched_functions": 2,
+    "matched_functions_percent": 100.0,
+    "complete_code": "373",
+    "complete_code_percent": 100.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 0
+    "complete_units": 1
    },
    "sections": [
     {
      "name": ".text",
      "size": "373",
-     "fuzzy_match_percent": 62.7714
+     "fuzzy_match_percent": 100.0
     }
    ],
    "functions": [
@@ -2069,14 +2069,14 @@
     {
      "name": "?Reset@EffectManager@@QAEHXZ",
      "size": "276",
-     "fuzzy_match_percent": 49.6875,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270025072"
      }
     }
    ],
    "metadata": {
-    "complete": false,
+    "complete": true,
     "source_path": "decomp/src/char_effects.cpp"
    }
   },
@@ -2730,6 +2730,48 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/dialog_yesno.cpp"
+   }
+  },
+  {
+   "name": "app/effect_defs",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "307",
+    "matched_code": "307",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "307",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "307",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1016f900",
+     "size": "307",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269940992"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/effect_defs.cpp"
    }
   },
   {
@@ -8696,13 +8738,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1656693",
+    "total_code": "1656386",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 625,
+    "total_functions": 624,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -8715,7 +8757,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1656693",
+     "size": "1656386",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -12830,14 +12872,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269927392"
-     }
-    },
-    {
-     "name": "FUN_1016f900",
-     "size": "307",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269940992"
      }
     },
     {

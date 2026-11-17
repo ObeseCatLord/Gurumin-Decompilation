@@ -175,6 +175,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   out-of-line copy. Game::TestScriptFlag (0x100022b0, now inline in game.h) is expanded 3 times and called once in
   ForEachActiveTrigger (0x100552f0), expanded twice and called twice in RaiseGameOverEvents (0x10054a60). A known
   function called "sometimes" after identical inline code is an inline helper.
+- Two short constant loops in a row get **fused** by cl 13.00 (stores interleaved); written-out stores keep the
+  original order and let the compiler keep the constant in a register for the earlier loops too (EffectManager::Reset
+  0x10184170, effect definitions 0x1016f900: the two five-entry -1 caches).
 - Texture_Load (0x1001e1a0) is also an inline helper: functions that load a fixed texture expand it, including
   three `strlen` loops over the literal (0x10050460). `include/texture_load.h` holds it as `LoadTexture`.
 

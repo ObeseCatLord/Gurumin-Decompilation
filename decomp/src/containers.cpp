@@ -15,11 +15,22 @@ struct Vec4
 
 struct VertexPack
 {
-    char pad_0000[0x1c];
+    int m_0000;
+    int m_0004;
+    int m_0008;
+    int m_000c;
+    int m_0010;
+    int m_0014;
+    int m_0018;
     int vertexCount;
-    char pad_0020[0x50];
+    Vec4 boundsMin;
+    Vec4 boundsMax;
+    int m_0040;
+    int m_0044;
+    char pad_0048[0x28];
     void *vertices;
     int SetVertexCount(int count);
+    int CopyFrom(const VertexPack *source);
 };
 
 struct IndexList
@@ -298,5 +309,30 @@ int MotionList::AddEntry(int id, int value, const char *name, int extra)
     names[entryCount][0x1f] = 0;
     extras[entryCount] = extra;
     entryCount++;
+    return 1;
+}
+extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);
+
+int VertexPack::CopyFrom(const VertexPack *source)
+{
+    vertexCount = 0;
+    if (source == 0)
+        return 0;
+    if (source->vertexCount == 0)
+        return 0;
+    SetVertexCount(source->vertexCount);
+    boundsMin.Copy(source->boundsMin);
+    boundsMax.Copy(source->boundsMax);
+    m_0000 = source->m_0000;
+    m_0004 = source->m_0004;
+    m_0008 = source->m_0008;
+    m_000c = source->m_000c;
+    vertexCount = source->vertexCount;
+    m_0010 = source->m_0010;
+    m_0018 = source->m_0018;
+    m_0014 = source->m_0014;
+    m_0040 = source->m_0040;
+    m_0044 = source->m_0044;
+    DAT_11b07530(vertices, source->vertices, vertexCount * 0x70);
     return 1;
 }

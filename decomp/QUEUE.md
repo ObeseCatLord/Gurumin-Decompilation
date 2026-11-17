@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (52)
+## 1. Walls to retry (54)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -26,6 +26,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
+- [ ] `10054a60` 270 — Game::RaiseGameOverEvents: identical except the loop pointer: the original keeps &entry.flags[1] in ebp, cl 13.00 here &entry.flags[0] (pointer and indexed forms tried)
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2110` 143 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2440` 139 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
@@ -53,6 +54,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10169e10` 35 — register choice: original pushes the last argument from edx, VS2003 from ecx
 - [ ] `1016a020` 109 — Playback bind to an owner's root node: same register residue as 0x1016a090 (original: ecx = -1, eax = 0, then a second zero in edi)
 - [ ] `1016a090` 97 — register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)
+- [ ] `1016a100` 280 — Playback::SetLayer: the original unrolls both 16-entry fills (zero kept in esi, -2 as immediates) and tests layer <= 0x8f; cl 13.00 here emits rep stosd (flat, nested 4x4, pointer and merged loops tried)
 - [ ] `1016b010` 53 — original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 - [ ] `1016b1e0` 73 — original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
@@ -126,23 +128,20 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (227)
+## 3. Medium functions (251-800 bytes) (224)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
 - [ ] `100bcb30` 259 bytes (calls 17)
 - [ ] `10001980` 263 bytes (calls 13)
 - [ ] `10010310` 263 bytes (float, calls 8)
-- [ ] `10054a60` 270 bytes (loops 1, calls 3)
 - [ ] `1015c850` 270 bytes Frame_PumpAndRecover (loops 3, calls 12)
 - [ ] `1003a6c0` 271 bytes (loops 1, calls 11)
 - [ ] `10150a90` 273 bytes (calls 13)
 - [ ] `100165e0` 275 bytes (calls 3)
 - [ ] `10184170` 276 bytes (loops 3, calls 1)
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
-- [ ] `1016a100` 280 bytes
 - [ ] `10164af0` 284 bytes (loops 2)
-- [ ] `100552f0` 285 bytes (loops 1, calls 2)
 - [ ] `1015c730` 288 bytes (calls 16)
 - [ ] `10021070` 290 bytes (float, loops 2, calls 7)
 - [ ] `1019f210` 290 bytes (float, loops 3, calls 7)

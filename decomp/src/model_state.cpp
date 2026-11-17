@@ -60,18 +60,25 @@ struct Playback
     int m_0028;
     int m_002c[16];
     int m_006c[16];           // -1 = unused
-    int m_00ac[0x90];
-    char pad_02ec[0x240];
-    int m_052c[0x90];
-    char pad_076c[0x480];
+    // Per-layer animation state, 0x90 layers (Init clears active and end; SetLayer starts one).
+    int m_00ac[0x90];         // 0xac: 1 while the layer is active
+    int m_02ec[0x90];         // 0x2ec: first frame
+    int m_052c[0x90];         // 0x52c: last frame
+    int m_076c[0x90];
+    int m_09ac[0x90];
     int m_0bec;
-    char pad_0bf0[0x7080];
+    int m_0bf0[0x90];         // 0xbf0: playback direction (+1 forwards, -1 backwards)
+    int m_0e30[0x90];
+    int m_1070[0x90][16];     // 0x1070: per-layer values, cleared to 0 when the layer starts
+    int m_3470[0x90][16];
+    int m_5870[0x90][16];     // 0x5870: per-layer values, set to -2 (unused) when the layer starts
     int m_7c70;
     int m_7c74;
     int m_7c78;
     int pad_7c7c;
     SceneNode *m_7c80;
     void Init();
+    int SetLayer(int layer, int a, int first, int last, int b, int c);
     int M_1016a090(SceneNode *node);
     int M_1016a020(struct SceneOwner *owner);
 };
@@ -144,6 +151,27 @@ void Playback::Init()
     m_0020 = 0;
     m_0028 = 0;
     m_001c = -1;
+}
+
+// Starts animation layer `layer` (0..0x8f) playing from frame `first` to `last` (backwards when last < first) with
+// the values a, b, c, and resets its per-layer tables. Returns 1, or 0 for a layer number out of range.
+// Not byte-identical yet: the original writes the two 16-entry fills as unrolled stores (see open.tsv).
+int Playback::SetLayer(int layer, int a, int first, int last, int b, int c)
+{
+    if (layer > 0x8f)
+        return 0;
+    m_0e30[layer] = b;
+    m_076c[layer] = a;
+    m_09ac[layer] = c;
+    m_052c[layer] = last;
+    m_02ec[layer] = first;
+    m_00ac[layer] = 1;
+    m_0bf0[layer] = first <= last ? 1 : -1;
+    for (int i = 0; i < 16; i++)
+        m_1070[layer][i] = 0;
+    for (int i = 0; i < 16; i++)
+        m_5870[layer][i] = -2;
+    return 1;
 }
 
 // Binds the playback to `node` and resets it to the start; the frame count is taken from the node when it has

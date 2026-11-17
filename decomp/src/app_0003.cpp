@@ -1,24 +1,7 @@
-// Script flags and a rectangle test.
+// Script flags, a rectangle test and the script tokenizers (Game::TestScriptFlag is inline in game.h).
 
+#include <string.h>
 #include "game.h"
-
-// Tests script flag `index` (4000 flags in m_3ee694, saved with the game). A negative index tests that the flag
-// is clear. Flag 0 is always set; out-of-range indexes read as clear (or as set for the negated test).
-int Game::M_100022b0(int index)
-{
-    if (index < 0)
-    {
-        index = -index;
-        if (index > 3999)
-            return 1;
-        return m_3ee694[index] == 0;
-    }
-    if (index > 3999)
-        return 0;
-    if (index == 0)
-        return 1;
-    return m_3ee694[index];
-}
 
 // Sets script flag `index` to `value` (flag 0 and out-of-range indexes are ignored).
 int Game::M_10002300(int index, int value)
@@ -163,4 +146,35 @@ int Game::ReadWordInLine()
             pos++;
         }
     }
+}
+
+// Calls `callback` for every event trigger whose map is the current one (or 9999 = any) and whose four script
+// flags all pass. Returns 0.
+int Game::ForEachActiveTrigger(void (*callback)(GameTrigger *trigger))
+{
+    for (int i = 0; i < triggerCount; i++)
+    {
+        GameTrigger *trigger = &triggers[i];
+        if ((trigger->map == 9999 || trigger->map == currentMap) && TestScriptFlag(trigger->flags[0]) &&
+            TestScriptFlag(trigger->flags[1]) && TestScriptFlag(trigger->flags[2]) &&
+            TestScriptFlag(trigger->flags[3]))
+            callback(trigger);
+    }
+    return 0;
+}
+
+// Registers every map event named "GAMEOVER" whose map is the current one (or 9999 = any) and whose four script
+// flags pass, so the game-over scripts run. Returns 0. Not byte-identical yet: the original walks the list with a
+// pointer to flags[1], ours to flags[0] (see open.tsv).
+int Game::RaiseGameOverEvents()
+{
+    for (int i = 0; i < mapEventCount; i++)
+    {
+        GameTrigger *event = &mapEvents[i];
+        if (strcmp(event->name, "GAMEOVER") == 0 && (event->map == 9999 || event->map == currentMap) &&
+            TestScriptFlag(event->flags[0]) && TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+            TestScriptFlag(event->flags[3]))
+            RegisterEvent(event->value);
+    }
+    return 0;
 }

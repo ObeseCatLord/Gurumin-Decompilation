@@ -1,5 +1,14 @@
 #pragma once
 
+// Event trigger (0xc8 bytes): runs when its map matches and all four script flags pass.
+struct GameTrigger
+{
+    int map;                    // map number, 9999 = any map
+    int flags[4];               // script flags that must be set (negative = must be clear, 0 = no condition)
+    int value;                  // 0x14: event id (for map events)
+    char name[0xb0];            // 0x18: event name, e.g. "GAMEOVER"
+};
+
 // Per-window item table: 0x80 item values, then the pointer that receives the chosen result.
 struct GameMenuItems
 {
@@ -103,18 +112,46 @@ struct Game : Object
     char pad_39c68[0x5c1ac];
     GameNamedEntry m_95e14[0x100];
     int m_a4614;
-    char pad_a4618[0x349364];
+    char pad_a4618[0xaf114];
+    GameTrigger triggers[3400]; // 0x15372c: event triggers of the loaded map
+    int triggerCount;           // 0x1f976c
+    char pad_1f9770[0x61a84];
+    GameTrigger mapEvents[2000];// 0x25b1f4: named map events
+    int mapEventCount;          // 0x2bcc74
+    char pad_2bcc78[0x130d04];
     char *text;                 // 0x3ed97c: script text being tokenised
     int pos;                    // 0x3ed980: read position in `text`
     int end;                    // 0x3ed984: text length
-    char token[0xd0c];          // 0x3ed988: the token read last
+    char token[0xd00];          // 0x3ed988: the token read last
+    int currentMap;             // 0x3ee688: number of the loaded map
+    int pad_3ee68c[2];
     int m_3ee694[4000];
 
     ~Game();
     int FindSlot(int id);
     void M_10007f20();
     int LoadMenuTextures(int value);
-    int M_100022b0(int index);
+    // Tests script flag `index` (4000 flags in m_3ee694, saved with the game). A negative index tests that the
+    // flag is clear. Flag 0 is always set; out-of-range indexes read as clear (or as set for the negated test).
+    // Inline: callers expand it (the out-of-line copy is at 0x100022b0).
+    int TestScriptFlag(int index)
+    {
+        if (index < 0)
+        {
+            index = -index;
+            if (index > 3999)
+                return 1;
+            return m_3ee694[index] == 0;
+        }
+        if (index > 3999)
+            return 0;
+        if (index == 0)
+            return 1;
+        return m_3ee694[index];
+    }
+    int ForEachActiveTrigger(void (*callback)(GameTrigger *trigger));
+    int RegisterEvent(int id);  // 0x100020d0 (flag_list.cpp: FlagOwner::M_100020d0)
+    int RaiseGameOverEvents();
     int M_10002300(int index, int value);
     int ReadWord();
     int ReadWordInLine();

@@ -604,3 +604,6 @@ address	name	evidence
 101ad820	KeyBank::Set	matched decompiled source (decomp/obj_symbols.tsv)
 101adcf0	KeyTrack::Set	matched decompiled source (decomp/obj_symbols.tsv)
 10194510	Node::ReleaseSavedStates	matched decompiled source (decomp/obj_symbols.tsv)
+1016a100	Playback::SetLayer	matched decompiled source (decomp/obj_symbols.tsv)
+100552f0	Game::ForEachActiveTrigger	matched decompiled source (decomp/obj_symbols.tsv)
+10054a60	Game::RaiseGameOverEvents	matched decompiled source (decomp/obj_symbols.tsv)

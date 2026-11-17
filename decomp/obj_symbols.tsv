@@ -218,3 +218,7 @@ _Vec3_Dot	101ac200
 ?Set@KeyBank@@QAEHHMMMM@Z	101ad820
 ?Set@KeyTrack@@QAEHHMMMM@Z	101adcf0
 ?ReleaseSavedStates@Node@@QAEHXZ	10194510
+?SetLayer@Playback@@QAEHHHHHHH@Z	1016a100
+?TestScriptFlag@Game@@QAEHH@Z	100022b0
+?ForEachActiveTrigger@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z	100552f0
+?RaiseGameOverEvents@Game@@QAEHXZ	10054a60

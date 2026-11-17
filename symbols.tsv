@@ -565,3 +565,6 @@ address	name	evidence
 101af080	Vec4::Normalized3	matched decompiled source (decomp/obj_symbols.tsv)
 1016b340	Camera_InputToWorld	turns an input direction into world space for the camera heading (decomp/src/camera_orbit.cpp)
 10054550	Sound_PlayDelayed	queues a sound effect to play after a delay (decomp/src/sound_queue.cpp)
+10191aa0	Node::FindRecursiveStripped	matched decompiled source (decomp/obj_symbols.tsv)
+10191b60	Node::FindPrefixRecursiveStripped	matched decompiled source (decomp/obj_symbols.tsv)
+1019afa0	Node::BuildMesh	matched decompiled source (decomp/obj_symbols.tsv)

@@ -61,19 +61,17 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad920` 179 — Spline (Hermite): the original multiplies t3 by -2.0 for the c term; cl 13.00 turns it into -(t3 + t3) and shares that with the b term (forms with 2.0f*, a separate h01 local and a -2 local tried)
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (71)
+## 2. Small functions (30-250 bytes) (68)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `101af140` 143 bytes (float, calls 8)
 - [ ] `101af1d0` 143 bytes (float, calls 8)
-- [ ] `1019afa0` 168 bytes (loops 1, calls 2)
 - [ ] `1001c410` 176 bytes (loops 2)
 - [ ] `100fc3e0` 179 bytes (loops 2, calls 2)
 - [ ] `10169660` 185 bytes (calls 10)
 - [ ] `101aec90` 185 bytes (float, calls 1)
 - [ ] `1014f060` 186 bytes (loops 1, calls 4)
-- [ ] `10191aa0` 188 bytes (loops 1, calls 2)
 - [ ] `101af360` 188 bytes (float, calls 9)
 - [ ] `10145060` 190 bytes (loops 1, calls 6)
 - [ ] `10024c40` 192 bytes (float, calls 9)
@@ -83,7 +81,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10165140` 202 bytes (float, calls 3)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 - [ ] `1014f120` 204 bytes (loops 2, calls 3)
-- [ ] `10191b60` 204 bytes (loops 2, calls 2)
 - [ ] `101ae060` 206 bytes Project (float, calls 1)
 - [ ] `10027560` 207 bytes (loops 2, calls 3)
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)

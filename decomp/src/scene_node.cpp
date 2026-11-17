@@ -50,6 +50,7 @@ struct GlyphState
 
 struct MeshData
 {
+    int M_10150bb0(struct PackHeader *packs, KeyPair *indexLists, int packCount, struct Material *materials, int flags);
     void M_10150a90();
     void M_101476e0(int pack, int value);
     void M_10147690(int a, int b);
@@ -112,7 +113,7 @@ struct Node
     void *m_0098;
     struct MeshData *mesh;
     int m_00a0;
-    int pad_00a4;
+    int built;                   // 0xa4: 1 once BuildMesh has created the mesh buffers
     int m_00a8;
     unsigned int flags;
     int pad_00b0;
@@ -132,7 +133,9 @@ struct Node
     int m_0294;
     char pad_0298[0x10];
     struct Extra *m_02a8;
-    char pad_02ac[0x440];
+    char pad_02ac[0x24];
+    unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
+    char pad_02d1[0x41b];
     int m_06ec;
     char pad_06f0[0xc];
     int m_06fc;
@@ -206,8 +209,9 @@ struct Node
     int M_101ab980();
     int M_10191a30(const char *name, int *value);
     int M_10191c30(const char *name, int *value);
-    int M_10191aa0(const char *name, int *value);
-    int M_10191b60(const char *name, int *value);
+    int FindRecursiveStripped(const char *name, int *skip);
+    int BuildMesh(int recurse, int flags);
+    int FindPrefixRecursiveStripped(const char *prefix, int *skip);
     int M_1019ece0(const char *name, int value);
     int M_1019ed10(const char *name, int value);
     int M_10191920(Node **list, int *count);
@@ -523,13 +527,14 @@ int Node::M_1019ece0(const char *name, int value)
     return M_10191a30(name, &result);
 }
 
-// Like M_1019ece0 with the second pair of finders (M_10191b60 / M_10191aa0).
+// Like M_1019ece0 with the second pair of finders (FindPrefixRecursiveStripped / FindRecursiveStripped), which ignore the name
+// prefixes of special nodes.
 int Node::M_1019ed10(const char *name, int value)
 {
     int result = value;
     if (*name == '@')
-        return M_10191b60(name + 1, &result);
-    return M_10191aa0(name, &result);
+        return FindPrefixRecursiveStripped(name + 1, &result);
+    return FindRecursiveStripped(name, &result);
 }
 
 
@@ -991,6 +996,46 @@ Node *Node::FindRecursive(const char *name, int *skip)
     return 0;
 }
 
+// Like FindRecursive, but compares the name without the prefix of special nodes: collision ("CDL", kinds below
+// 0x40) names skip 6 characters and overlay ("OVF", kind 0xfd) names 7. Nodes without a kind (0xff) are
+// recognised by the prefix itself. Returns the node (as an int, like the other finders here) or 0.
+int Node::FindRecursiveStripped(const char *name, int *skip)
+{
+    int offset = 0;
+    if (kind != 0xff)
+    {
+        if (kind < 0x40)
+            offset = 6;
+        else if (kind == 0xfd)
+            offset = 7;
+    }
+    else
+    {
+        if (this->name[0] == 'C' && this->name[1] == 'D' && this->name[2] == 'L')
+            offset = 6;
+        if (this->name[0] == 'O' && this->name[1] == 'V' && this->name[2] == 'F')
+            offset = 7;
+    }
+    if (_stricmp(this->name + offset, name) == 0)
+    {
+        if (skip == 0)
+            return (int)this;
+        if (*skip == 0)
+            return (int)this;
+        (*skip)--;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        if (children[i] != 0)
+        {
+            int found = children[i]->FindRecursiveStripped(name, skip);
+            if (found != 0)
+                return found;
+        }
+    }
+    return 0;
+}
+
 // Marks this node for the special pass (flag 0x8000) when it is flagged 0x20 or has m_0704 set, unless it or its
 // parent is in one of the excluded modes (flags 0x3e00 / parent 0x3000); otherwise passes the request on to the
 // children. Returns 0 when this node was marked, 1 otherwise.
@@ -1028,6 +1073,70 @@ Node *Node::FindPrefixRecursive(const char *prefix, int *skip)
         }
     }
     return 0;
+}
+
+// Prefix version of FindRecursiveStripped (names that start with `prefix` after the special-node prefix).
+int Node::FindPrefixRecursiveStripped(const char *prefix, int *skip)
+{
+    int offset = 0;
+    if (kind != 0xff)
+    {
+        if (kind < 0x40)
+            offset = 6;
+        else if (kind == 0xfd)
+            offset = 7;
+    }
+    else
+    {
+        if (name[0] == 'C' && name[1] == 'D' && name[2] == 'L')
+            offset = 6;
+        if (name[0] == 'O' && name[1] == 'V' && name[2] == 'F')
+            offset = 7;
+    }
+    if (_strnicmp(name + offset, prefix, strlen(prefix)) == 0)
+    {
+        if (skip == 0)
+            return (int)this;
+        if (*skip == 0)
+            return (int)this;
+        (*skip)--;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        if (children[i] != 0)
+        {
+            int found = children[i]->FindPrefixRecursiveStripped(prefix, skip);
+            if (found != 0)
+                return found;
+        }
+    }
+    return 0;
+}
+
+// Builds the node's mesh buffers from its packed vertex data (or, for a node without packs, from its index lists
+// alone) unless it is a bone (m_0704), and marks the node as built; with `recurse` the whole subtree follows.
+// Returns 1.
+int Node::BuildMesh(int recurse, int flags)
+{
+    if (packs == 0 && packCount == -1)
+    {
+        if (m_0704 == 0)
+        {
+            mesh->M_10150bb0(0, indexLists, -1, materials, flags);
+            built = 1;
+        }
+    }
+    else if (packs != 0 && m_0704 == 0)
+    {
+        mesh->M_10150bb0(packs, indexLists, packCount, materials, flags);
+        built = 1;
+    }
+    if (recurse != 0)
+    {
+        for (int i = 0; i < childCount; i++)
+            children[i]->BuildMesh(1, 0);
+    }
+    return 1;
 }
 
 // Runs the mesh pass M_10147690(a, b) on this node's mesh when it has materials and either no packed data

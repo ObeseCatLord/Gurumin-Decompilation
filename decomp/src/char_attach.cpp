@@ -9,7 +9,7 @@ struct Node
     Node *Find(const char *name, int flags);
     Node *AddChild(const char *name, int a);                // 0x101abc30
     int Load(const char *path, int a, int b, int c);        // 0x101ac010
-    int M_1019afa0(int a, int b);
+    int BuildMesh(int recurse, int flags);
     int RemoveChild(Node *child, int keep);                 // 0x101a2f30
 };
 
@@ -41,7 +41,7 @@ extern "C" int FUN_10012450(int index, int attach, const char *name)
                 child->Load(FUN_1013f8a0(name, 0), 0, 0, 0);
                 strcpy(child->name, "scop");
                 child->parent = hand;
-                child->M_1019afa0(1, 0);
+                child->BuildMesh(1, 0);
                 return 1;
             }
         }

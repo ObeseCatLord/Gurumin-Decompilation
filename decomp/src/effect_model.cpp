@@ -35,7 +35,7 @@ struct Node
     int Load(const char *path, int a, int b, int c);
     int Rebuild();
     int M_10199340();
-    int M_1019afa0(int a, int b);
+    int BuildMesh(int recurse, int flags);
 };
 
 struct EffectModel
@@ -114,7 +114,7 @@ int EffectModel::M_1000b9f0(const char *path, int value, int start, int end)
     if (end < 0)
         this->end = node->M_10199340();
     node->Rebuild();
-    node->M_1019afa0(1, 0);
+    node->BuildMesh(1, 0);
     changed = 0;
     return 1;
 }

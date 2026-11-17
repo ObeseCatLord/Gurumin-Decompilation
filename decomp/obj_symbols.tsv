@@ -187,3 +187,6 @@ _Vec3_Length	101ae890
 ?Push@AnimModel@@QAEHMMM@Z	101628f0
 ?Normalized3@Vec4@@QAE?AU1@XZ	101af080
 ?PreScanFile@Node@@QAEHPBDH@Z	101abd60
+?FindRecursiveStripped@Node@@QAEHPBDPAH@Z	10191aa0
+?FindPrefixRecursiveStripped@Node@@QAEHPBDPAH@Z	10191b60
+?BuildMesh@Node@@QAEHHH@Z	1019afa0

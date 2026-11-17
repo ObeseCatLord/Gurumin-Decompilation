@@ -146,3 +146,6 @@ address	name	evidence
 1019e8c0	Node_SetMaterialValue	for packs using the named material, recursively (matched)
 101a2f30	Node_RemoveChild	(matched)
 1019ebc0	Node_Construct	(matched)
+1015c9e0	Screen_StartTransition	starts (mode != 0) or ends a screen transition, swaps the two frame buffers (matched)
+10148a40	RenderWindow_Create	registers the class and creates the window: WS_POPUP when 0x10f65514 (fullscreen) is set, else WS_OVERLAPPEDWINDOW, size 0x10202b24/28 (matched)
+101489c0	RenderWindow_RegisterClass	WNDCLASSEX with WndProc 0x1013e410

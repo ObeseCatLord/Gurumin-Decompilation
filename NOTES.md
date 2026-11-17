@@ -92,3 +92,4 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   match when that callee is declared `throw()`. The original compiler evidently knew the callee could not throw,
   which fits whole-program /GL+LTCG (see the IPRA note). Use `throw()` on such declarations only where the
   original shows the missing state store.
+- Callee-saved push placement follows the early exits: a test written as its own `if (x == 0) return 0;` before the rest keeps the push after it (0x1015c9e0). Where the original pushes *before* the first test (0x100014b0, 0x10199be0) no spelling has been found yet.

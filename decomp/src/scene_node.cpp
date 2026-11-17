@@ -44,6 +44,7 @@ struct GlyphState
 struct MeshData
 {
     void M_10150a90();
+    void M_101476e0(int pack, int value);
 };
 extern "C" int FUN_10169990(MeshData *mesh);
 
@@ -64,11 +65,19 @@ struct Extra
     void M_10169660();
 };
 
+struct Material
+{
+    char name[0x40];
+    char pad_0040[0x140];
+};
+
 struct PackHeader
 {
     char pad_0000[0xc];
     int m_000c;
-    char pad_0010[0x64];
+    int m_0010;
+    int material;
+    char pad_0018[0x5c];
     void M_101acfa0();
 };
 
@@ -88,7 +97,9 @@ struct Node
     PackHeader *packs;
     KeyPair *indexLists;
     KeyPair *m_0070;
-    char pad_0074[0x24];
+    char pad_0074[0x1c];
+    int materialCount;
+    struct Material *materials;
     void *m_0098;
     struct MeshData *mesh;
     int m_00a0;
@@ -141,6 +152,7 @@ struct Node
     void M_1019e9a0();
     int RemoveChild(Node *child, int keep);
     int CopyPlugData();
+    int SetMaterialValue(const char *material, int value);
     void M_1019eca0();
     int M_10191870(Node **list, int *count);
     int Rebuild();
@@ -825,4 +837,21 @@ int Node::CopyPlugData()
     for (int i = 0; i < childCount; i++)
         children[i]->CopyPlugData();
     return 0;
+}
+int Node::SetMaterialValue(const char *material, int value)
+{
+    for (int m = 0; m < materialCount; m++)
+    {
+        if (_stricmp(materials[m].name, material) == 0 && packCount != 0 && packs != 0 && mesh != 0)
+        {
+            for (int i = 0; i < packCount; i++)
+            {
+                if (packs[i].material == m)
+                    mesh->M_101476e0(i, value);
+            }
+        }
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->SetMaterialValue(material, value);
+    return 1;
 }

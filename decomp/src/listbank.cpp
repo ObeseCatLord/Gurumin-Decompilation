@@ -10,6 +10,13 @@
 // the position of the error in the script text.
 typedef void (*ParserCallback)(int code, int value);
 
+// A top-level `{ ... }` block of a script (its start in the text).
+struct ScriptBlock
+{
+    char *start;
+    int m_0004;
+};
+
 struct ListBank
 {
     int pad_0000;
@@ -21,12 +28,15 @@ struct ListBank
     char pad_640c[0x8400];
     char m_e80c[8][0x80];
     char names[0xdce][0x20];  // 0xec0c: names of the declared script variables
-    char pad_2a5cc[8];
+    int pad_2a5cc;
+    int compiling;            // 0x2a5d0: 1 while CompileText runs
     int nameCount;            // 0x2a5d4: number of entries in `names`
-    int pad_2a5d8;
+    int globalNameCount;      // 0x2a5d8: names declared outside any script (kept between compiles)
     int m_2a5dc[8];
-    char pad_2a5fc[0x4004];
-    char text[0x7d04];        // 0x2e600: script text being parsed
+    ScriptBlock blocks[0x800];// 0x2a5fc: top-level `{ }` blocks of the text
+    int blockCount;           // 0x2e5fc
+    char text[0x7d00];        // 0x2e600: script text being parsed
+    int textLength;           // 0x36300
     char *cursor[8];          // 0x36304: read position in `text`, one per nesting level
     int depth;                // 0x36324: current nesting level
     int pad_36328;
@@ -44,6 +54,11 @@ struct ListBank
     int ReportError(const char *message);
     int FindAll(const char *name, int *out);
     int FreeAll();
+    int FreeBank(int group);                                   // 0x10007ce0 (resource_banks.cpp)
+    int ReadStatement(char **text, char *statement);           // 0x10035b10
+    int SkipBlock(char **text, int *level, int block);         // 0x10035a30
+    int CompileStatement(const char *statement);               // 0x100ed9b0
+    int CompileText();
 };
 
 // Clears group `group`: entries that are not in use lose their values. Returns 1.
@@ -171,4 +186,42 @@ int ListBank::FindAll(const char *name, int *out)
             out[found++] = i;
     }
     return found;
+}
+
+// Compiles the whole script text: top-level statements are compiled one by one, and each `{ ... }` block is recorded
+// in `blocks` and skipped (blocks are compiled when they run). Script variables start again from the global ones.
+// Returns 1, or 0 when an error stopped the compile.
+int ListBank::CompileText()
+{
+    char *p;
+    int level;
+    char statement[256];
+    FreeBank(0);
+    int savedDepth = depth;
+    nameCount = globalNameCount;
+    compiling = 1;
+    blockCount = 0;
+    p = text;
+    depth = 0;
+    while (p < text + textLength)
+    {
+        if (m_3632c != 0)
+            return 0;
+        ReadStatement(&p, statement);
+        cursor[0] = p;
+        if (statement[0] == 0)
+            p++;
+        else if (statement[0] == '{')
+        {
+            level = 1;
+            blocks[blockCount].start = p;
+            SkipBlock(&p, &level, blockCount);
+            blockCount++;
+        }
+        else
+            CompileStatement(statement);
+    }
+    depth = savedDepth;
+    compiling = 0;
+    return 1;
 }

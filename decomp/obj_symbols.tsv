@@ -116,3 +116,8 @@ _atan2f	10001f80
 ?Read@GameFile@@QAEHPAXHH@Z	101b23a0
 ?Close@GameFile@@QAEXXZ	101b22f0
 ??1GameFile@@QAE@XZ	101b2570
+?Init@Node@@QAEXXZ	10191500
+?Release@Node@@QAEXXZ	1019e9a0
+?Load@Node@@QAEHPBDHHH@Z	101ac010
+?FreeVertices@VertexPack@@QAEHXZ	101acfc0
+?Free@IndexList@@QAEHXZ	101ad0e0

@@ -50,17 +50,17 @@ extern "C" LRESULT CALLBACK FUN_1013e410(HWND, UINT, WPARAM, LPARAM);
 void RenderWindow::RegisterWindowClass(HINSTANCE instance)
 {
     WNDCLASSEXA wc;
-    wc.hIcon = icon;
     wc.cbSize = sizeof(wc);
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = FUN_1013e410;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hInstance = instance;
+    wc.hIcon = icon;
     wc.hCursor = LoadCursorA(0, IDC_ARROW);
-    wc.lpszClassName = className;
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW - 0);
     wc.lpszMenuName = 0;
+    wc.lpszClassName = className;
     wc.hIconSm = 0;
     RegisterClassExA(&wc);
 }
@@ -76,6 +76,10 @@ LRESULT __stdcall RenderWindow::WindowProc(HWND window, UINT message, WPARAM wPa
         return 0;
     case WM_ACTIVATEAPP:
         active = wParam;
+        break;
+    case WM_KEYDOWN:
+        if (wParam == VK_ESCAPE)
+            break;
         break;
     case WM_IME_ENDCOMPOSITION:
         onCompositionString();

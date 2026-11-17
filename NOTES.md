@@ -133,3 +133,15 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   a[i] = ...`), not pointer loops (0x1014b1c0).
 - Local arrays are laid out in declaration order from the top of the frame down: the one declared first sits higher
   (ItmScramble: `table` declared before `key`).
+- Math library (0x101ac000-0x101ae000, src/vec_math.cpp): `sqrt`/`sin`/`cos` are calls under /Op (no fsqrt inlining);
+  float arguments of an inline helper are copied to the stack in right-to-left argument order (`LengthSquared(x, y, z)`
+  copies z, y, x). Chained assignments store right to left (`a = b = c = 0` stores c first), which explains odd store
+  orders (0x101ae770). Stores otherwise keep source order, so write them in the original's order (0x101ae710).
+- Vec4 operators that return by value (0x101ac9e0 +, 0x101acb00 *, 0x101acb60 /) keep `this` in edx across the
+  `Vec4()` constructor call: inter-procedural register allocation, so the original was built with /GL + /LTCG.
+  Possible future lever: compile such files with /GL, link them into a test DLL with /LTCG and compare the linked code.
+- An empty `switch` case still counts when the compiler picks the split value if its body is not empty in the source
+  (WindowProc's `case WM_KEYDOWN:` with a dead `if`).
+- /Od translation units (src_od/) are built with `/Od /Oi`: strcpy expands inline there (0x1013e6f0). build_all includes them.
+- Functions called on freshly allocated memory without a null check are plain methods (`node->Init()`), not placement
+  `new` (0x1000b9f0).

@@ -7,15 +7,14 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (41)
+## 1. Walls to retry (38)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
 - [ ] `100014b0` 159 — ReportCursor: only the push edi position differs (original before the first test, VS2003 after it: shrink-wrapping)
-- [ ] `10007f20` 162 — Game reset: zero kept in ebx for all stores (cl 13.00 habit)
 - [ ] `10008910` 275 — Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
 - [ ] `100091d0` 239 — Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
-- [ ] `1000b9f0` 252 — model effect setup: zero kept in eax, then esi, for pushes and stores (cl 13.00)
+- [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
 - [ ] `1000ed20` 77 — original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 - [ ] `10012130` 172 — Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
@@ -26,9 +25,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e2110` 143 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2440` 139 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
-- [ ] `1013e4f0` 431 — RenderWindow::WindowProc: same cases and bodies; cl 13.00 splits the 9-case switch at 0x10e, VS2003 at 0x10f, and the original shares the DefWindowProc tail
-- [ ] `1013e6f0` 146 — from an unoptimised (/Od) translation unit (ebp frame, int3 padding); VS2003 /Od assigns the stack slots in a different order (all 12 declaration orders tried) - decomp/src_od/
-- [ ] `101489c0` 120 — RenderWindow::RegisterWindowClass: zero kept in edi for the five zero fields and LoadCursor's argument (cl 13.00)
+- [ ] `1013e4f0` 431 — RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `1014b390` 233 — Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores
 - [ ] `1015cac0` 20 — same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
@@ -53,27 +50,16 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad820` 245 — KeyBank::Set (insert or replace): same ebp/ecx register allocation as 0x101ad760
 - [ ] `101ade80` 54 — return-by-value Vec4: original copies the members straight into the hidden return slot; VS2003 goes through the local temporary
 
-## 2. Small functions (30-250 bytes) (202)
+## 2. Small functions (30-250 bytes) (186)
 
-- [ ] `101ae890` 32 bytes (float, calls 2)
 - [ ] `1000cf80` 33 bytes
-- [ ] `101adec0` 33 bytes (float)
-- [ ] `101acfc0` 34 bytes (calls 1)
-- [ ] `101ad0e0` 40 bytes (calls 1)
-- [ ] `101ae770` 43 bytes
 - [ ] `101627d0` 47 bytes (float)
 - [ ] `101a5860` 50 bytes (loops 1, calls 2)
 - [ ] `10167400` 52 bytes (float)
-- [ ] `101ac6a0` 55 bytes (float)
 - [ ] `10172a40` 57 bytes (calls 1)
-- [ ] `101ac500` 57 bytes (float, calls 1)
 - [ ] `101629b0` 58 bytes (float, calls 1)
-- [ ] `101ac220` 59 bytes (float)
 - [ ] `1019eca0` 62 bytes (calls 2)
 - [ ] `1013e410` 63 bytes (calls 3)
-- [ ] `101ac540` 65 bytes (float, calls 1)
-- [ ] `101ac7c0` 66 bytes (float)
-- [ ] `101ac650` 69 bytes (float)
 - [ ] `1013f8a0` 72 bytes (calls 1)
 - [ ] `10164aa0` 77 bytes (loops 1)
 - [ ] `10015860` 78 bytes (loops 1, calls 1)
@@ -82,20 +68,15 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10148960` 82 bytes (calls 3)
 - [ ] `1019b130` 82 bytes (loops 1, calls 1)
 - [ ] `10008330` 83 bytes (loops 1)
-- [ ] `101acb00` 83 bytes (float, calls 1)
-- [ ] `101acb60` 83 bytes (float, calls 1)
 - [ ] `1000c5c0` 84 bytes (loops 1, calls 1)
 - [ ] `10199dc0` 84 bytes (float)
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10145380` 87 bytes Font_GlyphWidth
 - [ ] `1003b260` 88 bytes (calls 2)
-- [ ] `101ac590` 88 bytes (float, calls 1)
 - [ ] `1000be40` 90 bytes (calls 4)
-- [ ] `101ac5f0` 90 bytes (float, calls 1)
 - [ ] `10007e80` 92 bytes (calls 2)
 - [ ] `101733f0` 92 bytes (calls 3)
 - [ ] `101ac6e0` 92 bytes (float)
-- [ ] `101ae710` 93 bytes (float, calls 2)
 - [ ] `101ac9e0` 95 bytes (float, calls 1)
 - [ ] `101aca40` 95 bytes (float, calls 1)
 - [ ] `101acaa0` 95 bytes (float, calls 1)
@@ -851,7 +832,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (279)
+## 6. Naming: matched functions without a readable name (295)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
@@ -882,6 +863,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `10004aa0` 103 bytes (src/listbank.cpp)
 - [ ] `10007e10` 112 bytes (src/panel_dtor.cpp)
 - [ ] `10007ee0` 56 bytes (src/app_0004.cpp)
+- [ ] `10007f20` 162 bytes (src/menu_textures.cpp)
 - [ ] `10007fd0` 773 bytes (src/menu_textures.cpp)
 - [ ] `100082e0` 64 bytes (src/app_0004.cpp)
 - [ ] `10008390` 67 bytes (src/app_0004.cpp)
@@ -954,6 +936,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `1013dfc0` 246 bytes (src/text_fields.cpp)
 - [ ] `1013e0c0` 161 bytes (src/path_util.cpp)
 - [ ] `1013e6d0` 11 bytes (src/engine_base.cpp)
+- [ ] `1013e6f0` 146 bytes (src/names_od.cpp)
 - [ ] `1013ed90` 3 bytes (src/engine_base.cpp)
 - [ ] `1013eda0` 1 bytes (src/engine_base.cpp)
 - [ ] `1013edb0` 3 bytes (src/engine_base.cpp)
@@ -1109,12 +1092,22 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `101ab980` 75 bytes (src/scene_node.cpp)
 - [ ] `101abb70` 179 bytes (src/scene_node.cpp)
 - [ ] `101ac1a0` 81 bytes (src/scene_node.cpp)
+- [ ] `101ac220` 59 bytes (src/vec_math.cpp)
+- [ ] `101ac500` 57 bytes (src/vec_math.cpp)
+- [ ] `101ac540` 65 bytes (src/vec_math.cpp)
+- [ ] `101ac590` 88 bytes (src/vec_math.cpp)
+- [ ] `101ac5f0` 90 bytes (src/vec_math.cpp)
+- [ ] `101ac650` 69 bytes (src/vec_math.cpp)
+- [ ] `101ac6a0` 55 bytes (src/vec_math.cpp)
+- [ ] `101ac7c0` 66 bytes (src/vec_math.cpp)
 - [ ] `101ac9a0` 32 bytes (src/vec4.cpp)
 - [ ] `101ac9c0` 30 bytes (src/vec4.cpp)
 - [ ] `101acc40` 26 bytes (src/vec4.cpp)
 - [ ] `101acea0` 105 bytes (src/vertex.cpp)
+- [ ] `101acfc0` 34 bytes (src/containers.cpp)
 - [ ] `101acff0` 68 bytes (src/containers.cpp)
 - [ ] `101ad040` 157 bytes (src/containers.cpp)
+- [ ] `101ad0e0` 40 bytes (src/containers.cpp)
 - [ ] `101ad110` 69 bytes (src/containers.cpp)
 - [ ] `101ad160` 74 bytes (src/containers.cpp)
 - [ ] `101ad550` 102 bytes (src/containers.cpp)
@@ -1128,11 +1121,15 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `101adc90` 32 bytes (src/containers.cpp)
 - [ ] `101adcb0` 51 bytes (src/containers.cpp)
 - [ ] `101ade10` 104 bytes (src/containers.cpp)
+- [ ] `101adec0` 33 bytes (src/vec_math.cpp)
 - [ ] `101adef0` 24 bytes (src/containers.cpp)
 - [ ] `101adf10` 34 bytes (src/containers.cpp)
 - [ ] `101ae250` 77 bytes (src/containers.cpp)
+- [ ] `101ae710` 93 bytes (src/vec_math.cpp)
+- [ ] `101ae770` 43 bytes (src/vec_math.cpp)
 - [ ] `101ae7a0` 55 bytes (src/containers.cpp)
 - [ ] `101ae7e0` 59 bytes (src/containers.cpp)
+- [ ] `101ae890` 32 bytes (src/vec_math.cpp)
 - [ ] `101af450` 110 bytes (src/containers.cpp)
 
 ## 7. Structures and globals

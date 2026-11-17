@@ -81,9 +81,13 @@ def main():
     matched_bytes = 0
     units = []
     seen = set()
-    for path in sorted(glob.glob(os.path.join(root, "src", "*.cpp"))):
+    sources = [(p, os.path.basename(p), []) for p in sorted(glob.glob(os.path.join(root, "src", "*.cpp")))]
+    sources += [(p, os.path.join("..", "src_od", os.path.basename(p)), ["/Od", "/Oi"])
+                for p in sorted(glob.glob(os.path.join(root, "src_od", "*.cpp")))]
+    for path, build_name, flags in sources:
         name = os.path.basename(path)
-        out = subprocess.run(["cmd", "/c", os.path.join(root, "build.bat"), name], capture_output=True, text=True).stdout
+        out = subprocess.run(["cmd", "/c", os.path.join(root, "build.bat"), build_name] + flags,
+                             capture_output=True, text=True).stdout
         functions = []
         for line in out.splitlines():
             if line.startswith("DIFF") or "error" in line:
@@ -112,7 +116,7 @@ def main():
         else:
             print(name, "BUILD FAILED"); print(out[-2000:])
         if functions:
-            units.append(unit_entry("app/" + os.path.splitext(name)[0], "decomp/src/" + name, functions))
+            units.append(unit_entry("app/" + os.path.splitext(name)[0], os.path.relpath(path, os.path.join(root, "..")).replace(os.sep, "/"), functions))
     print("TOTAL matched %d, equivalent (13.00 encoding only) %d, differing %d" % (total_m, total_e, total_d))
     code = sum(game.values())
     print("PROGRESS %d of %d game functions matched (%.1f%%), %d of %d code bytes (%.2f%%)" % (

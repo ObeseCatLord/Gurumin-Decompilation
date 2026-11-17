@@ -31,6 +31,7 @@ struct VertexPack
     void *vertices;
     int SetVertexCount(int count);
     int CopyFrom(const VertexPack *source);
+    int FreeVertices();
 };
 
 struct IndexList
@@ -39,6 +40,7 @@ struct IndexList
     int *indices;
     int Resize(int newCount);
     int CopyFrom(const IndexList *source);
+    int Free();
 };
 
 struct KeyTrack
@@ -92,6 +94,23 @@ int VertexPack::SetVertexCount(int count)
     void *buffer = DAT_11b0b938(count * 0x70, "");
     vertexCount = count;
     vertices = buffer;
+    return 1;
+}
+
+int VertexPack::FreeVertices()
+{
+    if (vertices != 0)
+        DAT_11b1ba40(vertices);
+    vertices = 0;
+    return 1;
+}
+
+int IndexList::Free()
+{
+    if (indices != 0)
+        DAT_11b1ba40(indices);
+    indices = 0;
+    count = 0;
     return 1;
 }
 

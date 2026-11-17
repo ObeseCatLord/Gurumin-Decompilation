@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdlib.h>
 #include "game.h"
 
@@ -34,4 +35,29 @@ int Game::LoadMenuTextures(int value)
     free(operator new(0x60000));
     m_6ffc = 1;
     return 1;
+}
+
+void Game::M_10007f20()
+{
+    m_0000 = 0;
+    m_0004 = 0;
+    m_7650 = 0;
+    m_7638 = 0;
+    m_763c = 0;
+    m_7630 = 0;
+    m_7634 = 0;
+    m_7648 = 0;
+    m_764c = 0;
+    m_7640 = 0;
+    m_7644 = 0;
+    m_0088 = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        m_008c[i] = 0;
+        m_0110[i] = 0;
+        m_00a4[i] = 0;
+        memset(m_5db4[i], 0, sizeof(m_5db4[i]));
+        m_0098[i] = 0;
+    }
+    memset(m_01dc, 0, 200 * sizeof(int));
 }

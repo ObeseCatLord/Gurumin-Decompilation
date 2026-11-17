@@ -66,7 +66,11 @@ struct Game
     int m_7634;
     int m_7638;
     int m_763c;
-    char pad_7640[0x14];
+    int m_7640;
+    int m_7644;
+    int m_7648;
+    int m_764c;
+    int m_7650;
     int m_7654[3];
     void (*m_7660)(int);
     int m_7664;

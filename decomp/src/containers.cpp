@@ -382,33 +382,6 @@ int VertexPack::CopyFrom(const VertexPack *source)
     DAT_11b07530(vertices, source->vertices, vertexCount * 0x70);
     return 1;
 }
-// Inserts key (x, y, z, w) at `frame` in frame order, or replaces the value of an existing key at that frame.
-// Returns its index. Not byte-identical yet (see open.tsv).
-int KeyBank::Insert(int frame, float x, float y, float z, float w)
-{
-    int i;
-    for (i = 0; i < m_0a80; i++)
-    {
-        if (m_0000[i] == frame)
-            break;
-        if (m_0000[i] > frame)
-            break;
-    }
-    for (int j = m_0a80 - 1; j >= i; j--)
-    {
-        m_0000[j + 1] = m_0000[j];
-        m_0200[j + 1].Copy(m_0200[j]);
-        flags[j + 1] = flags[j];
-    }
-    m_0200[i].x = x;
-    m_0200[i].y = y;
-    m_0200[i].z = z;
-    m_0200[i].w = w;
-    m_0000[i] = frame;
-    flags[i] = 0;
-    m_0a80++;
-    return i;
-}
 // Same as KeyBank::Insert for a growable track (grows the arrays when needed).
 int KeyTrack::Insert(int frame, float x, float y, float z, float w)
 {

@@ -247,6 +247,8 @@ struct KeyBank
     int m_0a80;
     KeyBank();
     void Clear();  // 0x101ad730
+    int Insert(int frame, float x, float y, float z, float w);
+    int Set(int frame, float x, float y, float z, float w);
 };
 
 // 0x101af420. Constructor: constructs the 0x80 key values and empties the bank.
@@ -292,4 +294,66 @@ void KeyTrack::Reserve(int extra)
         values = newValues;
     }
     capacity += extra;
+}
+
+// Inserts key (x, y, z, w) at `frame`, before the first key whose frame is the same or later, so the keys stay
+// sorted (an existing key at that frame moves up one place). Returns the new key's index.
+int KeyBank::Insert(int frame, float x, float y, float z, float w)
+{
+    int i;
+    for (i = 0; i < m_0a80; i++)
+    {
+        if (m_0000[i] == frame)
+            break;
+        if (m_0000[i] > frame)
+            break;
+    }
+    for (int j = m_0a80 - 1; j >= i; j--)
+    {
+        m_0000[j + 1] = m_0000[j];
+        m_0200[j + 1].Copy(m_0200[j]);
+        flags[j + 1] = flags[j];
+    }
+    m_0200[i].x = x;
+    m_0200[i].y = y;
+    m_0200[i].z = z;
+    m_0200[i].w = w;
+    m_0000[i] = frame;
+    flags[i] = 0;
+    m_0a80++;
+    return i;
+}
+
+// Sets the key at `frame` to (x, y, z, w): an existing key at that frame gets the new value (returns 1); otherwise a
+// new key is inserted in frame order like Insert (returns its index).
+int KeyBank::Set(int frame, float x, float y, float z, float w)
+{
+    int i;
+    for (i = 0; i < m_0a80; i++)
+    {
+        if (m_0000[i] == frame)
+        {
+            m_0200[i].x = x;
+            m_0200[i].y = y;
+            m_0200[i].z = z;
+            m_0200[i].w = w;
+            return 1;
+        }
+        if (m_0000[i] > frame)
+            break;
+    }
+    for (int j = m_0a80 - 1; j >= i; j--)
+    {
+        m_0000[j + 1] = m_0000[j];
+        m_0200[j + 1].Copy(m_0200[j]);
+        flags[j + 1] = flags[j];
+    }
+    m_0200[i].x = x;
+    m_0200[i].y = y;
+    m_0200[i].z = z;
+    m_0200[i].w = w;
+    m_0000[i] = frame;
+    flags[i] = 0;
+    m_0a80++;
+    return i;
 }

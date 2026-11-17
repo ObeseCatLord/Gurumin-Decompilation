@@ -601,3 +601,4 @@ address	name	evidence
 10191ec0	Node::CollectNearSegment	matched decompiled source (decomp/obj_symbols.tsv)
 101af260	Vec4::DistanceToSegment	matched decompiled source (decomp/obj_symbols.tsv)
 101adf40	TransformCoord	matched decompiled source (decomp/obj_symbols.tsv)
+101ad820	KeyBank::Set	matched decompiled source (decomp/obj_symbols.tsv)

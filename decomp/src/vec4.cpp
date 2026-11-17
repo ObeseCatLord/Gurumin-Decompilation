@@ -3,6 +3,9 @@
 // this file, the compiler knows it leaves edx alone and keeps `this` in edx across the call (this is why these
 // operators only match when they live here).
 
+#include <stdlib.h>
+#include <string.h>
+
 struct Vec4
 {
     float x;
@@ -138,4 +141,43 @@ struct KeyBank
 KeyBank::KeyBank()
 {
     Clear();
+}
+
+// Growable key-frame track (containers.cpp). Reserve lives here because its `new Vec4[]` loop keeps the element
+// pointer in edx across the Vec4() calls.
+struct KeyTrack
+{
+    int capacity;
+    int *frames;
+    Vec4 *values;
+    char *flags;
+    int count;
+    void Reserve(int extra);
+};
+
+// Grows the three key arrays by `extra` entries, keeping their contents. Returns nothing; the capacity grows.
+void KeyTrack::Reserve(int extra)
+{
+    int *newFrames = new int[capacity + extra];
+    Vec4 *newValues = new Vec4[capacity + extra];
+    char *newFlags = new char[capacity + extra];
+    if (capacity != 0)
+    {
+        memcpy(newFrames, frames, capacity * sizeof(int));
+        memcpy(newValues, values, capacity * sizeof(Vec4));
+        memcpy(newFlags, flags, capacity);
+        free(frames);
+        frames = newFrames;
+        free(values);
+        values = newValues;
+        free(flags);
+        flags = newFlags;
+    }
+    else
+    {
+        frames = newFrames;
+        flags = newFlags;
+        values = newValues;
+    }
+    capacity += extra;
 }

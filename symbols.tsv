@@ -584,3 +584,4 @@ address	name	evidence
 10163e90	AnimModel::IsClear	matched decompiled source (decomp/obj_symbols.tsv)
 101640b0	AnimModel::IsClearAny	matched decompiled source (decomp/obj_symbols.tsv)
 10163f90	AnimModel::IsClearFlagged	matched decompiled source (decomp/obj_symbols.tsv)
+101ada30	KeyTrack::Reserve	matched decompiled source (decomp/obj_symbols.tsv)

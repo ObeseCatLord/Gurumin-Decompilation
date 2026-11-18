@@ -15,6 +15,7 @@ struct DemoRecording
     char buttons[0x1c][36000];      // 0xafd00: 28 button bytes per frame
     int Load(const char *path);
     int PlayFrame();
+    int RecordFrame();
 };
 
 // 0x1015cc90. Loads a recording from `path`: the frame count, then per frame the five values and the 28 button
@@ -81,5 +82,49 @@ int DemoRecording::PlayFrame()
         values_now[4] = values[4][frame];
         playFrame = frame + 1;
     }
+    return 0;
+}
+
+// 0x1015cd70. Records the current input (28 button bytes and five values) as the next frame and makes it the end
+// of the recording. There is no check against the 36000-frame limit. Returns 0.
+int DemoRecording::RecordFrame()
+{
+    // written out one by one in the original (no loop)
+    buttons[0][playFrame] = buttons_now[0];
+    buttons[1][playFrame] = buttons_now[1];
+    buttons[2][playFrame] = buttons_now[2];
+    buttons[3][playFrame] = buttons_now[3];
+    buttons[4][playFrame] = buttons_now[4];
+    buttons[5][playFrame] = buttons_now[5];
+    buttons[6][playFrame] = buttons_now[6];
+    buttons[7][playFrame] = buttons_now[7];
+    buttons[8][playFrame] = buttons_now[8];
+    buttons[9][playFrame] = buttons_now[9];
+    buttons[10][playFrame] = buttons_now[10];
+    buttons[11][playFrame] = buttons_now[11];
+    buttons[12][playFrame] = buttons_now[12];
+    buttons[13][playFrame] = buttons_now[13];
+    buttons[14][playFrame] = buttons_now[14];
+    buttons[15][playFrame] = buttons_now[15];
+    buttons[16][playFrame] = buttons_now[16];
+    buttons[17][playFrame] = buttons_now[17];
+    buttons[18][playFrame] = buttons_now[18];
+    buttons[19][playFrame] = buttons_now[19];
+    buttons[20][playFrame] = buttons_now[20];
+    buttons[21][playFrame] = buttons_now[21];
+    buttons[22][playFrame] = buttons_now[22];
+    buttons[23][playFrame] = buttons_now[23];
+    buttons[24][playFrame] = buttons_now[24];
+    buttons[25][playFrame] = buttons_now[25];
+    buttons[26][playFrame] = buttons_now[26];
+    buttons[27][playFrame] = buttons_now[27];
+    values[0][playFrame] = values_now[0];
+    values[1][playFrame] = values_now[1];
+    values[2][playFrame] = values_now[2];
+    values[3][playFrame] = values_now[3];
+    values[4][playFrame] = values_now[4];
+    int next = playFrame + 1;
+    playFrame = next;
+    frameCount = next;
     return 0;
 }

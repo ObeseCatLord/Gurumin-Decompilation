@@ -1,6 +1,7 @@
 // Sound slots, menus, character helpers and option flags.
 
 #include <stdlib.h>
+#include <string.h>
 #include "world.h"
 #include "game.h"
 
@@ -124,3 +125,82 @@ extern "C" int FUN_10017ad0(int id)
     return -1;
 }
 
+// Model of the overlay mode closed below (scene_node.cpp Node).
+struct OverlayModel
+{
+    void Release();  // 0x1019e9a0
+};
+
+extern "C" int DAT_104bf8e4;          // frames left of the fade
+extern "C" float DAT_104bf8f0;        // fade value
+extern "C" float DAT_1032d4b0;        // fade step per frame
+extern "C" float DAT_104bf8e8;        // fade target (set exactly on the last frame)
+extern "C" int DAT_104bfe1c;          // 1 while the overlay mode is open
+extern "C" int DAT_104bfd78;
+extern "C" int DAT_104bf8d4;
+extern "C" int DAT_1030c500[0x100];   // the overlay mode's state (entry 0x13 is cleared first)
+extern "C" OverlayModel *DAT_104c03c8; // its model
+extern "C" int DAT_104c03cc;
+extern "C" int DAT_104c03d0;
+extern "C" int DAT_104c03d4;
+extern "C" int DAT_104c03d8;
+extern "C" int DAT_104c03dc;
+extern "C" int DAT_104c03e0;
+extern "C" int DAT_104c03e4;
+extern "C" int DAT_1030b870[0x22];    // its texture slots (-1 = none)
+extern "C" void (*DAT_11b1ba40)(void *block);       // the engine's free
+extern "C" int FUN_1000cb30(const char *text);
+extern "C" int FUN_1000cb90(const char *text);      // Caption_Set
+extern "C" int FUN_10174c70(int slot, int force);   // releases a texture slot
+
+// 0x1003a9d0. Advances the fade (DAT_104bf8f0 by DAT_1032d4b0 per frame, the target on the last frame). Once the
+// fade is under way while the overlay mode is open, the mode is closed: its menus (0x22c, 0x218, 0x216) and caption,
+// its model, texture slots and state are released.
+extern "C" void FUN_1003a9d0(void)
+{
+    if (DAT_104bf8e4 > 0)
+    {
+        DAT_104bf8e4--;
+        DAT_104bf8f0 = DAT_1032d4b0 + DAT_104bf8f0;
+        if (DAT_104bf8e4 == 0)
+            DAT_104bf8f0 = DAT_104bf8e8;
+    }
+    if (DAT_104bf8f0 != 0.0f && DAT_104bfe1c != 0)
+    {
+        DAT_1030c500[0x13] = 0;
+        DAT_104bfd78 = 0;
+        DAT_104b7200.M_100083e0(0x22c);
+        DAT_104b7200.M_100083e0(0x218);
+        DAT_104b7200.M_100083e0(0x216);
+        DAT_1020e0f8[0] = 0;
+        FUN_1000cb30("");
+        FUN_1000cb90("");
+        DAT_104bf8d4 = 1;
+        if (DAT_104c03c8 != 0)
+        {
+            DAT_104c03dc = 0;
+            DAT_104c03c8->Release();
+            DAT_11b1ba40(DAT_104c03c8);
+            DAT_104c03c8 = 0;
+            DAT_104c03cc = 0;
+            DAT_104c03d0 = 0;
+            DAT_104c03d4 = 0;
+            DAT_104c03d8 = 0;
+            DAT_104c03e0 = 0;
+            DAT_104c03e4 = 0;
+            for (int i = 0; i < 0x22; i++)
+            {
+                if (DAT_1030b870[i] > -1)
+                {
+                    FUN_10174c70(DAT_1030b870[i], 1);
+                    DAT_1030b870[i] = -1;
+                }
+            }
+        }
+        DAT_104b7200.M_100083e0(0x218);
+        DAT_104b7200.M_100083e0(0x216);
+        memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+        DAT_1020e0f8[0] = 0;
+        DAT_104bfe1c = 0;
+    }
+}

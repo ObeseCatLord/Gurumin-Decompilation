@@ -282,3 +282,4 @@ _Vec3_Dot	101ac200
 ?DrawStrip@TextureObject@@QAEHPAUScreenVertex@@H@Z	1014ba20
 ?PlayFrame@DemoRecording@@QAEHXZ	1015cf30
 ?GetModeText@ImeContext@@QAEHPAD@Z	1015d180
+?RecordFrame@DemoRecording@@QAEHXZ	1015cd70

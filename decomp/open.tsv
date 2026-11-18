@@ -79,3 +79,4 @@ address	status	reason
 100bd960	open	Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
 10144040	open	blue corner quad: stores and calls identical; the original alternates ecx/eax for the constants (loads the next constant before the last stores of the previous one); chained and separate statements tried
 101441b0	open	black thumbnail-background quad: same register alternation residue as 0x10144040
+10143870	open	TextureObject::BeginRenderTo: identical except block placement (the original puts the shared return 0 right after the first test; nested and early-return forms tried)

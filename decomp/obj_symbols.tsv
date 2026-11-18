@@ -288,3 +288,4 @@ _Vec3_Dot	101ac200
 ?Map_UpdateSpecial@@YAHXZ	100bd960
 ?Rename@Node@@QAEHPBD0@Z	1019ed40
 ?CaptureRgbFirst@TextureObject@@QAEHPAE@Z	10145210
+?BeginRenderTo@TextureObject@@QAEHHHH@Z	10143870

@@ -3,6 +3,7 @@
 // A TextureObject (0x38 bytes, table of 1600 at 0x118d0ba8) owns a Direct3D texture. Animated or streamed
 // textures keep their frames in the buffer pool (buffer_pool.cpp); for those `poolSlot` != 0 and the texture to
 // bind is fetched from the pool when the object is bound.
+#include <string.h>
 #include "d3d9_min.h"
 
 // D3DLOCKED_RECT.
@@ -70,6 +71,7 @@ struct TextureObject
     int CaptureRgb24(unsigned char *out);
     int CaptureRgbRows(unsigned char *out);
     int CaptureRgbFirst(unsigned char *out);
+    int BeginRenderTo(int width, int height, int offset);
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
     int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);
@@ -422,4 +424,61 @@ int TextureObject::CaptureRgbFirst(unsigned char *out)
     copy->UnlockRect();
     copy->Release();
     return 1;
+}
+
+extern "C" int DAT_10f6548c;
+extern "C" int DAT_10f654cc;              // non-zero when off-screen render targets are supported
+extern "C" int DAT_10f65478;              // non-zero while an off-screen target is set up
+extern "C" int DAT_10202b24;              // back-buffer width
+extern "C" int DAT_10202b28;              // back-buffer height
+extern "C" void *DAT_10f08d38;            // depth buffer for off-screen targets
+extern "C" void *DAT_10f60d30;            // saved render target
+extern "C" void *DAT_10f0d540;            // saved depth buffer
+extern "C" D3DVIEWPORT9_ DAT_10f1fd30;    // the full-screen viewport
+extern "C" D3DVIEWPORT9_ DAT_10f1fd48;    // the off-screen viewport
+extern "C" D3DVIEWPORT9_ DAT_10f0ece0;    // saved viewport
+extern "C" int DAT_10f65470;              // saved width
+extern "C" int DAT_10f65474;              // saved height
+
+// 0x10143870. Makes this texture's surface the render target (with the off-screen depth buffer) for drawing into
+// it: the textures of stages 0..3 are unbound and the viewport covers offset..width, offset..height (clamped to the
+// back-buffer size). Unless an off-screen target is already set up, the state to return to is saved. Returns 1 when
+// the target and viewport were set, else 0 (also when off-screen targets are not supported).
+int TextureObject::BeginRenderTo(int width, int height, int offset)
+{
+    DAT_10f6548c = 0;
+    DAT_10f1fcf0->SetTexture(0, 0);
+    DAT_10f6550c = (TextureObject *)1;
+    DAT_10f1fcf0->SetTexture(1, 0);
+    DAT_10f65510 = (TextureObject *)1;
+    DAT_10f1fcf0->SetTexture(2, 0);
+    DAT_10f1fcf0->SetTexture(3, 0);
+    if (DAT_10f654cc == 0)
+        return 0;
+    long result = DAT_10f1fcf0->SetRenderTarget(0, surface);
+    DAT_10f1fcf0->SetDepthStencilSurface(DAT_10f08d38);
+    if (result != 0)
+        return 0;
+    if (DAT_10202b24 <= width)
+        width = DAT_10202b24;
+    if (DAT_10202b28 <= height)
+        height = DAT_10202b28;
+    memset(&DAT_10f1fd48, 0, sizeof(DAT_10f1fd48));
+    DAT_10f1fd48.Width = width - offset;
+    DAT_10f1fd48.X = offset;
+    DAT_10f1fd48.Y = offset;
+    DAT_10f1fd48.Height = height - offset;
+    DAT_10f1fd48.MinZ = 0;
+    DAT_10f1fd48.MaxZ = 1.0f;
+    DAT_10202b34 = width;
+    DAT_10202b38 = height;
+    if (DAT_10f65478 == 0)
+    {
+        DAT_10f0d540 = DAT_10f08d38;
+        DAT_10f60d30 = surface;
+        DAT_10f0ece0 = DAT_10f1fd30;
+        DAT_10f65470 = width;
+        DAT_10f65474 = height;
+    }
+    return DAT_10f1fcf0->SetViewport(&DAT_10f1fd48) == 0;
 }

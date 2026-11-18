@@ -716,3 +716,4 @@ address	name	evidence
 1019ed40	Node::Rename	matched decompiled source (decomp/obj_symbols.tsv)
 10145210	TextureObject::CaptureRgbFirst	matched decompiled source (decomp/obj_symbols.tsv)
 101439e0	Render_ResetTarget	back buffer as target, full or split-screen viewport, saves it (decomp/src/render_reset.cpp)
+10143870	TextureObject::BeginRenderTo	matched decompiled source (decomp/obj_symbols.tsv)

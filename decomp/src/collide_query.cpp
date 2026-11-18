@@ -163,3 +163,58 @@ extern "C" int FUN_1001a450(int slot, const Vec4 *point)
     }
     return DAT_10467920[slot] != 0;
 }
+
+// Head bone node of a character model (scene_node.cpp Node), only its world matrix.
+struct HeadNode
+{
+    char pad_0000[0x24c];
+    CharMatrix worldMatrix;   // 0x24c
+};
+
+// 0x10024750 (Char_ProbeGround). Casts a ray down `depth` units from character `index` (from its head node when
+// `fromHead` is set and it has one, else from its position, 30 units up when `fromHead` is set), moved by `offset`
+// when given, against the world collision (mask 0x4000000, or 4 with `smallObjects`). With `testOnly` only whether
+// something is hit is returned; otherwise the hit point goes to `ground` (x = -200000 when there is none). Returns 1
+// on a hit, else 0.
+extern "C" int FUN_10024750(int index, Vec4 *ground, float depth, int fromHead, const Vec4 *offset, int testOnly,
+                            int smallObjects)
+{
+    Vec4 from;
+    Vec4 to;
+    Vec4 unused;
+    Vec4 hit;
+    float zero = 0;
+    hit.Fill(zero);
+    int mask = smallObjects != 0 ? 4 : 0x4000000;
+    hit.x = -200000.0f;
+    if (fromHead != 0 && DAT_10db6ed8[index].headNode != 0)
+    {
+        from.Copy(DAT_10db6ed8[index].headNode->worldMatrix.GetTranslation());
+    }
+    else
+    {
+        from.x = DAT_10db6ed8[index].m_2368.x;
+        from.y = DAT_10db6ed8[index].m_2368.y;
+        from.z = DAT_10db6ed8[index].m_2368.z;
+        from.w = DAT_10db6ed8[index].matrix.m[15];
+        if (fromHead != 0)
+            from.z += 30.0f;
+    }
+    if (offset != 0)
+        from.Copy(from + *offset);
+    to.Copy(from);
+    to.z -= depth;
+    if (testOnly != 0)
+    {
+        if (DAT_10255f08 != 0 && DAT_10255f08->Collide(0, mask, &to, &from, &hit) != 0)
+            return 1;
+        return 0;
+    }
+    if (DAT_10255f08 != 0)
+        DAT_10255f08->CastSegment(0, mask, &to, &from, &hit, 0);
+    if (ground != 0)
+        ground->Copy(hit);
+    if (hit.x == -200000.0f)
+        return 0;
+    return 1;
+}

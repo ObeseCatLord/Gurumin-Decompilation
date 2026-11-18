@@ -80,3 +80,4 @@ address	status	reason
 10144040	open	blue corner quad: stores and calls identical; the original alternates ecx/eax for the constants (loads the next constant before the last stores of the previous one); chained and separate statements tried
 101441b0	open	black thumbnail-background quad: same register alternation residue as 0x10144040
 10143870	open	TextureObject::BeginRenderTo: identical except block placement (the original puts the shared return 0 right after the first test; nested and early-return forms tried)
+10144ee0	open	TextureObject::HalveRgb24: loop shape differs (the original keeps the row counter in memory and recomputes both row addresses with imul each pixel; cl 13.00 here strength-reduces them); pointer and indexed forms tried

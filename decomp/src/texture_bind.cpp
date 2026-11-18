@@ -72,6 +72,7 @@ struct TextureObject
     int CaptureRgbRows(unsigned char *out);
     int CaptureRgbFirst(unsigned char *out);
     int BeginRenderTo(int width, int height, int offset);
+    int HalveRgb24(unsigned char *pixels, int width, int height);
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
     int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);
@@ -481,4 +482,35 @@ int TextureObject::BeginRenderTo(int width, int height, int offset)
         DAT_10f65474 = height;
     }
     return DAT_10f1fcf0->SetViewport(&DAT_10f1fd48) == 0;
+}
+
+extern "C" void *(*DAT_11b0b938)(int size, const char *tag);  // the engine's allocator
+extern "C" void (*DAT_11b1ba40)(void *block);                 // the engine's free
+
+// 0x10144ee0. Halves a 24-bit image in place: every 2x2 block of `pixels` (width x height) becomes the average of
+// its four pixels, per channel. The result (width/2 x height/2) is built in a temporary buffer and copied back.
+// Returns 0 when there is no image, else 1. Does not use `this`.
+int TextureObject::HalveRgb24(unsigned char *pixels, int width, int height)
+{
+    if (pixels == 0)
+        return 0;
+    int halfWidth = width / 2;
+    int halfHeight = height / 2;
+    unsigned char *half = (unsigned char *)DAT_11b0b938(halfHeight * halfWidth * 3, "a");
+    int pitch = width * 3;
+    for (int y = 0; y < halfHeight; y++)
+    {
+        for (int x = 0; x < halfWidth * 3; x += 3)
+        {
+            const unsigned char *top = pixels + y * 2 * pitch + x * 2;
+            const unsigned char *bottom = pixels + (y * 2 + 1) * pitch + x * 2;
+            unsigned char *out = half + y * halfWidth * 3 + x;
+            out[0] = (top[3] + bottom[3] + bottom[0] + top[0]) / 4;
+            out[1] = (top[4] + top[1] + bottom[4] + bottom[1]) / 4;
+            out[2] = (top[5] + top[2] + bottom[5] + bottom[2]) / 4;
+        }
+    }
+    DAT_11b07530(pixels, half, halfHeight * halfWidth * 3);
+    DAT_11b1ba40(half);
+    return 1;
 }

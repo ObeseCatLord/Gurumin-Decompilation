@@ -721,3 +721,4 @@ address	name	evidence
 10194360	Camera_SetMatrices	matched decompiled source (decomp/obj_symbols.tsv)
 10191280	Node::ReleaseUniqueMeshData	matched decompiled source (decomp/obj_symbols.tsv)
 10147880	MeshBuffers_Create	creates a vertex/index buffer pair in a free slot (decomp/src/buffer_pool.cpp)
+10144ee0	TextureObject::HalveRgb24	matched decompiled source (decomp/obj_symbols.tsv)

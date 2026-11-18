@@ -239,3 +239,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   time, not through a `char c = *p` local; with the local cl 13.00 threads jumps the original does not. The length
   limit is the loop condition at the bottom (`do { if (error) return 0; ... } while (length < 0x100);`), and each
   exit keeps its own copy of the terminating stores and `return 1`.
+- A range test compiled as `fcomp 1.0; test ah,0x41; je skip` then `fcomp 0.9; test ah,5; jnp skip` is the negated
+  form `if (!(z > 1.0 || z < 0.9))`; `z <= 1.0 && z >= 0.9` (in either operand order) gives `jp`/`test ah,1`
+  (Drops_Update 0x1000c390). A float argument computed into a register and pushed as an int (`mov edx,[tmp]; push
+  edx`) was a named local (`float alpha = ...;`) rather than an expression in the call.

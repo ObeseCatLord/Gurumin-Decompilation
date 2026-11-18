@@ -745,3 +745,5 @@ address	name	evidence
 10008c40	Game::DrawNumber	draws a centred number with menu digits (matched, decomp/src/game_panels.cpp)
 10008df0	Game::DrawNumberAlt	DrawNumber with the second digit row (matched, decomp/src/game_panels.cpp)
 100084b0	Game::OpenWindow	opens a menu window in a free slot (open, decomp/src/app_0006.cpp)
+1000cc30	Hud_DrawNameBanners	draws the one or two name banners at map start (matched, decomp/src/name_banners.cpp)
+1000c390	Drops_Update	moves, draws and fades the 1024 falling drops (matched, decomp/src/falling_drops.cpp)

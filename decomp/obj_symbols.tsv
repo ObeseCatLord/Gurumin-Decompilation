@@ -347,3 +347,5 @@ _TestDat_Load	1000beb0
 ?SetButtons@InputState@@QAEHI@Z	1015cae0
 ?ResetVertexColours@Node@@QAEHM@Z	1019c3a0
 ?Add@ScreenBatch@@QAEHPBUScreenVertex@@H@Z	10172ac0
+?DrawSpriteA@EffectManager@@QAEHHABUMatrix4@@H@Z	101890f0
+?DrawSpriteB@EffectManager@@QAEHHABUMatrix4@@H@Z	10189340

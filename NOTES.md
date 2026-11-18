@@ -261,3 +261,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - A destination computed before a branch that only picks the source (`mov edi,dest; test; je; mov esi,a / lea
   esi,b; rep movsd`) was an if/else with one full assignment per branch; the compiler hoists the common part. The
   conditional-expression form computes the source first (Node::SetupSkins 0x101ab9d0).
+- Arguments pushed before a branch that only computes one argument (the sprite alpha in EffectManager::DrawSpriteA
+  0x101890f0) come from one full call per if/else branch: the compiler hoists the shared pushes above the branch
+  and merges the tails. A conditional expression as the argument is evaluated before all pushes instead.
+- Bits 0-7 of a word stored as bytes with `mov al,dl; shr al,n; and al,1` (byte shifts) were read from the low byte:
+  `((unsigned char)bits >> n) & 1`; `(bits >> n) & 1` shifts the whole register (InputState::SetButtons 0x1015cae0).
+- A `<=`/`>=` test that lets NaN through (`test ah,0x41; jnp` / `test ah,1; je`) is the negation of the opposite
+  comparison, written as an early exit `if (a <= b || c >= d) return 0;` (Box_Overlap 0x10191fd0).

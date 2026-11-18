@@ -800,3 +800,5 @@ address	name	evidence
 1019c3a0	Node::ResetVertexColours	white vertices, optionally raised with texture coordinates from x/y (matched, decomp/src/node_vertex_colours.cpp)
 10172ac0	ScreenBatch::Add	appends 640x480 screen vertices scaled to the back buffer (matched, decomp/src/screen_vertices.cpp)
 10175c90	Texture_CreateFromPixels	named texture from RGB pixels in a free slot (open, decomp/src/texture_create.cpp)
+101890f0	EffectManager::DrawSpriteA	queues a world-space effect sprite, projected to the screen (matched, decomp/src/effect_sprites.cpp)
+10189340	EffectManager::DrawSpriteB	queues a screen-space effect sprite (matched, decomp/src/effect_sprites.cpp)

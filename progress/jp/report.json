@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 6.9877,
+  "fuzzy_match_percent": 7.0498,
   "total_code": "1720206",
-  "matched_code": "101907",
-  "matched_code_percent": 5.9241,
+  "matched_code": "102976",
+  "matched_code_percent": 5.9863,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 670,
-  "matched_functions_percent": 55.2805,
+  "matched_functions": 672,
+  "matched_functions_percent": 55.4455,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 182,
-  "complete_units": 116
+  "total_units": 183,
+  "complete_units": 117
  },
  "units": [
   {
@@ -4004,6 +4004,56 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/effect_model.cpp"
+   }
+  },
+  {
+   "name": "app/effect_sprites",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "1069",
+    "matched_code": "1069",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 2,
+    "matched_functions": 2,
+    "matched_functions_percent": 100.0,
+    "complete_code": "1069",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1069",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "?DrawSpriteA@EffectManager@@QAEHHABUMatrix4@@H@Z",
+     "size": "579",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270045424"
+     }
+    },
+    {
+     "name": "?DrawSpriteB@EffectManager@@QAEHHABUMatrix4@@H@Z",
+     "size": "490",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270046016"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/effect_sprites.cpp"
    }
   },
   {
@@ -12360,13 +12410,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1588473",
+    "total_code": "1587404",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 439,
+    "total_functions": 437,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -12379,7 +12429,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1588473",
+     "size": "1587404",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -15526,22 +15576,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "270042832"
-     }
-    },
-    {
-     "name": "FUN_101890f0",
-     "size": "579",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270045424"
-     }
-    },
-    {
-     "name": "FUN_10189340",
-     "size": "490",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270046016"
      }
     },
     {

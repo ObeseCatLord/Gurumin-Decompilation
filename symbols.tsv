@@ -729,3 +729,4 @@ address	name	evidence
 1001af10	Shaga_PushOut	matched decompiled source (decomp/obj_symbols.tsv)
 10024750	Char_ProbeGround	ray down from a character head or position; hit point or test only (decomp/src/collide_query.cpp)
 10009050	Game::MoveCursor	matched decompiled source (decomp/obj_symbols.tsv)
+1001a840	Char_ClampStatus	clamps status counters, marks a character down at zero life, sets state 4/6 in mode 7 (matched, decomp/src/char_status.cpp)

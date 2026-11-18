@@ -726,3 +726,4 @@ address	name	evidence
 1019d750	Node::CollectStatic	matched decompiled source (decomp/obj_symbols.tsv)
 10161cb0	AnimModel::SnapPosition	matched decompiled source (decomp/obj_symbols.tsv)
 10024ac0	Collision_AverageNormals	averages the world hit normals of a model probe nodes (decomp/src/collide_normals.cpp)
+1001af10	Shaga_PushOut	matched decompiled source (decomp/obj_symbols.tsv)

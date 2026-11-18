@@ -8,9 +8,9 @@ address	name	evidence
 10161120	Path_GetBaseName	copies the file name without directory and extension
 1013f910	MakeDataPath	sprintf("%s\\%s", base dir, name) into 4 rotating buffers
 10036ca0	Script_RegisterBuiltin	(signature, id, handler) called 118 times
-10037850	Script_InitLibrary	registers sin/cos/sqrt/rand/strcmp... (handler 0x10005a70)
+10037850	ListBank::InitLibrary	resets the parser and registers the library built-ins sin ... strcmp (matched, decomp/src/listbank.cpp)
 10005a70	Script_LibraryBuiltin	handler for the library built-ins
-1013ad90	Script_RegisterGameBuiltins	registers Message/Shop*/Wait/LoadMap/... (93)
+1013ad90	Script_RegisterGameBuiltins	sets up the game parser and registers the 93 game built-ins (matched, decomp/src/listbank.cpp)
 10138280	Script_GameBuiltin	handler switch for the game built-ins
 100ed9b0	Script_CompileStatement	errors for goto/for/while/switch/return in scripts
 10089a10	Script_CompileCall	argument count/type/reference checks

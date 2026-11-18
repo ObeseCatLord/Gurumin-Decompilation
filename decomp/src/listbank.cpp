@@ -43,7 +43,9 @@ struct ListBank
     int pad_36328;
     int m_3632c;
     ListBank *self;           // 0x36330: set to this object by LoadText
-    char m_36334[0x10][0x20];
+    char m_36334[0x20][0x20]; // 0x36334: registered keywords (16 are searched; the init clears 32)
+    int *m_36734[0x20];       // 0x36734: the variable arrays of the keywords ("ch" = the script flags)
+    char m_367b4;
 
     int M_10004680(int group);
     int M_100046d0(const char *text, int group, int value, char flag);
@@ -69,6 +71,8 @@ struct ListBank
     int CompileCall(const char *text, int flags);              // 0x10089a10 (Script_CompileCall)
     int FirstIndexValue(const char *name, int *value);
     int DeclareVariable(const char *name, int group, char type);
+    int RegisterBuiltin(const char *signature, int id, int (*handler)(ListBank *bank, int id));  // 0x10036ca0
+    int InitLibrary();
 };
 
 // Clears group `group`: entries that are not in use lose their values. Returns 1.
@@ -775,4 +779,173 @@ int ListBank::Evaluate(const char *expression, char type)
             strcpy((char *)result, "\"NULL\"");
     }
     return 1;
+}
+
+extern "C" int FUN_10005a70(ListBank *bank, int id);   // Script_LibraryBuiltin: runs the library built-ins
+
+// 0x10037850 (Script_InitLibrary). Resets the parser (no text, no blocks, no names, no keywords, empty groups;
+// results go to the scratch value at 0x2240c) and registers the library built-ins sin ... strcmp (ids 0x2774 to
+// 0x278c). The names declared so far count as global ones. Returns 0.
+int ListBank::InitLibrary()
+{
+    result = (int *)((char *)this + 0x2240c);
+    self = this;
+    callback = 0;
+    pad_36328 = 0;
+    blockCount = 0;
+    compiling = 0;
+    textLength = 0;
+    depth = 0;
+    m_3632c = 0;
+    nameCount = 0;
+    for (int i = 0; i < 0x20; i++)
+        m_36334[i][0] = 0;
+    for (int group = 0; group < 8; group++)
+    {
+        m_2a5dc[group] = 0;
+        for (int k = 0; k < 0x80; k++)
+            m_440c[group][k] = 0;
+    }
+    RegisterBuiltin("float sin(float)", 0x2774, FUN_10005a70);
+    RegisterBuiltin("float cos(float)", 0x2775, FUN_10005a70);
+    RegisterBuiltin("float tan(float)", 0x2776, FUN_10005a70);
+    RegisterBuiltin("float atan(float)", 0x2777, FUN_10005a70);
+    RegisterBuiltin("float atan2(float,float)", 0x2778, FUN_10005a70);
+    RegisterBuiltin("float sqrt(float)", 0x2779, FUN_10005a70);
+    RegisterBuiltin("int rand()", 0x277a, FUN_10005a70);
+    RegisterBuiltin("int abs(int)", 0x277b, FUN_10005a70);
+    RegisterBuiltin("float fabs(float)", 0x277c, FUN_10005a70);
+    RegisterBuiltin("float itof(int)", 0x277d, FUN_10005a70);
+    RegisterBuiltin("int ftoi(float)", 0x277e, FUN_10005a70);
+    RegisterBuiltin("float asin(float)", 0x277f, FUN_10005a70);
+    RegisterBuiltin("float acos(float)", 0x2780, FUN_10005a70);
+    RegisterBuiltin("float sinh(float)", 0x2781, FUN_10005a70);
+    RegisterBuiltin("float cosh(float)", 0x2782, FUN_10005a70);
+    RegisterBuiltin("float tanh(float)", 0x2783, FUN_10005a70);
+    RegisterBuiltin("float pow(float,float)", 0x2784, FUN_10005a70);
+    RegisterBuiltin("float ceil(float)", 0x2785, FUN_10005a70);
+    RegisterBuiltin("float floor(float)", 0x2786, FUN_10005a70);
+    RegisterBuiltin("float exp(float)", 0x2787, FUN_10005a70);
+    RegisterBuiltin("float log(float)", 0x2788, FUN_10005a70);
+    RegisterBuiltin("float log10(float)", 0x2789, FUN_10005a70);
+    RegisterBuiltin("float _max(float,float)", 0x278a, FUN_10005a70);
+    RegisterBuiltin("float _min(float,float)", 0x278b, FUN_10005a70);
+    RegisterBuiltin("int strcmp(string,string)", 0x278c, FUN_10005a70);
+    globalNameCount = nameCount;
+    return 0;
+}
+
+extern "C" ListBank DAT_104687b8;                       // the game's script parser
+extern "C" int DAT_10c62edc[0x1000];                    // script flags
+extern "C" int DAT_1032d69c;                            // 1 once the game built-ins are registered
+extern "C" char DAT_101dc1fc[];                         // "ch" (copied as an array, not a literal)
+extern "C" void FUN_10017f20(int code, int value);      // the game's parser message callback
+extern "C" int FUN_10138280(ListBank *bank, int id);    // Script_GameBuiltin: runs the game built-ins
+
+// 0x1013ad90 (Script_RegisterGameBuiltins). Sets up the game's script parser: the library built-ins, the keyword
+// "ch" for the script flags (ch[n]), the message callback and the 93 game built-ins (ids 11000 to 0x2fbe); the names
+// declared by then count as global ones.
+extern "C" void FUN_1013ad90(void)
+{
+    DAT_104687b8.InitLibrary();
+    DAT_104687b8.m_36734[0] = DAT_10c62edc;
+    DAT_104687b8.m_367b4 = 0;
+    strcpy(DAT_104687b8.m_36334[0], DAT_101dc1fc);
+    DAT_104687b8.m_3632c = 0;
+    DAT_104687b8.callback = FUN_10017f20;
+    DAT_104687b8.RegisterBuiltin("int Message(int,string,string,string,string)", 11000, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int ShopStart()", 0x2b5c, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int ShopItem(int)", 0x2b5d, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int ShopEnd()", 0x2b5e, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int ShopEnd2()", 0x2b62, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SelStart(int)", 0x2b5f, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SelText(string,int)", 0x2b60, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SelEnd()", 0x2b61, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Wait(int)", 0x2ee3, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int WaitD(int)", 0x2ee4, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int WaitC(int)", 0x32ca, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int LoadMap(int)", 0x3264, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int CharPos(int,int,int,int)", 0x3265, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int MapEnable(int)", 0x3266, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Lock()", 0x3267, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Unlock()", 0x3268, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Walk(int,int,int)", 0x3269, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Black(int,int,int)", 0x326a, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Look(int,int)", 0x326b, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int BGM(int)", 0x326c, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SE(int)", 0x3200, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Event(int)", 0x326d, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Visible(int,int)", 0x326e, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int MapEvent(int)", 0x326f, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int WMessage(string,string)", 0x3270, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Scop(int)", 0x3271, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int PlayMovie(string,int)", 0x3272, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int CrossFade()", 0x3273, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Kaifuku()", 0x3274, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int RCharEffect(int,int)", 0x3275, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Blur(int,int,int)", 0x3276, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int MMV(string)", 0x3277, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Soubi(int)", 0x3278, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int StatusUp(int)", 0x3279, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Camera(int,int,int,int)", 0x327a, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SetRoll(int,int)", 0x327b, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int GetItem(int)", 0x327c, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Walk2(int,int,int,int)", 0x3282, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Mes(string)", 0x3283, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Menu(int)", 0x3284, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SetMapColor(int,float,float,float)", 0x3285, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int PostScr(int)", 0x3286, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int LockCommand(int)", 0x3287, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int GetMP()", 0x328a, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SaveMap()", 0x328b, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int RestoreMap()", 0x328c, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int LVUP(int)", 0x328d, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SetSavePos()", 0x328e, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int ResetFade()", 0x3291, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int GetGP()", 0x3292, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SetGP(int)", 0x3293, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int KaguTest(int,int)", 0x3296, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int KaguTest2(int,int,string)", 0x3297, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int White(int,int,int)", 0x3298, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int YukaKesi(int,int)", 0x3299, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int REffect(int,int,int,int)", 0x329a, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SendEvent(int)", 0x329b, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int LiftEnable(int)", 0x329c, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Lift2C(int)", 0x329e, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Door2C(int)", 0x329f, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int TekiStop(int)", 0x32a0, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int GetCharPos(int,int&,int&,int&)", 0x32a1, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int LiftEnable2(int,int)", 0x32a2, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Getbt15(int)", 0x32a3, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Scop2(int,int,string)", 0x32a4, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SaveCamera()", 0x32a5, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int RestoreCamera()", 0x32a6, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Miss()", 0x32a7, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Reset()", 0x32a8, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SetSavePos2(int,int,int,int)", 0x32a9, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int GAMEOVER(int)", 0x32be, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Recover(int,int,float,float,float)", 0x2ee0, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Special(int)", 0x329d, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Wait2(int)", 0x32c8, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Takara2C(int)", 0x32c9, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Demo(string)", 0x332c, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int LoadMapB(int)", 0x332d, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("string StageName(int)", 0x332e, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("string StageMMV(int)", 0x332f, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int ReloadChar()", 0x3330, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int PlayMMV3(string,int)", 0x3336, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int PlayAVI(string,int)", 0x3337, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Fill(int,float)", 0x3338, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Custom()", 0x3339, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("string Custom2(int)", 0x333a, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Custom3(int)", 0x333b, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Ksk(int)", 0x333c, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int SetWaku(int)", 0x333d, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Kabe(string)", 0x333e, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Mouse(int)", 0x333f, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int PlayMovie2(string,int)", 0x3340, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("string Type(int)", 0x3341, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int GetCf(int)", 0x2fbe, FUN_10138280);
+    DAT_104687b8.globalNameCount = DAT_104687b8.nameCount;
+    DAT_1032d69c = 1;
 }

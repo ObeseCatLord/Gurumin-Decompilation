@@ -130,7 +130,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (74)
+## 3. Medium functions (251-800 bytes) (73)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
@@ -184,7 +184,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001a0d0` 691 bytes (float, calls 37)
 - [ ] `10016700` 694 bytes (float, loops 3, calls 12)
 - [ ] `1016b400` 695 bytes (float, calls 17)
-- [ ] `10037850` 706 bytes Script_InitLibrary (loops 2, calls 25)
 - [ ] `10001170` 712 bytes (float, calls 14)
 - [ ] `1014b750` 713 bytes (float, calls 16)
 - [ ] `1016a980` 718 bytes (calls 18)
@@ -207,7 +206,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (221)
+## 4. Large functions (801-3000 bytes) (220)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes (loops 8, calls 10)
@@ -403,7 +402,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1009d490` 2368 bytes (float, loops 7, calls 76)
 - [ ] `10167440` 2374 bytes (float, loops 2, calls 44)
 - [ ] `101a0cf0` 2380 bytes (float, loops 8, calls 58)
-- [ ] `1013ad90` 2411 bytes Script_RegisterGameBuiltins (loops 1, calls 94)
 - [ ] `101aa080` 2442 bytes (float, loops 4, calls 48)
 - [ ] `1007a370` 2478 bytes (float, calls 52)
 - [ ] `101aaa20` 2483 bytes (float, loops 4, calls 48)

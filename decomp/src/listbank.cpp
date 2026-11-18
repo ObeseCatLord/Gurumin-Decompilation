@@ -19,7 +19,7 @@ struct ScriptBlock
 
 struct ListBank
 {
-    int pad_0000;
+    int *result;              // 0x00: where the last evaluated expression left its value
     int pad_0004;
     ParserCallback callback;  // 0x08: message callback (may be 0)
     char m_000c[8][0x80][0x10];
@@ -60,6 +60,9 @@ struct ListBank
     int CompileStatement(const char *statement);               // 0x100ed9b0
     int CompileText();
     int LoadText(const char *source, int length);
+    int GetIndexPart(const char *name, char *part, int n);    // 0x10036560: the n-th [ ] part of `name`
+    int Evaluate(const char *expression, int flags);         // 0x100caf90: leaves the value in *result
+    int FirstIndexValue(const char *name, int *value);
 };
 
 // Clears group `group`: entries that are not in use lose their values. Returns 1.
@@ -324,3 +327,34 @@ int ListBank::LoadText(const char *source, int length)
     CompileText();
     return 1;
 }
+
+// 0x10037470. For an array reference such as "name[expr]..." (a '[' after the first character): evaluates every
+// bracketed index expression in turn and stores the value of the first one in `value` (0 when there is no '[').
+// Up to eight index values are kept, though only the first is used. Returns 0.
+int ListBank::FirstIndexValue(const char *name, int *value)
+{
+    int values[8];
+    char part[256];
+    char copy[256];
+    *value = 0;
+    int bracket = 0;
+    for (int i = (int)strlen(name) - 1; i > 0; i--)
+    {
+        if (name[i] == '[')
+            bracket = 1;
+    }
+    if (bracket != 0)
+    {
+        strcpy(copy, name);
+        int n = 0;
+        while (GetIndexPart(copy, part, n) != 0)
+        {
+            Evaluate(part, 0);
+            values[n] = *result;
+            n++;
+        }
+        *value = values[0];
+    }
+    return 0;
+}
+

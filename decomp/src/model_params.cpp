@@ -1,6 +1,7 @@
 // Character model parameters (offsets inside the model object of a Character, see world.h).
 
 #include <math.h>
+#include <stdlib.h>
 
 struct Vec4
 {
@@ -20,6 +21,7 @@ struct Matrix4
 {
     float m[16];
     Vec4 GetTranslation();
+    void SetTranslation(Vec4 position);  // 0x101adef0
 };
 
 // 0x101ae060: transforms `point` by `matrix` and divides by w (projection to -1..1 screen space).
@@ -118,6 +120,7 @@ struct AnimModel
     int IsClearOfMapLimited(const Vec4 *offset);
     int Hold(int on, float amount, AnimModel *other);
     int HoldAtSpine(int on, float amount);
+    int SnapHeight(float step, float offset);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -494,5 +497,28 @@ int AnimModel::HoldAtSpine(int on, float amount)
     }
     if (holdState == 1)
         holdState = 2;
+    return 0;
+}
+
+// 0x10161e40. Moves the model to the nearest height that is a multiple of `step` (worked out in tenths of a unit,
+// so step and height are rounded towards zero to 0.1), plus `offset`. Returns 0.
+int AnimModel::SnapHeight(float step, float offset)
+{
+    int candidates[4];  // the multiples just below, above and two below; the fourth entry is unused
+    Vec4 position = world.GetTranslation();
+    int height = (int)(position.z * 10.0f);
+    int grid = (int)(step * 10.0f);
+    int below = height / grid;
+    candidates[0] = below * grid;
+    candidates[1] = (below + 1) * grid;
+    candidates[2] = (below - 1) * grid;
+    int best = 0;
+    for (int i = 1; i < 3; i++)
+    {
+        if (abs(candidates[best] - height) > abs(candidates[i] - height))
+            best = i;
+    }
+    position.z = (float)candidates[best] * 0.1f + offset;
+    world.SetTranslation(position);
     return 0;
 }

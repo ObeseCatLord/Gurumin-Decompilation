@@ -17,6 +17,14 @@ struct Vec4
     float w;
     // 0x101af260 (vec4.cpp): distance from this point to the segment from-to; the closest point goes to *closest.
     float DistanceToSegment(const Vec4 *from, const Vec4 *to, Vec4 *closest);
+    int InBox(const struct Box2 *box);  // 0x101ac6e0 (vec_math.cpp)
+};
+
+// Axis-aligned box, 0x20 bytes (vec_math.cpp Box2).
+struct Box2
+{
+    Vec4 min;
+    Vec4 max;
 };
 
 struct Matrix
@@ -274,6 +282,7 @@ struct Node
     Node *Root();
     int SetUniqueName(const char *name);
     void MakeNameUnique();
+    int TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix *matrix);
 };
 
 
@@ -1411,4 +1420,38 @@ void Node::MakeNameUnique()
         number++;
     }
     strcpy(name, unique);
+}
+
+// 0x10199cd0. Finds the first of the 64 regions (`boxes`, with names in `names`; an empty name = unused) that
+// contains the position of `matrix`, or of this node when `matrix` is 0, and prefixes this node's name with
+// "CDL<region>-". Returns 1 when a region was found, else 0.
+int Node::TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix *matrix)
+{
+    char tagged[256];
+    int i;
+    if (matrix != 0)
+    {
+        for (i = 0; i < 0x40; i++)
+        {
+            if (names[i][0] != 0 && matrix->GetTranslation().InBox(&boxes[i]) != 0)
+            {
+                sprintf(tagged, "CDL%02d-%s", i, name);
+                sprintf(name, tagged);
+                return 1;
+            }
+        }
+    }
+    else
+    {
+        for (i = 0; i < 0x40; i++)
+        {
+            if (names[i][0] != 0 && worldMatrix.GetTranslation().InBox(&boxes[i]) != 0)
+            {
+                sprintf(tagged, "CDL%02d-%s", i, name);
+                sprintf(name, tagged);
+                return 1;
+            }
+        }
+    }
+    return 0;
 }

@@ -70,3 +70,4 @@ address	status	reason
 10054970	open	Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
 10054b70	open	Game::RaiseTalkEvents: same loop-pointer residue as 0x10054a60
 10054c60	open	Game::RaiseOpenEvents: same loop-pointer residue as 0x10054a60
+10037470	open	ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried

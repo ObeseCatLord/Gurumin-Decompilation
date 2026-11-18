@@ -11,6 +11,10 @@ struct Vec4
     float w;
     Vec4();
     void Copy(const Vec4 &source);
+    Vec4 operator+(const Vec4 &other) const;
+    Vec4 operator-(const Vec4 &other) const;
+    Vec4 Scaled(const float &scale);
+    float Length2D();  // 0x101ac500: length of x/y
 };
 
 // Per-slot state table at 0x10daaaec, 0x188 bytes per slot (CharSlot in world.h starts 0x98 bytes later).
@@ -96,6 +100,54 @@ extern "C" int FUN_1001ba40(int unused, const Vec4 *point)
             position.Copy(DAT_10db6ed8[i].matrix.GetTranslation());
             if (position.x - 125.0f < point->x + 25.0f && position.x + 125.0f > point->x - 25.0f &&
                 position.y - 125.0f < point->y + 25.0f && position.y + 125.0f > point->y - 25.0f)
+                return 1;
+        }
+    }
+    return 0;
+}
+
+// 0x1001bec0. Slows `velocity` down to 5 % when it would take `position` closer (in x/y) to one of the objects of
+// kind 0x14 in slots 0x5c..0x7b that is less than 400 units away. Returns 0.
+extern "C" int FUN_1001bec0(const Vec4 *position, Vec4 *velocity)
+{
+    Vec4 delta;
+    for (int i = 0x5c; i < 0x7c; i++)
+    {
+        if (DAT_1021f3c0[i] == 0x14)
+        {
+            delta.Copy(DAT_10db6ed8[i].matrix.GetTranslation() - *position);
+            float distance = delta.Length2D();
+            delta.Copy(delta - *velocity);
+            float distanceAfter = delta.Length2D();
+            if (distance < 400.0f && distance > distanceAfter)
+            {
+                velocity->Copy(velocity->Scaled(0.05f));
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
+
+extern "C" const char DAT_101d67f0[5];  // character slots checked by FUN_10034e80: 0, 13, 15, 58, 20
+
+// 0x10034e80. 1 when any of the five characters in DAT_101d67f0, other than `index` itself, stands within `range`
+// (x/y) of character `index`'s position, moved by `offset` when that is given. Returns 0 otherwise.
+extern "C" int FUN_10034e80(int index, const Vec4 *offset, int range)
+{
+    Vec4 position;
+    if (offset != 0)
+        position.Copy(DAT_10db6ed8[index].matrix.GetTranslation() + *offset);
+    else
+        position.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    Vec4 other;
+    for (int i = 0; i < 5; i++)
+    {
+        if (DAT_101d67f0[i] != index)
+        {
+            other.Copy(DAT_10db6ed8[DAT_101d67f0[i]].matrix.GetTranslation());
+            float distance = (other - position).Length2D();
+            if (distance < (float)range)
                 return 1;
         }
     }

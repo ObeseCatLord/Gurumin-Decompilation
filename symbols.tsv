@@ -669,3 +669,8 @@ address	name	evidence
 10054970	Game::RaiseKskonEvents	matched decompiled source (decomp/obj_symbols.tsv)
 10054b70	Game::RaiseTalkEvents	matched decompiled source (decomp/obj_symbols.tsv)
 10054c60	Game::RaiseOpenEvents	matched decompiled source (decomp/obj_symbols.tsv)
+1001bec0	Char_SlowNearKind14	slows a velocity that approaches a kind-0x14 object within 400 (decomp/src/actor_scan.cpp)
+10034e80	Char_NearParty	1 when one of characters 0/13/15/58/20 is within range (decomp/src/actor_scan.cpp)
+10161e40	AnimModel::SnapHeight	matched decompiled source (decomp/obj_symbols.tsv)
+10037470	ListBank::FirstIndexValue	matched decompiled source (decomp/obj_symbols.tsv)
+10199cd0	Node::TagRegion	matched decompiled source (decomp/obj_symbols.tsv)

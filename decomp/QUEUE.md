@@ -92,11 +92,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (191)
+## 3. Medium functions (251-800 bytes) (189)
 
-- [ ] `1015c850` 270 bytes Frame_PumpAndRecover (loops 3, calls 12)
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
-- [ ] `10021070` 290 bytes (float, loops 2, calls 7)
 - [ ] `1019f210` 290 bytes (float, loops 3, calls 7)
 - [ ] `100caf90` 292 bytes (float, loops 1, calls 6)
 - [ ] `101692c0` 294 bytes (float, calls 4)
@@ -628,11 +626,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (1)
+## 6. Naming: matched functions without a readable name (0)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
-- [ ] `10020f60` 259 bytes (src/collide_regions.cpp)
 
 ## 7. Comment pass (0 files)
 

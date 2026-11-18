@@ -1,5 +1,5 @@
-// Renderer shutdown at the end of the game (TextureManager::M_10175e70 calls it after unloading the textures).
-
+// The renderer's message pump with device-lost recovery, and its shutdown at the end of the game (TextureManager::M_10175e70
+// calls Shutdown after unloading the textures).
 #include <windows.h>
 #include <mmsystem.h>
 #include <stdio.h>
@@ -7,9 +7,23 @@
 
 struct TextureManager
 {
-    int OnLostDevice();  // 0x1014b2a0 (render_reset.cpp Render_OnLostDevice; it does not use `this`)
+    int OnLostDevice();   // 0x1014b2a0 (render_reset.cpp Render_OnLostDevice; it does not use `this`)
+    int OnResetDevice();  // 0x1013fbb0 (Render_OnResetDevice)
     int Shutdown();
+    int PumpAndRecover();
 };
+
+#define D3DERR_DEVICELOST ((long)0x88760868)
+#define D3DERR_DEVICENOTRESET ((long)0x88760869)
+
+extern "C" int DAT_10f6552c;                  // 1 once WM_QUIT was received
+extern "C" int DAT_10f65530;                  // 1 while the game window is active
+extern "C" int DAT_10f656a0;                  // 1 = keep running while inactive
+extern "C" int DAT_10f6550c;                  // texture bound to stage 0 (0 = forget the binding)
+extern "C" char DAT_10f0ff84[];               // the D3DPRESENT_PARAMETERS used for Reset
+extern "C" int FUN_101734d0(void);            // Texture_OnLostDevice: releases every registered texture
+extern "C" int FUN_10173510(void);            // Texture_OnResetDevice: recreates them
+extern "C" int FUN_1013ed20(void);            // Render_BeginScene
 
 extern "C" HWND DAT_10f6569c;                 // the game window
 extern "C" char DAT_10f65754[];               // its window class name
@@ -52,5 +66,43 @@ int TextureManager::Shutdown()
     DAT_10f141d8 = 0;
     DAT_10f1fcf0 = 0;
     DAT_10f141dc = 0;
+    return 1;
+}
+
+// Frame_PumpAndRecover (0x1015c850). Handles the pending window messages and waits (still handling messages) while
+// the game is inactive or the device is lost. When the device can be reset again, all default-pool resources are
+// released, the device is reset (a "restore failed" message box when that fails) and everything is recreated.
+// Then a new scene is begun. Returns 1, or 0 once WM_QUIT has been received.
+int TextureManager::PumpAndRecover()
+{
+    MSG message;
+    if (DAT_10f6552c != 0)
+        return 0;
+    long status;
+    do
+    {
+        while (PeekMessageA(&message, 0, 0, 0, PM_REMOVE))
+        {
+            if (message.message == WM_QUIT)
+            {
+                DAT_10f6552c = 1;
+                return 0;
+            }
+            TranslateMessage(&message);
+            DispatchMessageA(&message);
+        }
+    } while ((DAT_10f65530 == 0 && DAT_10f656a0 == 0) ||
+             (status = DAT_10f1fcf0->TestCooperativeLevel()) == D3DERR_DEVICELOST);
+    if (status == D3DERR_DEVICENOTRESET)
+    {
+        OnLostDevice();
+        FUN_101734d0();
+        if (DAT_10f1fcf0->Reset(DAT_10f0ff84) != 0)
+            MessageBoxA(0, "\x83\x8a\x83X\x83g\x83" "A" "\x8e\xb8\x94s", "err", 0);  // "restore failed"
+        OnResetDevice();
+        FUN_10173510();
+    }
+    DAT_10f6550c = 0;
+    FUN_1013ed20();
     return 1;
 }

@@ -272,3 +272,4 @@ _Vec3_Dot	101ac200
 ?AddLitModel@ModelBank@@QAEHPAUBankModel@@@Z	10164af0
 ?Release@MeshData@@QAEXXZ	10150a90
 ?Shutdown@TextureManager@@QAEHXZ	1015c730
+?PumpAndRecover@TextureManager@@QAEHXZ	1015c850

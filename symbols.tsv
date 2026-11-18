@@ -693,3 +693,5 @@ address	name	evidence
 100bcb30	Enemy_UpdateBehaviour	runs the behaviour updater chosen by DAT_1020b230 (decomp/src/char_dispatch.cpp)
 1015c730	Render_Shutdown	destroys the window, releases D3D and logs reference counts (decomp/src/render_shutdown.cpp)
 10150a90	MeshData::Release	matched decompiled source (decomp/obj_symbols.tsv)
+10020f60	Markers_ProbeGround	flags marker points with no testatari ground below (decomp/src/collide_regions.cpp)
+10021070	Region_IsVisible	1 when a corner of a map region box is in the view volume (decomp/src/region_view.cpp)

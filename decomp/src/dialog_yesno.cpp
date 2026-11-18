@@ -20,8 +20,8 @@ extern "C" int FUN_10010520(const char *message, int yesValue, int noValue)
     int slot = DAT_104b7200.FindSlot(0x216);
     if (slot != 3)
         DAT_104b7200.m_0128[slot] = 0x20;
-    DAT_104b7200.M_1000b2c0(0x216, TEXT_YES, yesValue);
-    DAT_104b7200.M_1000b2c0(0x216, TEXT_NO, noValue);
+    DAT_104b7200.AddFlagEntry(0x216, TEXT_YES, (int *)yesValue);
+    DAT_104b7200.AddFlagEntry(0x216, TEXT_NO, (int *)noValue);
     return 1;
 }
 
@@ -35,7 +35,7 @@ extern "C" int FUN_100105e0(const char *message, int yesValue, int noValue)
     int slot = DAT_104b7200.FindSlot(0x216);
     if (slot != 3)
         DAT_104b7200.m_0128[slot] = 0x20;
-    DAT_104b7200.M_1000b2c0(0x216, TEXT_NO, noValue);
-    DAT_104b7200.M_1000b2c0(0x216, TEXT_YES, yesValue);
+    DAT_104b7200.AddFlagEntry(0x216, TEXT_NO, (int *)noValue);
+    DAT_104b7200.AddFlagEntry(0x216, TEXT_YES, (int *)yesValue);
     return 1;
 }

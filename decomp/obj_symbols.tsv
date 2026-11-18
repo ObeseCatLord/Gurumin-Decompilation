@@ -308,3 +308,7 @@ _Vec3_Dot	101ac200
 ?DrawNumberAlt@Game@@QAEHHHHHHMM@Z	10008df0
 ?DrawLabelledNumber@Game@@QAEHHHHHHMM@Z	10008a30
 ?OpenWindow@Game@@QAEHHHHHH@Z	100084b0
+?AddValueEntry@Game@@QAEHHPBDH@Z	1000b060
+?AddFlagEntry@Game@@QAEHHPBDPAH@Z	1000b2c0
+?AddKind5Entry@Game@@QAEHHPBDPAH@Z	1000b4e0
+?AddRangeEntry@Game@@QAEHHPBDHHPAH@Z	1000b750

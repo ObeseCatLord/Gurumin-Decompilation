@@ -113,7 +113,7 @@ int Game::M_10008330(int id, int *result)
     int slot = FindSlot(id);
     if (slot == 3)
         return 0;
-    m_579c[slot].result = result;
+    m_579c[slot].entries[MENU_RESULT] = result;
     if (result != 0)
         *result = 0;
     return 1;

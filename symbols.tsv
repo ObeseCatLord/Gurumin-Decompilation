@@ -747,3 +747,7 @@ address	name	evidence
 100084b0	Game::OpenWindow	opens a menu window in a free slot (open, decomp/src/app_0006.cpp)
 1000cc30	Hud_DrawNameBanners	draws the one or two name banners at map start (matched, decomp/src/name_banners.cpp)
 1000c390	Drops_Update	moves, draws and fades the 1024 falling drops (matched, decomp/src/falling_drops.cpp)
+1000b060	Game::AddValueEntry	adds a value entry to a menu window (matched, decomp/src/menu_items.cpp)
+1000b2c0	Game::AddFlagEntry	adds a flag entry to a menu window (matched, decomp/src/menu_items.cpp)
+1000b4e0	Game::AddKind5Entry	adds a kind-5 entry to a menu window (matched, decomp/src/menu_items.cpp)
+1000b750	Game::AddRangeEntry	adds a range entry to a menu window (matched, decomp/src/menu_items.cpp)

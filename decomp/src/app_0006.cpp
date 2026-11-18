@@ -30,8 +30,8 @@ int Game::M_100083e0(int id)
 // 0x100084b0. Opens menu window `id` at (x, y) with size (width, height): in its current slot when it is already
 // open, else in the first unused slot (0 when all three are in use). The window's state is reset, the cursor goes
 // to the remembered position of menus that keep theirs, the item labels and the result pointer are cleared and the
-// open sound plays through m_7660. Every window's fade then advances by 0.05 and the item tables of all three are
-// cleared (each 0x82 entries long, so the result pointer and m_0204 too). Returns `id`.
+// open sound plays through m_7660. Every window's fade then advances by 0.05 and the entry tables of all three
+// are cleared (with their result pointers). Returns `id`.
 int Game::OpenWindow(int id, int x, int y, int width, int height)
 {
     int slot = FindSlot(id);
@@ -69,7 +69,7 @@ int Game::OpenWindow(int id, int x, int y, int width, int height)
     m_0140[slot] = 0;
     if (m_01dc[id] != 0)
         m_0140[slot] = (unsigned char)m_0434[id];
-    m_579c[slot].result = 0;
+    m_579c[slot].entries[MENU_RESULT] = 0;
     m_0104 = 10;
     for (int i = 0; i < 0x80; i++)
         m_069c[slot][i][0] = 0;
@@ -80,8 +80,8 @@ int Game::OpenWindow(int id, int x, int y, int width, int height)
         m_7668[w] += 0.05f;
         for (int j = 0; j < 0x82; j++)
         {
-            if (m_579c[w].values[j] != 0)
-                m_579c[w].values[j] = 0;
+            if (m_579c[w].entries[j] != 0)
+                m_579c[w].entries[j] = 0;
         }
     }
     return id;

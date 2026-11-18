@@ -11,12 +11,13 @@ struct GameTrigger
     char pad_002c[0x9c];
 };
 
-// Per-window item table: 0x80 item values, then the pointer that receives the chosen result.
+// Per-window entry table: 0x80 menu entries (a pointer to the variable an entry sets, or for value entries the
+// value itself), then the pointer that receives the window's chosen result (entries[MENU_RESULT]) and one more.
+enum { MENU_RESULT = 0x80 };
+
 struct GameMenuItems
 {
-    int values[0x80];
-    int *result;
-    int m_0204;
+    int *entries[0x82];
 };
 
 // Map table entry (0xe8 bytes): map number, four script-flag conditions and the map's names.
@@ -80,7 +81,7 @@ struct Game : Object
     int m_00bc[3];              // 0xbc: window y
     int m_00c8[3];              // 0xc8: window width
     int m_00d4[3];              // 0xd4: window height
-    char pad_00e0[0xc];
+    int m_00e0[3];              // 0xe0: index of the last entry added to the window
     int m_00ec[3];
     int m_00f8[3];
     int m_0104;                 // 0x104: set to 10 when a window opens
@@ -107,9 +108,10 @@ struct Game : Object
     int m_0690;
     char pad_0694[8];
     char m_069c[3][0x80][0x36]; // 0x69c: per-window item labels (0x80 items of 0x36 characters)
-    GameMenuItems m_579c[3];    // 0x579c: per-window item values and result pointer
-    int m_5db4[3][0x82];
-    char pad_63cc[0xc30];
+    GameMenuItems m_579c[3];    // 0x579c: per-window entries and result pointer
+    int m_5db4[3][0x82];        // 0x5db4: entry kind (0 = flag cleared on open, 1 = value, 2 = range, 5)
+    int m_63cc[3][0x82];        // 0x63cc: range entries' upper value (-1 for the others)
+    int m_69e4[3][0x82];        // 0x69e4: range entries' lower value
     int m_6ffc;
     char pad_7000[0x630];
     int m_7630;                 // 0x7630: menu cursor target x
@@ -199,7 +201,10 @@ struct Game : Object
     int M_10008710(int id, int a, int b, int c);
     int OpenWindow(int id, int x, int y, int width, int height);  // 0x100084b0
     int M_10008330(int id, int *result);
-    int M_1000b2c0(int id, const char *label, int value);
+    int AddValueEntry(int id, const char *label, int value);                    // 0x1000b060
+    int AddFlagEntry(int id, const char *label, int *flag);                     // 0x1000b2c0
+    int AddKind5Entry(int id, const char *label, int *flag);                    // 0x1000b4e0
+    int AddRangeEntry(int id, const char *label, int low, int high, int *value);  // 0x1000b750
 };
 
 inline int Game::FindSlot(int id)

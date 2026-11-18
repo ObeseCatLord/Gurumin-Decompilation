@@ -252,3 +252,6 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   in several conditions of the chain loaded early into a register was a local (`int level = DAT_10c64ad4;`).
 - A mode that is first resolved (`if (mode == -1) { if (...) mode = 0; else mode = 1; }`) and then dispatched lets
   the compiler thread the jumps straight into the attach/remove blocks; a conditional expression gives setcc.
+- A /GS cookie (`push ecx` frame, cookie check before every return) in a function without any buffer means the
+  original declared a character array it never used; an unused `char unused[8];` reproduces it
+  (Helmet_FaceSettings 0x10014d30, commented in the source).

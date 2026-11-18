@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (93)
+## 1. Walls to retry (94)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -29,6 +29,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10012130` 172 — Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
 - [ ] `10012220` 418 — Model_ApplyCommands: logic identical; index/model registers swapped (ebp/ebx) and argument loads scheduled differently; two parameter orders tried
 - [ ] `100143f0` 201 — helmet attach: 8 bytes; when Bip01 Head is missing the original returns through the shared epilogue with eax still 0 from Find, ours emits its own xor eax,eax / epilogue (return 0, return head, result-variable forms tried)
+- [ ] `10014d30` 1931 — Helmet_FaceSettings: values and branches identical; the result is kept in esi (eax in the original) and the inline ScriptFlag uses other registers. An unused char buffer reproduces the original /GS cookie
 - [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
 - [ ] `100157b0` 167 — near-cell list: original keeps the index/row pointer in edi and the box pointer in ebx (pushed late); ours swaps them (local row pointer, direct indexing, do/while tried)
 - [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
@@ -226,7 +227,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (222)
+## 4. Large functions (801-3000 bytes) (221)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes (loops 8, calls 10)
@@ -392,7 +393,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10028fa0` 1900 bytes (float, calls 11)
 - [ ] `100a8ac0` 1912 bytes (float, calls 58)
 - [ ] `1013f070` 1928 bytes (float, loops 3, calls 89)
-- [ ] `10014d30` 1931 bytes
 - [ ] `1017b210` 1944 bytes (float, loops 3, calls 52)
 - [ ] `100b7360` 1953 bytes (float, loops 3, calls 46)
 - [ ] `1017b9b0` 1961 bytes (float, loops 3, calls 53)

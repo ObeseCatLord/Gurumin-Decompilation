@@ -94,3 +94,4 @@ address	status	reason
 10001cb0	open	Bgm_CheckHeader: store order identical; the spills of the name characters and the registers of key[16]..key[24] differ (register allocation)
 1000beb0	open	TestDat_Load: logic identical; ecx/edx swapped for the word slot (operand orders tried)
 10012220	open	Model_ApplyCommands: logic identical; index/model registers swapped (ebp/ebx) and argument loads scheduled differently; two parameter orders tried
+10014d30	open	Helmet_FaceSettings: values and branches identical; the result is kept in esi (eax in the original) and the inline ScriptFlag uses other registers. An unused char buffer reproduces the original /GS cookie

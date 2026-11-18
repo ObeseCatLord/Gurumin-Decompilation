@@ -255,3 +255,6 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - A /GS cookie (`push ecx` frame, cookie check before every return) in a function without any buffer means the
   original declared a character array it never used; an unused `char unused[8];` reproduces it
   (Helmet_FaceSettings 0x10014d30, commented in the source).
+- A search loop whose found-branch's work sits at the end of the function and jumps back to a shared tail, while
+  the not-found work falls through after the loop, was written with the whole tail (`...; return slot;`) inside the
+  found-branch and again after the loop; the compiler cross-jumps the duplicate tail (Node::Load 0x101ac010).

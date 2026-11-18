@@ -231,7 +231,6 @@ address	name	evidence
 101b2570	GameFile::~GameFile	named in the decompiled source (decomp/obj_symbols.tsv)
 10191500	Node::Init	named in the decompiled source (decomp/obj_symbols.tsv)
 1019e9a0	Node::Release	named in the decompiled source (decomp/obj_symbols.tsv)
-101ac010	Node::Load	named in the decompiled source (decomp/obj_symbols.tsv)
 101acfc0	VertexPack::FreeVertices	named in the decompiled source (decomp/obj_symbols.tsv)
 101ad0e0	IndexList::Free	named in the decompiled source (decomp/obj_symbols.tsv)
 1000be40	EffectModel::EffectModel	named in the decompiled source (decomp/obj_symbols.tsv)
@@ -781,3 +780,4 @@ address	name	evidence
 1003ab40	Pickup_Collect	counts a collected pickup and banks every hundred (open, decomp/src/pickups.cpp)
 101995a0	Node::Draw	culls and draws a node's mesh, then its children and draw callback (matched, decomp/src/node_draw.cpp)
 101999a0	DrawList_DrawPass	draws the queued nodes of one pass with their colours and light sets (matched, decomp/src/draw_list.cpp)
+101ac010	Node::Load	gives a node a model through the 128-entry model cache (matched, decomp/src/node_cache.cpp)

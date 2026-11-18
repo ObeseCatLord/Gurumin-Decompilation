@@ -718,3 +718,4 @@ address	name	evidence
 101439e0	Render_ResetTarget	back buffer as target, full or split-screen viewport, saves it (decomp/src/render_reset.cpp)
 10143870	TextureObject::BeginRenderTo	matched decompiled source (decomp/obj_symbols.tsv)
 101842a0	EffectManager::Init	full effect system initialisation at load (decomp/src/char_effects.cpp)
+10194360	Camera_SetMatrices	matched decompiled source (decomp/obj_symbols.tsv)

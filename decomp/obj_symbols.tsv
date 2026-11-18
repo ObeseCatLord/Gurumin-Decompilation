@@ -291,3 +291,4 @@ _Vec3_Dot	101ac200
 ?BeginRenderTo@TextureObject@@QAEHHHH@Z	10143870
 ?Init@EffectManager@@QAEHXZ	101842a0
 ?ClearTables@EffectManager@@QAEHXZ	1016fb10
+?Camera_SetMatrices@@YAHPBUVec4@@0PAUMatrix4@@1M@Z	10194360

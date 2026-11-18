@@ -246,3 +246,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Two branches ending in the same call can be one shared call in the original's code because the compiler merged
   them: write the call in each branch (`if (a) { s = 1; Play(); } else if (b) { s = 0; Play(); }`), not an early
   `return` plus one call at the end; the merged tail schedules `this` differently (Npc_TalkFacing 0x1001c210).
+- Several full calls in an if/else chain that differ in one argument compile to shared pushes before the branch,
+  one differing push per branch and one call (cross-jumping); a conditional expression in the argument gives a
+  select into a register instead (Char_SetHandTool 0x10012510, Screenshot_ReadBackBuffer 0x1013e9d0). A global read
+  in several conditions of the chain loaded early into a register was a local (`int level = DAT_10c64ad4;`).
+- A mode that is first resolved (`if (mode == -1) { if (...) mode = 0; else mode = 1; }`) and then dispatched lets
+  the compiler thread the jumps straight into the attach/remove blocks; a conditional expression gives setcc.

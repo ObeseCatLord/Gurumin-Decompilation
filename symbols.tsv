@@ -766,3 +766,4 @@ address	name	evidence
 1000fb80	Loading_Tick	redraws the loading spinner, bar and percentage every 34 ms (matched, decomp/src/loading_tick.cpp)
 1000beb0	TestDat_Load	parses test.dat into word groups (open, decomp/src/test_dat.cpp)
 10012220	Model_ApplyCommands	applies a model definition's SET/DIS/RND/DAT commands to a character (open, decomp/src/model_commands.cpp)
+10012510	Char_SetHandTool	attaches, toggles or removes the drill/brush in a character's right hand (matched, decomp/src/char_attach.cpp)

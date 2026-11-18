@@ -46,8 +46,8 @@ extern "C" int DAT_104c0314;      // "DAT" source of the other characters
 // offset and "DAT" a layer source (one of three globals, chosen by the character and the kind).
 extern "C" void FUN_10012220(int a, int b)
 {
-    int model;
     int index;
+    int model;
     if (b >= 0)
     {
         model = a;

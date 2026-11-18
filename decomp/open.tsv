@@ -87,3 +87,4 @@ address	status	reason
 100084b0	open	Game::OpenWindow: logic identical; this/slot registers swapped (esi/edi) and the x/y/width/height stores come out in address order instead of the original y, x, height ... width
 100242c0	open	Char_ProbeAhead: logic identical; the original keeps the testOnly path's `return 1` block in place and the final test jumps back to it (ours puts it at the end); three return layouts tried
 100244b0	open	Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
+10011dd0	open	Npc_StandOnGround: logic identical; register residue (state address in eax and its store before the DAT_102022b8 load in the original, edi and after in ours; the hit result in eax vs our temporaries); state local and store order tried

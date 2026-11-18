@@ -23,7 +23,10 @@ struct CharMatrix
 
 struct CharRecord
 {
-    char pad_0000[0x2328];
+    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
+    char pad_0000[0x267];
+    char m_0267;              // 0x267: 1 while an NPC idles (char_move.cpp)
+    char pad_0268[0x20c0];
     CharMatrix matrix;        // 0x2328: world matrix
     char pad_2368[0xcc];
     CharMatrix m_2434;        // 0x2434: a second matrix that receives the ground position
@@ -50,6 +53,53 @@ extern "C" CollisionWorld *DAT_10255f08;
 extern "C" Vec4 DAT_118e69e8;            // player position
 extern "C" Vec4 DAT_118e6cb8;            // player velocity
 extern "C" int DAT_102022b8;             // non-zero = always place characters on the ground
+extern "C" char DAT_10255a88[0x80];
+
+// Per-character script state (world.h CharState).
+struct NpcState
+{
+    int state;                // 0x00: 0 = not started yet
+    char pad_0004[0x3c];
+};
+
+extern "C" NpcState DAT_1020b430[0x80];
+
+// 0x10011dd0 (Npc_StandOnGround). Keeps NPC `index` idle in motion 2. On its first call, when DAT_102022b8 is set,
+// it is put on the ground like Char_PlaceOnGround does (without the check for a loaded world; the start x and y
+// are kept whether or not something is hit). Returns 0.
+extern "C" int FUN_10011dd0(int index)
+{
+    DAT_10255a88[index] = 0;
+    DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+    DAT_10db6ee8[index].m_0267 = 1;
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_1020b430[index].state = 1;
+        if (DAT_102022b8 != 0)
+        {
+            Vec4 from;
+            Vec4 ground;
+            Vec4 top = DAT_10db6ee8[index].matrix.GetTranslation();
+            from.Copy(top);
+            top.z += 10.0f;
+            Vec4 direction = *DAT_10804bf8.M_10164c10(&DAT_10db6ee8[index], &DAT_118e69e8, &DAT_118e6cb8);
+            direction.Normalized3();
+            float distance = 1000.0f;
+            from.Copy(from - direction.Scaled(distance));
+            int hit = DAT_10255f08->CastSegment(0, 0x4000000, &from, &top, &ground, 0);
+            ground.y = from.y;
+            ground.x = from.x;
+            if (hit != 0)
+            {
+                DAT_10db6ee8[index].m_2434.SetTranslation(ground);
+                return 0;
+            }
+            ground.z = -3500.0f;
+            DAT_10db6ee8[index].m_2434.SetTranslation(ground);
+        }
+    }
+    return 0;
+}
 
 // 0x1001c090 (Char_PlaceOnGround). When DAT_102022b8 or `force` is set, casts from 1000 units back along the model
 // bank's direction for character `index` to 10 units above it against world collision (mask 0x4000000) and moves

@@ -15,7 +15,7 @@ struct PathMover
     int frame;
     int playing;
     int looping;
-    void SetPosition(float x, float y, float z);
+    int SetPosition(float x, float y, float z);  // 0x10162610 (model_place.cpp)
     int StepPath();
 };
 

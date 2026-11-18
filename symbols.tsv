@@ -222,7 +222,6 @@ address	name	evidence
 101727f0	AnimChannels::AnimChannels	named in the decompiled source (decomp/obj_symbols.tsv)
 101728c0	ModelInstance::ModelInstance	named in the decompiled source (decomp/obj_symbols.tsv)
 101af4c0	KeyBank::Sample	named in the decompiled source (decomp/obj_symbols.tsv)
-10162610	PathMover::SetPosition	named in the decompiled source (decomp/obj_symbols.tsv)
 10007fd0	Game::LoadMenuTextures	named in the decompiled source (decomp/obj_symbols.tsv)
 1019ece0	Node::Find	named in the decompiled source (decomp/obj_symbols.tsv)
 101a8e60	Node::Collide	named in the decompiled source (decomp/obj_symbols.tsv)
@@ -762,3 +761,5 @@ address	name	evidence
 1013e790	Names_Expand	replaces registered names by their paths in a text (open, decomp/src_od/names_od.cpp)
 1013e9d0	Screenshot_ReadBackBuffer	copies the back buffer into a new 24-bit picture (open, decomp/src/screenshot.cpp)
 100211a0	Region_WaveVertex	moves a region vertex by sine waves of the frame counter (open, decomp/src/region_view.cpp)
+10162610	AnimModel::SetPosition	moves a model and resets its motion state (matched, decomp/src/model_place.cpp)
+10162420	AnimModel::Teleport	SetPosition plus the second matrix and the root's saved states (matched, decomp/src/model_place.cpp)

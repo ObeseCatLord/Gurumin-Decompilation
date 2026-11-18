@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (95)
+## 1. Walls to retry (96)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -98,6 +98,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
 - [ ] `1019c560` 298 — Node::ApplyMaterialColours: schedule only (the original loads the material pointer into edx and g before r); local-struct and declaration orders tried
+- [ ] `101abe30` 468 — Node::LoadIt3 (Model_LoadIt3): identical except the Open result is tested with cmp eax,ebx (zero register) in the original and test eax,eax in ours; FILE* return and earlier locals tried
 - [ ] `101acc60` 301 — DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
 - [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
@@ -114,7 +115,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10017c55` 204 bytes (float, calls 8)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (107)
+## 3. Medium functions (251-800 bytes) (106)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10024d00` 377 bytes (float, calls 13)
@@ -131,7 +132,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100558d0` 449 bytes (loops 4, calls 4)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
-- [ ] `101abe30` 468 bytes Model_LoadIt3 (loops 1, calls 15)
 - [ ] `1002ee70` 473 bytes (float, loops 1, calls 8)
 - [ ] `10054d50` 476 bytes (loops 2, calls 8)
 - [ ] `10054f30` 476 bytes (loops 2, calls 8)

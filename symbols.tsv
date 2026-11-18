@@ -27,7 +27,6 @@ address	name	evidence
 10173550	Texture_LoadBmp	"%s\images\%s.bmp", "%s\%s.itm" (scrambled BMP), error "texture missing"
 10174ce0	Texture_LoadIti	"%s\%s.iti", ./data/%s.itp
 10160a90	Mmv_Open	".\bin\%s.MMV", MMV_ALL / MMV_DIB
-101abe30	Model_LoadIt3	error "no 3D data", load-time log
 101abd60	Model_LoadIt3Alt	error "no 3D data"
 101a58a0	It3_ParseChunks	compares chunk tags INFO/RTY2/LIG3/KAN3/INFS/MAT4/VPA2/CHID/MAN2/BONE/CAME/CDLO
 101a4a60	It3_ScanChunks	pre-pass over INFO/MAN2 chunks
@@ -781,3 +780,4 @@ address	name	evidence
 101995a0	Node::Draw	culls and draws a node's mesh, then its children and draw callback (matched, decomp/src/node_draw.cpp)
 101999a0	DrawList_DrawPass	draws the queued nodes of one pass with their colours and light sets (matched, decomp/src/draw_list.cpp)
 101ac010	Node::Load	gives a node a model through the 128-entry model cache (matched, decomp/src/node_cache.cpp)
+101abe30	Node::LoadIt3	loads a .it3 model file into a node with the name-key check (open, decomp/src/model_prescan.cpp)

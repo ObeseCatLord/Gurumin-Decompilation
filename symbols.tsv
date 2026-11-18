@@ -781,3 +781,4 @@ address	name	evidence
 101999a0	DrawList_DrawPass	draws the queued nodes of one pass with their colours and light sets (matched, decomp/src/draw_list.cpp)
 101ac010	Node::Load	gives a node a model through the 128-entry model cache (matched, decomp/src/node_cache.cpp)
 101abe30	Node::LoadIt3	loads a .it3 model file into a node with the name-key check (open, decomp/src/model_prescan.cpp)
+101ab9d0	Node::SetupSkins	stores bind poses and inverse bone matrices of the skinned nodes of a subtree (matched, decomp/src/node_bones.cpp)

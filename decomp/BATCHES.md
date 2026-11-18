@@ -107,3 +107,62 @@ DrawList_DrawPass (66), Node::Load (70), Node::SetupSkins (70), NodeExtra::Anima
 (54), Camera_Ease (26), Npc_TalkWhenNear (48). Written and recorded in open.tsv: Bgm_CheckHeader, TestDat_Load,
 Model_ApplyCommands, Helmet_FaceSettings, Pickup_Collect, Node::LoadIt3, Node::FindBone, Circle_Intersect,
 Enemy_CanReturnHome. Naming: 18 Game window/HUD methods and six TextureObject draw methods.
+
+## Batches 71-120 (generated 2026-11-18)
+
+Functions not in batches 1-70, in address order, then the open walls to retry with the patterns added to
+NOTES.md this session (shared pushes from per-branch calls, low-byte shifts, negated NaN comparisons, scoped
+copies, inline float helpers). (L) = over 1500 bytes.
+
+| # | Area | Functions |
+|---|---|---|
+| 71 | new functions | 10002440 (L), 10004b10 (L), 100094e0 (L) |
+| 72 | new functions | 1000a0b0 (L), 1000cf80, 100135b0 (L) |
+| 73 | new functions | 10017c55, 1001c670 (L), 10022830 (L) |
+| 74 | new functions | 10024f80 (L), 1002ae70 (L), 1002d4e0 (L) |
+| 75 | new functions | 1002f520 (L), 100311b0 (L), 10032240 (L) |
+| 76 | new functions | 10038c10 (L), 1003c570 (L), 1003e710 (L) |
+| 77 | new functions | 100404e0 (L), 10042a30 (L), 10049ec0 (L) |
+| 78 | new functions | 1004d960 (L), 1004f860, 10053020 (L) |
+| 79 | new functions | 10056b30 (L), 10058790 (L), 1005ce80 (L) |
+| 80 | new functions | 1005def0 (L), 1005fc00 (L), 100615f0 (L) |
+| 81 | new functions | 10062e70 (L), 10064630 (L), 10065bf0 (L) |
+| 82 | new functions | 100675d0 (L), 10068f70 (L), 1006be40 (L) |
+| 83 | new functions | 1006e150 (L), 1006f490 (L), 10070200 (L) |
+| 84 | new functions | 10071ee0 (L), 10075350 (L), 10076790 (L) |
+| 85 | new functions | 10078060 (L), 10079470 (L), 1007c050 (L) |
+| 86 | new functions | 1007dab0 (L), 1007f1e0 (L), 10083eb0 (L) |
+| 87 | new functions | 10084e80 (L), 10086380 (L), 10089a10 (L) |
+| 88 | new functions | 1008c680 (L), 1008fea0 (L), 10092af0 (L) |
+| 89 | new functions | 10093cc0 (L), 1009b120 (L), 1009c070 (L) |
+| 90 | new functions | 1009e380 (L), 100a4440 (L), 100a5960 (L) |
+| 91 | new functions | 100a9240 (L), 100aa820 (L), 100ac440 (L) |
+| 92 | new functions | 100ad0f0 (L), 100ade30 (L), 100af1b0 (L) |
+| 93 | new functions | 100b6740 (L), 100b84a0 (L), 100ba2a0 (L) |
+| 94 | new functions | 100bcce0 (L), 100bdad0 (L), 100c39c0 (L) |
+| 95 | new functions | 100cb0c0 (L), 100cc2a0 (L), 100d24a0 (L) |
+| 96 | new functions | 100e0320 (L), 100e25f0 (L), 100e7280 (L) |
+| 97 | new functions | 100edea0 (L), 100f5a80 (L), 100f9670 (L) |
+| 98 | new functions | 100fb7b0 (L), 100fc4a0 (L), 100fda40 (L) |
+| 99 | new functions | 100fedd0 (L), 101011b0 (L), 10104640 (L) |
+| 100 | new functions | 1010c650 (L), 10112140 (L), 10114950 (L) |
+| 101 | new functions | 10116550 (L), 1011a060 (L), 1011d810 (L) |
+| 102 | new functions | 10138280 (L), 1013b700 (L), 1013fbb0 (L) |
+| 103 | new functions | 10145ba0 (L), 101493f0 (L), 10151ba0 (L) |
+| 104 | new functions | 1015d520 (L), 1016c3e0 (L), 10170580 (L) |
+| 105 | new functions | 101713f0 (L), 10173550 (L), 10174ce0 (L) |
+| 106 | new functions | 10175f20 (L), 1017a010 (L), 1017cc90 (L) |
+| 107 | new functions | 10184440 (L), 10187520 (L), 10189530 (L) |
+| 108 | new functions | 10194f40 (L), 1019c8d0 (L), 1019f340 (L) |
+| 109 | new functions | 101a1640 (L), 101a3000 (L), 101a58a0 (L) |
+| 110 | walls to retry with the 2026-11-18 patterns | 100014b0, 100016c0, 10001980, 10001cb0, 10004760, 100084b0, 10008910, 10009050, 100091d0, 1000b9f0 |
+| 111 | walls to retry with the 2026-11-18 patterns | 1000beb0, 1000e870, 1000ed20, 1000f360, 10011dd0, 10012130, 10012220, 100143f0, 10014d30, 10015710 |
+| 112 | walls to retry with the 2026-11-18 patterns | 100157b0, 10015910, 1001b670, 1001b7b0, 100211a0, 100242c0, 100244b0, 10024d00, 1002a340, 1002ee70 |
+| 113 | walls to retry with the 2026-11-18 patterns | 10034c80, 10034cc0, 100357a0, 10035a30, 10037470, 1003ab40, 10043cc0, 10045ed0, 10054550, 10054970 |
+| 114 | walls to retry with the 2026-11-18 patterns | 10054a60, 10054b70, 10054c60, 10054d50, 10054f30, 10055110, 100bd960, 100e2080, 100e2110, 100e2440 |
+| 115 | walls to retry with the 2026-11-18 patterns | 100e24d0, 100e2560, 100fb6d0, 1013e4f0, 1013e790, 1013e9d0, 10143870, 10144040, 101441b0, 10144ee0 |
+| 116 | walls to retry with the 2026-11-18 patterns | 10145380, 1014b390, 1015cac0, 1015fb20, 1015fbf0, 10160960, 10160f00, 10161120, 10161200, 101614c0 |
+| 117 | walls to retry with the 2026-11-18 patterns | 101615d0, 10163e90, 10163f90, 101640b0, 101649c0, 10164af0, 10165020, 10166870, 10167390, 10169720 |
+| 118 | walls to retry with the 2026-11-18 patterns | 10169e10, 1016a020, 1016a090, 1016a100, 1016b010, 1016b1e0, 1016c300, 10175c90, 101883b0, 10188580 |
+| 119 | walls to retry with the 2026-11-18 patterns | 10191fd0, 10194a10, 10194c60, 101992f0, 10199380, 10199880, 10199be0, 1019b280, 1019c560, 101abe30 |
+| 120 | walls to retry with the 2026-11-18 patterns | 101acc60, 101ad240, 101ad2c0, 101ad5c0, 101ad920, 101ae950, 101aed50, 101aeee0 |

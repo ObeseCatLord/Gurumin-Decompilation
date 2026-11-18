@@ -703,3 +703,4 @@ address	name	evidence
 1002a340	Char_RunScript	runs a character script step loop, resets it at the end (decomp/src/char_script.cpp)
 10188580	EffectManager::Update	matched decompiled source (decomp/obj_symbols.tsv)
 100caf90	ListBank::Evaluate	matched decompiled source (decomp/obj_symbols.tsv)
+100b5ae0	Npc_Idle	keeps an NPC idle and now and then voices its talk prompt (decomp/src/char_move.cpp)

@@ -60,3 +60,5 @@ address	status	reason
 1001b670	open	enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 10160f00	open	MmvPlayer::ReadFrameOnce: identical except the original keeps 0 in ebx (push ebx / xor ebx,ebx) where ours uses immediates - same zero-register residue as the enemy AI updaters
 10035a30	open	ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
+101aed50	open	Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
+101ad5c0	open	MotionList::InsertByName: the original inlines Insert (cl 13.00 here calls it even when declared inline); with __forceinline only the loop index register differs (ecx vs ebp)

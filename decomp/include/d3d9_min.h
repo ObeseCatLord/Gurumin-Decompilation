@@ -45,11 +45,12 @@ struct IDirect3DDevice9
     virtual long __stdcall CreateDepthStencilSurface() = 0;
     virtual long __stdcall UpdateSurface() = 0;
     virtual long __stdcall UpdateTexture() = 0;
-    virtual long __stdcall GetRenderTargetData() = 0;
+    virtual long __stdcall GetRenderTargetData(void *renderTarget, void *destSurface) = 0;
     virtual long __stdcall GetFrontBufferData() = 0;
     virtual long __stdcall StretchRect() = 0;
     virtual long __stdcall ColorFill() = 0;
-    virtual long __stdcall CreateOffscreenPlainSurface() = 0;
+    virtual long __stdcall CreateOffscreenPlainSurface(unsigned int width, unsigned int height, int format, int pool,
+                                                       void **surface, void *sharedHandle) = 0;
     virtual long __stdcall SetRenderTarget(unsigned long index, void *surface) = 0;
     virtual long __stdcall GetRenderTarget() = 0;
     virtual long __stdcall SetDepthStencilSurface(void *surface) = 0;

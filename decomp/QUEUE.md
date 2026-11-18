@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (60)
+## 1. Walls to retry (62)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -70,21 +70,16 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101acc60` 301 — DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
 - [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
+- [ ] `101ad5c0` 193 — MotionList::InsertByName: the original inlines Insert (cl 13.00 here calls it even when declared inline); with __forceinline only the loop index register differs (ecx vs ebp)
 - [ ] `101ad920` 179 — Spline (Hermite): the original multiplies t3 by -2.0 for the c term; cl 13.00 turns it into -(t3 + t3) and shares that with the b term (forms with 2.0f*, a separate h01 local and a -2 local tried)
+- [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 
-## 2. Small functions (30-250 bytes) (58)
+## 2. Small functions (30-250 bytes) (51)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
-- [ ] `101af140` 143 bytes (float, calls 8)
-- [ ] `101af1d0` 143 bytes (float, calls 8)
-- [ ] `10145060` 190 bytes (loops 1, calls 6)
-- [ ] `10024c40` 192 bytes (float, calls 9)
-- [ ] `101ad5c0` 193 bytes (loops 3)
-- [ ] `10165140` 202 bytes (float, calls 3)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 - [ ] `1014f120` 204 bytes (loops 2, calls 3)
-- [ ] `101ae060` 206 bytes Project (float, calls 1)
 - [ ] `10027560` 207 bytes (loops 2, calls 3)
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
@@ -133,7 +128,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10019210` 248 bytes (float, calls 10)
 - [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (205)
+## 3. Medium functions (251-800 bytes) (203)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
@@ -169,7 +164,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10049990` 354 bytes (float, loops 2, calls 5)
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1019ed40` 359 bytes (loops 8, calls 7)
-- [ ] `101ac810` 359 bytes (float, loops 4, calls 4)
 - [ ] `1003a9d0` 360 bytes (float, loops 1, calls 10)
 - [ ] `10145210` 363 bytes (loops 1, calls 10)
 - [ ] `101439e0` 364 bytes (calls 7)
@@ -188,7 +182,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10144ee0` 377 bytes (loops 2, calls 3)
 - [ ] `1001c090` 384 bytes (float, calls 12)
 - [ ] `1000cdf0` 385 bytes (loops 1, calls 1)
-- [ ] `101aed50` 385 bytes (float, calls 14)
 - [ ] `10161cb0` 386 bytes (float, loops 2, calls 5)
 - [ ] `101ac010` 387 bytes Node::Load (loops 4, calls 12)
 - [ ] `1001af10` 394 bytes (float, loops 1, calls 14)

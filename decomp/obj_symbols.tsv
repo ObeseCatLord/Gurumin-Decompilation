@@ -232,3 +232,12 @@ _Vec3_Dot	101ac200
 ?CompileText@ListBank@@QAEHXZ	100f9520
 ?SkipBlock@ListBank@@QAEHPAPADPAHH@Z	10035a30
 ?FindMapEntry@Game@@QAEHHPAD00HHHPAH@Z	10054610
+?AngleDifference@@YAMMM@Z	101ac810
+?Mirror@Vec4@@QAEXABU1@@Z	101aed50
+?DistanceToLine@Vec4@@QAEMABU1@0@Z	101af140
+?DistanceSquaredToLine@Vec4@@QAEMABU1@0@Z	101af1d0
+?Project@@YA?AUVec4@@ABU1@ABUMatrix4@@@Z	101ae060
+?Clear@MotionList@@QAEHXZ	101ad690
+?InsertByName@MotionList@@QAEHHPBDH@Z	101ad5c0
+?CaptureRgb24@TextureObject@@QAEHPAE@Z	10145060
+?AddFlarePoint@ModelBank@@QAEHUVec4@@PBUMatrix4@@@Z	10165140

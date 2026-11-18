@@ -35,10 +35,27 @@ struct D3DTexture : IUnknownLike
     virtual long __stdcall UnlockRect(unsigned int level) = 0;
 };
 
+// IDirect3DSurface9 (LockRect at slot 13 and UnlockRect at slot 14).
+struct D3DSurface : IUnknownLike
+{
+    virtual void __stdcall Slot03() = 0;
+    virtual void __stdcall Slot04() = 0;
+    virtual void __stdcall Slot05() = 0;
+    virtual void __stdcall Slot06() = 0;
+    virtual void __stdcall Slot07() = 0;
+    virtual void __stdcall Slot08() = 0;
+    virtual void __stdcall Slot09() = 0;
+    virtual void __stdcall Slot10() = 0;
+    virtual void __stdcall Slot11() = 0;
+    virtual void __stdcall Slot12() = 0;
+    virtual long __stdcall LockRect(LockedRect *locked, const void *rect, unsigned long flags) = 0;
+    virtual long __stdcall UnlockRect() = 0;
+};
+
 struct TextureObject
 {
     D3DTexture *texture;     // 0x00: Direct3D texture
-    IUnknownLike *texture2;  // 0x04: second surface (e.g. the alpha or palette part), may be 0
+    D3DSurface *surface;     // 0x04: surface of a render-target texture (or a second part), may be 0
     int width;               // 0x08: texture width in pixels
     int height;              // 0x0c: texture height in pixels
     int pad_0010;
@@ -50,6 +67,7 @@ struct TextureObject
     int BindStage1();
     int Write16(int x, int y, int rowPixels, int rows, int pitch, const void *bits);
     int Release();
+    int CaptureRgb24(unsigned char *out);
 };
 
 extern "C" IDirect3DDevice9 *DAT_10f1fcf0;      // the Direct3D device
@@ -109,8 +127,8 @@ int TextureObject::Release()
             FUN_10148520(poolIndex, width, height);
         texture->Release();
     }
-    if (texture2 != 0)
-        texture2->Release();
+    if (surface != 0)
+        surface->Release();
     if (DAT_10f6550c == this)
         DAT_10f6550c = (TextureObject *)1;
     if (DAT_10f65510 == this)
@@ -119,7 +137,7 @@ int TextureObject::Release()
     height = 0;
     poolSlot = 0;
     texture = 0;
-    texture2 = 0;
+    surface = 0;
     return 0;
 }
 
@@ -147,5 +165,32 @@ int TextureObject::Write16(int x, int y, int rowPixels, int rows, int pitch, con
         DAT_10f6550c = (TextureObject *)1;
     if (DAT_10f65510 == this)
         DAT_10f65510 = (TextureObject *)1;
+    return 1;
+}
+
+// 0x10145060. Copies this 256x256 render target (R5G6B5) into `out` as 24-bit pixels in B, G, R byte order: the
+// thumbnail Save_Write stores in the save file. The surface is read back through a system-memory copy. Returns 1,
+// or 0 when the read-back fails.
+int TextureObject::CaptureRgb24(unsigned char *out)
+{
+    D3DSurface *copy;
+    DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x17 /* D3DFMT_R5G6B5 */, 2 /* D3DPOOL_SYSTEMMEM */,
+                                              (void **)&copy, 0);
+    if (DAT_10f1fcf0->GetRenderTargetData(surface, copy) != 0)
+    {
+        copy->Release();
+        return 0;
+    }
+    LockedRect locked;
+    copy->LockRect(&locked, 0, 0x10 /* D3DLOCK_READONLY */);
+    const unsigned short *pixels = (const unsigned short *)locked.bits;
+    for (int i = 0; i < 256 * 256; i++)
+    {
+        out[i * 3 + 2] = (pixels[i] >> 8) & 0xf8;               // red: top 5 bits
+        out[i * 3 + 1] = (unsigned char)(pixels[i] >> 5) << 2;  // green: middle 6 bits
+        out[i * 3 + 0] = pixels[i] << 3;                        // blue: low 5 bits
+    }
+    copy->UnlockRect();
+    copy->Release();
     return 1;
 }

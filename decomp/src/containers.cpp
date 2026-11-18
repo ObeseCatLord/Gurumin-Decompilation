@@ -320,6 +320,8 @@ struct MotionList
     int extras[0x40];
     int Insert(int position, int value, int tag);
     int AddEntry(int id, int value, const char *name, int extra);
+    int Clear();
+    int InsertByName(int position, const char *name, int tag);
 };
 
 // Inserts `value` at `position` (-1 = append) and records `tag`. Returns 0 when the position is past the end or
@@ -342,6 +344,28 @@ int MotionList::Insert(int position, int value, int tag)
     items[position] = value;
     count++;
     return 1;
+}
+
+// 0x101ad690. Empties the motion list (the named entries stay). Returns 1.
+int MotionList::Clear()
+{
+    count = 0;
+    return 1;
+}
+
+// 0x101ad5c0. Looks up the named entry `name` and inserts its index at `position` (-1 = append), recording `tag`
+// (see Insert). Returns 0 when there is no entry of that name or Insert fails.
+int MotionList::InsertByName(int position, const char *name, int tag)
+{
+    int i;
+    for (i = 0; i < entryCount; i++)
+    {
+        if (strcmp(name, names[i]) == 0)
+            break;
+    }
+    if (i == entryCount)
+        return 0;
+    return Insert(position, i, tag);
 }
 
 // Adds a named entry (`name`, id, value, extra). Returns 0 when all 64 entries are used.

@@ -8,6 +8,25 @@ struct Node
     Node *Find(const char *name, int index);  // 0x1019ece0: the index-th node called `name` in the subtree, or 0
 };
 
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    Vec4();
+    void Copy(const Vec4 &source);
+};
+
+struct Matrix4
+{
+    float m[16];
+};
+
+Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060 (vec4.cpp)
+// 0x101ae4d0: 1 when `point` transformed by `matrix` lies inside the view volume, widened by `margin`.
+extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin);
+
 // One model record (the CharModel part of a Character, see world.h / texture_mgr.cpp SceneOwner).
 struct BankModel
 {
@@ -34,10 +53,15 @@ struct ModelBank
     int params[16];         // 0x313a8: per-model parameter given when the model was added
     int m_313e8;            // 0x313e8
     int enabled;            // 0x313ec: 1 when the current map uses the bank
+    char pad_313f0[0x80];
+    float flareAlpha[0x2c]; // 0x31470: brightness of each flare point (0..1)
+    int flareCount;         // 0x31520: flare points collected this frame
+    Vec4 flareScreen[1];    // 0x31524: screen position of each flare point (x, y, depth, w); length unknown
     int Reset();
     int CollectLights(Node *root);
     int Add(int id, int param);
     int M_10164af0(BankModel *model);
+    int AddFlarePoint(Vec4 position, const Matrix4 *viewProjection);
 };
 
 // Empties the bank: clears the light list, the 0x80-entry table, every model record's id and the counters.
@@ -98,4 +122,22 @@ int ModelBank::Add(int id, int param)
         }
     }
     return 0;
+}
+
+// 0x10165140. Adds a lens-flare point for the world position `position` (the scene code passes the light/sun
+// position): when it is on screen (inside the view volume widened by 24) and in front of the far plane, its screen
+// position is recorded with a brightness that fades in over the last 1/70 of the depth range. Returns 1.
+int ModelBank::AddFlarePoint(Vec4 position, const Matrix4 *viewProjection)
+{
+    if (FUN_101ae4d0(&position, viewProjection, 24.0f) != 0)
+    {
+        flareScreen[flareCount].Copy(Project(position, *viewProjection));
+        if (flareScreen[flareCount].z > 0.0f && flareScreen[flareCount].z < 1.0f)
+        {
+            float alpha = (1.0f - flareScreen[flareCount].z) * 70.0f;
+            flareAlpha[flareCount] = 1.0f > alpha ? alpha : 1.0f;  // clamped to 1
+            flareCount++;
+        }
+    }
+    return 1;
 }

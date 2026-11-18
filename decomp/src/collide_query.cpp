@@ -9,6 +9,8 @@ struct Vec4
     Vec4();
     void Set(float x, float y, float z, float w);
     void Copy(const Vec4 &source);
+    Vec4 operator+(const Vec4 &other) const;
+    Vec4 Scaled(const float &scale);
 };
 
 struct Matrix4
@@ -21,6 +23,9 @@ struct Matrix4
 
 struct CollisionWorld
 {
+    // Node::Collide (0x101a8e60) on the world's root node: the segment `from`-`to` against the collision of the
+    // given kinds; the hit point goes to `hit`. Returns 1 on a hit.
+    int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);
     int Query(Matrix4 *matrix, Vec4 *point, int mask, Vec4 *hit, int *hitId, int a, int b);
     // Casts the segment `from`-`to` against the nodes called `name` (0 = all) whose flags match; writes the
     // nearest hit point and, when `t` is given, its position along the segment. Returns 1 on a hit.
@@ -61,5 +66,23 @@ extern "C" int FUN_100246b0(const Vec4 *from, const Vec4 *to, Vec4 *hit, int tes
             return 1;
         }
     }
+    return 0;
+}
+
+// 0x10024c40. Ledge test: 1 when there is world collision (mask 0x4000000) below the point `distance` units along
+// `direction` from `position`. The ray runs from 90 units above that point to `depth` units below it. Enemy AI
+// uses it (depth 300, distance 15) to stop at edges. Returns 0 when nothing is hit or no world is loaded.
+extern "C" int FUN_10024c40(const Vec4 *position, Vec4 *direction, float depth, int distance)
+{
+    Vec4 from;
+    Vec4 to;
+    Vec4 hit;
+    from.Copy(direction->Scaled((float)distance));
+    from.Copy(from + *position);
+    to.Copy(from);
+    from.z += 90.0f;
+    to.z -= depth;
+    if (DAT_10255f08 != 0 && DAT_10255f08->Collide(0, 0x4000000, &from, &to, &hit) != 0)
+        return 1;
     return 0;
 }

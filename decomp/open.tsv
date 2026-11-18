@@ -84,3 +84,4 @@ address	status	reason
 10009050	open	Game::MoveCursor: logic identical; the original shares one stack slot for the int-to-float temporaries, the distance and the speed (frame 4 bytes smaller); shared-variable form tried
 10043cc0	open	Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 100357a0	open	CharParams::operator= (implicit copy, include/char_params.h): byte-identical in a probe; emitted only by a file with a caller (FUN_1005def0, FUN_1003e710, Game_LoadData)
+100084b0	open	Game::OpenWindow: logic identical; this/slot registers swapped (esi/edi) and the x/y/width/height stores come out in address order instead of the original y, x, height ... width

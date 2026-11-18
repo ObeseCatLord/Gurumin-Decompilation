@@ -13,7 +13,7 @@ extern "C" int FUN_1000cb90(const char *text);
 // Shows `message` with "yes" as the first choice.
 extern "C" int FUN_10010520(const char *message, int yesValue, int noValue)
 {
-    DAT_104b7200.M_100084b0(0x216, 0x100, 0x90, 0x7c, 0x60);
+    DAT_104b7200.OpenWindow(0x216, 0x100, 0x90, 0x7c, 0x60);
     DAT_104b7200.M_10008330(0x216, (int *)noValue);  // the original passes the same value as the result pointer
     FUN_1000cb30("");
     FUN_1000cb90(message);
@@ -28,7 +28,7 @@ extern "C" int FUN_10010520(const char *message, int yesValue, int noValue)
 // Shows `message` with "no" as the first choice (for dangerous questions such as overwriting a save).
 extern "C" int FUN_100105e0(const char *message, int yesValue, int noValue)
 {
-    DAT_104b7200.M_100084b0(0x216, 0x100, 0x90, 0x7c, 0x60);
+    DAT_104b7200.OpenWindow(0x216, 0x100, 0x90, 0x7c, 0x60);
     DAT_104b7200.M_10008330(0x216, (int *)noValue);  // the original passes the same value as the result pointer
     FUN_1000cb30("");
     FUN_1000cb90(message);

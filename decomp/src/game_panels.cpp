@@ -1,6 +1,7 @@
 // Game (DAT_104b7200) drawing helpers for menus and the HUD. Coordinates are 640x480 screen pixels;
 // UV coordinates index the menu texture sheets loaded by Game::LoadMenuTextures.
 
+#include <stdio.h>
 #include <string.h>
 #include "game.h"
 
@@ -63,6 +64,83 @@ int Game::M_10008910(int x, int y, int lit, int rows, int a, int b, int color)
         DAT_118d0ba8[texWaku01].M_1014c430(x, y + 0x20 + i * 0x20, right, y + 0x40 + i * 0x20, 0.0f, 0.625f, 0.625f, 0.75f, 0, color, 0, 0);
     y += rows * 0x20;
     DAT_118d0ba8[texWaku01].M_1014c430(x, y + 0x20, right, y + 0x3f, 0.0f, 0.75390625f, 0.625f, 0.875f, 0, color, 0, 0);
+    return 0;
+}
+
+// 0x10008a30. DrawNumber with a label in front: the text is two cells longer, the label (three digit cells wide, u
+// 0.1875-0.4453 on row v 0.625-0.6875 of texMenu1) fills the first cells and the digits use row v 0.6875-0.75.
+int Game::DrawLabelledNumber(int value, int x, int y, int frame, int color, float scale, float alpha)
+{
+    char text[256];
+    sprintf(text, "%d", value);
+    int length = strlen(text) + 2;
+    int halfWidth = (int)((float)(length * 8) * scale * 0.7f);
+    int digitWidth = (int)(scale * 11.2f);
+    int halfHeight = (int)((float)digitWidth * 0.75f);
+    DAT_118d0ba8[texMenu1].M_1014c430(x - halfWidth, y - halfHeight, x - halfWidth + digitWidth * 3, y + halfHeight,
+                                      0.1875f, 0.625f, 0.4453125f, 0.6875f, frame, color, alpha, 0);
+    for (int i = 2; i < length; i++)
+    {
+        int digit = text[i - 2] - '0';
+        if (digit < 0)
+            digit = 0;
+        else if (digit > 9)
+            digit = 9;
+        int left = x - halfWidth + i * digitWidth;
+        DAT_118d0ba8[texMenu1].M_1014c430(left, y - halfHeight, left + digitWidth, y + halfHeight,
+                                          (float)((digit + 3) * 16) / 256.0f, 0.6875f,
+                                          (float)((digit + 4) * 16) / 256.0f, 0.75f, frame, color, alpha, 0);
+    }
+    return 0;
+}
+
+// 0x10008c40. Draws `value` in decimal centred on (x, y) with the digits of texMenu1 (16-pixel cells, row
+// v 0.8125-0.875, digit d at u (d + 3) / 16), `scale` setting the digit size (11.2 pixels wide at 1.0, 3/4 as high
+// above and below y), faded by `alpha`.
+int Game::DrawNumber(int value, int x, int y, int frame, int color, float scale, float alpha)
+{
+    char text[256];
+    sprintf(text, "%d", value);
+    int length = strlen(text);
+    int halfWidth = (int)((float)(length * 8) * scale * 0.7f);
+    int digitWidth = (int)(scale * 11.2f);
+    int halfHeight = (int)((float)digitWidth * 0.75f);
+    for (int i = 0; i < length; i++)
+    {
+        int digit = text[i] - '0';
+        if (digit < 0)
+            digit = 0;
+        else if (digit > 9)
+            digit = 9;
+        int left = x - halfWidth + i * digitWidth;
+        DAT_118d0ba8[texMenu1].M_1014c430(left, y - halfHeight, left + digitWidth, y + halfHeight,
+                                          (float)((digit + 3) * 16) / 256.0f, 0.8125f,
+                                          (float)((digit + 4) * 16) / 256.0f, 0.875f, frame, color, alpha, 0);
+    }
+    return 0;
+}
+
+// 0x10008df0. DrawNumber with the digit row above it (v 0.75-0.8125).
+int Game::DrawNumberAlt(int value, int x, int y, int frame, int color, float scale, float alpha)
+{
+    char text[256];
+    sprintf(text, "%d", value);
+    int length = strlen(text);
+    int halfWidth = (int)((float)(length * 8) * scale * 0.7f);
+    int digitWidth = (int)(scale * 11.2f);
+    int halfHeight = (int)((float)digitWidth * 0.75f);
+    for (int i = 0; i < length; i++)
+    {
+        int digit = text[i] - '0';
+        if (digit < 0)
+            digit = 0;
+        else if (digit > 9)
+            digit = 9;
+        int left = x - halfWidth + i * digitWidth;
+        DAT_118d0ba8[texMenu1].M_1014c430(left, y - halfHeight, left + digitWidth, y + halfHeight,
+                                          (float)((digit + 3) * 16) / 256.0f, 0.75f,
+                                          (float)((digit + 4) * 16) / 256.0f, 0.8125f, frame, color, alpha, 0);
+    }
     return 0;
 }
 

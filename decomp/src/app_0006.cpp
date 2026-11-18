@@ -27,6 +27,66 @@ int Game::M_100083e0(int id)
     return 1;
 }
 
+// 0x100084b0. Opens menu window `id` at (x, y) with size (width, height): in its current slot when it is already
+// open, else in the first unused slot (0 when all three are in use). The window's state is reset, the cursor goes
+// to the remembered position of menus that keep theirs, the item labels and the result pointer are cleared and the
+// open sound plays through m_7660. Every window's fade then advances by 0.05 and the item tables of all three are
+// cleared (each 0x82 entries long, so the result pointer and m_0204 too). Returns `id`.
+int Game::OpenWindow(int id, int x, int y, int width, int height)
+{
+    int slot = FindSlot(id);
+    if (slot == 3)
+    {
+        for (slot = 0; slot < 3; slot++)
+        {
+            if (m_008c[slot] == 0)
+                break;
+        }
+        if (slot == 3)
+            return 0;
+        m_0140[slot] = 0;
+        m_0098[slot] = 1;
+    }
+    m_068c[slot] = 0;
+    m_00bc[slot] = y;
+    m_00b0[slot] = x;
+    m_00d4[slot] = height;
+    m_0110[slot] = 1;
+    m_01b8[slot] = 0;
+    m_0134[slot] = 0;
+    m_7654[slot] = 0;
+    m_00a4[slot] = id;
+    m_00c8[slot] = width;
+    m_00ec[slot] = 0;
+    m_0164[slot] = 0;
+    m_0158[slot] = 0;
+    m_0088 = slot;
+    m_0194[slot] = 0;
+    m_00f8[slot] = 0;
+    m_011c[slot] = 0x80;
+    m_0128[slot] = 0x18;
+    m_008c[slot] = 1;
+    m_0140[slot] = 0;
+    if (m_01dc[id] != 0)
+        m_0140[slot] = (unsigned char)m_0434[id];
+    m_579c[slot].result = 0;
+    m_0104 = 10;
+    for (int i = 0; i < 0x80; i++)
+        m_069c[slot][i][0] = 0;
+    m_7660(0);
+    m_7668[slot] = 0.03f;
+    for (int w = 0; w < 3; w++)
+    {
+        m_7668[w] += 0.05f;
+        for (int j = 0; j < 0x82; j++)
+        {
+            if (m_579c[w].values[j] != 0)
+                m_579c[w].values[j] = 0;
+        }
+    }
+    return id;
+}
+
 // Sets menu `id`'s cursor position (and remembers it when that menu keeps its cursor).
 int Game::M_10008650(int id, int value)
 {

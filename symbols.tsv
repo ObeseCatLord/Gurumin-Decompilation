@@ -741,3 +741,7 @@ address	name	evidence
 10035fa0	ListBank::ReadTerm	reads the next word, '&' split off as its own word (matched, decomp/src/listbank.cpp)
 10036560	ListBank::GetIndexPart	copies the n-th [ ] part of a variable name (matched, decomp/src/listbank.cpp)
 100357a0	CharParams::operator=	copy of a 0x188-byte character parameter record (open, decomp/include/char_params.h)
+10008a30	Game::DrawLabelledNumber	draws a number with a label in front (matched, decomp/src/game_panels.cpp)
+10008c40	Game::DrawNumber	draws a centred number with menu digits (matched, decomp/src/game_panels.cpp)
+10008df0	Game::DrawNumberAlt	DrawNumber with the second digit row (matched, decomp/src/game_panels.cpp)
+100084b0	Game::OpenWindow	opens a menu window in a free slot (open, decomp/src/app_0006.cpp)

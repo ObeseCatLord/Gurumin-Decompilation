@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (83)
+## 1. Walls to retry (84)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -15,6 +15,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100016c0` 256 — sound play: identical apart from cross-jumping; the original merges the two position branches only at the code-5 SendMessage, cl 13.00 here already at code 4 (code 4 hoisted out, branches swapped tried)
 - [ ] `10001980` 263 — looping sound play: same cross-jumping residue as 0x100016c0
 - [ ] `10004760` 236 — ListBank::DeclareVariable: identical apart from block order (the original puts the type 0/1 block right after the type == 0 test, cl 13.00 here after all the tests); switch form tried
+- [ ] `100084b0` 413 — Game::OpenWindow: logic identical; this/slot registers swapped (esi/edi) and the x/y/width/height stores come out in address order instead of the original y, x, height ... width
 - [ ] `10008910` 275 — Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
 - [ ] `10009050` 375 — Game::MoveCursor: logic identical; the original shares one stack slot for the int-to-float temporaries, the distance and the speed (frame 4 bytes smaller); shared-variable form tried
 - [ ] `100091d0` 239 — Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
@@ -103,7 +104,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (141)
+## 3. Medium functions (251-800 bytes) (137)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)
@@ -115,13 +116,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10043e20` 402 bytes (float, loops 2, calls 8)
 - [ ] `10018100` 410 bytes (float, loops 1, calls 6)
 - [ ] `101ab9d0` 412 bytes (loops 1, calls 8)
-- [ ] `100084b0` 413 bytes (float, loops 5, calls 1)
 - [ ] `1016a2e0` 413 bytes (float, loops 1, calls 1)
 - [ ] `10012220` 418 bytes (loops 1, calls 8)
 - [ ] `1015cae0` 418 bytes
 - [ ] `10011dd0` 419 bytes (float, calls 13)
-- [ ] `10008c40` 425 bytes (float, loops 2, calls 6)
-- [ ] `10008df0` 425 bytes (float, loops 2, calls 6)
 - [ ] `100543a0` 425 bytes (float, loops 1, calls 13)
 - [ ] `1013e260` 428 bytes (loops 4, calls 16)
 - [ ] `10034cc0` 429 bytes (float, loops 1, calls 13)
@@ -166,7 +164,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10012780` 522 bytes (loops 7, calls 16)
 - [ ] `10199380` 526 bytes (loops 1, calls 11)
 - [ ] `1019e610` 526 bytes (loops 3, calls 12)
-- [ ] `10008a30` 528 bytes (float, loops 2, calls 7)
 - [ ] `100092c0` 535 bytes (float, loops 1, calls 6)
 - [ ] `1019e9a0` 539 bytes Node::Release (loops 4, calls 21)
 - [ ] `1000c390` 540 bytes (float, loops 1, calls 5)

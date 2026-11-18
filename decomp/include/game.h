@@ -75,16 +75,25 @@ struct Game : Object
     int m_0088;
     int m_008c[3];
     int m_0098[3];
-    int m_00a4[3];
-    char pad_00b0[0x3c];
+    int m_00a4[3];              // 0xa4: id of the menu window in each slot
+    int m_00b0[3];              // 0xb0: window x
+    int m_00bc[3];              // 0xbc: window y
+    int m_00c8[3];              // 0xc8: window width
+    int m_00d4[3];              // 0xd4: window height
+    char pad_00e0[0xc];
     int m_00ec[3];
-    char pad_00f8[0x18];
-    int m_0110[3];
+    int m_00f8[3];
+    int m_0104;                 // 0x104: set to 10 when a window opens
+    int pad_0108[2];
+    int m_0110[3];              // 0x110: 1 while the window slot is open
     int m_011c[3];
     int m_0128[3];
-    char pad_0134[0xc];
-    int m_0140[3];
-    char pad_014c[0x3c];
+    int m_0134[3];
+    int m_0140[3];              // 0x140: cursor position in the window (restored from m_0434 when remembered)
+    int pad_014c[3];
+    int m_0158[3];
+    int m_0164[3];
+    char pad_0170[0x18];
     int m_0188[3];
     int m_0194[3];
     int m_01a0[3];
@@ -94,9 +103,10 @@ struct Game : Object
     int m_01d0[3];
     char m_01dc[0x258];
     char m_0434[0x258];
-    char pad_068c[4];
+    char m_068c[4];
     int m_0690;
-    char pad_0694[0x5108];
+    char pad_0694[8];
+    char m_069c[3][0x80][0x36]; // 0x69c: per-window item labels (0x80 items of 0x36 characters)
     GameMenuItems m_579c[3];    // 0x579c: per-window item values and result pointer
     int m_5db4[3][0x82];
     char pad_63cc[0xc30];
@@ -114,7 +124,8 @@ struct Game : Object
     int m_7654[3];
     void (*m_7660)(int);
     int m_7664;
-    char pad_7668[0x1200];
+    float m_7668[3];            // 0x7668: per-window fade
+    char pad_7674[0x11f4];
     GameNodeBody m_8868[0x20];  // 0x8868: menu model nodes, destroyed in ~Game
     char pad_39c68[0x5c1ac];
     GameNamedEntry m_95e14[0x100];
@@ -174,6 +185,9 @@ struct Game : Object
     int M_100087b0(int id, int count);
     int M_100087f0(int x, int y, int w, int h, int frame, float alpha);
     int M_10008880(int x, int y, int w, int h, int frame, float alpha);
+    int DrawLabelledNumber(int value, int x, int y, int frame, int color, float scale, float alpha);  // 0x10008a30
+    int DrawNumber(int value, int x, int y, int frame, int color, float scale, float alpha);     // 0x10008c40
+    int DrawNumberAlt(int value, int x, int y, int frame, int color, float scale, float alpha);  // 0x10008df0
     int MoveCursor();  // 0x10009050 (game_panels.cpp)
     int M_10008910(int x, int y, int lit, int rows, int a, int b, int color);
     int M_10008fa0(int x, int y, int color, int frame);
@@ -183,7 +197,7 @@ struct Game : Object
     int M_10008650(int id, int value);
     int M_100086b0(int id, int a, int b, int c, int d);
     int M_10008710(int id, int a, int b, int c);
-    int M_100084b0(int id, int x, int y, int width, int height);
+    int OpenWindow(int id, int x, int y, int width, int height);  // 0x100084b0
     int M_10008330(int id, int *result);
     int M_1000b2c0(int id, const char *label, int value);
 };

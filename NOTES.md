@@ -226,3 +226,12 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   = Render_OnLostDevice); one called without ecx set from a method is a free or static function.
 - Pass-through field compares: `0.0f < x ? x : 0` and `1.0f > a ? a : 1.0f` keep the original operand order of the
   compare; the mirrored spelling flips the fcomp operands.
+- One helper applied twice to the same expression (`SignedField(code % 10000)` in a test, then again in the use):
+  write the expression twice. CSE shares the idiv, the first inline call works on a copy and the second folds the
+  dead remainder in place. A named `cost` local gives lea forms instead (Map_RouteLength 0x10049990).
+- A pointer local into a table (`RoutePoint *point = &table[i]`) changes the order of the induction increments at
+  the loop end; indexing the table directly can restore it (Map_RouteLength).
+- `x = total + f(); return x;` against `total += f(); return total;`: the second rounds through total's own stack
+  slot after the register pops.
+- Arrays read at `index + 3` with scaled addressing (shorts, ints, 0x188 records) keep `index + 3` in a register only
+  when it is a named local; byte arrays fold it into the displacement either way (Char_ClampStatus 0x1001a840).

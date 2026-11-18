@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (97)
+## 1. Walls to retry (98)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -93,6 +93,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
+- [ ] `10194a10` 580 — Circle_Intersect (__stdcall): logic identical; the stack slots of d2 and disc are swapped and the original multiplies by d2 after storing (rb2 + ra2); k split, 2.0 factor and early returns tried
 - [ ] `101992f0` 29 — Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)
 - [ ] `10199380` 526 — Node::FindBone: logic identical; the original keeps 0 in ebx (zero compares, trylevel store, then the loop counter) and frame in edx, ours tests against 0 and keeps frame in ebx; a counter declared at the top and the clamp spellings tried
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
@@ -116,7 +117,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10017c55` 204 bytes (float, calls 8)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (103)
+## 3. Medium functions (251-800 bytes) (102)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10024d00` 377 bytes (float, calls 13)
@@ -168,7 +169,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10143bc0` 572 bytes (float, calls 13)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
 - [ ] `101890f0` 579 bytes (float, calls 7)
-- [ ] `10194a10` 580 bytes (float, calls 7)
 - [ ] `1017c9c0` 581 bytes (loops 7, calls 2)
 - [ ] `1001f270` 588 bytes (float, loops 3, calls 15)
 - [ ] `1015c450` 589 bytes (loops 11, calls 19)

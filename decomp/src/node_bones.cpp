@@ -6,6 +6,7 @@ struct Matrix4
     float m[16];
     Matrix4();    // 0x101ae770
     ~Matrix4();   // 0x1013eda0 (empty)
+    Matrix4 operator*(const Matrix4 &other);   // 0x101b0670: matrix product
 };
 
 Matrix4 IdentityMatrix();  // 0x101b0ba0
@@ -36,7 +37,7 @@ struct Node
     char pad_00b0[0x11c];
     Matrix4 localMatrix;      // 0x1cc
     char pad_020c[0x84];
-    Matrix4 *matrixOverride;  // 0x290: used instead of localMatrix when m_0294 is set
+    Matrix4 *matrixOverride;  // 0x290: per-frame matrices used instead of localMatrix (m_0294 of them)
     int m_0294;
     char pad_0298[0x10];
     NodeExtra *extra;         // 0x2a8
@@ -56,6 +57,45 @@ struct Node
 };
 
 Matrix4 InverseMatrix(const Matrix4 &matrix);   // 0x101b0d40
+
+// 0x10199380 (Node::FindBone). Searches this subtree for the node `id` (a node address), accumulating world matrices:
+// this node's matrix for `frame` (a negative frame -1-n picks override matrix n, at most 15; animated nodes sample
+// their extra data; otherwise the override matrix of the frame, clamped to the last one, or the local matrix) times
+// `parent`. The bone's matrix is stored in `work` and returned; 0 when the subtree does not hold it.
+Matrix4 *Node::FindBone(int id, Matrix4 *parent, Matrix4 *work, int frame)
+{
+    Matrix4 matrix;
+    if (frame < 0)
+    {
+        int index = -1 - frame;
+        if (index > 15)
+            index = 15;
+        matrix = matrixOverride[index] * *parent;
+    }
+    else if ((flags & 0x100000) && extra != 0)
+        matrix = extra->AnimatedMatrix(frame) * *parent;
+    else if (matrixOverride != 0)
+    {
+        int index = frame;
+        if (m_0294 <= frame)
+            index = m_0294 - 1;
+        matrix = matrixOverride[index] * *parent;
+    }
+    else
+        matrix = localMatrix * *parent;
+    if (id == (int)this)
+    {
+        *work = matrix;
+        return work;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        Matrix4 *found = children[i]->FindBone(id, &matrix, work, frame);
+        if (found != 0)
+            return found;
+    }
+    return 0;
+}
 
 // Returns the world matrix of bone `id` in this model's tree, starting from the identity; when no child has the
 // bone, the identity itself.

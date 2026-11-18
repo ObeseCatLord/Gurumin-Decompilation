@@ -105,3 +105,4 @@ address	status	reason
 10054d50	open	Game::RaiseFireEvents: same loop-pointer residue as 0x10054a60 (flags pointer local tried: bias moves to argument)
 10054f30	open	Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
 10055110	open	Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60
+10175c90	open	Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried

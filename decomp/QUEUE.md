@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (104)
+## 1. Walls to retry (105)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -95,6 +95,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016b010` 53 — original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 - [ ] `1016b1e0` 73 — original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
+- [ ] `10175c90` 476 — Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
 - [ ] `10191fd0` 549 — Box_Overlap (__stdcall): only block order differs: the original keeps the return-0 block on the fallthrough of the last compare; early returns, per-axis returns, nested and else forms tried
@@ -116,14 +117,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (4)
+## 2. Small functions (30-250 bytes) (3)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
-- [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (89)
+## 3. Medium functions (251-800 bytes) (86)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
@@ -133,16 +133,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100543a0` 425 bytes (float, loops 1, calls 13)
 - [ ] `1013e260` 428 bytes (loops 4, calls 16)
 - [ ] `10034cc0` 429 bytes (float, loops 1, calls 13)
-- [ ] `1019c3a0` 434 bytes (float, loops 4)
 - [ ] `100558d0` 449 bytes (loops 4, calls 4)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
 - [ ] `1002ee70` 473 bytes (float, loops 1, calls 8)
-- [ ] `10175c90` 476 bytes (loops 4, calls 6)
 - [ ] `101612b0` 481 bytes (loops 1)
 - [ ] `1000dba0` 484 bytes (float, loops 1, calls 11)
 - [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
-- [ ] `10172ac0` 486 bytes (float, loops 2)
 - [ ] `10017d30` 488 bytes (loops 2, calls 22)
 - [ ] `10189340` 490 bytes (float, calls 6)
 - [ ] `1002f320` 494 bytes (float)

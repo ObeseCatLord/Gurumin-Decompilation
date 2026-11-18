@@ -796,3 +796,7 @@ address	name	evidence
 10054d50	Game::RaiseFireEvents	registers the MFIREON/MFIREOFF map events of an argument (open, decomp/src/app_0003.cpp)
 10054f30	Game::RaiseLeverEvents	registers the LEVERON/LEVEROFF map events of a lever node (open, decomp/src/app_0003.cpp)
 10055110	Game::RaiseDoorEvents	registers the DROPEN/DRCLOSE map events of a door gimmick (open, decomp/src/app_0003.cpp)
+1016b260	Camera_TurnPush	turns a direction by the camera heading into DAT_11af3f58, doubled (matched, decomp/src/camera_orbit.cpp)
+1019c3a0	Node::ResetVertexColours	white vertices, optionally raised with texture coordinates from x/y (matched, decomp/src/node_vertex_colours.cpp)
+10172ac0	ScreenBatch::Add	appends 640x480 screen vertices scaled to the back buffer (matched, decomp/src/screen_vertices.cpp)
+10175c90	Texture_CreateFromPixels	named texture from RGB pixels in a free slot (open, decomp/src/texture_create.cpp)

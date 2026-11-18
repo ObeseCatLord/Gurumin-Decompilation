@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (92)
+## 1. Walls to retry (93)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -27,6 +27,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000f360` 300 — face change: calls match; the original keeps index in esi and frame in edi (ours swapped) and indexes the face tables as flat int arrays [set*0x1c0+frame]
 - [ ] `10011dd0` 419 — Npc_StandOnGround: logic identical; register residue (state address in eax and its store before the DAT_102022b8 load in the original, edi and after in ours; the hit result in eax vs our temporaries); state local and store order tried
 - [ ] `10012130` 172 — Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
+- [ ] `10012220` 418 — Model_ApplyCommands: logic identical; index/model registers swapped (ebp/ebx) and argument loads scheduled differently; two parameter orders tried
 - [ ] `100143f0` 201 — helmet attach: 8 bytes; when Bip01 Head is missing the original returns through the shared epilogue with eax still 0 from Find, ours emits its own xor eax,eax / epilogue (return 0, return head, result-variable forms tried)
 - [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
 - [ ] `100157b0` 167 — near-cell list: original keeps the index/row pointer in edi and the box pointer in ebx (pushed late); ours swaps them (local row pointer, direct indexing, do/while tried)
@@ -112,7 +113,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (114)
+## 3. Medium functions (251-800 bytes) (113)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10024d00` 377 bytes (float, calls 13)
@@ -122,7 +123,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10043e20` 402 bytes (float, loops 2, calls 8)
 - [ ] `101ab9d0` 412 bytes (loops 1, calls 8)
 - [ ] `1016a2e0` 413 bytes (float, loops 1, calls 1)
-- [ ] `10012220` 418 bytes (loops 1, calls 8)
 - [ ] `1015cae0` 418 bytes
 - [ ] `100543a0` 425 bytes (float, loops 1, calls 13)
 - [ ] `1013e260` 428 bytes (loops 4, calls 16)

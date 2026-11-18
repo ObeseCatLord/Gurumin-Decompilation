@@ -93,3 +93,4 @@ address	status	reason
 100211a0	open	Region_WaveVertex: logic identical; ebx/ebp swapped for the flip counter and the point address, and the original rounds each sine result to float twice (helper and caller locals tried)
 10001cb0	open	Bgm_CheckHeader: store order identical; the spills of the name characters and the registers of key[16]..key[24] differ (register allocation)
 1000beb0	open	TestDat_Load: logic identical; ecx/edx swapped for the word slot (operand orders tried)
+10012220	open	Model_ApplyCommands: logic identical; index/model registers swapped (ebp/ebx) and argument loads scheduled differently; two parameter orders tried

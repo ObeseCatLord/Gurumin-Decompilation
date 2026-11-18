@@ -765,3 +765,4 @@ address	name	evidence
 10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (open, decomp/src/bgm_header.cpp)
 1000fb80	Loading_Tick	redraws the loading spinner, bar and percentage every 34 ms (matched, decomp/src/loading_tick.cpp)
 1000beb0	TestDat_Load	parses test.dat into word groups (open, decomp/src/test_dat.cpp)
+10012220	Model_ApplyCommands	applies a model definition's SET/DIS/RND/DAT commands to a character (open, decomp/src/model_commands.cpp)

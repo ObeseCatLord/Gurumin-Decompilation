@@ -228,7 +228,6 @@ address	name	evidence
 10001f60	acosf	named in the decompiled source (decomp/obj_symbols.tsv)
 10001f80	atan2f	named in the decompiled source (decomp/obj_symbols.tsv)
 101b2570	GameFile::~GameFile	named in the decompiled source (decomp/obj_symbols.tsv)
-1019e9a0	Node::Release	named in the decompiled source (decomp/obj_symbols.tsv)
 101acfc0	VertexPack::FreeVertices	named in the decompiled source (decomp/obj_symbols.tsv)
 101ad0e0	IndexList::Free	named in the decompiled source (decomp/obj_symbols.tsv)
 1000be40	EffectModel::EffectModel	named in the decompiled source (decomp/obj_symbols.tsv)
@@ -789,3 +788,4 @@ address	name	evidence
 100b58a0	Npc_TalkWhenNear	idle NPC that turns to the player and talks once the player comes near (matched, decomp/src/char_move.cpp)
 10024d00	Enemy_CanReturnHome	whether an enemy may head back to its start position in a direction (open, decomp/src/enemy_moves.cpp)
 10191500	Node::Init	resets every field of a new scene node (matched, decomp/src/node_init.cpp)
+1019e9a0	Node::Release	frees everything a node owns and its children, then resets it (matched, decomp/src/scene_node.cpp)

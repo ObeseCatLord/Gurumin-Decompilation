@@ -98,6 +98,7 @@ struct Channel
 struct Extra
 {
     void M_10169660();
+    void M_10169620();           // 0x10169620 (SlotLists::Clear): frees the extra data's lists
 };
 
 // Mesh material (0x180 bytes).
@@ -141,7 +142,12 @@ struct Node
     PackHeader *packs;
     KeyPair *indexLists;
     KeyPair *m_0070;
-    char pad_0074[0x15];
+    int m_0074;
+    int m_0078;
+    int m_007c;                  // 0x7c: number of entries in m_0080 and m_0084
+    PackHeader *m_0080;
+    KeyPair *m_0084;
+    char m_0088;
     char isStatic;               // 0x89: 1 once the node was collected as static scenery (or is the collector)
     short staticCount;           // 0x8a: on the collector: number of entries in `staticNodes`
     Node **staticNodes;          // 0x8c: on the collector: the collected nodes (room for 0x200)
@@ -194,7 +200,8 @@ struct Node
     char pad_1859[3];
     int m_185c;
     int m_1860;
-    char pad_1864[0x34];
+    void *m_1864;
+    char pad_1868[0x30];
     char element;
     char pad_1899;
     char m_189a;
@@ -206,7 +213,7 @@ struct Node
     void M_1019eeb0(Node *root, Node **list, int *count);
     void M_101ab9d0(Node *root);
     int M_10191770();
-    void M_1019e9a0();
+    void Release();
     int RemoveChild(Node *child, int keep);
     int CopyPlugData();
     int SetMaterialValue(const char *material, int value);
@@ -847,6 +854,89 @@ Node *Node::M_10191cc0(unsigned int mask, int nth, int *counter)
     }
     return 0;
 }
+// 0x1019e9a0 (Node::Release). Frees everything the node owns, then its children (recursively) and resets it with
+// M_10191500: the static-node list, the second pack and index lists, the extra data, the skin and saved blocks, the
+// materials, the texture reference (with more than one frame and no reference the game stops on purpose), the
+// second key list, the mesh (the same stop when there are packs without a mesh) and the plug channels and data.
+void Node::Release()
+{
+    if (staticNodes != 0)
+    {
+        DAT_11b1ba40(staticNodes);
+        staticNodes = 0;
+    }
+    isStatic = 0;
+    staticCount = 0;
+    M_101911b0(m_0080, m_007c);
+    M_101911e0(m_0084, m_007c);
+    if (m_0080 != 0)
+        DAT_11b1ba40(m_0080);
+    if (m_0084 != 0)
+        DAT_11b1ba40(m_0084);
+    m_0080 = 0;
+    m_0084 = 0;
+    if (m_02a8 != 0)
+    {
+        m_02a8->M_10169620();
+        DAT_11b1ba40(m_02a8);
+    }
+    m_02a8 = 0;
+    if (m_0708 != 0)
+        DAT_11b1ba40(m_0708);
+    m_0708 = 0;
+    if (saved != 0)
+        DAT_11b1ba40(saved);
+    saved = 0;
+    if (m_1864 != 0)
+        DAT_11b1ba40(m_1864);
+    m_1864 = 0;
+    if (materials != 0)
+        DAT_11b1ba40(materials);
+    materials = 0;
+    if (m_028c != 0)
+        M_10191210();
+    else if (m_0294 > 1)
+        fread(0, 1, 1, 0);
+    if (m_0070 != 0)
+    {
+        M_101911e0(m_0070, packCount);
+        DAT_11b1ba40(m_0070);
+        m_0070 = 0;
+    }
+    if (mesh != 0)
+        ReleaseMesh();
+    else if (packCount != 0)
+        fread(0, 1, 1, 0);
+    mesh = 0;
+    packs = 0;
+    indexLists = 0;
+    packCount = 0;
+    for (int j = 0; j < 16; j++)
+    {
+        if (plugs[j] != 0)
+        {
+            DAT_11b1ba40(plugs[j]);
+            plugs[j] = 0;
+            plugType[j] = 0;
+        }
+    }
+    for (int k = 0; k < 16; k++)
+    {
+        if (plugData[k] != 0)
+        {
+            DAT_11b1ba40(plugData[k]);
+            plugData[k] = 0;
+            plugTypeCopy[k] = 0;
+        }
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        children[i]->Release();
+        DAT_11b1ba40(children[i]);
+    }
+    M_10191500();
+}
+
 // Releases the node's shared mesh and, when it was the last user, frees the mesh, packs and index lists.
 void Node::ReleaseMesh()
 {
@@ -1119,7 +1209,7 @@ int Node::RemoveChild(Node *child, int keep)
         return 0;
     if (keep == 0)
     {
-        children[i]->M_1019e9a0();
+        children[i]->Release();
         DAT_11b1ba40(children[i]);
     }
     int j;

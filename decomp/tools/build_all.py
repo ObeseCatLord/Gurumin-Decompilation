@@ -79,6 +79,7 @@ def main():
     symbols = load_symbol_addresses()
     total_m = total_d = total_e = 0
     matched_bytes = 0
+    unique_matched = 0  # game functions matched, each address counted once (some files repeat a callee)
     units = []
     seen = set()
     sources = [(p, os.path.basename(p), []) for p in sorted(glob.glob(os.path.join(root, "src", "*.cpp")))]
@@ -97,7 +98,6 @@ def main():
             d = re.match(r"DIFF (\S+) len ours=(\d+), diffs=(\d+)", line)
             if m:
                 sym, percent = m.group(1), 100.0
-                matched_bytes += int(m.group(2))
             elif e:
                 sym, percent = e.group(1), 99.0
             elif d:
@@ -109,6 +109,9 @@ def main():
             if addr is None or addr not in game or addr in seen:
                 continue
             seen.add(addr)
+            if percent >= 100.0:
+                unique_matched += 1
+                matched_bytes += game[addr]
             functions.append({"name": sym, "size": game[addr], "percent": percent, "address": addr})
         m = re.search(r"matched (\d+), differing (\d+), equivalent (\d+)", out)
         if m:
@@ -120,7 +123,7 @@ def main():
     print("TOTAL matched %d, equivalent (13.00 encoding only) %d, differing %d" % (total_m, total_e, total_d))
     code = sum(game.values())
     print("PROGRESS %d of %d game functions matched (%.1f%%), %d of %d code bytes (%.2f%%)" % (
-        total_m, len(game), 100.0 * total_m / len(game), matched_bytes, code, 100.0 * matched_bytes / code))
+        unique_matched, len(game), 100.0 * unique_matched / len(game), matched_bytes, code, 100.0 * matched_bytes / code))
     if report_path:
         rest = [{"name": "FUN_" + a, "size": s, "percent": 0.0, "address": a} for a, s in sorted(game.items()) if a not in seen]
         units.append(unit_entry("app/unmatched", "", rest))

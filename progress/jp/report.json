@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 7.2404,
+  "fuzzy_match_percent": 7.2513,
   "total_code": "1720206",
   "matched_code": "104368",
   "matched_code_percent": 6.0672,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 190,
+  "total_units": 191,
   "complete_units": 120
  },
  "units": [
@@ -5762,6 +5762,48 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/itm_scramble.cpp"
+   }
+  },
+  {
+   "name": "app/joystick_buttons",
+   "measures": {
+    "fuzzy_match_percent": 36.1702,
+    "total_code": "519",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "519",
+     "fuzzy_match_percent": 36.1702
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10142b20@8",
+     "size": "519",
+     "fuzzy_match_percent": 36.1702,
+     "metadata": {
+      "virtual_address": "269757216"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/joystick_buttons.cpp"
    }
   },
   {
@@ -12720,13 +12762,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1583141",
+    "total_code": "1582622",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 428,
+    "total_functions": 427,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -12739,7 +12781,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1583141",
+     "size": "1582622",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -15094,14 +15136,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269756304"
-     }
-    },
-    {
-     "name": "FUN_10142b20",
-     "size": "519",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269757216"
      }
     },
     {

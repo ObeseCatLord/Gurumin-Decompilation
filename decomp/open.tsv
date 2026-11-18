@@ -112,3 +112,4 @@ address	status	reason
 1016a2e0	open	Playback::Play: control flow and stores identical; register allocation differs (original keeps the layer in eax and reuses the zero restart register as the follow-up loop counter; ours the layer in ecx); index-variable forms tried
 101ad350	open	MotionList::FrameAt: control flow identical; register allocation differs (original keeps time in ebp, the start in edx and the item index in ebx; ours edx/ebx/edi)
 1002a110	open	Char_WalkRoute: code identical; the original keeps the next route point in the slot parameter's stack home (frame 4 bytes smaller), ours gives it a local; declaration positions tried
+10142b20	open	Joystick_IsButtonDown (__stdcall): same cases and code; the tail-merged axis tests are placed differently (the original keeps the full low-x test in the default-layout switch and jumps to it from the mapped cases, ours the other way round)

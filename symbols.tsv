@@ -811,3 +811,4 @@ address	name	evidence
 101ad350	MotionList::FrameAt	frame shown at a time for a list of motion ranges (open, decomp/src/containers.cpp)
 10021c80	Sound_UpdateListener	smooths the camera and sends the 3D sound listener (matched, decomp/src/sound_listener.cpp)
 1002a110	Char_WalkRoute	character steps along its route towards the next point (open, decomp/src/route_walk.cpp)
+10142b20	Joystick_IsButtonDown	whether a game button is down in a DirectInput joystick state (open, decomp/src/joystick_buttons.cpp)

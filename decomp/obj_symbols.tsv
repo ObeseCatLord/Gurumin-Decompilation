@@ -269,3 +269,4 @@ _Vec3_Dot	101ac200
 ?CaptureRgbRows@TextureObject@@QAEHPAE@Z	10145120
 ?DrawTriangles@TextureObject@@QAEHPBXH@Z	1014bb70
 ?Unload@AnimModel@@QAEHXZ	10162c50
+?AddLitModel@ModelBank@@QAEHPAUBankModel@@@Z	10164af0

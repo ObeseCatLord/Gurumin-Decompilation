@@ -688,3 +688,5 @@ address	name	evidence
 10027560	Enemy_IdleMotion	plays idle motion 5 or 6 at random and waits for it (decomp/src/enemy_moves.cpp)
 10027400	Enemy_WatchPlayer	motion 7, faces the player until a random end (decomp/src/enemy_moves.cpp)
 10028360	Enemy_TurnToPlayer	turns towards the player at most 20 degrees a frame, random end (decomp/src/enemy_moves.cpp)
+1001e240	Map_IconTexture	texture of the current map icon, loaded with maruf00a.bmp as fallback (decomp/src/map_icons.cpp)
+10164af0	ModelBank::AddLitModel	matched decompiled source (decomp/obj_symbols.tsv)

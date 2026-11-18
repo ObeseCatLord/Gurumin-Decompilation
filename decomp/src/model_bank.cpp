@@ -47,13 +47,13 @@ struct BankModel
 struct ModelBank
 {
     Node *lights[0x20];     // 0x0000: light nodes of the scene (Omn..., then Spot...)
-    int m_0080[0x80];       // 0x0080
+    BankModel *litModels[0x80];  // 0x0080: models that take part in the scene lighting
     char pad_0280[0x204];
     Vec4 m_0484[0x80];      // 0x0484
     Vec4 m_0c84[0x80];      // 0x0c84
     char pad_1484[0x400];
     int m_1884;             // 0x1884
-    Vec4 m_1888[0xb00];     // 0x1888
+    Vec4 lighting[0xb00];   // 0x1888: 22 vectors of light parameters for each entry of litModels
     Vec4 m_c888[0x16];      // 0xc888
     BankModel models[16];   // 0xc9e8
     int params[16];         // 0x313a8: per-model parameter given when the model was added
@@ -67,7 +67,7 @@ struct ModelBank
     int Reset();
     int CollectLights(Node *root);
     int Add(int id, int param);
-    int M_10164af0(BankModel *model);
+    int AddLitModel(BankModel *model);
     int AddFlarePoint(Vec4 position, const Matrix4 *viewProjection);
 };
 
@@ -75,7 +75,7 @@ struct ModelBank
 int ModelBank::Reset()
 {
     for (int j = 0; j < 0x80; j++)
-        m_0080[j] = 0;
+        litModels[j] = 0;
     m_1884 = 0;
     for (int i = 0; i < 16; i++)
         models[i].id = 0;
@@ -86,7 +86,7 @@ int ModelBank::Reset()
 
 // Rebuilds the light list from the scene below `root`: up to 32 nodes whose names start with "Omn" (omni lights)
 // followed by up to 32 starting with "Spot" (spot lights); the leading '@' makes Node::Find a prefix search. Missing lights are skipped, so the list stays packed. Returns 0 when the bank
-// is not in use, else 1. (The list has 32 entries; with more than 32 lights in total it overruns into m_0080.)
+// is not in use, else 1. (The list has 32 entries; with more than 32 lights in total it overruns into litModels.)
 int ModelBank::CollectLights(Node *root)
 {
     if (enabled == 0)
@@ -111,7 +111,7 @@ int ModelBank::CollectLights(Node *root)
 }
 
 // Adds model `id` to the first free record (scale 1, no timeout), remembers `param` for it and sets the record up
-// (M_10164af0). Returns 0 when all 16 records are in use.
+// (AddLitModel). Returns 0 when all 16 records are in use.
 int ModelBank::Add(int id, int param)
 {
     for (int i = 0; i < 16; i++)
@@ -124,7 +124,7 @@ int ModelBank::Add(int id, int param)
             models[i].timer = 99999;
             models[i].index = i;
             params[i] = param;
-            M_10164af0(&models[i]);
+            AddLitModel(&models[i]);
             return 1;
         }
     }
@@ -154,4 +154,54 @@ int ModelBank::AddFlarePoint(Vec4 position, const Matrix4 *viewProjection)
 ModelBank::ModelBank()
 {
     enabled = 0;
+}
+
+// 0x10164af0. Adds `model` to the lit models (once; only models with an id, and only while the bank is in use)
+// and gives it default light parameters. Returns 1 when it was added, else 0.
+int ModelBank::AddLitModel(BankModel *model)
+{
+    if (enabled == 0)
+        return 0;
+    if (model == 0 || model->id2 == 0)
+        return 0;
+    int i;
+    for (i = 0; i < 0x80; i++)
+    {
+        if (litModels[i] == model)
+            return 0;
+    }
+    for (i = 0; i < 0x80; i++)
+    {
+        if (litModels[i] == 0)
+        {
+            litModels[i] = model;
+            Vec4 *light = &lighting[i * 22];  // this model's 22 light vectors
+            light[0].x = 0;
+            light[0].y = 0;
+            light[0].z = 1.0f;
+            light[0].w = 1.0f;
+            light[1].x = 1.0f;
+            light[1].y = 1.0f;
+            light[1].z = 1.0f;
+            light[1].w = 1.0f;
+            light[2].x = 0;
+            light[2].y = -1.0f;
+            light[2].z = 0;
+            light[2].w = 1.0f;
+            light[3].x = 1.0f;
+            light[3].y = 1.0f;
+            light[3].z = 1.0f;
+            light[3].w = 1.0f;
+            light[4].x = 0;
+            light[4].y = 0.5f;
+            light[4].z = 0;
+            light[4].w = 1.0f;
+            light[5].x = 1.0f;
+            light[5].y = 1.0f;
+            light[5].z = 1.0f;
+            light[5].w = 1.0f;
+            return 1;
+        }
+    }
+    return 0;
 }

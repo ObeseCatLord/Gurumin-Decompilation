@@ -108,7 +108,7 @@ struct IDirect3DDevice9
     virtual long __stdcall CreateVertexShader() = 0;
     virtual long __stdcall SetVertexShader(void *shader) = 0;
     virtual long __stdcall GetVertexShader() = 0;
-    virtual long __stdcall SetVertexShaderConstantF() = 0;
+    virtual long __stdcall SetVertexShaderConstantF(unsigned int start, const float *data, unsigned int count) = 0;
     virtual long __stdcall GetVertexShaderConstantF() = 0;
     virtual long __stdcall SetVertexShaderConstantI() = 0;
     virtual long __stdcall GetVertexShaderConstantI() = 0;

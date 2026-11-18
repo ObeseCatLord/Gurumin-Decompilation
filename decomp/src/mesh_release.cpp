@@ -1,5 +1,35 @@
 // Mesh data of a scene node (scene_node.cpp Node::mesh): the texture slot and the buffers BuildMesh creates.
 
+#include "d3d9_min.h"
+
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    Vec4();                                     // 0x101ac990
+};
+
+// Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
+struct Matrix4
+{
+    float m[16];
+    Matrix4();                                  // 0x101ae770
+    ~Matrix4();                                 // 0x1013eda0 (empty)
+    Matrix4 operator*(const Matrix4 &other);    // 0x101b0670: matrix product
+};
+
+Matrix4 Transpose(const Matrix4 &matrix);       // 0x101b1090
+
+// The first three rows of a transposed bone matrix: one vertex-shader constant each.
+struct BoneRows
+{
+    Vec4 row[3];
+};
+
+extern "C" IDirect3DDevice9 *DAT_10f1fcf0;      // the Direct3D device
+
 struct MeshData
 {
     int textureSlot;          // 0x00: texture slot of the mesh, -1 = none
@@ -19,6 +49,7 @@ struct MeshData
     int pad_003c[2];
     int m_0044;
     void Release();
+    void UploadBones(Matrix4 *bones, int count, Matrix4 *world, int unused);
 };
 
 extern "C" void FUN_101477c0(int slot);          // Texture_ReleaseSlot
@@ -67,4 +98,19 @@ void MeshData::Release()
     m_0030 = 0;
     m_0034 = 0;
     m_0038 = 0;
+}
+
+// 0x10145a50. Uploads the skinning matrices of the mesh: each of the `count` bone matrices (at most 24) is
+// multiplied by `world`, transposed, and its first three rows go to the vertex-shader constants from register 11.
+void MeshData::UploadBones(Matrix4 *bones, int count, Matrix4 *world, int unused)
+{
+    Vec4 constants[24 * 3];  // three registers per bone
+    for (int i = 0; i < count; i++)
+    {
+        Matrix4 matrix;
+        matrix = bones[i] * *world;
+        matrix = Transpose(matrix);
+        *(BoneRows *)&constants[i * 3] = *(BoneRows *)&matrix;  // its first three rows
+    }
+    DAT_10f1fcf0->SetVertexShaderConstantF(11, (const float *)constants, count * 3);
 }

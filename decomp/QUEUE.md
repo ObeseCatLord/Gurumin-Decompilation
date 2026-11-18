@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (91)
+## 1. Walls to retry (92)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -21,6 +21,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10009050` 375 — Game::MoveCursor: logic identical; the original shares one stack slot for the int-to-float temporaries, the distance and the speed (frame 4 bytes smaller); shared-variable form tried
 - [ ] `100091d0` 239 — Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
+- [ ] `1000beb0` 366 — TestDat_Load: logic identical; ecx/edx swapped for the word slot (operand orders tried)
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
 - [ ] `1000ed20` 77 — original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 - [ ] `1000f360` 300 — face change: calls match; the original keeps index in esi and frame in edi (ours swapped) and indexes the face tables as flat int arrays [set*0x1c0+frame]
@@ -111,10 +112,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (115)
+## 3. Medium functions (251-800 bytes) (114)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
-- [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)
 - [ ] `10024d00` 377 bytes (float, calls 13)
 - [ ] `101ac010` 387 bytes Node::Load (loops 4, calls 12)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)

@@ -35,7 +35,6 @@ address	name	evidence
 1013b700	Game_Startup	reads every gurumin.def key (docs/config_keys.tsv), loads packs.dll, demo.sav/%s.sav
 10166950	Character_Load	"chara %d"
 101602d0	File_Checksum	sum/xor (seed 0xcc82) over a file in dwords
-1000beb0	TestDat_Load	parses test.dat (debug)
 1013ed20	Render_BeginScene	EndScene if a scene is open, then IDirect3DDevice9::BeginScene on the device at 0x10f1fcf0
 1013ed60	Render_EndScene	IDirect3DDevice9::EndScene if a scene is open
 1013eeb0	FrameTimer_Reset	timeGetTime() -> 0x10f654d8
@@ -765,3 +764,4 @@ address	name	evidence
 10166f20	WorldRenderer::SetModelState	starts, ends or drops the saved state of a world model's linked node (matched, decomp/src/world_model_state.cpp)
 10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (open, decomp/src/bgm_header.cpp)
 1000fb80	Loading_Tick	redraws the loading spinner, bar and percentage every 34 ms (matched, decomp/src/loading_tick.cpp)
+1000beb0	TestDat_Load	parses test.dat into word groups (open, decomp/src/test_dat.cpp)

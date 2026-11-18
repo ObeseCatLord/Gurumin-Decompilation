@@ -1,0 +1,52 @@
+// Movement limits: a character can be kept within a range of its start position along x and/or y.
+#include <math.h>
+#include "world.h"
+
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
+// Per-slot position record, 0x40 bytes (char_shots.cpp); here the start position of each character.
+struct SlotPosition
+{
+    Vec4 position;
+    char pad_0010[0x30];
+};
+
+// Per-character movement limits, 0x100 bytes per slot (set up by the spawn code at 0x1002ae70).
+struct MoveLimit
+{
+    int rangeX;               // allowed distance from the start position along x (0 = unlimited)
+    int rangeY;               // the same along y
+    int limitX;               // 1 = the x range applies
+    int limitY;               // 1 = the y range applies
+    char pad_0010[0xf0];
+};
+
+// Absolute value of a float (an inline helper: its argument is rounded to float first).
+inline float AbsFloat(float value)
+{
+    return (float)fabs(value);
+}
+
+extern "C" MoveLimit DAT_102110b0[0x80];
+extern "C" SlotPosition DAT_10802bf8[0x80];
+
+// 0x10024e80 (Char_OutsideLimit). 1 when moving character `index` by (dx, dy) would take it further from its start
+// position than its x or y range allows, else 0.
+extern "C" int FUN_10024e80(int index, float dx, float dy)
+{
+    float rangeX = (float)DAT_102110b0[index].rangeX;
+    float rangeY = (float)DAT_102110b0[index].rangeY;
+    if (DAT_102110b0[index].limitX == 1 && rangeX != 0.0f &&
+        AbsFloat(dx + DAT_10db6ed8[index].m_2368.x - DAT_10802bf8[index].position.x) > rangeX)
+        return 1;
+    if (DAT_102110b0[index].limitY == 1 && rangeY != 0.0f &&
+        AbsFloat(dy + DAT_10db6ed8[index].m_2368.y - DAT_10802bf8[index].position.y) > rangeY)
+        return 1;
+    return 0;
+}

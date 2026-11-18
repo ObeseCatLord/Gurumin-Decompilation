@@ -682,3 +682,6 @@ address	name	evidence
 1003ac20	Sound_PlayWav	plays wav\<name>.<ext>, positional or not, volume scaled by mode (decomp/src/sound_effects.cpp)
 1003ad20	Sound_PlayEffect	plays effect id from the table at 0x108dc158 (loop handles in 0x10447338) (decomp/src/sound_effects.cpp)
 10162c50	AnimModel::Unload	matched decompiled source (decomp/obj_symbols.tsv)
+10024e80	Char_OutsideLimit	1 when a move leaves the per-character x/y range around the start position (decomp/src/char_leash.cpp)
+100249c0	Char_IsAbove	1 when one character stands 20..20+h above another within a distance (decomp/src/actor_scan.cpp)
+10019210	Player_LookAround	swings the head-look target from side to side around the player (decomp/src/head_look.cpp)

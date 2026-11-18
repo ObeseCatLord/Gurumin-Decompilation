@@ -15,6 +15,7 @@ struct Vec4
     Vec4 operator-(const Vec4 &other) const;
     Vec4 Scaled(const float &scale);
     float Length2D();  // 0x101ac500: length of x/y
+    float LengthSquared3();  // 0x101ac6a0: x*x + y*y + z*z
 };
 
 // Per-slot state table at 0x10daaaec, 0x188 bytes per slot (CharSlot in world.h starts 0x98 bytes later).
@@ -152,4 +153,21 @@ extern "C" int FUN_10034e80(int index, const Vec4 *offset, int range)
         }
     }
     return 0;
+}
+
+// 0x100249c0. 1 when character `upper` stands between 20 and 20 + `maxHeight` units above character `lower`, their
+// squared distance in x/y is at most `maxDistanceSquared`, and `upper`'s m_239c is set. Returns 0 otherwise.
+extern "C" int FUN_100249c0(int lower, int upper, int maxHeight, int maxDistanceSquared)
+{
+    Vec4 top;
+    Vec4 bottom;
+    top.Copy(DAT_10db6ed8[upper].matrix.GetTranslation());
+    bottom.Copy(DAT_10db6ed8[lower].matrix.GetTranslation());
+    float height = top.z - (bottom.z + 20.0f);
+    top.z = 0;
+    bottom.z = 0;
+    float distanceSquared = (top - bottom).LengthSquared3();
+    if (height < 0.0f || height > (float)maxHeight || distanceSquared > (float)maxDistanceSquared)
+        return 0;
+    return DAT_10db6ed8[upper].m_239c != 0;
 }

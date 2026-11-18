@@ -241,3 +241,8 @@ _Vec3_Dot	101ac200
 ?InsertByName@MotionList@@QAEHHPBDH@Z	101ad5c0
 ?CaptureRgb24@TextureObject@@QAEHPAE@Z	10145060
 ?AddFlarePoint@ModelBank@@QAEHUVec4@@PBUMatrix4@@@Z	10165140
+?WritePaletted@TextureObject@@QAEHHHHHHPBEPBG@Z	1014f120
+?QuatFromAxisAngle@@YA?AUVec4@@AAU1@M@Z	101ae950
+?InTriangle@Vec4@@QAEHABU1@00@Z	101aeee0
+?Slerp@@YA?AUVec4@@ABU1@0M@Z	101aeae0
+?QuatFromMatrix@@YA?AUVec4@@ABUMatrix4@@@Z	101ae2a0

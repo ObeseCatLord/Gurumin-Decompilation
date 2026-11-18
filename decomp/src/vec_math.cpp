@@ -218,6 +218,41 @@ Vec4 Nlerp(const Vec4 &a, const Vec4 &b, float t)
     return result;
 }
 
+// 0x101aeae0. Spherical interpolation between the rotation quaternions `a` and `b` by `t`. `b` is flipped when the
+// two point into opposite hemispheres, so the shorter way round is taken; when they are nearly equal (cosine of the
+// angle 0.95 or more) the cheaper Nlerp is used instead.
+Vec4 Slerp(const Vec4 &a, const Vec4 &b, float t)
+{
+    Vec4 target;
+    float cosAngle = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+    if (cosAngle < 0.0f)
+    {
+        cosAngle = -cosAngle;
+        target.x = b.x * -1.0f;
+        target.y = b.y * -1.0f;
+        target.z = b.z * -1.0f;
+        target.w = b.w * -1.0f;
+    }
+    else
+    {
+        target.Copy(b);
+    }
+    if (cosAngle < 0.95f)
+    {
+        float angle = (float)acos(cosAngle);
+        float sinAngle = (float)sin(angle);
+        float weightB = (float)sin(angle * t);
+        float weightA = (float)sin((1.0f - t) * angle);
+        Vec4 result;
+        result.x = (weightA * a.x + weightB * target.x) / sinAngle;
+        result.y = (weightA * a.y + weightB * target.y) / sinAngle;
+        result.z = (weightA * a.z + weightB * target.z) / sinAngle;
+        result.w = (weightB * target.w + weightA * a.w) / sinAngle;
+        return result;
+    }
+    return Nlerp(a, target, t);
+}
+
 // Transforms direction `v` by the rotation part of `matrix` (no translation); the result's w is 0.
 Vec4 TransformNormal(const Vec4 &v, const Matrix4 &matrix)
 {

@@ -24,7 +24,7 @@ struct Matrix4
 };
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060 (vec4.cpp)
-// 0x101ae4d0: 1 when `point` transformed by `matrix` lies inside the view volume, widened by `margin`.
+// 0x101ae4d0 (View_ContainsPoint, vec4.cpp): 1 when `point` transformed by `matrix` lies inside the view volume, widened by `margin`.
 extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin);
 
 // One model record (the CharModel part of a Character, see world.h / texture_mgr.cpp SceneOwner).

@@ -68,6 +68,8 @@ struct TextureObject
     int Write16(int x, int y, int rowPixels, int rows, int pitch, const void *bits);
     int Release();
     int CaptureRgb24(unsigned char *out);
+    int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
+                      const unsigned short *palette);
 };
 
 extern "C" IDirect3DDevice9 *DAT_10f1fcf0;      // the Direct3D device
@@ -156,6 +158,36 @@ int TextureObject::Write16(int x, int y, int rowPixels, int rows, int pitch, con
     for (int row = y; row < rows; row++)
     {
         DAT_11b07530(dst, src, rowPixels * 2);
+        dst += locked.pitch;
+        src += pitch;
+    }
+    texture->UnlockRect(0);
+    FUN_101484b0(poolIndex, width, height);
+    if (DAT_10f6550c == this)
+        DAT_10f6550c = (TextureObject *)1;
+    if (DAT_10f65510 == this)
+        DAT_10f65510 = (TextureObject *)1;
+    return 1;
+}
+
+// 0x1014f120. Writes 8-bit palette indexes into the 16-bit texture: the rectangle left..right-1, top..bottom-1 of
+// the texture gets palette[index] for each source byte (`bits` is the rectangle's first row, `pitch` bytes per
+// row). Like Write16, it drops the pooled copy and forgets the stage bindings afterwards. Returns 0 when the
+// texture cannot be locked, else 1.
+int TextureObject::WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
+                                 const unsigned short *palette)
+{
+    LockedRect locked;
+    if (texture == 0)
+        return 0;
+    if (texture->LockRect(0, &locked, 0, 0x800) != 0)
+        return 0;
+    char *dst = (char *)locked.bits;
+    const unsigned char *src = bits;
+    for (int y = top; y < bottom; y++)
+    {
+        for (int x = left; x < right; x++)
+            ((unsigned short *)dst)[x] = palette[src[x - left]];
         dst += locked.pitch;
         src += pitch;
     }

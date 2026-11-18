@@ -5,6 +5,7 @@
 // this file, the compiler knows it leaves edx alone and keeps `this` in edx across the call (this is why these
 // operators only match when they live here).
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,6 +37,7 @@ struct Vec4
     float DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2);
     float DistanceToLine(const Vec4 &a, const Vec4 &b);
     float DistanceSquaredToLine(const Vec4 &a, const Vec4 &b);
+    int InTriangle(const Vec4 &a, const Vec4 &b, const Vec4 &c);
 };
 
 // Dot product of the x/y/z parts of two vectors (free function, cdecl; 0x101ac200).
@@ -242,6 +244,28 @@ float Vec4::DistanceSquaredToLine(const Vec4 &a, const Vec4 &b)
     return Vec3_LengthSquared(&(a + direction.Scaled(t) - *this));
 }
 
+// 0x101aeee0. 1 when this point, projected onto the plane of triangle a-b-c, lies strictly inside the triangle
+// (x/y/z). Uses barycentric coordinates without dividing by the denominator: u and v must be positive and u + v
+// below the denominator. Used by the collision code (0x1019f340, 0x101a0cf0, 0x101a1640).
+int Vec4::InTriangle(const Vec4 &a, const Vec4 &b, const Vec4 &c)
+{
+    Vec4 ab = b - a;
+    Vec4 ac = c - a;
+    Vec4 ap = *this - a;
+    float u = Vec3_Dot(&ac, &ac) * Vec3_Dot(&ap, &ab) - Vec3_Dot(&ac, &ab) * Vec3_Dot(&ap, &ac);
+    if (u > 0.0f)
+    {
+        float v = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ap, &ac) - Vec3_Dot(&ab, &ac) * Vec3_Dot(&ap, &ab);
+        if (v > 0.0f)
+        {
+            float denominator = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ac, &ac) - Vec3_Dot(&ab, &ac) * Vec3_Dot(&ab, &ac);
+            if (u + v - denominator < 0.0f)
+                return 1;
+        }
+    }
+    return 0;
+}
+
 // Row-major 4x4 matrix (vec_math.cpp); the translation is in m[12..14].
 struct Matrix4
 {
@@ -301,6 +325,74 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix)
     result.z = v[2] / v[3];
     result.w = v[3];
     return result;
+}
+
+// Sets component `index` (0 = x, 1 = y, 2 = z) of the vector `v` to `value`.
+#define SET_XYZ(v, index, value)      if ((index) == 0)                      (v).x = (value);               else if ((index) == 1)                 (v).y = (value);               else if ((index) == 2)                 (v).z = (value)
+
+// 0x101ae2a0. Rotation quaternion (x, y, z = vector part, w = scalar part) of the rotation part of `matrix`
+// (element [row][column] is m[row * 4 + column]). With a large trace the quaternion follows from the trace
+// directly; otherwise from the largest diagonal element i and the two after it, j and k (Shoemake's method).
+Vec4 QuatFromMatrix(const Matrix4 &matrix)
+{
+    Vec4 result;
+    float s = matrix.m[0] + matrix.m[5] + matrix.m[10] + matrix.m[15];
+    if (s >= 1.0f)
+    {
+        s = (float)sqrt(s);
+        s = s + s;
+        result.w = s / 4.0f;
+        result.x = (matrix.m[9] - matrix.m[6]) / s;
+        result.y = (matrix.m[2] - matrix.m[8]) / s;
+        result.z = (matrix.m[4] - matrix.m[1]) / s;
+    }
+    else
+    {
+        int i = matrix.m[0] > matrix.m[5] ? 0 : 1;
+        if (matrix.m[10] > matrix.m[i * 5])
+            i = 2;
+        int j = (i + 1) % 3;
+        int k = (j + 1) % 3;
+        s = (float)sqrt(matrix.m[i * 5] - matrix.m[j * 5] - matrix.m[k * 5] + 1.0f);
+        s = s + s;
+        SET_XYZ(result, i, s / 4.0f);
+        SET_XYZ(result, j, (matrix.m[i * 4 + j] + matrix.m[j * 4 + i]) / s);
+        SET_XYZ(result, k, (matrix.m[i * 4 + k] + matrix.m[k * 4 + i]) / s);
+        result.w = (matrix.m[k * 4 + j] - matrix.m[j * 4 + k]) / s;
+    }
+    return result;
+}
+
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
+
+// 0x101ae4d0. 1 when `point` transformed by `matrix` (a view-projection) falls inside the view volume in x and y,
+// i.e. -limit <= x, y <= limit. In front of the camera (w > 0) the limit is w widened by 2 * margin * (w - min(w, z)),
+// so points just off screen still count (AddFlarePoint passes 24). Behind the camera the coordinates are negated;
+// there the widening term w - max(w, z) is never positive, so it can only narrow the volume. The MIN/MAX macros
+// evaluate their arguments twice, as the original code does.
+extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin)
+{
+    float v[4];  // the transformed x, y, z, w
+    v[0] = point->x * matrix->m[0] + point->y * matrix->m[4] + point->z * matrix->m[8] + matrix->m[12];
+    v[1] = point->x * matrix->m[1] + point->y * matrix->m[5] + point->z * matrix->m[9] + matrix->m[13];
+    v[2] = point->x * matrix->m[2] + point->y * matrix->m[6] + point->z * matrix->m[10] + matrix->m[14];
+    v[3] = point->x * matrix->m[3] + point->y * matrix->m[7] + point->z * matrix->m[11] + matrix->m[15];
+    if (v[3] > 0.0f)
+    {
+        float slack = MAX(v[3] - MIN(v[3], v[2]), 0.0f);
+        float limit = slack * margin + slack * margin + v[3];
+        if (v[0] < -limit || v[0] > limit || v[1] < -limit || v[1] > limit)
+            return 0;
+        return 1;
+    }
+    float w = -v[3];
+    float z = -v[2];
+    float slack = MIN(w - MAX(w, z), 0.0f);
+    float limit = slack * margin - v[3];
+    if (-v[0] < -limit || -v[0] > limit || -v[1] < -limit || -v[1] > limit)
+        return 0;
+    return 1;
 }
 
 // Fixed key-frame bank (containers.cpp). Its constructor lives here, next to Vec4(), for the same reason as the
@@ -424,7 +516,33 @@ int KeyBank::Set(int frame, float x, float y, float z, float w)
     return i;
 }
 
-#include <math.h>
+
+// Length of all four components; an inline helper whose float arguments are spilled to the stack (as in
+// vec_math.cpp).
+inline float Length4(float x, float y, float z, float w)
+{
+    return (float)sqrt(x * x + y * y + z * z + w * w);
+}
+
+// 0x101ae950. Rotation quaternion for `angle` radians about `axis` (x, y, z = vector part, w = scalar part),
+// normalised. Note that `axis` itself is scaled by sin(angle / 2) on the way.
+Vec4 QuatFromAxisAngle(Vec4 &axis, float angle)
+{
+    Vec4 result;
+    float half = angle / 2.0f;
+    float s = (float)sin(half);
+    axis.x = s * axis.x;
+    axis.y = s * axis.y;
+    axis.z = s * axis.z;
+    float c = (float)cos(half);
+    float length = Length4(axis.z, axis.y, axis.x, c);  // the original sums z*z first
+    result.w = c / length;
+    result.x = axis.x / length;
+    result.y = axis.y / length;
+    result.z = axis.z / length;
+    return result;
+}
+
 
 // Difference a - b between two angles in radians, taking the shorter way round. Both angles are first folded into
 // -pi..pi (in steps of pi, as the game does; pi = 3.1415), then the differences a - b and a - b +- 2pi are compared.

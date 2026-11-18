@@ -62,3 +62,5 @@ address	status	reason
 10035a30	open	ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 101aed50	open	Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 101ad5c0	open	MotionList::InsertByName: the original inlines Insert (cl 13.00 here calls it even when declared inline); with __forceinline only the loop index register differs (ecx vs ebp)
+101ae950	open	QuatFromAxisAngle: 16 bytes; the original keeps cos(half) in the angle slot and spills axis.z into the axis slot, ours the other way round (declaration order tried)
+101aeee0	open	Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)

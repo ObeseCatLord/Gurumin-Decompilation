@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (62)
+## 1. Walls to retry (64)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -72,14 +72,15 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
 - [ ] `101ad5c0` 193 — MotionList::InsertByName: the original inlines Insert (cl 13.00 here calls it even when declared inline); with __forceinline only the loop index register differs (ecx vs ebp)
 - [ ] `101ad920` 179 — Spline (Hermite): the original multiplies t3 by -2.0 for the c term; cl 13.00 turns it into -(t3 + t3) and shares that with the b term (forms with 2.0f*, a separate h01 local and a -2 local tried)
+- [ ] `101ae950` 249 — QuatFromAxisAngle: 16 bytes; the original keeps cos(half) in the angle slot and spills axis.z into the axis slot, ours the other way round (declaration order tried)
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
+- [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (51)
+## 2. Small functions (30-250 bytes) (49)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
-- [ ] `1014f120` 204 bytes (loops 2, calls 3)
 - [ ] `10027560` 207 bytes (loops 2, calls 3)
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
@@ -126,9 +127,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10024e80` 245 bytes (float, calls 2)
 - [ ] `100249c0` 246 bytes (float, calls 8)
 - [ ] `10019210` 248 bytes (float, calls 10)
-- [ ] `101ae950` 249 bytes (float, calls 4)
 
-## 3. Medium functions (251-800 bytes) (203)
+## 3. Medium functions (251-800 bytes) (199)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
@@ -191,7 +191,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
 - [ ] `10043e20` 402 bytes (float, loops 2, calls 8)
 - [ ] `10018100` 410 bytes (float, loops 1, calls 6)
-- [ ] `101aeee0` 411 bytes (float, calls 15)
 - [ ] `101ab9d0` 412 bytes (loops 1, calls 8)
 - [ ] `100084b0` 413 bytes (float, loops 5, calls 1)
 - [ ] `1016a2e0` 413 bytes (float, loops 1, calls 1)
@@ -201,7 +200,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10008c40` 425 bytes (float, loops 2, calls 6)
 - [ ] `10008df0` 425 bytes (float, loops 2, calls 6)
 - [ ] `100543a0` 425 bytes (float, loops 1, calls 13)
-- [ ] `101aeae0` 425 bytes (float, calls 8)
 - [ ] `1013e260` 428 bytes (loops 4, calls 16)
 - [ ] `10034cc0` 429 bytes (float, loops 1, calls 13)
 - [ ] `100541f0` 430 bytes (float, calls 13)
@@ -256,7 +254,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000c390` 540 bytes (float, loops 1, calls 5)
 - [ ] `1000b2c0` 544 bytes (loops 4)
 - [ ] `1000df10` 544 bytes (float, loops 1, calls 13)
-- [ ] `101ae2a0` 545 bytes (float, calls 3)
 - [ ] `10001cb0` 547 bytes Bgm_CheckHeader (loops 1, calls 1)
 - [ ] `10191fd0` 549 bytes (float, loops 2, calls 16)
 - [ ] `101693f0` 557 bytes (calls 16)
@@ -268,7 +265,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10055690` 566 bytes (loops 3)
 - [ ] `10143e00` 566 bytes (float, calls 14)
 - [ ] `100b58a0` 568 bytes (float, calls 15)
-- [ ] `101ae4d0` 568 bytes (float)
 - [ ] `101999a0` 571 bytes (loops 1, calls 11)
 - [ ] `10143bc0` 572 bytes (float, calls 13)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)

@@ -780,3 +780,4 @@ address	name	evidence
 1014e940	TextureObject::DrawFrameAlt	frame of the alternative panel style (callee, named from decomp/src/game_panels.cpp)
 1003ab40	Pickup_Collect	counts a collected pickup and banks every hundred (open, decomp/src/pickups.cpp)
 101995a0	Node::Draw	culls and draws a node's mesh, then its children and draw callback (matched, decomp/src/node_draw.cpp)
+101999a0	DrawList_DrawPass	draws the queued nodes of one pass with their colours and light sets (matched, decomp/src/draw_list.cpp)

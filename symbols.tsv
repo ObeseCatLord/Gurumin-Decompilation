@@ -812,3 +812,4 @@ address	name	evidence
 10021c80	Sound_UpdateListener	smooths the camera and sends the 3D sound listener (matched, decomp/src/sound_listener.cpp)
 1002a110	Char_WalkRoute	character steps along its route towards the next point (open, decomp/src/route_walk.cpp)
 10142b20	Joystick_IsButtonDown	whether a game button is down in a DirectInput joystick state (open, decomp/src/joystick_buttons.cpp)
+1003c370	Item_DrawCaption	item name, level and scrolling ability list in the item menus (matched, decomp/src/item_caption.cpp)

@@ -275,3 +275,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Locals that overlap the stack slots of temporaries from an earlier block (Vec4 locals at offsets the original
   also uses for the smoothing temporaries) were declared in their own `{ }` scope after that block; function-scope
   locals declared later still get slots of their own (Sound_UpdateListener 0x10021c80).
+- A clamp computed twice (`test; setl; dec; and` before and after the compare) is a `__max` expression repeated
+  in a conditional: `__max(0, t - 5) > limit ? limit : __max(0, t - 5)` (Item_DrawCaption 0x1003c370).
+  `__max(0, x)` gives `setl`, `__max(x, 0)` gives `setle`.
+- `strlen(s) / 2` divides unsigned (`shr`); the original's `cdq; sub; sar` is `(int)strlen(s) / 2`.

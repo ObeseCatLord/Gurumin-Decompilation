@@ -764,3 +764,4 @@ address	name	evidence
 10162420	AnimModel::Teleport	SetPosition plus the second matrix and the root's saved states (matched, decomp/src/model_place.cpp)
 10166f20	WorldRenderer::SetModelState	starts, ends or drops the saved state of a world model's linked node (matched, decomp/src/world_model_state.cpp)
 10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (open, decomp/src/bgm_header.cpp)
+1000fb80	Loading_Tick	redraws the loading spinner, bar and percentage every 34 ms (matched, decomp/src/loading_tick.cpp)

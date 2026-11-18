@@ -778,3 +778,4 @@ address	name	evidence
 1014d4e0	TextureObject::DrawFrame	draws a nine-part frame around a rectangle (callee, named from decomp/src/game_panels.cpp)
 1014d850	TextureObject::DrawFillAlt	panel background of the alternative style (callee, named from decomp/src/game_panels.cpp)
 1014e940	TextureObject::DrawFrameAlt	frame of the alternative panel style (callee, named from decomp/src/game_panels.cpp)
+1003ab40	Pickup_Collect	counts a collected pickup and banks every hundred (open, decomp/src/pickups.cpp)

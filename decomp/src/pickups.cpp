@@ -1,0 +1,52 @@
+// Picking up a counted item: a pickup effect goes into the ring of 32 effect slots (app_0009.cpp draws them) and the
+// counter at 0x10daab04 goes up; each full hundred is banked in DAT_10c64ad8 (up to 300, or 400 with DAT_10c64ad0).
+
+extern "C" int DAT_10210fb8;          // next slot of the pickup effect ring
+extern "C" int DAT_10255040[0x20];    // effect kind of each slot (0 = free)
+extern "C" int DAT_102196f0[0x20];
+extern "C" int DAT_1020d5c8[0x20];
+extern "C" int DAT_10daab04;          // the counter (0..99)
+extern "C" int DAT_10c64ad8;          // banked hundreds
+extern "C" int DAT_10c64ad0;          // non-zero = the bank holds 400
+extern "C" int DAT_10c655f0;          // current costume
+extern "C" int DAT_104c02c8;          // face settings of the worn helmet (Helmet_FaceSettings)
+extern "C" char DAT_104c0119;         // HUD counter display timer
+extern "C" int FUN_10011aa0(int id, int value);   // EventSlots_AddWaiting
+extern "C" void FUN_1000e750(void);               // AntiTamper_Store
+
+// 0x1003ab40 (Pickup_Collect). Collects a pickup: unless `quiet`, event `id` waits with value 2. The counter goes up
+// by 1, by 2 with costume 11 or helmet bit 0x400000, by 3 with helmet bit 0x800000. Past 99 a hundred is banked and
+// the counter restarts at 0, or it stays at 99 when the bank is full. The HUD counter shows for 8 frames and the
+// anti-tamper copies are refreshed.
+extern "C" void FUN_1003ab40(int id, int quiet)
+{
+    if (quiet == 0)
+        FUN_10011aa0(id, 2);
+    DAT_10255040[DAT_10210fb8] = 5;
+    DAT_102196f0[DAT_10210fb8] = -1;
+    DAT_1020d5c8[DAT_10210fb8] = 0;
+    DAT_10210fb8++;
+    if (DAT_10210fb8 > 31)
+        DAT_10210fb8 = 0;
+    int count = DAT_10daab04 + 1;
+    if (DAT_10c655f0 == 11)
+        count++;
+    else if (DAT_104c02c8 & 0x800000)
+        count += 2;
+    else if (DAT_104c02c8 & 0x400000)
+        count++;
+    if (count > 99)
+    {
+        int banked = DAT_10c64ad8;
+        if (banked >= (DAT_10c64ad0 != 0 ? 100 : 0) + 300)
+            count = 99;
+        else
+        {
+            DAT_10c64ad8 = banked + 100;
+            count = 0;
+        }
+    }
+    DAT_10daab04 = count;
+    DAT_104c0119 = 8;
+    FUN_1000e750();
+}

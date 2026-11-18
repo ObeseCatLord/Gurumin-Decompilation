@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (94)
+## 1. Walls to retry (95)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -43,6 +43,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100357a0` 537 — CharParams::operator= (implicit copy, include/char_params.h): byte-identical in a probe; emitted only by a file with a caller (FUN_1005def0, FUN_1003e710, Game_LoadData)
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
+- [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054970` 239 — Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
@@ -106,12 +107,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (5)
+## 2. Small functions (30-250 bytes) (4)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
-- [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
 ## 3. Medium functions (251-800 bytes) (110)

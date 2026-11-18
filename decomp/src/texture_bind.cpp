@@ -68,6 +68,8 @@ struct TextureObject
     int Write16(int x, int y, int rowPixels, int rows, int pitch, const void *bits);
     int Release();
     int CaptureRgb24(unsigned char *out);
+    int CaptureRgbRows(unsigned char *out);
+    int DrawTriangles(const void *vertices, int triangles);
     int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
                       const unsigned short *palette);
 };
@@ -224,5 +226,66 @@ int TextureObject::CaptureRgb24(unsigned char *out)
     }
     copy->UnlockRect();
     copy->Release();
+    return 1;
+}
+
+// 0x10145120. Like CaptureRgb24, but reads back only the first 0x400 pixels (four rows of 256) and writes them in
+// R, G, B byte order. When an R5G6B5 copy cannot be created an X1R5G5B5 one is tried (its pixels are still
+// converted as R5G6B5). Called by FUN_10017d30. Returns 1, or 0 when the copy or the read-back fails.
+int TextureObject::CaptureRgbRows(unsigned char *out)
+{
+    D3DSurface *copy;
+    if (DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x17 /* D3DFMT_R5G6B5 */, 2 /* D3DPOOL_SYSTEMMEM */,
+                                                  (void **)&copy, 0) != 0 &&
+        DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x18 /* D3DFMT_X1R5G5B5 */, 2, (void **)&copy, 0) != 0)
+        return 0;
+    if (DAT_10f1fcf0->GetRenderTargetData(surface, copy) != 0)
+    {
+        copy->Release();
+        return 0;
+    }
+    LockedRect locked;
+    copy->LockRect(&locked, 0, 0x10 /* D3DLOCK_READONLY */);
+    const unsigned short *pixels = (const unsigned short *)locked.bits;
+    for (int i = 0; i < 0x400; i++)
+    {
+        out[i * 3 + 0] = (pixels[i] >> 8) & 0xf8;               // red: top 5 bits
+        out[i * 3 + 1] = (unsigned char)(pixels[i] >> 5) << 2;  // green: middle 6 bits
+        out[i * 3 + 2] = pixels[i] << 3;                        // blue: low 5 bits
+    }
+    copy->UnlockRect();
+    copy->Release();
+    return 1;
+}
+
+extern "C" void FUN_1013ef30(int state, int value);                   // Render_SetRenderState (cached)
+extern "C" void FUN_1013ef90(int stage, int type, int value);         // Render_SetTextureStageState (cached)
+extern "C" void FUN_10143b80(void);                                   // Render_UnbindTexture1
+extern "C" int DAT_10f0d5c8;                                          // draw calls this frame (statistics)
+
+// 0x1014bb70. Draws `triangles` triangles from `vertices` (FVF 0x1c4: position, diffuse colour, one texture
+// coordinate; 0x20 bytes per vertex) with this texture on stage 0: texture times vertex colour for both colour and
+// alpha, stages 1 to 3 off. Returns 0 when there is nothing to draw, else 1. Used by the triangle batches
+// (tri_batch.cpp).
+int TextureObject::DrawTriangles(const void *vertices, int triangles)
+{
+    if (triangles < 1)
+        return 0;
+    BindStage0();
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    FUN_1013ef90(0, 4, 4);                  // alpha: modulate
+    FUN_1013ef90(0, 5, 2);                  //   texture
+    FUN_1013ef90(0, 6, 0);                  //   diffuse
+    FUN_1013ef90(0, 1, 4);                  // colour: modulate
+    FUN_1013ef90(0, 2, 2);                  //   texture
+    FUN_1013ef90(0, 3, 0);                  //   diffuse
+    FUN_10143b80();
+    DAT_10f1fcf0->SetTexture(2, 0);
+    DAT_10f1fcf0->SetTexture(3, 0);
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(4 /* D3DPT_TRIANGLELIST */, triangles, vertices, 0x20);
     return 1;
 }

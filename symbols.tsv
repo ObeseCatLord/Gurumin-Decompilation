@@ -674,3 +674,8 @@ address	name	evidence
 10161e40	AnimModel::SnapHeight	matched decompiled source (decomp/obj_symbols.tsv)
 10037470	ListBank::FirstIndexValue	matched decompiled source (decomp/obj_symbols.tsv)
 10199cd0	Node::TagRegion	matched decompiled source (decomp/obj_symbols.tsv)
+10011b70	Char_PushAwayFrom	queues a push of a character away from a point (decomp/src/char_turn.cpp)
+1013edc0	Render_Present	ends the scene and presents a 640x480 rect scaled to the client area (decomp/src/engine_1013e.cpp)
+10004760	ListBank::DeclareVariable	matched decompiled source (decomp/obj_symbols.tsv)
+10145120	TextureObject::CaptureRgbRows	matched decompiled source (decomp/obj_symbols.tsv)
+1014bb70	TextureObject::DrawTriangles	matched decompiled source (decomp/obj_symbols.tsv)

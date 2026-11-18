@@ -1,5 +1,20 @@
-// Turning characters towards a target heading.
+// Turning characters towards a target heading, and pushing them.
 #include "world.h"
+
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    Vec4();
+    void Copy(const Vec4 &source);
+    Vec4 operator-(const Vec4 &other) const;
+    Vec4 Scaled(const float &scale);
+    Vec4 Normalized3();  // 0x101af080: normalises x/y/z in place
+};
+
+extern "C" int DAT_104c00d0;  // when non-zero, the player (character 0) cannot be pushed
 
 // 0x1001bfb0 (Char_LimitTurn). Limits how far character `index` turns this step: the difference between its target
 // heading and its heading, wrapped into -pi..pi (pi = 3.1415, a full turn = 6.283 here), is clamped to
@@ -16,5 +31,23 @@ extern "C" int FUN_1001bfb0(int index, float maxTurn)
     else if (turn < -maxTurn)
         turn = -maxTurn;
     DAT_10db6ed8[index].targetHeading = turn + DAT_10db6ed8[index].heading;
+    return 0;
+}
+
+// 0x10011b70 (Char_PushAwayFrom). Pushes character `index` away from `point` with `strength` (in the x/y plane of
+// the direction, z = 0), passing `flag` on with the push. Character 0 is not pushed while DAT_104c00d0 is set, and
+// nothing happens when the character stands exactly on the point. Returns 0.
+extern "C" int FUN_10011b70(int strength, char flag, int index, const Vec4 *point)
+{
+    Vec4 direction = DAT_10db6ed8[index].matrix.GetTranslation();
+    Vec4 from;
+    from.Copy(*point);
+    direction.Copy(direction - from);
+    direction.Normalized3();
+    if ((index != 0 || DAT_104c00d0 == 0) && (direction.x != 0.0f || direction.y != 0.0f || direction.z != 0.0f))
+    {
+        direction.Copy(direction.Scaled((float)strength));
+        DAT_10db6ed8[index].model.SetPendingPush(direction.x, direction.y, 0, flag);
+    }
     return 0;
 }

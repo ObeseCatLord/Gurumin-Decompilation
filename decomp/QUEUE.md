@@ -7,13 +7,14 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (70)
+## 1. Walls to retry (71)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
 - [ ] `100014b0` 159 — ReportCursor: only the push edi position differs (original before the first test, VS2003 after it: shrink-wrapping)
 - [ ] `100016c0` 256 — sound play: identical apart from cross-jumping; the original merges the two position branches only at the code-5 SendMessage, cl 13.00 here already at code 4 (code 4 hoisted out, branches swapped tried)
 - [ ] `10001980` 263 — looping sound play: same cross-jumping residue as 0x100016c0
+- [ ] `10004760` 236 — ListBank::DeclareVariable: identical apart from block order (the original puts the type 0/1 block right after the type == 0 test, cl 13.00 here after all the tests); switch form tried
 - [ ] `10008910` 275 — Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
 - [ ] `100091d0` 239 — Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
@@ -82,7 +83,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (16)
+## 2. Small functions (30-250 bytes) (11)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
@@ -90,11 +91,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10027560` 207 bytes (loops 2, calls 3)
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
-- [ ] `10004760` 236 bytes (loops 2, calls 2)
-- [ ] `10011b70` 236 bytes (float, calls 9)
-- [ ] `1013edc0` 237 bytes (float, calls 7)
-- [ ] `10145120` 237 bytes (loops 1, calls 7)
-- [ ] `1014bb70` 240 bytes (calls 15)
 - [ ] `1003ac20` 242 bytes (float, calls 4)
 - [ ] `10162c50` 242 bytes (loops 1, calls 6)
 - [ ] `10024e80` 245 bytes (float, calls 2)

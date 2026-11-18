@@ -63,6 +63,7 @@ struct ListBank
     int GetIndexPart(const char *name, char *part, int n);    // 0x10036560: the n-th [ ] part of `name`
     int Evaluate(const char *expression, int flags);         // 0x100caf90: leaves the value in *result
     int FirstIndexValue(const char *name, int *value);
+    int DeclareVariable(const char *name, int group, char type);
 };
 
 // Clears group `group`: entries that are not in use lose their values. Returns 1.
@@ -356,5 +357,27 @@ int ListBank::FirstIndexValue(const char *name, int *value)
         *value = values[0];
     }
     return 0;
+}
+
+// 0x10004760. Declares variable `name` as the next entry of group `group` with storage of its own: types 0 and 1
+// (numbers) get a new int set to 0, type 2 (text) a new 256-byte string set to "NULL". The entry is marked as not
+// in use (m_e80c = 0) and keeps a pointer to the storage in m_440c. Returns 1.
+int ListBank::DeclareVariable(const char *name, int group, char type)
+{
+    m_e80c[group][m_2a5dc[group]] = 0;
+    strcpy(m_000c[group][m_2a5dc[group]], name);
+    if (type == 0 || type == 1)
+    {
+        m_440c[group][m_2a5dc[group]] = (int)new int;
+        *(int *)m_440c[group][m_2a5dc[group]] = 0;
+    }
+    else if (type == 2)
+    {
+        m_440c[group][m_2a5dc[group]] = (int)new char[0x100];
+        strcpy((char *)m_440c[group][m_2a5dc[group]], "NULL");
+    }
+    m_400c[group][m_2a5dc[group]] = type;
+    m_2a5dc[group]++;
+    return 1;
 }
 

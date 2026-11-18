@@ -265,3 +265,6 @@ _Vec3_Dot	101ac200
 ?SnapHeight@AnimModel@@QAEHMM@Z	10161e40
 ?FirstIndexValue@ListBank@@QAEHPBDPAH@Z	10037470
 ?TagRegion@Node@@QAEHPBUBox2@@PAY0EA@$$CBDPAUMatrix@@@Z	10199cd0
+?DeclareVariable@ListBank@@QAEHPBDHD@Z	10004760
+?CaptureRgbRows@TextureObject@@QAEHPAE@Z	10145120
+?DrawTriangles@TextureObject@@QAEHPBXH@Z	1014bb70

@@ -28,6 +28,8 @@ struct CharModel
     void M_10161b60();
     int M_10161b90(int frame, float value);
     int M_10161be0(int a, int b);
+    // 0x101628b0 (anim_model.cpp AnimModel::M_101628b0): queues a push (x, y, z) with `flag` unless the model is locked.
+    int SetPendingPush(float x, float y, float z, char flag);
 };
 
 struct Character

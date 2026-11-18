@@ -43,6 +43,26 @@ extern "C" int FUN_1013ed60(void)
     return 0;
 }
 
+extern "C" HWND DAT_10f6569c;  // the game window
+
+// 0x1013edc0 (Render_Present). Ends the scene and presents the back-buffer rectangle `source` (in the game's 640x480
+// coordinates), scaled to the same place in the window's client area. Returns 1.
+extern "C" int __stdcall FUN_1013edc0(const RECT *source)
+{
+    RECT dest;
+    FUN_1013ed60();
+    GetClientRect(DAT_10f6569c, &dest);
+    float scaleX = (float)dest.right / 640.0f;
+    float scaleY = (float)dest.bottom / 480.0f;
+    dest = *source;
+    dest.left = (long)((float)dest.left * scaleX);
+    dest.bottom = (long)((float)dest.bottom * scaleY);
+    dest.right = (long)((float)dest.right * scaleX);
+    dest.top = (long)((float)dest.top * scaleY);
+    DAT_10f1fcf0->Present(source, &dest, 0, 0);
+    return 1;
+}
+
 // Sets the next-frame deadline DAT_10f654d8 to now (no wait).
 extern "C" int FUN_1013eeb0(void)
 {

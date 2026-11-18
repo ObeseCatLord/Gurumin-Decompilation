@@ -100,7 +100,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (159)
+## 3. Medium functions (251-800 bytes) (158)
 
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `10035d20` 328 bytes (loops 2, calls 1)
@@ -120,7 +120,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ac010` 387 bytes Node::Load (loops 4, calls 12)
 - [ ] `1001af10` 394 bytes (float, loops 1, calls 14)
 - [ ] `10024750` 397 bytes (float, calls 13)
-- [ ] `1019d750` 398 bytes (loops 3, calls 4)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
 - [ ] `10043e20` 402 bytes (float, loops 2, calls 8)

@@ -141,7 +141,10 @@ struct Node
     PackHeader *packs;
     KeyPair *indexLists;
     KeyPair *m_0070;
-    char pad_0074[0x1c];
+    char pad_0074[0x15];
+    char isStatic;               // 0x89: 1 once the node was collected as static scenery (or is the collector)
+    short staticCount;           // 0x8a: on the collector: number of entries in `staticNodes`
+    Node **staticNodes;          // 0x8c: on the collector: the collected nodes (room for 0x200)
     int materialCount;
     struct Material *materials;
     void *m_0098;
@@ -287,6 +290,7 @@ struct Node
     int SetUniqueName(const char *name);
     void MakeNameUnique();
     void ReleaseUniqueMeshData();
+    void CollectStatic(Node *collector);
     int Rename(const char *newName, const char *oldName);
     int TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix *matrix);
 };
@@ -1544,4 +1548,47 @@ void Node::ReleaseUniqueMeshData()
     }
     for (int i = 0; i < childCount; i++)
         children[i]->ReleaseUniqueMeshData();
+}
+
+// 0x1019d750. Called with no collector on the root, which becomes the collector: every node below it gets its kind
+// from its name ("CDLnn..." = nn, "OvF..." = 0xfd, else 0xfe) and nodes with mesh data that are flagged (flags or
+// m_1860 bit 4) or whose name (after the prefix) starts with "CS", "CA" or "CT" are marked static and appended to
+// the collector's list ("FCHILD", allocated on first use).
+void Node::CollectStatic(Node *collector)
+{
+    int i;
+    if (collector == 0)
+    {
+        isStatic = 1;
+        for (i = 0; i < childCount; i++)
+            children[i]->CollectStatic(this);
+        return;
+    }
+    kind = 0xfe;
+    int skip = 0;
+    if (name[0] == 'C' && name[1] == 'D' && name[2] == 'L')
+    {
+        kind = (name[3] - '0') * 10 + name[4] - '0';
+        skip = 6;
+    }
+    if (name[0] == 'O' && name[1] == 'v' && name[2] == 'F')
+    {
+        kind = 0xfd;
+        skip = 7;
+    }
+    if (packs == 0 || indexLists == 0 || packCount == 0 ||
+        ((flags & 4) == 0 && (m_1860 & 4) == 0 &&
+         (name[skip] != 'C' || (name[skip + 1] != 'S' && name[skip + 1] != 'A' && name[skip + 1] != 'T'))))
+    {
+        for (i = 0; i < childCount; i++)
+            children[i]->CollectStatic(collector);
+        return;
+    }
+    isStatic = 1;
+    if (collector->staticNodes == 0)
+        collector->staticNodes = (Node **)DAT_11b0b938(0x800, "FCHILD");
+    collector->staticNodes[collector->staticCount] = this;
+    collector->staticCount++;
+    for (i = 0; i < childCount; i++)
+        children[i]->CollectStatic(collector);
 }

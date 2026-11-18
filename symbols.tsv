@@ -792,3 +792,7 @@ address	name	evidence
 1019c690	Node::SortPacks	copies the vertex packs into new arrays, packs whose material has m_0178 == 1 first (matched, decomp/src/node_sort_packs.cpp)
 10191fd0	Box_Overlap	overlap test of two offset boxes with optional centre deltas (open, decomp/src/box_overlap.cpp)
 10194c60	Node::UpdateWorld	world matrix of a node tree for a frame (open, decomp/src/node_world.cpp)
+1015cae0	InputState::SetButtons	new raw button bits: pressed (edge) and held bytes for 14 buttons (matched, decomp/src/input_state.cpp)
+10054d50	Game::RaiseFireEvents	registers the MFIREON/MFIREOFF map events of an argument (open, decomp/src/app_0003.cpp)
+10054f30	Game::RaiseLeverEvents	registers the LEVERON/LEVEROFF map events of a lever node (open, decomp/src/app_0003.cpp)
+10055110	Game::RaiseDoorEvents	registers the DROPEN/DRCLOSE map events of a door gimmick (open, decomp/src/app_0003.cpp)

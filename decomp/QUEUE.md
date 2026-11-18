@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (101)
+## 1. Walls to retry (104)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -51,6 +51,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10054a60` 270 — Game::RaiseGameOverEvents: identical except the loop pointer: the original keeps &entry.flags[1] in ebp, cl 13.00 here &entry.flags[0] (pointer and indexed forms tried)
 - [ ] `10054b70` 239 — Game::RaiseTalkEvents: same loop-pointer residue as 0x10054a60
 - [ ] `10054c60` 239 — Game::RaiseOpenEvents: same loop-pointer residue as 0x10054a60
+- [ ] `10054d50` 476 — Game::RaiseFireEvents: same loop-pointer residue as 0x10054a60 (flags pointer local tried: bias moves to argument)
+- [ ] `10054f30` 476 — Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
+- [ ] `10055110` 476 — Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2110` 143 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
@@ -120,14 +123,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10017c55` 204 bytes (float, calls 8)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (93)
+## 3. Medium functions (251-800 bytes) (89)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
 - [ ] `10043e20` 402 bytes (float, loops 2, calls 8)
 - [ ] `1016a2e0` 413 bytes (float, loops 1, calls 1)
-- [ ] `1015cae0` 418 bytes
 - [ ] `100543a0` 425 bytes (float, loops 1, calls 13)
 - [ ] `1013e260` 428 bytes (loops 4, calls 16)
 - [ ] `10034cc0` 429 bytes (float, loops 1, calls 13)
@@ -136,9 +138,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
 - [ ] `1002ee70` 473 bytes (float, loops 1, calls 8)
-- [ ] `10054d50` 476 bytes (loops 2, calls 8)
-- [ ] `10054f30` 476 bytes (loops 2, calls 8)
-- [ ] `10055110` 476 bytes (loops 2, calls 8)
 - [ ] `10175c90` 476 bytes (loops 4, calls 6)
 - [ ] `101612b0` 481 bytes (loops 1)
 - [ ] `1000dba0` 484 bytes (float, loops 1, calls 11)

@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 6.8703,
+  "fuzzy_match_percent": 6.9175,
   "total_code": "1720206",
-  "matched_code": "100360",
-  "matched_code_percent": 5.8342,
+  "matched_code": "100778",
+  "matched_code_percent": 5.8585,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 666,
-  "matched_functions_percent": 54.9505,
+  "matched_functions": 667,
+  "matched_functions_percent": 55.033,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 178,
-  "complete_units": 113
+  "total_units": 179,
+  "complete_units": 114
  },
  "units": [
   {
@@ -661,16 +661,16 @@
   {
    "name": "app/app_0003",
    "measures": {
-    "fuzzy_match_percent": 87.9474,
-    "total_code": "2305",
+    "fuzzy_match_percent": 64.8641,
+    "total_code": "3733",
     "matched_code": "1318",
-    "matched_code_percent": 57.18,
+    "matched_code_percent": 35.3067,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 11,
+    "total_functions": 14,
     "matched_functions": 7,
-    "matched_functions_percent": 63.6364,
+    "matched_functions_percent": 50.0,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -681,8 +681,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "2305",
-     "fuzzy_match_percent": 87.9474
+     "size": "3733",
+     "fuzzy_match_percent": 64.8641
     }
    ],
    "functions": [
@@ -772,6 +772,30 @@
      "fuzzy_match_percent": 61.25,
      "metadata": {
       "virtual_address": "268782688"
+     }
+    },
+    {
+     "name": "?RaiseFireEvents@Game@@QAEHHH@Z",
+     "size": "476",
+     "fuzzy_match_percent": 27.6042,
+     "metadata": {
+      "virtual_address": "268782928"
+     }
+    },
+    {
+     "name": "?RaiseLeverEvents@Game@@QAEHHH@Z",
+     "size": "476",
+     "fuzzy_match_percent": 27.6042,
+     "metadata": {
+      "virtual_address": "268783408"
+     }
+    },
+    {
+     "name": "?RaiseDoorEvents@Game@@QAEHHH@Z",
+     "size": "476",
+     "fuzzy_match_percent": 27.6042,
+     "metadata": {
+      "virtual_address": "268783888"
      }
     }
    ],
@@ -5446,6 +5470,48 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/input_font.cpp"
+   }
+  },
+  {
+   "name": "app/input_state",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "418",
+    "matched_code": "418",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "418",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "418",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "?SetButtons@InputState@@QAEHI@Z",
+     "size": "418",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269863648"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/input_state.cpp"
    }
   },
   {
@@ -12160,13 +12226,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1591924",
+    "total_code": "1590078",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 447,
+    "total_functions": 443,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -12179,7 +12245,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1591924",
+     "size": "1590078",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -13414,30 +13480,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268781424"
-     }
-    },
-    {
-     "name": "FUN_10054d50",
-     "size": "476",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268782928"
-     }
-    },
-    {
-     "name": "FUN_10054f30",
-     "size": "476",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268783408"
-     }
-    },
-    {
-     "name": "FUN_10055110",
-     "size": "476",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268783888"
      }
     },
     {
@@ -14926,14 +14968,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269861968"
-     }
-    },
-    {
-     "name": "FUN_1015cae0",
-     "size": "418",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269863648"
      }
     },
     {

@@ -102,3 +102,6 @@ address	status	reason
 10024d00	open	Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
 10191fd0	open	Box_Overlap (__stdcall): only block order differs: the original keeps the return-0 block on the fallthrough of the last compare; early returns, per-axis returns, nested and else forms tried
 10194c60	open	Node::UpdateWorld: code identical except the EH state of the AnimatedMatrix temporary (ours 1, original 5; the original unwind map has four empty states 1-4); branch order, named result locals and a conditional expression tried
+10054d50	open	Game::RaiseFireEvents: same loop-pointer residue as 0x10054a60 (flags pointer local tried: bias moves to argument)
+10054f30	open	Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
+10055110	open	Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60

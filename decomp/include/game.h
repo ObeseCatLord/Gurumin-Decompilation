@@ -173,6 +173,9 @@ struct Game : Object
     int RaiseKskonEvents(int argument);
     int RaiseTalkEvents(int argument);
     int RaiseOpenEvents(int argument);
+    int RaiseFireEvents(int argument, int on);
+    int RaiseLeverEvents(int argument, int on);
+    int RaiseDoorEvents(int argument, int on);
     int RegisterEvent(int id);  // 0x100020d0 (flag_list.cpp: FlagOwner::M_100020d0)
     int RaiseGameOverEvents();
     int FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value);

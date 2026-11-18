@@ -243,3 +243,88 @@ int Game::RaiseOpenEvents(int argument)
     }
     return 0;
 }
+
+// 0x10054d50. Same for the "MFIREON" events of `argument` when `on` is 1, else for its "MFIREOFF" events (a fire
+// being lit or put out).
+int Game::RaiseFireEvents(int argument, int on)
+{
+    if (on == 1)
+    {
+        for (int i = 0; i < mapEventCount; i++)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if (event->argument == argument && strcmp(event->name, "MFIREON") == 0 &&
+                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < mapEventCount; i++)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if (event->argument == argument && strcmp(event->name, "MFIREOFF") == 0 &&
+                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
+    }
+    return 0;
+}
+
+// 0x10054f30. Same for the "LEVERON" or "LEVEROFF" events of `argument` (a lever node), by `on`.
+int Game::RaiseLeverEvents(int argument, int on)
+{
+    if (on == 1)
+    {
+        for (int i = 0; i < mapEventCount; i++)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if (event->argument == argument && strcmp(event->name, "LEVERON") == 0 &&
+                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < mapEventCount; i++)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if (event->argument == argument && strcmp(event->name, "LEVEROFF") == 0 &&
+                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
+    }
+    return 0;
+}
+
+// 0x10055110. Same for the "DROPEN" or "DRCLOSE" events of `argument` (a door gimmick), by `on`.
+int Game::RaiseDoorEvents(int argument, int on)
+{
+    if (on == 1)
+    {
+        for (int i = 0; i < mapEventCount; i++)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if (event->argument == argument && strcmp(event->name, "DROPEN") == 0 &&
+                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < mapEventCount; i++)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if (event->argument == argument && strcmp(event->name, "DRCLOSE") == 0 &&
+                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
+    }
+    return 0;
+}

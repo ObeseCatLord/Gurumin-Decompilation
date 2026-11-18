@@ -341,3 +341,7 @@ _TestDat_Load	1000beb0
 ?FindBone@Node@@QAEPAUMatrix4@@HPAU2@0H@Z	10199380
 ?SortPacks@Node@@QAEHXZ	1019c690
 ?UpdateWorld@Node@@QAEHABUMatrix4@@H@Z	10194c60
+?RaiseFireEvents@Game@@QAEHHH@Z	10054d50
+?RaiseLeverEvents@Game@@QAEHHH@Z	10054f30
+?RaiseDoorEvents@Game@@QAEHHH@Z	10055110
+?SetButtons@InputState@@QAEHI@Z	1015cae0

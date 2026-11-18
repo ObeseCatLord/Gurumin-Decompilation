@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 7.1216,
+  "fuzzy_match_percent": 7.1717,
   "total_code": "1720206",
-  "matched_code": "103470",
-  "matched_code_percent": 6.015,
+  "matched_code": "103872",
+  "matched_code_percent": 6.0383,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 673,
-  "matched_functions_percent": 55.5281,
+  "matched_functions": 674,
+  "matched_functions_percent": 55.6106,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 186,
-  "complete_units": 118
+  "total_units": 188,
+  "complete_units": 119
  },
  "units": [
   {
@@ -8103,6 +8103,48 @@
    }
   },
   {
+   "name": "app/npc_approach",
+   "measures": {
+    "fuzzy_match_percent": 92.7734,
+    "total_code": "497",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "497",
+     "fuzzy_match_percent": 92.7734
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10045ed0",
+     "size": "497",
+     "fuzzy_match_percent": 92.7734,
+     "metadata": {
+      "virtual_address": "268721872"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/npc_approach.cpp"
+   }
+  },
+  {
    "name": "app/npc_facing",
    "measures": {
     "fuzzy_match_percent": 100.0,
@@ -10094,6 +10136,48 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/shaga_spawn.cpp"
+   }
+  },
+  {
+   "name": "app/sight_check",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "402",
+    "matched_code": "402",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "402",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "402",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10043e20",
+     "size": "402",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268713504"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/sight_check.cpp"
    }
   },
   {
@@ -12536,13 +12620,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1586008",
+    "total_code": "1585109",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 434,
+    "total_functions": 432,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -12555,7 +12639,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1586008",
+     "size": "1585109",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -13457,14 +13541,6 @@
      }
     },
     {
-     "name": "FUN_10043e20",
-     "size": "402",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268713504"
-     }
-    },
-    {
      "name": "FUN_10043fc0",
      "size": "1423",
      "fuzzy_match_percent": 0.0,
@@ -13510,14 +13586,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268721200"
-     }
-    },
-    {
-     "name": "FUN_10045ed0",
-     "size": "497",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268721872"
      }
     },
     {

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (107)
+## 1. Walls to retry (108)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -48,6 +48,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
 - [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
+- [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054970` 239 — Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
 - [ ] `10054a60` 270 — Game::RaiseGameOverEvents: identical except the loop pointer: the original keeps &entry.flags[1] in ebp, cl 13.00 here &entry.flags[0] (pointer and indexed forms tried)
@@ -125,12 +126,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (81)
+## 3. Medium functions (251-800 bytes) (79)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
-- [ ] `10043e20` 402 bytes (float, loops 2, calls 8)
 - [ ] `1016a2e0` 413 bytes (float, loops 1, calls 1)
 - [ ] `100543a0` 425 bytes (float, loops 1, calls 13)
 - [ ] `1013e260` 428 bytes (loops 4, calls 16)
@@ -144,7 +144,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10021c80` 496 bytes (float, calls 22)
 - [ ] `10055aa0` 496 bytes (loops 5, calls 2)
 - [ ] `1003c370` 497 bytes (loops 3, calls 9)
-- [ ] `10045ed0` 497 bytes (float, loops 2, calls 8)
 - [ ] `101ad350` 500 bytes (loops 1)
 - [ ] `10054770` 506 bytes (loops 1, calls 3)
 - [ ] `1009ddd0` 507 bytes (calls 11)

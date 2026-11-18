@@ -268,3 +268,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `((unsigned char)bits >> n) & 1`; `(bits >> n) & 1` shifts the whole register (InputState::SetButtons 0x1015cae0).
 - A `<=`/`>=` test that lets NaN through (`test ah,0x41; jnp` / `test ah,1; je`) is the negation of the opposite
   comparison, written as an early exit `if (a <= b || c >= d) return 0;` (Box_Overlap 0x10191fd0).
+- Two Vec4 locals sharing one stack slot (a frame 16 bytes smaller than ours) were in disjoint scopes: the copy
+  used only to measure a distance sat in its own block (Char_CanSee 0x10043e20).
+- A call with ecx loaded from a global object pointer and no `add esp` afterwards is a method of that object
+  (thiscall), even when the pointer was only tested before: `DAT_10255f08->Raycast(...)`.

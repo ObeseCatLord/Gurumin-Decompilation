@@ -805,3 +805,5 @@ address	name	evidence
 1002f320	Route_Follow	reads a route point and moves the walker on when it is reached (matched, decomp/src/route_follow.cpp)
 1002ee70	Char_UpdateShoves	scripted per-frame shoves of characters and the player look target (open, decomp/src/char_shove.cpp)
 10034cc0	Party_BlocksMove	whether a party character blocks a move (open, decomp/src/party_block.cpp)
+10043e20	Char_CanSee	range, view angle and wall test from an eye to a target (matched, decomp/src/sight_check.cpp)
+10045ed0	Npc_ApproachPlayer	NPC walks up to the player until near enough (open, decomp/src/npc_approach.cpp)

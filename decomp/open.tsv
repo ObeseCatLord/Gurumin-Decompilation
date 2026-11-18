@@ -115,3 +115,4 @@ address	status	reason
 10142b20	open	Joystick_IsButtonDown (__stdcall): same cases and code; the tail-merged axis tests are placed differently (the original keeps the full low-x test in the default-layout switch and jumps to it from the mapped cases, ours the other way round)
 10011240	open	Save_ReadThumbnail: code identical; stack layout differs (the original puts the unused Vec4 at 0x378 above the path buffer and the scalars below the file object); declaration orders and buffer sizes tried
 10056260	open	Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
+10143bc0	open	Render_DrawGradientQuad (__stdcall): identical except each scaled corner coordinate goes through the float temporary at esp+4 before the two stores (ours stores into the first vertex directly); local, cast, split and inline-helper forms tried

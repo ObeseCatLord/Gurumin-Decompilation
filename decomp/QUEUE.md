@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (114)
+## 1. Walls to retry (115)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -72,6 +72,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1013e9d0` 689 — Screenshot_ReadBackBuffer: identical except the row address in the 32-bit and 16-bit loops (original loads y then multiplies by the pitch, ours loads the pitch first); operand orders and index form tried
 - [ ] `10142b20` 519 — Joystick_IsButtonDown (__stdcall): same cases and code; the tail-merged axis tests are placed differently (the original keeps the full low-x test in the default-layout switch and jumps to it from the mapped cases, ours the other way round)
 - [ ] `10143870` 366 — TextureObject::BeginRenderTo: identical except block placement (the original puts the shared return 0 right after the first test; nested and early-return forms tried)
+- [ ] `10143bc0` 572 — Render_DrawGradientQuad (__stdcall): identical except each scaled corner coordinate goes through the float temporary at esp+4 before the two stores (ours stores into the first vertex directly); local, cast, split and inline-helper forms tried
 - [ ] `10144040` 365 — blue corner quad: stores and calls identical; the original alternates ecx/eax for the constants (loads the next constant before the last stores of the previous one); chained and separate statements tried
 - [ ] `101441b0` 365 — black thumbnail-background quad: same register alternation residue as 0x10144040
 - [ ] `10144ee0` 377 — TextureObject::HalveRgb24: loop shape differs (the original keeps the row counter in memory and recomputes both row addresses with imul each pixel; cl 13.00 here strength-reduces them); pointer and indexed forms tried
@@ -132,7 +133,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (70)
+## 3. Medium functions (251-800 bytes) (69)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
@@ -156,7 +157,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100236c0` 563 bytes (float, calls 22)
 - [ ] `10055690` 566 bytes (loops 3)
 - [ ] `10143e00` 566 bytes (float, calls 14)
-- [ ] `10143bc0` 572 bytes (float, calls 13)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
 - [ ] `1017c9c0` 581 bytes (loops 7, calls 2)
 - [ ] `1001f270` 588 bytes (float, loops 3, calls 15)

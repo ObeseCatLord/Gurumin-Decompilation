@@ -814,3 +814,4 @@ address	name	evidence
 10142b20	Joystick_IsButtonDown	whether a game button is down in a DirectInput joystick state (open, decomp/src/joystick_buttons.cpp)
 1003c370	Item_DrawCaption	item name, level and scrolling ability list in the item menus (matched, decomp/src/item_caption.cpp)
 10056260	Message_Open	opens a message box with four lines and the speaker name (open, decomp/src/message_open.cpp)
+10143bc0	Render_DrawGradientQuad	untextured screen rectangle with top and bottom colours (open, decomp/src/engine_10143.cpp)

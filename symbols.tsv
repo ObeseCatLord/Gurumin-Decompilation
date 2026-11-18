@@ -119,7 +119,6 @@ address	name	evidence
 10160a20	Mmv_DecodeFrameRle	hand-written asm: 8-bit frame delta RLE (0xFC n = skip n pixels, 0xFD n v = n copies of v, else literal)
 101608c0	MmvPlayer_dtor	closes the movie file and frees the frame buffers
 101609b0	MmvPlayer_Close	same without destroying the object
-10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (tools/de2_header.py)
 101453e0	Font_DrawGlyph	draws one Shift-JIS glyph from ddfont8.dat into a 512-wide ARGB4444 surface
 10191e50	Node_TagElements	marks nodes whose name starts with fire (1) / thun (2) in byte +0x1898, recursively
 1000e750	AntiTamper_Store	stores ~value+i*0x41 shadows of HP/max HP/money etc. in 0x104684b0 (matched)
@@ -764,3 +763,4 @@ address	name	evidence
 10162610	AnimModel::SetPosition	moves a model and resets its motion state (matched, decomp/src/model_place.cpp)
 10162420	AnimModel::Teleport	SetPosition plus the second matrix and the root's saved states (matched, decomp/src/model_place.cpp)
 10166f20	WorldRenderer::SetModelState	starts, ends or drops the saved state of a world model's linked node (matched, decomp/src/world_model_state.cpp)
+10001cb0	Bgm_CheckHeader	name-keyed sum/xor check of a .de2 header (open, decomp/src/bgm_header.cpp)

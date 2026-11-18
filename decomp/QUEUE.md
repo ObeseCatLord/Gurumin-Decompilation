@@ -7,13 +7,14 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (90)
+## 1. Walls to retry (91)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
 - [ ] `100014b0` 159 — ReportCursor: only the push edi position differs (original before the first test, VS2003 after it: shrink-wrapping)
 - [ ] `100016c0` 256 — sound play: identical apart from cross-jumping; the original merges the two position branches only at the code-5 SendMessage, cl 13.00 here already at code 4 (code 4 hoisted out, branches swapped tried)
 - [ ] `10001980` 263 — looping sound play: same cross-jumping residue as 0x100016c0
+- [ ] `10001cb0` 547 — Bgm_CheckHeader: store order identical; the spills of the name characters and the registers of key[16]..key[24] differ (register allocation)
 - [ ] `10004760` 236 — ListBank::DeclareVariable: identical apart from block order (the original puts the type 0/1 block right after the type == 0 test, cl 13.00 here after all the tests); switch form tried
 - [ ] `100084b0` 413 — Game::OpenWindow: logic identical; this/slot registers swapped (esi/edi) and the x/y/width/height stores come out in address order instead of the original y, x, height ... width
 - [ ] `10008910` 275 — Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
@@ -110,7 +111,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (117)
+## 3. Medium functions (251-800 bytes) (116)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)
@@ -159,7 +160,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019e610` 526 bytes (loops 3, calls 12)
 - [ ] `100092c0` 535 bytes (float, loops 1, calls 6)
 - [ ] `1019e9a0` 539 bytes Node::Release (loops 4, calls 21)
-- [ ] `10001cb0` 547 bytes Bgm_CheckHeader (loops 1, calls 1)
 - [ ] `10191fd0` 549 bytes (float, loops 2, calls 16)
 - [ ] `101693f0` 557 bytes (calls 16)
 - [ ] `1002a110` 559 bytes (float, calls 17)

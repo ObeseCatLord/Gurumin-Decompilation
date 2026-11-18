@@ -314,3 +314,4 @@ _Vec3_Dot	101ac200
 ?AddRangeEntry@Game@@QAEHHPBDHHPAH@Z	1000b750
 ?Teleport@PathMover@@QAEHMMM@Z	10162420
 ?SetModelState@WorldRenderer@@QAEHHH@Z	10166f20
+_Bgm_CheckHeader	10001cb0

@@ -724,3 +724,4 @@ address	name	evidence
 10144ee0	TextureObject::HalveRgb24	matched decompiled source (decomp/obj_symbols.tsv)
 1000cdf0	Messages_Update	fades message boxes in/out and holds them for a time or until a key (decomp/src/message_fades.cpp)
 1019d750	Node::CollectStatic	matched decompiled source (decomp/obj_symbols.tsv)
+10161cb0	AnimModel::SnapPosition	matched decompiled source (decomp/obj_symbols.tsv)

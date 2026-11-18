@@ -121,6 +121,7 @@ struct AnimModel
     int Hold(int on, float amount, AnimModel *other);
     int HoldAtSpine(int on, float amount);
     int SnapHeight(float step, float offset);
+    int SnapPosition(float step, float offset);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -519,6 +520,42 @@ int AnimModel::SnapHeight(float step, float offset)
             best = i;
     }
     position.z = (float)candidates[best] * 0.1f + offset;
+    world.SetTranslation(position);
+    return 0;
+}
+
+// 0x10161cb0. Like SnapHeight for x and y: both are moved to the nearest multiple of `step` (in tenths of a unit)
+// plus `offset`; the height stays. Returns 0.
+int AnimModel::SnapPosition(float step, float offset)
+{
+    int candidates[4];  // the multiples just below, above and two below; the fourth entry is unused
+    Vec4 position = world.GetTranslation();
+    int x = (int)(position.x * 10.0f);
+    int grid = (int)(step * 10.0f);
+    int below = x / grid;
+    candidates[0] = below * grid;
+    candidates[1] = (below + 1) * grid;
+    candidates[2] = (below - 1) * grid;
+    int best = 0;
+    int i;
+    for (i = 1; i < 3; i++)
+    {
+        if (abs(candidates[best] - x) > abs(candidates[i] - x))
+            best = i;
+    }
+    position.x = (float)candidates[best] * 0.1f + offset;
+    int y = (int)(position.y * 10.0f);
+    below = y / grid;
+    candidates[0] = below * grid;
+    candidates[1] = (below + 1) * grid;
+    candidates[2] = (below - 1) * grid;
+    best = 0;
+    for (i = 1; i < 3; i++)
+    {
+        if (abs(candidates[best] - y) > abs(candidates[i] - y))
+            best = i;
+    }
+    position.y = (float)candidates[best] * 0.1f + offset;
     world.SetTranslation(position);
     return 0;
 }

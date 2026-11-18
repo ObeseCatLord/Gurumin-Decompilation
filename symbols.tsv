@@ -735,3 +735,7 @@ address	name	evidence
 1000dd90	Debris_Spawn	starts a simple debris piece in slots 0-127 (matched, decomp/src/debris.cpp)
 1000df10	Debris_SpawnFromCharacter	starts a thrown debris piece with a character's colour and scale (matched, decomp/src/debris.cpp)
 1000e130	Debris_SpawnFrom	starts a thrown debris piece with a given colour (matched, decomp/src/debris.cpp)
+10035b10	ListBank::ReadStatement	reads the next script statement (matched, decomp/src/listbank.cpp)
+10035d20	ListBank::ReadArgument	reads the next call argument, parentheses nest (matched, decomp/src/listbank.cpp)
+10035e80	ListBank::ReadWord	reads the next word of a statement (matched, decomp/src/listbank.cpp)
+10035fa0	ListBank::ReadTerm	reads the next word, '&' split off as its own word (matched, decomp/src/listbank.cpp)

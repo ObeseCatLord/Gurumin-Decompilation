@@ -298,3 +298,7 @@ _Vec3_Dot	101ac200
 ?SnapPosition@AnimModel@@QAEHMM@Z	10161cb0
 ?Shaga_PushOut@@YAHH@Z	1001af10
 ?MoveCursor@Game@@QAEHXZ	10009050
+?ReadWord@ListBank@@QAEHPAPADPAD@Z	10035e80
+?ReadTerm@ListBank@@QAEHPAPADPAD@Z	10035fa0
+?ReadArgument@ListBank@@QAEHPAPADPAD@Z	10035d20
+?ReadStatement@ListBank@@QAEHPAPADPAD@Z	10035b10

@@ -58,6 +58,9 @@ struct ListBank
     int FreeBank(int group);                                   // 0x10007ce0 (resource_banks.cpp)
     int ReadStatement(char **text, char *statement);           // 0x10035b10
     int SkipBlock(char **text, int *level, int block);         // 0x10035a30
+    int ReadArgument(char **text, char *word);
+    int ReadWord(char **text, char *word);
+    int ReadTerm(char **text, char *word);
     int CompileStatement(const char *statement);               // 0x100ed9b0
     int CompileText();
     int LoadText(const char *source, int length);
@@ -279,6 +282,276 @@ int ListBank::SkipBlock(char **text, int *level, int block)
     ReportError("}\x82\xaa\x91\xab\x82\xe8\x82\xc8\x82\xa2\x81" "B");
     *text = p;
     return 0;
+}
+
+// 0x10035b10. Reads the next statement into `statement` (at most 255 characters, followed by two zero bytes). A
+// '{', '}' or ';' at the cursor is a statement of its own. Otherwise separators are skipped and the statement runs to a
+// ';', brace or the end of the text outside quotes, brackets and parentheses (the ';' is consumed, a brace is left
+// for the next call), or up to and including a ':' (a label). A closing parenthesis of the enclosing call ends it
+// too, and after a ')' a letter or '_' (past any white space) starts the next statement. Tabs and line ends outside
+// quotes are dropped. Returns 1, or 0 at the end of the text or after an error.
+int ListBank::ReadStatement(char **text, char *statement)
+{
+    char *p = *text;
+    statement[0] = 0;
+    int inQuotes = 0;
+    int parens = 0;
+    int brackets = 0;
+    if (*p == 0)
+        return 0;
+    if (*p == '{' || *p == '}' || *p == ';')
+    {
+        statement[0] = *p;
+        statement[1] = 0;
+        *text = p + 1;
+        return 1;
+    }
+    while (*p == ' ' || *p == ',' || *p == '\t' || *p == '\r' || *p == '\n')
+        p++;
+    int afterParen = 0;
+    int length = 0;
+    do
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (inQuotes == 0)
+        {
+            while (*p == '\t' || *p == '\n' || *p == '\r')
+                p++;
+        }
+        if (afterParen && ((*p >= 'a' && *p <= 'z') || *p == '_' || (*p >= 'A' && *p <= 'Z')))
+        {
+            *text = p;
+            statement[length] = 0;
+            statement[length + 1] = 0;
+            return 1;
+        }
+        if (*p == '"')
+        {
+            if (inQuotes == 0)
+                inQuotes = 1;
+            else if (inQuotes == 1)
+                inQuotes = 0;
+        }
+        if (*p != ' ' && *p != '\n' && *p != '\r' && *p != '\t')
+            afterParen = 0;
+        if (inQuotes == 0)
+        {
+            if (*p == '(')
+                parens++;
+            else if (*p == ')')
+            {
+                parens--;
+                afterParen = 1;
+            }
+            if (parens < 0)
+            {
+                *text = p + 1;
+                return 1;
+            }
+            if (*p == '[')
+                brackets++;
+            else if (*p == ']')
+                brackets--;
+            if (parens == 0 && brackets == 0 && (*p == ':' || *p == 0 || *p == ';' || *p == '{' || *p == '}'))
+            {
+                if (*p == ':')
+                {
+                    statement[length] = *p;
+                    length++;
+                    p++;
+                    *text = p;
+                    statement[length] = 0;
+                    statement[length + 1] = 0;
+                    return 1;
+                }
+                if (*p != '{' && *p != '}' && *p != ';')
+                    p++;
+                *text = p;
+                statement[length] = 0;
+                statement[length + 1] = 0;
+                return 1;
+            }
+        }
+        statement[length] = *p;
+        length++;
+        p++;
+        statement[length] = 0;
+        statement[length + 1] = 0;
+    } while (length < 0x100);
+    ReportError("\x8c^\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81" "B");
+    *text = p;
+    return 1;
+}
+
+// 0x10035d20. Reads the next argument of a call into `word`, like ReadWord, but parentheses nest too: the argument
+// ends at a space, comma, ';' or the end of the text outside quotes, brackets and parentheses, or at the closing
+// parenthesis of the call (not copied). *text is moved past the character that ended it.
+int ListBank::ReadArgument(char **text, char *word)
+{
+    char *p = *text;
+    word[0] = 0;
+    int length = 0;
+    int inQuotes = 0;
+    int parens = 0;
+    int brackets = 0;
+    if (*p == 0)
+        return 0;
+    while (*p == ' ' || *p == ',' || *p == '\t' || *p == '\r' || *p == '\n' || *p == ';')
+        p++;
+    do
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (*p == '"')
+        {
+            if (inQuotes == 0)
+                inQuotes = 1;
+            else if (inQuotes == 1)
+                inQuotes = 0;
+        }
+        if (inQuotes == 0)
+        {
+            if (*p == '(')
+                parens++;
+            else if (*p == ')')
+                parens--;
+            if (parens < 0)
+            {
+                *text = p + 1;
+                return 1;
+            }
+            if (*p == '[')
+                brackets++;
+            else if (*p == ']')
+                brackets--;
+            if (parens == 0 && brackets == 0 && (*p == 0 || *p == ' ' || *p == ',' || *p == ';'))
+            {
+                *text = p + 1;
+                return 1;
+            }
+        }
+        word[length] = *p;
+        length++;
+        p++;
+        word[length] = 0;
+        word[length + 1] = 0;
+    } while (length < 0x100);
+    ReportError("\x8c^\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81" "B");
+    *text = p;
+    return 1;
+}
+
+
+// 0x10035e80. Reads the next word of a statement into `word` (at most 255 characters, followed by two zero bytes):
+// separators (space, comma, tab, line ends, ';') before it are skipped, and the word ends at a separator, a
+// parenthesis or the end of the text outside double quotes and outside `[ ]` brackets. *text is moved past the word
+// and its separator (a parenthesis or the end of the text is left in place). Returns 1, or 0 at the end of the text
+// or after an error. A word that is too long reports "型が異常です。" ("the type is invalid") and returns 1.
+int ListBank::ReadWord(char **text, char *word)
+{
+    char *p = *text;
+    word[0] = 0;
+    int length = 0;
+    int inQuotes = 0;
+    int brackets = 0;
+    if (*p == 0)
+        return 0;
+    while (*p == ' ' || *p == ',' || *p == '\t' || *p == '\r' || *p == '\n' || *p == ';')
+        p++;
+    do
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (*p == '"')
+        {
+            if (inQuotes == 0)
+                inQuotes = 1;
+            else if (inQuotes == 1)
+                inQuotes = 0;
+        }
+        if (inQuotes == 0)
+        {
+            if (*p == '[')
+                brackets++;
+            else if (*p == ']')
+                brackets--;
+            if (brackets == 0 && (*p == '\n' || *p == '\r' || *p == 0 || *p == ')' || *p == '(' || *p == ' ' ||
+                                  *p == ',' || *p == ';'))
+            {
+                if (*p != 0 && *p != ')' && *p != '(')
+                    p++;
+                *text = p;
+                return 1;
+            }
+        }
+        word[length] = *p;
+        length++;
+        p++;
+        word[length] = 0;
+        word[length + 1] = 0;
+    } while (length < 0x100);
+    ReportError("\x8c^\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81" "B");
+    *text = p;
+    return 1;
+}
+
+// 0x10035fa0. Like ReadWord, but '&' also ends a word, and a '&' at the start of a word is read as a word of its
+// own (so `a&b` reads as "a", "&", "b").
+int ListBank::ReadTerm(char **text, char *word)
+{
+    char *p = *text;
+    word[0] = 0;
+    int length = 0;
+    int inQuotes = 0;
+    int brackets = 0;
+    if (*p == 0)
+        return 0;
+    while (*p == ' ' || *p == ',' || *p == '\t' || *p == '\r' || *p == '\n' || *p == ';')
+        p++;
+    do
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (*p == '"')
+        {
+            if (inQuotes == 0)
+                inQuotes = 1;
+            else if (inQuotes == 1)
+                inQuotes = 0;
+        }
+        if (inQuotes == 0)
+        {
+            if (*p == '[')
+                brackets++;
+            else if (*p == ']')
+                brackets--;
+            if (brackets == 0 && (*p == '&' || *p == '\n' || *p == '\r' || *p == 0 || *p == ')' || *p == '(' ||
+                                  *p == ' ' || *p == ',' || *p == ';'))
+            {
+                if (*p == '&' && length == 0)
+                {
+                    word[0] = *p;
+                    word[1] = 0;
+                    word[2] = 0;
+                    *text = p + 1;
+                    return 1;
+                }
+                if (*p != '&' && *p != 0 && *p != ')' && *p != '(')
+                    p++;
+                *text = p;
+                return 1;
+            }
+        }
+        word[length] = *p;
+        length++;
+        p++;
+        word[length] = 0;
+        word[length + 1] = 0;
+    } while (length < 0x100);
+    ReportError("\x8c^\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81" "B");
+    *text = p;
+    return 1;
 }
 
 // 0x100fb6d0. Copies the script `source` (`length` bytes, plus the byte after them) into `text` and compiles it.

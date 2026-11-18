@@ -235,3 +235,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   slot after the register pops.
 - Arrays read at `index + 3` with scaled addressing (shorts, ints, 0x188 records) keep `index + 3` in a register only
   when it is a named local; byte arrays fold it into the displacement either way (Char_ClampStatus 0x1001a840).
+- Tokenizer loops (ListBank::ReadWord and siblings 0x10035b10-0x10035fa0): test the characters through `*p` every
+  time, not through a `char c = *p` local; with the local cl 13.00 threads jumps the original does not. The length
+  limit is the loop condition at the bottom (`do { if (error) return 0; ... } while (length < 0x100);`), and each
+  exit keeps its own copy of the terminating stores and `return 1`.

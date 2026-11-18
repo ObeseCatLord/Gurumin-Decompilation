@@ -788,3 +788,4 @@ address	name	evidence
 1014b480	Render_ResetSwapTarget	swap target and clamped viewport as the render state (matched, decomp/src/render_reset.cpp)
 10018fb0	Camera_Ease	eases the camera target and position towards their goals each frame (matched, decomp/src/camera_follow.cpp)
 100b58a0	Npc_TalkWhenNear	idle NPC that turns to the player and talks once the player comes near (matched, decomp/src/char_move.cpp)
+10024d00	Enemy_CanReturnHome	whether an enemy may head back to its start position in a direction (open, decomp/src/enemy_moves.cpp)

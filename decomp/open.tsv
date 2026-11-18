@@ -99,3 +99,4 @@ address	status	reason
 101abe30	open	Node::LoadIt3 (Model_LoadIt3): identical except the Open result is tested with cmp eax,ebx (zero register) in the original and test eax,eax in ours; FILE* return and earlier locals tried
 10199380	open	Node::FindBone: logic identical; the original keeps 0 in ebx (zero compares, trylevel store, then the loop counter) and frame in edx, ours tests against 0 and keeps frame in ebx; a counter declared at the top and the clamp spellings tried
 10194a10	open	Circle_Intersect (__stdcall): logic identical; the stack slots of d2 and disc are swapped and the original multiplies by d2 after storing (rb2 + ra2); k split, 2.0 factor and early returns tried
+10024d00	open	Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried

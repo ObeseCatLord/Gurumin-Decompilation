@@ -17,6 +17,17 @@ struct Vec4
     float Length2D();  // 0x101ac500: length of x/y
 };
 
+// Per-slot start vectors, 0x40 bytes (char_shots.cpp, char_leash.cpp).
+struct StartVectors
+{
+    Vec4 position;            // start position
+    char pad_0010[0x30];
+};
+
+extern "C" StartVectors DAT_10802bf8[0x80];
+// Char_ProbeAhead (collide_query.cpp): casts a ray `depth` ahead of character `index`.
+extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, int testOnly, const Vec4 *offset);
+
 // Root node of a character model (scene_node.cpp Node): node-flag setters applied to the whole tree.
 struct RootNode
 {
@@ -33,6 +44,36 @@ extern "C" int FUN_1013f880(void);  // the game's random number
 inline float Atan2(float y, float x)
 {
     return (float)atan2(y, x);
+}
+
+// Absolute value of a float (an inline helper: its argument is rounded to float first).
+inline float AbsFloat(float value)
+{
+    return (float)fabs(value);
+}
+
+// 0x10024d00 (Enemy_CanReturnHome). 1 when enemy `index` may head for its start position in direction (dirX, dirY):
+// always when `distance` is below `minimum` or below `minimumHome`; otherwise only when nothing blocks the way to the
+// start position (a test ray 10 units up) and that way is less than 150 degrees away from the direction. The sixth
+// and seventh parameters are not used.
+extern "C" int FUN_10024d00(int index, float distance, float minimumHome, float dirX, float dirY, int unused6,
+                            int unused7, float minimum)
+{
+    if (distance < minimum || distance < minimumHome)
+        return 1;
+    Vec4 offset;
+    offset.Fill(0);
+    offset.z += 10.0f;
+    float homeDistance = (DAT_10802bf8[index].position - DAT_10db6ed8[index].matrix.GetTranslation()).Length2D();
+    if (FUN_100242c0(index, 0, homeDistance, 0, 1, &offset) == 0)
+        return 0;
+    Vec4 home;
+    home.Copy(DAT_10802bf8[index].position - DAT_10db6ed8[index].matrix.GetTranslation());
+    float wanted = Atan2(dirX, dirY);
+    float toHome = Atan2(home.x, home.y);
+    if (AbsFloat(toHome - wanted) < 2.61799f)
+        return 1;
+    return 0;
 }
 
 // 0x10027560 (Enemy_IdleMotion). Plays one of the two idle motions, chosen at random (motion 5 for 146 frames or

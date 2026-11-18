@@ -1,0 +1,126 @@
+// A character walking its route: each frame the next route target is looked up (0x100286d0) and the character
+// steps towards it at walking or running speed.
+
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    Vec4();                                      // 0x101ac990: zero
+    void Copy(const Vec4 &source);               // 0x101acc20
+    void Fill(const float &value);               // 0x101acc40: sets all four components
+    Vec4 Scaled(const float &factor);            // 0x101acb00
+    Vec4 Normalized3();                          // 0x101af080: returns the normalised copy
+    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
+};
+
+struct CharMatrix
+{
+    float m[16];
+    Vec4 GetTranslation();                       // 0x101ade80
+};
+
+struct CharModel
+{
+    int M_10161be0(int a, int b);                // AnimModel::M_10161be0
+    int SetPosition(float x, float y, float z);  // 0x10162610 (model_place.cpp PathMover::SetPosition)
+};
+
+// A character record (world.h Character), only the fields used here.
+struct Character
+{
+    char pad_0000[0x10];
+    CharModel model;              // 0x10
+    char pad_0011[0x293];
+    int m_02a4;                   // 0x2a4: 1 while the character walks a route
+    char pad_02a8[0x2090];
+    CharMatrix matrix;            // 0x2338: world matrix (translation at 0x2368)
+    int m_2378;                   // 0x2378: set to 30 while walking
+    char pad_237c[0x4c];
+    Vec4 m_23c8;                  // 0x23c8: zeroed while walking
+    char pad_23d8[0xc4];
+};
+
+// Field 0x24a8 of each character record (npc_approach.cpp CharMoveLock).
+struct CharMoveLock
+{
+    int locked;
+    char pad_0004[0x2498];
+};
+
+// CharState (world.h) as the route walk uses it.
+struct RouteState
+{
+    int pad_0000;
+    int stopped;                  // 0x04: non-zero = the character stays where it is
+    int point;                    // 0x08: route point the character heads for
+    int placed;                   // 0x0c: 1 once the character was put on its route
+    char pad_0010[0x30];
+};
+
+// A 0x40-byte record per character slot (DAT_10802c08): the last step taken.
+struct StepRecord
+{
+    Vec4 step;
+    char pad_0010[0x30];
+};
+
+extern "C" Character DAT_10db6ed8[0x80];
+extern "C" CharMoveLock DAT_10db9380[0x80];
+extern "C" RouteState DAT_1020b430[0x80];
+extern "C" StepRecord DAT_10802c08[0x80];
+extern "C" int DAT_1049f0f0;                     // number of entries in the two lists below
+extern "C" Vec4 *DAT_1032d5b8[];                 // positions of the characters moved by routes
+extern "C" char DAT_1021bbc0[];
+// 0x100286d0: the route target of character `slot` heading for `point` (writes the next point, the target and the
+// point's action, value and group).
+extern "C" int FUN_100286d0(int slot, int *state, int point, int *nextPoint, Vec4 *target, int *group, int *value,
+                            int *action);
+
+// 0x1002a110 (Char_WalkRoute). Moves character `slot` one step along its route: it is unlocked and flagged as
+// walking, the route target looked up (on the first call the character is placed at it and listed in
+// DAT_1032d5b8), and unless it is stopped it steps 5 units (12 with `run`) towards the target. Returns 0.
+extern "C" int FUN_1002a110(int slot, int run)
+{
+    Vec4 target;
+    Vec4 step;
+    int state = 0;
+    int next;
+    int group;
+    int value;
+    int action;
+    target.Copy(DAT_10db6ed8[slot].matrix.GetTranslation());
+    DAT_10db9380[slot].locked = 0;
+    DAT_10db6ed8[slot].m_02a4 = 1;
+    DAT_10db6ed8[slot].m_2378 = 0x1e;
+    DAT_10db6ed8[slot].model.M_10161be0(0, 0);
+    FUN_100286d0(slot, &state, DAT_1020b430[slot].point, &next, &target, &group, &value, &action);
+    if (DAT_1020b430[slot].placed == 0)
+    {
+        DAT_1032d5b8[DAT_1049f0f0] = (Vec4 *)&DAT_10db6ed8[slot].matrix.m[12];
+        DAT_1021bbc0[DAT_1049f0f0] = 0;
+        DAT_1049f0f0++;
+        DAT_1020b430[slot].placed = 1;
+        DAT_10db6ed8[slot].model.SetPosition(target.x, target.y, target.z);
+    }
+    DAT_1020b430[slot].point = next;
+    DAT_10802c08[slot].step.Fill(0.0f);
+    if (DAT_1020b430[slot].stopped == 0)
+    {
+        step.Copy(target - DAT_10db6ed8[slot].matrix.GetTranslation());
+        if (step.x != 0.0f || step.y != 0.0f || step.z != 0.0f)
+            step.Normalized3();
+        if (run != 0)
+            step.Copy(step.Scaled(12.0f));
+        else
+            step.Copy(step.Scaled(5.0f));
+        DAT_10db6ed8[slot].matrix.m[12] += step.x;
+        DAT_10db6ed8[slot].matrix.m[13] += step.y;
+        DAT_10db6ed8[slot].matrix.m[14] += step.z;
+        DAT_10802c08[slot].step.Copy(step);
+        DAT_10db6ed8[slot].m_23c8.Fill(0.0f);
+    }
+    DAT_10db6ed8[slot].m_23c8.Fill(0.0f);
+    return 0;
+}

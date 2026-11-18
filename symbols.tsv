@@ -810,3 +810,4 @@ address	name	evidence
 1016a2e0	Playback::Play	starts or blends into an animation layer (open, decomp/src/model_state.cpp)
 101ad350	MotionList::FrameAt	frame shown at a time for a list of motion ranges (open, decomp/src/containers.cpp)
 10021c80	Sound_UpdateListener	smooths the camera and sends the 3D sound listener (matched, decomp/src/sound_listener.cpp)
+1002a110	Char_WalkRoute	character steps along its route towards the next point (open, decomp/src/route_walk.cpp)

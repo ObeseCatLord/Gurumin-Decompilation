@@ -9,7 +9,7 @@ struct TextureObject
 {
     char pad_0000[0x38];
     // 0x1014bc60: draws the cell (u0, v0)-(u1, v1) into the rectangle, turned by `angle`.
-    void M_1014bc60(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int frame,
+    void DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int frame,
                     float alpha, float angle);
 };
 
@@ -54,10 +54,10 @@ extern "C" int FUN_1000fb80(void)
         FUN_101439e0();
         DAT_104c031c += 0.02;
         DAT_10f65478 = 0;
-        DAT_118d0ba8[DAT_104b7200.texMenu1].M_1014bc60(0, 0, 48, 48, 0, 0.5f, 0.1875f, 0.6875f, 0, 1.0f, DAT_104c031c);
-        DAT_118d0ba8[DAT_104b7200.texMenu1].M_1014bc60(2, 51, (int)(DAT_104c0320 * 44.0f / 100.0f + 2.0f), 57,
+        DAT_118d0ba8[DAT_104b7200.texMenu1].DrawCell(0, 0, 48, 48, 0, 0.5f, 0.1875f, 0.6875f, 0, 1.0f, DAT_104c031c);
+        DAT_118d0ba8[DAT_104b7200.texMenu1].DrawCell(2, 51, (int)(DAT_104c0320 * 44.0f / 100.0f + 2.0f), 57,
                                                        0.75390625f, 0.25390625f, 0.7578125f, 0.2578125f, 0, 1.0f, 0);
-        DAT_118d0ba8[DAT_104b7200.texMenu1].M_1014bc60(0, 48, 48, 64, 0.5f, 0.25f, 0.6875f, 0.3125f, 0, 1.0f, 0);
+        DAT_118d0ba8[DAT_104b7200.texMenu1].DrawCell(0, 48, 48, 64, 0.5f, 0.25f, 0.6875f, 0.3125f, 0, 1.0f, 0);
         sprintf(text, "%d%%", (int)DAT_104c0320);
         DAT_104b7200.DrawDebugText(text, 8, 45);
         RECT corner;

@@ -18,7 +18,7 @@ struct NodeExtra
 
 struct Keys
 {
-    int M_101ad350(float value, int a, int b);   // 0x101ad350: the frame for `value`
+    int M_101ad350(float value, int a, int b);   // 0x101ad350 (containers.cpp MotionList::FrameAt)
 };
 
 // A plug of a node (scene_node.cpp Channel).

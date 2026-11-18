@@ -807,3 +807,5 @@ address	name	evidence
 10034cc0	Party_BlocksMove	whether a party character blocks a move (open, decomp/src/party_block.cpp)
 10043e20	Char_CanSee	range, view angle and wall test from an eye to a target (matched, decomp/src/sight_check.cpp)
 10045ed0	Npc_ApproachPlayer	NPC walks up to the player until near enough (open, decomp/src/npc_approach.cpp)
+1016a2e0	Playback::Play	starts or blends into an animation layer (open, decomp/src/model_state.cpp)
+101ad350	MotionList::FrameAt	frame shown at a time for a list of motion ranges (open, decomp/src/containers.cpp)

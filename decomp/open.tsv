@@ -109,3 +109,5 @@ address	status	reason
 1002ee70	open	Char_UpdateShoves: identical except the original schedules the fadd of 3.1415 after the stack pop of the atan2 call (angle local and separate add tried)
 10034cc0	open	Party_BlocksMove: logic identical; the original copies the first atan2 result through a temporary and reloads the second in place (fld/fstp round trips); result locals and helper forms tried
 10045ed0	open	Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
+1016a2e0	open	Playback::Play: control flow and stores identical; register allocation differs (original keeps the layer in eax and reuses the zero restart register as the follow-up loop counter; ours the layer in ecx); index-variable forms tried
+101ad350	open	MotionList::FrameAt: control flow identical; register allocation differs (original keeps time in ebp, the start in edx and the item index in ebx; ours edx/ebx/edi)

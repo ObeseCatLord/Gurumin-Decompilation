@@ -11,6 +11,7 @@ struct NodeLink
 struct SceneNode
 {
     int M_10199340();
+    int M_1019b630(int fromFrame, int toFrame, int frames);   // 0x1019b630: sets up a blend between two frames
 };
 
 struct ModelState
@@ -47,15 +48,15 @@ struct ModelState
 struct Playback
 {
     int m_0000;
-    int m_0004;
+    float m_0004;             // 0x04: frame position (-1 while blending)
     float m_0008;             // 0x08: playback speed (1.0)
     char m_000c;
     char pad_000d[3];
     int m_0010;
     int m_0014;
     int m_0018;
-    int m_001c;
-    int m_0020;
+    int m_001c;               // 0x1c: layer playing (0x90 = blending into m_7c7c, -1 = none)
+    int m_0020;               // 0x20: current frame
     int m_0024;
     int m_0028;
     int m_002c[16];
@@ -75,12 +76,13 @@ struct Playback
     int m_7c70;
     int m_7c74;
     int m_7c78;
-    int pad_7c7c;
+    int m_7c7c;               // 0x7c7c: layer being blended into
     SceneNode *m_7c80;
     void Init();
     int SetLayer(int layer, int a, int first, int last, int b, int c);
     int M_1016a090(SceneNode *node);
     int M_1016a020(struct SceneOwner *owner);
+    int Play(int layer, int restart, int blendFrames, float speed);
 };
 
 extern "C" NodeLink *DAT_10faaa88[0x100];
@@ -227,5 +229,65 @@ int Playback::M_1016a020(SceneOwner *owner)
         }
     }
     m_7c70 = 0;
+    return 1;
+}
+
+extern "C" int DAT_110175f8;  // number of motion blends started
+
+// 0x1016a2e0 (Playback::Play). Starts layer `layer` at `speed`. Nothing happens (returns 0) for an inactive or
+// out-of-range layer, or, unless `restart` is set, when the layer is already playing, being blended into or is the
+// one the current layer chains to (m_076c); a layer listed in the current layer's follow-up table (m_5870) is
+// left to come up by itself (returns 1). Without `blendFrames` the layer starts at once from its first frame;
+// otherwise the playback blends into it over `blendFrames` + 1 frames (at most 15). Returns 1.
+int Playback::Play(int layer, int restart, int blendFrames, float speed)
+{
+    if (layer < 0 || layer > 0x8f || m_00ac[layer] == 0)
+        return 0;
+    if (m_001c == layer && restart == 0 && m_076c[layer] != -1)
+        return 0;
+    if (m_0bec == 2 && m_7c78 == layer)
+        return 0;
+    if (m_001c != -1 && m_7c74 != 0 && m_7c7c == layer && restart == 0)
+        return 0;
+    if (m_001c != -1 && restart == 0 && m_001c == m_076c[layer])
+        return 0;
+    if (m_001c != -1 && restart == 0)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            int from = m_001c;
+            if (from == 0x90)
+                from = m_7c7c;
+            if (m_5870[from][i] == layer)
+                return 1;
+        }
+    }
+    m_7c78 = -1;
+    m_0bec = m_09ac[layer];
+    m_0024 = 0;
+    m_0008 = speed;
+    if (blendFrames == 0)
+    {
+        m_7c7c = 0;
+        m_7c74 = 0;
+        m_001c = layer;
+        m_0020 = m_02ec[layer];
+        m_0004 = (float)m_02ec[layer];
+        m_0bec = m_09ac[layer];
+        return 1;
+    }
+    m_7c74 = 1;
+    m_7c7c = layer;
+    if (m_7c80 != 0)
+    {
+        if (blendFrames >= 14)
+            blendFrames = 14;
+        DAT_110175f8++;
+        m_7c80->M_1019b630(m_0020, m_02ec[layer], blendFrames + 1);
+        m_0014 = blendFrames;
+    }
+    m_001c = 0x90;
+    m_0020 = -1;
+    m_0004 = -1.0f;
     return 1;
 }

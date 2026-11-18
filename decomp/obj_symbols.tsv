@@ -287,3 +287,4 @@ _Vec3_Dot	101ac200
 ?UploadBones@MeshData@@QAEXPAUMatrix4@@H0H@Z	10145a50
 ?Map_UpdateSpecial@@YAHXZ	100bd960
 ?Rename@Node@@QAEHPBD0@Z	1019ed40
+?CaptureRgbFirst@TextureObject@@QAEHPAE@Z	10145210

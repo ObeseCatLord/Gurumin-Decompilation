@@ -69,6 +69,7 @@ struct TextureObject
     int Release();
     int CaptureRgb24(unsigned char *out);
     int CaptureRgbRows(unsigned char *out);
+    int CaptureRgbFirst(unsigned char *out);
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
     int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);
@@ -370,5 +371,55 @@ int TextureObject::DrawStrip(ScreenVertex *vertices, int count)
     }
     DAT_10f0d5c8++;
     DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, count - 2, vertices, 0x20);
+    return 1;
+}
+
+// A RECT (left, top, right, bottom).
+struct Rect
+{
+    long left;
+    long top;
+    long right;
+    long bottom;
+};
+
+extern "C" D3DSurface *DAT_10f141dc;  // the back buffer surface
+
+// 0x10145210. Like CaptureRgbRows for only the first 32 pixels. When the render target cannot be read back, the
+// 256x256 corner of the back buffer is stretch-copied into a scratch surface instead. Returns 1, or 0 on failure.
+int TextureObject::CaptureRgbFirst(unsigned char *out)
+{
+    D3DSurface *copy;
+    Rect rect;
+    if (DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x17 /* D3DFMT_R5G6B5 */, 2 /* D3DPOOL_SYSTEMMEM */,
+                                                  (void **)&copy, 0) != 0 &&
+        DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x18 /* D3DFMT_X1R5G5B5 */, 2, (void **)&copy, 0) != 0)
+        return 0;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = 256;
+    rect.bottom = 256;
+    if (DAT_10f1fcf0->GetRenderTargetData(surface, copy) != 0)
+    {
+        copy->Release();
+        if (DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x18, 3 /* D3DPOOL_SCRATCH */, (void **)&copy, 0) != 0)
+            return 0;
+        if (DAT_10f1fcf0->StretchRect(DAT_10f141dc, &rect, copy, 0, 0) != 0)
+        {
+            copy->Release();
+            return 0;
+        }
+    }
+    LockedRect locked;
+    copy->LockRect(&locked, 0, 0x10 /* D3DLOCK_READONLY */);
+    const unsigned short *pixels = (const unsigned short *)locked.bits;
+    for (int i = 0; i < 0x20; i++)
+    {
+        out[i * 3 + 0] = (pixels[i] >> 8) & 0xf8;               // red: top 5 bits
+        out[i * 3 + 1] = (unsigned char)(pixels[i] >> 5) << 2;  // green: middle 6 bits
+        out[i * 3 + 2] = pixels[i] << 3;                        // blue: low 5 bits
+    }
+    copy->UnlockRect();
+    copy->Release();
     return 1;
 }

@@ -685,3 +685,5 @@ address	name	evidence
 10024e80	Char_OutsideLimit	1 when a move leaves the per-character x/y range around the start position (decomp/src/char_leash.cpp)
 100249c0	Char_IsAbove	1 when one character stands 20..20+h above another within a distance (decomp/src/actor_scan.cpp)
 10019210	Player_LookAround	swings the head-look target from side to side around the player (decomp/src/head_look.cpp)
+10027560	Enemy_IdleMotion	plays idle motion 5 or 6 at random and waits for it (decomp/src/enemy_moves.cpp)
+10027400	Enemy_WatchPlayer	motion 7, faces the player until a random end (decomp/src/enemy_moves.cpp)

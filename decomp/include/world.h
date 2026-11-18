@@ -32,6 +32,17 @@ struct CharModel
     int SetPendingPush(float x, float y, float z, char flag);
 };
 
+// Motion playback state of a model (only the fields used so far).
+struct MotionState
+{
+    char pad_0000[0x1c];
+    int current;              // 0x1c: motion number playing
+    char pad_0020[0x7c54];
+    int blending;             // 0x7c74: non-zero while blending into the next motion
+    int pad_7c78;
+    int next;                 // 0x7c7c: motion being blended into
+};
+
 struct Character
 {
     int id;
@@ -41,7 +52,9 @@ struct Character
     char *nearCells;          // 0x80: row of DAT_1021d338 (map cells near the character), 0 = no visibility data
     char pad_0084[0x1fc];
     int m_0280;               // 0x280: node id of the switch this character works (see switches.cpp)
-    char pad_0284[0xad8];
+    char pad_0284[0x24];
+    struct MotionState *motion;  // 0x2a8: the model's motion playback state
+    char pad_02ac[0xab0];
     float m_0d5c;             // 0xd5c: 1.0 when spawned (model alpha or scale)
     char pad_0d60[0x159c];
     struct RootNode *m_22fc;  // 0x22fc: root node of the model (0x22ec inside CharModel)

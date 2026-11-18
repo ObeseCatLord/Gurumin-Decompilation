@@ -697,3 +697,5 @@ address	name	evidence
 10021070	Region_IsVisible	1 when a corner of a map region box is in the view volume (decomp/src/region_view.cpp)
 1019f210	Node::FindTouchingSphere	matched decompiled source (decomp/obj_symbols.tsv)
 101692c0	WorldRenderer::DrawOverlay	matched decompiled source (decomp/obj_symbols.tsv)
+1019c560	Node::ApplyMaterialColours	matched decompiled source (decomp/obj_symbols.tsv)
+1014ef20	TextureObject::WriteRgb32	matched decompiled source (decomp/obj_symbols.tsv)

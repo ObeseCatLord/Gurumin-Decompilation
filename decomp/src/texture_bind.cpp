@@ -70,6 +70,7 @@ struct TextureObject
     int CaptureRgb24(unsigned char *out);
     int CaptureRgbRows(unsigned char *out);
     int DrawTriangles(const void *vertices, int triangles);
+    int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);
     int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
                       const unsigned short *palette);
 };
@@ -192,6 +193,42 @@ int TextureObject::WritePaletted(int left, int top, int right, int bottom, int p
             ((unsigned short *)dst)[x] = palette[src[x - left]];
         dst += locked.pitch;
         src += pitch;
+    }
+    texture->UnlockRect(0);
+    FUN_101484b0(poolIndex, width, height);
+    if (DAT_10f6550c == this)
+        DAT_10f6550c = (TextureObject *)1;
+    if (DAT_10f65510 == this)
+        DAT_10f65510 = (TextureObject *)1;
+    return 1;
+}
+
+// 0x1014ef20. Writes 32-bit pixels (B, G, R, unused bytes) into the 16-bit (R5G6B5) texture, rows top..bottom-1,
+// two pixels per 32-bit store: the row of `pitch` source bytes becomes pitch / 8 pairs (`left` and `right` are not
+// used). Like Write16, it drops the pooled copy and forgets the stage bindings afterwards. Returns 0 when the
+// texture cannot be locked, else 1.
+int TextureObject::WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits)
+{
+    LockedRect locked;
+    if (texture == 0)
+        return 0;
+    if (texture->LockRect(0, &locked, 0, 0x800) != 0)
+        return 0;
+    const unsigned char *src = bits;
+    int pairs = pitch / 8;
+    char *dst = (char *)locked.bits;
+    for (int y = top; y < bottom; y++)
+    {
+        for (int i = 0; i < pairs; i++)
+        {
+            // second pixel in the high half, first pixel in the low half
+            *(unsigned int *)dst = ((((((src[6] & 0xf8) << 5 | (src[5] & 0xfc)) << 6 | (src[4] & 0xf8)) << 5 |
+                                     (src[2] & 0xf8)) << 5 | (src[1] & 0xfc)) << 3) | (src[0] >> 3);
+            dst += 4;
+            src += 8;
+        }
+        dst += locked.pitch - pairs * 4;
+        src += pitch - pairs * 8;
     }
     texture->UnlockRect(0);
     FUN_101484b0(poolIndex, width, height);

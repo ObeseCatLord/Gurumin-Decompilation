@@ -1,20 +1,20 @@
 {
  "measures": {
-  "fuzzy_match_percent": 4.6192,
+  "fuzzy_match_percent": 4.6535,
   "total_code": "1720206",
-  "matched_code": "71129",
-  "matched_code_percent": 4.1349,
+  "matched_code": "71440",
+  "matched_code_percent": 4.153,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 599,
-  "matched_functions_percent": 49.4224,
+  "matched_functions": 600,
+  "matched_functions_percent": 49.505,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 139,
+  "total_units": 140,
   "complete_units": 97
  },
  "units": [
@@ -6023,6 +6023,48 @@
    }
   },
   {
+   "name": "app/node_colours",
+   "measures": {
+    "fuzzy_match_percent": 93.4211,
+    "total_code": "298",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "298",
+     "fuzzy_match_percent": 93.4211
+    }
+   ],
+   "functions": [
+    {
+     "name": "?ApplyMaterialColours@Node@@QAEHXZ",
+     "size": "298",
+     "fuzzy_match_percent": 93.4211,
+     "metadata": {
+      "virtual_address": "270124384"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/node_colours.cpp"
+   }
+  },
+  {
    "name": "app/node_ctor",
    "measures": {
     "fuzzy_match_percent": 100.0,
@@ -8542,16 +8584,16 @@
    "name": "app/texture_bind",
    "measures": {
     "fuzzy_match_percent": 100.0,
-    "total_code": "1385",
-    "matched_code": "1385",
+    "total_code": "1696",
+    "matched_code": "1696",
     "matched_code_percent": 100.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 8,
-    "matched_functions": 8,
+    "total_functions": 9,
+    "matched_functions": 9,
     "matched_functions_percent": 100.0,
-    "complete_code": "1385",
+    "complete_code": "1696",
     "complete_code_percent": 100.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
@@ -8561,7 +8603,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1385",
+     "size": "1696",
      "fuzzy_match_percent": 100.0
     }
    ],
@@ -8604,6 +8646,14 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "269807904"
+     }
+    },
+    {
+     "name": "?WriteRgb32@TextureObject@@QAEHHHHHHPBE@Z",
+     "size": "311",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269807392"
      }
     },
     {
@@ -10074,13 +10124,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1634773",
+    "total_code": "1634164",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 542,
+    "total_functions": 540,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -10093,7 +10143,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1634773",
+     "size": "1634164",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -13307,14 +13357,6 @@
      }
     },
     {
-     "name": "FUN_1014ef20",
-     "size": "311",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269807392"
-     }
-    },
-    {
      "name": "FUN_1014f1f0",
      "size": "806",
      "fuzzy_match_percent": 0.0,
@@ -14136,14 +14178,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "270123936"
-     }
-    },
-    {
-     "name": "FUN_1019c560",
-     "size": "298",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270124384"
      }
     },
     {

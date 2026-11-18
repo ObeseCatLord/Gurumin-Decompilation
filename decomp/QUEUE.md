@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (72)
+## 1. Walls to retry (73)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -75,6 +75,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
+- [ ] `1019c560` 298 — Node::ApplyMaterialColours: schedule only (the original loads the material pointer into edx and g before r); local-struct and declaration orders tried
 - [ ] `101acc60` 301 — DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
 - [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
@@ -92,12 +93,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (187)
+## 3. Medium functions (251-800 bytes) (185)
 
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `100caf90` 292 bytes (float, loops 1, calls 6)
-- [ ] `1019c560` 298 bytes (float, loops 2, calls 1)
-- [ ] `1014ef20` 311 bytes (loops 2, calls 3)
 - [ ] `1001a450` 315 bytes (float, calls 10)
 - [ ] `10145a50` 321 bytes (loops 2, calls 8)
 - [ ] `1002a340` 325 bytes (float, loops 1, calls 6)

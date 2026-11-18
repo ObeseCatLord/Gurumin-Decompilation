@@ -73,3 +73,4 @@ address	status	reason
 10037470	open	ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
 10004760	open	ListBank::DeclareVariable: identical apart from block order (the original puts the type 0/1 block right after the type == 0 test, cl 13.00 here after all the tests); switch form tried
 10164af0	open	ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
+1019c560	open	Node::ApplyMaterialColours: schedule only (the original loads the material pointer into edx and g before r); local-struct and declaration orders tried

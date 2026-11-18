@@ -275,3 +275,5 @@ _Vec3_Dot	101ac200
 ?PumpAndRecover@TextureManager@@QAEHXZ	1015c850
 ?FindTouchingSphere@Node@@QAEHHPBUVec4@@MPAPAU1@PAH@Z	1019f210
 ?DrawOverlay@WorldRenderer@@QAEXXZ	101692c0
+?ApplyMaterialColours@Node@@QAEHXZ	1019c560
+?WriteRgb32@TextureObject@@QAEHHHHHHPBE@Z	1014ef20

@@ -63,7 +63,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016b010` 53 — original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 - [ ] `1016b1e0` 73 — original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
-- [ ] `101992f0` 29 — walk to the root: original keeps the next pointer in edx, VS2003 in ecx (two loop shapes tried)
+- [ ] `101992f0` 29 — Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
@@ -76,7 +76,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (49)
+## 2. Small functions (30-250 bytes) (40)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
@@ -84,15 +84,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10027560` 207 bytes (loops 2, calls 3)
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
-- [ ] `100241e0` 210 bytes (float, calls 1)
-- [ ] `100248e0` 210 bytes (float, calls 10)
-- [ ] `10065b10` 211 bytes (float, calls 7)
-- [ ] `1001a760` 214 bytes (calls 9)
-- [ ] `101508d0` 214 bytes (float, calls 5)
-- [ ] `101509b0` 214 bytes (float, calls 5)
-- [ ] `101a52d0` 215 bytes (loops 3, calls 7)
-- [ ] `1001bfb0` 218 bytes (float, loops 2)
-- [ ] `1001ba40` 219 bytes (float, loops 1, calls 3)
 - [ ] `1001a680` 220 bytes (float, loops 1, calls 2)
 - [ ] `101883b0` 221 bytes (loops 2, calls 1)
 - [ ] `10193060` 221 bytes (float, calls 11)

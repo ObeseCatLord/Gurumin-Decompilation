@@ -5,6 +5,7 @@
 // Flags (`flags`, 0xac): 0x4 visible, 0x20 solid wall (wall_flags.cpp), 0x200/0x400/0x800 node kinds that take the
 // colour values, 0x1000/0x2000/0x4000/0x400000 matrix states restored from `saved`, 0x8000 special pass marker.
 
+#include <stdio.h>
 #include <string.h>
 
 struct Vec4
@@ -269,6 +270,8 @@ struct Node
     int M_1019b0c0(int value, int except1, int except2);
     int M_1019b1b0(unsigned int bits);
     int M_1019bca0(Node **keep, int count);
+    Node *Root();
+    int SetUniqueName(const char *name);
 };
 
 
@@ -1354,5 +1357,36 @@ int Node::M_1019e830(int a, int b)
     }
     for (int i = 0; i < childCount; i++)
         children[i]->M_1019e830(a, b);
+    return 1;
+}
+
+// 0x101992f0. The top node of the tree this node belongs to (following the parent links).
+Node *Node::Root()
+{
+    Node *node = this;
+    while (node->parent != 0)
+        node = node->parent;
+    return node;
+}
+
+// 0x101a52d0. Names this node `name`, or "name(0)", "name(1)", ... (the first that no node of the tree uses yet)
+// when the tree already has a node called `name`. Returns 1.
+int Node::SetUniqueName(const char *name)
+{
+    char unique[256];
+    int number = 0;
+    Node *root = Root();
+    if (root->M_1019ece0(name, 0) == 0)
+    {
+        strcpy(this->name, name);
+        return 1;
+    }
+    sprintf(unique, "%s(%d)", name, 0);
+    while (root->M_1019ece0(unique, 0) != 0)
+    {
+        number++;
+        sprintf(unique, "%s(%d)", name, number);
+    }
+    strcpy(this->name, unique);
     return 1;
 }

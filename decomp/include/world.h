@@ -55,7 +55,10 @@ struct Character
     };
     char pad_2378[0x24];
     int m_239c;
-    char pad_23a0[0xfc];
+    char pad_23a0[0xec];
+    float heading;            // 0x248c: facing angle in radians
+    float targetHeading;      // 0x2490: angle the character turns towards
+    char pad_2494[8];
 };
 
 struct CharSlot

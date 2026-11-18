@@ -10,7 +10,10 @@ struct Vec4
     void Set(float x, float y, float z, float w);
     void Copy(const Vec4 &source);
     Vec4 operator+(const Vec4 &other) const;
+    Vec4 operator-(const Vec4 &other) const;
     Vec4 Scaled(const float &scale);
+    void Fill(const float &value);
+    float Length();  // 0x101ac4e0: length of x/y/z
 };
 
 struct Matrix4
@@ -26,6 +29,10 @@ struct CollisionWorld
     // Node::Collide (0x101a8e60) on the world's root node: the segment `from`-`to` against the collision of the
     // given kinds; the hit point goes to `hit`. Returns 1 on a hit.
     int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);
+    // 0x101aaa20: casts the segment `from`-`to` against the collision of the nodes called `name` (0 = all) with
+    // the given mask; the nearest hit point goes to `hit` and, when `t` is given, its position along the segment.
+    // Returns 1 on a hit.
+    int CastSegment(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
     int Query(Matrix4 *matrix, Vec4 *point, int mask, Vec4 *hit, int *hitId, int a, int b);
     // Casts the segment `from`-`to` against the nodes called `name` (0 = all) whose flags match; writes the
     // nearest hit point and, when `t` is given, its position along the segment. Returns 1 on a hit.
@@ -85,4 +92,29 @@ extern "C" int FUN_10024c40(const Vec4 *position, Vec4 *direction, float depth, 
     if (DAT_10255f08 != 0 && DAT_10255f08->Collide(0, 0x4000000, &from, &to, &hit) != 0)
         return 1;
     return 0;
+}
+
+// 0x100248e0 (Collision_ProbeDown). Casts a ray down from `height` units above `position` to `position` against the
+// world collision (mask 0x4000000) and stores the result in `ground`. Returns 1 on a hit, 0 when nothing was hit
+// (`ground` then has x = -200000) or no world is loaded. Note: on a hit the code copies `unused` (a zero vector)
+// over the hit point and computes a length it throws away, so callers only learn whether something was hit.
+extern "C" int FUN_100248e0(Vec4 position, Vec4 *ground, float height)
+{
+    Vec4 from;
+    Vec4 unused;
+    Vec4 hit;
+    float zero = 0;
+    hit.Fill(zero);
+    hit.x = -200000.0f;
+    from.Copy(position);
+    from.z += height;
+    if (DAT_10255f08 != 0 && DAT_10255f08->CastSegment(0, 0x4000000, &from, &position, &hit, 0) != 0)
+    {
+        hit.Copy(unused);
+        (hit - position).Length();
+    }
+    ground->Copy(hit);
+    if (hit.x == -200000.0f)
+        return 0;
+    return 1;
 }

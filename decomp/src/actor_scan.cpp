@@ -3,6 +3,16 @@
 
 #include "world.h"
 
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    Vec4();
+    void Copy(const Vec4 &source);
+};
+
 // Per-slot state table at 0x10daaaec, 0x188 bytes per slot (CharSlot in world.h starts 0x98 bytes later).
 struct ActorSlot
 {
@@ -72,4 +82,22 @@ extern "C" int FUN_10011d40(float a, float b, float c)
         return i;
     }
     return -1;
+}
+
+// 0x1001ba40. 1 when the point (x, y) lies near one of the objects in slots 0x5c..0x7b whose kind byte is 0x5c: its
+// 50x50 square around the point overlaps the object's 250x250 square (x/y only). The first argument is unused.
+extern "C" int FUN_1001ba40(int unused, const Vec4 *point)
+{
+    Vec4 position;
+    for (int i = 0x5c; i < 0x7c; i++)
+    {
+        if (DAT_1021f3c0[i] == 0x5c)
+        {
+            position.Copy(DAT_10db6ed8[i].matrix.GetTranslation());
+            if (position.x - 125.0f < point->x + 25.0f && position.x + 125.0f > point->x - 25.0f &&
+                position.y - 125.0f < point->y + 25.0f && position.y + 125.0f > point->y - 25.0f)
+                return 1;
+        }
+    }
+    return 0;
 }

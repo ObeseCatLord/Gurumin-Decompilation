@@ -82,3 +82,35 @@ extern "C" int FUN_100143f0(int index, const char *name)
     }
     return 0;
 }
+
+// Left-hand counterpart of FUN_10012450: with `attach` = 1 loads model `name` as a child "scop_l" of character
+// `index`'s "Bip01 L Hand", first removing a "scop_l" that is already there (by calling itself). Otherwise removes
+// the "scop_l" child. Returns 0.
+extern "C" int FUN_1001a760(int index, int attach, const char *name)
+{
+    if (DAT_10db6ed8[index].root != 0)
+    {
+        if (attach == 1)
+        {
+            if (DAT_10db6ed8[index].root->Find("scop_l", 0) != 0)
+                FUN_1001a760(index, 0, 0);
+            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 L Hand", 0);
+            if (hand != 0)
+            {
+                Node *child = hand->AddChild(0, 0x40);
+                child->Load(FUN_1013f8a0(name, 0), 0, 0, 0);
+                strcpy(child->name, "scop_l");
+                child->parent = hand;
+                child->BuildMesh(1, 0);
+                return 0;
+            }
+        }
+        else
+        {
+            Node *child = DAT_10db6ed8[index].root->Find("scop_l", 0);
+            if (child != 0)
+                child->parent->RemoveChild(child, 0);
+        }
+    }
+    return 0;
+}

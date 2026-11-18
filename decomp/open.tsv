@@ -64,3 +64,4 @@ address	status	reason
 101ad5c0	open	MotionList::InsertByName: the original inlines Insert (cl 13.00 here calls it even when declared inline); with __forceinline only the loop index register differs (ecx vs ebp)
 101ae950	open	QuatFromAxisAngle: 16 bytes; the original keeps cos(half) in the angle slot and spills axis.z into the axis slot, ours the other way round (declaration order tried)
 101aeee0	open	Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
+101992f0	open	Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)

@@ -291,7 +291,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (223)
+## 4. Large functions (801-3000 bytes) (222)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes (loops 8, calls 10)
@@ -302,7 +302,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10045830` 843 bytes (float, calls 20)
 - [ ] `100b5c30` 843 bytes (float, calls 25)
 - [ ] `1019eeb0` 844 bytes (loops 5, calls 19)
-- [ ] `10028360` 846 bytes (float, calls 22)
 - [ ] `10142790` 846 bytes (loops 1, calls 24)
 - [ ] `10019310` 849 bytes (float, calls 45)
 - [ ] `10160a90` 850 bytes Mmv_Open (loops 1, calls 20)

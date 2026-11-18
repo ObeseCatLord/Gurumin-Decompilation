@@ -687,3 +687,4 @@ address	name	evidence
 10019210	Player_LookAround	swings the head-look target from side to side around the player (decomp/src/head_look.cpp)
 10027560	Enemy_IdleMotion	plays idle motion 5 or 6 at random and waits for it (decomp/src/enemy_moves.cpp)
 10027400	Enemy_WatchPlayer	motion 7, faces the player until a random end (decomp/src/enemy_moves.cpp)
+10028360	Enemy_TurnToPlayer	turns towards the player at most 20 degrees a frame, random end (decomp/src/enemy_moves.cpp)

@@ -13,7 +13,19 @@ struct Vec4
     Vec4();
     void Copy(const Vec4 &source);
     void Fill(const float &value);
+    Vec4 operator-(const Vec4 &other) const;
+    float Length2D();  // 0x101ac500: length of x/y
 };
+
+// Root node of a character model (scene_node.cpp Node): node-flag setters applied to the whole tree.
+struct RootNode
+{
+    int M_10194630(char value, unsigned int mask);
+    int M_101946b0(unsigned char value, unsigned int mask);
+    int M_10194730(char value, unsigned int mask);
+};
+
+extern "C" char DAT_1021f6c0[0x80];
 
 extern "C" int FUN_1013f880(void);  // the game's random number
 
@@ -85,6 +97,95 @@ extern "C" int FUN_10027400(int index)
             DAT_1020b430[index].m_0004[1] = 0;
             return 1;
         }
+    }
+    return 0;
+}
+
+// 0x10028360 (Enemy_TurnToPlayer). Turns the enemy towards the player, at most 0.349 radians (20 degrees) per frame,
+// playing walk-in-place motion 0 while it turns and idle motion 2 otherwise. Facing the player (within 0.05236
+// radians) and closer than 1500 units it keeps motion 0 for the remaining turn frames. The first call sets up the
+// model's node flags. The behaviour ends with a chance of `endChance` in 400 per frame; returns 1 then, else 0.
+// CharState: m_003c = set up, m_0004[2] = turn frames left, m_0004[3] = cooldown.
+extern "C" int FUN_10028360(int index, int endChance)
+{
+    Vec4 player;
+    Vec4 self;
+    Vec4 toPlayer;
+    DAT_1020b430[index].m_0004[0] = 0;
+    if (DAT_1020b430[index].m_003c == 0)
+    {
+        DAT_1020b430[index].m_003c = 1;
+        DAT_10db6ed8[index].m_22fc->M_10194630((char)index, 0x400);
+        DAT_10db6ed8[index].m_22fc->M_101946b0(0xfe, 0x400);
+        DAT_10db6ed8[index].m_22fc->M_10194730(0x2f, 0x400);
+        DAT_10db6ed8[index].m_22fc->M_10194730(0x2f, 0x200);
+        DAT_1021f6c0[index] = 0;
+    }
+    player.Copy(DAT_10db6ed8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    toPlayer.Copy(player - self);
+    if (DAT_1020b430[index].m_0004[1] == 0)
+    {
+        // Angle still to turn, wrapped into -pi..pi.
+        float turn = (float)atan2(toPlayer.x, toPlayer.y);
+        turn = turn + 3.1415f;
+        turn = turn - DAT_10db6ed8[index].heading;
+        if (turn > 3.1415f)
+            turn = -(6.28319f - turn);
+        else if (turn < -3.1415f)
+            turn = turn + 6.28319f;
+        if ((float)fabs(turn) < 0.05236f && toPlayer.Length2D() < 1500.0f)
+        {
+            if (DAT_1020b430[index].m_0004[3] == 0)
+                DAT_1020b430[index].m_0004[3] = 30;
+            DAT_10db6ed8[index].targetHeading = DAT_10db6ed8[index].heading;
+            if (DAT_1020b430[index].m_0004[2] > 0)
+            {
+                DAT_10db6ed8[index].model.M_1017b0e0(0, 0, 5, 1.0f);
+                DAT_1020b430[index].m_0004[2]--;
+            }
+            else
+            {
+                DAT_10db6ed8[index].model.M_1017b0e0(2, 0, 5, 1.0f);
+            }
+        }
+        else if (((float)fabs(turn) < 3.14159f && toPlayer.Length2D() < 1500.0f) || DAT_1020b430[index].m_0004[3] > 0)
+        {
+            if (DAT_1020b430[index].m_0004[3] == 0)
+                DAT_1020b430[index].m_0004[3] = 30;
+            DAT_1020b430[index].m_0004[2] = 4;
+            if (turn > 0.0f)
+            {
+                if (turn > 0.349066f)
+                    DAT_10db6ed8[index].targetHeading = DAT_10db6ed8[index].heading + 0.349066f;
+                else
+                    DAT_10db6ed8[index].targetHeading = turn + DAT_10db6ed8[index].heading;
+            }
+            else if (turn < 0.0f)
+            {
+                if (turn < -0.349066f)
+                    DAT_10db6ed8[index].targetHeading = DAT_10db6ed8[index].heading - 0.349066f;
+                else
+                    DAT_10db6ed8[index].targetHeading = turn + DAT_10db6ed8[index].heading;
+            }
+            DAT_10db6ed8[index].model.M_1017b0e0(0, 0, 5, 1.0f);
+        }
+        else
+        {
+            DAT_10db6ed8[index].model.M_1017b0e0(2, 0, 5, 1.0f);
+        }
+        if (DAT_1020b430[index].m_0004[3] > 0)
+            DAT_1020b430[index].m_0004[3]--;
+        if (FUN_1013f880() % 400 < endChance)
+        {
+            DAT_1020b430[index].m_0004[3] = 0;
+            DAT_1020b430[index].m_0004[2] = 0;
+            return 1;
+        }
+    }
+    else
+    {
+        DAT_10db6ed8[index].model.M_1017b0e0(2, 0, 5, 1.0f);
     }
     return 0;
 }

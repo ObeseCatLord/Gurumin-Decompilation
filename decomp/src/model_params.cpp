@@ -30,6 +30,8 @@ struct LoadedModel
 {
     char pad_0000[0xa8];
     int m_00a8;               // non-zero while the model takes part in collision
+    char pad_00ac[0x1a0];
+    Matrix4 worldMatrix;      // 0x24c: world matrix of the node (scene_node.cpp Node::worldMatrix)
     LoadedModel *Find(const char *name, int flags);  // Node::Find 0x1019ece0
 };
 
@@ -115,6 +117,7 @@ struct AnimModel
     int IsClearOfMap(const Vec4 *offset);
     int IsClearOfMapLimited(const Vec4 *offset);
     int Hold(int on, float amount, AnimModel *other);
+    int HoldAtSpine(int on, float amount);
 };
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
@@ -449,6 +452,37 @@ int AnimModel::Hold(int on, float amount, AnimModel *other)
             {
                 holdOffset.Copy(other->holdOffset + other->world.GetTranslation());
                 holdOffset.Copy(holdOffset - world.GetTranslation());
+            }
+        }
+        float weight = amount + holdWeight;
+        holdWeight = weight;
+        if (weight > 0.9f)
+            holdWeight = 0.9f;
+        holdState = 1;
+        return 0;
+    }
+    if (holdState == 1)
+        holdState = 2;
+    return 0;
+}
+
+// 0x10163c70. Like Hold, but the offset recorded on the first call is the model's own "Bip01 Spine" bone relative to
+// its position (0 when there is no such bone). Returns 0.
+int AnimModel::HoldAtSpine(int on, float amount)
+{
+    if (on != 0)
+    {
+        if (holdState == 0)
+        {
+            holdOffset.Fill(0);
+            if (root != 0)
+            {
+                LoadedModel *spine = root->Find("Bip01 Spine", 0);
+                if (spine != 0)
+                {
+                    holdOffset.Copy(spine->worldMatrix.GetTranslation());
+                    holdOffset.Copy(holdOffset - world.GetTranslation());
+                }
             }
         }
         float weight = amount + holdWeight;

@@ -256,3 +256,9 @@ _Vec3_Dot	101ac200
 ?LoadText@ListBank@@QAEHPBDH@Z	100fb6d0
 ?Load@DemoRecording@@QAEHPBD@Z	1015cc90
 ??0ModelBank@@QAE@XZ	1017c8e0
+?RemoveChildren@EffectManager@@QAEHH@Z	10172260
+?HoldAtSpine@AnimModel@@QAEHHM@Z	10163c70
+?RemoveOfType@EffectManager@@QAEHH@Z	10188490
+?RaiseKskonEvents@Game@@QAEHH@Z	10054970
+?RaiseTalkEvents@Game@@QAEHH@Z	10054b70
+?RaiseOpenEvents@Game@@QAEHH@Z	10054c60

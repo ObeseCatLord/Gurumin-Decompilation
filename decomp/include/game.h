@@ -6,7 +6,9 @@ struct GameTrigger
     int map;                    // map number, 9999 = any map
     int flags[4];               // script flags that must be set (negative = must be clear, 0 = no condition)
     int value;                  // 0x14: event id (for map events)
-    char name[0xb0];            // 0x18: event name, e.g. "GAMEOVER"
+    char name[0x10];            // 0x18: event name, e.g. "GAMEOVER", "KSKON", "TALK", "OPEN"
+    int argument;               // 0x28: what the event reacts to (for example the character or object id)
+    char pad_002c[0x9c];
 };
 
 // Per-window item table: 0x80 item values, then the pointer that receives the chosen result.
@@ -155,6 +157,9 @@ struct Game : Object
         return m_3ee694[index];
     }
     int ForEachActiveTrigger(void (*callback)(GameTrigger *trigger));
+    int RaiseKskonEvents(int argument);
+    int RaiseTalkEvents(int argument);
+    int RaiseOpenEvents(int argument);
     int RegisterEvent(int id);  // 0x100020d0 (flag_list.cpp: FlagOwner::M_100020d0)
     int RaiseGameOverEvents();
     int FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value);

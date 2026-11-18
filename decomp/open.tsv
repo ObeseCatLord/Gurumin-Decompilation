@@ -67,3 +67,6 @@ address	status	reason
 101992f0	open	Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)
 101883b0	open	EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 100fb6d0	open	ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
+10054970	open	Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
+10054b70	open	Game::RaiseTalkEvents: same loop-pointer residue as 0x10054a60
+10054c60	open	Game::RaiseOpenEvents: same loop-pointer residue as 0x10054a60

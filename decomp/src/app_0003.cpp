@@ -200,3 +200,46 @@ int Game::FindMapEntry(int map, char *name, char *file, char *title, int unused1
     }
     return 0;
 }
+
+// 0x10054970. Registers every map event named "KSKON" whose argument is `argument` and that applies now (its map is
+// the current one or 9999, and its four script flags pass). Returns 0.
+int Game::RaiseKskonEvents(int argument)
+{
+    for (int i = 0; i < mapEventCount; i++)
+    {
+        GameTrigger *event = &mapEvents[i];
+        if (strcmp(event->name, "KSKON") == 0 && event->argument == argument &&
+            (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+            TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+            RegisterEvent(event->value);
+    }
+    return 0;
+}
+
+// 0x10054b70. Same for the "TALK" events of `argument` (talking to a character).
+int Game::RaiseTalkEvents(int argument)
+{
+    for (int i = 0; i < mapEventCount; i++)
+    {
+        GameTrigger *event = &mapEvents[i];
+        if (event->argument == argument && strcmp(event->name, "TALK") == 0 &&
+            (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+            TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+            RegisterEvent(event->value);
+    }
+    return 0;
+}
+
+// 0x10054c60. Same for the "OPEN" events of `argument` (opening a door or chest).
+int Game::RaiseOpenEvents(int argument)
+{
+    for (int i = 0; i < mapEventCount; i++)
+    {
+        GameTrigger *event = &mapEvents[i];
+        if (event->argument == argument && strcmp(event->name, "OPEN") == 0 &&
+            (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+            TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+            RegisterEvent(event->value);
+    }
+    return 0;
+}

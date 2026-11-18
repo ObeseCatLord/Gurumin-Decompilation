@@ -42,3 +42,61 @@ extern "C" void FUN_1014b390(void)
         DAT_10f1fcf0->SetViewport(&DAT_10f0ece0);
     }
 }
+
+// Default-pool Direct3D resources that do not survive a device reset (Render_OnResetDevice recreates them).
+extern "C" IUnknownLike *DAT_10f0ee00[16][0x46];  // vertex/index buffers of the 16 draw lists (FUN_1014ddf0)
+extern "C" IUnknownLike *DAT_10f1fd04[8];         // render-target surfaces
+extern "C" IUnknownLike *DAT_10f654ac;            // dynamic vertex buffer of the 2D drawing code
+extern "C" IUnknownLike *DAT_10f141dc;
+extern "C" IUnknownLike *DAT_10f1a864;
+extern "C" IUnknownLike *DAT_10f1fcfc;            // created with the device (Render_CreateDevice)
+extern "C" IUnknownLike *DAT_10f1fd00;
+extern "C" IUnknownLike *DAT_10f1fd28;            // created with the device
+extern "C" IUnknownLike *DAT_10f1fd2c;
+extern "C" IUnknownLike *DAT_10f08d38;
+extern "C" void FUN_10147760(void);  // BufferPool_ReleaseDynamic
+extern "C" int FUN_10148350(void);   // TexCache_ReleaseAll
+
+// Render_OnLostDevice (0x1014b2a0). Releases every default-pool resource before IDirect3DDevice9::Reset: the draw
+// list buffers, the render targets, the 2D vertex buffer, the dynamic buffer pool, the texture cache and the
+// single objects below. Some pointers are cleared afterwards and some are left dangling until they are recreated,
+// as in the original. Returns 1.
+extern "C" int FUN_1014b2a0(void)
+{
+    int list;
+    for (list = 0; list < 16; list++)
+    {
+        for (int i = 0; i < 0x46; i++)
+        {
+            if (DAT_10f0ee00[list][i] != 0)
+                DAT_10f0ee00[list][i]->Release();
+        }
+    }
+    for (int target = 0; target < 8; target++)
+    {
+        if (DAT_10f1fd04[target] != 0)
+            DAT_10f1fd04[target]->Release();
+        DAT_10f1fd04[target] = 0;
+    }
+    DAT_10f654ac->Release();
+    FUN_10147760();
+    FUN_10148350();
+    if (DAT_10f141dc != 0)
+        DAT_10f141dc->Release();
+    DAT_10f141dc = 0;
+    if (DAT_10f1a864 != 0)
+        DAT_10f1a864->Release();
+    if (DAT_10f1fcfc != 0)
+        DAT_10f1fcfc->Release();
+    if (DAT_10f1fd00 != 0)
+        DAT_10f1fd00->Release();
+    if (DAT_10f1fd28 != 0)
+        DAT_10f1fd28->Release();
+    if (DAT_10f1fd2c != 0)
+        DAT_10f1fd2c->Release();
+    DAT_10f1a864 = 0;
+    if (DAT_10f08d38 != 0)
+        DAT_10f08d38->Release();
+    DAT_10f08d38 = 0;
+    return 1;
+}

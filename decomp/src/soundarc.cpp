@@ -175,3 +175,39 @@ extern "C" LRESULT FUN_10001980(const char *file, const LPARAM *x, const LPARAM 
     }
     return 0;
 }
+
+// SoundArc_GetWindow (0x10001570). Returns the window of the sound process ("SOUNDARC" / "SoundArc"). When it is
+// already running it is told whether sound is on (WM_USER code 0x400) and the window is returned only if it
+// answers. Otherwise soundarc.dll (the path in DAT_1020ade0) is started as a high-priority, minimised process and
+// polled for up to 100 x 20 ms;
+// a window found that way is told code 0x401 and returned. Returns 0 when there is none. Defined last in the file
+// so that the functions above call it like the original does (no knowledge of its registers).
+extern "C" HWND FUN_10001570(void)
+{
+    HWND window = FindWindowA("SOUNDARC", "SoundArc");
+    if (window != 0)
+        return SendMessageA(window, WM_USER, 0x400, DAT_1020aee4) != 0 ? window : 0;
+    STARTUPINFOA startup;
+    PROCESS_INFORMATION process;
+    memset(&startup, 0, sizeof(startup));
+    startup.cb = sizeof(startup);
+    startup.dwFlags = STARTF_USESHOWWINDOW;
+    startup.wShowWindow = SW_SHOWMINNOACTIVE;
+    CreateProcessA(0, DAT_1020ade0, 0, 0, FALSE, HIGH_PRIORITY_CLASS, 0, 0, &startup, &process);
+    if (process.hProcess != 0)
+    {
+        int tries = 0;
+        do
+        {
+            tries++;
+            window = FindWindowA("SOUNDARC", "SoundArc");
+            Sleep(20);
+            if (window != 0)
+            {
+                SendMessageA(window, WM_USER, 0x401, DAT_1020aee4);
+                return window;
+            }
+        } while (tries < 100);
+    }
+    return 0;
+}

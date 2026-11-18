@@ -41,7 +41,7 @@ struct ListBank
     int depth;                // 0x36324: current nesting level
     int pad_36328;
     int m_3632c;
-    int pad_36330;
+    ListBank *self;           // 0x36330: set to this object by LoadText
     char m_36334[0x10][0x20];
 
     int M_10004680(int group);
@@ -59,6 +59,7 @@ struct ListBank
     int SkipBlock(char **text, int *level, int block);         // 0x10035a30
     int CompileStatement(const char *statement);               // 0x100ed9b0
     int CompileText();
+    int LoadText(const char *source, int length);
 };
 
 // Clears group `group`: entries that are not in use lose their values. Returns 1.
@@ -272,4 +273,54 @@ int ListBank::SkipBlock(char **text, int *level, int block)
     ReportError("}\x82\xaa\x91\xab\x82\xe8\x82\xc8\x82\xa2\x81" "B");
     *text = p;
     return 0;
+}
+
+// 0x100fb6d0. Copies the script `source` (`length` bytes, plus the byte after them) into `text` and compiles it.
+// "//" comments outside double quotes are blanked out on the way: from the second slash to the end of the line
+// every character becomes '\r', and the first slash is dropped. Returns 1.
+int ListBank::LoadText(const char *source, int length)
+{
+    int inQuotes = 0;
+    int inComment = 0;
+    int out = 0;
+    self = this;
+    textLength = 0;
+    memset(text, 0, sizeof(text));
+    for (int in = 0; in <= length;)
+    {
+        char c = source[in];
+        in++;
+        text[out] = c;
+        if (inComment == 0)
+        {
+            if (c == '"' && inQuotes == 0)
+                inQuotes = 1;
+            else if (c == '"' && inQuotes == 1)
+                inQuotes = 0;
+            if (out > 0 && inQuotes == 0 && c == '/' && text[out - 1] == '/')
+            {
+                // Start of a comment: drop the first slash and blank out the rest of the line.
+                out--;
+                textLength--;
+                inComment = 1;
+            }
+        }
+        if (inComment == 1)
+        {
+            if (text[out] == '\r' || text[out] == '\n')
+            {
+                inComment = 0;
+            }
+            else
+            {
+                text[out] = '\r';
+                out--;
+                textLength--;
+            }
+        }
+        textLength++;
+        out++;
+    }
+    CompileText();
+    return 1;
 }

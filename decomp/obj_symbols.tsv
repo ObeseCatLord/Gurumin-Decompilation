@@ -250,3 +250,7 @@ _Vec3_Dot	101ac200
 ?DrawOutlinedIn@TextRenderer@@QAEHHHPBDHHMHH@Z	101509b0
 ?Root@Node@@QAEPAU1@XZ	101992f0
 ?SetUniqueName@Node@@QAEHPBD@Z	101a52d0
+?RemoveOwnedBy@EffectManager@@QAEHH@Z	101883b0
+?SpheresOverlap@Node@@QAEHPBUVec4@@000PAU2@1@Z	10193060
+?MakeNameUnique@Node@@QAEXXZ	101a2290
+?LoadText@ListBank@@QAEHPBDH@Z	100fb6d0

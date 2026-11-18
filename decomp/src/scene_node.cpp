@@ -6,6 +6,7 @@
 // colour values, 0x1000/0x2000/0x4000/0x400000 matrix states restored from `saved`, 0x8000 special pass marker.
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 struct Vec4
@@ -272,6 +273,7 @@ struct Node
     int M_1019bca0(Node **keep, int count);
     Node *Root();
     int SetUniqueName(const char *name);
+    void MakeNameUnique();
 };
 
 
@@ -1389,4 +1391,24 @@ int Node::SetUniqueName(const char *name)
     }
     strcpy(this->name, unique);
     return 1;
+}
+
+// 0x101a2290. Makes this node's name unique in its tree (called when a child is added, 0x101abc30): the node first
+// takes a random name "uni<rand><rand>" so that the search does not find the node itself, then gets its old name,
+// or "name(1)", "name(2)", ... when another node already has it.
+void Node::MakeNameUnique()
+{
+    char unique[256];
+    char base[256];
+    Node *root = Root();
+    strcpy(base, name);
+    strcpy(unique, name);
+    sprintf(name, "uni%d%d", rand(), rand());
+    int number = 1;
+    while (root->M_1019ece0(unique, 0) != 0)
+    {
+        sprintf(unique, "%s(%d)", base, number);
+        number++;
+    }
+    strcpy(name, unique);
 }

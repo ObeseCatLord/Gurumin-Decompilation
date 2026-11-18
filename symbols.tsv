@@ -652,3 +652,8 @@ address	name	evidence
 101509b0	TextRenderer::DrawOutlinedIn	matched decompiled source (decomp/obj_symbols.tsv)
 101992f0	Node::Root	matched decompiled source (decomp/obj_symbols.tsv)
 101a52d0	Node::SetUniqueName	matched decompiled source (decomp/obj_symbols.tsv)
+1001a680	Char_FireShot	starts a shot in a free helper slot owner+2..owner+7 (decomp/src/char_shots.cpp)
+101883b0	EffectManager::RemoveOwnedBy	matched decompiled source (decomp/obj_symbols.tsv)
+10193060	Node::SpheresOverlap	matched decompiled source (decomp/obj_symbols.tsv)
+101a2290	Node::MakeNameUnique	matched decompiled source (decomp/obj_symbols.tsv)
+100fb6d0	ListBank::LoadText	matched decompiled source (decomp/obj_symbols.tsv)

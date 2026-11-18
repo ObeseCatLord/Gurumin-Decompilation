@@ -21,6 +21,8 @@ struct EffectManager
     int m_004c;
     int m_0050;               // 0x50: number of running effects
     int Reset();
+    int RemoveOwnedBy(int owner);
+    void Free(int record);    // 0x10172260: releases effect record `record`
     // Starts effect `effect` at `position`; the seven values are its options (colour, follow target, flags, ...;
     // callers mostly pass -1 and 0). Stores the effect handle in *handle.
     int M_10172350(int effect, Vec4 position, int a, int b, int c, int d, int e, int f, int g, int *handle);
@@ -45,9 +47,14 @@ struct TriangleBatch
 // Effect slot tables.
 struct EffectRecordA
 {
-    int pad_0000[2];
+    int prev;                 // 0x00: previous record of its list, -1 = first
+    int next;                 // 0x04: next record of its list, -1 = last
     int id;                   // 0x08: -1 = free
-    char pad_000c[0x1d0];
+    char pad_000c[0x186];
+    short light;              // 0x192: entry of DAT_118e99f8 (0x4014-byte records) this effect uses, 0 = none
+    char pad_0194[0x2c];
+    int owner;                // 0x1c0: character slot that started the effect
+    char pad_01c4[0x18];
 };
 
 struct EffectRecordB
@@ -104,6 +111,35 @@ int EffectManager::Reset()
     {
         m_0030[i] = offsets[i];
         m_0010[i] = offsets[i];
+    }
+    return 0;
+}
+
+// 0x101883b0. Stops every running effect started by character slot `owner`: each one is marked free, unlinked from
+// its list (five lists with heads DAT_1101d820 and tails DAT_11018604), its light entry is cleared and the record
+// is released. Returns 0.
+int EffectManager::RemoveOwnedBy(int owner)
+{
+    for (int list = 0; list < 5; list++)
+    {
+        for (int i = DAT_1101d820[list]; i > -1; i = DAT_1115cfe8[i].next)
+        {
+            if (DAT_1115cfe8[i].id > -1 && DAT_1115cfe8[i].owner == owner)
+            {
+                DAT_1115cfe8[i].id = -1;
+                if (DAT_1115cfe8[i].prev == -1)
+                    DAT_1101d820[list] = DAT_1115cfe8[i].next;
+                else
+                    DAT_1115cfe8[DAT_1115cfe8[i].prev].next = DAT_1115cfe8[i].next;
+                if (DAT_1115cfe8[i].next != -1)
+                    DAT_1115cfe8[DAT_1115cfe8[i].next].prev = DAT_1115cfe8[i].prev;
+                else
+                    DAT_11018604[list] = DAT_1115cfe8[i].prev;
+                if (DAT_1115cfe8[i].light != 0)
+                    DAT_118e99f8[DAT_1115cfe8[i].light * 0x1005] = 0;
+                Free(i);
+            }
+        }
     }
     return 0;
 }

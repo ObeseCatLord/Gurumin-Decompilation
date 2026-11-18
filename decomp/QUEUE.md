@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (105)
+## 1. Walls to retry (107)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -40,7 +40,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100244b0` 502 — Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
 - [ ] `10024d00` 377 — Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
+- [ ] `1002ee70` 473 — Char_UpdateShoves: identical except the original schedules the fadd of 3.1415 after the stack pop of the atan2 call (angle local and separate add tried)
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
+- [ ] `10034cc0` 429 — Party_BlocksMove: logic identical; the original copies the first atan2 result through a temporary and reloads the second in place (fld/fstp round trips); result locals and helper forms tried
 - [ ] `100357a0` 537 — CharParams::operator= (implicit copy, include/char_params.h): byte-identical in a probe; emitted only by a file with a caller (FUN_1005def0, FUN_1003e710, Game_LoadData)
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
@@ -123,7 +125,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (84)
+## 3. Medium functions (251-800 bytes) (81)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
@@ -132,16 +134,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016a2e0` 413 bytes (float, loops 1, calls 1)
 - [ ] `100543a0` 425 bytes (float, loops 1, calls 13)
 - [ ] `1013e260` 428 bytes (loops 4, calls 16)
-- [ ] `10034cc0` 429 bytes (float, loops 1, calls 13)
 - [ ] `100558d0` 449 bytes (loops 4, calls 4)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
-- [ ] `1002ee70` 473 bytes (float, loops 1, calls 8)
 - [ ] `101612b0` 481 bytes (loops 1)
 - [ ] `1000dba0` 484 bytes (float, loops 1, calls 11)
 - [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
 - [ ] `10017d30` 488 bytes (loops 2, calls 22)
-- [ ] `1002f320` 494 bytes (float)
 - [ ] `10021c80` 496 bytes (float, calls 22)
 - [ ] `10055aa0` 496 bytes (loops 5, calls 2)
 - [ ] `1003c370` 497 bytes (loops 3, calls 9)

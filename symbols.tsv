@@ -758,3 +758,4 @@ address	name	evidence
 100244b0	Char_ProbeDirection	casts a ray from a character in a given direction (open, decomp/src/collide_query.cpp)
 10018100	Map_FindRegionAt	first @CDL region whose rectangle holds a point (matched, decomp/src/map_regions.cpp)
 10011dd0	Npc_StandOnGround	idle NPC put on the ground on its first frame (open, decomp/src/char_ground.cpp)
+100541f0	Enemy_Destroy	destroys a character: sounds, effect, leftover model, script flag (matched, decomp/src/enemy_destroy.cpp)

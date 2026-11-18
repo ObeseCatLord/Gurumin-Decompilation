@@ -46,7 +46,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
 - [ ] `1013e4f0` 431 — RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `10145380` 87 — FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)
-- [ ] `1014b390` 233 — Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores
+- [ ] `1014b390` 233 — Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
 - [ ] `1015cac0` 20 — same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
@@ -96,7 +96,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (169)
+## 3. Medium functions (251-800 bytes) (168)
 
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `10035d20` 328 bytes (loops 2, calls 1)
@@ -106,7 +106,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10036560` 343 bytes (loops 11, calls 1)
 - [ ] `10049990` 354 bytes (float, loops 2, calls 5)
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
-- [ ] `101439e0` 364 bytes (calls 7)
 - [ ] `10144040` 365 bytes (calls 14)
 - [ ] `101441b0` 365 bytes (calls 14)
 - [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)

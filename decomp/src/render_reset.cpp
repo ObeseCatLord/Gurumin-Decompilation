@@ -100,3 +100,59 @@ extern "C" int FUN_1014b2a0(void)
     DAT_10f08d38 = 0;
     return 1;
 }
+
+extern "C" int DAT_10202b24;   // back-buffer width set at device creation
+extern "C" int DAT_10202b28;   // back-buffer height
+extern "C" int DAT_10f65480;   // split screen: 0 = whole screen, 1 = left half, 2 = right half
+extern "C" int DAT_10f65478;   // non-zero while an off-screen target is set up (then the saved state is kept)
+
+// 0x101439e0 (Render_ResetTarget). Unbinds the textures of stages 0..3, makes the back buffer and depth buffer the
+// render targets again and sets the viewport to the whole back buffer or one half of it (split screen). Unless an
+// off-screen target is set up, this is also saved as the state Render_ResetState returns to.
+extern "C" void FUN_101439e0(void)
+{
+    DAT_10f6548c = 0;
+    DAT_10f1fcf0->SetTexture(0, 0);
+    DAT_10f6550c = 1;
+    DAT_10f1fcf0->SetTexture(1, 0);
+    DAT_10f65510 = 1;
+    DAT_10f1fcf0->SetTexture(2, 0);
+    DAT_10f1fcf0->SetTexture(3, 0);
+    DAT_10f1fcf0->SetRenderTarget(0, DAT_10f141dc);
+    DAT_10f1fcf0->SetDepthStencilSurface(DAT_10f1a864);
+    int width = DAT_10202b24;
+    int height = DAT_10202b28;
+    memset(&DAT_10f1fd30, 0, sizeof(DAT_10f1fd30));
+    DAT_10f1fd30.X = 0;
+    DAT_10f1fd30.Y = 0;
+    DAT_10f1fd30.Width = width;
+    DAT_10f1fd30.Height = height;
+    if (DAT_10f65480 == 0)
+    {
+        DAT_10f1fd30.X = 0;
+        DAT_10f1fd30.Width = width;
+    }
+    else if (DAT_10f65480 == 1)
+    {
+        DAT_10f1fd30.X = 0;
+        DAT_10f1fd30.Width = width / 2;
+    }
+    else if (DAT_10f65480 == 2)
+    {
+        DAT_10f1fd30.X = width / 2;
+        DAT_10f1fd30.Width = width / 2;
+    }
+    DAT_10f1fd30.MinZ = 0;
+    DAT_10f1fd30.MaxZ = 1.0f;
+    DAT_10202b34 = width;
+    DAT_10202b38 = height;
+    if (DAT_10f65478 == 0)
+    {
+        DAT_10f0d540 = DAT_10f1a864;
+        DAT_10f60d30 = DAT_10f141dc;
+        DAT_10f0ece0 = DAT_10f1fd30;
+        DAT_10f65470 = width;
+        DAT_10f65474 = height;
+    }
+    DAT_10f1fcf0->SetViewport(&DAT_10f1fd30);
+}

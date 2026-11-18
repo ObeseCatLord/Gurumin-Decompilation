@@ -23,7 +23,7 @@ address	status	reason
 10199be0	open	VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 101649c0	open	lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
 10161200	open	Bmp_FlipVertical: VS2003 turns the step-3 inner loop into a precomputed trip count (mul 0xaaaaaaab); cl 13.00 keeps the index compare
-1014b390	open	Render_ResetState: identical except cl 13.00 keeps 1 in esi for a stage argument and two stores
+1014b390	open	Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
 1013e4f0	open	RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 1000b9f0	open	EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
 10034920	skip	costume texture switch: compiler-merged case tails and an uninitialised default path; not attempted yet

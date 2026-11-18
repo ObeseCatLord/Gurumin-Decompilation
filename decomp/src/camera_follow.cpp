@@ -16,6 +16,8 @@ struct Vec4
     Vec4();                                      // 0x101ac990: zero
     float Length2D();                            // 0x101ac500: length of x/y
     void RotateZ(float angle);                   // 0x101ac300
+    void Fill(const float &value);               // 0x101acc40: sets all four components
+    Vec4 Divided(const float &divisor);          // 0x101acb60
 };
 
 struct NodeMatrix
@@ -84,9 +86,56 @@ extern "C" int FUN_10018fb0(void)
     return 0;
 }
 
+
 extern "C" Vec4 DAT_108393d8;     // the point the camera orbits (w: its heading)
 extern "C" Vec4 DAT_10da93f0;     // the orbit centre (the player's position)
 extern "C" Node *DAT_1021c624;    // a node the target goal drifts towards (0 = none)
+extern "C" Vec4 DAT_10802be8;     // the position goal of a camera shift
+extern "C" Vec4 DAT_10c67ff0;     // the target goal of a camera shift
+extern "C" int DAT_104c035c;      // frames left in the camera shift (0 = none)
+
+// 0x10019310 (Camera_Shift). Like Camera_Ease, with the goals offset: while a shift runs (DAT_104c035c counts down)
+// the offsets move 15 % towards the shift goals relative to the current camera, divided by 1 + the frames left / 2;
+// otherwise they shrink to 60 % each frame. The target and position then move halfway from their previous values
+// by the offsets, and the copies are refreshed. Returns 0.
+extern "C" int FUN_10019310(void)
+{
+    if (DAT_104c0358 == 0)
+    {
+        FUN_1016a8d0();
+        DAT_104c0358 = 1;
+        DAT_108393d8.Fill(0.0f);
+        DAT_10da93f0.Fill(0.0f);
+    }
+    DAT_10866d98.Copy(DAT_118e69e8);
+    DAT_10edbd48.Copy(DAT_118e6cb8);
+    if (DAT_104c035c == 0 || --DAT_104c035c == 0)
+    {
+        DAT_108393d8.Copy(DAT_108393d8.Scaled(0.6f));
+        DAT_10da93f0.Copy(DAT_10da93f0.Scaled(0.6f));
+    }
+    else
+    {
+        Vec4 positionStep;
+        Vec4 targetStep;
+        int half = (int)((float)DAT_104c035c * -0.5f);
+        positionStep.Copy((DAT_10802be8 - DAT_10866d98).Divided((float)(1 - half)));
+        targetStep.Copy((DAT_10c67ff0 - DAT_10edbd48).Divided((float)(1 - half)));
+        DAT_108393d8.Copy(DAT_108393d8.Scaled(0.85f) + positionStep.Scaled(0.15f));
+        DAT_10da93f0.Copy(DAT_10da93f0.Scaled(0.85f) + targetStep.Scaled(0.15f));
+    }
+    DAT_10866d98.Copy(DAT_108393d8);
+    DAT_10edbd48.Copy(DAT_10da93f0);
+    DAT_118e6cb8.Copy(DAT_118e6cb8 + DAT_10edbd48.Scaled(0.5f) + (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.5f));
+    DAT_118e69e8.Copy(DAT_118e69e8 + DAT_10866d98.Scaled(0.5f) + (DAT_104d29d8 - DAT_118e69e8).Scaled(0.5f));
+    DAT_118e6c78.Copy(DAT_118e6cb8);
+    DAT_11af3e28.Copy(DAT_118e69e8);
+    DAT_10f668e8.Copy(DAT_118e6cb8);
+    DAT_10f65688.Copy(DAT_118e69e8);
+    DAT_104d29d8.Copy(DAT_118e69e8);
+    DAT_10f08aa0.Copy(DAT_118e6cb8);
+    return 0;
+}
 
 // 0x1001a0d0 (Camera_Orbit). Like Camera_Ease with an orbit: the position goal keeps the camera's heading around
 // the orbit centre at the distance of DAT_108393d8 from it, turned by that point's heading; the target goal is the

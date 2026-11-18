@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (115)
+## 1. Walls to retry (116)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -34,6 +34,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
 - [ ] `100157b0` 167 — near-cell list: original keeps the index/row pointer in edi and the box pointer in ebx (pushed late); ours swaps them (local row pointer, direct indexing, do/while tried)
 - [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
+- [ ] `10019310` 849 — Camera_Shift: same statements; block layout differs (the original keeps the shrink branch on the fallthrough of the counter tests and cross-jumps into the shift branch's final Copy) and the shift-goal subtraction loads its operands in another order; branch order swapped tried
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `100211a0` 466 — Region_WaveVertex: logic identical; ebx/ebp swapped for the flip counter and the point address, and the original rounds each sine result to float twice (helper and caller locals tried)
@@ -204,7 +205,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (220)
+## 4. Large functions (801-3000 bytes) (219)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes (loops 8, calls 10)
@@ -216,7 +217,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100b5c30` 843 bytes (float, calls 25)
 - [ ] `1019eeb0` 844 bytes (loops 5, calls 19)
 - [ ] `10142790` 846 bytes (loops 1, calls 24)
-- [ ] `10019310` 849 bytes (float, calls 45)
 - [ ] `10160a90` 850 bytes Mmv_Open (loops 1, calls 20)
 - [ ] `1014f590` 865 bytes (float, loops 5, calls 11)
 - [ ] `100b9bb0` 867 bytes (calls 1)
@@ -554,7 +554,7 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
-- [ ] `src/camera_follow.cpp`: 0 of 2 functions without a comment, no header
+- [ ] `src/camera_follow.cpp`: 0 of 3 functions without a comment, no header
 
 ## 8. Structures and globals
 

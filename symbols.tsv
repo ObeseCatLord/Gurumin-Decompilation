@@ -62,7 +62,7 @@ address	name	evidence
 101610f0	Texture_ClearNames	clears the 1600-entry name tables
 10160890	MmvPlayer_ctor	MMV player object constructor
 1015d090	ImeContext_ctor	IME (Japanese input) wrapper; methods 0x1015d0a0..0x1015d4e0
-10011240	Save_ReadThumbnail	unreferenced: reads the first 0x30000 body bytes (thumbnail) of a save
+10011240	Save_ReadThumbnail	unreferenced: reads the 0x30000-byte thumbnail of a save (open, decomp/src/save_slot.cpp)
 10010d10	Save_ReadSlotInfo	name / play time / flags of a save slot for the menus
 1005cdc0	Save_LoadSlot	sprintf(savedir + name) -> Save_Load
 1003b2c0	Save_Load	reads gdataNN.sav and copies the body into game globals (docs/SAVE_FORMAT.md)

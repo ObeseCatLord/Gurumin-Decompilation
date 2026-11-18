@@ -174,3 +174,36 @@ void SurfaceSet::Release()
         surfaces[0]->Release();
     surfaces[0] = 0;
 }
+
+extern "C" char DAT_10f60690[0x5a0];
+
+// 0x10147880. Creates a mesh buffer pair in the first free slot: a vertex buffer and a 16-bit index buffer in system
+// memory, each rounded up to the next multiple of 256 bytes. Their sizes are recorded and the buffers returned in
+// `vertexBuffer` and `indexBuffer`. Returns the slot, or -1 when no slot is free or a buffer cannot be created.
+extern "C" int FUN_10147880(IUnknownLike **vertexBuffer, int vertexBytes, IUnknownLike **indexBuffer, int indexBytes)
+{
+    int indexSize = (indexBytes / 256 + 1) * 256;
+    vertexBytes = (vertexBytes / 256 + 1) * 256;  // rounded up in place
+    int slot;
+    for (slot = 0; slot < 0x5a0; slot++)
+    {
+        if (DAT_10f1a870[slot] == 0)
+            break;
+    }
+    if (slot == 0x5a0)
+        return -1;
+    if (DAT_10f1fcf0->CreateVertexBuffer(vertexBytes, 0, 0, 2 /* D3DPOOL_SYSTEMMEM */, &DAT_10f1a870[slot], 0) != 0)
+        return -1;
+    if (DAT_10f1fcf0->CreateIndexBuffer(indexSize, 0, 0x65 /* D3DFMT_INDEX16 */, 2, &DAT_10f60d38[slot], 0) != 0)
+    {
+        DAT_10f1a870[slot]->Release();
+        DAT_10f1a870[slot] = 0;
+        return -1;
+    }
+    DAT_10f628e8[slot] = vertexBytes;
+    DAT_10f1e670[slot] = indexSize;
+    DAT_10f60690[slot] = 0;
+    *vertexBuffer = DAT_10f1a870[slot];
+    *indexBuffer = DAT_10f60d38[slot];
+    return slot;
+}

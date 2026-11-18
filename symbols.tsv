@@ -720,3 +720,4 @@ address	name	evidence
 101842a0	EffectManager::Init	full effect system initialisation at load (decomp/src/char_effects.cpp)
 10194360	Camera_SetMatrices	matched decompiled source (decomp/obj_symbols.tsv)
 10191280	Node::ReleaseUniqueMeshData	matched decompiled source (decomp/obj_symbols.tsv)
+10147880	MeshBuffers_Create	creates a vertex/index buffer pair in a free slot (decomp/src/buffer_pool.cpp)

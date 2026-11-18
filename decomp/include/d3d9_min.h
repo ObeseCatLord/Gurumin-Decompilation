@@ -10,6 +10,8 @@ struct D3DVIEWPORT9_
     float MaxZ;
 };
 
+struct IUnknownLike;
+
 // IDirect3DDevice9 in vtable order (the VS2003 SDK has no d3d9.h). Parameters are filled in as methods get used.
 struct IDirect3DDevice9
 {
@@ -39,8 +41,10 @@ struct IDirect3DDevice9
     virtual long __stdcall CreateTexture() = 0;
     virtual long __stdcall CreateVolumeTexture() = 0;
     virtual long __stdcall CreateCubeTexture() = 0;
-    virtual long __stdcall CreateVertexBuffer() = 0;
-    virtual long __stdcall CreateIndexBuffer() = 0;
+    virtual long __stdcall CreateVertexBuffer(unsigned int length, unsigned long usage, unsigned long fvf, int pool,
+                                              IUnknownLike **buffer, void *sharedHandle) = 0;
+    virtual long __stdcall CreateIndexBuffer(unsigned int length, unsigned long usage, int format, int pool,
+                                             IUnknownLike **buffer, void *sharedHandle) = 0;
     virtual long __stdcall CreateRenderTarget() = 0;
     virtual long __stdcall CreateDepthStencilSurface() = 0;
     virtual long __stdcall UpdateSurface() = 0;

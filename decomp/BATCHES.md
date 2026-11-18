@@ -166,3 +166,12 @@ copies, inline float helpers). (L) = over 1500 bytes.
 | 118 | walls to retry with the 2026-11-18 patterns | 10169e10, 1016a020, 1016a090, 1016a100, 1016b010, 1016b1e0, 1016c300, 10175c90, 101883b0, 10188580 |
 | 119 | walls to retry with the 2026-11-18 patterns | 10191fd0, 10194a10, 10194c60, 101992f0, 10199380, 10199880, 10199be0, 1019b280, 1019c560, 101abe30 |
 | 120 | walls to retry with the 2026-11-18 patterns | 101acc60, 101ad240, 101ad2c0, 101ad5c0, 101ad920, 101ae950, 101aed50, 101aeee0 |
+
+### Progress (2026-11-18, second half)
+
+Matched: Node::SortPacks, Node::ResetVertexColours, InputState::SetButtons, Camera_TurnPush, ScreenBatch::Add,
+EffectManager::DrawSpriteA/B, Route_Follow, Char_CanSee, Sound_UpdateListener, ListBank::InitLibrary,
+Script_RegisterGameBuiltins, Item_DrawCaption. Written and recorded in open.tsv: Node::UpdateWorld, Box_Overlap,
+Game::RaiseFireEvents/RaiseLeverEvents/RaiseDoorEvents, Texture_CreateFromPixels, Char_UpdateShoves,
+Party_BlocksMove, Npc_ApproachPlayer, Playback::Play, MotionList::FrameAt, Char_WalkRoute, Joystick_IsButtonDown,
+Save_ReadThumbnail.

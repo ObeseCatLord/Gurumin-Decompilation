@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (113)
+## 1. Walls to retry (114)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -59,6 +59,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10054d50` 476 — Game::RaiseFireEvents: same loop-pointer residue as 0x10054a60 (flags pointer local tried: bias moves to argument)
 - [ ] `10054f30` 476 — Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
 - [ ] `10055110` 476 — Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60
+- [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2110` 143 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
@@ -131,7 +132,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (71)
+## 3. Medium functions (251-800 bytes) (70)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
@@ -164,7 +165,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100ba040` 604 bytes (float, loops 1, calls 15)
 - [ ] `1019b630` 604 bytes (loops 1, calls 6)
 - [ ] `1003aef0` 611 bytes Bgm_Play (calls 20)
-- [ ] `10056260` 616 bytes (loops 6, calls 10)
 - [ ] `100b8220` 627 bytes (float, calls 19)
 - [ ] `1002ebf0` 628 bytes (float, loops 1, calls 3)
 - [ ] `100b9930` 637 bytes (float, calls 22)

@@ -554,6 +554,83 @@ int ListBank::ReadTerm(char **text, char *word)
     return 1;
 }
 
+// 0x10036560. Copies the `n`-th (from 0) bracketed part of `name` into `part`: for "a[1][x+2]", part 1 is "x+2"
+// (inner brackets and quoted text are kept, at most 255 characters, followed by two zero bytes). Returns 1 once the
+// part is complete, 0 when `name` ends first (at its end, a space, comma or ';' outside the brackets), at an unmatched
+// ')' or after an error.
+int ListBank::GetIndexPart(const char *name, char *part, int n)
+{
+    part[0] = 0;
+    int length = 0;
+    int inQuotes = 0;
+    int brackets = 0;
+    int seenBracket = 0;
+    int index = 0;
+    int parens = 0;
+    if (*name == 0)
+        return 0;
+    while (*name == ' ' || *name == ',' || *name == '\t' || *name == '\r' || *name == '\n' || *name == ';')
+        name++;
+    do
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (*name == 0)
+            return 0;
+        if (*name == '"')
+        {
+            if (inQuotes == 0)
+                inQuotes = 1;
+            else if (inQuotes == 1)
+                inQuotes = 0;
+        }
+        if (inQuotes == 0)
+        {
+            if (*name == '(')
+                parens++;
+            else if (*name == ')')
+                parens--;
+            if (parens < 0)
+                return 0;
+            if (*name == '[')
+            {
+                brackets++;
+                seenBracket = 1;
+                if (brackets == 1)
+                    name++;
+            }
+            else if (*name == ']')
+                brackets--;
+            if (brackets == 0 && seenBracket == 1)
+            {
+                if (n <= index)
+                    return 1;
+                length = 0;
+                part[0] = 0;
+                part[1] = 0;
+                index++;
+            }
+            if (parens == 0 && brackets == 0)
+            {
+                if (*name == 0 || *name == ' ' || *name == ',' || *name == ';')
+                    return 0;
+                name++;
+                continue;
+            }
+        }
+        if (brackets >= 1)
+        {
+            part[length] = *name;
+            length++;
+            part[length] = 0;
+            part[length + 1] = 0;
+        }
+        name++;
+    } while (length < 0x100);
+    ReportError("\x8c^\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81" "B");
+    return 0;
+}
+
 // 0x100fb6d0. Copies the script `source` (`length` bytes, plus the byte after them) into `text` and compiles it.
 // "//" comments outside double quotes are blanked out on the way: from the second slash to the end of the line
 // every character becomes '\r', and the first slash is dropped. Returns 1.

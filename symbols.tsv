@@ -739,3 +739,5 @@ address	name	evidence
 10035d20	ListBank::ReadArgument	reads the next call argument, parentheses nest (matched, decomp/src/listbank.cpp)
 10035e80	ListBank::ReadWord	reads the next word of a statement (matched, decomp/src/listbank.cpp)
 10035fa0	ListBank::ReadTerm	reads the next word, '&' split off as its own word (matched, decomp/src/listbank.cpp)
+10036560	ListBank::GetIndexPart	copies the n-th [ ] part of a variable name (matched, decomp/src/listbank.cpp)
+100357a0	CharParams::operator=	copy of a 0x188-byte character parameter record (open, decomp/include/char_params.h)

@@ -302,3 +302,5 @@ _Vec3_Dot	101ac200
 ?ReadTerm@ListBank@@QAEHPAPADPAD@Z	10035fa0
 ?ReadArgument@ListBank@@QAEHPAPADPAD@Z	10035d20
 ?ReadStatement@ListBank@@QAEHPAPADPAD@Z	10035b10
+?GetIndexPart@ListBank@@QAEHPBDPADH@Z	10036560
+??4CharParams@@QAEAAU0@ABU0@@Z	100357a0

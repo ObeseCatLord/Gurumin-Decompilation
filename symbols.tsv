@@ -759,3 +759,4 @@ address	name	evidence
 10018100	Map_FindRegionAt	first @CDL region whose rectangle holds a point (matched, decomp/src/map_regions.cpp)
 10011dd0	Npc_StandOnGround	idle NPC put on the ground on its first frame (open, decomp/src/char_ground.cpp)
 100541f0	Enemy_Destroy	destroys a character: sounds, effect, leftover model, script flag (matched, decomp/src/enemy_destroy.cpp)
+1013e790	Names_Expand	replaces registered names by their paths in a text (open, decomp/src_od/names_od.cpp)

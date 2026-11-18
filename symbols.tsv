@@ -480,7 +480,7 @@ address	name	evidence
 101a8760	Node::RunSpecialPass	role from the decompiled source (decomp/src/scene_node.cpp)
 101ab980	Node::FreeExtraIndexLists	role from the decompiled source (decomp/src/scene_node.cpp)
 1000c5c0	PositionRing_Add	role from the decompiled source (decomp/src/slot_alloc.cpp)
-1016fb10	ObjectTables_Reset	role from the decompiled source (decomp/src/slot_alloc.cpp)
+1016fb10	EffectManager::ClearTables	marks effect definitions and short-lived records free (decomp/src/char_effects.cpp)
 10001660	SoundArc_Command230	role from the decompiled source (decomp/src/soundarc.cpp)
 10001c50	SoundArc_Command224	role from the decompiled source (decomp/src/soundarc.cpp)
 10001c80	SoundArc_Command225	role from the decompiled source (decomp/src/soundarc.cpp)
@@ -717,3 +717,4 @@ address	name	evidence
 10145210	TextureObject::CaptureRgbFirst	matched decompiled source (decomp/obj_symbols.tsv)
 101439e0	Render_ResetTarget	back buffer as target, full or split-screen viewport, saves it (decomp/src/render_reset.cpp)
 10143870	TextureObject::BeginRenderTo	matched decompiled source (decomp/obj_symbols.tsv)
+101842a0	EffectManager::Init	full effect system initialisation at load (decomp/src/char_effects.cpp)

@@ -50,16 +50,5 @@ extern "C" Record3d8 DAT_1101e0d8[1150];
 extern "C" RecordC4 DAT_11134cc8[840];
 extern "C" RecordC4 DAT_118a8888[840];
 
-// Marks all entries of three object tables as free (id = -1): 1150 records of 0x3d8 bytes and two tables of
-// 840 records of 0xc4 bytes.
-extern "C" int FUN_1016fb10(void)
-{
-    int i;
-    for (i = 0; i < 1150; i++)
-        DAT_1101e0d8[i].id = -1;
-    for (i = 0; i < 840; i++)
-        DAT_11134cc8[i].id = -1;
-    for (i = 0; i < 840; i++)
-        DAT_118a8888[i].id = -1;
-    return 0;
-}
+// 0x1016fb10 (marking the three tables free) is EffectManager::ClearTables in char_effects.cpp: the effect
+// manager's Init relies on knowing its registers.

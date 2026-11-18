@@ -11,9 +11,19 @@ struct Vec4
     float w;
 };
 
+// Four floats with the Vec4 setter (0x101ac9c0).
+struct Colour4
+{
+    float r;
+    float g;
+    float b;
+    float a;
+    void Set(float r, float g, float b, float a);
+};
+
 struct EffectManager
 {
-    char pad_0000[0x10];
+    Colour4 colour;           // 0x00: overall effect colour (white after Init)
     int m_0010[6];            // 0x10: start offset of each of the six effect groups
     int pad_0028[2];
     int m_0030[6];            // 0x30: current offset of each group (reset to the start)
@@ -21,6 +31,9 @@ struct EffectManager
     int m_004c;
     int m_0050;               // 0x50: number of running effects
     int Reset();
+    int Init();
+    void M_1016fab0();
+    int ClearTables();
     int RemoveOwnedBy(int owner);
     int RemoveChildren(int parent);
     int RemoveOfType(int type);
@@ -79,7 +92,9 @@ struct EffectType
     int id;
     char pad_0004[0x7c];
     int lightFrames;          // 0x80: how long the effect's light lasts (it fades out over lightFrames + 10)
-    char pad_0084[0x354];
+    char pad_0084[0x78];
+    int m_00fc;               // 0xfc: -1 after Init
+    char pad_0100[0x2d8];
 };
 
 extern "C" EffectType DAT_1101dfdc[0x47e];
@@ -283,5 +298,79 @@ int EffectManager::Update(int restricted, int includeHidden, int ignorePause)
             }
         }
     }
+    return 0;
+}
+
+// 0x1016fb10. Marks the effect definitions (field 0xfc) and both short-lived record tables free (-1). Defined
+// before Init: Init relies on this function leaving edx alone. Returns 0.
+int EffectManager::ClearTables()
+{
+    int i;
+    for (i = 0; i < 0x47e; i++)
+        DAT_1101dfdc[i].m_00fc = -1;
+    for (i = 0; i < 840; i++)
+        DAT_11134cc8[i].id = -1;
+    for (i = 0; i < 840; i++)
+        DAT_118a8888[i].id = -1;
+    return 0;
+}
+
+extern "C" char DAT_1101de68[0x114450];   // effect definitions with the data before them (cleared by Init)
+extern "C" int DAT_110186a8[32];
+extern "C" char DAT_1101de64;
+extern "C" int FUN_1016f900(void);        // adds the default effect definition (effect_defs.cpp)
+
+// 0x101842a0. Full initialisation at load time: Reset plus the effect definitions. The colour becomes white, every
+// table is cleared and marked free, the lists emptied, the six group offsets set and the default definition added.
+// The sixth offset is uninitialised in the original, as in Reset. Returns 0.
+int EffectManager::Init()
+{
+    int offsets[6];
+    colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
+    DAT_1101c804.SetBuffer(DAT_10fc6a90, 0x400);
+    M_1016fab0();
+    m_0050 = 0;
+    memset(DAT_118e99f8, 0, sizeof(DAT_118e99f8));
+    memset(DAT_1115cfe8, 0, 840 * sizeof(EffectRecordA));
+    memset(DAT_1101de68, 0, sizeof(DAT_1101de68));
+    memset(DAT_11134cc8, 0, 840 * sizeof(EffectRecordB));
+    memset(DAT_118a8888, 0, 840 * sizeof(EffectRecordB));
+    int i;
+    for (i = 0; i < 32; i++)
+        DAT_110186a8[i] = -1;
+    DAT_1101de64 = 0;
+    for (i = 0; i < 840; i++)
+        DAT_1115cfe8[i].id = -1;
+    for (i = 0; i < 840; i++)
+        DAT_11134cc8[i].id = -1;
+    for (i = 0; i < 840; i++)
+        DAT_118a8888[i].id = -1;
+    for (i = 0; i < 0x47e; i++)
+    {
+        DAT_1101dfdc[i].id = -1;
+        DAT_1101dfdc[i].m_00fc = -1;
+    }
+    DAT_1101d820[0] = -1;
+    DAT_1101d820[1] = -1;
+    DAT_1101d820[2] = -1;
+    DAT_1101d820[3] = -1;
+    DAT_1101d820[4] = -1;
+    DAT_11018604[0] = -1;
+    DAT_11018604[1] = -1;
+    DAT_11018604[2] = -1;
+    DAT_11018604[3] = -1;
+    DAT_11018604[4] = -1;
+    ClearTables();
+    offsets[0] = 0;
+    offsets[1] = 0x1cc;
+    offsets[2] = 0x244;
+    offsets[3] = 0x2a8;
+    offsets[4] = 0x2f8;
+    for (i = 0; i < 6; i++)
+    {
+        m_0030[i] = offsets[i];
+        m_0010[i] = offsets[i];
+    }
+    FUN_1016f900();
     return 0;
 }

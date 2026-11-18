@@ -289,3 +289,5 @@ _Vec3_Dot	101ac200
 ?Rename@Node@@QAEHPBD0@Z	1019ed40
 ?CaptureRgbFirst@TextureObject@@QAEHPAE@Z	10145210
 ?BeginRenderTo@TextureObject@@QAEHHHH@Z	10143870
+?Init@EffectManager@@QAEHXZ	101842a0
+?ClearTables@EffectManager@@QAEHXZ	1016fb10

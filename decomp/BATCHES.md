@@ -99,3 +99,11 @@ raisers wait for the loop-pointer fix (BACKLOG item 23).
 | 68 | effects, scene nodes, maths | 1019e610, 1019e9a0 Node::Release, 1019eeb0 (L), 101a0cf0 (L), 101a24e0 (L), 101a29e0 (L), 101a4a60 It3_ScanChunks (L) |
 | 69 | effects, scene nodes, maths | 101a53b0 (L), 101a82d0 (L), 101a8780 (L), 101a8e60 Node::Collide (L), 101a9670 (L), 101aa080 (L), 101aaa20 (L) |
 | 70 | effects, scene nodes, maths | 101ab3e0 (L), 101ab9d0, 101abe30 Model_LoadIt3, 101ac010 Node::Load, 101af4c0 KeyBank::Sample (L), 101af960 (L), 101afe00 (L) |
+
+### Progress on batches 21-70 (2026-11-18)
+
+Matched: Loading_Tick (21), Char_SetHandTool, Char_SetHandToolPlain, Char_WearHelmet (23-25), Node::Draw,
+DrawList_DrawPass (66), Node::Load (70), Node::SetupSkins (70), NodeExtra::AnimatedMatrix (60), Render_ResetSwapTarget
+(54), Camera_Ease (26), Npc_TalkWhenNear (48). Written and recorded in open.tsv: Bgm_CheckHeader, TestDat_Load,
+Model_ApplyCommands, Helmet_FaceSettings, Pickup_Collect, Node::LoadIt3, Node::FindBone, Circle_Intersect,
+Enemy_CanReturnHome. Naming: 18 Game window/HUD methods and six TextureObject draw methods.

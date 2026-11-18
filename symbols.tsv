@@ -704,3 +704,6 @@ address	name	evidence
 10188580	EffectManager::Update	matched decompiled source (decomp/obj_symbols.tsv)
 100caf90	ListBank::Evaluate	matched decompiled source (decomp/obj_symbols.tsv)
 100b5ae0	Npc_Idle	keeps an NPC idle and now and then voices its talk prompt (decomp/src/char_move.cpp)
+1014ba20	TextureObject::DrawStrip	matched decompiled source (decomp/obj_symbols.tsv)
+1015cf30	DemoRecording::PlayFrame	matched decompiled source (decomp/obj_symbols.tsv)
+1015d180	ImeContext::GetModeText	matched decompiled source (decomp/obj_symbols.tsv)

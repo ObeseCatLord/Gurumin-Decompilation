@@ -39,6 +39,7 @@ struct ImeContext
     int GetResultString(char *out);
     int GetCompositionString(char *out);
     DWORD LoadCandidates();
+    int GetModeText(char *out);
 };
 
 // Stores `value` in slot `index` of the first state array.
@@ -351,5 +352,35 @@ extern "C" int FUN_1015fda0(char *buffer)
     DAT_10f65698.onCompositionResult = FUN_1015f400;
     DAT_10f65698.onCursorPos = FUN_1015f490;
     DAT_10f65698.onAttributes = FUN_1015f4b0;
+    return 1;
+}
+
+// 0x1015d180. Writes the IME input mode as a short Japanese label into `out`, built from the conversion and
+// sentence modes: "R" (romaji input), full or half width, kana or katakana, then the sentence-mode marks
+// (renbunsetsu, fukugo, tanbunsetsu, jidou). Returns 1.
+int ImeContext::GetModeText(char *out)
+{
+    DWORD conversion;
+    DWORD sentence;
+    out[0] = 0;
+    GetConversion(&conversion, &sentence);
+    if (conversion & IME_CMODE_ROMAN)
+        strcat(out, "\x82\x71");                  // "R" (full width)
+    if (conversion & IME_CMODE_FULLSHAPE)
+        strcat(out, "\x91\x53");                  // "zen" (full width)
+    else
+        strcat(out, "\x94\xbc");                  // "han" (half width)
+    if (conversion & IME_CMODE_KATAKANA)
+        strcat(out, "\x83\x4a\x83\x69");          // "kana" in katakana
+    else
+        strcat(out, "\x82\xa9\x82\xc8");          // "kana" in hiragana
+    if (sentence & IME_SMODE_PHRASEPREDICT)
+        strcat(out, "\x98\x41");                  // "ren"
+    if (sentence & IME_SMODE_PLAURALCLAUSE)
+        strcat(out, "\x95\xa1");                  // "fuku"
+    if (sentence & IME_SMODE_SINGLECONVERT)
+        strcat(out, "\x92\x50");                  // "tan"
+    if (sentence & IME_SMODE_AUTOMATIC)
+        strcat(out, "\x8e\xa9");                  // "ji"
     return 1;
 }

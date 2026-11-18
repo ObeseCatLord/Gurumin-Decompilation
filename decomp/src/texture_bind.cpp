@@ -70,6 +70,7 @@ struct TextureObject
     int CaptureRgb24(unsigned char *out);
     int CaptureRgbRows(unsigned char *out);
     int DrawTriangles(const void *vertices, int triangles);
+    int DrawStrip(struct ScreenVertex *vertices, int count);
     int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);
     int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
                       const unsigned short *palette);
@@ -324,5 +325,50 @@ int TextureObject::DrawTriangles(const void *vertices, int triangles)
     DAT_10f1fcf0->SetTexture(3, 0);
     DAT_10f0d5c8++;
     DAT_10f1fcf0->DrawPrimitiveUP(4 /* D3DPT_TRIANGLELIST */, triangles, vertices, 0x20);
+    return 1;
+}
+
+extern "C" int DAT_10202b34;  // back-buffer width
+extern "C" int DAT_10202b38;  // back-buffer height
+
+// Pre-transformed vertex (FVF 0x1c4), 0x20 bytes.
+struct ScreenVertex
+{
+    float x;
+    float y;
+    char pad_0008[0x18];
+};
+
+// 0x1014ba20. Draws a triangle strip of `count` vertices given in 640x480 screen coordinates: the positions are
+// scaled to the back-buffer size in place, then drawn like DrawTriangles. Returns 0 when there are fewer than 3
+// vertices, else 1.
+int TextureObject::DrawStrip(ScreenVertex *vertices, int count)
+{
+    if (count < 3)
+        return 0;
+    BindStage0();
+    FUN_10143b80();
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    FUN_1013ef90(0, 4, 4);                  // alpha: modulate
+    FUN_1013ef90(0, 5, 2);                  //   texture
+    FUN_1013ef90(0, 6, 0);                  //   diffuse
+    FUN_1013ef90(0, 1, 4);                  // colour: modulate
+    FUN_1013ef90(0, 2, 2);                  //   texture
+    FUN_1013ef90(0, 3, 0);                  //   diffuse
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    FUN_10143b80();
+    DAT_10f1fcf0->SetTexture(2, 0);
+    DAT_10f1fcf0->SetTexture(3, 0);
+    for (int i = 0; i < count; i++)
+    {
+        vertices[i].x = scaleX * vertices[i].x;
+        vertices[i].y = scaleY * vertices[i].y;
+    }
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, count - 2, vertices, 0x20);
     return 1;
 }

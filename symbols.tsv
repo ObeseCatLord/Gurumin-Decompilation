@@ -732,3 +732,6 @@ address	name	evidence
 1001a840	Char_ClampStatus	clamps status counters, marks a character down at zero life, sets state 4/6 in mode 7 (matched, decomp/src/char_status.cpp)
 10043cc0	Char_ResetState	clears a character's AI state, start vectors and pose entry, marks it in play and re-applies its packed setup (open, decomp/src/char_reset.cpp)
 10049990	Map_RouteLength	length of a map table route plus per-point costs (matched, decomp/src/map_route.cpp)
+1000dd90	Debris_Spawn	starts a simple debris piece in slots 0-127 (matched, decomp/src/debris.cpp)
+1000df10	Debris_SpawnFromCharacter	starts a thrown debris piece with a character's colour and scale (matched, decomp/src/debris.cpp)
+1000e130	Debris_SpawnFrom	starts a thrown debris piece with a given colour (matched, decomp/src/debris.cpp)

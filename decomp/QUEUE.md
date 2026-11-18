@@ -102,7 +102,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (150)
+## 3. Medium functions (251-800 bytes) (147)
 
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `10035d20` 328 bytes (loops 2, calls 1)
@@ -110,7 +110,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10036560` 343 bytes (loops 11, calls 1)
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)
-- [ ] `1000dd90` 373 bytes (float, loops 1, calls 6)
 - [ ] `10024d00` 377 bytes (float, calls 13)
 - [ ] `1001c090` 384 bytes (float, calls 12)
 - [ ] `101ac010` 387 bytes Node::Load (loops 4, calls 12)
@@ -166,7 +165,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10054770` 506 bytes (loops 1, calls 3)
 - [ ] `1009ddd0` 507 bytes (calls 11)
 - [ ] `10175a90` 507 bytes (loops 4, calls 6)
-- [ ] `1000e130` 519 bytes (float, loops 1, calls 12)
 - [ ] `10142b20` 519 bytes (loops 5)
 - [ ] `10035b10` 520 bytes (loops 3, calls 1)
 - [ ] `10012780` 522 bytes (loops 7, calls 16)
@@ -178,7 +176,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019e9a0` 539 bytes Node::Release (loops 4, calls 21)
 - [ ] `1000c390` 540 bytes (float, loops 1, calls 5)
 - [ ] `1000b2c0` 544 bytes (loops 4)
-- [ ] `1000df10` 544 bytes (float, loops 1, calls 13)
 - [ ] `10001cb0` 547 bytes Bgm_CheckHeader (loops 1, calls 1)
 - [ ] `10191fd0` 549 bytes (float, loops 2, calls 16)
 - [ ] `101693f0` 557 bytes (calls 16)

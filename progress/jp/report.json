@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 5.3174,
+  "fuzzy_match_percent": 5.4009,
   "total_code": "1720206",
-  "matched_code": "80814",
-  "matched_code_percent": 4.6979,
+  "matched_code": "82250",
+  "matched_code_percent": 4.7814,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 626,
-  "matched_functions_percent": 51.6502,
+  "matched_functions": 629,
+  "matched_functions_percent": 51.8977,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 151,
-  "complete_units": 103
+  "total_units": 152,
+  "complete_units": 104
  },
  "units": [
   {
@@ -3382,6 +3382,64 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/containers.cpp"
+   }
+  },
+  {
+   "name": "app/debris",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "1436",
+    "matched_code": "1436",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 3,
+    "matched_functions": 3,
+    "matched_functions_percent": 100.0,
+    "complete_code": "1436",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1436",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1000dd90",
+     "size": "373",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268492176"
+     }
+    },
+    {
+     "name": "_FUN_1000df10",
+     "size": "544",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268492560"
+     }
+    },
+    {
+     "name": "_FUN_1000e130",
+     "size": "519",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268493104"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/debris.cpp"
    }
   },
   {
@@ -10778,13 +10836,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1621607",
+    "total_code": "1620171",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 505,
+    "total_functions": 502,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -10797,7 +10855,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1621607",
+     "size": "1620171",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -11040,30 +11098,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268491680"
-     }
-    },
-    {
-     "name": "FUN_1000dd90",
-     "size": "373",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268492176"
-     }
-    },
-    {
-     "name": "FUN_1000df10",
-     "size": "544",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268492560"
-     }
-    },
-    {
-     "name": "FUN_1000e130",
-     "size": "519",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268493104"
      }
     },
     {

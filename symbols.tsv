@@ -787,3 +787,4 @@ address	name	evidence
 10194a10	Circle_Intersect	intersection points of two circles given as double triples (open, decomp/src/circle_intersect.cpp)
 1014b480	Render_ResetSwapTarget	swap target and clamped viewport as the render state (matched, decomp/src/render_reset.cpp)
 10018fb0	Camera_Ease	eases the camera target and position towards their goals each frame (matched, decomp/src/camera_follow.cpp)
+100b58a0	Npc_TalkWhenNear	idle NPC that turns to the player and talks once the player comes near (matched, decomp/src/char_move.cpp)

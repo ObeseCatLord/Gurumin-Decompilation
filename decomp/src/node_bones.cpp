@@ -13,7 +13,7 @@ Matrix4 IdentityMatrix();  // 0x101b0ba0
 // Extra data of a node (scene_node.cpp Extra).
 struct NodeExtra
 {
-    Matrix4 M_101693f0(int a);   // 0x101693f0: the node's current animated matrix
+    Matrix4 AnimatedMatrix(int frame);   // 0x101693f0 (node_extra.cpp)
 };
 
 struct Node;
@@ -81,7 +81,7 @@ int Node::SetupSkins(Node *root)
     if (skinned != 0)
     {
         if ((flags & 0x100000) && extra != 0)
-            skin->bindPose = extra->M_101693f0(0);
+            skin->bindPose = extra->AnimatedMatrix(0);
         else if (m_0294 != 0)
             skin->bindPose = *matrixOverride;
         else

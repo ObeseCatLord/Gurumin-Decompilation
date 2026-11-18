@@ -770,3 +770,5 @@ address	name	evidence
 10012780	Char_SetHandToolPlain	Char_SetHandTool without drill 5 and the drill motions (matched, decomp/src/char_attach.cpp)
 100154c0	Char_WearHelmet	puts a helmet item on the player and sets the face variant (matched, decomp/src/char_attach.cpp)
 10014d30	Helmet_FaceSettings	face mesh mask of a helmet item at its upgrade level (open, decomp/src/helmet_face.cpp)
+10008910	Game::DrawBalloon	matched decompiled source (decomp/obj_symbols.tsv)
+100091d0	Game::DrawDebugText	matched decompiled source (decomp/obj_symbols.tsv)

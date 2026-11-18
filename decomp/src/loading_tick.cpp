@@ -17,7 +17,7 @@ struct Game
 {
     char pad_0000[8];
     int texMenu1;             // 0x08: the menu texture sheet
-    int M_100091d0(const char *text, int x, int y);   // 0x100091d0: debug-font text (game_panels.cpp)
+    int DrawDebugText(const char *text, int x, int y);   // 0x100091d0: debug-font text (game_panels.cpp)
 };
 
 // The engine object at 0x10836c70.
@@ -59,7 +59,7 @@ extern "C" int FUN_1000fb80(void)
                                                        0.75390625f, 0.25390625f, 0.7578125f, 0.2578125f, 0, 1.0f, 0);
         DAT_118d0ba8[DAT_104b7200.texMenu1].M_1014bc60(0, 48, 48, 64, 0.5f, 0.25f, 0.6875f, 0.3125f, 0, 1.0f, 0);
         sprintf(text, "%d%%", (int)DAT_104c0320);
-        DAT_104b7200.M_100091d0(text, 8, 45);
+        DAT_104b7200.DrawDebugText(text, 8, 45);
         RECT corner;
         corner.left = 0;
         corner.top = 0;

@@ -26,7 +26,7 @@ extern "C" void FUN_1000f4d0(void)
         FUN_1013f070(9, 0, 0);
         if (DAT_104bff00 != 0 || DAT_104bff0c != 0)
         {
-            DAT_104b7200.M_10008880(0x19d, 0x74, 200, 0xcc, 0, DAT_104bff0c / 15.0f);
+            DAT_104b7200.DrawPanelAlt(0x19d, 0x74, 200, 0xcc, 0, DAT_104bff0c / 15.0f);
             if (DAT_102024a0 > 0)
                 DAT_118d0ba8[DAT_102024a0].M_1014e5d0(0x19f, 0x76, 0x263, 0x13e, 0, DAT_104bff0c / 15.0f, 1, 0);
         }

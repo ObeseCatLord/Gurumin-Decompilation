@@ -3,7 +3,7 @@
 #include "game.h"
 
 // 1 while any menu window is open or still animating (more than 16 frames into its open animation).
-int Game::M_10007ee0()
+int Game::IsAnyWindowBusy()
 {
     for (int i = 0; i < 3; i++)
     {
@@ -16,7 +16,7 @@ int Game::M_10007ee0()
 }
 
 // Closes all three menu windows and clears their item tables.
-void Game::M_100082e0()
+void Game::CloseAllWindows()
 {
     for (int i = 0; i < 3; i++)
     {
@@ -29,7 +29,7 @@ void Game::M_100082e0()
 }
 
 // Sets menu `id`'s callback value m_7654. 0 when not open.
-int Game::M_10008390(int id, int value)
+int Game::SetWindowCallbackValue(int id, int value)
 {
     int slot = FindSlot(id);
     if (slot == 3)
@@ -39,7 +39,7 @@ int Game::M_10008390(int id, int value)
 }
 
 // Marks menu `id` as confirmed (m_00ec). 0 when not open.
-int Game::M_10008460(int id)
+int Game::ConfirmWindow(int id)
 {
     int slot = FindSlot(id);
     if (slot == 3)
@@ -49,7 +49,7 @@ int Game::M_10008460(int id)
 }
 
 // Sets menu `id`'s m_0128 value (the first visible line offset).
-int Game::M_10008770(int id, int value)
+int Game::SetWindowScroll(int id, int value)
 {
     int slot = FindSlot(id);
     if (slot != 3)
@@ -58,7 +58,7 @@ int Game::M_10008770(int id, int value)
 }
 
 // Sets menu `id`'s last item index (count - 1).
-int Game::M_100087b0(int id, int count)
+int Game::SetWindowLastItem(int id, int count)
 {
     int slot = FindSlot(id);
     if (slot != 3)
@@ -108,7 +108,7 @@ int Latch::M_1000b9c0()
 
 
 // Sets the pointer that receives menu `id`'s chosen result and clears it. 0 when the menu is not open.
-int Game::M_10008330(int id, int *result)
+int Game::SetWindowResult(int id, int *result)
 {
     int slot = FindSlot(id);
     if (slot == 3)

@@ -45,8 +45,8 @@ extern "C" void FUN_100102e0(void)
 // Closes the yes/no dialog (menu 0x216) and menu 0x218 and clears the message text. Returns 1.
 extern "C" int FUN_100106a0(void)
 {
-    DAT_104b7200.M_100083e0(0x218);
-    DAT_104b7200.M_100083e0(0x216);
+    DAT_104b7200.CloseWindow(0x218);
+    DAT_104b7200.CloseWindow(0x216);
     DAT_1020e0f8[0] = 0;
     return 1;
 }
@@ -169,9 +169,9 @@ extern "C" void FUN_1003a9d0(void)
     {
         DAT_1030c500[0x13] = 0;
         DAT_104bfd78 = 0;
-        DAT_104b7200.M_100083e0(0x22c);
-        DAT_104b7200.M_100083e0(0x218);
-        DAT_104b7200.M_100083e0(0x216);
+        DAT_104b7200.CloseWindow(0x22c);
+        DAT_104b7200.CloseWindow(0x218);
+        DAT_104b7200.CloseWindow(0x216);
         DAT_1020e0f8[0] = 0;
         FUN_1000cb30("");
         FUN_1000cb90("");
@@ -197,8 +197,8 @@ extern "C" void FUN_1003a9d0(void)
                 }
             }
         }
-        DAT_104b7200.M_100083e0(0x218);
-        DAT_104b7200.M_100083e0(0x216);
+        DAT_104b7200.CloseWindow(0x218);
+        DAT_104b7200.CloseWindow(0x216);
         memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
         DAT_1020e0f8[0] = 0;
         DAT_104bfe1c = 0;

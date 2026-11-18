@@ -3,7 +3,7 @@
 struct Game
 {
     // 0x10008880 (game_panels.cpp): draws a framed panel in the alternative style.
-    int M_10008880(int x, int y, int w, int h, int frame, float alpha);
+    int DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha);
 };
 
 struct TextRenderer
@@ -30,7 +30,7 @@ extern "C" int FUN_1001e340(float alpha)
     if (DAT_1020c330 == 0)
         return 0;
     FUN_1013f070(2, 0, 0);
-    DAT_104b7200.M_10008880(460, 295, 184, 140, 0, alpha * 0.85f);
+    DAT_104b7200.DrawPanelAlt(460, 295, 184, 140, 0, alpha * 0.85f);
     int lastColour = DAT_1020dc80 < 4 ? 0xffffff : 0xffff00;
     if (DAT_1020c330 < 8 || DAT_1020c330 > 22 || alpha < 0.1f)
         return 0;

@@ -6,7 +6,7 @@
 #include "game.h"
 
 // Looks up a named script constant (case-insensitive prefix match over the m_95e14 table); -1 when unknown.
-int Game::M_10002060(const char *name)
+int Game::FindConstant(const char *name)
 {
     for (int i = 0; i < m_a4614; i++)
     {
@@ -17,7 +17,7 @@ int Game::M_10002060(const char *name)
 }
 
 // Closes menu `id`: plays the close sound through the m_7660 callback and clears the slot. 0 when not open.
-int Game::M_100083e0(int id)
+int Game::CloseWindow(int id)
 {
     int slot = FindSlot(id);
     if (slot == 3)
@@ -88,7 +88,7 @@ int Game::OpenWindow(int id, int x, int y, int width, int height)
 }
 
 // Sets menu `id`'s cursor position (and remembers it when that menu keeps its cursor).
-int Game::M_10008650(int id, int value)
+int Game::SetWindowCursor(int id, int value)
 {
     int slot = FindSlot(id);
     if (slot != 3)
@@ -101,7 +101,7 @@ int Game::M_10008650(int id, int value)
 }
 
 // Sets four layout values of menu `id` (window rectangle).
-int Game::M_100086b0(int id, int a, int b, int c, int d)
+int Game::SetWindowLayout(int id, int a, int b, int c, int d)
 {
     int slot = FindSlot(id);
     if (slot != 3)
@@ -115,7 +115,7 @@ int Game::M_100086b0(int id, int a, int b, int c, int d)
 }
 
 // Sets three more layout values of menu `id`.
-int Game::M_10008710(int id, int a, int b, int c)
+int Game::SetWindowLayout2(int id, int a, int b, int c)
 {
     int slot = FindSlot(id);
     if (slot != 3)

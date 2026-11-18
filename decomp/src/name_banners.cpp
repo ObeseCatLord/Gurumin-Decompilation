@@ -4,7 +4,7 @@
 struct Game
 {
     // 0x10008880 (game_panels.cpp): draws a framed panel in the alternative style.
-    int M_10008880(int x, int y, int w, int h, int frame, float alpha);
+    int DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha);
 };
 
 struct TextRenderer
@@ -28,19 +28,19 @@ extern "C" void FUN_1000cc30(void)
     if (DAT_10210ae8[0] != 0)
     {
         int width = DAT_1020e538.Width(DAT_10210ae8, 1.0f);
-        DAT_104b7200.M_10008880(32, 10, width + 40, 64, 0, (float)DAT_104bf8d8 / 15.0f);
+        DAT_104b7200.DrawPanelAlt(32, 10, width + 40, 64, 0, (float)DAT_104bf8d8 / 15.0f);
         DAT_1020e538.DrawOutlined(52, 32, DAT_10210ae8, 0xffffff, 0, (float)DAT_104bf8d8 / 15.0f, 1.0f);
         if (DAT_1020e0f8[0] != 0)
         {
             width = DAT_1020e538.Width(DAT_1020e0f8, 1.0f);
-            DAT_104b7200.M_10008880(310, 10, width + 40, 64, 0, (float)DAT_104bf8d8 / 15.0f);
+            DAT_104b7200.DrawPanelAlt(310, 10, width + 40, 64, 0, (float)DAT_104bf8d8 / 15.0f);
             DAT_1020e538.DrawOutlined(330, 32, DAT_1020e0f8, 0xffffff, 0, (float)DAT_104bf8d8 / 15.0f, 1.0f);
         }
     }
     else if (DAT_1020e0f8[0] != 0)
     {
         int width = DAT_1020e538.Width(DAT_1020e0f8, 1.0f);
-        DAT_104b7200.M_10008880(304 - width / 2, 74, width + 32, 64, 0, (float)DAT_104bf8d8 / 15.0f);
+        DAT_104b7200.DrawPanelAlt(304 - width / 2, 74, width + 32, 64, 0, (float)DAT_104bf8d8 / 15.0f);
         DAT_1020e538.DrawOutlined(320 - width / 2, 96, DAT_1020e0f8, 0xffffff, 0, (float)DAT_104bf8d8 / 15.0f, 1.0f);
     }
 }

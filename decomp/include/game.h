@@ -176,31 +176,31 @@ struct Game : Object
     int RegisterEvent(int id);  // 0x100020d0 (flag_list.cpp: FlagOwner::M_100020d0)
     int RaiseGameOverEvents();
     int FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value);
-    int M_10002300(int index, int value);
+    int SetScriptFlag(int index, int value);
     int ReadWord();
     int ReadWordInLine();
-    int M_10007ee0();
-    void M_100082e0();
-    int M_10008390(int id, int value);
-    int M_10008460(int id);
-    int M_10008770(int id, int value);
-    int M_100087b0(int id, int count);
-    int M_100087f0(int x, int y, int w, int h, int frame, float alpha);
-    int M_10008880(int x, int y, int w, int h, int frame, float alpha);
+    int IsAnyWindowBusy();
+    void CloseAllWindows();
+    int SetWindowCallbackValue(int id, int value);
+    int ConfirmWindow(int id);
+    int SetWindowScroll(int id, int value);
+    int SetWindowLastItem(int id, int count);
+    int DrawPanel(int x, int y, int w, int h, int frame, float alpha);
+    int DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha);
     int DrawLabelledNumber(int value, int x, int y, int frame, int color, float scale, float alpha);  // 0x10008a30
     int DrawNumber(int value, int x, int y, int frame, int color, float scale, float alpha);     // 0x10008c40
     int DrawNumberAlt(int value, int x, int y, int frame, int color, float scale, float alpha);  // 0x10008df0
     int MoveCursor();  // 0x10009050 (game_panels.cpp)
-    int M_10008910(int x, int y, int lit, int rows, int a, int b, int color);
-    int M_10008fa0(int x, int y, int color, int frame);
-    int M_100091d0(const char *text, int x, int y);
-    int M_10002060(const char *name);
-    int M_100083e0(int id);
-    int M_10008650(int id, int value);
-    int M_100086b0(int id, int a, int b, int c, int d);
-    int M_10008710(int id, int a, int b, int c);
+    int DrawBalloon(int x, int y, int lit, int rows, int a, int b, int color);
+    int DrawCursor(int x, int y, int color, int frame);
+    int DrawDebugText(const char *text, int x, int y);
+    int FindConstant(const char *name);
+    int CloseWindow(int id);
+    int SetWindowCursor(int id, int value);
+    int SetWindowLayout(int id, int a, int b, int c, int d);
+    int SetWindowLayout2(int id, int a, int b, int c);
     int OpenWindow(int id, int x, int y, int width, int height);  // 0x100084b0
-    int M_10008330(int id, int *result);
+    int SetWindowResult(int id, int *result);
     int AddValueEntry(int id, const char *label, int value);                    // 0x1000b060
     int AddFlagEntry(int id, const char *label, int *flag);                     // 0x1000b2c0
     int AddKind5Entry(int id, const char *label, int *flag);                    // 0x1000b4e0

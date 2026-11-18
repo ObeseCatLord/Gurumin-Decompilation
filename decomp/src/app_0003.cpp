@@ -4,7 +4,7 @@
 #include "game.h"
 
 // Sets script flag `index` to `value` (flag 0 and out-of-range indexes are ignored).
-int Game::M_10002300(int index, int value)
+int Game::SetScriptFlag(int index, int value)
 {
     if (index > 3999)
         return 0;

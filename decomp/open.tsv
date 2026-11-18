@@ -77,3 +77,5 @@ address	status	reason
 1002a340	open	Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
 10188580	open	EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
 100bd960	open	Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
+10144040	open	blue corner quad: stores and calls identical; the original alternates ecx/eax for the constants (loads the next constant before the last stores of the previous one); chained and separate statements tried
+101441b0	open	black thumbnail-background quad: same register alternation residue as 0x10144040

@@ -24,6 +24,8 @@ struct EffectManager
     int RemoveOwnedBy(int owner);
     int RemoveChildren(int parent);
     int RemoveOfType(int type);
+    void Step(int record, int list);  // 0x10184440: advances one effect
+    int Update(int restricted, int includeHidden, int ignorePause);
     // Starts effect `effect` at `position`; the seven values are its options (colour, follow target, flags, ...;
     // callers mostly pass -1 and 0). Stores the effect handle in *handle.
     int M_10172350(int effect, Vec4 position, int a, int b, int c, int d, int e, int f, int g, int *handle);
@@ -54,28 +56,47 @@ struct EffectRecordA
     int parent;               // 0x0c: record this effect is attached to, -1 = none
     char pad_0010[0x182];
     short light;              // 0x192: entry of DAT_118e99f8 (0x4014-byte records) this effect uses, 0 = none
-    char pad_0194[0x2c];
+    char pad_0194[0xd];
+    unsigned char flags;      // 0x1a1: 1 = also updated in the restricted pass, 2 = only updated when hidden effects are
+    char pad_01a2[0x1e];
     int owner;                // 0x1c0: character slot that started the effect
-    char pad_01c4[0x18];
+    char pad_01c4[0x14];
+    int *pause;               // 0x1d8: when it points to a non-zero value the effect is paused
 };
 
 struct EffectRecordB
 {
     int id;                   // -1 = free
-    char pad_0004[0xc0];
+    char pad_0004[0xb8];
+    short lifetime;           // 0xbc: frames the record lives
+    short age;                // 0xbe: frames it has lived
+    int pad_00c0;
 };
 
 // Effect definition (effect_defs.cpp EffectDef): `id` is the effect type a script refers to.
 struct EffectType
 {
     int id;
-    char pad_0004[0x3d4];
+    char pad_0004[0x7c];
+    int lightFrames;          // 0x80: how long the effect's light lasts (it fades out over lightFrames + 10)
+    char pad_0084[0x354];
 };
 
 extern "C" EffectType DAT_1101dfdc[0x47e];
 extern "C" TriangleBatch DAT_1101c804;
 extern "C" char DAT_10fc6a90[];                  // vertex buffer of the effect batch (0x400 entries)
-extern "C" int DAT_118e99f8[0x80280];
+// Light of an effect, 0x4014 bytes.
+struct EffectLight
+{
+    int active;
+    int type;                 // 0x04: effect definition (DAT_1101dfdc) the light belongs to
+    int pad_0008;
+    int frame;                // 0x0c: frames since the light started (0 = not counting)
+    float fade;               // 0x10: 1 at the start, falling to 0
+    char pad_0014[0x4000];
+};
+
+extern "C" EffectLight DAT_118e99f8[0x80];
 extern "C" EffectRecordA DAT_1115cfe8[];
 extern "C" EffectRecordB DAT_11134cc8[];
 extern "C" EffectRecordB DAT_118a8888[];
@@ -146,7 +167,7 @@ int EffectManager::RemoveOwnedBy(int owner)
                 else
                     DAT_11018604[list] = DAT_1115cfe8[i].prev;
                 if (DAT_1115cfe8[i].light != 0)
-                    DAT_118e99f8[DAT_1115cfe8[i].light * 0x1005] = 0;
+                    DAT_118e99f8[DAT_1115cfe8[i].light].active = 0;
                 RemoveChildren(i);
             }
         }
@@ -175,7 +196,7 @@ int EffectManager::RemoveChildren(int parent)
                     DAT_11018604[list] = DAT_1115cfe8[i].prev;
                 DAT_1115cfe8[i].parent = -1;
                 if (DAT_1115cfe8[i].light != 0)
-                    DAT_118e99f8[DAT_1115cfe8[i].light * 0x1005] = 0;
+                    DAT_118e99f8[DAT_1115cfe8[i].light].active = 0;
                 RemoveChildren(i);
             }
         }
@@ -203,8 +224,62 @@ int EffectManager::RemoveOfType(int type)
                 else
                     DAT_11018604[list] = DAT_1115cfe8[i].prev;
                 if (DAT_1115cfe8[i].light != 0)
-                    DAT_118e99f8[DAT_1115cfe8[i].light * 0x1005] = 0;
+                    DAT_118e99f8[DAT_1115cfe8[i].light].active = 0;
                 RemoveChildren(i);
+            }
+        }
+    }
+    return 0;
+}
+
+// 0x10188580. Advances all effects by one frame: every running effect is stepped unless it is hidden (flag 2,
+// skipped unless `includeHidden`), outside a restricted pass (`restricted` steps only effects with flag 1) or paused
+// (unless `ignorePause`). The short-lived records of the two other tables expire when their age reaches their
+// lifetime, and effect lights fade out over the effect's light frames plus 10. Returns 0.
+int EffectManager::Update(int restricted, int includeHidden, int ignorePause)
+{
+    for (int list = 0; list < 5; list++)
+    {
+        for (int i = DAT_1101d820[list]; i > -1; i = DAT_1115cfe8[i].next)
+        {
+            if (DAT_1115cfe8[i].id != -1 && (includeHidden != 0 || (DAT_1115cfe8[i].flags & 2) == 0) &&
+                (restricted == 0 || (DAT_1115cfe8[i].flags & 1) != 0) &&
+                (DAT_1115cfe8[i].pause == 0 || *DAT_1115cfe8[i].pause == 0 || ignorePause != 0))
+                Step(i, list);
+        }
+    }
+    int j;
+    for (j = 0; j < 840; j++)
+    {
+        if (DAT_11134cc8[j].id != -1)
+        {
+            DAT_11134cc8[j].age++;
+            if (DAT_11134cc8[j].age >= DAT_11134cc8[j].lifetime)
+                DAT_11134cc8[j].id = -1;
+        }
+    }
+    for (j = 0; j < 840; j++)
+    {
+        if (DAT_118a8888[j].id != -1)
+        {
+            DAT_118a8888[j].age++;
+            if (DAT_118a8888[j].age >= DAT_118a8888[j].lifetime)
+                DAT_118a8888[j].id = -1;
+        }
+    }
+    for (int k = 0; k < 0x80; k++)
+    {
+        if (DAT_118e99f8[k].active != 0 && DAT_118e99f8[k].frame != 0)
+        {
+            int frame = DAT_118e99f8[k].frame + 1;
+            int frames = DAT_1101dfdc[DAT_118e99f8[k].type].lightFrames;
+            DAT_118e99f8[k].frame = frame;
+            DAT_118e99f8[k].fade = 1.0f - (float)frame / (float)(frames + 10);
+            if (frame >= frames + 10)
+            {
+                DAT_118e99f8[k].fade = 0;
+                DAT_118e99f8[k].frame = 0;
+                DAT_118e99f8[k].active = 0;
             }
         }
     }

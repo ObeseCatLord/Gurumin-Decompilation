@@ -277,3 +277,4 @@ _Vec3_Dot	101ac200
 ?DrawOverlay@WorldRenderer@@QAEXXZ	101692c0
 ?ApplyMaterialColours@Node@@QAEHXZ	1019c560
 ?WriteRgb32@TextureObject@@QAEHHHHHHPBE@Z	1014ef20
+?Update@EffectManager@@QAEHHHH@Z	10188580

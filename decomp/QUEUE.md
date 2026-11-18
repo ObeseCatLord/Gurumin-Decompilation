@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (74)
+## 1. Walls to retry (75)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -72,6 +72,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016b1e0` 73 — original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
+- [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
 - [ ] `101992f0` 29 — Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
@@ -94,12 +95,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (183)
+## 3. Medium functions (251-800 bytes) (182)
 
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `100caf90` 292 bytes (float, loops 1, calls 6)
 - [ ] `10145a50` 321 bytes (loops 2, calls 8)
-- [ ] `10188580` 325 bytes (float, loops 4, calls 1)
 - [ ] `10035d20` 328 bytes (loops 2, calls 1)
 - [ ] `10035fa0` 329 bytes (loops 2, calls 1)
 - [ ] `1001a840` 330 bytes (calls 6)

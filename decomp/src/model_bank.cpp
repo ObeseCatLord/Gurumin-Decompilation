@@ -40,15 +40,21 @@ struct BankModel
     char pad_22f4[0x9c];
     int timer;              // 0x2390: 99999 = no timeout
     char pad_2394[0x108];
+    BankModel();            // 0x101629f0 (the model record constructor)
+    ~BankModel();           // 0x10007e10
 };
 
 struct ModelBank
 {
     Node *lights[0x20];     // 0x0000: light nodes of the scene (Omn..., then Spot...)
     int m_0080[0x80];       // 0x0080
-    char pad_0280[0x1604];
+    char pad_0280[0x204];
+    Vec4 m_0484[0x80];      // 0x0484
+    Vec4 m_0c84[0x80];      // 0x0c84
+    char pad_1484[0x400];
     int m_1884;             // 0x1884
-    char pad_1888[0xb160];
+    Vec4 m_1888[0xb00];     // 0x1888
+    Vec4 m_c888[0x16];      // 0xc888
     BankModel models[16];   // 0xc9e8
     int params[16];         // 0x313a8: per-model parameter given when the model was added
     int m_313e8;            // 0x313e8
@@ -56,7 +62,8 @@ struct ModelBank
     char pad_313f0[0x80];
     float flareAlpha[0x2c]; // 0x31470: brightness of each flare point (0..1)
     int flareCount;         // 0x31520: flare points collected this frame
-    Vec4 flareScreen[1];    // 0x31524: screen position of each flare point (x, y, depth, w); length unknown
+    Vec4 flareScreen[0x20]; // 0x31524: screen position of each flare point (x, y, depth, w)
+    ModelBank();
     int Reset();
     int CollectLights(Node *root);
     int Add(int id, int param);
@@ -140,4 +147,11 @@ int ModelBank::AddFlarePoint(Vec4 position, const Matrix4 *viewProjection)
         }
     }
     return 1;
+}
+
+// 0x1017c8e0. Constructs the bank: the vector tables and model records are constructed (zeroed vectors) and the bank
+// starts disabled.
+ModelBank::ModelBank()
+{
+    enabled = 0;
 }

@@ -9,6 +9,8 @@ struct Vec4
     void Set(float x, float y, float z, float w);  // 0x101ac9c0
     Vec4 operator+(const Vec4 &other);              // 0x101ac9e0 (component-wise sum)
     void Copy(const Vec4 &source);                  // 0x101acc20
+    Vec4 operator-(const Vec4 &other);              // 0x101aca40 (component-wise difference)
+    Vec4 Scaled(const float &scale);                // 0x101acb00
 };
 
 extern "C" int DAT_10f08d30[2];   // frames left for each of the two colour blends (0 = idle)
@@ -29,6 +31,26 @@ extern "C" void FUN_1013f9a0(void)
                 DAT_10f66978[i].Copy(DAT_10f65828[i]);
         }
     }
+}
+
+extern "C" int DAT_10203424;   // counts requests whose x is 530 or more (never read here)
+
+// 0x1013fa10. Starts colour blend `index` towards (x, y, z, w) over `frames` frames; with 1 frame or fewer the
+// colour is set at once. Note the argument order: z, y, x, w. Callers: the device setup and the scene code.
+extern "C" void FUN_1013fa10(int index, int frames, float z, float y, float x, float w)
+{
+    if (x >= 530.0f)
+        DAT_10203424++;
+    if (frames <= 1)
+    {
+        DAT_10f66978[index].Set(x, y, z, w);
+        DAT_10f08d30[index] = 0;
+        return;
+    }
+    DAT_10f65828[index].Set(x, y, z, w);
+    float step = 1.0f / (float)frames;
+    DAT_10f657c4[index].Copy((DAT_10f65828[index] - DAT_10f66978[index]).Scaled(step));
+    DAT_10f08d30[index] = frames;
 }
 
 extern "C" int DAT_10ff1df0;   // 1 = the effect is on

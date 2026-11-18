@@ -78,7 +78,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (34)
+## 2. Small functions (30-250 bytes) (28)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
@@ -86,12 +86,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10027560` 207 bytes (loops 2, calls 3)
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
-- [ ] `1013fa10` 223 bytes (float, calls 5)
-- [ ] `1015cc90` 224 bytes (loops 3, calls 5)
-- [ ] `1017c8e0` 224 bytes (loops 5, calls 6)
-- [ ] `1001a590` 227 bytes (float, calls 6)
-- [ ] `1013e170` 229 bytes (loops 7, calls 4)
-- [ ] `10011fb0` 230 bytes (float, calls 10)
 - [ ] `1014b2a0` 230 bytes Render_OnLostDevice (loops 3, calls 12)
 - [ ] `10163c70` 230 bytes (float, calls 7)
 - [ ] `10172260` 231 bytes (loops 2, calls 1)

@@ -254,3 +254,5 @@ _Vec3_Dot	101ac200
 ?SpheresOverlap@Node@@QAEHPBUVec4@@000PAU2@1@Z	10193060
 ?MakeNameUnique@Node@@QAEXXZ	101a2290
 ?LoadText@ListBank@@QAEHPBDH@Z	100fb6d0
+?Load@DemoRecording@@QAEHPBD@Z	1015cc90
+??0ModelBank@@QAE@XZ	1017c8e0

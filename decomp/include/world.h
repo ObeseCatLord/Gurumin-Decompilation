@@ -83,7 +83,9 @@ struct CharState
 {
     int m_0000;
     int m_0004[6];
-    char pad_001c[0x20];
+    char pad_001c[0xc];
+    int m_0028;               // 0x28: non-zero = skip the ground probe of a shot (0x1001a590)
+    char pad_002c[0x10];
     int m_003c;
 };
 

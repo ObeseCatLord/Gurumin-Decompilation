@@ -339,3 +339,5 @@ _TestDat_Load	1000beb0
 ?SetupSkins@Node@@QAEHPAU1@@Z	101ab9d0
 ?AnimatedMatrix@NodeExtra@@QAE?AUMatrix4@@H@Z	101693f0
 ?FindBone@Node@@QAEPAUMatrix4@@HPAU2@0H@Z	10199380
+?SortPacks@Node@@QAEHXZ	1019c690
+?UpdateWorld@Node@@QAEHABUMatrix4@@H@Z	10194c60

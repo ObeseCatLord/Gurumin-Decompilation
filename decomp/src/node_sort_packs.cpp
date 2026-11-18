@@ -1,0 +1,111 @@
+// Reordering a scene node's vertex packs so that the packs whose material has m_0178 == 1 are drawn first, before
+// the others (the mesh is rebuilt from the new order).
+
+// Mesh material (scene_node.cpp Material, 0x180 bytes), only the value tested here.
+struct Material
+{
+    char pad_0000[0x178];
+    float m_0178;                // 0x178: 1 = the pack goes first
+    char pad_017c[4];
+};
+
+// A vertex pack (scene_node.cpp PackHeader, 0x74 bytes).
+struct PackHeader
+{
+    char pad_0000[0x14];
+    int material;                // 0x14: index into the node's materials
+    char pad_0018[0x5c];
+    void Init();                                 // 0x101acfa0
+    void Copy(const PackHeader *source);         // 0x101ad040
+};
+
+// The index list of a vertex pack (8 bytes).
+struct IndexList
+{
+    int data[2];
+    void Init();                                 // 0x101ad1b0
+    void Copy(const IndexList *source);          // 0x101ad160
+};
+
+// The mesh buffers built from the packs (scene_node.cpp MeshData).
+struct MeshData
+{
+    char pad_0000[0x4c];
+    int bufferSlot;              // 0x4c: entry of the mesh buffer tables, -1 = none
+    void Init();                                 // 0x10145a10
+    void Release();                              // 0x10150a90
+};
+extern "C" int FUN_10169990(MeshData *mesh);     // MeshCache_Release: drops one reference, returns those left
+
+// A scene node (scene_node.cpp Node), only the fields used here.
+struct Node
+{
+    char pad_0000[0x64];
+    int packCount;               // 0x64
+    PackHeader *packs;           // 0x68
+    IndexList *indexLists;       // 0x6c
+    char pad_0070[0x24];
+    Material *materials;         // 0x94
+    char pad_0098[4];
+    MeshData *mesh;              // 0x9c
+    void M_101911b0(PackHeader *packs, int count);   // frees the packs' vertex data
+    void M_101911e0(IndexList *lists, int count);    // frees the index lists' data
+    int SortPacks();
+};
+
+extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // the engine's allocator
+extern "C" void (*DAT_11b1ba40)(void *);                      // the engine's free
+
+// 0x1019c690 (Node::SortPacks). Drops this node's mesh when it was its last user, copies the packs and their index
+// lists into new arrays (first those whose material has m_0178 == 1, then the others), frees the old ones and gives
+// the node a new, empty mesh. Returns 0 for a node without packs, else 1.
+int Node::SortPacks()
+{
+    int i;
+    if (packCount == 0)
+        return 0;
+    if (mesh != 0 && FUN_10169990(mesh) == 0)
+    {
+        mesh->Release();
+        DAT_11b1ba40(mesh);
+        mesh = 0;
+    }
+    PackHeader *newPacks = (PackHeader *)DAT_11b0b938(packCount * sizeof(PackHeader), "vp");
+    IndexList *newLists = (IndexList *)DAT_11b0b938(packCount * sizeof(IndexList), "vpi");
+    for (i = 0; i < packCount; i++)
+    {
+        newPacks[i].Init();
+        newLists[i].Init();
+    }
+    int count = 0;
+    for (i = 0; i < packCount; i++)
+    {
+        if (materials[packs[i].material].m_0178 == 1.0f)
+        {
+            newPacks[count].Copy(&packs[i]);
+            newLists[count].Copy(&indexLists[i]);
+            count++;
+        }
+    }
+    for (i = 0; i < packCount; i++)
+    {
+        if (materials[packs[i].material].m_0178 != 1.0f)
+        {
+            newPacks[count].Copy(&packs[i]);
+            newLists[count].Copy(&indexLists[i]);
+            count++;
+        }
+    }
+    M_101911b0(packs, packCount);
+    M_101911e0(indexLists, packCount);
+    if (packs != 0)
+        DAT_11b1ba40(packs);
+    if (indexLists != 0)
+        DAT_11b1ba40(indexLists);
+    packs = newPacks;
+    indexLists = newLists;
+    mesh = (MeshData *)DAT_11b0b938(0x50, "CVPCObjB");
+    mesh->Init();
+    mesh->bufferSlot = -1;
+    return 1;
+}

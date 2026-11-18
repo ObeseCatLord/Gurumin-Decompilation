@@ -789,3 +789,6 @@ address	name	evidence
 10024d00	Enemy_CanReturnHome	whether an enemy may head back to its start position in a direction (open, decomp/src/enemy_moves.cpp)
 10191500	Node::Init	resets every field of a new scene node (matched, decomp/src/node_init.cpp)
 1019e9a0	Node::Release	frees everything a node owns and its children, then resets it (matched, decomp/src/scene_node.cpp)
+1019c690	Node::SortPacks	copies the vertex packs into new arrays, packs whose material has m_0178 == 1 first (matched, decomp/src/node_sort_packs.cpp)
+10191fd0	Box_Overlap	overlap test of two offset boxes with optional centre deltas (open, decomp/src/box_overlap.cpp)
+10194c60	Node::UpdateWorld	world matrix of a node tree for a frame (open, decomp/src/node_world.cpp)

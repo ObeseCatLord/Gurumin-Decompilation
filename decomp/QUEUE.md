@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (99)
+## 1. Walls to retry (101)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -94,7 +94,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
+- [ ] `10191fd0` 549 — Box_Overlap (__stdcall): only block order differs: the original keeps the return-0 block on the fallthrough of the last compare; early returns, per-axis returns, nested and else forms tried
 - [ ] `10194a10` 580 — Circle_Intersect (__stdcall): logic identical; the stack slots of d2 and disc are swapped and the original multiplies by d2 after storing (rb2 + ra2); k split, 2.0 factor and early returns tried
+- [ ] `10194c60` 629 — Node::UpdateWorld: code identical except the EH state of the AnimatedMatrix temporary (ours 1, original 5; the original unwind map has four empty states 1-4); branch order, named result locals and a conditional expression tried
 - [ ] `101992f0` 29 — Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)
 - [ ] `10199380` 526 — Node::FindBone: logic identical; the original keeps 0 in ebx (zero compares, trylevel store, then the loop counter) and frame in edx, ours tests against 0 and keeps frame in ebx; a counter declared at the top and the clamp spellings tried
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
@@ -118,7 +120,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10017c55` 204 bytes (float, calls 8)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (96)
+## 3. Medium functions (251-800 bytes) (93)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
@@ -156,9 +158,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10142b20` 519 bytes (loops 5)
 - [ ] `1019e610` 526 bytes (loops 3, calls 12)
 - [ ] `100092c0` 535 bytes (float, loops 1, calls 6)
-- [ ] `10191fd0` 549 bytes (float, loops 2, calls 16)
 - [ ] `1002a110` 559 bytes (float, calls 17)
-- [ ] `1019c690` 561 bytes (float, loops 3, calls 17)
 - [ ] `10055ca0` 562 bytes (loops 6, calls 6)
 - [ ] `100236c0` 563 bytes (float, calls 22)
 - [ ] `10055690` 566 bytes (loops 3)
@@ -177,7 +177,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10056260` 616 bytes (loops 6, calls 10)
 - [ ] `100b8220` 627 bytes (float, calls 19)
 - [ ] `1002ebf0` 628 bytes (float, loops 1, calls 3)
-- [ ] `10194c60` 629 bytes (loops 2, calls 12)
 - [ ] `100b9930` 637 bytes (float, calls 22)
 - [ ] `10055410` 638 bytes (loops 5, calls 1)
 - [ ] `10058500` 644 bytes (float, loops 1, calls 16)

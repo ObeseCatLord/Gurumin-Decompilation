@@ -157,6 +157,90 @@ extern "C" int FUN_10012510(int mode, int index)
     return 1;
 }
 
+// 0x10012780 (Char_SetHandToolPlain). Char_SetHandTool without drill 5 and without loading the drill motions.
+extern "C" int FUN_10012780(int mode, int index)
+{
+    if (DAT_10db6ed8[index].root == 0)
+        return 0;
+    if (mode == -1)   // toggle: remove the tool when there is one, else attach the drill
+    {
+        if (DAT_10db6ed8[index].root->Find("scop", 0) != 0)
+            mode = 0;
+        else
+            mode = 1;
+    }
+    if (mode == 1)
+    {
+        if (DAT_10db6ed8[index].root->Find("scop", 0) == 0)
+        {
+            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 R Hand", 0);
+            if (hand != 0)
+            {
+                Node *child = hand->AddChild(0, 0x40);
+                // The costume-6 scope or the drill of the current level.
+                int level = DAT_10c64ad4;
+                if (DAT_10c655f0 == 6)
+                    child->Load(FUN_1013f8a0("spscop.it3", 0), 0, 0, 0);
+                else if (level == 0)
+                    child->Load(FUN_1013f8a0("char02-d.it3", 0), 0, 0, 0);
+                else if (level == 1)
+                    child->Load(FUN_1013f8a0("drill2.it3", 0), 0, 0, 0);
+                else if (level == 2)
+                    child->Load(FUN_1013f8a0("drill3.it3", 0), 0, 0, 0);
+                else
+                    child->Load(FUN_1013f8a0("drill4.it3", 0), 0, 0, 0);
+                strcpy(child->name, "scop");
+                child->parent = hand;
+                child->BuildMesh(1, 0);
+            }
+        }
+    }
+    else if (mode == 2)
+    {
+        if (DAT_10db6ed8[index].root->Find("scop", 0) == 0)
+        {
+            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 R Hand", 0);
+            if (hand != 0)
+            {
+                Node *child = hand->AddChild(0, 0x40);
+                child->Load(FUN_1013f8a0("O_brush.it3", 0), 0, 0, 0);
+                strcpy(child->name, "scop");
+                child->parent = hand;
+                child->BuildMesh(1, 0);
+            }
+        }
+    }
+    else
+    {
+        Node *child = DAT_10db6ed8[index].root->Find("scop", 0);
+        if (child != 0)
+            child->parent->RemoveChild(child, 0);
+    }
+    if (DAT_10db6ed8[0].root != 0)
+    {
+        DAT_104c00f8 = DAT_10db6ed8[0].root->Find("scop-pt", 0);
+        if (DAT_10db6ed8[0].root != 0)
+            DAT_104c00fc = DAT_10db6ed8[0].root->Find("charbase0", 0);
+        else
+            DAT_104c00fc = 0;
+        DAT_104c0100 = 0;
+        DAT_104c0104 = 0;
+        if (DAT_10c655f0 == 6)
+        {
+            DAT_104c0100 = DAT_10db6ed8[0].root->Find("scop-2pt", 0);
+            DAT_104c0104 = DAT_10db6ed8[0].root->Find("scop-3pt", 0);
+        }
+    }
+    else
+    {
+        DAT_104c00f8 = 0;
+        DAT_104c00fc = 0;
+        DAT_104c0100 = 0;
+        DAT_104c0104 = 0;
+    }
+    return 1;
+}
+
 // Replaces the "helmet" child of character `index`'s "Bip01 Head" with model `name` (0 = just remove it). Returns 0
 // when only removing or when the head is missing, else the result of building the new helmet (or the old helmet
 // node when one is still attached). Not byte-identical yet: the original returns the null `head` already in eax

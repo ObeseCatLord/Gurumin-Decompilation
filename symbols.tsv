@@ -767,3 +767,4 @@ address	name	evidence
 1000beb0	TestDat_Load	parses test.dat into word groups (open, decomp/src/test_dat.cpp)
 10012220	Model_ApplyCommands	applies a model definition's SET/DIS/RND/DAT commands to a character (open, decomp/src/model_commands.cpp)
 10012510	Char_SetHandTool	attaches, toggles or removes the drill/brush in a character's right hand (matched, decomp/src/char_attach.cpp)
+10012780	Char_SetHandToolPlain	Char_SetHandTool without drill 5 and the drill motions (matched, decomp/src/char_attach.cpp)

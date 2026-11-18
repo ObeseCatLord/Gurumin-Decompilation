@@ -719,3 +719,4 @@ address	name	evidence
 10143870	TextureObject::BeginRenderTo	matched decompiled source (decomp/obj_symbols.tsv)
 101842a0	EffectManager::Init	full effect system initialisation at load (decomp/src/char_effects.cpp)
 10194360	Camera_SetMatrices	matched decompiled source (decomp/obj_symbols.tsv)
+10191280	Node::ReleaseUniqueMeshData	matched decompiled source (decomp/obj_symbols.tsv)

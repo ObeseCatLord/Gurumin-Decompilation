@@ -292,3 +292,4 @@ _Vec3_Dot	101ac200
 ?Init@EffectManager@@QAEHXZ	101842a0
 ?ClearTables@EffectManager@@QAEHXZ	1016fb10
 ?Camera_SetMatrices@@YAHPBUVec4@@0PAUMatrix4@@1M@Z	10194360
+?ReleaseUniqueMeshData@Node@@QAEXXZ	10191280

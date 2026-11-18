@@ -74,6 +74,8 @@ struct GlyphState
 
 struct MeshData
 {
+    char pad_0000[0x4c];
+    int bufferSlot;              // 0x4c: entry of the mesh buffer tables (DAT_10feb3e0 ...), -1 = none
     int M_10150bb0(struct PackHeader *packs, KeyPair *indexLists, int packCount, struct Material *materials, int flags);
     void Release();  // 0x10150a90 (mesh_release.cpp)
     void M_101476e0(int pack, int value);
@@ -284,6 +286,7 @@ struct Node
     Node *Root();
     int SetUniqueName(const char *name);
     void MakeNameUnique();
+    void ReleaseUniqueMeshData();
     int Rename(const char *newName, const char *oldName);
     int TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix *matrix);
 };
@@ -1497,4 +1500,48 @@ int Node::Rename(const char *newName, const char *oldName)
     for (int j = 0; j < childCount; j++)
         children[j]->Rename(newName, oldName);
     return 1;
+}
+
+extern "C" int DAT_10feb3e0[];   // per mesh buffer slot: 1 = owned by a single node
+extern "C" int DAT_10fee5e0[];
+extern "C" int DAT_10ff2ff8[];
+extern "C" int DAT_10fe01d8[];
+
+// 0x10191280. Frees the pack and index data of every node in this subtree whose mesh buffer is not shared (its slot
+// in DAT_10feb3e0 is 1), and resets the slot. Nodes are skipped when their name (after a "CDL..." or "OvF..." prefix
+// of 6 or 7 characters) starts with "CA", "CS" or "CT", when they are flagged (m_1860 bit 4, flags 4 or 0xf00) or
+// have no mesh buffer.
+void Node::ReleaseUniqueMeshData()
+{
+    int skip = 0;
+    if (name[0] == 'C' && name[1] == 'D' && name[2] == 'L')
+        skip = 6;
+    if (name[0] == 'O' && name[1] == 'v' && name[2] == 'F')
+        skip = 7;
+    if (!((name[skip] == 'C' && name[skip + 1] == 'A') || (name[skip] == 'C' && name[skip + 1] == 'S') ||
+          (name[skip] == 'C' && name[skip + 1] == 'T')) &&
+        (m_1860 & 4) == 0 && (flags & 4) == 0 && (flags & 0xf00) == 0 && mesh != 0 && mesh->bufferSlot >= 0 &&
+        DAT_10feb3e0[mesh->bufferSlot] == 1)
+    {
+        DAT_10fee5e0[mesh->bufferSlot] = -1;
+        DAT_10ff2ff8[mesh->bufferSlot] = 0;
+        DAT_10fe01d8[mesh->bufferSlot] = 0;
+        M_101911b0(packs, packCount);
+        M_101911e0(indexLists, packCount);
+        if (m_0070 != 0)
+        {
+            M_101911e0(m_0070, packCount);
+            DAT_11b1ba40(m_0070);
+            m_0070 = 0;
+        }
+        if (packs != 0)
+            DAT_11b1ba40(packs);
+        packs = 0;
+        if (indexLists != 0)
+            DAT_11b1ba40(indexLists);
+        indexLists = 0;
+        packCount = -1;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->ReleaseUniqueMeshData();
 }

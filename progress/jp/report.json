@@ -1,15 +1,15 @@
 {
  "measures": {
-  "fuzzy_match_percent": 5.078,
+  "fuzzy_match_percent": 5.0994,
   "total_code": "1720206",
-  "matched_code": "77053",
-  "matched_code_percent": 4.4793,
+  "matched_code": "77421",
+  "matched_code_percent": 4.5007,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 616,
-  "matched_functions_percent": 50.8251,
+  "matched_functions": 617,
+  "matched_functions_percent": 50.9076,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
@@ -7397,16 +7397,16 @@
   {
    "name": "app/scene_node",
    "measures": {
-    "fuzzy_match_percent": 99.944,
-    "total_code": "8086",
-    "matched_code": "8057",
-    "matched_code_percent": 99.6414,
+    "fuzzy_match_percent": 99.9464,
+    "total_code": "8454",
+    "matched_code": "8425",
+    "matched_code_percent": 99.657,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 71,
-    "matched_functions": 70,
-    "matched_functions_percent": 98.5915,
+    "total_functions": 72,
+    "matched_functions": 71,
+    "matched_functions_percent": 98.6111,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -7417,8 +7417,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "8086",
-     "fuzzy_match_percent": 99.944
+     "size": "8454",
+     "fuzzy_match_percent": 99.9464
     }
    ],
    "functions": [
@@ -7940,6 +7940,14 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270134592"
+     }
+    },
+    {
+     "name": "?ReleaseUniqueMeshData@Node@@QAEXXZ",
+     "size": "368",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270078592"
      }
     },
     {
@@ -10470,13 +10478,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1626460",
+    "total_code": "1626092",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 518,
+    "total_functions": 517,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -10489,7 +10497,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1626460",
+     "size": "1626092",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -14180,14 +14188,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "270077488"
-     }
-    },
-    {
-     "name": "FUN_10191280",
-     "size": "368",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270078592"
      }
     },
     {

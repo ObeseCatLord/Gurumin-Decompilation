@@ -83,7 +83,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (11)
+## 2. Small functions (30-250 bytes) (9)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `1004f860` 87 bytes (calls 1)
@@ -91,13 +91,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10027560` 207 bytes (loops 2, calls 3)
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
-- [ ] `1003ac20` 242 bytes (float, calls 4)
-- [ ] `10162c50` 242 bytes (loops 1, calls 6)
 - [ ] `10024e80` 245 bytes (float, calls 2)
 - [ ] `100249c0` 246 bytes (float, calls 8)
 - [ ] `10019210` 248 bytes (float, calls 10)
 
-## 3. Medium functions (251-800 bytes) (199)
+## 3. Medium functions (251-800 bytes) (198)
 
 - [ ] `1001e240` 253 bytes (loops 4, calls 3)
 - [ ] `10020f60` 259 bytes (float, loops 1, calls 7)
@@ -180,7 +178,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001b880` 444 bytes (float, calls 11)
 - [ ] `100558d0` 449 bytes (loops 4, calls 4)
 - [ ] `1000fb80` 453 bytes (float, calls 12)
-- [ ] `1003ad20` 463 bytes (float, calls 6)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
 - [ ] `100211a0` 466 bytes (float, calls 5)

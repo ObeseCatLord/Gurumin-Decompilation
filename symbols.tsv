@@ -679,3 +679,6 @@ address	name	evidence
 10004760	ListBank::DeclareVariable	matched decompiled source (decomp/obj_symbols.tsv)
 10145120	TextureObject::CaptureRgbRows	matched decompiled source (decomp/obj_symbols.tsv)
 1014bb70	TextureObject::DrawTriangles	matched decompiled source (decomp/obj_symbols.tsv)
+1003ac20	Sound_PlayWav	plays wav\<name>.<ext>, positional or not, volume scaled by mode (decomp/src/sound_effects.cpp)
+1003ad20	Sound_PlayEffect	plays effect id from the table at 0x108dc158 (loop handles in 0x10447338) (decomp/src/sound_effects.cpp)
+10162c50	AnimModel::Unload	matched decompiled source (decomp/obj_symbols.tsv)

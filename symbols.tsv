@@ -809,3 +809,4 @@ address	name	evidence
 10045ed0	Npc_ApproachPlayer	NPC walks up to the player until near enough (open, decomp/src/npc_approach.cpp)
 1016a2e0	Playback::Play	starts or blends into an animation layer (open, decomp/src/model_state.cpp)
 101ad350	MotionList::FrameAt	frame shown at a time for a list of motion ranges (open, decomp/src/containers.cpp)
+10021c80	Sound_UpdateListener	smooths the camera and sends the 3D sound listener (matched, decomp/src/sound_listener.cpp)

@@ -272,3 +272,6 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   used only to measure a distance sat in its own block (Char_CanSee 0x10043e20).
 - A call with ecx loaded from a global object pointer and no `add esp` afterwards is a method of that object
   (thiscall), even when the pointer was only tested before: `DAT_10255f08->Raycast(...)`.
+- Locals that overlap the stack slots of temporaries from an earlier block (Vec4 locals at offsets the original
+  also uses for the smoothing temporaries) were declared in their own `{ }` scope after that block; function-scope
+  locals declared later still get slots of their own (Sound_UpdateListener 0x10021c80).

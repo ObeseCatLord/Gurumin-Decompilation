@@ -711,3 +711,4 @@ address	name	evidence
 1015cd70	DemoRecording::RecordFrame	matched decompiled source (decomp/obj_symbols.tsv)
 1001c510	Point_Transform	matched decompiled source (decomp/obj_symbols.tsv)
 10145a50	MeshData::UploadBones	matched decompiled source (decomp/obj_symbols.tsv)
+100bd960	Map_UpdateSpecial	matched decompiled source (decomp/obj_symbols.tsv)

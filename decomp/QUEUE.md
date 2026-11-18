@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (89)
+## 1. Walls to retry (90)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -31,6 +31,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
+- [ ] `100211a0` 466 — Region_WaveVertex: logic identical; ebx/ebp swapped for the flip counter and the point address, and the original rounds each sine result to float twice (helper and caller locals tried)
 - [ ] `100242c0` 487 — Char_ProbeAhead: logic identical; the original keeps the testOnly path's `return 1` block in place and the final test jumps back to it (ours puts it at the end); three return layouts tried
 - [ ] `100244b0` 502 — Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
@@ -109,7 +110,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (121)
+## 3. Medium functions (251-800 bytes) (120)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)
@@ -132,7 +133,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000fb80` 453 bytes (float, calls 12)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
-- [ ] `100211a0` 466 bytes (float, calls 5)
 - [ ] `101abe30` 468 bytes Model_LoadIt3 (loops 1, calls 15)
 - [ ] `1002ee70` 473 bytes (float, loops 1, calls 8)
 - [ ] `10054d50` 476 bytes (loops 2, calls 8)

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (81)
+## 1. Walls to retry (82)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -33,6 +33,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
+- [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054970` 239 — Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
 - [ ] `10054a60` 270 — Game::RaiseGameOverEvents: identical except the loop pointer: the original keeps &entry.flags[1] in ebp, cl 13.00 here &entry.flags[0] (pointer and indexed forms tried)
@@ -101,12 +102,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (152)
+## 3. Medium functions (251-800 bytes) (151)
 
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `10035d20` 328 bytes (loops 2, calls 1)
 - [ ] `10035fa0` 329 bytes (loops 2, calls 1)
-- [ ] `10043cc0` 340 bytes (calls 5)
 - [ ] `10036560` 343 bytes (loops 11, calls 1)
 - [ ] `10049990` 354 bytes (float, loops 2, calls 5)
 - [ ] `10161781` 357 bytes (loops 2, calls 3)

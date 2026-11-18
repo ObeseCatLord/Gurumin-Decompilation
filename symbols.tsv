@@ -730,3 +730,4 @@ address	name	evidence
 10024750	Char_ProbeGround	ray down from a character head or position; hit point or test only (decomp/src/collide_query.cpp)
 10009050	Game::MoveCursor	matched decompiled source (decomp/obj_symbols.tsv)
 1001a840	Char_ClampStatus	clamps status counters, marks a character down at zero life, sets state 4/6 in mode 7 (matched, decomp/src/char_status.cpp)
+10043cc0	Char_ResetState	clears a character's AI state, start vectors and pose entry, marks it in play and re-applies its packed setup (open, decomp/src/char_reset.cpp)

@@ -283,3 +283,4 @@ _Vec3_Dot	101ac200
 ?PlayFrame@DemoRecording@@QAEHXZ	1015cf30
 ?GetModeText@ImeContext@@QAEHPAD@Z	1015d180
 ?RecordFrame@DemoRecording@@QAEHXZ	1015cd70
+?Point_Transform@@YAHPAUVec4@@PAUMatrix4@@@Z	1001c510

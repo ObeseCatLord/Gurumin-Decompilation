@@ -213,3 +213,16 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - A function's stack frame size reveals the type of its locals: three floats computed into a 16-byte constructor-less
   local is a `float t[4]` (TransformNormal 0x101ae130), not a Vec3 or separate floats.
 - TextureObject +0x08/+0x0c are the texture width and height in pixels (FUN_101616e0 divides pixel UVs by them).
+- Exception frames: with /GX (/EHsc) an `extern "C"` function gets no unwind frame for its locals with destructors.
+  A function whose original has `push -1 / push handler / fs:[0]` must be a C++ function (Point_Transform 0x1001c510).
+- Fully unrolled copies (28 byte stores, 5 dword stores) are written out in the source; cl 13.00 does not unroll a
+  loop that long (DemoRecording::PlayFrame/RecordFrame 0x1015cf30/0x1015cd70).
+- `x = (a + b) * c` with a store between the add and the multiply was two statements: `x = a + b; x *= c;`
+  (Region_IsVisible 0x10021070). A float rounded to memory before fabs/atan2 means an inline float helper
+  (AbsFloat in char_leash.cpp, Atan2 in enemy_moves.cpp), whose parameters are spilled.
+- An `else` block placed first (right after a test) usually comes from else-if chains with one shared `return` at
+  the end rather than early returns (ListBank::Evaluate 0x100caf90).
+- A function that never uses `this` but is called with ecx set is a member function (TextureManager::OnLostDevice
+  = Render_OnLostDevice); one called without ecx set from a method is a free or static function.
+- Pass-through field compares: `0.0f < x ? x : 0` and `1.0f > a ? a : 1.0f` keep the original operand order of the
+  compare; the mirrored spelling flips the fcomp operands.

@@ -709,3 +709,4 @@ address	name	evidence
 1015d180	ImeContext::GetModeText	matched decompiled source (decomp/obj_symbols.tsv)
 1003a9d0	Overlay_UpdateFade	advances the fade and closes the open overlay mode (decomp/src/app_0010.cpp)
 1015cd70	DemoRecording::RecordFrame	matched decompiled source (decomp/obj_symbols.tsv)
+1001c510	Point_Transform	matched decompiled source (decomp/obj_symbols.tsv)

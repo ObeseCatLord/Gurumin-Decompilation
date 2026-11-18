@@ -1,4 +1,5 @@
 // Collision queries against the world (DAT_10255f08).
+#include "world.h"
 
 struct Vec4
 {
@@ -117,4 +118,48 @@ extern "C" int FUN_100248e0(Vec4 position, Vec4 *ground, float height)
     if (hit.x == -200000.0f)
         return 0;
     return 1;
+}
+
+// Per-slot direction record, 0x40 bytes (the first vector of DAT_10802bf8; see char_shots.cpp).
+struct SlotVector
+{
+    Vec4 vector;
+    char pad_0010[0x30];
+};
+
+extern "C" unsigned short DAT_104c0380;  // frame counter
+extern "C" SlotVector DAT_10802bf8[0x80];
+extern "C" Vec4 DAT_10864cf8[0x80];      // ground point found below each slot
+extern "C" char DAT_10467920[0x80];      // 1 = no ground found below the slot
+extern "C" int DAT_11b002c0;             // collision filter of the current test (a character's nearCells)
+
+// 0x1001a450 (Slot_HasNoGround). Every tenth frame (spread over the slots by slot number) casts a ray at the point
+// 15 units along slot `slot`'s vector from `point`, from 300 below to 50 above it, against the world collision
+// (mask 0x4000000) filtered by the slot's nearCells, and records the hit point in DAT_10864cf8 or that there is no
+// ground. Returns 1 when the slot has no ground below it (from this or an earlier test), else 0.
+extern "C" int FUN_1001a450(int slot, const Vec4 *point)
+{
+    if (DAT_104c0380 % 10 == slot % 10)
+    {
+        Vec4 low;
+        Vec4 high;
+        Vec4 hit;
+        low.Copy(DAT_10802bf8[slot].vector.Scaled(15.0f));
+        low.Copy(low + *point);
+        high.Copy(low);
+        high.z += 50.0f;
+        low.z -= 300.0f;
+        DAT_11b002c0 = (int)DAT_10db6ed8[slot].nearCells;
+        if (DAT_10255f08 != 0 && DAT_10255f08->CastSegment(0, 0x4000000, &low, &high, &hit, 0) != 0)
+        {
+            DAT_10864cf8[slot].Copy(hit);
+            DAT_10467920[slot] = 0;
+        }
+        else
+        {
+            DAT_10467920[slot] = 1;
+        }
+        DAT_11b002c0 = 0;
+    }
+    return DAT_10467920[slot] != 0;
 }

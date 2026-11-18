@@ -699,3 +699,5 @@ address	name	evidence
 101692c0	WorldRenderer::DrawOverlay	matched decompiled source (decomp/obj_symbols.tsv)
 1019c560	Node::ApplyMaterialColours	matched decompiled source (decomp/obj_symbols.tsv)
 1014ef20	TextureObject::WriteRgb32	matched decompiled source (decomp/obj_symbols.tsv)
+1001a450	Slot_HasNoGround	every tenth frame probes the ground ahead of a slot; 1 when there is none (decomp/src/collide_query.cpp)
+1002a340	Char_RunScript	runs a character script step loop, resets it at the end (decomp/src/char_script.cpp)

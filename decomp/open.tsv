@@ -74,3 +74,4 @@ address	status	reason
 10004760	open	ListBank::DeclareVariable: identical apart from block order (the original puts the type 0/1 block right after the type == 0 test, cl 13.00 here after all the tests); switch form tried
 10164af0	open	ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
 1019c560	open	Node::ApplyMaterialColours: schedule only (the original loads the material pointer into edx and g before r); local-struct and declaration orders tried
+1002a340	open	Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local

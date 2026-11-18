@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (73)
+## 1. Walls to retry (74)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -28,6 +28,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
+- [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
@@ -93,13 +94,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (185)
+## 3. Medium functions (251-800 bytes) (183)
 
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `100caf90` 292 bytes (float, loops 1, calls 6)
-- [ ] `1001a450` 315 bytes (float, calls 10)
 - [ ] `10145a50` 321 bytes (loops 2, calls 8)
-- [ ] `1002a340` 325 bytes (float, loops 1, calls 6)
 - [ ] `10188580` 325 bytes (float, loops 4, calls 1)
 - [ ] `10035d20` 328 bytes (loops 2, calls 1)
 - [ ] `10035fa0` 329 bytes (loops 2, calls 1)

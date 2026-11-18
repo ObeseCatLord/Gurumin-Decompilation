@@ -133,7 +133,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (69)
+## 3. Medium functions (251-800 bytes) (68)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `10169c60` 399 bytes (loops 2, calls 8)
@@ -180,7 +180,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1002a490` 685 bytes (float, calls 20)
 - [ ] `1016ac90` 687 bytes (loops 3, calls 13)
 - [ ] `1002f050` 690 bytes (float, calls 4)
-- [ ] `1001a0d0` 691 bytes (float, calls 37)
 - [ ] `10016700` 694 bytes (float, loops 3, calls 12)
 - [ ] `1016b400` 695 bytes (float, calls 17)
 - [ ] `10001170` 712 bytes (float, calls 14)
@@ -550,11 +549,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (0 files)
+## 7. Comment pass (1 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
+- [ ] `src/camera_follow.cpp`: 0 of 2 functions without a comment, no header
 
 ## 8. Structures and globals
 

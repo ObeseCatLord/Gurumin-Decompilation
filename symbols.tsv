@@ -760,3 +760,4 @@ address	name	evidence
 10011dd0	Npc_StandOnGround	idle NPC put on the ground on its first frame (open, decomp/src/char_ground.cpp)
 100541f0	Enemy_Destroy	destroys a character: sounds, effect, leftover model, script flag (matched, decomp/src/enemy_destroy.cpp)
 1013e790	Names_Expand	replaces registered names by their paths in a text (open, decomp/src_od/names_od.cpp)
+1013e9d0	Screenshot_ReadBackBuffer	copies the back buffer into a new 24-bit picture (open, decomp/src/screenshot.cpp)

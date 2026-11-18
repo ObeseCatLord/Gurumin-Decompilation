@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (88)
+## 1. Walls to retry (89)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -53,6 +53,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
 - [ ] `1013e4f0` 431 — RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `1013e790` 561 — Names_Expand (/Od unit src_od/names_od.cpp): code identical, only the stack slot of `p` differs (the original puts it below found/matches/best); function-scope declaration orders tried
+- [ ] `1013e9d0` 689 — Screenshot_ReadBackBuffer: identical except the row address in the 32-bit and 16-bit loops (original loads y then multiplies by the pitch, ours loads the pitch first); operand orders and index form tried
 - [ ] `10143870` 366 — TextureObject::BeginRenderTo: identical except block placement (the original puts the shared return 0 right after the first test; nested and early-return forms tried)
 - [ ] `10144040` 365 — blue corner quad: stores and calls identical; the original alternates ecx/eax for the constants (loads the next constant before the last stores of the previous one); chained and separate statements tried
 - [ ] `101441b0` 365 — black thumbnail-background quad: same register alternation residue as 0x10144040
@@ -108,7 +109,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (122)
+## 3. Medium functions (251-800 bytes) (121)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)
@@ -205,7 +206,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e21a0` 671 bytes (float, loops 2, calls 19)
 - [ ] `1002a490` 685 bytes (float, calls 20)
 - [ ] `1016ac90` 687 bytes (loops 3, calls 13)
-- [ ] `1013e9d0` 689 bytes (loops 6, calls 10)
 - [ ] `1002f050` 690 bytes (float, calls 4)
 - [ ] `1001a0d0` 691 bytes (float, calls 37)
 - [ ] `10016700` 694 bytes (float, loops 3, calls 12)

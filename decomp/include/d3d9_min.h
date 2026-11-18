@@ -33,7 +33,7 @@ struct IDirect3DDevice9
     virtual long __stdcall GetNumberOfSwapChains() = 0;
     virtual long __stdcall Reset(void *presentParameters) = 0;
     virtual long __stdcall Present(const void *source, const void *dest, void *window, const void *dirty) = 0;
-    virtual long __stdcall GetBackBuffer() = 0;
+    virtual long __stdcall GetBackBuffer(unsigned int swapChain, unsigned int index, int type, void **surface) = 0;
     virtual long __stdcall GetRasterStatus() = 0;
     virtual long __stdcall SetDialogBoxMode() = 0;
     virtual long __stdcall SetGammaRamp() = 0;

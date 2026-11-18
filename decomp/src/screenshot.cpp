@@ -1,0 +1,122 @@
+// Reading the back buffer for a screenshot (Screenshot_Capture 0x10137b10 saves the result).
+
+#include "d3d9_min.h"
+
+// D3DLOCKED_RECT.
+struct LockedRect
+{
+    int pitch;
+    void *bits;
+};
+
+// IDirect3DSurface9 (LockRect at slot 13 and UnlockRect at slot 14), as in texture_bind.cpp.
+struct D3DSurface : IUnknownLike
+{
+    virtual void __stdcall Slot03() = 0;
+    virtual void __stdcall Slot04() = 0;
+    virtual void __stdcall Slot05() = 0;
+    virtual void __stdcall Slot06() = 0;
+    virtual void __stdcall Slot07() = 0;
+    virtual void __stdcall Slot08() = 0;
+    virtual void __stdcall Slot09() = 0;
+    virtual void __stdcall Slot10() = 0;
+    virtual void __stdcall Slot11() = 0;
+    virtual void __stdcall Slot12() = 0;
+    virtual long __stdcall LockRect(LockedRect *locked, const void *rect, unsigned long flags) = 0;
+    virtual long __stdcall UnlockRect() = 0;
+};
+
+extern "C" IDirect3DDevice9 *DAT_10f1fcf0;   // the Direct3D device
+extern "C" int DAT_10202b24;                 // back-buffer width
+extern "C" int DAT_10202b28;                 // back-buffer height
+extern "C" int DAT_10f654a4;                 // non-zero = 32-bit colour mode (else R5G6B5)
+extern "C" int DAT_10f65540;                 // with 32-bit colour: non-zero = R8G8B8, else X8R8G8B8
+
+// 0x1013e9d0 (Screenshot_ReadBackBuffer). Copies the back buffer into a new 24-bit BGR picture (width * height * 3
+// bytes, allocated with new) and stores its size in *width and *height. The back buffer goes through a system-memory
+// surface of its own format (R8G8B8, X8R8G8B8 or R5G6B5, the last widened to 8 bits per channel). Returns the
+// picture, or 0 when a Direct3D call fails.
+extern "C" unsigned char *FUN_1013e9d0(int *width, int *height)
+{
+    D3DSurface *copy;
+    D3DSurface *backBuffer;
+    LockedRect locked;
+    int y;
+    if (DAT_10f1fcf0->GetBackBuffer(0, 0, 0, (void **)&backBuffer) != 0)
+        return 0;
+    long result;
+    if (DAT_10f654a4 != 0)
+    {
+        if (DAT_10f65540 != 0)
+            result = DAT_10f1fcf0->CreateOffscreenPlainSurface(DAT_10202b24, DAT_10202b28, 0x14 /* D3DFMT_R8G8B8 */,
+                                                               2 /* D3DPOOL_SYSTEMMEM */, (void **)&copy, 0);
+        else
+            result = DAT_10f1fcf0->CreateOffscreenPlainSurface(DAT_10202b24, DAT_10202b28, 0x16 /* D3DFMT_X8R8G8B8 */,
+                                                               2, (void **)&copy, 0);
+    }
+    else
+        result = DAT_10f1fcf0->CreateOffscreenPlainSurface(DAT_10202b24, DAT_10202b28, 0x17 /* D3DFMT_R5G6B5 */, 2,
+                                                           (void **)&copy, 0);
+    if (result != 0)
+    {
+        backBuffer->Release();
+        return 0;
+    }
+    if (DAT_10f1fcf0->GetRenderTargetData(backBuffer, copy) != 0)
+    {
+        backBuffer->Release();
+        copy->Release();
+        return 0;
+    }
+    unsigned char *pixels = new unsigned char[DAT_10202b24 * DAT_10202b28 * 3];
+    copy->LockRect(&locked, 0, 0x10 /* D3DLOCK_READONLY */);
+    unsigned char *bits = (unsigned char *)locked.bits;
+    if (DAT_10f654a4 != 0)
+    {
+        if (DAT_10f65540 != 0)
+        {
+            for (y = 0; y < DAT_10202b28; y++)
+            {
+                unsigned char *row = bits + y * locked.pitch;
+                for (int x = 0; x < DAT_10202b24; x++)
+                {
+                    pixels[(y * DAT_10202b24 + x) * 3 + 2] = row[x * 3 + 2];
+                    pixels[(y * DAT_10202b24 + x) * 3 + 1] = row[x * 3 + 1];
+                    pixels[(y * DAT_10202b24 + x) * 3 + 0] = row[x * 3 + 0];
+                }
+            }
+        }
+        else
+        {
+            for (y = 0; y < DAT_10202b28; y++)
+            {
+                unsigned char *row = bits + y * locked.pitch;
+                for (int x = 0; x < DAT_10202b24; x++)
+                {
+                    pixels[(y * DAT_10202b24 + x) * 3 + 2] = row[x * 4 + 2];
+                    pixels[(y * DAT_10202b24 + x) * 3 + 1] = row[x * 4 + 1];
+                    pixels[(y * DAT_10202b24 + x) * 3 + 0] = row[x * 4 + 0];
+                }
+            }
+        }
+    }
+    else
+    {
+        for (y = 0; y < DAT_10202b28; y++)
+        {
+            unsigned short *row = (unsigned short *)(bits + y * locked.pitch);
+            for (int x = 0; x < DAT_10202b24; x++)
+            {
+                pixels[(y * DAT_10202b24 + x) * 3 + 2] = (row[x] >> 8) & 0xf8;               // red: top 5 bits
+                pixels[(y * DAT_10202b24 + x) * 3 + 1] = (unsigned char)(row[x] >> 5) << 2;  // green: 6 bits
+                pixels[(y * DAT_10202b24 + x) * 3 + 0] = row[x] << 3;                        // blue: low 5 bits
+            }
+        }
+    }
+    copy->UnlockRect();
+    *width = DAT_10202b24;
+    *height = DAT_10202b28;
+    copy->Release();
+    backBuffer->Release();
+    return pixels;
+}

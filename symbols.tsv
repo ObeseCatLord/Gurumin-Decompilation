@@ -695,3 +695,5 @@ address	name	evidence
 10150a90	MeshData::Release	matched decompiled source (decomp/obj_symbols.tsv)
 10020f60	Markers_ProbeGround	flags marker points with no testatari ground below (decomp/src/collide_regions.cpp)
 10021070	Region_IsVisible	1 when a corner of a map region box is in the view volume (decomp/src/region_view.cpp)
+1019f210	Node::FindTouchingSphere	matched decompiled source (decomp/obj_symbols.tsv)
+101692c0	WorldRenderer::DrawOverlay	matched decompiled source (decomp/obj_symbols.tsv)

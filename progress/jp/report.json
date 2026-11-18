@@ -1,15 +1,15 @@
 {
  "measures": {
-  "fuzzy_match_percent": 4.5853,
+  "fuzzy_match_percent": 4.6192,
   "total_code": "1720206",
-  "matched_code": "70545",
-  "matched_code_percent": 4.101,
+  "matched_code": "71129",
+  "matched_code_percent": 4.1349,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 597,
-  "matched_functions_percent": 49.2574,
+  "matched_functions": 599,
+  "matched_functions_percent": 49.4224,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
@@ -6202,16 +6202,16 @@
    "name": "app/node_spheres",
    "measures": {
     "fuzzy_match_percent": 100.0,
-    "total_code": "221",
-    "matched_code": "221",
+    "total_code": "511",
+    "matched_code": "511",
     "matched_code_percent": 100.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 1,
-    "matched_functions": 1,
+    "total_functions": 2,
+    "matched_functions": 2,
     "matched_functions_percent": 100.0,
-    "complete_code": "221",
+    "complete_code": "511",
     "complete_code_percent": 100.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
@@ -6221,7 +6221,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "221",
+     "size": "511",
      "fuzzy_match_percent": 100.0
     }
    ],
@@ -6232,6 +6232,14 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270086240"
+     }
+    },
+    {
+     "name": "?FindTouchingSphere@Node@@QAEHHPBUVec4@@MPAPAU1@PAH@Z",
+     "size": "290",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270135824"
      }
     }
    ],
@@ -9958,16 +9966,16 @@
    "name": "app/world_frame",
    "measures": {
     "fuzzy_match_percent": 100.0,
-    "total_code": "350",
-    "matched_code": "350",
+    "total_code": "644",
+    "matched_code": "644",
     "matched_code_percent": 100.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 3,
-    "matched_functions": 3,
+    "total_functions": 4,
+    "matched_functions": 4,
     "matched_functions_percent": 100.0,
-    "complete_code": "350",
+    "complete_code": "644",
     "complete_code_percent": 100.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
@@ -9977,7 +9985,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "350",
+     "size": "644",
      "fuzzy_match_percent": 100.0
     }
    ],
@@ -10004,6 +10012,14 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270045184"
+     }
+    },
+    {
+     "name": "?DrawOverlay@WorldRenderer@@QAEXXZ",
+     "size": "294",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269914816"
      }
     }
    ],
@@ -10058,13 +10074,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1635357",
+    "total_code": "1634773",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 544,
+    "total_functions": 542,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -10077,7 +10093,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1635357",
+     "size": "1634773",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -13627,14 +13643,6 @@
      }
     },
     {
-     "name": "FUN_101692c0",
-     "size": "294",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269914816"
-     }
-    },
-    {
      "name": "FUN_101693f0",
      "size": "557",
      "fuzzy_match_percent": 0.0,
@@ -14216,14 +14224,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "270134960"
-     }
-    },
-    {
-     "name": "FUN_1019f210",
-     "size": "290",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270135824"
      }
     },
     {

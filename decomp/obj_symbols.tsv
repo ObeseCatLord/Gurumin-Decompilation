@@ -273,3 +273,5 @@ _Vec3_Dot	101ac200
 ?Release@MeshData@@QAEXXZ	10150a90
 ?Shutdown@TextureManager@@QAEHXZ	1015c730
 ?PumpAndRecover@TextureManager@@QAEHXZ	1015c850
+?FindTouchingSphere@Node@@QAEHHPBUVec4@@MPAPAU1@PAH@Z	1019f210
+?DrawOverlay@WorldRenderer@@QAEXXZ	101692c0

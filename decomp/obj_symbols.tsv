@@ -286,3 +286,4 @@ _Vec3_Dot	101ac200
 ?Point_Transform@@YAHPAUVec4@@PAUMatrix4@@@Z	1001c510
 ?UploadBones@MeshData@@QAEXPAUMatrix4@@H0H@Z	10145a50
 ?Map_UpdateSpecial@@YAHXZ	100bd960
+?Rename@Node@@QAEHPBD0@Z	1019ed40

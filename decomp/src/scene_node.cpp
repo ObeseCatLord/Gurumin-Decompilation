@@ -58,12 +58,14 @@ struct Node;
 
 struct GlyphState
 {
-    char pad_0000[0xc4];
+    char pad_0000[0x84];
+    char parentName[0x40];      // 0x84: name of the node this one is bound to
     Matrix m_00c4;
-    char pad_0104[0x1004];
+    int pad_0104;
+    char linkNames[0x40][0x40]; // 0x108: names of the linked nodes
     Node *links[0x40];          // 0x1108: nodes this skinned node depends on (m_5618 of them)
     Node *bones[0x44];
-    char pad_1318[0x1100];
+    char boneNames[0x44][0x40]; // 0x1318: names of the bones
     Matrix bindPose[0x44];
     Matrix m_3518[0x44];
     char pad_4618[0x1000];
@@ -282,6 +284,7 @@ struct Node
     Node *Root();
     int SetUniqueName(const char *name);
     void MakeNameUnique();
+    int Rename(const char *newName, const char *oldName);
     int TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix *matrix);
 };
 
@@ -1454,4 +1457,44 @@ int Node::TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix *matrix
         }
     }
     return 0;
+}
+
+// 0x1019ed40. Renames a node and every reference to it. Called with `oldName` = 0 on the node itself: the whole
+// tree (from its root) replaces the node's current name by `newName` in the skinning names (bound-to name, link
+// names, bone names), then the node takes the new name (returns 0). Called with a name, it does the replacing in
+// this node and all nodes below it (returns 1).
+int Node::Rename(const char *newName, const char *oldName)
+{
+    if (oldName == 0)
+    {
+        Node *root = Root();
+        if (root != 0)
+        {
+            root->Rename(newName, name);
+            strcpy(name, newName);
+            return 0;
+        }
+        Rename(newName, name);
+        strcpy(name, newName);
+        return 0;
+    }
+    if (m_0708 != 0)
+    {
+        if (_stricmp(m_0708->parentName, oldName) == 0)
+            strcpy(m_0708->parentName, newName);
+        int i;
+        for (i = 0; i < 0x40; i++)
+        {
+            if (_stricmp(m_0708->linkNames[i], oldName) == 0)
+                strcpy(m_0708->linkNames[i], newName);
+        }
+        for (i = 0; i < 0x44; i++)
+        {
+            if (_stricmp(m_0708->boneNames[i], oldName) == 0)
+                strcpy(m_0708->boneNames[i], newName);
+        }
+    }
+    for (int j = 0; j < childCount; j++)
+        children[j]->Rename(newName, oldName);
+    return 1;
 }

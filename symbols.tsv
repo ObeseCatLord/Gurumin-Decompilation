@@ -713,3 +713,4 @@ address	name	evidence
 10145a50	MeshData::UploadBones	matched decompiled source (decomp/obj_symbols.tsv)
 100bd960	Map_UpdateSpecial	matched decompiled source (decomp/obj_symbols.tsv)
 1001e340	Panel_DrawStatus	five-line text panel at the lower right (decomp/src/status_panel.cpp)
+1019ed40	Node::Rename	matched decompiled source (decomp/obj_symbols.tsv)

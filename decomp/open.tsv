@@ -85,3 +85,5 @@ address	status	reason
 10043cc0	open	Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 100357a0	open	CharParams::operator= (implicit copy, include/char_params.h): byte-identical in a probe; emitted only by a file with a caller (FUN_1005def0, FUN_1003e710, Game_LoadData)
 100084b0	open	Game::OpenWindow: logic identical; this/slot registers swapped (esi/edi) and the x/y/width/height stores come out in address order instead of the original y, x, height ... width
+100242c0	open	Char_ProbeAhead: logic identical; the original keeps the testOnly path's `return 1` block in place and the final test jumps back to it (ours puts it at the end); three return layouts tried
+100244b0	open	Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0

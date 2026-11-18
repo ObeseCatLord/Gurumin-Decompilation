@@ -15,6 +15,7 @@ struct Vec4
     Vec4 Scaled(const float &scale);
     void Fill(const float &value);
     float Length();  // 0x101ac4e0: length of x/y/z
+    void RotateZ(float angle);  // 0x101ac300
 };
 
 struct Matrix4
@@ -170,6 +171,107 @@ struct HeadNode
     char pad_0000[0x24c];
     CharMatrix worldMatrix;   // 0x24c
 };
+
+// Root node of a character model (scene_node.cpp Node).
+struct RootNode
+{
+    HeadNode *Find(const char *name, int index);  // 0x1019ece0: the index-th node called `name` in the subtree, or 0
+};
+
+// 0x100242c0 (Char_ProbeAhead). Casts a ray from character `index` (from its "Bip01 Head" node when `fromHead` is
+// set, or its position when it has none; from its position otherwise), moved by `offset` when given, to the point
+// `depth` units ahead of it (along -y turned by its heading), against world collision of kind 4 (mask 0x4000000). With `testOnly` only whether something is hit is returned; otherwise the hit
+// point goes to `ground` (x = -200000 when there is none). Returns 1 on a hit, else 0.
+extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, int testOnly, const Vec4 *offset)
+{
+    Vec4 from;
+    Vec4 to;
+    Vec4 unused;
+    Vec4 hit;
+    float zero = 0;
+    hit.Fill(zero);
+    hit.x = -200000.0f;
+    if (fromHead != 0)
+    {
+        HeadNode *head = DAT_10db6ed8[index].m_22fc->Find("Bip01 Head", 0);
+        if (head != 0)
+            from.Copy(head->worldMatrix.GetTranslation());
+        else
+            from.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    }
+    else
+    {
+        from.x = DAT_10db6ed8[index].m_2368.x;
+        from.y = DAT_10db6ed8[index].m_2368.y;
+        from.z = DAT_10db6ed8[index].m_2368.z;
+        from.w = DAT_10db6ed8[index].matrix.m[15];
+    }
+    if (offset != 0)
+        from.Copy(from + *offset);
+    to.Fill(0);
+    to.y -= depth;
+    to.RotateZ(-DAT_10db6ed8[index].heading);
+    to.Copy(to + from);
+    if (testOnly != 0)
+    {
+        if (DAT_10255f08 != 0 && DAT_10255f08->RayCast(0, 4, 0x4000000, &to, &from, &hit, 0) != 0)
+            return 1;
+        return 0;
+    }
+    if (DAT_10255f08 != 0 && DAT_10255f08->RayCast(0, 4, 0x4000000, &to, &from, &hit, 0) != 0)
+        float distance = (hit - from).Length();   // computed and not used
+    ground->Copy(hit);
+    if (hit.x != -200000.0f)
+        return 1;
+    return 0;
+}
+
+// 0x100244b0 (Char_ProbeDirection). Char_ProbeAhead with the direction given as `angle` (the drop of `depth` along -y
+// turned by it) and the collision limited to the nodes called `name` (0 = all).
+extern "C" int FUN_100244b0(int index, float angle, Vec4 *ground, float depth, int fromHead, int testOnly,
+                            const Vec4 *offset, const char *name)
+{
+    Vec4 from;
+    Vec4 to;
+    Vec4 unused;
+    Vec4 hit;
+    float zero = 0;
+    hit.Fill(zero);
+    hit.x = -200000.0f;
+    if (fromHead != 0)
+    {
+        HeadNode *head = DAT_10db6ed8[index].m_22fc->Find("Bip01 Head", 0);
+        if (head != 0)
+            from.Copy(head->worldMatrix.GetTranslation());
+        else
+            from.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    }
+    else
+    {
+        from.x = DAT_10db6ed8[index].m_2368.x;
+        from.y = DAT_10db6ed8[index].m_2368.y;
+        from.z = DAT_10db6ed8[index].m_2368.z;
+        from.w = DAT_10db6ed8[index].matrix.m[15];
+    }
+    if (offset != 0)
+        from.Copy(from + *offset);
+    to.Fill(0);
+    to.y -= depth;
+    to.RotateZ(angle);
+    to.Copy(to + from);
+    if (testOnly != 0)
+    {
+        if (DAT_10255f08 != 0 && DAT_10255f08->RayCast(name, 4, 0x4000000, &to, &from, &hit, 0) != 0)
+            return 1;
+        return 0;
+    }
+    if (DAT_10255f08 != 0 && DAT_10255f08->RayCast(name, 4, 0x4000000, &to, &from, &hit, 0) != 0)
+        float distance = (hit - from).Length();   // computed and not used
+    ground->Copy(hit);
+    if (hit.x != -200000.0f)
+        return 1;
+    return 0;
+}
 
 // 0x10024750 (Char_ProbeGround). Casts a ray down `depth` units from character `index` (from its head node when
 // `fromHead` is set and it has one, else from its position, 30 units up when `fromHead` is set), moved by `offset`

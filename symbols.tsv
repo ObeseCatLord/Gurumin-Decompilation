@@ -754,3 +754,5 @@ address	name	evidence
 1001c090	Char_PlaceOnGround	casts down and moves a character's second matrix to the ground (matched, decomp/src/char_ground.cpp)
 1001c210	Npc_TalkFacing	idle facing and turning to the player while talking (matched, decomp/src/npc_facing.cpp)
 1001b880	Npc_TalkFacingSimple	Npc_TalkFacing with talk motion 3 (matched, decomp/src/npc_facing.cpp)
+100242c0	Char_ProbeAhead	casts a ray ahead of a character along its heading (open, decomp/src/collide_query.cpp)
+100244b0	Char_ProbeDirection	casts a ray from a character in a given direction (open, decomp/src/collide_query.cpp)

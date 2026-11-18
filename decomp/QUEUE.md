@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (84)
+## 1. Walls to retry (86)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -30,6 +30,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
+- [ ] `100242c0` 487 — Char_ProbeAhead: logic identical; the original keeps the testOnly path's `return 1` block in place and the final test jumps back to it (ours puts it at the end); three return layouts tried
+- [ ] `100244b0` 502 — Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
 - [ ] `100357a0` 537 — CharParams::operator= (implicit copy, include/char_params.h): byte-identical in a probe; emitted only by a file with a caller (FUN_1005def0, FUN_1003e710, Game_LoadData)
@@ -104,7 +106,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (128)
+## 3. Medium functions (251-800 bytes) (126)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)
@@ -142,7 +144,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014b480` 484 bytes (float, calls 10)
 - [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
 - [ ] `10172ac0` 486 bytes (float, loops 2)
-- [ ] `100242c0` 487 bytes (float, loops 1, calls 21)
 - [ ] `10017d30` 488 bytes (loops 2, calls 22)
 - [ ] `10189340` 490 bytes (float, calls 6)
 - [ ] `1002f320` 494 bytes (float)
@@ -152,7 +153,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003c370` 497 bytes (loops 3, calls 9)
 - [ ] `10045ed0` 497 bytes (float, loops 2, calls 8)
 - [ ] `101ad350` 500 bytes (loops 1)
-- [ ] `100244b0` 502 bytes (float, loops 1, calls 21)
 - [ ] `10054770` 506 bytes (loops 1, calls 3)
 - [ ] `1009ddd0` 507 bytes (calls 11)
 - [ ] `10175a90` 507 bytes (loops 4, calls 6)

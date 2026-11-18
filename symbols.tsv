@@ -690,3 +690,6 @@ address	name	evidence
 10028360	Enemy_TurnToPlayer	turns towards the player at most 20 degrees a frame, random end (decomp/src/enemy_moves.cpp)
 1001e240	Map_IconTexture	texture of the current map icon, loaded with maruf00a.bmp as fallback (decomp/src/map_icons.cpp)
 10164af0	ModelBank::AddLitModel	matched decompiled source (decomp/obj_symbols.tsv)
+100bcb30	Enemy_UpdateBehaviour	runs the behaviour updater chosen by DAT_1020b230 (decomp/src/char_dispatch.cpp)
+1015c730	Render_Shutdown	destroys the window, releases D3D and logs reference counts (decomp/src/render_shutdown.cpp)
+10150a90	MeshData::Release	matched decompiled source (decomp/obj_symbols.tsv)

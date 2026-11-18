@@ -14,7 +14,7 @@ struct TextureManager
     int M_10173480();
     int M_101734d0();
     int M_10173510();
-    void M_1015c730();
+    void M_1015c730();  // Shutdown (render_shutdown.cpp)
     void M_10175e70();
 };
 
@@ -198,7 +198,7 @@ int TextureManager::M_10173510()
     return 1;
 }
 
-// Unloads all textures and releases the IME state (M_1015c730).
+// Unloads all textures and shuts the renderer down (M_1015c730 = TextureManager::Shutdown, render_shutdown.cpp).
 void TextureManager::M_10175e70()
 {
     M_10173480();

@@ -73,7 +73,7 @@ struct GlyphState
 struct MeshData
 {
     int M_10150bb0(struct PackHeader *packs, KeyPair *indexLists, int packCount, struct Material *materials, int flags);
-    void M_10150a90();
+    void Release();  // 0x10150a90 (mesh_release.cpp)
     void M_101476e0(int pack, int value);
     void M_10147690(int a, int b);
 };
@@ -842,7 +842,7 @@ void Node::ReleaseMesh()
 {
     if (mesh != 0 && FUN_10169990(mesh) == 0)
     {
-        mesh->M_10150a90();
+        mesh->Release();
         DAT_11b1ba40(mesh);
         mesh = 0;
         M_101911b0(packs, packCount);

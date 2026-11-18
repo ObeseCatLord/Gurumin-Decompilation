@@ -270,3 +270,5 @@ _Vec3_Dot	101ac200
 ?DrawTriangles@TextureObject@@QAEHPBXH@Z	1014bb70
 ?Unload@AnimModel@@QAEHXZ	10162c50
 ?AddLitModel@ModelBank@@QAEHPAUBankModel@@@Z	10164af0
+?Release@MeshData@@QAEXXZ	10150a90
+?Shutdown@TextureManager@@QAEHXZ	1015c730

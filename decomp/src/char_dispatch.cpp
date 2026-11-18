@@ -74,3 +74,80 @@ extern "C" int FUN_1009e2d0(int index)
         return FUN_1009c070(index);
     return 0;
 }
+
+// Enemy behaviour updaters selected by DAT_1020b230 (one value per character slot).
+extern "C" int DAT_1020b230[0x80];
+extern "C" int FUN_100a9240(int index, int variant);
+extern "C" int FUN_100aa820(int index, int variant);
+extern "C" int FUN_100af1b0(int index);
+extern "C" int FUN_100ade30(int index, int variant);
+extern "C" int FUN_100a5960(int index);
+extern "C" int FUN_10076790(int index, int variant);
+extern "C" int FUN_100a6a50(int index);
+extern "C" int FUN_100a7150(int index);
+extern "C" int FUN_100a7db0(int index);
+extern "C" int FUN_100a77f0(int index);
+extern "C" int FUN_100a8370(int index, int variant);
+extern "C" int FUN_1001d2d0(int index);
+
+// 0x100bcb30. Runs the behaviour updater of character `index` chosen by its behaviour number in DAT_1020b230
+// (1..17 and 99; any other number uses FUN_10076790 variant 0). Returns 0.
+extern "C" int FUN_100bcb30(int index)
+{
+    switch (DAT_1020b230[index])
+    {
+    case 1:
+        FUN_100a9240(index, 0);
+        return 0;
+    case 2:
+        FUN_100a9240(index, 1);
+        return 0;
+    case 3:
+    case 5:
+        FUN_100aa820(index, 2);
+        return 0;
+    case 4:
+    case 6:
+        FUN_100aa820(index, 1);
+        return 0;
+    case 7:
+        FUN_100af1b0(index);
+        return 0;
+    case 8:
+        FUN_100ade30(index, 0);
+        return 0;
+    case 9:
+        FUN_100ade30(index, 1);
+        return 0;
+    case 10:
+        FUN_100a5960(index);
+        return 0;
+    case 11:
+        FUN_10076790(index, 1);
+        return 0;
+    case 12:
+        FUN_100a6a50(index);
+        return 0;
+    case 13:
+        FUN_100a7150(index);
+        return 0;
+    case 14:
+        FUN_100a7db0(index);
+        return 0;
+    case 15:
+        FUN_100a77f0(index);
+        return 0;
+    case 16:
+        FUN_100a8370(index, 0);
+        return 0;
+    case 17:
+        FUN_100a8370(index, 1);
+        return 0;
+    case 99:
+        FUN_1001d2d0(index);
+        return 0;
+    default:
+        FUN_10076790(index, 0);
+        return 0;
+    }
+}

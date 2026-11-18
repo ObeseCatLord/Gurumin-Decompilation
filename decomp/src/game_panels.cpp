@@ -86,3 +86,54 @@ int Game::M_100091d0(const char *text, int x, int y)
     }
     return 1;
 }
+
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    Vec4();
+    void Copy(const Vec4 &source);
+    Vec4 Scaled(const float &scale);
+    float Length();                  // 0x101ac4e0: length of x/y/z
+};
+
+Vec4 Normalize3(const Vec4 &v);      // 0x101b1180: v scaled to unit length (x/y/z)
+
+// 0x10009050. Moves the menu cursor towards its target: 160 pixels a frame when more than 256 away, 80 when more
+// than 128, 20 when more than 20, and onto the target otherwise. Returns 1.
+int Game::MoveCursor()
+{
+    Vec4 step;
+    step.x = (float)(m_7630 - m_7638);
+    step.y = (float)(m_7634 - m_763c);
+    step.z = 0;
+    float distance = step.Length();
+    float speed;
+    if (distance > 256.0f)
+    {
+        step.Copy(Normalize3(step));
+        speed = 160.0f;
+    }
+    else if (distance > 128.0f)
+    {
+        step.Copy(Normalize3(step));
+        speed = 80.0f;
+    }
+    else if (distance > 20.0f)
+    {
+        step.Copy(Normalize3(step));
+        speed = 20.0f;
+    }
+    else
+    {
+        m_763c = m_7634;
+        m_7638 = m_7630;
+        return 1;
+    }
+    step.Copy(step.Scaled(speed));
+    m_7638 += (int)step.x;
+    m_763c += (int)step.y;
+    return 1;
+}

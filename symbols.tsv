@@ -728,3 +728,4 @@ address	name	evidence
 10024ac0	Collision_AverageNormals	averages the world hit normals of a model probe nodes (decomp/src/collide_normals.cpp)
 1001af10	Shaga_PushOut	matched decompiled source (decomp/obj_symbols.tsv)
 10024750	Char_ProbeGround	ray down from a character head or position; hit point or test only (decomp/src/collide_query.cpp)
+10009050	Game::MoveCursor	matched decompiled source (decomp/obj_symbols.tsv)

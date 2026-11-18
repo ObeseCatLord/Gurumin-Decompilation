@@ -102,10 +102,10 @@ struct Game : Object
     char pad_63cc[0xc30];
     int m_6ffc;
     char pad_7000[0x630];
-    int m_7630;
-    int m_7634;
-    int m_7638;
-    int m_763c;
+    int m_7630;                 // 0x7630: menu cursor target x
+    int m_7634;                 // 0x7634: menu cursor target y
+    int m_7638;                 // 0x7638: menu cursor x (follows the target)
+    int m_763c;                 // 0x763c: menu cursor y
     int m_7640;
     int m_7644;
     int m_7648;
@@ -174,6 +174,7 @@ struct Game : Object
     int M_100087b0(int id, int count);
     int M_100087f0(int x, int y, int w, int h, int frame, float alpha);
     int M_10008880(int x, int y, int w, int h, int frame, float alpha);
+    int MoveCursor();  // 0x10009050 (game_panels.cpp)
     int M_10008910(int x, int y, int lit, int rows, int a, int b, int color);
     int M_10008fa0(int x, int y, int color, int frame);
     int M_100091d0(const char *text, int x, int y);

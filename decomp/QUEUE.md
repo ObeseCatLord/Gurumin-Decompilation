@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (80)
+## 1. Walls to retry (81)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -16,6 +16,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10001980` 263 — looping sound play: same cross-jumping residue as 0x100016c0
 - [ ] `10004760` 236 — ListBank::DeclareVariable: identical apart from block order (the original puts the type 0/1 block right after the type == 0 test, cl 13.00 here after all the tests); switch form tried
 - [ ] `10008910` 275 — Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
+- [ ] `10009050` 375 — Game::MoveCursor: logic identical; the original shares one stack slot for the int-to-float temporaries, the distance and the speed (frame 4 bytes smaller); shared-variable form tried
 - [ ] `100091d0` 239 — Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
@@ -100,7 +101,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 bytes (loops 2, calls 1)
 - [ ] `1016b260` 209 bytes (float, calls 5)
 
-## 3. Medium functions (251-800 bytes) (154)
+## 3. Medium functions (251-800 bytes) (153)
 
 - [ ] `10035e80` 277 bytes (loops 2, calls 1)
 - [ ] `10035d20` 328 bytes (loops 2, calls 1)
@@ -112,7 +113,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000beb0` 366 bytes TestDat_Load (loops 6, calls 7)
 - [ ] `1000dd90` 373 bytes (float, loops 1, calls 6)
-- [ ] `10009050` 375 bytes (float, calls 12)
 - [ ] `10024d00` 377 bytes (float, calls 13)
 - [ ] `1001c090` 384 bytes (float, calls 12)
 - [ ] `101ac010` 387 bytes Node::Load (loops 4, calls 12)

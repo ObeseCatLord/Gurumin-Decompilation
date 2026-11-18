@@ -243,3 +243,6 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   form `if (!(z > 1.0 || z < 0.9))`; `z <= 1.0 && z >= 0.9` (in either operand order) gives `jp`/`test ah,1`
   (Drops_Update 0x1000c390). A float argument computed into a register and pushed as an int (`mov edx,[tmp]; push
   edx`) was a named local (`float alpha = ...;`) rather than an expression in the call.
+- Two branches ending in the same call can be one shared call in the original's code because the compiler merged
+  them: write the call in each branch (`if (a) { s = 1; Play(); } else if (b) { s = 0; Play(); }`), not an early
+  `return` plus one call at the end; the merged tail schedules `this` differently (Npc_TalkFacing 0x1001c210).

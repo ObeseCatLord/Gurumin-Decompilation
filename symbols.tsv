@@ -751,3 +751,6 @@ address	name	evidence
 1000b2c0	Game::AddFlagEntry	adds a flag entry to a menu window (matched, decomp/src/menu_items.cpp)
 1000b4e0	Game::AddKind5Entry	adds a kind-5 entry to a menu window (matched, decomp/src/menu_items.cpp)
 1000b750	Game::AddRangeEntry	adds a range entry to a menu window (matched, decomp/src/menu_items.cpp)
+1001c090	Char_PlaceOnGround	casts down and moves a character's second matrix to the ground (matched, decomp/src/char_ground.cpp)
+1001c210	Npc_TalkFacing	idle facing and turning to the player while talking (matched, decomp/src/npc_facing.cpp)
+1001b880	Npc_TalkFacingSimple	Npc_TalkFacing with talk motion 3 (matched, decomp/src/npc_facing.cpp)

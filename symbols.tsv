@@ -702,3 +702,4 @@ address	name	evidence
 1001a450	Slot_HasNoGround	every tenth frame probes the ground ahead of a slot; 1 when there is none (decomp/src/collide_query.cpp)
 1002a340	Char_RunScript	runs a character script step loop, resets it at the end (decomp/src/char_script.cpp)
 10188580	EffectManager::Update	matched decompiled source (decomp/obj_symbols.tsv)
+100caf90	ListBank::Evaluate	matched decompiled source (decomp/obj_symbols.tsv)

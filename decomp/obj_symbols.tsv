@@ -278,3 +278,4 @@ _Vec3_Dot	101ac200
 ?ApplyMaterialColours@Node@@QAEHXZ	1019c560
 ?WriteRgb32@TextureObject@@QAEHHHHHHPBE@Z	1014ef20
 ?Update@EffectManager@@QAEHHHH@Z	10188580
+?Evaluate@ListBank@@QAEHPBDD@Z	100caf90

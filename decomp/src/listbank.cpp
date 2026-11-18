@@ -20,7 +20,8 @@ struct ScriptBlock
 struct ListBank
 {
     int *result;              // 0x00: where the last evaluated expression left its value
-    int pad_0004;
+    char resultType;          // 0x04: type of *result: 0 = int, 1 = float, 2 = quoted text
+    char pad_0005[3];
     ParserCallback callback;  // 0x08: message callback (may be 0)
     char m_000c[8][0x80][0x10];
     char m_400c[8][0x80];
@@ -61,7 +62,8 @@ struct ListBank
     int CompileText();
     int LoadText(const char *source, int length);
     int GetIndexPart(const char *name, char *part, int n);    // 0x10036560: the n-th [ ] part of `name`
-    int Evaluate(const char *expression, int flags);         // 0x100caf90: leaves the value in *result
+    int Evaluate(const char *expression, char type);
+    int CompileCall(const char *text, int flags);              // 0x10089a10 (Script_CompileCall)
     int FirstIndexValue(const char *name, int *value);
     int DeclareVariable(const char *name, int group, char type);
 };
@@ -381,3 +383,46 @@ int ListBank::DeclareVariable(const char *name, int group, char type)
     return 1;
 }
 
+// 0x100caf90. Compiles `expression` (its value lands in *result, of type resultType) and converts the value to
+// `type`: 0 = int (a float is truncated, text is read with atol), 1 = float (text with atof), 2 = quoted text
+// ("%d" or "%f" in quotes). An unknown result type gives 0, or "NULL" in quotes for text. Returns 1.
+int ListBank::Evaluate(const char *expression, char type)
+{
+    CompileCall(expression, 0);
+    if (type == 0)
+    {
+        if (resultType == 0)
+        {
+            // already an int
+        }
+        else if (resultType == 1)
+            *result = (int)*(float *)result;
+        else if (resultType == 2)
+            *result = atol((char *)result + 1);
+        else
+            *result = 0;
+    }
+    else if (type == 1)
+    {
+        if (resultType == 0)
+            *(float *)result = (float)*result;
+        else if (resultType == 1)
+        {
+            // already a float
+        }
+        else if (resultType == 2)
+            *(float *)result = (float)atof((char *)result + 1);
+        else
+            *result = 0;
+    }
+    else if (type == 2)
+    {
+        if (resultType == 0)
+            sprintf((char *)result, "\"%d\"", *result);
+        else if (resultType == 1)
+            sprintf((char *)result, "\"%f\"", *(float *)result);
+        else if (resultType != 2)
+            strcpy((char *)result, "\"NULL\"");
+    }
+    return 1;
+}

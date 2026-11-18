@@ -313,3 +313,4 @@ _Vec3_Dot	101ac200
 ?AddKind5Entry@Game@@QAEHHPBDPAH@Z	1000b4e0
 ?AddRangeEntry@Game@@QAEHHPBDHHPAH@Z	1000b750
 ?Teleport@PathMover@@QAEHMMM@Z	10162420
+?SetModelState@WorldRenderer@@QAEHHH@Z	10166f20

@@ -763,3 +763,4 @@ address	name	evidence
 100211a0	Region_WaveVertex	moves a region vertex by sine waves of the frame counter (open, decomp/src/region_view.cpp)
 10162610	AnimModel::SetPosition	moves a model and resets its motion state (matched, decomp/src/model_place.cpp)
 10162420	AnimModel::Teleport	SetPosition plus the second matrix and the root's saved states (matched, decomp/src/model_place.cpp)
+10166f20	WorldRenderer::SetModelState	starts, ends or drops the saved state of a world model's linked node (matched, decomp/src/world_model_state.cpp)

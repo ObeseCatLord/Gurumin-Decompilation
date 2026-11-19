@@ -834,3 +834,4 @@ address	name	evidence
 100b8220	Npc_Greet	NPC greeting countdown, faces the player, random greeting balloon and sound 0x356 (decomp/src/npc_greet.cpp)
 1002ebf0	DamageZone_Update	zone box hurts enemies 0x3a-0x5b, every step-th per frame (decomp/src/damage_zone.cpp)
 10058500	Switch_UpdateEffects	every 12 frames restarts the effects of visible held switch objects (decomp/src/switch_effects.cpp)
+10057c40	Switch_Hold	puts an object in a free switch hold slot, sets the holder's hold bit or object bonus (decomp/src/switches.cpp)

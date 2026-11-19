@@ -111,3 +111,87 @@ extern "C" int FUN_1005f640(int slot)
     }
     return 0;
 }
+
+extern "C" int DAT_10219fc0[0x80];       // effect kind of each slot (switch_effects.cpp)
+extern "C" int DAT_1042e0a8[0x80];       // 1 once the slot's effect was started
+extern "C" int DAT_10219c40[0x80];
+
+// 0x10057c40 (Switch_Hold). Lets `holder` (a character slot, or 0x80 + an object index) hold `object` (0 = the
+// holder's own model) with effect kind `kind`: the object must not be held yet and needs a free slot. A character
+// gets hold bit 1 (kinds 0 and 1) or 2 (kind 2) and, for slot kind 0x60, its switch node turned on; an object gets
+// its "held" bonus of 1000. Returns 1, or 0 when the object is already held or no slot is free. (Without an
+// explicit object the original treats slot 0x40 as "none free", a leftover of a smaller table.)
+extern "C" int FUN_10057c40(int holder, int object, int kind)
+{
+    int slot;
+    if (object != 0)
+    {
+        for (slot = 0; slot < 0x80; slot++)
+        {
+            if (DAT_1030bbf8[slot] == object)
+                return 0;
+        }
+        for (slot = 0; slot < 0x80; slot++)
+        {
+            if (DAT_1030bbf8[slot] == 0)
+                break;
+        }
+        if (slot == 0x80)
+            return 0;
+    }
+    else
+    {
+        object = (int)DAT_10db6ed8[holder].m_22fc;
+        for (slot = 0; slot < 0x80; slot++)
+        {
+            if (DAT_1030bbf8[slot] == object)
+                return 0;
+        }
+        for (slot = 0; slot < 0x80; slot++)
+        {
+            if (DAT_1030bbf8[slot] == 0)
+                break;
+        }
+        if (slot == 0x40)
+            return 0;
+    }
+    DAT_1030bbf8[slot] = object;
+    DAT_10255b08[slot] = holder;
+    if (kind == 0)
+    {
+        if (holder < 0x80)
+        {
+            DAT_10daab84[holder].m_00a4 |= 1;
+            if (DAT_1021f3c0[holder] == 0x60)
+                DAT_10874848.M_10054f30(DAT_10db6ed8[holder].m_0280, 1);
+        }
+        else
+            DAT_10254838[holder % 0x80] += 1000;
+    }
+    else if (kind == 1)
+    {
+        if (holder < 0x80)
+        {
+            DAT_10daab84[holder].m_00a4 |= 1;
+            if (DAT_1021f3c0[holder] == 0x60)
+                DAT_10874848.M_10054f30(DAT_10db6ed8[holder].m_0280, 1);
+        }
+        else
+            DAT_10254838[holder % 0x80] += 1000;
+    }
+    else if (kind == 2)
+    {
+        if (holder < 0x80)
+        {
+            DAT_10daab84[holder].m_00a4 |= 2;
+            if (DAT_1021f3c0[holder] == 0x60)
+                DAT_10874848.M_10054f30(DAT_10db6ed8[holder].m_0280, 1);
+        }
+        else
+            DAT_10254838[holder % 0x80] += 1000;
+    }
+    DAT_10219fc0[slot] = kind;
+    DAT_1042e0a8[slot] = 0;
+    DAT_10219c40[slot] = 1;
+    return 1;
+}

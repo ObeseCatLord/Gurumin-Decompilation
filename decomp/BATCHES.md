@@ -193,7 +193,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 129 | medium functions | 100ba040, 1019b630, 1003aef0 Bgm_Play | Bgm_Play matched; 100ba040 (talk prompt near NPCs, many globals) and 1019b630 (recursive bone blend) left |
 | 130 | medium functions | 100b8220 Npc_Greet, 1002ebf0 DamageZone_Update, 100b9930 | Npc_Greet matched; DamageZone_Update open (index register); 100b9930 (enemy retreat behaviour) left |
 | 131 | medium functions | 10058500 Switch_UpdateEffects, 10192a00, 10045c30 | Switch_UpdateEffects matched; 10192a00 (cylinder overlap) and 10045c30 (NPC watching the player) left |
-| 132 | medium functions | 1004f250, 10057c40, 1000d6b0 | |
+| 132 | medium functions | 1004f250, 10057c40 Switch_Hold, 1000d6b0 | Switch_Hold open (slot register swap); 1004f250 (tutorial texture loader) and 1000d6b0 (key prompt drawing) left |
 | 133 | medium functions | 1001d920, 100e21a0, 1002a490 | |
 | 134 | medium functions | 1002f050, 10016700, 1016b400 | |
 | 135 | medium functions | 10001170, 1014b750, 1016a980 | |
@@ -205,3 +205,5 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 141 | medium functions | 100b5f80, 1009dfd0, 101453e0 Font_DrawGlyph | |
 | 142 | medium functions | 10161781, 1016b050, 101670e0 | |
 | 143 | medium functions | 10055690 retry, 1013f070 neighbours: 10148590, 1014b750 | |
+| 144 | medium functions | 1019b350, 10037560, 1014e940 | |
+| 145 | medium functions | 1017c5f0, 10166520, 1005dbf0 | |

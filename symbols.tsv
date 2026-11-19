@@ -890,3 +890,4 @@ address	name	evidence
 1000d6b0	KeyPrompt_DrawAll	draws the key prompt cell above every character that shows one (matched, decomp/src/key_prompt_draw.cpp)
 10192a00	Cylinder_Overlap	overlap test of the upright cylinders inscribed in two moved boxes (matched, decomp/src/box_overlap.cpp)
 100b9930	Enemy_DragToPit	turns an enemy to the player and drags it along until it fades out over the pit
+100ba040	Npc_PlayGreeting	plays the voice line of a kind-0x140 town character when the player walks up to it

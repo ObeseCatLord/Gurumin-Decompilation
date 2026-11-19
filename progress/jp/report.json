@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.1496,
+  "fuzzy_match_percent": 11.1314,
   "total_code": "1720206",
-  "matched_code": "153962",
-  "matched_code_percent": 8.9502,
+  "matched_code": "153335",
+  "matched_code_percent": 8.9138,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 742,
-  "matched_functions_percent": 61.2211,
+  "matched_functions": 741,
+  "matched_functions_percent": 61.1386,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 226,
-  "complete_units": 138
+  "complete_units": 137
  },
  "units": [
   {
@@ -9477,42 +9477,42 @@
   {
    "name": "app/npc_greet",
    "measures": {
-    "fuzzy_match_percent": 100.0,
-    "total_code": "627",
-    "matched_code": "627",
-    "matched_code_percent": 100.0,
+    "fuzzy_match_percent": 51.8581,
+    "total_code": "604",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
     "total_functions": 1,
-    "matched_functions": 1,
-    "matched_functions_percent": 100.0,
-    "complete_code": "627",
-    "complete_code_percent": 100.0,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 1
+    "complete_units": 0
    },
    "sections": [
     {
      "name": ".text",
-     "size": "627",
-     "fuzzy_match_percent": 100.0
+     "size": "604",
+     "fuzzy_match_percent": 51.8581
     }
    ],
    "functions": [
     {
-     "name": "_FUN_100b8220",
-     "size": "627",
-     "fuzzy_match_percent": 100.0,
+     "name": "_FUN_100ba040",
+     "size": "604",
+     "fuzzy_match_percent": 51.8581,
      "metadata": {
-      "virtual_address": "269189664"
+      "virtual_address": "269197376"
      }
     }
    ],
    "metadata": {
-    "complete": true,
+    "complete": false,
     "source_path": "decomp/src/npc_greet.cpp"
    }
   },
@@ -14672,7 +14672,7 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1505929",
+    "total_code": "1505952",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
@@ -14691,7 +14691,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1505929",
+     "size": "1505952",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -16297,6 +16297,14 @@
      }
     },
     {
+     "name": "FUN_100b8220",
+     "size": "627",
+     "fuzzy_match_percent": 0.0,
+     "metadata": {
+      "virtual_address": "269189664"
+     }
+    },
+    {
      "name": "FUN_100b84a0",
      "size": "3244",
      "fuzzy_match_percent": 0.0,
@@ -16318,14 +16326,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269196208"
-     }
-    },
-    {
-     "name": "FUN_100ba040",
-     "size": "604",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269197376"
      }
     },
     {

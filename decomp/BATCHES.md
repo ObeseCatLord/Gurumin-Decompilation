@@ -260,6 +260,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 196 | wall retries | 10055690, Raise*Events | IsQueuedEventReady, RaiseGameOver/Kskon/Talk/OpenEvents matched (element pointer after the first test); Fire/Lever/Door left (inline budget) |
 | 198 | medium functions | 100ba040, 100b9930, 10192a00 | 10192a00 Cylinder_Overlap matched (block-scoped temporaries) and wall 10191fd0 Box_Overlap with it (separate early returns) |
 | 199 | medium functions | 100ba040, 100b9930, 1004f250 | 100b9930 Enemy_DragToPit open (one float copy) |
-| 201 | medium functions | 100ba040, 1004f250, 10045c30 | |
-| 200 | wall retries | float-compare walls, MarkKilled | |
+| 201 | medium functions | 100ba040, 1004f250, 10045c30 | 100ba040 Npc_PlayGreeting open; pick.py now keeps line endings |
+| 202 | medium functions | 1004f250, 10045c30, 10037560 | |
+| 200 | wall retries | float-compare walls, MarkKilled | MarkKilled and Vec4::InTriangle still open (register roles, return-block placement) |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (127)
+## 1. Walls to retry (126)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -50,7 +50,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1002ee70` 473 — Char_UpdateShoves: identical except the original schedules the fadd of 3.1415 after the stack pop of the atan2 call (angle local and separate add tried)
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
 - [ ] `10034cc0` 429 — Party_BlocksMove: logic identical; the original copies the first atan2 result through a temporary and reloads the second in place (fld/fstp round trips); result locals and helper forms tried
-- [ ] `100357a0` 537 — CharParams::operator= (implicit copy, include/char_params.h): byte-identical in a probe; emitted only by a file with a caller (FUN_1005def0, FUN_1003e710, Game_LoadData)
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
 - [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
@@ -411,7 +410,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10016ec0` 2970 bytes (float, loops 6, calls 56)
 - [ ] `10165240` 2986 bytes (float, loops 15, calls 68)
 
-## 5. Very large functions (over 3000 bytes) (114)
+## 5. Very large functions (over 3000 bytes) (113)
 
 - [ ] `100094e0` 3023 bytes (float, loops 2, calls 27)
 - [ ] `100fb7b0` 3089 bytes (float, loops 16, calls 57)
@@ -463,7 +462,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10075350` 5154 bytes (float, loops 10, calls 95)
 - [ ] `10084e80` 5359 bytes (float, loops 14, calls 128)
 - [ ] `100a4440` 5381 bytes (float, loops 13, calls 149)
-- [ ] `1003e710` 5401 bytes (loops 7, calls 69)
 - [ ] `100fc4a0` 5485 bytes (float, loops 21, calls 143)
 - [ ] `100a9240` 5587 bytes (float, loops 19, calls 109)
 - [ ] `1002d4e0` 5810 bytes (float, loops 4, calls 83)
@@ -533,12 +531,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (1 files)
+## 7. Comment pass (2 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
 - [ ] `src/camera_follow.cpp`: 0 of 3 functions without a comment, no header
+- [ ] `src/zz_probe.cpp`: 1 of 1 functions without a comment, no header
 
 ## 8. Structures and globals
 

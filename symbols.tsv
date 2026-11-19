@@ -733,7 +733,7 @@ address	name	evidence
 10035e80	ListBank::ReadWord	reads the next word of a statement (matched, decomp/src/listbank.cpp)
 10035fa0	ListBank::ReadTerm	reads the next word, '&' split off as its own word (matched, decomp/src/listbank.cpp)
 10036560	ListBank::GetIndexPart	copies the n-th [ ] part of a variable name (matched, decomp/src/listbank.cpp)
-100357a0	CharParams::operator=	copy of a 0x188-byte character parameter record (open, decomp/include/char_params.h)
+100357a0	CharParams::operator=	copy of a 0x188-byte character parameter record (matched through Game_Reset, decomp/include/char_params.h)
 10008a30	Game::DrawLabelledNumber	draws a number with a label in front (matched, decomp/src/game_panels.cpp)
 10008c40	Game::DrawNumber	draws a centred number with menu digits (matched, decomp/src/game_panels.cpp)
 10008df0	Game::DrawNumberAlt	DrawNumber with the second digit row (matched, decomp/src/game_panels.cpp)
@@ -841,3 +841,4 @@ address	name	evidence
 1016a980	Camera_Reset	zeroes the camera vectors and clears camera flags and blend counters (decomp/src/camera_reset.cpp)
 10021380	Map_SetEntryFlags	sets script flags 0x400/0x418/0x43c/0x453/0x454 per map number (decomp/src/map_entry_flags.cpp)
 10142dd0	Keyboard_IsButtonDown	game button mapped to a DirectInput key, default layout for map 0 (decomp/src/joystick_buttons.cpp)
+1003e710	Game_Reset	clears every game global and resets the subsystems for a new game (decomp/src/game_reset.cpp)

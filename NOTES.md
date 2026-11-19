@@ -296,3 +296,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   offset += n;` per field) explain a run of stores to that int between the copies (Save_Load 0x1003b2c0).
 - A big sparse `switch` lays out its case blocks in source order; recover that order from the original's block
   addresses (Map_SetEntryFlags 0x10021380).
+- cl 13.00 turns plain fill loops into `rep stosd`, packing shorts into dwords (`for (i < 0x44c) a[i] = -11` gives
+  `mov eax, 0xfff5fff5; mov ecx, 0x226; rep stosd`), so a fill of a value memset cannot make is still a loop
+  (Game_Reset 0x1003e710).
+- Ghidra drops `this` for thiscall callees whose ecx is set well before the call (`mov ecx, 0x104687b8` six
+  stores earlier): an unexplained early `mov ecx, imm` is the object of the next call.
+- Long store-only functions can be generated from the pseudocode (store widths from the asm, `Fill` targets from
+  the `mov ecx` before each call) and then fixed by comparing instruction offsets to find the first divergence.

@@ -15,7 +15,7 @@ address	name	evidence
 100ed9b0	Script_CompileStatement	errors for goto/for/while/switch/return in scripts
 10089a10	Script_CompileCall	argument count/type/reference checks
 100cb0c0	Game_LoadData	loads effects.efx, logo.mmv, bin\map.txt (map.itm), render textures
-1003aef0	Bgm_Play	builds "bgm\%s.de2"; index 0..0x40
+1003aef0	Bgm_Play	streams bgm\<name>.de2 and checks its header, anti-tamper noise on failure (decomp/src/bgm_play.cpp)
 10064630	Menu_SaveLoad	save/load/quit confirmation texts, gdata%02d.sav
 10112140	Menu_Main	main menu, shop, sound config, name entry, gdata%02d.sav
 10137b10	Screenshot_Capture	"%s\capture\capture%05d.jpg"
@@ -831,4 +831,3 @@ address	name	evidence
 10175a90	Texture_CreateCopy	named texture slot made from another texture object's pixels, size and alpha (decomp/src/texture_create.cpp)
 100236c0	Overlay_DrawModel	draws the overlay mode model with its camera, light and fade-in alpha (decomp/src/overlay_draw.cpp)
 1015c450	DShowStream::Open	opens a movie as an IAMMultiMediaStream with a DirectDraw surface sample (decomp/src/dshow_stream.cpp)
-1003aef0	Bgm_Play	streams bgm\<name>.de2 and checks its header, anti-tamper noise on failure (decomp/src/bgm_play.cpp)

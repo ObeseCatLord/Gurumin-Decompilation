@@ -279,3 +279,12 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   in a conditional: `__max(0, t - 5) > limit ? limit : __max(0, t - 5)` (Item_DrawCaption 0x1003c370).
   `__max(0, x)` gives `setl`, `__max(x, 0)` gives `setle`.
 - `strlen(s) / 2` divides unsigned (`shr`); the original's `cdq; sub; sar` is `(int)strlen(s) / 2`.
+- Range checks written as two statements (`if (i < 0) return 0; if (i > max) return 0;`) keep the shared
+  `return 0` block inline right after the tests; `if (i < 0 || i > max) return 0;` moves it to the end of the
+  function (Bgm_Play 0x1003aef0).
+- An if/else whose then-branch is the common path (`if (attacking == 1) {...} else {...}`) puts the else-branch at
+  the end; the same logic as early returns lays the blocks out the other way (Kind4a_Update 0x1009ddd0).
+- A reloaded-pointer copy `T *p = param;` made before a loop moves the parameter loads above the first test
+  (Rle_Decode 0x101612b0); a table indexed `[group * 256 + word]` should be declared `[groups][256]` when the
+  original steps a row pointer (Text_Substitute 0x1000c020).
+- An `inline` helper with a call and three stores was not inlined at /Ob1 here; duplicated statements matched.

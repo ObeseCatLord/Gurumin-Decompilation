@@ -831,3 +831,4 @@ address	name	evidence
 10175a90	Texture_CreateCopy	named texture slot made from another texture object's pixels, size and alpha (decomp/src/texture_create.cpp)
 100236c0	Overlay_DrawModel	draws the overlay mode model with its camera, light and fade-in alpha (decomp/src/overlay_draw.cpp)
 1015c450	DShowStream::Open	opens a movie as an IAMMultiMediaStream with a DirectDraw surface sample (decomp/src/dshow_stream.cpp)
+1003aef0	Bgm_Play	streams bgm\<name>.de2 and checks its header, anti-tamper noise on failure (decomp/src/bgm_play.cpp)

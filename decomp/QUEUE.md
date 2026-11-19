@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (139)
+## 1. Walls to retry (140)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -74,6 +74,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
 - [ ] `100b9930` 637 — Enemy_DragToPit: identical except the heading store: the original rounds atan2 into the dead parameter slot and copies it with fld/fstp before the RotateZ setup, cl 13.00 here copies it through edx after; direct cast, Atan2 wrapper and local forms tried
+- [ ] `100b9bb0` 867 — Enemy_PlayVoice: same switch (jump table plus the 0x1e4.. range); the original keeps 15 and 0x2d in ebx/ebp, recomputes index*16+slot for every access and tests the cooldown kinds in turn, cl 13.00 here threads the kind tests after the reset stores; 2-D, flat and re-read kind forms tried
 - [ ] `100ba040` 604 — Npc_PlayGreeting: same statements; the original copies the AbsFloat result into the height local with fld/fstp (cl 13.00 here stores it directly) and places the new-greeting block after the walked-away block (goto and flag forms tried)
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
@@ -178,7 +179,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (196)
+## 4. Large functions (801-3000 bytes) (195)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -190,7 +191,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100b5c30` 843 bytes (float, calls 25)
 - [ ] `10142790` 846 bytes (loops 1, calls 24)
 - [ ] `1014f590` 865 bytes (float, loops 5, calls 11)
-- [ ] `100b9bb0` 867 bytes (calls 1)
 - [ ] `1014e5d0` 870 bytes (float, loops 1, calls 12)
 - [ ] `1014d4e0` 874 bytes TextureObject::DrawFrame (float, loops 1, calls 19)
 - [ ] `10055ee0` 881 bytes (loops 4, calls 17)

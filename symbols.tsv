@@ -896,3 +896,4 @@ address	name	evidence
 10037560	ListBank::AssignValue	stores a script value into a keyword array element or a declared variable, converting to its type
 10016700	Ground_HeightAt	averages the height samples of the nearest ground object around a point (-5000 = none)
 10037090	ListBank::FindVariable	finds a declared script variable (array indexes evaluated and checked) and its element offset
+100b9bb0	Enemy_PlayVoice	plays an enemy voice unless its per-kind cooldown runs, then sets the cooldown by sound

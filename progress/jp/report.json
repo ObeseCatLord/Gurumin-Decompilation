@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.2899,
+  "fuzzy_match_percent": 11.3062,
   "total_code": "1720206",
   "matched_code": "154615",
   "matched_code_percent": 8.9882,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 229,
+  "total_units": 230,
   "complete_units": 138
  },
  "units": [
@@ -4944,6 +4944,48 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/enemy_moves.cpp"
+   }
+  },
+  {
+   "name": "app/enemy_voice",
+   "measures": {
+    "fuzzy_match_percent": 32.2464,
+    "total_code": "867",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "867",
+     "fuzzy_match_percent": 32.2464
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_100b9bb0",
+     "size": "867",
+     "fuzzy_match_percent": 32.2464,
+     "metadata": {
+      "virtual_address": "269196208"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/enemy_voice.cpp"
    }
   },
   {
@@ -14822,13 +14864,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1501604",
+    "total_code": "1500737",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 331,
+    "total_functions": 330,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14841,7 +14883,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1501604",
+     "size": "1500737",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -16420,14 +16462,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269193552"
-     }
-    },
-    {
-     "name": "FUN_100b9bb0",
-     "size": "867",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269196208"
      }
     },
     {

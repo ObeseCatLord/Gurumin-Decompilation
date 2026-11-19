@@ -184,13 +184,14 @@ struct Node
     Matrix worldMatrix;          // 0x24c: the node's matrix in world space
 
     struct TextureRef *m_028c;
-    void *m_0290;
-    int m_0294;
+    Matrix *frames;              // 0x290: the node's matrix for each animation frame
+    int m_0294;                  // 0x294: number of frames
     char pad_0298[0x10];
     struct Extra *m_02a8;
     char pad_02ac[0x24];
     unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
-    char pad_02d1[0x403];
+    char pad_02d1[3];
+    Matrix poses[16];            // 0x2d4: the current pose ([0]) and stored poses
     union
     {
         Vec4 bounds[3];          // 0x6d4: bounding sphere (w = radius) and the two box corners
@@ -230,6 +231,7 @@ struct Node
     void M_10191d50();
     int M_1019eeb0(Node *root, Node **list, int *count);
     int CopyMesh(Node *source, int slot);
+    int BlendFrames(int from, int to, float t);
     void M_101ab9d0(Node *root);
     int M_10191770();
     void Release();
@@ -828,12 +830,12 @@ void Node::M_10191210()
     {
         DAT_11b1ba40(m_028c);
         m_028c = 0;
-        if (m_0290 != 0)
-            DAT_11b1ba40(m_0290);
-        m_0290 = 0;
+        if (frames != 0)
+            DAT_11b1ba40(frames);
+        frames = 0;
         m_0294 = 0;
     }
-    m_0290 = 0;
+    frames = 0;
     m_0294 = 0;
     m_028c = 0;
 }
@@ -1869,5 +1871,55 @@ copyMaterials:
     bounds[0].Copy(source->bounds[0]);
     bounds[1].Copy(source->bounds[1]);
     bounds[2].Copy(source->bounds[2]);
+    return 1;
+}
+
+// 0x101b1420: `out` = a blended towards b by t (mode 1: rotation interpolated for skeleton roots).
+Matrix *MatrixBlend(Matrix *out, Matrix a, Matrix b, float t, int mode);
+
+// 0x1019b630. Sets the current pose of this node and its subtree to frame `from` (a stored pose for -1, -2, ...)
+// blended towards frame `to` by `t`. The skeleton root "Bip01" (when DAT_11b04508 is set) and "charbase..." nodes
+// blend their rotation (mode 1; charbase only with DAT_11b04508 set). Returns 0 for no node, else 1.
+int Node::BlendFrames(int from, int to, float t)
+{
+    if (this == 0)
+        return 0;
+    if (frames != 0)
+    {
+        if (from < 0)
+        {
+            if (m_0294 > to)
+            {
+                int pose = -1 - from;
+                if (DAT_11b04508 != 0 && _stricmp(name, "Bip01") == 0)
+                    MatrixBlend(&poses[0], poses[pose], frames[to], t, 1);
+                else if (_strnicmp(name, "charbase", 8) == 0)
+                {
+                    if (DAT_11b04508 != 0)
+                        MatrixBlend(&poses[0], poses[pose], frames[to], t, 1);
+                    else
+                        MatrixBlend(&poses[0], poses[pose], frames[to], t, 0);
+                }
+                else
+                    MatrixBlend(&poses[0], poses[pose], frames[to], t, 0);
+            }
+        }
+        else if (m_0294 > from && m_0294 > to)
+        {
+            if (DAT_11b04508 != 0 && _stricmp(name, "Bip01") == 0)
+                MatrixBlend(&poses[0], frames[from], frames[to], t, 1);
+            else if (_strnicmp(name, "charbase", 8) == 0)
+            {
+                if (DAT_11b04508 != 0)
+                    MatrixBlend(&poses[0], frames[from], frames[to], t, 1);
+                else
+                    MatrixBlend(&poses[0], frames[from], frames[to], t, 0);
+            }
+            else
+                MatrixBlend(&poses[0], frames[from], frames[to], t, 0);
+        }
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->BlendFrames(from, to, t);
     return 1;
 }

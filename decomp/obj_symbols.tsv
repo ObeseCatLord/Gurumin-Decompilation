@@ -383,3 +383,4 @@ _sqrtf	10002010
 ?CreateTextures@ModelBank@@QAEHXZ	1017c160
 ?WeldVertices@Node@@QAEHXZ	1019e610
 ?CopyMesh@Node@@QAEHPAU1@H@Z	1019b350
+?BlendFrames@Node@@QAEHHHM@Z	1019b630

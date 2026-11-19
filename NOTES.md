@@ -326,3 +326,6 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `FILETIME times[4]` used as times[0..2] (SystemSav_WriteRecord 0x1015fea0); separate variables are ordered differently.
 - Copying a byte buffer once per loop iteration into an `int c` local gives the original's movsx/xor/add sequence
   in cl's 8x-unrolled checksum loops; two reads of `name[i]` do not.
+- Comparison operand order is visible: `count > to` gives `cmp eax(count), reg / jle`, `to < count` gives
+  `cmp reg, [count] / jge` (Node::BlendFrames 0x1019b630). Matrices passed by value are copied with `rep movsd`
+  onto the stack in argument order.

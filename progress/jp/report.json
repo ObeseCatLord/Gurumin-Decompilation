@@ -1,15 +1,15 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.0218,
+  "fuzzy_match_percent": 11.0598,
   "total_code": "1720206",
-  "matched_code": "151211",
-  "matched_code_percent": 8.7903,
+  "matched_code": "152764",
+  "matched_code_percent": 8.8806,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 735,
-  "matched_functions_percent": 60.6436,
+  "matched_functions": 740,
+  "matched_functions_percent": 61.0561,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
@@ -795,16 +795,16 @@
   {
    "name": "app/app_0003",
    "measures": {
-    "fuzzy_match_percent": 62.7853,
+    "fuzzy_match_percent": 74.8058,
     "total_code": "5443",
-    "matched_code": "1956",
-    "matched_code_percent": 35.9361,
+    "matched_code": "3509",
+    "matched_code_percent": 64.4681,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
     "total_functions": 17,
-    "matched_functions": 8,
-    "matched_functions_percent": 47.0588,
+    "matched_functions": 13,
+    "matched_functions_percent": 76.4706,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -816,7 +816,7 @@
     {
      "name": ".text",
      "size": "5443",
-     "fuzzy_match_percent": 62.7853
+     "fuzzy_match_percent": 74.8058
     }
    ],
    "functions": [
@@ -871,7 +871,7 @@
     {
      "name": "?RaiseGameOverEvents@Game@@QAEHXZ",
      "size": "270",
-     "fuzzy_match_percent": 97.0588,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "268782176"
      }
@@ -879,7 +879,7 @@
     {
      "name": "?MarkKilled@Game@@QAEHH@Z",
      "size": "506",
-     "fuzzy_match_percent": 26.6129,
+     "fuzzy_match_percent": 27.4194,
      "metadata": {
       "virtual_address": "268781424"
      }
@@ -895,7 +895,7 @@
     {
      "name": "?RaiseKskonEvents@Game@@QAEHH@Z",
      "size": "239",
-     "fuzzy_match_percent": 64.5833,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "268781936"
      }
@@ -903,7 +903,7 @@
     {
      "name": "?RaiseTalkEvents@Game@@QAEHH@Z",
      "size": "239",
-     "fuzzy_match_percent": 61.25,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "268782448"
      }
@@ -911,7 +911,7 @@
     {
      "name": "?RaiseOpenEvents@Game@@QAEHH@Z",
      "size": "239",
-     "fuzzy_match_percent": 61.25,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "268782688"
      }
@@ -919,7 +919,7 @@
     {
      "name": "?RaiseFireEvents@Game@@QAEHHH@Z",
      "size": "476",
-     "fuzzy_match_percent": 27.6042,
+     "fuzzy_match_percent": 29.6875,
      "metadata": {
       "virtual_address": "268782928"
      }
@@ -927,7 +927,7 @@
     {
      "name": "?RaiseLeverEvents@Game@@QAEHHH@Z",
      "size": "476",
-     "fuzzy_match_percent": 27.6042,
+     "fuzzy_match_percent": 29.6875,
      "metadata": {
       "virtual_address": "268783408"
      }
@@ -935,7 +935,7 @@
     {
      "name": "?RaiseDoorEvents@Game@@QAEHHH@Z",
      "size": "476",
-     "fuzzy_match_percent": 27.6042,
+     "fuzzy_match_percent": 29.6875,
      "metadata": {
       "virtual_address": "268783888"
      }
@@ -943,7 +943,7 @@
     {
      "name": "?IsQueuedEventReady@Game@@QAEHXZ",
      "size": "566",
-     "fuzzy_match_percent": 39.4643,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "268785296"
      }

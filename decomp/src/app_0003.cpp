@@ -170,11 +170,13 @@ int Game::RaiseGameOverEvents()
 {
     for (int i = 0; i < mapEventCount; i++)
     {
-        GameTrigger *event = &mapEvents[i];
-        if (strcmp(event->name, "GAMEOVER") == 0 && (event->map == 9999 || event->map == currentMap) &&
-            TestScriptFlag(event->flags[0]) && TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
-            TestScriptFlag(event->flags[3]))
-            RegisterEvent(event->value);
+        if (strcmp(mapEvents[i].name, "GAMEOVER") == 0)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
     }
     return 0;
 }
@@ -188,24 +190,27 @@ int Game::MarkKilled(int id)
     killed[id] = 1;
     for (int i = 0; i < mapEventCount; i++)
     {
-        GameTrigger *event = &mapEvents[i];
-        if (strcmp(event->name, "DEAD") == 0 && (event->map == 9999 || event->map == currentMap) &&
-            TestScriptFlag(event->flags[0]) && TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
-            TestScriptFlag(event->flags[3]))
+        if (strcmp(mapEvents[i].name, "DEAD") == 0)
         {
-            char count = killed[event->argument > 0x5e ? 0x5f : event->argument] != 0;
-            if (killed[event->ids[0] > 0x5e ? 0x5f : event->ids[0]] != 0)
-                count++;
-            if (killed[event->ids[1] > 0x5e ? 0x5f : event->ids[1]] != 0)
-                count++;
-            if (killed[event->ids[2] > 0x5e ? 0x5f : event->ids[2]] != 0)
-                count++;
-            if (killed[event->ids[3] > 0x5e ? 0x5f : event->ids[3]] != 0)
-                count++;
-            if (killed[event->ids[4] > 0x5e ? 0x5f : event->ids[4]] != 0)
-                count++;
-            if (count == 6)
-                RegisterEvent(event->value);
+            GameTrigger *event = &mapEvents[i];
+            if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                TestScriptFlag(event->flags[3]))
+            {
+                char count = killed[event->argument > 0x5e ? 0x5f : event->argument] != 0;
+                if (killed[event->ids[0] > 0x5e ? 0x5f : event->ids[0]] != 0)
+                    count++;
+                if (killed[event->ids[1] > 0x5e ? 0x5f : event->ids[1]] != 0)
+                    count++;
+                if (killed[event->ids[2] > 0x5e ? 0x5f : event->ids[2]] != 0)
+                    count++;
+                if (killed[event->ids[3] > 0x5e ? 0x5f : event->ids[3]] != 0)
+                    count++;
+                if (killed[event->ids[4] > 0x5e ? 0x5f : event->ids[4]] != 0)
+                    count++;
+                if (count == 6)
+                    RegisterEvent(event->value);
+            }
         }
     }
     return 0;
@@ -239,11 +244,14 @@ int Game::RaiseKskonEvents(int argument)
 {
     for (int i = 0; i < mapEventCount; i++)
     {
-        GameTrigger *event = &mapEvents[i];
-        if (strcmp(event->name, "KSKON") == 0 && event->argument == argument &&
-            (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-            TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-            RegisterEvent(event->value);
+        if (strcmp(mapEvents[i].name, "KSKON") == 0 && mapEvents[i].argument == argument)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
     }
     return 0;
 }
@@ -253,11 +261,14 @@ int Game::RaiseTalkEvents(int argument)
 {
     for (int i = 0; i < mapEventCount; i++)
     {
-        GameTrigger *event = &mapEvents[i];
-        if (event->argument == argument && strcmp(event->name, "TALK") == 0 &&
-            (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-            TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-            RegisterEvent(event->value);
+        if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "TALK") == 0)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
     }
     return 0;
 }
@@ -267,11 +278,14 @@ int Game::RaiseOpenEvents(int argument)
 {
     for (int i = 0; i < mapEventCount; i++)
     {
-        GameTrigger *event = &mapEvents[i];
-        if (event->argument == argument && strcmp(event->name, "OPEN") == 0 &&
-            (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-            TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-            RegisterEvent(event->value);
+        if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "OPEN") == 0)
+        {
+            GameTrigger *event = &mapEvents[i];
+            if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                TestScriptFlag(event->flags[3]))
+                RegisterEvent(event->value);
+        }
     }
     return 0;
 }
@@ -284,27 +298,32 @@ int Game::RaiseFireEvents(int argument, int on)
     {
         for (int i = 0; i < mapEventCount; i++)
         {
-            GameTrigger *event = &mapEvents[i];
-            if (event->argument == argument && strcmp(event->name, "MFIREON") == 0 &&
-                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-                RegisterEvent(event->value);
+            if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "MFIREON") == 0)
+            {
+                GameTrigger *event = &mapEvents[i];
+                if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                    TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                    TestScriptFlag(event->flags[3]))
+                    RegisterEvent(event->value);
+            }
         }
     }
     else
     {
         for (int i = 0; i < mapEventCount; i++)
         {
-            GameTrigger *event = &mapEvents[i];
-            if (event->argument == argument && strcmp(event->name, "MFIREOFF") == 0 &&
-                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-                RegisterEvent(event->value);
+            if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "MFIREOFF") == 0)
+            {
+                GameTrigger *event = &mapEvents[i];
+                if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                    TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                    TestScriptFlag(event->flags[3]))
+                    RegisterEvent(event->value);
+            }
         }
     }
     return 0;
 }
-
 // 0x10054f30. Same for the "LEVERON" or "LEVEROFF" events of `argument` (a lever node), by `on`.
 int Game::RaiseLeverEvents(int argument, int on)
 {
@@ -312,22 +331,28 @@ int Game::RaiseLeverEvents(int argument, int on)
     {
         for (int i = 0; i < mapEventCount; i++)
         {
-            GameTrigger *event = &mapEvents[i];
-            if (event->argument == argument && strcmp(event->name, "LEVERON") == 0 &&
-                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-                RegisterEvent(event->value);
+            if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "LEVERON") == 0)
+            {
+                GameTrigger *event = &mapEvents[i];
+                if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                    TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                    TestScriptFlag(event->flags[3]))
+                    RegisterEvent(event->value);
+            }
         }
     }
     else
     {
         for (int i = 0; i < mapEventCount; i++)
         {
-            GameTrigger *event = &mapEvents[i];
-            if (event->argument == argument && strcmp(event->name, "LEVEROFF") == 0 &&
-                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-                RegisterEvent(event->value);
+            if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "LEVEROFF") == 0)
+            {
+                GameTrigger *event = &mapEvents[i];
+                if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                    TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                    TestScriptFlag(event->flags[3]))
+                    RegisterEvent(event->value);
+            }
         }
     }
     return 0;
@@ -340,22 +365,28 @@ int Game::RaiseDoorEvents(int argument, int on)
     {
         for (int i = 0; i < mapEventCount; i++)
         {
-            GameTrigger *event = &mapEvents[i];
-            if (event->argument == argument && strcmp(event->name, "DROPEN") == 0 &&
-                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-                RegisterEvent(event->value);
+            if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "DROPEN") == 0)
+            {
+                GameTrigger *event = &mapEvents[i];
+                if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                    TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                    TestScriptFlag(event->flags[3]))
+                    RegisterEvent(event->value);
+            }
         }
     }
     else
     {
         for (int i = 0; i < mapEventCount; i++)
         {
-            GameTrigger *event = &mapEvents[i];
-            if (event->argument == argument && strcmp(event->name, "DRCLOSE") == 0 &&
-                (event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
-                TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) && TestScriptFlag(event->flags[3]))
-                RegisterEvent(event->value);
+            if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "DRCLOSE") == 0)
+            {
+                GameTrigger *event = &mapEvents[i];
+                if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
+                    TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+                    TestScriptFlag(event->flags[3]))
+                    RegisterEvent(event->value);
+            }
         }
     }
     return 0;
@@ -377,11 +408,14 @@ int Game::IsQueuedEventReady()
     {
         for (int j = 0; j < count; j++)
         {
-            if (ids[j] == queuedTriggers[t].value &&
-                (queuedTriggers[t].map == 9999 || currentMap == queuedTriggers[t].map) &&
-                TestScriptFlag(queuedTriggers[t].flags[0]) && TestScriptFlag(queuedTriggers[t].flags[1]) &&
-                TestScriptFlag(queuedTriggers[t].flags[2]) && TestScriptFlag(queuedTriggers[t].flags[3]))
-                return 1;
+            if (ids[j] == queuedTriggers[t].value)
+            {
+                GameTrigger *trigger = &queuedTriggers[t];
+                if ((trigger->map == 9999 || currentMap == trigger->map) && TestScriptFlag(trigger->flags[0]) &&
+                    TestScriptFlag(trigger->flags[1]) && TestScriptFlag(trigger->flags[2]) &&
+                    TestScriptFlag(trigger->flags[3]))
+                    return 1;
+            }
         }
     }
     return 0;

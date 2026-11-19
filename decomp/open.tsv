@@ -47,7 +47,6 @@ address	status	reason
 100016c0	open	sound play: identical apart from cross-jumping; the original merges the two position branches only at the code-5 SendMessage, cl 13.00 here already at code 4 (code 4 hoisted out, branches swapped tried)
 10165020	open	bubble sort: ours stores count-1 in the dead parameter slot, the original in a separate local; a named local makes cl 13.00 unroll the inner loop by 4 (local inside/outside the loop, early return tried)
 1016a100	open	Playback::SetLayer: the original unrolls both 16-entry fills (zero kept in esi, -2 as immediates) and tests layer <= 0x8f; cl 13.00 here emits rep stosd (flat, nested 4x4, pointer and merged loops tried)
-10054a60	open	Game::RaiseGameOverEvents: identical except the loop pointer: the original keeps &entry.flags[1] in ebp, cl 13.00 here &entry.flags[0] (pointer and indexed forms tried)
 10001980	open	looping sound play: same cross-jumping residue as 0x100016c0
 101acc60	open	DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 1000f360	open	face change: calls match; the original keeps index in esi and frame in edi (ours swapped) and indexes the face tables as flat int arrays [set*0x1c0+frame]
@@ -61,9 +60,6 @@ address	status	reason
 101992f0	open	Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)
 101883b0	open	EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 100fb6d0	open	ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
-10054970	open	Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
-10054b70	open	Game::RaiseTalkEvents: same loop-pointer residue as 0x10054a60
-10054c60	open	Game::RaiseOpenEvents: same loop-pointer residue as 0x10054a60
 10037470	open	ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
 10004760	open	ListBank::DeclareVariable: identical apart from block order (the original puts the type 0/1 block right after the type == 0 test, cl 13.00 here after all the tests); switch form tried
 10164af0	open	ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
@@ -94,9 +90,9 @@ address	status	reason
 10024d00	open	Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
 10191fd0	open	Box_Overlap (__stdcall): only block order differs: the original keeps the return-0 block on the fallthrough of the last compare; early returns, per-axis returns, nested and else forms tried
 10194c60	open	Node::UpdateWorld: code identical except the EH state of the AnimatedMatrix temporary (ours 1, original 5; the original unwind map has four empty states 1-4); branch order, named result locals and a conditional expression tried
-10054d50	open	Game::RaiseFireEvents: same loop-pointer residue as 0x10054a60 (flags pointer local tried: bias moves to argument)
-10054f30	open	Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
-10055110	open	Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60
+10054d50	open	Game::RaiseFireEvents: the event-pointer form of the other Raise* functions fixes the loop pointer, but cl 13.00 inlines no TestScriptFlag here (the original expands flags[0] once per loop and calls the rest), even compiled alone; swapped loop order and a function-scope pointer tried
+10054f30	open	Game::RaiseLeverEvents: same inline-budget residue as 0x10054d50
+10055110	open	Game::RaiseDoorEvents: same inline-budget residue as 0x10054d50
 10175c90	open	Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
 1002ee70	open	Char_UpdateShoves: identical except the original schedules the fadd of 3.1415 after the stack pop of the atan2 call (angle local and separate add tried)
 10034cc0	open	Party_BlocksMove: logic identical; the original copies the first atan2 result through a temporary and reloads the second in place (fld/fstp round trips); result locals and helper forms tried
@@ -112,7 +108,6 @@ address	status	reason
 10169c60	open	TextureObject::Create (MeshInstance in mesh_cache.cpp): statements identical; the original returns from the first size test before push esi (ours pushes first) and computes width*height*3 separately in the two speckle branches (ours computes it once before the branch); split tests and loop forms tried
 1013e260	open	UserFolder_FindNt: identical apart from block placement (the original puts the strcpy(base) branch out of line after the fsetup.dll loop and jumps back; ours keeps it before the loop); if/else orders and the combined test tried
 10017d30	open	RenderTarget_Probe: 2 bytes; the original compares the second UpdateImage result with the zero register (cmp eax, ebp), ours uses test eax, eax; !x and result-local forms tried
-10055690	open	Game::IsQueuedEventReady: the unrolled collection loop matches; in the trigger loop the original steps a pointer equal to this + t*200 and addresses every field with its full offset, ours folds 0x1f9780 into the pointer; trigger-pointer and comparison-order forms tried
 1000c020	open	Text_Substitute: 15 bytes; in the replacement path the original keeps out in edx (stored once at the loop bottom) and loads best before the copy, ours keeps text in the register and stores out on both paths; the word tables are 2-D now (that fixed the search loop); add orders and declaration orders tried
 1015c450	open	DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
 1002ebf0	open	DamageZone_Update: same tests; register allocation differs from the start (the original leaves index in its stack slot and reloads it, ours keeps it in ebx, which changes the flag-test layout and hides the loop-invariant (float)left the original hoists); else-if, nested and conditional forms of the flag test tried

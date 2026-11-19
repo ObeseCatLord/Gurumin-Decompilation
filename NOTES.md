@@ -193,6 +193,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - **Float comparison spellings** (fcomp, then the flag test): `a <= b` gives `test ah, 41h / jnp`, `!(a > b)` gives
   `test ah, 41h / jne`; `a >= b` gives `test ah, 1`, while `a < b` used as a skip test gives `test ah, 5 / jnp`. Pick
   the spelling from the flag test (KeyPrompt_DrawAll 0x1000d6b0: `!(x > -100000)` and `if (z < 0.9 || ...) continue`).
+- **Element pointer after the first test**: a loop that tests one field of `array[i]` and only then works on the
+  entry takes the pointer inside the `if` (`if (strcmp(events[i].name, "TALK") == 0) { GameTrigger *event =
+  &events[i]; ... }`). Taking it first biases the loop pointer to another field. This matched RunQueuedEvents,
+  IsQueuedEventReady and the Raise*Events family (0x10054970..0x10054c60).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (139)
+## 1. Walls to retry (134)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -64,14 +64,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054770` 506 — Game::MarkKilled: same statements; like RaiseGameOverEvents the original walks the events with two pointers (&flags[1] and &ids[0]) and keeps this in ebp, cl 13.00 here one event pointer and this in ebx (pointer and indexed forms tried)
-- [ ] `10054970` 239 — Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
-- [ ] `10054a60` 270 — Game::RaiseGameOverEvents: identical except the loop pointer: the original keeps &entry.flags[1] in ebp, cl 13.00 here &entry.flags[0] (pointer and indexed forms tried)
-- [ ] `10054b70` 239 — Game::RaiseTalkEvents: same loop-pointer residue as 0x10054a60
-- [ ] `10054c60` 239 — Game::RaiseOpenEvents: same loop-pointer residue as 0x10054a60
-- [ ] `10054d50` 476 — Game::RaiseFireEvents: same loop-pointer residue as 0x10054a60 (flags pointer local tried: bias moves to argument)
-- [ ] `10054f30` 476 — Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
-- [ ] `10055110` 476 — Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60
-- [ ] `10055690` 566 — Game::IsQueuedEventReady: the unrolled collection loop matches; in the trigger loop the original steps a pointer equal to this + t*200 and addresses every field with its full offset, ours folds 0x1f9780 into the pointer; trigger-pointer and comparison-order forms tried
+- [ ] `10054d50` 476 — Game::RaiseFireEvents: the event-pointer form of the other Raise* functions fixes the loop pointer, but cl 13.00 inlines no TestScriptFlag here (the original expands flags[0] once per loop and calls the rest), even compiled alone; swapped loop order and a function-scope pointer tried
+- [ ] `10054f30` 476 — Game::RaiseLeverEvents: same inline-budget residue as 0x10054d50
+- [ ] `10055110` 476 — Game::RaiseDoorEvents: same inline-budget residue as 0x10054d50
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried

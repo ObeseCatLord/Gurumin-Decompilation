@@ -288,3 +288,11 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   (Rle_Decode 0x101612b0); a table indexed `[group * 256 + word]` should be declared `[groups][256]` when the
   original steps a row pointer (Text_Substitute 0x1000c020).
 - An `inline` helper with a call and three stores was not inlined at /Ob1 here; duplicated statements matched.
+- `cmp eax, ebx` (the zero register) after a call where cl 13.00 gives `test eax, eax`: the result went into a
+  local first (`void *opened = file.Open(...); if (opened == 0)`) (MmvPlayer::Open 0x10160a90).
+- A palette built with `movzx reg16` and `and reg, 0xfff8` works on unsigned shorts:
+  `(unsigned short)(unsigned char)r & ~7` (MmvPlayer::Open).
+- Reads from a buffer with a moving cursor whose position is also counted in an address-taken int (`p += n;
+  offset += n;` per field) explain a run of stores to that int between the copies (Save_Load 0x1003b2c0).
+- A big sparse `switch` lays out its case blocks in source order; recover that order from the original's block
+  addresses (Map_SetEntryFlags 0x10021380).

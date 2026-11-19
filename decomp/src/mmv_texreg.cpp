@@ -1,6 +1,7 @@
 // MMV movie player (docs/MODDING_MAP.md, tools/mmv_tool.py) and the texture name registry.
 // Texture slots: DAT_10ffe5f8[1600][0x40] holds each slot's file name (empty = free).
 
+#include <stdio.h>
 #include <string.h>
 
 struct ClipRect
@@ -20,6 +21,8 @@ struct MovieFile
     void Close();
     int Read(void *buffer, int size, int count);   // 0x101b23a0
     int Seek(int offset, int origin);              // 0x101b2380
+    int Open(const char *path, const char *mode);  // 0x101b2310: non-zero when the file was opened
+    int Size();                                    // 0x101b2370
 };
 
 struct MmvPlayer
@@ -41,7 +44,7 @@ struct MmvPlayer
     char m_004b;
     char m_004c;
     char pad_004d;
-    char m_004e[0x202];
+    unsigned short palette[0x101]; // 0x4e: the movie's 255 colours as RGB565, entry 255 = 0xfbff
     char *memory;          // 0x250: whole movie in memory (when not streamed from the file)
     void *frame;           // 0x254: decoded 8-bit frame (palette indexes), updated in place
     unsigned char *data;   // 0x258: compressed data of the current frame
@@ -54,6 +57,7 @@ struct MmvPlayer
     void ReadFrameOnce();
     void M_10161050();
     void DecodeFrameRle(int count);
+    void Open(const char *path);
 };
 
 extern "C" void (*DAT_11b1ba40)(void *);
@@ -223,7 +227,7 @@ int MmvPlayer::M_10160960(const ClipRect *clip)
     {
         int h = height > clip->bottom ? clip->bottom : height;
         int w = width > clip->right ? clip->right : width;
-        FUN_1014f120(0, 0, w, h, width, frame, m_004e);
+        FUN_1014f120(0, 0, w, h, width, frame, palette);
     }
     return 1;
 }
@@ -345,5 +349,86 @@ void MmvPlayer::DecodeFrameRle(int count)
     done_code:
         or edx, edx
         jne next_code
+    }
+}
+
+// The engine's file object (save_slot.cpp GameFile, 0x28 bytes).
+struct GameFile
+{
+    void *handle;
+    char name[0x24];
+    GameFile();                                    // 0x101ad9e0
+    ~GameFile();                                   // 0x101b2570
+    void *Open(const char *path, const char *mode);    // 0x101b2310: the stdio handle, 0 on failure
+    void Close();                                  // 0x101b22f0
+    int Size();                                    // 0x101b2370
+    int Seek(int offset, int origin);              // 0x101b2380
+    int Read(void *buffer, int size, int count);   // 0x101b23a0
+};
+
+extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // engine allocator
+extern "C" int FUN_10161120(char *out, const char *path);       // Path_GetBaseName
+
+// 0x10160a90 (MmvPlayer::Open). Loads movie `path` (looked for as .in\<base name>.MMV first) whole into memory:
+// the size, the 255-colour palette (as RGB565, colour 255 set to 0xfbff), a frame buffer of width x height and the
+// first frame decoded. When the frame buffer cannot be allocated the movie is dropped again.
+void MmvPlayer::Open(const char *path)
+{
+    char base[0x100];
+    char name[0x100];
+    m_0010 = 0;
+    m_004c = 0;
+    isOpen = 0;
+    GameFile movie;
+    FUN_10161120(base, path);
+    sprintf(name, ".\\bin\\%s.MMV", base);
+    void *opened = movie.Open(name, "rb");
+    if (opened == 0)
+    {
+        opened = movie.Open(path, "rb");
+        if (opened == 0)
+            return;
+    }
+    movie.Seek(0, 2);
+    int length = movie.Size();
+    movie.Seek(0, 0);
+    if (memory != 0)
+        DAT_11b1ba40(memory);
+    memory = (char *)DAT_11b0b938(length, "MMV_ALL");
+    if (memory == 0)
+        movie.Close();
+    else
+    {
+        movie.Read(memory, 1, length);
+        movie.Close();
+        width = *(short *)(memory + 2);
+        height = *(short *)(memory + 4);
+        int i;
+        for (i = 0; i < 0xff; i++)
+            palette[i] = (((unsigned short)(unsigned char)memory[i * 4 + 8] & ~7) << 5 |
+                          ((unsigned short)(unsigned char)memory[i * 4 + 7] & ~3)) << 3 |
+                         (unsigned short)((unsigned char)memory[i * 4 + 6] >> 3);
+        palette[i] = 0xfbff;
+        if (frame != 0 && m_004a != 0)
+            DAT_11b1ba40(frame);
+        frame = DAT_11b0b938(width * height, "MMV_DIB");
+        if (frame == 0)
+        {
+            if (memory != 0)
+                DAT_11b1ba40(memory);
+            memory = 0;
+        }
+        else
+        {
+            m_004a = 1;
+            int first = *(int *)(memory + 0x406);
+            data = (unsigned char *)memory + 0x40a;
+            DecodeFrameRle(first);
+            start = first + 0x40a;
+            offset = 0;
+            size = length;
+            frameIndex = 0;
+            m_004b = 1;
+        }
     }
 }

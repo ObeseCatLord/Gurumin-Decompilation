@@ -26,7 +26,7 @@ address	name	evidence
 101b2310	File_Open	File object: stores base name, fopen(path, mode); 15 loader callers
 10173550	Texture_LoadBmp	"%s\images\%s.bmp", "%s\%s.itm" (scrambled BMP), error "texture missing"
 10174ce0	Texture_LoadIti	"%s\%s.iti", ./data/%s.itp
-10160a90	Mmv_Open	".\bin\%s.MMV", MMV_ALL / MMV_DIB
+10160a90	MmvPlayer::Open	loads a whole .MMV movie, its RGB565 palette and first frame (decomp/src/mmv_texreg.cpp)
 101abd60	Model_LoadIt3Alt	error "no 3D data"
 101a58a0	It3_ParseChunks	compares chunk tags INFO/RTY2/LIG3/KAN3/INFS/MAT4/VPA2/CHID/MAN2/BONE/CAME/CDLO
 101a4a60	It3_ScanChunks	pre-pass over INFO/MAN2 chunks

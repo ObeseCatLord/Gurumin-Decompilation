@@ -828,3 +828,4 @@ address	name	evidence
 10055690	Game::IsQueuedEventReady	queued event ids with a passing trigger in Game::queuedTriggers (decomp/src/app_0003.cpp)
 1009ddd0	Kind4a_Update	kind 0x4a: idles in motion 2, random or on-hit attack motions 4-6, effect 0x352 at 20 frames left (decomp/src/kind4a_turret.cpp)
 1000c020	Text_Substitute	replaces test.dat group words in message text with a random word of the same group (decomp/src/test_dat.cpp)
+10175a90	Texture_CreateCopy	named texture slot made from another texture object's pixels, size and alpha (decomp/src/texture_create.cpp)

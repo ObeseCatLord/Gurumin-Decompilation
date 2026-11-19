@@ -187,9 +187,11 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 123 | medium functions | 1000dba0 Fade_Draw, 10017d30 RenderTarget_Probe, 10055aa0 | Fade_Draw matched; RenderTarget_Probe open (2 bytes); 10055aa0 (label search like FindCase) moved to batch 124 |
 | 124 | medium functions | 10055690 Game::IsQueuedEventReady, 10055410, 10055ca0, 10055aa0 | IsQueuedEventReady open (trigger-loop pointer base; game.h gained queuedTriggers and queuedEvents); 10055410 has the same loop, left; 10055ca0/10055aa0 (keyword scanners) left |
 | 125 | medium functions | 1000c020 Text_Substitute, 10054770, 1009ddd0 Kind4a_Update | Kind4a_Update matched; Text_Substitute open (15 bytes); 10054770 is Game::RaiseDeadEvents (same loop wall as the other Raise*Events), left |
-| 126 | medium functions | 10175a90, 1019e610, 100092c0 | |
+| 126 | medium functions | 10175a90 Texture_CreateCopy, 1019e610, 100092c0 | Texture_CreateCopy matched; 1019e610 (vertex de-duplication, three nested loops) and 100092c0 (window scroll arrows over Game's per-window field arrays) left |
 | 127 | medium functions | 100236c0, 1000f5a0, 1001f270 | |
 | 128 | medium functions | 1017c9c0, 1015c450, 101629f0 | |
 | 129 | medium functions | 100ba040, 1019b630, 1003aef0 Bgm_Play | |
 | 130 | medium functions | 100b8220, 1002ebf0, 100b9930 | |
 | 131 | medium functions | 10058500, 10192a00, 10045c30 | |
+| 132 | medium functions | 1004f250, 10057c40, 1000d6b0 | |
+| 133 | medium functions | 1001d920, 100e21a0, 1002a490 | |

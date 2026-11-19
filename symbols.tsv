@@ -843,3 +843,4 @@ address	name	evidence
 10142dd0	Keyboard_IsButtonDown	game button mapped to a DirectInput key, default layout for map 0 (decomp/src/joystick_buttons.cpp)
 1003e710	Game_Reset	clears every game global and resets the subsystems for a new game (decomp/src/game_reset.cpp)
 1015d520	Text_ToFullWidth	converts single-byte text to full-width Shift-JIS through a 256-entry table (decomp/src/text_fullwidth.cpp)
+10161f80	AnimModel::ResetState	clears the 0x249c-byte model object and sets its vectors and defaults (decomp/src/anim_reset.cpp)

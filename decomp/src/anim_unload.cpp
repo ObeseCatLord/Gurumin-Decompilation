@@ -41,7 +41,7 @@ struct AnimModel
     char pad_241c[0x60];
     int m_247c;
     int Unload();
-    void M_10161f80();           // 0x10161f80: resets the motion state
+    int M_10161f80();            // 0x10161f80 (anim_reset.cpp AnimModel::ResetState): resets the motion state
 };
 
 extern "C" Node *DAT_10faaa88[0x100];  // the model table

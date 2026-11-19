@@ -186,7 +186,7 @@ struct Node
     int built;                   // 0xa4: 1 once BuildMesh has created the mesh buffers
     int m_00a8;
     unsigned int flags;
-    int pad_00b0;
+    int m_00b0;
     int group;
     int m_00b8;
     char pad_00bc[4];
@@ -194,7 +194,8 @@ struct Node
     struct Channel *plugs[16];
     int plugTypeCopy[16];
     void *plugData[16];
-    char pad_01c0[8];
+    int m_01c0;
+    int m_01c4;
     int m_01c8;
     Matrix matrix;
     Matrix inverseMatrix;        // 0x20c: inverse of `matrix`
@@ -227,7 +228,7 @@ struct Node
     char m_0704;
     char pad_0705[3];
     struct GlyphState *m_0708;
-    char pad_070c[0x40];
+    char m_070c[0x40];
     Node *parent;
     int childCount;
     char childNames[0x40][0x40];
@@ -238,7 +239,11 @@ struct Node
     int m_185c;
     int m_1860;
     void *m_1864;
-    char pad_1868[0x30];
+    Vec4 m_1868;
+    char m_1878[7];
+    char pad_187f;
+    int m_1880[5];
+    char pad_1894[4];
     char element;
     char pad_1899;
     char m_189a;
@@ -261,7 +266,8 @@ struct Node
     void M_101a2290();
     Node *AddChild(const char *childName, int position);
     int AllocMaterials(int count);
-    int M_101a53b0(Node *source, int a, int b);
+    int Clone(Node *source, int a, int b);
+    void M_1019d8e0();
     void M_10193d10(int index);
     void M_101913f0();
     int CreateChildCopies();
@@ -1313,7 +1319,7 @@ int Node::CreateChildCopies()
         Node *node = (Node *)DAT_11b0b938(0x18a0, "m_child[m_numchild]");
         created[i] = node;
         node->M_10191500();
-        node->M_101a53b0(this, 0, 1);
+        node->Clone(this, 0, 1);
     }
     childCount = 0x20;
     for (int i = 0; i < 0x20; i++)
@@ -2054,4 +2060,86 @@ int Node::CopyAnimation(Node *source, int slot)
 keepPose:
     poses[15] = current;
     return 0;
+}
+
+// 0x101a53b0. Makes this node a copy of `source` and its whole subtree: names, matrices and stored poses, flags and
+// settings, the saved block, the plug channels, the animation (CopyAnimation, cache flag `motionSlot`) and the mesh
+// (CopyMesh, cache flag `meshSlot`), the skin data, and a new copy of every child. Returns 1.
+int Node::Clone(Node *source, int motionSlot, int meshSlot)
+{
+    Release();
+    strcpy(name, source->name);
+    strcpy(folder, source->folder);
+    strcpy(m_0050, source->m_0050);
+    matrix = source->matrix;
+    worldMatrix = source->worldMatrix;
+    int i;
+    for (i = 0; i < 16; i++)
+        poses[i] = source->poses[i];
+    flags = source->flags;
+    m_00b0 = source->m_00b0;
+    group = source->group;
+    m_1868.Copy(source->m_1868);
+    m_1878[0] = source->m_1878[0];
+    m_1880[0] = source->m_1880[0];
+    m_1880[1] = source->m_1880[1];
+    m_1880[2] = source->m_1880[2];
+    m_1880[3] = source->m_1880[3];
+    m_1880[4] = source->m_1880[4];
+    m_1878[1] = source->m_1878[1];
+    m_1878[2] = source->m_1878[2];
+    m_1878[3] = source->m_1878[3];
+    m_1878[4] = source->m_1878[4];
+    m_1878[5] = source->m_1878[5];
+    m_1878[6] = source->m_1878[6];
+    m_00a0 = source->m_00a0;
+    m_01c0 = source->m_01c0;
+    m_01c8 = source->m_01c8;
+    m_01c4 = source->m_01c4;
+    if (source->saved != 0)
+    {
+        saved = (NodeSaved *)DAT_11b0b938(0xdc, "ik");
+        saved->M_10166870();
+        *saved = *source->saved;
+    }
+    for (int g = 0; g < 16; g++)
+    {
+        if (source->plugs[g] != 0)
+        {
+            int size = source->plugs[g]->size;
+            plugs[g] = (Channel *)DAT_11b0b938(size, "->m_plugdata[g]");
+            memcpy(plugs[g], source->plugs[g], size);
+            plugType[g] = source->plugType[g];
+        }
+    }
+    CopyAnimation(source, motionSlot);
+    CopyMesh(source, meshSlot);
+    M_1019d8e0();
+    if (source->m_0708 != 0 && source->m_0708->m_5618 != 0)
+    {
+        m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
+        m_0708->Clear();
+        strcpy(m_0708->parentName, source->m_0708->parentName);
+        m_0708->m_5618 = source->m_0708->m_5618;
+        for (i = 0; i < source->m_0708->m_5618; i++)
+            strcpy(m_0708->linkNames[i], source->m_0708->linkNames[i]);
+        for (i = 0; i < 0x44; i++)
+        {
+            strcpy(m_0708->boneNames[i], source->m_0708->boneNames[i]);
+            m_0708->bindPose[i] = source->m_0708->bindPose[i];
+            m_0708->m_3518[i] = source->m_0708->m_3518[i];
+        }
+    }
+    strcpy(m_070c, source->m_070c);
+    childCount = source->childCount;
+    for (i = 0; i < source->childCount; i++)
+    {
+        strcpy(childNames[i], source->childNames[i]);
+        children[i] = (Node *)DAT_11b0b938(0x18a0, "dup");
+        children[i]->M_10191500();
+        children[i]->Clone(source->children[i], motionSlot, meshSlot);
+        children[i]->parent = this;
+    }
+    m_00a8 = 0;
+    return 1;
 }

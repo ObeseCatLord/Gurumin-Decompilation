@@ -243,5 +243,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 180 | node functions | 1019b350 Node::CopyMesh, 1019b630, 1019b890 | CopyMesh matched (Node bounds as a Vec4[3] union); others left |
 | 181 | node functions | 1019b630 Node::BlendFrames, 1019b890, 101a53b0 | BlendFrames matched (Node::poses[16] at 0x2d4, frames at 0x290); others left |
 | 182 | node functions | 1019b890 Node::CopyAnimation, 101a53b0, 1019dca0 | CopyAnimation matched (reading `frame` per branch fixed the registers); others left |
-| 183 | node functions | 101a53b0, 1019dca0, 1019d8e0 | |
+| 183 | node functions | 101a53b0 Node::Clone, 1019dca0, 1019d8e0 | Clone matched (first build); others left |
+| 184 | node functions | 1019dca0, 1019d8e0, 101a24e0 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

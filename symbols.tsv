@@ -873,3 +873,4 @@ address	name	evidence
 1019b350	Node::CopyMesh	shares or copies the mesh, packs and materials of another node, caching the mesh by folder+name (matched, decomp/src/scene_node.cpp)
 1019b630	Node::BlendFrames	sets the pose of a node tree to frame (or stored pose) from blended towards frame to (matched, decomp/src/scene_node.cpp)
 1019b890	Node::CopyAnimation	copies plug channels, extra tracks, matrix and (cached) frame matrices from another node, keeping the old pose in poses[15] (matched, decomp/src/scene_node.cpp)
+101a53b0	Node::Clone	copies a node and its whole subtree (names, matrices, poses, plugs, animation, mesh, skin, children) (matched, decomp/src/scene_node.cpp)

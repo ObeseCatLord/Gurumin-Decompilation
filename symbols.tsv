@@ -32,7 +32,7 @@ address	name	evidence
 101a4a60	It3_ScanChunks	pre-pass over INFO/MAN2 chunks
 101455d0	Font_Init	ddfont8.dat, MS P Gothic, m_lpFont
 1013b700	Game_Startup	reads every gurumin.def key (docs/config_keys.tsv), loads packs.dll, demo.sav/%s.sav
-10166950	Character_Load	"chara %d"
+10166950	WorldRenderer::LoadCharacter	resets the scene and reads the character's .itm message file ("##nnnnn text" lines) (decomp/src/world_ctor.cpp)
 101602d0	File_Checksum	sum/xor (seed 0xcc82) over a file in dwords
 1013ed20	Render_BeginScene	EndScene if a scene is open, then IDirect3DDevice9::BeginScene on the device at 0x10f1fcf0
 1013ed60	Render_EndScene	IDirect3DDevice9::EndScene if a scene is open

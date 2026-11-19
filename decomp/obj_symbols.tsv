@@ -375,4 +375,5 @@ _sqrtf	10002010
 ?Init@VertexPack@@QAEXXZ	101acfa0
 ?Init@IndexList@@QAEXXZ	101ad1b0
 ??0WorldRenderer@@QAE@XZ	101670e0
-?Bind@WorldRenderer@@QAEHPAX0PAHP6AHHH0@Z0@Z	1017c9c0
+?Bind@WorldRenderer@@QAEHPAUModelRecord@@PAXPAHP6AXHH@Z1@Z	1017c9c0
+?LoadCharacter@WorldRenderer@@QAEHPBD@Z	10166950

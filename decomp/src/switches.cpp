@@ -22,7 +22,7 @@ struct Vec4
 
 
 extern "C" MapObject DAT_10874848;
-extern "C" int DAT_1030bbf8[0x80];       // 1 while the hold slot is used
+extern "C" int DAT_1030bbf8[0x80];       // the held object of each slot (non-zero while used, switch_effects.cpp)
 extern "C" int DAT_10255b08[0x80];       // holder of each slot
 extern "C" short DAT_10254838[0x80];     // per-object switch state; 1000 is added while it is held
 

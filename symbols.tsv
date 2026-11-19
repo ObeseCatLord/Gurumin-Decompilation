@@ -833,3 +833,4 @@ address	name	evidence
 1015c450	DShowStream::Open	opens a movie as an IAMMultiMediaStream with a DirectDraw surface sample (decomp/src/dshow_stream.cpp)
 100b8220	Npc_Greet	NPC greeting countdown, faces the player, random greeting balloon and sound 0x356 (decomp/src/npc_greet.cpp)
 1002ebf0	DamageZone_Update	zone box hurts enemies 0x3a-0x5b, every step-th per frame (decomp/src/damage_zone.cpp)
+10058500	Switch_UpdateEffects	every 12 frames restarts the effects of visible held switch objects (decomp/src/switch_effects.cpp)

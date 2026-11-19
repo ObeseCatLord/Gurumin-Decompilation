@@ -360,3 +360,4 @@ _TestDat_Load	1000beb0
 ?Close@DShowStream@@QAEXXZ	101488b0
 ?Open@DShowStream@@QAEJPBD@Z	1015c450
 ?Bgm_Play@@YAHH@Z	1003aef0
+?Update@Obj@@QAEHPAUPoint@@PAD11PAH1@Z	10001170

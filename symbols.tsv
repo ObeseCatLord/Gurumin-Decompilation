@@ -837,3 +837,5 @@ address	name	evidence
 10057c40	Switch_Hold	puts an object in a free switch hold slot, sets the holder's hold bit or object bonus (decomp/src/switches.cpp)
 1002a490	Block_Update	sinking block: drops when DAT_10db0544 < half, rises, pushes the player (decomp/src/pushing_platform.cpp)
 1016b400	Camera_TurnInput	input direction turned by the camera heading, blended across a camera cut (decomp/src/camera_orbit.cpp)
+10001170	Obj::Update	mouse: cursor in 640x480, button states, double click, wheel direction (decomp/src/app_0001.cpp)
+1016a980	Camera_Reset	zeroes the camera vectors and clears camera flags and blend counters (decomp/src/camera_reset.cpp)

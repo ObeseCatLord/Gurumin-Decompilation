@@ -196,7 +196,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 132 | medium functions | 1004f250, 10057c40 Switch_Hold, 1000d6b0 | Switch_Hold open (slot register swap); 1004f250 (tutorial texture loader) and 1000d6b0 (key prompt drawing) left |
 | 133 | medium functions | 1001d920, 100e21a0, 1002a490 Block_Update | Block_Update open (model address register); 1001d920 (camera target lock) and 100e21a0 (per-kind enemy hit reactions) left |
 | 134 | medium functions | 1002f050, 10016700, 1016b400 Camera_TurnInput | Camera_TurnInput open (blend weight copy); 1002f050 (route point decoding) and 10016700 (ground height sampling) left |
-| 135 | medium functions | 10001170, 1014b750, 1016a980 | |
+| 135 | medium functions | 10001170 Obj::Update, 1014b750, 1016a980 Camera_Reset | Obj::Update and Camera_Reset matched; 1014b750 (scaled texture quad) left |
 | 136 | medium functions | 10148590, 100b1520, 10142dd0 | |
 | 137 | medium functions | 10149100, 10037560, 10144bf0 | |
 | 138 | medium functions | 1014e940 TextureObject::DrawFrameAlt, 1014ec30, 1017c5f0 | |
@@ -211,3 +211,5 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 147 | medium functions | 10048b70, 100b5f80, 1009dfd0 | |
 | 148 | walls to retry | 10169c60, 1013e260, 10017d30, 10057c40 | |
 | 149 | medium functions | 1014ec30, 10144bf0, 10149100 | |
+| 150 | medium functions | 101670e0, 10169720 retry, 1015fea0 | |
+| 151 | medium functions | 1003e710, 10161f80, 10163150 | |

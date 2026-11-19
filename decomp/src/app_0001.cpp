@@ -3,6 +3,7 @@
 // window it belongs to (m_001c). m_0038 is an optional cursor callback.
 
 #include <windows.h>
+#include <math.h>
 
 struct Point
 {
@@ -24,13 +25,17 @@ struct Obj
     char m_0003;
     int m_0004;
     int m_0008;
-    int pad_000c[2];
+    int clickX;               // 0x0c: where the left button was last pressed
+    int clickY;               // 0x10
     int m_0014;
     int changed;
     int m_001c;
     int lastX;
     int lastY;
-    int pad_0028[4];
+    int leftHeld;             // 0x28: 1 while the left button stays down
+    int rightHeld;            // 0x2c
+    int middleHeld;           // 0x30
+    DWORD clickTime;          // 0x34: tick count of the last left press (0 after a double click)
     int m_0038;
     int m_003c;
     int m_0040;
@@ -38,6 +43,7 @@ struct Obj
     int GetState(Point *pos, char *a, char *b, char *c, int *d, char *e);
     int UpdateChanged();
     int ReportCursor();
+    int Update(Point *pos, char *left, char *middle, char *right, int *wheel, char *doubleClick);
 };
 
 // Init: binds the object to window `p` with cursor callback `q` and user value `r`; clears the position.
@@ -123,4 +129,112 @@ int Obj::ReportCursor()
     if (m_0038 != 0)
         ((CursorCallback)m_0038)(cursor.x, cursor.y);
     return 0;
+}
+typedef int (*WheelCallback)();
+
+// 0x10001170 (Obj::Update). Reads the mouse: the cursor in 640x480 game coordinates, the left, middle and right
+// buttons (0 = up, 2 = just pressed, 1 = held), a double click (a second left press within 230 ms roughly in the
+// same direction from the screen centre as the first) and the wheel direction (-1, 0 or 1, from the wheel callback
+// m_003c). Each part is also copied to its out pointer when that is not null. Returns 1, or 0 when the window has
+// no client area.
+int Obj::Update(Point *pos, char *left, char *middle, char *right, int *wheel, char *doubleClick)
+{
+    POINT cursor;
+    POINT origin;
+    RECT client;
+    GetCursorPos(&cursor);
+    origin.x = 0;
+    origin.y = 0;
+    ClientToScreen((HWND)m_001c, &origin);
+    GetClientRect((HWND)m_001c, &client);
+    if ((GetAsyncKeyState(VK_LBUTTON) & 0xf000) == 0)
+        leftHeld = 0;
+    if ((GetAsyncKeyState(VK_MBUTTON) & 0xf000) == 0)
+        middleHeld = 0;
+    if ((GetAsyncKeyState(VK_RBUTTON) & 0xf000) == 0)
+        rightHeld = 0;
+    char clicked = 0;
+    if (client.right == 0)
+        return 0;
+    if (client.bottom == 0)
+        return 0;
+    cursor.x = (cursor.x - origin.x) * 640 / client.right;
+    cursor.y = (cursor.y - origin.y) * 480 / client.bottom;
+    if ((GetAsyncKeyState(VK_LBUTTON) & 0xf000) != 0 && leftHeld == 0)
+    {
+        DWORD now = GetTickCount();
+        float lastX = (float)(clickX - 320);
+        float lastY = (float)(clickY - 240);
+        float x = (float)(cursor.x - 320);
+        float y = (float)(cursor.y - 240);
+        float lastLength = (float)sqrt(lastX * lastX + lastY * lastY);
+        float length = (float)sqrt(x * x + y * y);
+        lastX = lastX / lastLength;
+        lastY = lastY / lastLength;
+        x = x / length;
+        y = y / length;
+        // a press at the centre gives no direction (NaN) and counts as a new click
+        if (now >= clickTime + 230 || !(x * lastX + y * lastY > 0.5))
+        {
+            clickX = cursor.x;
+            clickY = cursor.y;
+            clickTime = now;
+        }
+        else
+        {
+            clicked = 1;
+            clickTime = 0;
+        }
+    }
+    if ((GetAsyncKeyState(VK_LBUTTON) & 0xf000) != 0)
+    {
+        m_0000 = (leftHeld == 0) + 1;
+        leftHeld = 1;
+    }
+    else
+        m_0000 = 0;
+    if ((GetAsyncKeyState(VK_MBUTTON) & 0xf000) != 0)
+    {
+        m_0001 = (middleHeld == 0) + 1;
+        middleHeld = 1;
+    }
+    else
+        m_0001 = 0;
+    if ((GetAsyncKeyState(VK_RBUTTON) & 0xf000) != 0)
+    {
+        m_0002 = (rightHeld == 0) + 1;
+        rightHeld = 1;
+    }
+    else
+        m_0002 = 0;
+    if (left != 0)
+        *left = m_0000;
+    if (middle != 0)
+        *middle = m_0001;
+    if (right != 0)
+        *right = m_0002;
+    m_0003 = clicked;
+    if (doubleClick != 0)
+        *doubleClick = clicked;
+    int count = 0;
+    m_0014 = 0;
+    if (m_003c != 0)
+    {
+        count = ((WheelCallback)m_003c)();
+        if (m_0040 > count)
+            m_0014 = -1;
+        else if (m_0040 < count)
+            m_0014 = 1;
+    }
+    m_0040 = count;
+    if (wheel != 0)
+        *wheel = m_0014;
+    m_0004 = cursor.x;
+    m_0008 = cursor.y;
+    if (pos != 0)
+    {
+        pos->x = cursor.x;
+        pos->y = cursor.y;
+    }
+    return 1;
 }

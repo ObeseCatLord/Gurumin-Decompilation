@@ -821,3 +821,5 @@ address	name	evidence
 1014f1f0	TextureObject::Upload	called by TextureObject::Create and the device-reset re-creation 0x10169e10
 1013e260	UserFolder_FindNt	Application Data\FALCOM folder from fsetup.dll GetUserPath or the shell profile (decomp/src/user_folder.cpp)
 100543a0	Balloon_Blast	kind B slots 0x5c..0x7b: angle, push, burst with sound 0x2e5 (decomp/src/balloon_burst.cpp)
+100558d0	ListBank::FindCase	finds "case <n>" at brace depth 1 of a switch block (decomp/src/listbank.cpp)
+101612b0	Rle_Decode	run-length unpacker of compressed bitmaps, 8 run kinds (decomp/src/rle_decode.cpp)

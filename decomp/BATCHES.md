@@ -183,5 +183,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | # | Area | Functions | Result |
 |---|---|---|---|
 | 121 | textures, user folder, balloons | 10169c60 TextureObject::Create, 1013e260 UserFolder_FindNt, 100543a0 Balloon_Blast | Balloon_Blast matched; the other two open (block placement) |
-| 122 | medium functions | 100558d0, 1000c020 Text_Substitute, 101612b0 | |
+| 122 | medium functions | 100558d0 ListBank::FindCase, 1000c020 Text_Substitute, 101612b0 Rle_Decode | Rle_Decode matched; FindCase open (jump threading); Text_Substitute deferred to batch 125 (eight loops) |
 | 123 | medium functions | 1000dba0, 10017d30, 10055aa0 | |
+| 124 | medium functions | 10055690, 10055410, 10055ca0 (script switch parsers next to FindCase) | |
+| 125 | medium functions | 1000c020 Text_Substitute, 10054770, 1009ddd0 | |

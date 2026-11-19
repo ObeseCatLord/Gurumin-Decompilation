@@ -62,6 +62,7 @@ struct ListBank
     int SkipBlock(char **text, int *level, int block);         // 0x10035a30
     int ReadArgument(char **text, char *word);
     int ReadWord(char **text, char *word);
+    int FindCase(const char *value, char *text, char **found);
     int ReadTerm(char **text, char *word);
     int CompileStatement(const char *statement);               // 0x100ed9b0
     int CompileText();
@@ -948,4 +949,69 @@ extern "C" void FUN_1013ad90(void)
     DAT_104687b8.RegisterBuiltin("int GetCf(int)", 0x2fbe, FUN_10138280);
     DAT_104687b8.globalNameCount = DAT_104687b8.nameCount;
     DAT_1032d69c = 1;
+}
+
+// 0x100558d0 (ListBank::FindCase). Looks for the label `case <value>` of a switch block, starting at `text` (just
+// before the block's opening brace) and going on to the end of the script text. Only labels directly inside the
+// block count: outside quotes and parentheses and at brace depth 1. The label's number may be followed by spaces,
+// tabs or the colon. On a match `found` is set to the character after "case" and 1 is returned; 0 when the block
+// ends (or the text does) without one, or on a parse error.
+int ListBank::FindCase(const char *value, char *text, char **found)
+{
+    char word[0x100];
+    int quoted = 0;
+    int parens = 0;
+    int braces = 0;
+    int opened = 0;
+    int count = 0;
+    for (; text < &this->text[textLength]; text++)
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (quoted == 0 && parens == 0 && braces == 1 && count >= 3 && text[-3] == 'c' && text[-2] == 'a' &&
+            text[-1] == 's' && text[0] == 'e')
+        {
+            // `text` moves past "case" (to the character after it)
+            text++;
+            char *label = text;
+            ReadWord(&label, word);
+            for (int i = (int)strlen(word) - 1; i > 0; i--)
+            {
+                if (word[i] == ' ' || word[i] == '	' || word[i] == ':')
+                    word[i] = 0;
+            }
+            if (atol(value) == atol(word))
+            {
+                *found = text;
+                return 1;
+            }
+            text += 2;
+        }
+        char c = *text;
+        if (c == '(')
+            parens++;
+        else if (c == ')')
+            parens--;
+        if (c == '"')
+        {
+            if (quoted == 1)
+                quoted = 0;
+            else if (quoted == 0)
+                quoted = 1;
+        }
+        if (quoted == 0 && parens == 0)
+        {
+            if (c == '{')
+            {
+                braces++;
+                opened = 1;
+            }
+            if (c == '}')
+                braces--;
+        }
+        if (opened != 0 && braces == 0)
+            return 0;
+        count++;
+    }
+    return 0;
 }

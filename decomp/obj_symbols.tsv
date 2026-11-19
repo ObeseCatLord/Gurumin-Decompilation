@@ -355,3 +355,4 @@ _TestDat_Load	1000beb0
 ?Create@MeshInstance@@QAEHHHHHH@Z	10169c60
 ?Upload@MeshInstance@@QAEHHHHH@Z	1014f1f0
 ?Release@MeshInstance@@QAEHXZ	1014f520
+?FindCase@ListBank@@QAEHPBDPADPAPAD@Z	100558d0

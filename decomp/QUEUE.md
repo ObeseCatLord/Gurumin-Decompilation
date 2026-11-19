@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (118)
+## 1. Walls to retry (119)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -60,6 +60,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10054d50` 476 — Game::RaiseFireEvents: same loop-pointer residue as 0x10054a60 (flags pointer local tried: bias moves to argument)
 - [ ] `10054f30` 476 — Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
 - [ ] `10055110` 476 — Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60
+- [ ] `100558d0` 449 — ListBank::FindCase: same statements; the original keeps the brace block once (after the quote block, re-zeroing ebx after opened = 1), cl 13.00 here copies it into the parenthesis path (jump threading, 15 bytes longer); else-if, combined-test and quote-order forms tried
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
@@ -136,14 +137,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (65)
+## 3. Medium functions (251-800 bytes) (63)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
-- [ ] `100558d0` 449 bytes (loops 4, calls 4)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
-- [ ] `101612b0` 481 bytes (loops 1)
 - [ ] `1000dba0` 484 bytes (float, loops 1, calls 11)
 - [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
 - [ ] `10017d30` 488 bytes (loops 2, calls 22)

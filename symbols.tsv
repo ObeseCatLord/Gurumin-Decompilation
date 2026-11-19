@@ -878,3 +878,4 @@ address	name	evidence
 10190e30	EffectManager::Draw	draws the effect lists of a render pass, then the sprite tables and lights (decomp/src/char_effects.cpp)
 1019e120	Node::BuildCollisionSpheres	one bounding sphere per triangle for collision nodes (decomp/src/scene_node.cpp)
 1016ac90	Camera_CollectPaths	fills the camera path tables from the kind-2 nodes of a scene (matched, decomp/src/camera_path_select.cpp)
+10023d30	Map_Unload	frees the map objects and models and clears the per-map tables (decomp/src/map_unload.cpp)

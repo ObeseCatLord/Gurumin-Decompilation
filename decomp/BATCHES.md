@@ -223,3 +223,5 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 159 | medium functions | 10146db0, 10023900, 1004f4f0 | |
 | 160 | large, table-like | 101ab3e0, 1013b700 Game_Startup (10376 bytes), 10138280 Script_GameBuiltin (10107 bytes) | |
 | 161 | large, table-like | 1011a060 (14244 bytes), 100fedd0 (6739 bytes), 10112140 Menu_Main | |
+| 162 | model class | 101629f0 AnimModel::AnimModel (matched), 1017c9c0 (scene object reset, member arrays), 10166950 Character_Load | |
+| 163 | large, table-like | 10116550 (staff roll, 15107 bytes), 10023900, 1004f4f0 | |

@@ -201,6 +201,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   last compare (the hit code behind a `jne`) was written as one `if (...) return 0;` per test, not one `||` chain
   (Box_Overlap 0x10191fd0; Cylinder_Overlap 0x10192a00). Stack slots shared between successive temporaries come
   from block-scoped locals: `float r; { float dy = ...; float dx = ...; r = ...; }` (Cylinder_Overlap).
+- **Sum of two rounded calls**: `float s = (float)fabs(a) + (float)fabs(b);` rounds the first result into the cast
+  temporary and copies it (fld/fstp) to a spill slot before the second call; separate statements keep it in place
+  (Ground_HeightAt 0x10016700). Which operand cl 13.00 evaluates first does not follow the source order there.
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

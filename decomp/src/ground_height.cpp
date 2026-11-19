@@ -35,12 +35,6 @@ struct GroundOrigin
     float base;                                      // 0x204: height added to the samples
 };
 
-// Absolute value as a float.
-inline float AbsValue(double value)
-{
-    return (float)fabs(value);
-}
-
 extern "C" Matrix4 DAT_10db9210;                     // the player's world matrix
 extern "C" GroundOrigin *DAT_1020d860[0x60];         // the ground objects (0 = free)
 extern "C" int DAT_104bfdb4;                         // the ground object nearest to the player
@@ -87,8 +81,7 @@ extern "C" float FUN_10016700(int x, int y)
                 int dy = row * 25 - y;
                 if (sqrt((float)(dx * dx + dy * dy)) < 72.0)
                 {
-                    float wy = AbsValue((float)row * 25.0f - (float)y);
-                    float spread = AbsValue((float)column * 25.0f - (float)x) + wy;
+                    float spread = (float)fabs((float)row * 25.0f - (float)y) + (float)fabs((float)column * 25.0f - (float)x);
                     float weight = 60.0f - spread * 0.2f;
                     if (0.0f < weight && weight > 1.0f && DAT_1049f3dc[DAT_104bfdb4][column][row] > -200.0f)
                     {

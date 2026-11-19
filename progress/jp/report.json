@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.2706,
+  "fuzzy_match_percent": 11.275,
   "total_code": "1720206",
   "matched_code": "154615",
   "matched_code_percent": 8.9882,
@@ -5797,7 +5797,7 @@
   {
    "name": "app/ground_height",
    "measures": {
-    "fuzzy_match_percent": 64.2442,
+    "fuzzy_match_percent": 75.2907,
     "total_code": "694",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -5818,14 +5818,14 @@
     {
      "name": ".text",
      "size": "694",
-     "fuzzy_match_percent": 64.2442
+     "fuzzy_match_percent": 75.2907
     }
    ],
    "functions": [
     {
      "name": "_FUN_10016700",
      "size": "694",
-     "fuzzy_match_percent": 64.2442,
+     "fuzzy_match_percent": 75.2907,
      "metadata": {
       "virtual_address": "268527360"
      }

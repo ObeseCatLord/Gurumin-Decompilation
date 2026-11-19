@@ -37,7 +37,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
 - [ ] `100157b0` 167 — near-cell list: original keeps the index/row pointer in edi and the box pointer in ebx (pushed late); ours swaps them (local row pointer, direct indexing, do/while tried)
 - [ ] `10015910` 69 — settings byte flags: cl 13.00 here threads the three mode tests (after mode == 0 it jumps past the others), the original tests each in turn; flag-array, local copy and (char)mode forms tried
-- [ ] `10016700` 694 — Ground_HeightAt: same code apart from two float copies: the original copies the first fabs result into its local with fld/fstp and copies the weight through edx before the > 1 test (cl 13.00 here uses the values in place); the same copy pattern as 0x100ba040 and 0x100b9930
+- [ ] `10016700` 694 — Ground_HeightAt: the spill copy of the first fabs comes from summing two casts in one expression (written so); left: cl 13.00 here evaluates the column term first (the original the row term, whatever the source order) and the weight is copied through edx before the > 1 test
 - [ ] `10017d30` 488 — RenderTarget_Probe: 2 bytes; the original compares the second UpdateImage result with the zero register (cmp eax, ebp), ours uses test eax, eax; !x and result-local forms tried
 - [ ] `10019310` 849 — Camera_Shift: same statements; block layout differs (the original keeps the shrink branch on the fallthrough of the counter tests and cross-jumps into the shift branch's final Copy) and the shift-goal subtraction loads its operands in another order; branch order swapped tried
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
@@ -501,11 +501,12 @@ Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence
 - [ ] `10166870` 52 bytes (src/model_misc.cpp)
 - [ ] `1016b1e0` 73 bytes (src/camera.cpp)
 
-## 7. Comment pass (0 files)
+## 7. Comment pass (1 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
+- [ ] `src/zz_probe.cpp`: 0 of 0 functions without a comment, no header
 
 ## 8. Structures and globals
 

@@ -266,6 +266,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 204 | medium functions | 10037560, 10016700, 1014b750 | 10037560 ListBank::AssignValue open (frame layout) |
 | 205 | medium functions | 10016700, 1014b750, 100b1520 | 10016700 Ground_HeightAt open (float copy pattern shared with two other drafts) |
 | 206 | medium functions | 1014b750, 100b1520, 10149100 | |
-| 207 | wall study | the fld/fstp float-copy pattern (100ba040, 100b9930, 10016700) | |
+| 207 | wall study | the fld/fstp float-copy pattern (100ba040, 100b9930, 10016700) | found for 10016700 (sum of two casts spills the first); the other two are a different copy, still open |
 | 200 | wall retries | float-compare walls, MarkKilled | MarkKilled and Vec4::InTriangle still open (register roles, return-block placement) |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

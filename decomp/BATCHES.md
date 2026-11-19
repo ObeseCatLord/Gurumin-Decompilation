@@ -258,5 +258,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 197 | medium functions | 1000f5a0, 10045c30, 1004f250 | |
 | 194 | medium functions | 1001f270, 100ba040, 10055 neighbours | 1001f270 Map_SelectMovie open (registers; it is a C++ function, extern "C" drops its EH frame) |
 | 196 | wall retries | 10055690, Raise*Events | IsQueuedEventReady, RaiseGameOver/Kskon/Talk/OpenEvents matched (element pointer after the first test); Fire/Lever/Door left (inline budget) |
-| 198 | medium functions | 100ba040, 100b9930, 10192a00 | |
+| 198 | medium functions | 100ba040, 100b9930, 10192a00 | 10192a00 Cylinder_Overlap matched (block-scoped temporaries) and wall 10191fd0 Box_Overlap with it (separate early returns) |
+| 199 | medium functions | 100ba040, 100b9930, 1004f250 | |
+| 200 | wall retries | float-compare walls, MarkKilled | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

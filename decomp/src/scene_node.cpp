@@ -140,12 +140,16 @@ struct Material
 
 struct PackHeader
 {
-    char pad_0000[0xc];
-    int m_000c;
+    float center[3];             // 0x00: centre of the pack's vertices
+    float radius;                // 0x0c: bounding radius (0 = not needed)
     int m_0010;
     int material;
-    char pad_0018[0x58];
-    int *m_0070;
+    int pad_0018;
+    int vertexCount;             // 0x1c
+    float boxMin[4];             // 0x20: (w = 1)
+    float boxMax[4];             // 0x30
+    char pad_0040[0x30];
+    int *m_0070;                 // 0x70: the vertices, 0x1c floats each (position first)
     void M_101acfa0();
     void Copy(const PackHeader *source);         // 0x101ad040
 };
@@ -267,7 +271,8 @@ struct Node
     Node *AddChild(const char *childName, int position);
     int AllocMaterials(int count);
     int Clone(Node *source, int a, int b);
-    void M_1019d8e0();
+    int ComputeBounds();
+
     void M_10193d10(int index);
     void M_101913f0();
     int CreateChildCopies();
@@ -755,7 +760,7 @@ extern "C" PackHeader *__stdcall FUN_1019c320(int count)
     for (int i = 0; i < count; i++)
     {
         packs[i].M_101acfa0();
-        packs[i].m_000c = 0;
+        packs[i].radius = 0;
     }
     return packs;
 }
@@ -2114,7 +2119,7 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     }
     CopyAnimation(source, motionSlot);
     CopyMesh(source, meshSlot);
-    M_1019d8e0();
+    ComputeBounds();
     if (source->m_0708 != 0 && source->m_0708->m_5618 != 0)
     {
         m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
@@ -2141,5 +2146,113 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
         children[i]->parent = this;
     }
     m_00a8 = 0;
+    return 1;
+}
+
+// A vector with the engine's constructor and length (vec4.cpp Vec4; Node::bounds uses the plain Vec4 above).
+struct LengthVector
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    LengthVector();                                  // 0x101ac990: zero
+    float Length();                                  // 0x101ac4e0: length of x/y/z
+};
+
+// 0x1019d8e0. Computes the bounds of this node's packs (box corners and centre; the radius only for packs that
+// already have one, nodes with flag 4, and "CS"/"CA"/"CT" nodes, after a "CDL"/"OvF" prefix of 6/7 characters) and
+// of the whole node (bounds: sphere and box). Returns 1.
+int Node::ComputeBounds()
+{
+    int prefix = 0;
+    if (name[0] == 'C' && name[1] == 'D' && name[2] == 'L')
+        prefix = 6;
+    if (name[0] == 'O' && name[1] == 'v' && name[2] == 'F')
+        prefix = 7;
+    if (packCount != -1)
+    {
+        float maxX = -999999.0f;
+        float maxY = -999999.0f;
+        float maxZ = -999999.0f;
+        float minX = 999999.0f;
+        float minY = 999999.0f;
+        float minZ = 999999.0f;
+        for (int i = 0; i < packCount; i++)
+        {
+            float packMaxX = -999999.0f;
+            float packMaxY = -999999.0f;
+            float packMaxZ = -999999.0f;
+            float packMinX = 999999.0f;
+            float packMinY = 999999.0f;
+            float packMinZ = 999999.0f;
+            const float *vertex = (const float *)packs[i].m_0070;
+            for (int j = 0; j < packs[i].vertexCount; j++)
+            {
+                if (vertex[0] < packMinX)
+                    packMinX = vertex[0];
+                if (vertex[0] > packMaxX)
+                    packMaxX = vertex[0];
+                if (vertex[1] < packMinY)
+                    packMinY = vertex[1];
+                if (vertex[1] > packMaxY)
+                    packMaxY = vertex[1];
+                if (vertex[2] < packMinZ)
+                    packMinZ = vertex[2];
+                if (vertex[2] > packMaxZ)
+                    packMaxZ = vertex[2];
+                vertex += 0x1c;
+            }
+            if (packMinX < minX)
+                minX = packMinX;
+            if (packMaxX > maxX)
+                maxX = packMaxX;
+            if (packMinY < minY)
+                minY = packMinY;
+            if (packMaxY > maxY)
+                maxY = packMaxY;
+            if (packMinZ < minZ)
+                minZ = packMinZ;
+            if (packMaxZ > maxZ)
+                maxZ = packMaxZ;
+            packs[i].boxMin[0] = packMinX;
+            packs[i].boxMin[1] = packMinY;
+            packs[i].boxMin[2] = packMinZ;
+            packs[i].boxMin[3] = 1.0f;
+            packs[i].boxMax[0] = packMaxX;
+            packs[i].boxMax[1] = packMaxY;
+            packs[i].boxMax[2] = packMaxZ;
+            packs[i].boxMax[3] = 1.0f;
+            packs[i].center[0] = (packMinX + packMaxX) / 2.0f;
+            packs[i].center[1] = (packMinY + packMaxY) / 2.0f;
+            packs[i].center[2] = (packMinZ + packMaxZ) / 2.0f;
+            if (packs[i].radius != 0.0f || (flags & 4) != 0 ||
+                (name[prefix] == 'C' && (name[prefix + 1] == 'S' || name[prefix + 1] == 'A' || name[prefix + 1] == 'T')))
+            {
+                LengthVector size;
+                size.x = packMaxX - packMinX;
+                size.y = packMaxY - packMinY;
+                size.z = packMaxZ - packMinZ;
+                packs[i].radius = size.Length() / 2.0f;
+            }
+        }
+        LengthVector size;
+        size.x = maxX - minX;
+        size.y = maxY - minY;
+        size.z = maxZ - minZ;
+        bounds[0].x = (minX + maxX) / 2.0f;
+        bounds[0].y = (minY + maxY) / 2.0f;
+        bounds[0].z = (minZ + maxZ) / 2.0f;
+        float radius = size.Length() / 2.0f;
+        bounds[1].x = minX;
+        bounds[1].y = minY;
+        bounds[1].z = minZ;
+        bounds[2].x = maxX;
+        bounds[1].w = 1.0f;
+        bounds[2].y = maxY;
+        bounds[2].z = maxZ;
+        bounds[2].w = 1.0f;
+        bounds[0].w = radius;
+    }
     return 1;
 }

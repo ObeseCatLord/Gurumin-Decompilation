@@ -138,3 +138,4 @@ address	status	reason
 101603c0	open	SystemSav_ReadRecord: 20 bytes; the original places the -1 (other machine) return block before the 0 return that the early exits share, ours after it (nested, else and result-variable forms tried)
 10010d10	open	Save_ReadSlotInfo: statements and flow match; the stack layout differs like Save_ReadThumbnail 0x10011240 (original frame 0x3f0, ours 0x400; the unused Vec4 sits near the path buffer); Vec4 placements tried
 1019eeb0	open	Node::SetupSkinning (M_1019eeb0): identical except the bone != 0 test in the parent-name condition, which cl 13.00 here drops (the original keeps test eax, eax; je); local and re-read forms tried
+1019d8e0	open	Node::ComputeBounds: control flow and stores in place; the -999999 constant and the y min/max slots use other registers/slots (ecx and swapped 0x18/0x1c in the original), declaration orders tried

@@ -386,3 +386,4 @@ _sqrtf	10002010
 ?BlendFrames@Node@@QAEHHHM@Z	1019b630
 ?CopyAnimation@Node@@QAEHPAU1@H@Z	1019b890
 ?Clone@Node@@QAEHPAU1@HH@Z	101a53b0
+?ComputeBounds@Node@@QAEHXZ	1019d8e0

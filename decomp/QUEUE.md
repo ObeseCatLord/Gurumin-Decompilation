@@ -410,7 +410,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10016ec0` 2970 bytes (float, loops 6, calls 56)
 - [ ] `10165240` 2986 bytes (float, loops 15, calls 68)
 
-## 5. Very large functions (over 3000 bytes) (113)
+## 5. Very large functions (over 3000 bytes) (112)
 
 - [ ] `100094e0` 3023 bytes (float, loops 2, calls 27)
 - [ ] `100fb7b0` 3089 bytes (float, loops 16, calls 57)
@@ -482,7 +482,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100aa820` 7194 bytes (float, loops 5, calls 162)
 - [ ] `10070200` 7360 bytes (float, loops 13, calls 148)
 - [ ] `100f9670` 7639 bytes (float, loops 30, calls 183)
-- [ ] `1015d520` 7652 bytes (loops 3)
 - [ ] `1002ae70` 7666 bytes (float, loops 7, calls 127)
 - [ ] `1008fea0` 8040 bytes (float, loops 9, calls 229)
 - [ ] `10032240` 8119 bytes (float, loops 14, calls 173)
@@ -531,13 +530,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (2 files)
+## 7. Comment pass (1 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
 - [ ] `src/camera_follow.cpp`: 0 of 3 functions without a comment, no header
-- [ ] `src/zz_probe.cpp`: 1 of 1 functions without a comment, no header
 
 ## 8. Structures and globals
 

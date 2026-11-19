@@ -303,3 +303,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   stores earlier): an unexplained early `mov ecx, imm` is the object of the next call.
 - Long store-only functions can be generated from the pseudocode (store widths from the asm, `Fill` targets from
   the `mov ecx` before each call) and then fixed by comparing instruction offsets to find the first divergence.
+- A local `char table[256][4] = { "..", ... }` compiles to a word load and a byte load from each literal plus a
+  zero store for the 4th byte (no block copy); replay the stores against the image to recover the strings
+  (Text_ToFullWidth 0x1015d520). Test order matters: `(c >= 0x7f && c < 0xa0) || c >= 0xe0` is not the same layout
+  as its negation with the branches swapped.

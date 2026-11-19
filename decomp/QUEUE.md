@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (128)
+## 1. Walls to retry (129)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -115,6 +115,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016a100` 280 — Playback::SetLayer: the original unrolls both 16-entry fills (zero kept in esi, -2 as immediates) and tests layer <= 0x8f; cl 13.00 here emits rep stosd (flat, nested 4x4, pointer and merged loops tried)
 - [ ] `1016a2e0` 413 — Playback::Play: control flow and stores identical; register allocation differs (original keeps the layer in eax and reuses the zero restart register as the follow-up loop counter; ours the layer in ecx); index-variable forms tried
 - [ ] `1016b010` 53 — original keeps 1.0f in edx and stores the register; VS2003 stores immediates
+- [ ] `1016b050` 399 — Camera_SelectPath: body identical apart from the camera-target pointer register (eax vs ecx); the original pushes all four registers before the id == -1 test and stores the 0 as an immediate (no shrink-wrapping), cl 13.00 here shrink-wraps the early return; inverted if tried
 - [ ] `1016b1e0` 73 — original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 - [ ] `1016b400` 695 — Camera_TurnInput: same arithmetic; the original stores the blend weight a second time (integer copy into the slot of the converted frame count) and swaps the two argument loads at the end; frame-count, compound and copy-variable forms tried
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
@@ -146,11 +147,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (44)
+## 3. Medium functions (251-800 bytes) (41)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
-- [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
-- [ ] `101670e0` 465 bytes (loops 13, calls 14)
 - [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
 - [ ] `10055aa0` 496 bytes (loops 5, calls 2)
 - [ ] `10054770` 506 bytes (loops 1, calls 3)
@@ -159,7 +158,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10055ca0` 562 bytes (loops 6, calls 6)
 - [ ] `10143e00` 566 bytes (float, calls 14)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
-- [ ] `1017c9c0` 581 bytes (loops 7, calls 2)
 - [ ] `1001f270` 588 bytes (float, loops 3, calls 15)
 - [ ] `100ba040` 604 bytes (float, loops 1, calls 15)
 - [ ] `1019b630` 604 bytes (loops 1, calls 6)
@@ -523,18 +521,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (8)
+## 6. Naming: matched functions without a readable name (0)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
-- [ ] `10001fb0` 27 bytes (src/math_float.cpp)
-- [ ] `10001fd0` 27 bytes (src/math_float.cpp)
-- [ ] `10001ff0` 27 bytes (src/math_float.cpp)
-- [ ] `10002010` 27 bytes (src/math_float.cpp)
-- [ ] `1013e6a0` 18 bytes (src/window_create.cpp)
-- [ ] `101ac4e0` 28 bytes (src/vec4.cpp)
-- [ ] `101acfa0` 26 bytes (src/containers.cpp)
-- [ ] `101ad1b0` 8 bytes (src/containers.cpp)
 
 ## 7. Comment pass (1 files)
 

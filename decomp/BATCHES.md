@@ -227,5 +227,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 163 | large, table-like | 10116550 (staff roll, 15107 bytes), 10023900, 1004f4f0 | 10023900 Map_ResetOnEnter open (49 bytes: New Year block placement), 1004f4f0 TutorialBook_NextPage open (draft) |
 | 164 | small helpers | cosf/floorf/sinf/sqrtf copies, 1013f880 Random, Vec4::Length, VertexPack/IndexList::Init, RenderWindow::WindowProc + GameWindow ctor, 10161970 | all 11 matched (File_Checksum was already matched); the game's window procedure is GameWindow::WindowProc |
 | 166 | save and system files | 101603c0 SystemSav_ReadRecord, 1015fea0 SystemSav_WriteRecord, 10161770 (fragment check) | |
-| 167 | medium functions | 101670e0, 1016b050, 101453e0 | |
+| 167 | medium functions | 101670e0, 1016b050, 101453e0 | 101670e0 WorldRenderer::WorldRenderer matched, and with its layout 1017c9c0 WorldRenderer::Bind; 1016b050 Camera_SelectPath open (shrink-wrapping); 101453e0 left |
+| 168 | world renderer | 10166950 WorldRenderer::LoadCharacter, 10167390, 1017cc90 | |
+| 169 | medium functions | 101453e0 Font_DrawGlyph, 10055aa0, 10054770 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

@@ -858,3 +858,6 @@ address	name	evidence
 101ac4e0	Vec4::Length	matched decompiled source (decomp/obj_symbols.tsv)
 101acfa0	VertexPack::Init	matched decompiled source (decomp/obj_symbols.tsv)
 101ad1b0	IndexList::Init	matched decompiled source (decomp/obj_symbols.tsv)
+1016b050	Camera_SelectPath	makes the camera path with the given id current and starts it at the frame nearest the camera target (decomp/src/camera_path_select.cpp)
+101670e0	WorldRenderer::WorldRenderer	constructs the map scene object (decomp/src/world_ctor.cpp)
+1017c9c0	WorldRenderer::Bind	resets the scene object for a new map and stores the model records, callback and data (decomp/src/world_ctor.cpp)

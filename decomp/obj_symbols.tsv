@@ -305,9 +305,9 @@ _Vec3_Dot	101ac200
 ?ReadStatement@ListBank@@QAEHPAPADPAD@Z	10035b10
 ?GetIndexPart@ListBank@@QAEHPBDPADH@Z	10036560
 ??4CharParams@@QAEAAU0@ABU0@@Z	100357a0
-?DrawNumber@Game@@QAEHHHHHHMM@Z	10008c40
-?DrawNumberAlt@Game@@QAEHHHHHHMM@Z	10008df0
-?DrawLabelledNumber@Game@@QAEHHHHHHMM@Z	10008a30
+?DrawNumber@Game@@QAEHHHHHMMM@Z	10008c40
+?DrawNumberAlt@Game@@QAEHHHHHMMM@Z	10008df0
+?DrawLabelledNumber@Game@@QAEHHHHHMMM@Z	10008a30
 ?OpenWindow@Game@@QAEHHHHHH@Z	100084b0
 ?AddValueEntry@Game@@QAEHHPBDH@Z	1000b060
 ?AddFlagEntry@Game@@QAEHHPBDPAH@Z	1000b2c0
@@ -332,8 +332,8 @@ _TestDat_Load	1000beb0
 ?SetWindowLayout2@Game@@QAEHHHHH@Z	10008710
 ?DrawPanel@Game@@QAEHHHHHHM@Z	100087f0
 ?DrawPanelAlt@Game@@QAEHHHHHHM@Z	10008880
-?DrawCursor@Game@@QAEHHHHH@Z	10008fa0
-?DrawBalloon@Game@@QAEHHHHHHHH@Z	10008910
+?DrawCursor@Game@@QAEHHHMH@Z	10008fa0
+?DrawBalloon@Game@@QAEHHHHHHHM@Z	10008910
 ?DrawDebugText@Game@@QAEHPBDHH@Z	100091d0
 ?Draw@Node@@QAEHPBUMatrix4@@0HHHHHHHHHHHH@Z	101995a0
 ?LoadIt3@Node@@QAEHPBDHH@Z	101abe30
@@ -394,3 +394,5 @@ _sqrtf	10002010
 ?FindLabel@ListBank@@QAEHPBDPADPAPAD@Z	10055aa0
 ?SkipStatement@ListBank@@QAEHPAPAD@Z	10055ca0
 ?RunQueuedEvents@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z	10055410
+?DrawGlyph@FontRenderer@@QAEHPAGHHGGH@Z	101453e0
+?DrawWindowMarks@Game@@QAEHH@Z	100092c0

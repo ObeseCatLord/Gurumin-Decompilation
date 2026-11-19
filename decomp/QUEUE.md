@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (136)
+## 1. Walls to retry (138)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -20,6 +20,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10008910` 275 — Game balloon frame: call written in both branches matches the duplicated pushes; register allocation of right/y (original keeps right in edi across the loop) differs
 - [ ] `10009050` 375 — Game::MoveCursor: logic identical; the original shares one stack slot for the int-to-float temporaries, the distance and the speed (frame 4 bytes smaller); shared-variable form tried
 - [ ] `100091d0` 239 — Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
+- [ ] `100092c0` 535 — Game::DrawWindowMarks: identical except the down-mark label index (original adds m_011c + w*0x80, then m_0134; cl 13.00 here m_0134 + w*0x80 + m_011c); index orders, a local and flat forms tried
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
 - [ ] `1000c020` 465 — Text_Substitute: 15 bytes; in the replacement path the original keeps out in edx (stored once at the loop bottom) and loads best before the copy, ours keeps text in the register and stores out on both paths; the word tables are 2-D now (that fixed the search loop); add orders and declaration orders tried
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
@@ -92,6 +93,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101441b0` 365 — black thumbnail-background quad: same register alternation residue as 0x10144040
 - [ ] `10144ee0` 377 — TextureObject::HalveRgb24: loop shape differs (the original keeps the row counter in memory and recomputes both row addresses with imul each pixel; cl 13.00 here strength-reduces them); pointer and indexed forms tried
 - [ ] `10145380` 87 — FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)
+- [ ] `101453e0` 485 — Font_DrawGlyph draft: same loops (the right-column fills come out as the same rep stosd/stosw); the original swaps the code bytes through ah, spills the glyph index into the code parameter slot and evaluates the coverage shift twice (imul 3 in both branches), cl 13.00 here keeps the index in ebx and reuses the shifted word; int/char/unsigned short pixel spellings tried
 - [ ] `101455d0` 914 — FontRenderer::Init (Font_Init): flow and calls in place; the original keeps 0 in edi and the path in ebx (ours the other way round) and compares the Open results with the zero register; its frame is 4 bytes smaller (result locals, FILE* result and goto form tried)
 - [ ] `10148590` 731 — TexturePool_Get: statements and the 8x-unrolled LRU scan in place; the original keeps the constant 1 in ebx (found, evict and the pool flags are set from it), keeps found/age in ecx/edx, and pushes its registers only after the index checks; declaration orders tried
 - [ ] `1014b390` 233 — Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
@@ -153,11 +155,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (31)
+## 3. Medium functions (251-800 bytes) (29)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
-- [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
-- [ ] `100092c0` 535 bytes (float, loops 1, calls 6)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
 - [ ] `1001f270` 588 bytes (float, loops 3, calls 15)
 - [ ] `100ba040` 604 bytes (float, loops 1, calls 15)

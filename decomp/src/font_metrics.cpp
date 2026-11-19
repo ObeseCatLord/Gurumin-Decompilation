@@ -26,6 +26,7 @@ struct FontRenderer
 
     int Init(HWND window, const char *path);
     int GlyphWidth(int x, int y, int color, unsigned short code, int a, int b);
+    int DrawGlyph(unsigned short *pixels, int x, int y, unsigned short code, unsigned short color, int unused);
     int DrawString(int x, int y, int color, const char *text, float a, int b);  // 0x1014f590; returns the width
     int TextWidth(const char *text, float scale);
 };
@@ -52,6 +53,60 @@ int FontRenderer::GlyphWidth(int x, int y, int color, unsigned short code, int a
     if (index < 0 || index > 0x108840)  // 0x108840 = 15,048 glyphs * 72 words (end of the table)
         index = 0x1c0;
     return ((font[index + 3] >> 9) & 0x1f) + 1;
+}
+
+// 0x101453e0 (Font_DrawGlyph). Draws the Shift-JIS character `code` (bytes in memory order, as in GlyphWidth) at
+// (x, y) of the 512-pixel-wide ARGB4444 surface `pixels`: each of the 17 rows has `width` pixels whose 3-bit
+// coverage becomes the alpha nibble's top bits over `color` (coverage 0 leaves just `color`), and one column right
+// of the glyph plus one row below it are filled with `color`. Returns the advance width (glyph width + 1).
+int FontRenderer::DrawGlyph(unsigned short *pixels, int x, int y, unsigned short code, unsigned short color, int unused)
+{
+    unsigned short *font = glyphs;
+    if (useAlt == 1 && altGlyphs != 0)
+        font = altGlyphs;
+    unsigned short raw = code;
+    unsigned char high = (unsigned char)(raw >> 8);
+    unsigned char low = (unsigned char)(raw & 0xff);
+    ((unsigned char *)&code)[0] = high;
+    ((unsigned char *)&code)[1] = low;
+    // the font skips the unused codes between 0x9ffc and 0xe040
+    int index;
+    if (code >= 0xe040)
+        index = (code - 0x4043) * 72;
+    else
+        index = (code - 0x8141) * 72;
+    if (index < 0 || index > 0x108840)
+        index = 0x1c0;
+    int width = (font[index + 3] >> 9) & 0x1f;
+    int row = 0;
+    unsigned short *line = &pixels[y * 0x200 + x];
+    do
+    {
+        unsigned short *out = line;
+        for (int column = 0; column < width; column++)
+        {
+            unsigned short bits = font[column / 5 + row + index];
+            if (((bits >> (column % 5 * 3)) & 7) == 0)
+                *out = color;
+            else
+                *out = (((bits >> (column % 5 * 3)) & 7) << 13) + 0x1000 | color;
+            out++;
+        }
+        row += 4;
+        line += 0x200;
+    } while (row < 0x44);
+    int advance = width + 1;
+    unsigned short *edge = &pixels[y * 0x200 + width + x];
+    for (int i = 0x11; i != 0; i--)
+    {
+        for (int k = width; k < advance; k++)
+            edge[k - width] = color;
+        edge += 0x200;
+    }
+    unsigned short *bottom = &pixels[(y + 0x11) * 0x200 + width + x];
+    for (int k = width; k < advance; k++)
+        bottom[k - width] = color;
+    return advance;
 }
 
 // Width in pixels of `text` drawn at `scale`: measured with the bitmap font when one is loaded (the text-draw

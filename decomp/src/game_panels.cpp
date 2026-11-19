@@ -8,7 +8,7 @@
 struct TextureObject
 {
     char pad_0000[0x38];
-    void DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int frame, int color, float alpha, int b);
+    void DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int colour, float unused, float alpha, int b);  // `unused` is never read
     void DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int frame, float alpha, int b);
     void DrawFill(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
     void DrawFrame(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
@@ -39,37 +39,37 @@ int Game::DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha)
 
 // Stores the cursor position (m_7630/m_7634) and draws the menu cursor (a 32x32 cell of texMenu1) at the
 // previous position (m_7638/m_763c), fading with `frame`.
-int Game::DrawCursor(int x, int y, int color, int frame)
+int Game::DrawCursor(int x, int y, float fade, int frame)
 {
     m_7630 = x;
     m_7634 = y;
     FUN_1013f070(0, 1, 0);
     DAT_118d0ba8[texMenu1].DrawTinted(m_7638 - 4, m_763c + 2, m_7638 + 0x1c, m_763c + 0x22, 1.0f / 256, 97.0f / 256,
-                                      31.0f / 256, 127.0f / 256, 0, color, (frame - 5) / 20.0f, 0);
+                                      31.0f / 256, 127.0f / 256, 0, fade, (frame - 5) / 20.0f, 0);
     FUN_1013f070(0, 0, 0);
     return 1;
 }
 
 // Draws a speech balloon from texWaku01: a top cap (lit or unlit), `rows` middle rows of 32 pixels and a
 // bottom cap, all 160 pixels wide. Not byte-identical yet (see open.tsv).
-int Game::DrawBalloon(int x, int y, int lit, int rows, int a, int b, int color)
+int Game::DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade)
 {
     FUN_1013f070(2, 0, 0);
     int right = x + 0xa0;
     if (lit != 0)
-        DAT_118d0ba8[texWaku01].DrawTinted(x, y, right, y + 0x20, 0.0f, 0.875f, 0.625f, 1.0f, 0, color, 0, 0);
+        DAT_118d0ba8[texWaku01].DrawTinted(x, y, right, y + 0x20, 0.0f, 0.875f, 0.625f, 1.0f, 0, fade, 0, 0);
     else
-        DAT_118d0ba8[texWaku01].DrawTinted(x, y, right, y + 0x20, 0.0f, 0.5f, 0.625f, 0.625f, 0, color, 0, 0);
+        DAT_118d0ba8[texWaku01].DrawTinted(x, y, right, y + 0x20, 0.0f, 0.5f, 0.625f, 0.625f, 0, fade, 0, 0);
     for (int i = 0; i < rows; i++)
-        DAT_118d0ba8[texWaku01].DrawTinted(x, y + 0x20 + i * 0x20, right, y + 0x40 + i * 0x20, 0.0f, 0.625f, 0.625f, 0.75f, 0, color, 0, 0);
+        DAT_118d0ba8[texWaku01].DrawTinted(x, y + 0x20 + i * 0x20, right, y + 0x40 + i * 0x20, 0.0f, 0.625f, 0.625f, 0.75f, 0, fade, 0, 0);
     y += rows * 0x20;
-    DAT_118d0ba8[texWaku01].DrawTinted(x, y + 0x20, right, y + 0x3f, 0.0f, 0.75390625f, 0.625f, 0.875f, 0, color, 0, 0);
+    DAT_118d0ba8[texWaku01].DrawTinted(x, y + 0x20, right, y + 0x3f, 0.0f, 0.75390625f, 0.625f, 0.875f, 0, fade, 0, 0);
     return 0;
 }
 
 // 0x10008a30. DrawNumber with a label in front: the text is two cells longer, the label (three digit cells wide, u
 // 0.1875-0.4453 on row v 0.625-0.6875 of texMenu1) fills the first cells and the digits use row v 0.6875-0.75.
-int Game::DrawLabelledNumber(int value, int x, int y, int frame, int color, float scale, float alpha)
+int Game::DrawLabelledNumber(int value, int x, int y, int frame, float fade, float scale, float alpha)
 {
     char text[256];
     sprintf(text, "%d", value);
@@ -78,7 +78,7 @@ int Game::DrawLabelledNumber(int value, int x, int y, int frame, int color, floa
     int digitWidth = (int)(scale * 11.2f);
     int halfHeight = (int)((float)digitWidth * 0.75f);
     DAT_118d0ba8[texMenu1].DrawTinted(x - halfWidth, y - halfHeight, x - halfWidth + digitWidth * 3, y + halfHeight,
-                                      0.1875f, 0.625f, 0.4453125f, 0.6875f, frame, color, alpha, 0);
+                                      0.1875f, 0.625f, 0.4453125f, 0.6875f, frame, fade, alpha, 0);
     for (int i = 2; i < length; i++)
     {
         int digit = text[i - 2] - '0';
@@ -89,7 +89,7 @@ int Game::DrawLabelledNumber(int value, int x, int y, int frame, int color, floa
         int left = x - halfWidth + i * digitWidth;
         DAT_118d0ba8[texMenu1].DrawTinted(left, y - halfHeight, left + digitWidth, y + halfHeight,
                                           (float)((digit + 3) * 16) / 256.0f, 0.6875f,
-                                          (float)((digit + 4) * 16) / 256.0f, 0.75f, frame, color, alpha, 0);
+                                          (float)((digit + 4) * 16) / 256.0f, 0.75f, frame, fade, alpha, 0);
     }
     return 0;
 }
@@ -97,7 +97,7 @@ int Game::DrawLabelledNumber(int value, int x, int y, int frame, int color, floa
 // 0x10008c40. Draws `value` in decimal centred on (x, y) with the digits of texMenu1 (16-pixel cells, row
 // v 0.8125-0.875, digit d at u (d + 3) / 16), `scale` setting the digit size (11.2 pixels wide at 1.0, 3/4 as high
 // above and below y), faded by `alpha`.
-int Game::DrawNumber(int value, int x, int y, int frame, int color, float scale, float alpha)
+int Game::DrawNumber(int value, int x, int y, int frame, float fade, float scale, float alpha)
 {
     char text[256];
     sprintf(text, "%d", value);
@@ -115,13 +115,13 @@ int Game::DrawNumber(int value, int x, int y, int frame, int color, float scale,
         int left = x - halfWidth + i * digitWidth;
         DAT_118d0ba8[texMenu1].DrawTinted(left, y - halfHeight, left + digitWidth, y + halfHeight,
                                           (float)((digit + 3) * 16) / 256.0f, 0.8125f,
-                                          (float)((digit + 4) * 16) / 256.0f, 0.875f, frame, color, alpha, 0);
+                                          (float)((digit + 4) * 16) / 256.0f, 0.875f, frame, fade, alpha, 0);
     }
     return 0;
 }
 
 // 0x10008df0. DrawNumber with the digit row above it (v 0.75-0.8125).
-int Game::DrawNumberAlt(int value, int x, int y, int frame, int color, float scale, float alpha)
+int Game::DrawNumberAlt(int value, int x, int y, int frame, float fade, float scale, float alpha)
 {
     char text[256];
     sprintf(text, "%d", value);
@@ -139,7 +139,7 @@ int Game::DrawNumberAlt(int value, int x, int y, int frame, int color, float sca
         int left = x - halfWidth + i * digitWidth;
         DAT_118d0ba8[texMenu1].DrawTinted(left, y - halfHeight, left + digitWidth, y + halfHeight,
                                           (float)((digit + 3) * 16) / 256.0f, 0.75f,
-                                          (float)((digit + 4) * 16) / 256.0f, 0.8125f, frame, color, alpha, 0);
+                                          (float)((digit + 4) * 16) / 256.0f, 0.8125f, frame, fade, alpha, 0);
     }
     return 0;
 }
@@ -214,4 +214,65 @@ int Game::MoveCursor()
     m_7638 += (int)step.x;
     m_763c += (int)step.y;
     return 1;
+}
+
+// The menu text renderer (Game::m_7664, see menu_list.cpp).
+struct MenuTextRenderer
+{
+    int M_101501f0(int x, int y, const char *text, int colour, int a, float scaleX, float scaleY);  // draws text
+};
+
+// Scroll marks, Shift-JIS: filled while `frame` is at most 5, outlined after that (they blink).
+#define MARK_UP "\x81\xa3"              // ▲
+#define MARK_UP_OUTLINE "\x81\xa2"      // △
+#define MARK_DOWN "\x81\xa5"            // ▼
+#define MARK_DOWN_OUTLINE "\x81\xa4"    // ▽
+
+// 0x100092c0. Draws the marks of the three menu windows, last window first: for list windows an up mark when the
+// list is scrolled, a down mark when an item follows the visible ones, and the cursor on the chosen item of the
+// active window; for grid windows (m_0158) only the cursor at its column and row. Returns 0.
+int Game::DrawWindowMarks(int frame)
+{
+    for (int w = 2; w >= 0; w--)
+    {
+        if (m_00ec[w] == 0)
+            continue;
+        if (m_0158[w] != 0)
+        {
+            if (m_008c[w] != 0 && m_0088 == w && m_0110[w] != 0)
+            {
+                FUN_1013f070(0, 1, 0);
+                DrawCursor(m_0170[w] * m_0164[w] - 0x10 + m_00b0[w], m_0128[w] * m_017c[w] + m_00bc[w],
+                           (float)m_0098[w] / 32.0f, frame);
+                FUN_1013f070(0, 0, 0);
+            }
+        }
+        else if (m_008c[w] != 0)
+        {
+            if (m_0134[w] > 0)
+            {
+                if (frame > 5)
+                    ((MenuTextRenderer *)m_7664)->M_101501f0(m_00b0[w] + 0x20, m_00bc[w], MARK_UP_OUTLINE, 0xffefcf, 0, 1.0f, 0.9f);
+                else
+                    ((MenuTextRenderer *)m_7664)->M_101501f0(m_00b0[w] + 0x20, m_00bc[w], MARK_UP, 0xffefcf, 0, 1.0f, 0.9f);
+            }
+            if (m_011c[w] < 0x80 && m_069c[w][m_0134[w] + m_011c[w] + 1][0] != 0)
+            {
+                if (frame > 5)
+                    ((MenuTextRenderer *)m_7664)->M_101501f0(m_00b0[w] + 0x20, m_0128[w] * m_011c[w] + 0x2c + m_00bc[w], MARK_DOWN_OUTLINE,
+                                     0xffefcf, 0, 1.0f, 0.9f);
+                else
+                    ((MenuTextRenderer *)m_7664)->M_101501f0(m_00b0[w] + 0x20, m_0128[w] * m_011c[w] + 0x2c + m_00bc[w], MARK_DOWN, 0xffefcf,
+                                     0, 1.0f, 0.9f);
+            }
+            if (m_0088 == w && m_0110[w] != 0)
+            {
+                FUN_1013f070(0, 1, 0);
+                DrawCursor(m_00b0[w], (m_0140[w] - m_0134[w]) * m_0128[w] + 0xc + m_00bc[w], (float)m_0098[w] / 32.0f,
+                           frame);
+                FUN_1013f070(0, 0, 0);
+            }
+        }
+    }
+    return 0;
 }

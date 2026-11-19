@@ -95,7 +95,8 @@ struct Game : Object
     int pad_014c[3];
     int m_0158[3];
     int m_0164[3];
-    char pad_0170[0x18];
+    int m_0170[3];              // 0x170: column of the cursor in grid windows
+    int m_017c[3];              // 0x17c: row of the cursor in grid windows
     int m_0188[3];
     int m_0194[3];
     int m_01a0[3];
@@ -198,12 +199,13 @@ struct Game : Object
     int SetWindowLastItem(int id, int count);
     int DrawPanel(int x, int y, int w, int h, int frame, float alpha);
     int DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha);
-    int DrawLabelledNumber(int value, int x, int y, int frame, int color, float scale, float alpha);  // 0x10008a30
-    int DrawNumber(int value, int x, int y, int frame, int color, float scale, float alpha);     // 0x10008c40
-    int DrawNumberAlt(int value, int x, int y, int frame, int color, float scale, float alpha);  // 0x10008df0
+    int DrawLabelledNumber(int value, int x, int y, int frame, float fade, float scale, float alpha);  // 0x10008a30
+    int DrawNumber(int value, int x, int y, int frame, float fade, float scale, float alpha);     // 0x10008c40
+    int DrawNumberAlt(int value, int x, int y, int frame, float fade, float scale, float alpha);  // 0x10008df0
     int MoveCursor();  // 0x10009050 (game_panels.cpp)
-    int DrawBalloon(int x, int y, int lit, int rows, int a, int b, int color);
-    int DrawCursor(int x, int y, int color, int frame);
+    int DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade);  // fade: passed to DrawTinted, unused there
+    int DrawCursor(int x, int y, float fade, int frame);
+    int DrawWindowMarks(int frame);
     int DrawDebugText(const char *text, int x, int y);
     int FindConstant(const char *name);
     int CloseWindow(int id);

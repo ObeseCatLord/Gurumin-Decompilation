@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 10.8951,
+  "fuzzy_match_percent": 10.9168,
   "total_code": "1720206",
   "matched_code": "149879",
   "matched_code_percent": 8.7129,
@@ -5425,16 +5425,16 @@
   {
    "name": "app/font_metrics",
    "measures": {
-    "fuzzy_match_percent": 68.6015,
-    "total_code": "1155",
+    "fuzzy_match_percent": 51.4824,
+    "total_code": "1640",
     "matched_code": "154",
-    "matched_code_percent": 13.3333,
+    "matched_code_percent": 9.3902,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 3,
+    "total_functions": 4,
     "matched_functions": 1,
-    "matched_functions_percent": 33.3333,
+    "matched_functions_percent": 25.0,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -5445,8 +5445,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1155",
-     "fuzzy_match_percent": 68.6015
+     "size": "1640",
+     "fuzzy_match_percent": 51.4824
     }
    ],
    "functions": [
@@ -5456,6 +5456,14 @@
      "fuzzy_match_percent": 37.5,
      "metadata": {
       "virtual_address": "269767552"
+     }
+    },
+    {
+     "name": "?DrawGlyph@FontRenderer@@QAEHPAGHHGGH@Z",
+     "size": "485",
+     "fuzzy_match_percent": 10.7143,
+     "metadata": {
+      "virtual_address": "269767648"
      }
     },
     {
@@ -5525,16 +5533,16 @@
   {
    "name": "app/game_panels",
    "measures": {
-    "fuzzy_match_percent": 84.6066,
-    "total_code": "2719",
+    "fuzzy_match_percent": 80.5791,
+    "total_code": "3254",
     "matched_code": "1830",
-    "matched_code_percent": 67.3042,
+    "matched_code_percent": 56.2385,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 9,
+    "total_functions": 10,
     "matched_functions": 6,
-    "matched_functions_percent": 66.6667,
+    "matched_functions_percent": 60.0,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -5545,8 +5553,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "2719",
-     "fuzzy_match_percent": 84.6066
+     "size": "3254",
+     "fuzzy_match_percent": 80.5791
     }
    ],
    "functions": [
@@ -5567,7 +5575,7 @@
      }
     },
     {
-     "name": "?DrawCursor@Game@@QAEHHHHH@Z",
+     "name": "?DrawCursor@Game@@QAEHHHMH@Z",
      "size": "167",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -5575,7 +5583,7 @@
      }
     },
     {
-     "name": "?DrawBalloon@Game@@QAEHHHHHHHH@Z",
+     "name": "?DrawBalloon@Game@@QAEHHHHHHHM@Z",
      "size": "275",
      "fuzzy_match_percent": 49.6528,
      "metadata": {
@@ -5583,7 +5591,7 @@
      }
     },
     {
-     "name": "?DrawLabelledNumber@Game@@QAEHHHHHHMM@Z",
+     "name": "?DrawLabelledNumber@Game@@QAEHHHHHMMM@Z",
      "size": "528",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -5591,7 +5599,7 @@
      }
     },
     {
-     "name": "?DrawNumber@Game@@QAEHHHHHHMM@Z",
+     "name": "?DrawNumber@Game@@QAEHHHHHMMM@Z",
      "size": "425",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -5599,7 +5607,7 @@
      }
     },
     {
-     "name": "?DrawNumberAlt@Game@@QAEHHHHHHMM@Z",
+     "name": "?DrawNumberAlt@Game@@QAEHHHHHMMM@Z",
      "size": "425",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -5620,6 +5628,14 @@
      "fuzzy_match_percent": 26.9022,
      "metadata": {
       "virtual_address": "268472400"
+     }
+    },
+    {
+     "name": "?DrawWindowMarks@Game@@QAEHH@Z",
+     "size": "535",
+     "fuzzy_match_percent": 60.1103,
+     "metadata": {
+      "virtual_address": "268473024"
      }
     }
    ],
@@ -14480,13 +14496,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1510155",
+    "total_code": "1509135",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 344,
+    "total_functions": 342,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14499,7 +14515,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1510155",
+     "size": "1509135",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -14526,14 +14542,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268467696"
-     }
-    },
-    {
-     "name": "FUN_100092c0",
-     "size": "535",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268473024"
      }
     },
     {
@@ -16510,14 +16518,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269765616"
-     }
-    },
-    {
-     "name": "FUN_101453e0",
-     "size": "485",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269767648"
      }
     },
     {

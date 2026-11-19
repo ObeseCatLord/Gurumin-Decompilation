@@ -336,3 +336,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Walls written down as "VS2003 does X" deserve a retry with cl 13.00: statement order of independent stores
   does change the output (0x10034c80 matched with the two stores swapped, 0x10166870 with `m_00b8 = 0` first),
   and a call that keeps `this` in ecx is a method call (MeshInstance::M_10169e10 calls Upload, not a free function).
+- `int left = counter; if (left != 0) counter = left - 1;` gives `dec eax / mov [counter], eax` where
+  `counter--` copies to another register first (0x1000ed20). A clamp written as two ternaries through a second
+  variable (`int c = x > 0 ? x : 0; int slot = c > 3 ? 3 : c;`) gives the branchless low clamp and a
+  `mov esi, 3 / cmp / jg / mov esi, eax` high clamp (0x1016b1e0).

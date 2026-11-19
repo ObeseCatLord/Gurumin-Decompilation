@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 10.7885,
+  "fuzzy_match_percent": 10.7909,
   "total_code": "1720206",
-  "matched_code": "147584",
-  "matched_code_percent": 8.5794,
+  "matched_code": "147734",
+  "matched_code_percent": 8.5882,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 727,
-  "matched_functions_percent": 59.9835,
+  "matched_functions": 729,
+  "matched_functions_percent": 60.1485,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 222,
-  "complete_units": 134
+  "complete_units": 135
  },
  "units": [
   {
@@ -1351,28 +1351,28 @@
   {
    "name": "app/app_0009",
    "measures": {
-    "fuzzy_match_percent": 96.1659,
+    "fuzzy_match_percent": 100.0,
     "total_code": "728",
-    "matched_code": "651",
-    "matched_code_percent": 89.4231,
+    "matched_code": "728",
+    "matched_code_percent": 100.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
     "total_functions": 9,
-    "matched_functions": 8,
-    "matched_functions_percent": 88.8889,
-    "complete_code": "0",
-    "complete_code_percent": 0.0,
+    "matched_functions": 9,
+    "matched_functions_percent": 100.0,
+    "complete_code": "728",
+    "complete_code_percent": 100.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 0
+    "complete_units": 1
    },
    "sections": [
     {
      "name": ".text",
      "size": "728",
-     "fuzzy_match_percent": 96.1659
+     "fuzzy_match_percent": 100.0
     }
    ],
    "functions": [
@@ -1403,7 +1403,7 @@
     {
      "name": "_FUN_1000ed20",
      "size": "77",
-     "fuzzy_match_percent": 63.75,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "268496160"
      }
@@ -1450,7 +1450,7 @@
     }
    ],
    "metadata": {
-    "complete": false,
+    "complete": true,
     "source_path": "decomp/src/app_0009.cpp"
    }
   },
@@ -2275,16 +2275,16 @@
   {
    "name": "app/camera",
    "measures": {
-    "fuzzy_match_percent": 85.9731,
+    "fuzzy_match_percent": 88.9681,
     "total_code": "457",
-    "matched_code": "270",
-    "matched_code_percent": 59.081,
+    "matched_code": "343",
+    "matched_code_percent": 75.0547,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
     "total_functions": 11,
-    "matched_functions": 8,
-    "matched_functions_percent": 72.7273,
+    "matched_functions": 9,
+    "matched_functions_percent": 81.8182,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -2296,7 +2296,7 @@
     {
      "name": ".text",
      "size": "457",
-     "fuzzy_match_percent": 85.9731
+     "fuzzy_match_percent": 88.9681
     }
    ],
    "functions": [
@@ -2351,7 +2351,7 @@
     {
      "name": "_FUN_1016b1e0",
      "size": "73",
-     "fuzzy_match_percent": 81.25,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "269922784"
      }

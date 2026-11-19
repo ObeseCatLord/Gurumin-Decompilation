@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (138)
+## 1. Walls to retry (136)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -23,7 +23,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
 - [ ] `1000c020` 465 — Text_Substitute: 15 bytes; in the replacement path the original keeps out in edx (stored once at the loop bottom) and loads best before the copy, ours keeps text in the register and stores out on both paths; the word tables are 2-D now (that fixed the search loop); add orders and declaration orders tried
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
-- [ ] `1000ed20` 77 — original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 - [ ] `1000f360` 300 — face change: calls match; the original keeps index in esi and frame in edi (ours swapped) and indexes the face tables as flat int arrays [set*0x1c0+frame]
 - [ ] `100106e0` 1567 — Save_Write: frame, calls and layout identical; the unrolled bit-set loop swaps ebx/edi for two of its counters and the start-position loads use other registers; locals for the position tried
 - [ ] `10010d10` 1323 — Save_ReadSlotInfo: statements and flow match; the stack layout differs like Save_ReadThumbnail 0x10011240 (original frame 0x3f0, ours 0x400; the unused Vec4 sits near the path buffer); Vec4 placements tried
@@ -121,7 +120,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016a2e0` 413 — Playback::Play: control flow and stores identical; register allocation differs (original keeps the layer in eax and reuses the zero restart register as the follow-up loop counter; ours the layer in ecx); index-variable forms tried
 - [ ] `1016b010` 53 — original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 - [ ] `1016b050` 399 — Camera_SelectPath: body identical apart from the camera-target pointer register (eax vs ecx); the original pushes all four registers before the id == -1 test and stores the 0 as an immediate (no shrink-wrapping), cl 13.00 here shrink-wraps the early return; inverted if tried
-- [ ] `1016b1e0` 73 — original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 - [ ] `1016b400` 695 — Camera_TurnInput: same arithmetic; the original stores the blend weight a second time (integer copy into the slot of the converted frame count) and swaps the two argument loads at the end; frame-count, compound and copy-variable forms tried
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
 - [ ] `10175c90` 476 — Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
@@ -507,13 +505,15 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (3)
+## 6. Naming: matched functions without a readable name (5)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
+- [ ] `1000ed20` 77 bytes (src/app_0009.cpp)
 - [ ] `10034c80` 52 bytes (src/app_0011.cpp)
 - [ ] `1015cac0` 20 bytes (src/ime.cpp)
 - [ ] `10166870` 52 bytes (src/model_misc.cpp)
+- [ ] `1016b1e0` 73 bytes (src/camera.cpp)
 
 ## 7. Comment pass (0 files)
 

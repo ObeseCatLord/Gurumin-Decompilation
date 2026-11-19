@@ -1,9 +1,7 @@
 address	status	reason
-1000ed20	open	original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 10015910	open	settings byte flags: cl 13.00 here threads the three mode tests (after mode == 0 it jumps past the others), the original tests each in turn; flag-array, local copy and (char)mode forms tried
 10169720	open	memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 1016b010	open	original keeps 1.0f in edx and stores the register; VS2003 stores immediates
-1016b1e0	open	original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 1016c300	open	control-flow layout of a three-way flag test differs (two source shapes tried)
 101992f0	open	walk to the root: original keeps the next pointer in edx, VS2003 in ecx (two loop shapes tried)
 100e2080	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates

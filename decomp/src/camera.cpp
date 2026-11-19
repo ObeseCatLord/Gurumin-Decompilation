@@ -107,12 +107,11 @@ extern "C" int FUN_1016b010(int mode)
     return 0;
 }
 
-// Sets caption line `index` (clamped to 0..3) to `text` and restarts its timer. Not byte-identical yet.
+// Sets caption line `index` (clamped to 0..3) to `text` and restarts its timer.
 extern "C" int FUN_1016b1e0(int index, const char *text)
 {
-    int slot = index > 0 ? index : 0;
-    if (slot > 3)
-        slot = 3;
+    int clamped = index > 0 ? index : 0;
+    int slot = clamped > 3 ? 3 : clamped;
     strcpy(DAT_1101d9c0[slot], text);
     DAT_1101ddc0[slot] = 0;
     return 0;

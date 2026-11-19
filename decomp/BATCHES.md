@@ -249,5 +249,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 186 | integer functions | 101455d0 Font_Init, 10023d30 Map_Unload, 10142790 | Font_Init (FontRenderer layout filled in) and Map_Unload open (register choice); 10142790 left |
 | 187 | integer functions | 10142790, 1014f1f0 TextureObject::Upload, 10148590 | 10148590 TexturePool_Get open; the other two left (DirectInput, pixel loops) |
 | 188 | wall retries | 1015cac0, 10169e10, 10034c80, 10166870, 1016b010 | four matched (float setter, method call, two store orders); 1016b010 left (eax/edx) |
-| 189 | wall retries | 1000ed20, 1016a090, 10012130, 1016b1e0 | |
+| 189 | wall retries | 1000ed20, 1016a090, 10012130, 1016b1e0 | 1000ed20 (counter read into a local) and 1016b1e0 (two ternaries) matched; 1016a090 and 10012130 still open |
+| 190 | wall retries | 1016b010, 100e2080 family, 10015710, 101992f0 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

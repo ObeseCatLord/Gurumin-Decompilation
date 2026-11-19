@@ -86,12 +86,12 @@ extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a)
 }
 
 // Advances the colour blend of DAT_10da90d0 by one step, snapping to the target on the last frame.
-// Not byte-identical yet (see open.tsv).
 extern "C" void FUN_1000ed20(void)
 {
-    if (DAT_1042da68 != 0)
+    int left = DAT_1042da68;
+    if (left != 0)
     {
-        DAT_1042da68--;
+        DAT_1042da68 = left - 1;
         DAT_10da90d0.Copy(DAT_10da90d0 + DAT_10daa800);
         if (DAT_1042da68 == 0)
             DAT_10da90d0.Copy(DAT_10c67f60);

@@ -898,3 +898,4 @@ address	name	evidence
 10037090	ListBank::FindVariable	finds a declared script variable (array indexes evaluated and checked) and its element offset
 100b9bb0	Enemy_PlayVoice	plays an enemy voice unless its per-kind cooldown runs, then sets the cooldown by sound
 1002f050	Route_FollowGates	follows a route whose points carry gate types (flag jump, stop, wait, walk on)
+10172350	EffectManager::Start	starts an effect by script id: definition lookup (cached), free record in its list, fills the record

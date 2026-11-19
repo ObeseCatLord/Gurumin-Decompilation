@@ -399,3 +399,4 @@ _sqrtf	10002010
 ?Map_SelectMovie@@YAHXZ	1001f270
 ?AssignValue@ListBank@@QAEHPBDPBUScriptValue@@D@Z	10037560
 ?FindVariable@ListBank@@QAEHPBDPAH11@Z	10037090
+?Start@EffectManager@@QAEHHUVec4@@HHHHHPBUMatrix4@@PBUEffectOptions@@PAH@Z	10172350

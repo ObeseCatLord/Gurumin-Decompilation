@@ -271,7 +271,8 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 210 | wall retries + medium | 1003ab40, 101ad350, 1002f050 | walls unchanged (register allocation); 1002f050 Route_FollowGates open (registers) |
 | 211 | near-miss walls | 10194c60, 1001b670, 101ad240, 1002ee70 (fewest differing bytes) | all residues confirmed: EH state numbering, slot order by first use, dot-product schedule, fadd schedule; 100e21a0 left (enemy AI zero-register family) |
 | 212 | large functions | 10172350, 1001b0a0, 100366c0 | 10172350 EffectManager::Start studied (needs the 0x1dc-byte effect record laid out: matrix 0x104, options 0x17c..0x1c0, handle 0x1d8); not written yet |
-| 213 | effect record layout | EffectRecordA fields for 10172350, then the function | |
+| 213 | effect record layout | EffectRecordA fields for 10172350, then the function | effect_start.cpp lays out the record, definition and options; EffectManager::Start open (one store cluster) |
+| 214 | effect neighbours | 1016fa40 LoadDefinition, 10172780 | |
 | 207 | wall study | the fld/fstp float-copy pattern (100ba040, 100b9930, 10016700) | found for 10016700 (sum of two casts spills the first); the other two are a different copy, still open |
 | 200 | wall retries | float-compare walls, MarkKilled | MarkKilled and Vec4::InTriangle still open (register roles, return-block placement) |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

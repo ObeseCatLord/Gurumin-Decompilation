@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.3395,
+  "fuzzy_match_percent": 11.3823,
   "total_code": "1720206",
   "matched_code": "154913",
   "matched_code_percent": 9.0055,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 230,
+  "total_units": 231,
   "complete_units": 138
  },
  "units": [
@@ -4762,6 +4762,48 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/effect_sprites.cpp"
+   }
+  },
+  {
+   "name": "app/effect_start",
+   "measures": {
+    "fuzzy_match_percent": 68.9366,
+    "total_code": "1068",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1068",
+     "fuzzy_match_percent": 68.9366
+    }
+   ],
+   "functions": [
+    {
+     "name": "?Start@EffectManager@@QAEHHUVec4@@HHHHHPBUMatrix4@@PBUEffectOptions@@PAH@Z",
+     "size": "1068",
+     "fuzzy_match_percent": 68.9366,
+     "metadata": {
+      "virtual_address": "269951824"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/effect_start.cpp"
    }
   },
   {
@@ -14872,13 +14914,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1500047",
+    "total_code": "1498979",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 329,
+    "total_functions": 328,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14891,7 +14933,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1500047",
+     "size": "1498979",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -17182,14 +17224,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269947888"
-     }
-    },
-    {
-     "name": "FUN_10172350",
-     "size": "1068",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269951824"
      }
     },
     {

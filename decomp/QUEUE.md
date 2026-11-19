@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (140)
+## 1. Walls to retry (141)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -128,6 +128,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016b050` 399 — Camera_SelectPath: body identical apart from the camera-target pointer register (eax vs ecx); the original pushes all four registers before the id == -1 test and stores the 0 as an immediate (no shrink-wrapping), cl 13.00 here shrink-wraps the early return; inverted if tried
 - [ ] `1016b400` 695 — Camera_TurnInput: same arithmetic; the original stores the blend weight a second time (integer copy into the slot of the converted frame count) and swaps the two argument loads at the end; frame-count, compound and copy-variable forms tried
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
+- [ ] `10172350` 1068 — EffectManager::Start: all but one cluster identical; the original loads the matrix owner before the value but stores the value first and computes the start frame early (cl 13.00 here pairs them the other way); the 24 orders of value/owner/serial/frame and a start local tried
 - [ ] `10175c90` 476 — Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
@@ -178,7 +179,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (195)
+## 4. Large functions (801-3000 bytes) (194)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -226,7 +227,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014fdd0` 1048 bytes (float, loops 3, calls 9)
 - [ ] `1014bc60` 1051 bytes TextureObject::DrawCell (float, calls 22)
 - [ ] `10166100` 1055 bytes (float, loops 2, calls 14)
-- [ ] `10172350` 1068 bytes (loops 4, calls 5)
 - [ ] `1014f900` 1070 bytes (float, loops 6, calls 12)
 - [ ] `101afe00` 1079 bytes (float, loops 2, calls 7)
 - [ ] `100425f0` 1081 bytes (float, loops 1, calls 35)

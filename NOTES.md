@@ -320,3 +320,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Texture loads by literal name (`FUN_10174ce0(FUN_1013f8a0(name, 0), 0, 0)`) come from a one-line inline helper
   (`LoadIti`, face_anim.cpp / bs003_variant.cpp); the full `LoadTexture` of texture_load.h is not inlined at /Ob1.
   Repeated loads at the end of switch cases are cross-jumped into one call, so write each case in full.
+- Locals that live only in one block should be declared in that block: cl reuses their stack slot for later
+  spills (SystemSav_ReadRecord 0x101603c0 matched its frame once `zero`/`word` moved into their loops).
+- Three FILETIMEs in ascending address order with an 8-byte gap after the last-write time are an array
+  `FILETIME times[4]` used as times[0..2] (SystemSav_WriteRecord 0x1015fea0); separate variables are ordered differently.
+- Copying a byte buffer once per loop iteration into an `int c` local gives the original's movsx/xor/add sequence
+  in cl's 8x-unrolled checksum loops; two reads of `name[i]` do not.

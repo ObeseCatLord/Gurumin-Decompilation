@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (133)
+## 1. Walls to retry (134)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -35,7 +35,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10014d30` 1931 — Helmet_FaceSettings: values and branches identical; the result is kept in esi (eax in the original) and the inline ScriptFlag uses other registers. An unused char buffer reproduces the original /GS cookie
 - [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
 - [ ] `100157b0` 167 — near-cell list: original keeps the index/row pointer in edi and the box pointer in ebx (pushed late); ours swaps them (local row pointer, direct indexing, do/while tried)
-- [ ] `10015910` 69 — settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
+- [ ] `10015910` 69 — settings byte flags: cl 13.00 here threads the three mode tests (after mode == 0 it jumps past the others), the original tests each in turn; flag-array, local copy and (char)mode forms tried
 - [ ] `10017d30` 488 — RenderTarget_Probe: 2 bytes; the original compares the second UpdateImage result with the zero register (cmp eax, ebp), ours uses test eax, eax; !x and result-local forms tried
 - [ ] `10019310` 849 — Camera_Shift: same statements; block layout differs (the original keeps the shrink branch on the fallthrough of the counter tests and cross-jumps into the shift branch's final Copy) and the shift-goal subtraction loads its operands in another order; branch order swapped tried
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
@@ -97,6 +97,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1015cac0` 20 — same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
+- [ ] `101603c0` 1218 — SystemSav_ReadRecord: 20 bytes; the original places the -1 (other machine) return block before the 0 return that the early exits share, ours after it (nested, else and result-variable forms tried)
 - [ ] `10160960` 75 — frame blit clamp: register allocation of the two min() results differs
 - [ ] `10160f00` 326 — MmvPlayer::ReadFrameOnce: identical except the original keeps 0 in ebx (push ebx / xor ebx,ebx) where ours uses immediates - same zero-register residue as the enemy AI updaters
 - [ ] `10161120` 213 — Path_GetBaseName: register allocation (original reads buffer[0] before the pushes and zeroes out[] with esi); memset and do/while forms tried
@@ -193,7 +194,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (208)
+## 4. Large functions (801-3000 bytes) (206)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -248,7 +249,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014fdd0` 1048 bytes (float, loops 3, calls 9)
 - [ ] `1014bc60` 1051 bytes TextureObject::DrawCell (float, calls 22)
 - [ ] `10166100` 1055 bytes (float, loops 2, calls 14)
-- [ ] `1015fea0` 1060 bytes SystemSav_WriteRecord (loops 7, calls 36)
 - [ ] `10172350` 1068 bytes (loops 4, calls 5)
 - [ ] `1014f900` 1070 bytes (float, loops 6, calls 12)
 - [ ] `101afe00` 1079 bytes (float, loops 2, calls 7)
@@ -272,7 +272,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10042140` 1195 bytes (float, loops 2, calls 33)
 - [ ] `1005f750` 1200 bytes (float, loops 4, calls 28)
 - [ ] `1003b6e0` 1208 bytes Costume_LoadPlayerModel (calls 33)
-- [ ] `101603c0` 1218 bytes SystemSav_ReadRecord (loops 10, calls 34)
 - [ ] `10050510` 1219 bytes (float, loops 2, calls 18)
 - [ ] `100169c0` 1220 bytes (float, loops 9, calls 33)
 - [ ] `10020090` 1224 bytes (float, loops 1, calls 27)
@@ -523,12 +522,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (1 files)
+## 7. Comment pass (0 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
-- [ ] `src/camera_follow.cpp`: 0 of 3 functions without a comment, no header
 
 ## 8. Structures and globals
 

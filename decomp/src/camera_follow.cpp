@@ -1,7 +1,7 @@
-#include <math.h>
-
 // Camera easing in the scene frame (FUN_100f5a80): the camera target (DAT_118e6cb8) and position (DAT_118e69e8) move
 // towards their goals every frame, and the results are copied to the other camera vectors.
+
+#include <math.h>
 
 struct Vec4
 {

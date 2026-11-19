@@ -1,6 +1,6 @@
 address	status	reason
 1000ed20	open	original decrements the global in eax; VS2003 copies to ecx first (scheduling)
-10015910	open	settings byte flags: register/constant reuse differs (cl=1, al=2); not yet tried variants
+10015910	open	settings byte flags: cl 13.00 here threads the three mode tests (after mode == 0 it jumps past the others), the original tests each in turn; flag-array, local copy and (char)mode forms tried
 10034c80	open	two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
 1015cac0	open	same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
 10166870	open	same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
@@ -135,3 +135,4 @@ address	status	reason
 10054770	open	Game::MarkKilled: same statements; like RaiseGameOverEvents the original walks the events with two pointers (&flags[1] and &ids[0]) and keeps this in ebp, cl 13.00 here one event pointer and this in ebx (pointer and indexed forms tried)
 1001d2d0	open	DigitCounter_Update: blocks and cases in place; the original keeps the state offset (index * 0x40) in edi and the divisor 10 in ebx, ours swaps them (and pushes ebx/edi around the first test)
 100135b0	open	Map_ShowEquipment: same length and statements; in each part the original keeps the shared "show version a/ba" tail in the version 1 block and jumps to it from version 0, cl 13.00 here the other way round (if chain and switch tried)
+101603c0	open	SystemSav_ReadRecord: 20 bytes; the original places the -1 (other machine) return block before the 0 return that the early exits share, ours after it (nested, else and result-variable forms tried)

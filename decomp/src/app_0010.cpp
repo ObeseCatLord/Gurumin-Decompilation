@@ -23,6 +23,7 @@ extern "C" int DAT_1049f0f0;
 extern "C" Vec3 *DAT_1032d5b8[];
 extern "C" char DAT_1021bbc0[];
 extern "C" int DAT_10c66590;
+extern "C" int DAT_10c62edc[0x1000];
 extern "C" int DAT_10c66594;
 extern "C" char DAT_104c0131;
 extern "C" char DAT_104c0130;

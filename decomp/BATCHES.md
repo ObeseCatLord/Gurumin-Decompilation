@@ -214,4 +214,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 150 | medium functions | 101670e0, 10169720 retry, 1015fea0 | |
 | 151 | medium functions | 1003e710, 10161f80, 10163150 | |
 | 152 | large, mechanical | 1003e710 (game reset, 5401 bytes, mostly stores), 10161f80 (model record reset, needs the record layout) | |
-| 153 | medium functions | 1003b2c0, 101455d0 Font_Init, 10160a90 Mmv_Open | |
+| 153 | medium functions | 1003b2c0 Save_Load, 101455d0 Font_Init, 10160a90 Mmv_Open | Save_Load matched |

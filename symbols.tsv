@@ -869,3 +869,4 @@ address	name	evidence
 1017c160	ModelBank::CreateTextures	creates the shadow, lens-flare, cel and render-target textures (matched, decomp/src/model_bank.cpp)
 100135b0	Map_ShowEquipment	shows the chosen versions of the equipment parts and the house on the map model (decomp/src/map_equipment.cpp)
 1019e610	Node::WeldVertices	merges identical vertices of each pack and rewrites the indices (matched, decomp/src/node_sort_packs.cpp)
+1019eeb0	Node::SetupSkinning	inverse matrix, bone flags and skin links of a node tree (decomp/src/scene_node.cpp)

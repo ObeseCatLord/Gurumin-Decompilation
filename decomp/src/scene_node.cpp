@@ -31,6 +31,7 @@ struct Matrix
 {
     float m[16];
     Vec4 GetTranslation();  // 0x101ade80
+    ~Matrix();              // 0x1013eda0 (empty)
 };
 
 struct NodeSaved
@@ -70,6 +71,7 @@ struct GlyphState
     Matrix m_3518[0x44];
     char pad_4618[0x1000];
     int m_5618;
+    void Clear();               // 0x10166810: empties the skin data
 };
 
 struct MeshData
@@ -133,6 +135,8 @@ struct IndexList
 
 struct KeyPair;
 
+Matrix InverseMatrix(const Matrix &matrix);      // 0x101b0d40 (node_bones.cpp)
+
 struct Node
 {
     char name[0x40];
@@ -170,7 +174,7 @@ struct Node
     char pad_01c0[8];
     int m_01c8;
     Matrix matrix;
-    char pad_020c[0x40];
+    Matrix inverseMatrix;        // 0x20c: inverse of `matrix`
     Matrix worldMatrix;          // 0x24c: the node's matrix in world space
 
     struct TextureRef *m_028c;
@@ -210,7 +214,7 @@ struct Node
     char pad_189d[3];
 
     void M_10191d50();
-    void M_1019eeb0(Node *root, Node **list, int *count);
+    int M_1019eeb0(Node *root, Node **list, int *count);
     void M_101ab9d0(Node *root);
     int M_10191770();
     void Release();
@@ -267,14 +271,14 @@ struct Node
     void M_101911e0(KeyPair *pairs, int count);
     void M_1019e120();
     int M_101ab980();
-    int M_10191a30(const char *name, int *value);
-    int M_10191c30(const char *name, int *value);
+    Node *M_10191a30(const char *name, int *value);
+    Node *M_10191c30(const char *name, int *value);
     int FindRecursiveStripped(const char *name, int *skip);
     int BuildMesh(int recurse, int flags);
     int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
                            Vec4 *closest);
     int FindPrefixRecursiveStripped(const char *prefix, int *skip);
-    int M_1019ece0(const char *name, int value);
+    Node *Find(const char *name, int index);
     int M_1019ed10(const char *name, int value);
     int M_10191920(Node **list, int *count);
     void M_10191210();
@@ -752,7 +756,7 @@ int Node::ClearSpecialPassOnLinks()
 
 // Node::Find: the index-th node called `name` in the subtree; a leading '@' turns it into a prefix search
 // ("@Spot" finds Spot01, Spot02, ...).
-int Node::M_1019ece0(const char *name, int value)
+Node *Node::Find(const char *name, int value)
 {
     int result = value;
     if (*name == '@')
@@ -760,7 +764,7 @@ int Node::M_1019ece0(const char *name, int value)
     return M_10191a30(name, &result);
 }
 
-// Like M_1019ece0 with the second pair of finders (FindPrefixRecursiveStripped / FindRecursiveStripped), which ignore the name
+// Like Find with the second pair of finders (FindPrefixRecursiveStripped / FindRecursiveStripped), which ignore the name
 // prefixes of special nodes.
 int Node::M_1019ed10(const char *name, int value)
 {
@@ -1487,13 +1491,13 @@ int Node::SetUniqueName(const char *name)
     char unique[256];
     int number = 0;
     Node *root = Root();
-    if (root->M_1019ece0(name, 0) == 0)
+    if (root->Find(name, 0) == 0)
     {
         strcpy(this->name, name);
         return 1;
     }
     sprintf(unique, "%s(%d)", name, 0);
-    while (root->M_1019ece0(unique, 0) != 0)
+    while (root->Find(unique, 0) != 0)
     {
         number++;
         sprintf(unique, "%s(%d)", name, number);
@@ -1514,7 +1518,7 @@ void Node::MakeNameUnique()
     strcpy(unique, name);
     sprintf(name, "uni%d%d", rand(), rand());
     int number = 1;
-    while (root->M_1019ece0(unique, 0) != 0)
+    while (root->Find(unique, 0) != 0)
     {
         sprintf(unique, "%s(%d)", base, number);
         number++;
@@ -1681,4 +1685,84 @@ void Node::CollectStatic(Node *collector)
     collector->staticCount++;
     for (i = 0; i < childCount; i++)
         children[i]->CollectStatic(collector);
+}
+
+// 0x1019eeb0. Prepares the skinning of this node and, recursively, its children: stores the inverse of the node
+// matrix; "bip"/"bone" nodes are marked as bones and get skin data. A skinned node (skin data with links) looks up
+// its linked nodes and bones under `root`, marks them and passes its parent name on to them (to the bones only while
+// every earlier bone is a leaf or a bone itself). Nodes with flag 0x400000, 0x1000 or 0x4000 get their saved block
+// (0x1000: with the linked root stored in it, 0x4000: the node is added to `list`). Returns 1.
+int Node::M_1019eeb0(Node *root, Node **list, int *count)
+{
+    inverseMatrix = InverseMatrix(matrix);
+    if (_strnicmp(name, "bip", 3) == 0 || _strnicmp(name, "bone", 4) == 0)
+    {
+        m_0704 = 1;
+        if (m_0708 == 0)
+        {
+            m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
+            m_0708->Clear();
+        }
+    }
+    if (m_0708 != 0 && m_0708->m_5618 != 0)
+    {
+        int i;
+        for (i = 0; i < 0x40; i++)
+        {
+            if (m_0708->linkNames[i][0] != 0)
+            {
+                m_0708->links[i] = root->Find(m_0708->linkNames[i], 0);
+                m_0708->links[i]->m_0704 = 1;
+                if (m_0708->links[i]->m_0708 == 0)
+                {
+                    m_0708->links[i]->m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
+                    m_0708->links[i]->m_0708->Clear();
+                }
+                m_0708->links[i]->m_0708->pad_0104 = 1;
+                strcpy(m_0708->links[i]->m_0708->parentName, m_0708->parentName);
+            }
+        }
+        int chain = 1;
+        for (i = 0; i < 0x44; i++)
+        {
+            if (m_0708->boneNames[i][0] != 0)
+            {
+                m_0708->bones[i] = root->Find(m_0708->boneNames[i], 0);
+                if (m_0708->bones[i] != 0)
+                {
+                    if (_strnicmp(m_0708->bones[i]->name, "bip", 3) == 0 ||
+                        _strnicmp(m_0708->bones[i]->name, "bone", 4) == 0)
+                        m_0708->bones[i]->m_0704 = 1;
+                    Node *bone = m_0708->bones[i];
+                    if (bone->m_0704 == 0 && bone->childCount != 0)
+                        chain = 0;
+                    if (i > 0 && chain && bone != 0)
+                    {
+                        if (bone->m_0708 == 0)
+                        {
+                            m_0708->bones[i]->m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
+                            m_0708->bones[i]->m_0708->Clear();
+                        }
+                        strcpy(m_0708->bones[i]->m_0708->parentName, m_0708->parentName);
+                    }
+                }
+            }
+        }
+    }
+    if ((flags & 0x400000) != 0)
+        M_101947b0();
+    else if ((flags & 0x1000) != 0)
+    {
+        M_101947b0();
+        *(Node **)&saved->pad_0064[0] = M_10199310();
+    }
+    else if ((flags & 0x4000) != 0)
+    {
+        M_101947b0();
+        list[*count] = this;
+        (*count)++;
+    }
+    for (int child = 0; child < childCount; child++)
+        children[child]->M_1019eeb0(root, list, count);
+    return 1;
 }

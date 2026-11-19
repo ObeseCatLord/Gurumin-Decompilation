@@ -137,3 +137,4 @@ address	status	reason
 100135b0	open	Map_ShowEquipment: same length and statements; in each part the original keeps the shared "show version a/ba" tail in the version 1 block and jumps to it from version 0, cl 13.00 here the other way round (if chain and switch tried)
 101603c0	open	SystemSav_ReadRecord: 20 bytes; the original places the -1 (other machine) return block before the 0 return that the early exits share, ours after it (nested, else and result-variable forms tried)
 10010d10	open	Save_ReadSlotInfo: statements and flow match; the stack layout differs like Save_ReadThumbnail 0x10011240 (original frame 0x3f0, ours 0x400; the unused Vec4 sits near the path buffer); Vec4 placements tried
+1019eeb0	open	Node::SetupSkinning (M_1019eeb0): identical except the bone != 0 test in the parent-name condition, which cl 13.00 here drops (the original keeps test eax, eax; je); local and re-read forms tried

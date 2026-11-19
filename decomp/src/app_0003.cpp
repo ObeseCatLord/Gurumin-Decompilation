@@ -328,3 +328,36 @@ int Game::RaiseDoorEvents(int argument, int on)
     }
     return 0;
 }
+
+// 0x10055690 (Game::IsQueuedEventReady). Collects the queued events not yet handled (id > 0, handled flag 0) and
+// returns 1 when one of them has a queued trigger on the current map (or 9999 = any) whose four script flags pass;
+// otherwise 0.
+int Game::IsQueuedEventReady()
+{
+    int ids[0x100];
+    int count = 0;
+    for (int i = 0; i < 0x100; i++)
+    {
+        if (queuedEvents[i][0] > 0 && queuedEvents[i][1] == 0)
+            ids[count++] = queuedEvents[i][0];
+    }
+                TestScriptFlag(queuedTriggers[t].flags[0]) && TestScriptFlag(queuedTriggers[t].flags[1]) &&
+                TestScriptFlag(queuedTriggers[t].flags[2]) && TestScriptFlag(queuedTriggers[t].flags[3]))
+                return 1;
+        }
+    }
+#else
+    for (int t = 0; t < queuedTriggerCount; t++)
+    {
+        for (int j = 0; j < count; j++)
+        {
+            if (ids[j] == queuedTriggers[t].value &&
+                (queuedTriggers[t].map == 9999 || currentMap == queuedTriggers[t].map) &&
+                TestScriptFlag(queuedTriggers[t].flags[0]) && TestScriptFlag(queuedTriggers[t].flags[1]) &&
+                TestScriptFlag(queuedTriggers[t].flags[2]) && TestScriptFlag(queuedTriggers[t].flags[3]))
+                return 1;
+        }
+    }
+#endif
+    return 0;
+}

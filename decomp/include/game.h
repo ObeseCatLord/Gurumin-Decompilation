@@ -135,14 +135,17 @@ struct Game : Object
     char pad_a4618[0xaf114];
     GameTrigger triggers[3400]; // 0x15372c: event triggers of the loaded map
     int triggerCount;           // 0x1f976c
-    char pad_1f9770[0x61a84];
+    GameTrigger queuedTriggers[2000];  // 0x1f9770: triggers of queued events (see IsQueuedEventReady)
+    int queuedTriggerCount;     // 0x25b1f0
     GameTrigger mapEvents[2000];// 0x25b1f4: named map events
     int mapEventCount;          // 0x2bcc74
     char pad_2bcc78[0x130d04];
     char *text;                 // 0x3ed97c: script text being tokenised
     int pos;                    // 0x3ed980: read position in `text`
     int end;                    // 0x3ed984: text length
-    char token[0xd00];          // 0x3ed988: the token read last
+    char token[0x480];          // 0x3ed988: the token read last
+    int queuedEvents[0x100][2]; // 0x3ede08: queued event ids (> 0) and whether each was handled (non-zero)
+    char pad_3ee608[0x80];
     int currentMap;             // 0x3ee688: number of the loaded map
     int pad_3ee68c[2];
     int m_3ee694[4000];
@@ -169,6 +172,7 @@ struct Game : Object
             return 1;
         return m_3ee694[index];
     }
+    int IsQueuedEventReady();
     int ForEachActiveTrigger(void (*callback)(GameTrigger *trigger));
     int RaiseKskonEvents(int argument);
     int RaiseTalkEvents(int argument);

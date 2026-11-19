@@ -825,3 +825,4 @@ address	name	evidence
 101612b0	Rle_Decode	run-length unpacker of compressed bitmaps, 8 run kinds (decomp/src/rle_decode.cpp)
 1000dba0	Fade_Draw	full-screen fade in the kind colour or the iris wipe texture (decomp/src/screen_fade.cpp)
 10017d30	RenderTarget_Probe	renders a blue square into texture "crtcc" and reads it back to decide whether render-to-texture works (decomp/src/render_target_probe.cpp)
+10055690	Game::IsQueuedEventReady	queued event ids with a passing trigger in Game::queuedTriggers (decomp/src/app_0003.cpp)

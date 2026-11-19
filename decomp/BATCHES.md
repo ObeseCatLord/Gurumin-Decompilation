@@ -185,7 +185,9 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 121 | textures, user folder, balloons | 10169c60 TextureObject::Create, 1013e260 UserFolder_FindNt, 100543a0 Balloon_Blast | Balloon_Blast matched; the other two open (block placement) |
 | 122 | medium functions | 100558d0 ListBank::FindCase, 1000c020 Text_Substitute, 101612b0 Rle_Decode | Rle_Decode matched; FindCase open (jump threading); Text_Substitute deferred to batch 125 (eight loops) |
 | 123 | medium functions | 1000dba0 Fade_Draw, 10017d30 RenderTarget_Probe, 10055aa0 | Fade_Draw matched; RenderTarget_Probe open (2 bytes); 10055aa0 (label search like FindCase) moved to batch 124 |
-| 124 | medium functions | 10055690, 10055410, 10055ca0 (script switch parsers next to FindCase) | |
+| 124 | medium functions | 10055690 Game::IsQueuedEventReady, 10055410, 10055ca0, 10055aa0 | IsQueuedEventReady open (trigger-loop pointer base; game.h gained queuedTriggers and queuedEvents); 10055410 has the same loop, left; 10055ca0/10055aa0 (keyword scanners) left |
 | 125 | medium functions | 1000c020 Text_Substitute, 10054770, 1009ddd0 | |
 | 126 | medium functions | 10175a90, 1019e610, 100092c0 | |
 | 127 | medium functions | 100236c0, 1000f5a0, 1001f270 | |
+| 128 | medium functions | 1017c9c0, 1015c450, 101629f0 | |
+| 129 | medium functions | 100ba040, 1019b630, 1003aef0 Bgm_Play | |

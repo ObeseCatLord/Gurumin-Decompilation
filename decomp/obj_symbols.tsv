@@ -356,3 +356,4 @@ _TestDat_Load	1000beb0
 ?Upload@MeshInstance@@QAEHHHHH@Z	1014f1f0
 ?Release@MeshInstance@@QAEHXZ	1014f520
 ?FindCase@ListBank@@QAEHPBDPADPAPAD@Z	100558d0
+?IsQueuedEventReady@Game@@QAEHXZ	10055690

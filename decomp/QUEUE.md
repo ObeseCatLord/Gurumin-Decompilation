@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (120)
+## 1. Walls to retry (121)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -61,6 +61,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10054d50` 476 — Game::RaiseFireEvents: same loop-pointer residue as 0x10054a60 (flags pointer local tried: bias moves to argument)
 - [ ] `10054f30` 476 — Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
 - [ ] `10055110` 476 — Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60
+- [ ] `10055690` 566 — Game::IsQueuedEventReady: the unrolled collection loop matches; in the trigger loop the original steps a pointer equal to this + t*200 and addresses every field with its full offset, ours folds 0x1f9780 into the pointer; trigger-pointer and comparison-order forms tried
 - [ ] `100558d0` 449 — ListBank::FindCase: same statements; the original keeps the brace block once (after the quote block, re-zeroing ebx after opened = 1), cl 13.00 here copies it into the parenthesis path (jump threading, 15 bytes longer); else-if, combined-test and quote-order forms tried
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
@@ -132,14 +133,21 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (3)
+## 2. Small functions (30-250 bytes) (6)
 
 - [ ] `1000cf80` 33 bytes
+- [ ] `10002300` 39 bytes Game::SetScriptFlag
+- [ ] `10008430` 45 bytes PointInRectEdges
+- [ ] `100022b0` 72 bytes Game::TestScriptFlag
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (61)
+## 3. Medium functions (251-800 bytes) (64)
 
+- [ ] `10002330` 262 bytes Game::ReadWordInLine (loops 6)
+- [ ] `10002190` 277 bytes Game::ReadWord (loops 8)
+- [ ] `100552f0` 285 bytes Game::ForEachActiveTrigger (loops 1, calls 2)
+- [ ] `10054610` 338 bytes Game::FindMapEntry (loops 4, calls 2)
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
@@ -153,7 +161,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100092c0` 535 bytes (float, loops 1, calls 6)
 - [ ] `10055ca0` 562 bytes (loops 6, calls 6)
 - [ ] `100236c0` 563 bytes (float, calls 22)
-- [ ] `10055690` 566 bytes (loops 3)
 - [ ] `10143e00` 566 bytes (float, calls 14)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
 - [ ] `1017c9c0` 581 bytes (loops 7, calls 2)

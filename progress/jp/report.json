@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 8.039,
+  "fuzzy_match_percent": 8.0622,
   "total_code": "1720206",
   "matched_code": "113888",
   "matched_code_percent": 6.6206,
@@ -15,7 +15,7 @@
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 205,
-  "complete_units": 125
+  "complete_units": 124
  },
  "units": [
   {
@@ -2263,28 +2263,28 @@
   {
    "name": "app/camera_orbit",
    "measures": {
-    "fuzzy_match_percent": 100.0,
-    "total_code": "530",
+    "fuzzy_match_percent": 75.8383,
+    "total_code": "1225",
     "matched_code": "530",
-    "matched_code_percent": 100.0,
+    "matched_code_percent": 43.2653,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 3,
+    "total_functions": 4,
     "matched_functions": 3,
-    "matched_functions_percent": 100.0,
-    "complete_code": "530",
-    "complete_code_percent": 100.0,
+    "matched_functions_percent": 75.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 1
+    "complete_units": 0
    },
    "sections": [
     {
      "name": ".text",
-     "size": "530",
-     "fuzzy_match_percent": 100.0
+     "size": "1225",
+     "fuzzy_match_percent": 75.8383
     }
    ],
    "functions": [
@@ -2311,10 +2311,18 @@
      "metadata": {
       "virtual_address": "269923136"
      }
+    },
+    {
+     "name": "_FUN_1016b400",
+     "size": "695",
+     "fuzzy_match_percent": 57.4128,
+     "metadata": {
+      "virtual_address": "269923328"
+     }
     }
    ],
    "metadata": {
-    "complete": true,
+    "complete": false,
     "source_path": "decomp/src/camera_orbit.cpp"
    }
   },
@@ -13454,13 +13462,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1565472",
+    "total_code": "1564777",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 400,
+    "total_functions": 399,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -13473,7 +13481,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1565472",
+     "size": "1564777",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -16156,14 +16164,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269922384"
-     }
-    },
-    {
-     "name": "FUN_1016b400",
-     "size": "695",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269923328"
      }
     },
     {

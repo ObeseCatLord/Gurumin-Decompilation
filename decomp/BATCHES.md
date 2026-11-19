@@ -255,5 +255,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 192 | medium functions | 10055410, 10055ca0, 10161781 | 10055410 Game::RunQueuedEvents (trigger pointer taken after the id test) and 10055ca0 ListBank::SkipStatement (declaration order) matched; 10161781 is a fragment |
 | 193 | medium functions | 101453e0 Font_DrawGlyph, 100092c0, 1000f5a0 | 101453e0 and 100092c0 Game::DrawWindowMarks open (near-matches); the Game::Draw* colour argument is a float (callers push floats), retyped without losing matches |
 | 195 | medium functions | 1000f5a0, 1000d6b0, 1001d920 | |
-| 194 | medium functions | 1001f270, 100ba040, 10055 neighbours | |
+| 194 | medium functions | 1001f270, 100ba040, 10055 neighbours | 1001f270 Map_SelectMovie open (registers; it is a C++ function, extern "C" drops its EH frame) |
+| 196 | medium functions | 100ba040, 100b9930, 10192a00 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

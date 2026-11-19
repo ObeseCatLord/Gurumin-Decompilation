@@ -396,3 +396,4 @@ _sqrtf	10002010
 ?RunQueuedEvents@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z	10055410
 ?DrawGlyph@FontRenderer@@QAEHPAGHHGGH@Z	101453e0
 ?DrawWindowMarks@Game@@QAEHH@Z	100092c0
+?Map_SelectMovie@@YAHXZ	1001f270

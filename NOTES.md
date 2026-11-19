@@ -187,6 +187,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   and jumps past the later tests (blocks moved, about 15 bytes longer). Writing `*text == ...` in every test leaves
   the threading out; the loads are still merged into one register later (ListBank::FindCase 0x100558d0,
   ListBank::FindLabel 0x10055aa0).
+- **extern "C" means no EH frame**: under /GX cl 13.00 treats an `extern "C"` function as not throwing and drops the
+  exception frame for its temporaries. A function whose temporary (a returned Matrix4) gets an fs:[0] frame and
+  state stores is a C++ function (Map_SelectMovie 0x1001f270).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

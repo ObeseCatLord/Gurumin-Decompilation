@@ -885,3 +885,4 @@ address	name	evidence
 10055ca0	ListBank::SkipStatement	moves past one statement (if/else, for, while, switch, block or up to a semicolon) (matched, decomp/src/listbank.cpp)
 10055410	Game::RunQueuedEvents	moves the queued events into runningEvents and runs their queued triggers that pass (matched, decomp/src/app_0003.cpp)
 100092c0	Game::DrawWindowMarks	draws the scroll marks and the cursor of the three menu windows
+1001f270	Map_SelectMovie	picks the camera point nearest the player and switches the background movie

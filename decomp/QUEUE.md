@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (138)
+## 1. Walls to retry (139)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -42,6 +42,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `1001d2d0` 1154 — DigitCounter_Update: blocks and cases in place; the original keeps the state offset (index * 0x40) in edi and the divisor 10 in ebx, ours swaps them (and pushes ebx/edi around the first test)
+- [ ] `1001f270` 588 — Map_SelectMovie: same code apart from register roles (the original keeps the nearest index in ebx, the counter in esi and the camera-point pointer in edi, pushed inside the loop); declaration orders, pointer loop and named matrix tried
 - [ ] `100211a0` 466 — Region_WaveVertex: logic identical; ebx/ebp swapped for the flip counter and the point address, and the original rounds each sine result to float twice (helper and caller locals tried)
 - [ ] `10023900` 1069 — date test: the New Year block (0x829 = 1) is laid out after the return in the original; if/else, switch, goto and nested forms all keep it inline
 - [ ] `10023d30` 1181 — Map_Unload: statements and loops in place; cl 13.00 here keeps -1 in ebp for the [r][9] and DAT_102028d4 stores (the original uses immediates there and only puts -1 in esi for the texture tests), which shifts the later registers
@@ -155,11 +156,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (29)
+## 3. Medium functions (251-800 bytes) (28)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
-- [ ] `1001f270` 588 bytes (float, loops 3, calls 15)
 - [ ] `100ba040` 604 bytes (float, loops 1, calls 15)
 - [ ] `100b9930` 637 bytes (float, calls 22)
 - [ ] `10192a00` 649 bytes (float, loops 2, calls 10)

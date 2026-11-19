@@ -1,6 +1,7 @@
-// BGM volume fades. A fade has a target volume (DAT_104bf8e8), the current volume (DAT_104bf8f0), a per-frame
+// Screen fades. A fade has a target amount (DAT_104bf8e8), the current amount (DAT_104bf8f0, 0-100), a per-frame
 // step (DAT_1032d4b0) and a frame counter (DAT_104bf8e4); the per-frame update elsewhere adds the step until the
-// counter runs out. DAT_104bf8ec is the id of the track the fade applies to. Script built-ins call these.
+// counter runs out. DAT_104bf8ec is the fade kind: its hundreds pick the colour (0 black, 1 white, 2 red, 3 the
+// colour in DAT_104c02e0), the rest an iris wipe (drawn by Fade_Draw, screen_fade.cpp). Script built-ins call these.
 
 extern "C" float DAT_104bf8e8;
 extern "C" int DAT_104bf8ec;

@@ -823,3 +823,5 @@ address	name	evidence
 100543a0	Balloon_Blast	kind B slots 0x5c..0x7b: angle, push, burst with sound 0x2e5 (decomp/src/balloon_burst.cpp)
 100558d0	ListBank::FindCase	finds "case <n>" at brace depth 1 of a switch block (decomp/src/listbank.cpp)
 101612b0	Rle_Decode	run-length unpacker of compressed bitmaps, 8 run kinds (decomp/src/rle_decode.cpp)
+1000dba0	Fade_Draw	full-screen fade in the kind colour or the iris wipe texture (decomp/src/screen_fade.cpp)
+10017d30	RenderTarget_Probe	renders a blue square into texture "crtcc" and reads it back to decide whether render-to-texture works (decomp/src/render_target_probe.cpp)

@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.275,
+  "fuzzy_match_percent": 11.2899,
   "total_code": "1720206",
   "matched_code": "154615",
   "matched_code_percent": 8.9882,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 228,
+  "total_units": 229,
   "complete_units": 138
  },
  "units": [
@@ -6970,6 +6970,48 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/listbank.cpp"
+   }
+  },
+  {
+   "name": "app/listbank_vars",
+   "measures": {
+    "fuzzy_match_percent": 26.2097,
+    "total_code": "976",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "976",
+     "fuzzy_match_percent": 26.2097
+    }
+   ],
+   "functions": [
+    {
+     "name": "?FindVariable@ListBank@@QAEHPBDPAH11@Z",
+     "size": "976",
+     "fuzzy_match_percent": 26.2097,
+     "metadata": {
+      "virtual_address": "268660880"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/listbank_vars.cpp"
    }
   },
   {
@@ -14780,13 +14822,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1502580",
+    "total_code": "1501604",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 332,
+    "total_functions": 331,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14799,7 +14841,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1502580",
+     "size": "1501604",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -15306,14 +15348,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268659872"
-     }
-    },
-    {
-     "name": "FUN_10037090",
-     "size": "976",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268660880"
      }
     },
     {

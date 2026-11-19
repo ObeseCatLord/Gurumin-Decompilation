@@ -398,3 +398,4 @@ _sqrtf	10002010
 ?DrawWindowMarks@Game@@QAEHH@Z	100092c0
 ?Map_SelectMovie@@YAHXZ	1001f270
 ?AssignValue@ListBank@@QAEHPBDPBUScriptValue@@D@Z	10037560
+?FindVariable@ListBank@@QAEHPBDPAH11@Z	10037090

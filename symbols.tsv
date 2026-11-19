@@ -895,3 +895,4 @@ address	name	evidence
 1004f250	TutorialBook_Close	starts closing the tutorial book: cover and first pages, pagedown/stop/close motions, sound 0x3bd
 10037560	ListBank::AssignValue	stores a script value into a keyword array element or a declared variable, converting to its type
 10016700	Ground_HeightAt	averages the height samples of the nearest ground object around a point (-5000 = none)
+10037090	ListBank::FindVariable	finds a declared script variable (array indexes evaluated and checked) and its element offset

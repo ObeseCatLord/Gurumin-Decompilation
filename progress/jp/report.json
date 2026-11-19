@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.2256,
+  "fuzzy_match_percent": 11.2447,
   "total_code": "1720206",
   "matched_code": "154615",
   "matched_code_percent": 8.9882,
@@ -6691,16 +6691,16 @@
   {
    "name": "app/listbank",
    "measures": {
-    "fuzzy_match_percent": 93.5041,
-    "total_code": "8906",
+    "fuzzy_match_percent": 89.6925,
+    "total_code": "9649",
     "matched_code": "7988",
-    "matched_code_percent": 89.6923,
+    "matched_code_percent": 82.7858,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 25,
+    "total_functions": 26,
     "matched_functions": 21,
-    "matched_functions_percent": 84.0,
+    "matched_functions_percent": 80.7692,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -6711,8 +6711,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "8906",
-     "fuzzy_match_percent": 93.5041
+     "size": "9649",
+     "fuzzy_match_percent": 89.6925
     }
    ],
    "functions": [
@@ -6914,6 +6914,14 @@
      "fuzzy_match_percent": 82.5,
      "metadata": {
       "virtual_address": "268661872"
+     }
+    },
+    {
+     "name": "?AssignValue@ListBank@@QAEHPBDPBUScriptValue@@D@Z",
+     "size": "743",
+     "fuzzy_match_percent": 44.0051,
+     "metadata": {
+      "virtual_address": "268662112"
      }
     }
    ],
@@ -14730,13 +14738,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1504017",
+    "total_code": "1503274",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 334,
+    "total_functions": 333,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14749,7 +14757,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1504017",
+     "size": "1503274",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -15272,14 +15280,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268660880"
-     }
-    },
-    {
-     "name": "FUN_10037560",
-     "size": "743",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268662112"
      }
     },
     {

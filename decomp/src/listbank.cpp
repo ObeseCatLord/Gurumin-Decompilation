@@ -45,7 +45,7 @@ struct ListBank
     ListBank *self;           // 0x36330: set to this object by LoadText
     char m_36334[0x20][0x20]; // 0x36334: registered keywords (16 are searched; the init clears 32)
     int *m_36734[0x20];       // 0x36734: the variable arrays of the keywords ("ch" = the script flags)
-    char m_367b4;
+    char m_367b4[0x20];       // 0x367b4: element type of each keyword array (0 = int, otherwise float)
 
     int M_10004680(int group);
     int M_100046d0(const char *text, int group, int value, char flag);
@@ -65,6 +65,8 @@ struct ListBank
     int FindCase(const char *value, char *text, char **found);
     int FindLabel(const char *name, char *text, char **found);
     int SkipStatement(char **text);
+    int FindVariable(const char *name, int *index, int *group, int *element);  // 0x10037090
+    int AssignValue(const char *name, const struct ScriptValue *value, char type);
     int ReadTerm(char **text, char *word);
     int CompileStatement(const char *statement);               // 0x100ed9b0
     int CompileText();
@@ -852,7 +854,7 @@ extern "C" void FUN_1013ad90(void)
 {
     DAT_104687b8.InitLibrary();
     DAT_104687b8.m_36734[0] = DAT_10c62edc;
-    DAT_104687b8.m_367b4 = 0;
+    DAT_104687b8.m_367b4[0] = 0;
     strcpy(DAT_104687b8.m_36334[0], DAT_101dc1fc);
     DAT_104687b8.m_3632c = 0;
     DAT_104687b8.callback = FUN_10017f20;
@@ -1163,5 +1165,123 @@ int ListBank::SkipStatement(char **text)
     }
     ReportError(END_REACHED_TEXT);
     *text = p;
+    return 0;
+}
+
+// A value produced by the expression evaluator: an int (type 0), a float (type 1) or quoted text (type 2, the text
+// still starts with its opening quote).
+struct ScriptValue
+{
+    char text[0x100];
+    int &i() { return *(int *)text; }
+    float &f() { return *(float *)text; }
+};
+
+// "定義されてない識別子です。" ("This identifier is not defined."), Shift-JIS.
+#define UNDEFINED_NAME_TEXT "è`³êÄÈ¢¯ÊqÅ·B"
+
+// 0x10037560 (ListBank::AssignValue). Stores `value` (of `type`) into the variable `name`: an element of a
+// registered keyword array (int or float elements, the index from the name's first [ ]), or a declared script
+// variable (int, float or text; text receives numbers formatted as "%d" / "%f" in quotes, and numbers parse the
+// quoted text after its quote). Values are converted to the variable's type. Reports an undefined name. Returns 1
+// once the variable was found, 0 otherwise or after an error.
+int ListBank::AssignValue(const char *name, const ScriptValue *value, char type)
+{
+    if (m_3632c != 0)
+        return 0;
+    ScriptValue v = *value;
+    {
+        int index;
+        int element;
+        if (M_100048f0(name, &index) != 0)
+        {
+            FirstIndexValue(name, &element);
+            if (m_367b4[index] == 0)
+            {
+                if (type == 0)
+                {
+                    m_36734[index][element] = v.i();
+                    return 1;
+                }
+                if (type == 1)
+                {
+                    m_36734[index][element] = (int)v.f();
+                    return 1;
+                }
+            }
+            else
+            {
+                if (type == 0)
+                {
+                    ((float *)m_36734[index])[element] = (float)v.i();
+                    return 1;
+                }
+                if (type == 1)
+                    ((float *)m_36734[index])[element] = (float)(int)v.f();
+            }
+            return 1;
+        }
+    }
+    {
+        int index;
+        int group;
+        int element;
+        if (FindVariable(name, &index, &group, &element) != 0)
+        {
+            if (m_400c[group][index] == 0)
+            {
+                if (type == 0)
+                {
+                    ((int *)m_440c[group][index])[element] = v.i();
+                    return 1;
+                }
+                if (type == 1)
+                {
+                    ((int *)m_440c[group][index])[element] = (int)v.f();
+                    return 1;
+                }
+                if (type == 2)
+                {
+                    ((int *)m_440c[group][index])[element] = atol(&v.text[1]);
+                    return 1;
+                }
+            }
+            else if (m_400c[group][index] == 1)
+            {
+                if (type == 0)
+                {
+                    ((float *)m_440c[group][index])[element] = (float)v.i();
+                    return 1;
+                }
+                if (type == 1)
+                {
+                    ((float *)m_440c[group][index])[element] = v.f();
+                    return 1;
+                }
+                if (type == 2)
+                {
+                    ((float *)m_440c[group][index])[element] = (float)atof(&v.text[1]);
+                    return 1;
+                }
+            }
+            else if (m_400c[group][index] == 2)
+            {
+                if (type == 0)
+                {
+                    sprintf((char *)m_440c[group][index] + element * 0x100, "\"%d\"", v.i());
+                    return 1;
+                }
+                if (type == 1)
+                {
+                    sprintf((char *)m_440c[group][index] + element * 0x100, "\"%f\"", v.f());
+                    return 1;
+                }
+                if (type == 2)
+                    strcpy((char *)m_440c[group][index] + element * 0x100, v.text);
+            }
+            return 1;
+        }
+    }
+    ReportError(UNDEFINED_NAME_TEXT);
     return 0;
 }

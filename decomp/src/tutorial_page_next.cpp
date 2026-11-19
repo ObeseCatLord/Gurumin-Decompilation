@@ -331,12 +331,12 @@ extern "C" int FUN_1004f250(void)
     int right = cover;
     for (int i = DAT_102194c0; i < 0x22; i++)
     {
-        int flag = DAT_1030c908[i];
-        if (flag == 0)
+        if (DAT_1030c908[i] == 0)
             continue;
         if (found == 0)
         {
-            if (DAT_104c03e8 == 0 || flag == -1 || (flag > 0 && DAT_10874848.TestScriptFlag(flag) != 0))
+            if (DAT_104c03e8 == 0 || DAT_1030c908[i] == -1 ||
+                (DAT_1030c908[i] > 0 && DAT_10874848.TestScriptFlag(DAT_1030c908[i]) != 0))
             {
                 left = FUN_1001e1a0(DAT_102028e8[i], 0);
                 DAT_1030b870[i] = left;

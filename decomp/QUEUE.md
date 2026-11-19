@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (136)
+## 1. Walls to retry (137)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -57,6 +57,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10034cc0` 429 — Party_BlocksMove: logic identical; the original copies the first atan2 result through a temporary and reloads the second in place (fld/fstp round trips); result locals and helper forms tried
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
+- [ ] `10037560` 743 — ListBank::AssignValue: statements and calls match; frame 8 bytes larger (the original puts the (float)(int) conversion temporary in the keyword index slot and the atof result in the value buffer) and the int-variable type-0 store is placed after the type tests; block scopes, an int local and kind forms tried
 - [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
@@ -153,7 +154,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (21)
+## 3. Medium functions (251-800 bytes) (20)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
@@ -163,7 +164,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014b750` 713 bytes (float, calls 16)
 - [ ] `100b1520` 736 bytes (float, loops 2, calls 19)
 - [ ] `10149100` 742 bytes (float, calls 17)
-- [ ] `10037560` 743 bytes (float, loops 3, calls 12)
 - [ ] `10144bf0` 749 bytes (float, loops 1, calls 12)
 - [ ] `1014e940` 749 bytes TextureObject::DrawFrameAlt (float, loops 1, calls 12)
 - [ ] `1014ec30` 749 bytes (float, loops 1, calls 12)

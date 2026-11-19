@@ -246,3 +246,137 @@ int FUN_1003b2c0(const char *path, int mode)
     }
     return 0;
 }
+
+// "ポポン" (Popon), Shift-JIS: the name shown for a save made in costume 6.
+#define POPON_NAME "\x83\x7c\x83\x7c\x83\x93"
+
+// 0x10010d10 (Save_ReadSlotInfo). Reads what the save and load menus show for save `name`: the map, the play time,
+// the player's name and the costume (with the difficulty variants 3 and 5, and 4 on map 1000). Handles the scrambled
+// format (header 9999) and the old plain one (header 0x36b1). In costume 6 the name is "ポポン". Returns 1, or 0
+// when the file is missing, has another header or does not descramble.
+int FUN_10010d10(const char *name, int *map, int *playTime, char *playerName, int *costume)
+{
+    *playTime = 0;
+    *map = 0;
+    if (costume != 0)
+        *costume = 0;
+    playerName[0] = 0;
+    int popon = 0;
+    GameFile file;
+    char path[0x104];
+    sprintf(path, "%s%s", DAT_10f60590, name);
+    file.Open(path, "rb");
+    if (file.handle != 0)
+    {
+        Vec4 unused;
+        int header;
+        int mapNumber;
+        int x;
+        int y;
+        int z;
+        int w;
+        char record[0x188];
+        file.Read(&header, 1, 4);
+        if (header == 9999)
+        {
+            char key[4];
+            file.Read(key, 1, 4);
+            file.Seek(0, 2);
+            int size = file.Size() - 0x14;
+            unsigned char *body = (unsigned char *)operator new(size);
+            int offset = 0;
+            file.Seek(8, 0);
+            file.Read(body, 1, size);
+            file.Read(&offset, 1, 4);
+            int sum;
+            file.Read(&sum, 1, 4);
+            unsigned int check;
+            file.Read(&check, 1, 4);
+            file.Close();
+            char baseName[0x100];
+            FUN_10161120(baseName, name);
+            baseName[0] += key[0];
+            baseName[2] += key[0];
+            baseName[4] += key[0];
+            baseName[6] += key[0];
+            if (FUN_101615d0(body, size, baseName, sum, check) != 0)
+            {
+                mapNumber = *(int *)(body + 0x30000);
+                x = *(int *)(body + 0x30004);
+                y = *(int *)(body + 0x30008);
+                z = *(int *)(body + 0x3000c);
+                w = *(int *)(body + 0x30010);
+                memcpy(record, body + 0x3016c, 0x188);
+                offset += 0x302f4;
+                int *flags = (int *)operator new(0x4000);
+                memcpy(flags, body + 0x302f4, 0x4000);
+                offset += 0x4000;
+                int look = flags[0x1c7];
+                int difficulty = flags[0xf79];
+                if (flags[0x9c5] == 6)
+                    popon = 1;
+                free(flags);
+                *playTime = *(int *)(body + 0x34374);
+                if (costume != 0)
+                {
+                    *costume = look;
+                    if (difficulty == 1)
+                        *costume = 3;
+                    else if (difficulty == 2)
+                        *costume = 5;
+                }
+                offset += 0x88;
+                *map = mapNumber;
+                if (mapNumber == 1000)
+                    *costume = 4;
+                free(body);
+                goto copyName;
+            }
+            free(body);
+        }
+        else if (header == 0x36b1)
+        {
+            file.Seek(0x30000, 1);
+            file.Read(&mapNumber, 1, 4);
+            file.Read(&x, 1, 4);
+            file.Read(&y, 1, 4);
+            file.Read(&z, 1, 4);
+            file.Read(&w, 1, 4);
+            file.Seek(4, 1);
+            file.Seek(0x140, 1);
+            file.Seek(0x14, 1);
+            file.Read(record, 1, 0x188);
+            int *flags = (int *)operator new(0x4000);
+            file.Read(flags, 1, 0x4000);
+            int look = flags[0x1c7];
+            int difficulty = flags[0xf79];
+            if (flags[0x9c5] == 6)
+                popon = 1;
+            free(flags);
+            file.Seek(0x80, 1);
+            file.Read(playTime, 1, 4);
+            if (costume != 0)
+            {
+                *costume = look;
+                if (difficulty == 1)
+                    *costume = 3;
+                else if (difficulty == 2)
+                    *costume = 5;
+            }
+            int unusedValue;
+            file.Read(&unusedValue, 1, 4);
+            *map = mapNumber;
+            file.Close();
+            goto copyName;
+        }
+        else
+            file.Close();
+        return 0;
+    copyName:
+        strcpy(playerName, &record[0x145]);
+        if (popon != 0)
+            strcpy(playerName, POPON_NAME);
+        return 1;
+    }
+    return 0;
+}

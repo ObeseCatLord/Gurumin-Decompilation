@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (134)
+## 1. Walls to retry (135)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -26,6 +26,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000ed20` 77 — original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 - [ ] `1000f360` 300 — face change: calls match; the original keeps index in esi and frame in edi (ours swapped) and indexes the face tables as flat int arrays [set*0x1c0+frame]
 - [ ] `100106e0` 1567 — Save_Write: frame, calls and layout identical; the unrolled bit-set loop swaps ebx/edi for two of its counters and the start-position loads use other registers; locals for the position tried
+- [ ] `10010d10` 1323 — Save_ReadSlotInfo: statements and flow match; the stack layout differs like Save_ReadThumbnail 0x10011240 (original frame 0x3f0, ours 0x400; the unused Vec4 sits near the path buffer); Vec4 placements tried
 - [ ] `10011240` 605 — Save_ReadThumbnail: code identical; stack layout differs (the original puts the unused Vec4 at 0x378 above the path buffer and the scalars below the file object); declaration orders and buffer sizes tried
 - [ ] `10011dd0` 419 — Npc_StandOnGround: logic identical; register residue (state address in eax and its store before the DAT_102022b8 load in the original, edi and after in ours; the hit result in eax vs our temporaries); state local and store order tried
 - [ ] `10012130` 172 — Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
@@ -194,7 +195,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (206)
+## 4. Large functions (801-3000 bytes) (205)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -286,7 +287,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101a24e0` 1267 bytes (float, calls 50)
 - [ ] `101446f0` 1273 bytes (float, calls 17)
 - [ ] `1014c430` 1315 bytes TextureObject::DrawTinted (float, calls 28)
-- [ ] `10010d10` 1323 bytes Save_ReadSlotInfo (loops 3, calls 42)
 - [ ] `100469d0` 1337 bytes (float, calls 30)
 - [ ] `100b23b0` 1347 bytes (float, loops 2, calls 47)
 - [ ] `1001a990` 1350 bytes (loops 1, calls 20)

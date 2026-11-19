@@ -237,5 +237,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 174 | string-heavy | 100135b0 Map_ShowEquipment, 1001e4b0, 1001a990 | Map_ShowEquipment open (3600 bytes, cross-jump direction); 1001e4b0 (records text) and 1001a990 (texture names by kind) left |
 | 175 | init-like | 1003b6e0 Costume_LoadPlayerModel, 100b0f00, 100b0250 | none (branchy character logic); left |
 | 176 | save and system files | 1015fea0 SystemSav_WriteRecord, 101603c0 SystemSav_ReadRecord, 10015910 retry | WriteRecord matched (FILETIME times[4]); ReadRecord open (20 bytes, return block order); 10015910 still threads its tests |
-| 177 | medium functions | 1001b0a0, 1004f250, 10055410 | |
+| 177 | save files | 10010d10 Save_ReadSlotInfo, 1001b0a0, 1004f250 | Save_ReadSlotInfo open (stack layout, as Save_ReadThumbnail); the others left |
+| 178 | medium functions | 1004ed60, 10055410, 1019e610 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

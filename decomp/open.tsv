@@ -136,3 +136,4 @@ address	status	reason
 1001d2d0	open	DigitCounter_Update: blocks and cases in place; the original keeps the state offset (index * 0x40) in edi and the divisor 10 in ebx, ours swaps them (and pushes ebx/edi around the first test)
 100135b0	open	Map_ShowEquipment: same length and statements; in each part the original keeps the shared "show version a/ba" tail in the version 1 block and jumps to it from version 0, cl 13.00 here the other way round (if chain and switch tried)
 101603c0	open	SystemSav_ReadRecord: 20 bytes; the original places the -1 (other machine) return block before the 0 return that the early exits share, ours after it (nested, else and result-variable forms tried)
+10010d10	open	Save_ReadSlotInfo: statements and flow match; the stack layout differs like Save_ReadThumbnail 0x10011240 (original frame 0x3f0, ours 0x400; the unused Vec4 sits near the path buffer); Vec4 placements tried

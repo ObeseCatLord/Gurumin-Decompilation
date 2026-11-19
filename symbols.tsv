@@ -817,3 +817,7 @@ address	name	evidence
 10143bc0	Render_DrawGradientQuad	untextured screen rectangle with top and bottom colours (open, decomp/src/engine_10143.cpp)
 1001a0d0	Camera_Orbit	camera easing with an orbit around the player (matched, decomp/src/camera_follow.cpp)
 10019310	Camera_Shift	camera easing with timed goal offsets (open, decomp/src/camera_follow.cpp)
+10169c60	TextureObject::Create	allocates m_rgb/m_al copies, speckled alpha, then calls 0x1014f1f0
+1014f1f0	TextureObject::Upload	called by TextureObject::Create and the device-reset re-creation 0x10169e10
+1013e260	UserFolder_FindNt	Application Data\FALCOM folder from fsetup.dll GetUserPath or the shell profile (decomp/src/user_folder.cpp)
+100543a0	Balloon_Blast	kind B slots 0x5c..0x7b: angle, push, burst with sound 0x2e5 (decomp/src/balloon_burst.cpp)

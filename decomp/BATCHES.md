@@ -175,3 +175,13 @@ Script_RegisterGameBuiltins, Item_DrawCaption. Written and recorded in open.tsv:
 Game::RaiseFireEvents/RaiseLeverEvents/RaiseDoorEvents, Texture_CreateFromPixels, Char_UpdateShoves,
 Party_BlocksMove, Npc_ApproachPlayer, Playback::Play, MotionList::FrameAt, Char_WalkRoute, Joystick_IsButtonDown,
 Save_ReadThumbnail.
+
+## Batches 121+ (2026-11-18, rolling)
+
+Each finished batch adds two new ones, taken from the medium-function section of QUEUE.md.
+
+| # | Area | Functions | Result |
+|---|---|---|---|
+| 121 | textures, user folder, balloons | 10169c60 TextureObject::Create, 1013e260 UserFolder_FindNt, 100543a0 Balloon_Blast | Balloon_Blast matched; the other two open (block placement) |
+| 122 | medium functions | 100558d0, 1000c020 Text_Substitute, 101612b0 | |
+| 123 | medium functions | 1000dba0, 10017d30, 10055aa0 | |

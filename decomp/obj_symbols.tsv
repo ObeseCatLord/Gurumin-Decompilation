@@ -352,3 +352,6 @@ _TestDat_Load	1000beb0
 ?Play@Playback@@QAEHHHHM@Z	1016a2e0
 ?FrameAt@MotionList@@QAEHHPAH0@Z	101ad350
 ?InitLibrary@ListBank@@QAEHXZ	10037850
+?Create@MeshInstance@@QAEHHHHHH@Z	10169c60
+?Upload@MeshInstance@@QAEHHHHH@Z	1014f1f0
+?Release@MeshInstance@@QAEHXZ	1014f520

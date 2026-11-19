@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (116)
+## 1. Walls to retry (118)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -68,6 +68,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
+- [ ] `1013e260` 428 — UserFolder_FindNt: identical apart from block placement (the original puts the strcpy(base) branch out of line after the fsetup.dll loop and jumps back; ours keeps it before the loop); if/else orders and the combined test tried
 - [ ] `1013e4f0` 431 — RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `1013e790` 561 — Names_Expand (/Od unit src_od/names_od.cpp): code identical, only the stack slot of `p` differs (the original puts it below found/matches/best); function-scope declaration orders tried
 - [ ] `1013e9d0` 689 — Screenshot_ReadBackBuffer: identical except the row address in the 32-bit and 16-bit loops (original loads y then multiplies by the pitch, ours loads the pitch first); operand orders and index form tried
@@ -97,6 +98,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10166870` 52 — same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
 - [ ] `10167390` 104 — AnimModel timed value setup: the rounded int-to-float temporary lands in the id parameter slot in ours, the value slot in the original
 - [ ] `10169720` 40 — memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
+- [ ] `10169c60` 399 — TextureObject::Create (MeshInstance in mesh_cache.cpp): statements identical; the original returns from the first size test before push esi (ours pushes first) and computes width*height*3 separately in the two speckle branches (ours computes it once before the branch); split tests and loop forms tried
 - [ ] `10169e10` 35 — register choice: original pushes the last argument from edx, VS2003 from ecx
 - [ ] `1016a020` 109 — Playback bind to an owner's root node: same register residue as 0x1016a090 (original: ecx = -1, eax = 0, then a second zero in edi)
 - [ ] `1016a090` 97 — register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)
@@ -134,13 +136,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (68)
+## 3. Medium functions (251-800 bytes) (65)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
-- [ ] `10169c60` 399 bytes (loops 2, calls 8)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
-- [ ] `100543a0` 425 bytes (float, loops 1, calls 13)
-- [ ] `1013e260` 428 bytes (loops 4, calls 16)
 - [ ] `100558d0` 449 bytes (loops 4, calls 4)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
@@ -208,7 +207,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 ## 4. Large functions (801-3000 bytes) (219)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `1014f1f0` 806 bytes (loops 8, calls 10)
+- [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
 - [ ] `100b3430` 818 bytes (float, calls 19)
 - [ ] `10049650` 822 bytes (float, loops 2, calls 17)
 - [ ] `100b5550` 840 bytes (float, calls 25)

@@ -13,11 +13,15 @@ struct MeshInstance : IntPair
     char pad_0008[0x18];
     int m_0020;               // 0x20: image pixels (1 and 2 mark built-in images that are not freed)
     int m_0024;               // 0x24: second image buffer
-    int pad_0028;
+    char m_0028;              // 0x28: 1 when the image has its own alpha pixels
+    char pad_0029[3];
     int m_002c;               // 0x2c: image width
     int m_0030;               // 0x30: image height
     int m_0034;
     int Release();            // 0x1014f520 (TextureObject::Release)
+    // 0x1014f1f0: creates the Direct3D texture from `width` x `height` RGB pixels and alpha (0, 1, 2 or pixels).
+    int Upload(int width, int height, int pixels, int alpha);
+    int Create(int width, int height, int pixels, int alpha, int flags);
     void FreeImage();
 
     MeshInstance();
@@ -111,6 +115,74 @@ extern "C" int FUN_10169c00(const TextureRef *texture)
 
 extern "C" int DAT_1101d874;                     // texture memory in use (bytes)
 extern "C" void (*DAT_11b1ba40)(void *);          // engine free
+extern "C" int DAT_1101d878;                     // non-zero = images without generated alpha are not kept
+extern "C" void *(*DAT_11b0b938)(int size, const char *tag);              // engine allocator
+extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);   // engine memcpy
+extern "C" int FUN_1013f880(void);                // the game's random number
+
+// 0x10169c60 (TextureObject::Create). Creates the texture from `width` x `height` RGB `pixels` (at most 2048 x 2048).
+// `alpha` is 0 (opaque), 1 or 2 (generated alpha) or a buffer of alpha pixels (one per RGB triple). Unless
+// DAT_1101d878 is set, the pixels and alpha pixels are kept in copies (for re-creating the texture after a device
+// reset). With `flags` set the alpha is speckled: one in four pixels at random keeps it (a new buffer when there
+// was no alpha). Returns 0 for a bad size, else the result of Upload.
+int MeshInstance::Create(int width, int height, int pixels, int alpha, int flags)
+{
+    if (width > 0x800 || height > 0x800)
+        return 0;
+    if (alpha == 1 || alpha == 2)
+        m_0034 = 1;
+    else
+        m_0034 = 0;
+    m_0028 = 0;
+    if (m_0034 == 0 && alpha != 0)
+        m_0028 = 1;
+    m_0024 = 0;
+    m_0020 = 0;
+    m_002c = width;
+    m_0030 = height;
+    if (width <= 0 || height <= 0)
+        return 0;
+    if (DAT_1101d878 == 0 || m_0034 != 0)
+    {
+        if (alpha > 2 || alpha == 0)
+        {
+            int size = width * height * 3;
+            m_0024 = (int)DAT_11b0b938(size, "m_rgb");
+            DAT_11b07530((void *)m_0024, (const void *)pixels, size);
+            if (alpha != 0 && alpha != 1)
+            {
+                m_0020 = (int)DAT_11b0b938(size, "m_al");
+                DAT_11b07530((void *)m_0020, (const void *)alpha, size);
+            }
+        }
+        if (alpha == 1)
+            m_0020 = 1;
+        if (alpha == 2)
+            m_0020 = 2;
+    }
+    if (flags != 0 && alpha != 1 && alpha != 2)
+    {
+        if (alpha == 0)
+        {
+            int size = width * height * 3;
+            unsigned char *speckles = (unsigned char *)DAT_11b0b938(size, "m_al");
+            alpha = (int)speckles;
+            m_0020 = alpha;
+            for (int i = 0; i < size; i += 3)
+                speckles[i] = (FUN_1013f880() & 7) < 2 ? 0xff : 0;
+        }
+        else
+        {
+            int size = width * height * 3;
+            for (int i = 0; i < size; i += 3)
+            {
+                if ((FUN_1013f880() & 7) >= 2)
+                    ((unsigned char *)alpha)[i] = 0;
+            }
+        }
+    }
+    return Upload(width, height, pixels, alpha);
+}
 
 // Frees the stored image and releases the Direct3D texture. The texture memory counter drops by the size of a
 // 16-bit texture with five mip levels below it.

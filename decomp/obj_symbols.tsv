@@ -380,3 +380,4 @@ _sqrtf	10002010
 ?StartFade@WorldRenderer@@QAEHHHH@Z	10167390
 ?TickFade@WorldRenderer@@QAEXXZ	10167400
 ?MarkKilled@Game@@QAEHH@Z	10054770
+?CreateTextures@ModelBank@@QAEHXZ	1017c160

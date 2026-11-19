@@ -48,7 +48,9 @@ struct ModelBank
 {
     Node *lights[0x20];     // 0x0000: light nodes of the scene (Omn..., then Spot...)
     BankModel *litModels[0x80];  // 0x0080: models that take part in the scene lighting
-    char pad_0280[0x204];
+    int shadows[10];        // 0x0280: the shadow render targets "shadow0".."shadow9"
+    char pad_02a8[0x1d8];
+    int shadowTexture;      // 0x0480: kage.bmp
     Vec4 m_0484[0x80];      // 0x0484
     Vec4 m_0c84[0x80];      // 0x0c84
     char pad_1484[0x400];
@@ -59,8 +61,17 @@ struct ModelBank
     int params[16];         // 0x313a8: per-model parameter given when the model was added
     int m_313e8;            // 0x313e8
     int enabled;            // 0x313ec: 1 when the current map uses the bank
-    char pad_313f0[0x80];
-    float flareAlpha[0x2c]; // 0x31470: brightness of each flare point (0..1)
+    int lens[4];            // 0x313f0: lens01.bmp .. lens04.bmp (lens flare)
+    char pad_31400[0x70];
+    float flareAlpha[0x20]; // 0x31470: brightness of each flare point (0..1)
+    int crossfade[3];       // 0x314f0: "crossfade0".."crossfade2" render targets (screen size)
+    int mirror;             // 0x314fc: 256x256 render targets
+    int saveBuffer;         // 0x31500
+    int minimap;            // 0x31504
+    int mirror2;            // 0x31508
+    int saveBuffer2;        // 0x3150c
+    int minimap2;           // 0x31510
+    char pad_31514[0xc];
     int flareCount;         // 0x31520: flare points collected this frame
     Vec4 flareScreen[0x20]; // 0x31524: screen position of each flare point (x, y, depth, w)
     ModelBank();
@@ -69,6 +80,7 @@ struct ModelBank
     int Add(int id, int param);
     int AddLitModel(BankModel *model);
     int AddFlarePoint(Vec4 position, const Matrix4 *viewProjection);
+    int CreateTextures();
 };
 
 // Empties the bank: clears the light list, the 0x80-entry table, every model record's id and the counters.
@@ -204,4 +216,113 @@ int ModelBank::AddLitModel(BankModel *model)
         }
     }
     return 0;
+}
+
+#include <stdio.h>
+
+// The texture slots (texture_mgr.cpp TextureObject), only the image update.
+struct TextureSlot
+{
+    char pad_0000[0x38];
+    int UpdateImage(int flags);                      // 0x10169f70
+};
+
+extern "C" TextureSlot DAT_118d0ba8[1600];
+extern "C" int DAT_10203434;                         // 1 when shadows are drawn
+extern "C" int DAT_1101d864;
+extern "C" int DAT_1101d878;                         // set while loading the shared textures
+extern "C" int DAT_10f8d9b8[10];                     // copy of the shadow targets
+extern "C" int DAT_10f655ac;                         // cel.bmp (cel shading ramp)
+extern "C" int DAT_10f655b0;                         // cel2.bmp
+extern "C" int DAT_10f654cc;                         // render-to-texture available (RenderTarget_Probe)
+extern "C" int DAT_10f654d0;
+extern "C" int DAT_10f654e4;                         // 1 = screen-size crossfade targets
+extern "C" float DAT_10202b18;                       // size of the crossfade targets
+extern "C" int DAT_10f6559c;
+extern "C" int DAT_10f655a0;
+extern "C" int DAT_10f65484;
+extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
+extern "C" int FUN_10173550(const char *path, const char *alphaPath, int flags);  // Texture_LoadBmp
+extern "C" int FUN_10175c90(const char *name, int width, int height, const unsigned char *pixels, int alpha,
+                            int flags);                              // Texture_CreateFromPixels
+extern "C" void FUN_1013f070(int mode, int a, int b);                // sets a 2D/3D render state
+extern "C" void FUN_101439e0(void);
+extern "C" void FUN_1014b480(void);
+
+// Loads BMP texture `name` from the data folder (the BMP branch of LoadTexture, texture_load.h).
+inline int LoadBmp(const char *name)
+{
+    return FUN_10173550(FUN_1013f8a0(name, 0), 0, 0);
+}
+
+// 0x1017c160 (ModelBank::CreateTextures). Creates the bank's textures for a new game: the ten shadow targets (when
+// shadows are on), the lens-flare, shadow and cel-shading images, and, when render-to-texture works, the crossfade,
+// mirror, save-thumbnail and minimap targets; the shadow targets are cleared once. Returns 0 when one of the needed
+// targets could not be created, else 1.
+int ModelBank::CreateTextures()
+{
+    int pixel;
+    char name[0x80];
+    m_313e8 = 0;
+    DAT_1101d864 = 0;
+    if (DAT_10203434 != 0)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            sprintf(name, "shadow%0d", i);
+            shadows[i] = FUN_10175c90(name, 0x100, 0x100, (unsigned char *)&pixel, 1, 0);
+            DAT_10f8d9b8[i] = shadows[i];
+        }
+    }
+    int loading = DAT_1101d878;
+    DAT_1101d878 = 1;
+    lens[0] = LoadBmp("lens01.bmp");
+    lens[1] = LoadBmp("lens02.bmp");
+    lens[2] = LoadBmp("lens03.bmp");
+    lens[3] = LoadBmp("lens04.bmp");
+    shadowTexture = LoadBmp("kage.bmp");
+    DAT_10f655ac = LoadBmp("cel.bmp");
+    DAT_10f655b0 = LoadBmp("cel2.bmp");
+    DAT_1101d878 = loading;
+    if (DAT_10f654cc != 0 && DAT_10f654d0 != 0)
+    {
+        if (DAT_10f654e4 != 0)
+        {
+            crossfade[0] = FUN_10175c90("crossfade0", (int)DAT_10202b18, (int)DAT_10202b18, (unsigned char *)&pixel,
+                                        1, 0);
+            crossfade[1] = FUN_10175c90("crossfade1", (int)DAT_10202b18, (int)DAT_10202b18, (unsigned char *)&pixel,
+                                        1, 0);
+            crossfade[2] = FUN_10175c90("crossfade2", (int)DAT_10202b18, (int)DAT_10202b18, (unsigned char *)&pixel,
+                                        1, 0);
+        }
+        mirror = FUN_10175c90("mirror", 0x100, 0x100, (unsigned char *)&pixel, 1, 0);
+        saveBuffer = FUN_10175c90("savebuf", 0x100, 0x100, (unsigned char *)&pixel, 1, 0);
+        minimap = FUN_10175c90("minimap", 0x100, 0x100, (unsigned char *)&pixel, 1, 0);
+        mirror2 = FUN_10175c90("mirror2", 0x100, 0x100, (unsigned char *)&pixel, 1, 0);
+        saveBuffer2 = FUN_10175c90("savebuf2", 0x100, 0x100, (unsigned char *)&pixel, 1, 0);
+        minimap2 = FUN_10175c90("minimap2", 0x100, 0x100, (unsigned char *)&pixel, 1, 0);
+        DAT_10f655a0 = DAT_10f6559c = mirror;
+        if (DAT_10203434 != 0)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                DAT_118d0ba8[shadows[i]].UpdateImage(0);
+                FUN_1013f070(4, -1, 0);
+                FUN_1013f070(6, 0, 0);
+            }
+        }
+        if (DAT_10f65484 != 0)
+            FUN_101439e0();
+        else
+            FUN_1014b480();
+        if (DAT_10f654e4 != 0)
+        {
+            if (crossfade[0] < 0 || crossfade[1] < 0 || crossfade[2] < 0 || mirror < 0 || saveBuffer < 0 ||
+                minimap < 0)
+                return 0;
+        }
+        else if (minimap2 < 0 || saveBuffer2 < 0 || mirror2 < 0 || minimap < 0 || saveBuffer < 0 || mirror < 0)
+            return 0;
+    }
+    return 1;
 }

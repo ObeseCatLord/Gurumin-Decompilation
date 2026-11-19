@@ -233,5 +233,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 169 | medium functions | 101453e0 Font_DrawGlyph, 10055aa0, 10054770 | 10054770 Game::MarkKilled open (two-pointer loop, as RaiseGameOverEvents); 10143e00 Render_FillRect open (6 bytes); 10055aa0 (label search) and Font_DrawGlyph left |
 | 171 | table-like | 100144c0 Ability_GetDescription (generated from the asm skeleton), 1019b630, 10055410 | Ability_GetDescription matched (2146 bytes; int parameter); the others left |
 | 172 | string-heavy | 1001d2d0 (digit counter), 10034920 (BS_003 variants), 100b9bb0 | 10034920 Bs003_SetVariant matched; 1001d2d0 DigitCounter_Update open (register swap); 100b9bb0 left |
-| 173 | string-heavy | 1001e4b0, 1017c160, 1004ed60 | |
+| 173 | string-heavy | 1001e4b0, 1017c160, 1004ed60 | 1017c160 ModelBank::CreateTextures matched (first build); others left |
+| 174 | string-heavy | 1001e4b0, 1001a990, 1004ed60 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

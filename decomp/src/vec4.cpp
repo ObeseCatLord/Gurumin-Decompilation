@@ -21,6 +21,7 @@ struct Vec4
     void Set(float x, float y, float z, float w);
     void Copy(const Vec4 &source);
     void Fill(const float &value);
+    float Length();
     float Distance(const Vec4 &other);   // 0x101ac590 (vec_math.cpp)
     float DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest);
     void RotateX(float angle);   // 0x101ac440 (vec_math.cpp)
@@ -58,6 +59,12 @@ extern "C" float Vec3_LengthSquared(const Vec4 *v)
     return LengthSquared(v->x, v->y, v->z);
 }
 extern "C" float Vec3_Length(const Vec4 *v);                   // 0x101ae890 (x/y/z only)
+
+// 0x101ac4e0. Length of the x/y/z part.
+float Vec4::Length()
+{
+    return (float)sqrt(Vec3_LengthSquared(this));
+}
 
 // Zero vector.
 Vec4::Vec4()

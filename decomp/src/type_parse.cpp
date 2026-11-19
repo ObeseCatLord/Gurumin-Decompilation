@@ -45,7 +45,7 @@ struct GameFile
     void Close();
 };
 
-extern "C" short DAT_10f65558;
+extern "C" unsigned short DAT_10f65558;          // position in the random table
 extern "C" int DAT_10f20590[0x10000];
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
@@ -66,4 +66,10 @@ int FUN_1014b1c0(short value)
             DAT_10f20590[i] = rand();
     }
     return 0;
+}
+
+// 0x1013f880 (Random). Returns the next entry of the random table loaded above; the position wraps at 0x10000.
+extern "C" int FUN_1013f880(void)
+{
+    return DAT_10f20590[++DAT_10f65558];
 }

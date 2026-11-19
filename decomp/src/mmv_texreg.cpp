@@ -299,6 +299,17 @@ extern "C" int FUN_10161920(const char *name)
     return -1;
 }
 
+extern "C" int FUN_10148b00(void);               // Render_CreateDevice
+
+// 0x10161970. Creates the Direct3D device and empties the texture name tables; returns the device result. The
+// compiler keeps the result in edx across the call because it sees that FUN_101610f0 above leaves edx alone.
+extern "C" int FUN_10161970(void)
+{
+    int result = FUN_10148b00();
+    FUN_101610f0();
+    return result;
+}
+
 // Mmv_DecodeFrameRle: applies one frame's RLE data (`count` bytes at `data`) to the previous frame in `frame`.
 // Codes (docs/MODDING_MAP.md, tools/mmv_tool.py):
 //   0xFC n     skip n pixels (they keep the previous frame's colour)

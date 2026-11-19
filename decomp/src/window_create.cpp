@@ -30,6 +30,13 @@ struct RenderWindow
     void Create(HINSTANCE instance);
 };
 
+// The game's window (the instance at 0x10f65698): a RenderWindow whose WindowProc handles the game's messages.
+struct GameWindow : RenderWindow
+{
+    LRESULT __stdcall WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+    GameWindow();
+};
+
 extern "C" RenderWindow *DAT_10f1a860;
 extern "C" int DAT_10f65514;
 extern "C" int DAT_10202b24;
@@ -63,7 +70,7 @@ void RenderWindow::Create(HINSTANCE instance)
 }
 
 // The Windows procedure registered for the class: stores the RenderWindow pointer in the window's extra data on
-// the first message and forwards every message to RenderWindow::WindowProc.
+// the first message and forwards every message to its (virtual) WindowProc.
 extern "C" LRESULT CALLBACK FUN_1013e410(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if (GetWindowLongA(window, 8) == 0)
@@ -89,11 +96,22 @@ void RenderWindow::RegisterWindowClass(HINSTANCE instance)
     wc.hIconSm = 0;
     RegisterClassExA(&wc);
 }
-// Handles the messages the game cares about: quit, paint, focus changes (active), IME composition (forwarded
+// 0x1013e450. The base window procedure: every message goes to DefWindowProc.
+LRESULT __stdcall RenderWindow::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    return DefWindowProcA(window, message, wParam, lParam);
+}
+
+// 0x1013e6a0. Constructor: only the RenderWindow part and the vtable.
+GameWindow::GameWindow()
+{
+}
+
+// 0x1013e4f0. Handles the messages the game cares about: quit, paint, focus changes (active), IME composition (forwarded
 // to the callbacks set by the text input code), middle-button capture and the mouse wheel; it closes the IME's
 // own window (WM_IME_SETCONTEXT) because the game draws the composition itself. Everything else goes to
 // DefWindowProc. Not byte-identical yet (see open.tsv).
-LRESULT __stdcall RenderWindow::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT __stdcall GameWindow::WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {

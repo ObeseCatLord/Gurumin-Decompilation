@@ -108,7 +108,9 @@
 ?Collide@Node@@QAEHHHPAUVec4@@00@Z	101a8e60
 ?SetFlags@Node@@QAEXI@Z	1019b130
 ?ClearFlags@Node@@QAEXI@Z	1019b1b0
-?WindowProc@RenderWindow@@UAGJPAUHWND__@@IIJ@Z	1013e4f0
+?WindowProc@GameWindow@@UAGJPAUHWND__@@IIJ@Z	1013e4f0
+?WindowProc@RenderWindow@@UAGJPAUHWND__@@IIJ@Z	1013e450
+??0GameWindow@@QAE@XZ	1013e6a0
 _acosf	10001f60
 _atan2f	10001f80
 ?Open@GameFile@@QAEHPBD0@Z	101b2310
@@ -365,3 +367,10 @@ _TestDat_Load	1000beb0
 ?FUN_100106e0@@YAHPBD@Z	100106e0
 ?ResetState@AnimModel@@QAEHXZ	10161f80
 ??0AnimModel@@QAE@XZ	101629f0
+_cosf	10001fb0
+_floorf	10001fd0
+_sinf	10001ff0
+_sqrtf	10002010
+?Length@Vec4@@QAEMXZ	101ac4e0
+?Init@VertexPack@@QAEXXZ	101acfa0
+?Init@IndexList@@QAEXXZ	101ad1b0

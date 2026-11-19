@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (126)
+## 1. Walls to retry (128)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -40,6 +40,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `100211a0` 466 — Region_WaveVertex: logic identical; ebx/ebp swapped for the flip counter and the point address, and the original rounds each sine result to float twice (helper and caller locals tried)
+- [ ] `10023900` 1069 — date test: the New Year block (0x829 = 1) is laid out after the return in the original; if/else, switch, goto and nested forms all keep it inline
 - [ ] `100242c0` 487 — Char_ProbeAhead: logic identical; the original keeps the testOnly path's `return 1` block in place and the final test jumps back to it (ours puts it at the end); three return layouts tried
 - [ ] `100244b0` 502 — Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
 - [ ] `10024d00` 377 — Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
@@ -55,6 +56,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
+- [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054970` 239 — Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
 - [ ] `10054a60` 270 — Game::RaiseGameOverEvents: identical except the loop pointer: the original keeps &entry.flags[1] in ebp, cl 13.00 here &entry.flags[0] (pointer and indexed forms tried)
@@ -75,7 +77,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
 - [ ] `1013e260` 428 — UserFolder_FindNt: identical apart from block placement (the original puts the strcpy(base) branch out of line after the fsetup.dll loop and jumps back; ours keeps it before the loop); if/else orders and the combined test tried
-- [ ] `1013e4f0` 431 — RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
+- [ ] `1013e4f0` 431 — GameWindow::WindowProc (the base RenderWindow::WindowProc 0x1013e450 is DefWindowProc): an inline base WindowProc called from each case duplicates the tails like the original but cl 13.00 then propagates message constants and does not cache window/wParam in ebx/edi; has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `1013e790` 561 — Names_Expand (/Od unit src_od/names_od.cpp): code identical, only the stack slot of `p` differs (the original puts it below found/matches/best); function-scope declaration orders tried
 - [ ] `1013e9d0` 689 — Screenshot_ReadBackBuffer: identical except the row address in the 32-bit and 16-bit loops (original loads y then multiplies by the pitch, ours loads the pitch first); operand orders and index form tried
 - [ ] `10142b20` 519 — Joystick_IsButtonDown (__stdcall): same cases and code; the tail-merged axis tests are placed differently (the original keeps the full low-x test in the default-layout switch and jumps to it from the mapped cases, ours the other way round)
@@ -191,7 +193,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (214)
+## 4. Large functions (801-3000 bytes) (212)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -206,7 +208,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014f590` 865 bytes (float, loops 5, calls 11)
 - [ ] `100b9bb0` 867 bytes (calls 1)
 - [ ] `1014e5d0` 870 bytes (float, loops 1, calls 12)
-- [ ] `1004f4f0` 873 bytes (loops 2, calls 20)
 - [ ] `1014d4e0` 874 bytes TextureObject::DrawFrame (float, loops 1, calls 19)
 - [ ] `10055ee0` 881 bytes (loops 4, calls 17)
 - [ ] `10027630` 882 bytes (float, calls 27)
@@ -250,7 +251,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10166100` 1055 bytes (float, loops 2, calls 14)
 - [ ] `1015fea0` 1060 bytes SystemSav_WriteRecord (loops 7, calls 36)
 - [ ] `10172350` 1068 bytes (loops 4, calls 5)
-- [ ] `10023900` 1069 bytes (loops 3, calls 8)
 - [ ] `1014f900` 1070 bytes (float, loops 6, calls 12)
 - [ ] `101afe00` 1079 bytes (float, loops 2, calls 7)
 - [ ] `100425f0` 1081 bytes (float, loops 1, calls 35)
@@ -523,10 +523,18 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (0)
+## 6. Naming: matched functions without a readable name (8)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
+- [ ] `10001fb0` 27 bytes (src/math_float.cpp)
+- [ ] `10001fd0` 27 bytes (src/math_float.cpp)
+- [ ] `10001ff0` 27 bytes (src/math_float.cpp)
+- [ ] `10002010` 27 bytes (src/math_float.cpp)
+- [ ] `1013e6a0` 18 bytes (src/window_create.cpp)
+- [ ] `101ac4e0` 28 bytes (src/vec4.cpp)
+- [ ] `101acfa0` 26 bytes (src/containers.cpp)
+- [ ] `101ad1b0` 8 bytes (src/containers.cpp)
 
 ## 7. Comment pass (1 files)
 

@@ -224,4 +224,8 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 160 | large, table-like | 101ab3e0, 1013b700 Game_Startup (10376 bytes), 10138280 Script_GameBuiltin (10107 bytes) | |
 | 161 | large, table-like | 1011a060 (14244 bytes), 100fedd0 (6739 bytes), 10112140 Menu_Main | |
 | 162 | model class | 101629f0 AnimModel::AnimModel (matched), 1017c9c0 (scene object reset, member arrays), 10166950 Character_Load | |
-| 163 | large, table-like | 10116550 (staff roll, 15107 bytes), 10023900, 1004f4f0 | |
+| 163 | large, table-like | 10116550 (staff roll, 15107 bytes), 10023900, 1004f4f0 | 10023900 Map_ResetOnEnter open (49 bytes: New Year block placement), 1004f4f0 TutorialBook_NextPage open (draft) |
+| 164 | small helpers | cosf/floorf/sinf/sqrtf copies, 1013f880 Random, Vec4::Length, VertexPack/IndexList::Init, RenderWindow::WindowProc + GameWindow ctor, 10161970 | all 11 matched (File_Checksum was already matched); the game's window procedure is GameWindow::WindowProc |
+| 166 | save and system files | 101603c0 SystemSav_ReadRecord, 1015fea0 SystemSav_WriteRecord, 10161770 (fragment check) | |
+| 167 | medium functions | 101670e0, 1016b050, 101453e0 | |
+| 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

@@ -24,7 +24,7 @@ address	status	reason
 101649c0	open	lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
 10161200	open	Bmp_FlipVertical: VS2003 turns the step-3 inner loop into a precomputed trip count (mul 0xaaaaaaab); cl 13.00 keeps the index compare
 1014b390	open	Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
-1013e4f0	open	RenderWindow::WindowProc: has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
+1013e4f0	open	GameWindow::WindowProc (the base RenderWindow::WindowProc 0x1013e450 is DefWindowProc): an inline base WindowProc called from each case duplicates the tails like the original but cl 13.00 then propagates message constants and does not cache window/wParam in ebx/edi; has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 1000b9f0	open	EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
 10034920	skip	costume texture switch: compiler-merged case tails and an uninitialised default path; not attempted yet
 10199880	open	RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
@@ -128,3 +128,5 @@ address	status	reason
 1016b400	open	Camera_TurnInput: same arithmetic; the original stores the blend weight a second time (integer copy into the slot of the converted frame count) and swaps the two argument loads at the end; frame-count, compound and copy-variable forms tried
 10142dd0	open	Keyboard_IsButtonDown: same returns; in the original the default layout (map 0) of buttons 0, 2, 5, 7 and 10-13 shares the return blocks of the fixed maps 0x12, 1, 0x13, 2 and 0x14-0x17 and the blocks are laid out in another order; the plain nested switch here gives each its own block
 100106e0	open	Save_Write: frame, calls and layout identical; the unrolled bit-set loop swaps ebx/edi for two of its counters and the start-position loads use other registers; locals for the position tried
+10023900	open	date test: the New Year block (0x829 = 1) is laid out after the return in the original; if/else, switch, goto and nested forms all keep it inline
+1004f4f0	open	draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)

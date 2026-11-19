@@ -37,6 +37,7 @@ struct VertexPack
     int m_0044;
     char pad_0048[0x28];
     void *vertices;
+    void Init();
     int SetVertexCount(int count);
     int CopyFrom(const VertexPack *source);
     int FreeVertices();
@@ -46,6 +47,7 @@ struct IndexList
 {
     int count;
     int *indices;
+    void Init();
     int Resize(int newCount);
     int CopyFrom(const IndexList *source);
     int Free();
@@ -572,4 +574,24 @@ float __stdcall Spline(float t, float a, float b, float c, float d)
     float t2x3 = t2 * 3.0f;
     return (t3 - (t2 + t2) + t) * tangentB + (t3 + t3 - t2x3 + 1.0f) * b + (t3 * -2.0f + t2x3) * c +
            (t3 - t2) * tangentC;
+}
+
+// 0x101acfa0. Empties a vertex pack that was allocated without a constructor: no vertices, no count, zero bounds
+// fields (the arrays are not freed).
+void VertexPack::Init()
+{
+    vertices = 0;
+    m_0000 = 0;
+    m_0004 = 0;
+    m_0008 = 0;
+    m_000c = 0;
+    vertexCount = 0;
+    m_0040 = 0;
+    m_0044 = 0;
+}
+
+// 0x101ad1b0. Empties an index list allocated without a constructor (only the pointer is cleared).
+void IndexList::Init()
+{
+    indices = 0;
 }

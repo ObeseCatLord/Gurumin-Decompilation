@@ -181,3 +181,78 @@ extern "C" int FUN_10147880(IUnknownLike **vertexBuffer, int vertexBytes, IUnkno
     *indexBuffer = DAT_10f60d38[slot];
     return slot;
 }
+
+extern "C" int DAT_1020340c;                         // texture memory budget of the pool
+extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
+
+// 0x10148590. Returns the video-memory copy of pooled buffer `index`, creating it from `source` (width x height,
+// 16-bit: R5G6B5 for mode 1, else A4R4G4B4) when it has none. While the pool would exceed its budget, or after a
+// failed creation, the least recently used copy is released first; creation is tried up to nine times. Every
+// pooled buffer ages by one and the new one starts at 0. Returns 0 for a bad index or when creation fails.
+extern "C" IUnknownLike *FUN_10148590(int index, IDirect3DTexture9Like *source, int width, int height, int mode)
+{
+    if (index < 0 || index >= 0x200 || DAT_10f1fd90[index] == 0)
+        return 0;
+    IUnknownLike **slot = &DAT_10f1bff0[index];
+    if (*slot != 0)
+        return *slot;
+    int size = width * height * 2;
+    int format = mode != 1 ? 0x1a : 0x17;
+    int evict = 0;
+    int attempts = 0;
+    for (;;)
+    {
+        if (DAT_1020340c < size + DAT_10f0ff80 || evict)
+        {
+            int oldest = -1;
+            int age = 0;
+            int found = 0;
+            for (int i = 0; i < 0x200; i++)
+            {
+                if (DAT_10f1bff0[i] != 0 && (!found || DAT_10f0cd40[i] > age))
+                {
+                    age = DAT_10f0cd40[i];
+                    oldest = i;
+                    found = 1;
+                }
+            }
+            if (oldest >= 0)
+            {
+                FUN_1013f070(6, 0, 0);
+                if (DAT_10f1bff0[oldest] != 0)
+                {
+                    DAT_10f1bff0[oldest]->Release();
+                    DAT_10f0ff80 -= DAT_10f1de70[oldest];
+                }
+                DAT_10f1bff0[oldest] = 0;
+                DAT_10f0cd40[oldest] = 0;
+                DAT_10f1fd90[oldest] = 1;
+                evict = 0;
+                continue;
+            }
+        }
+        if (DAT_10f1fcf0->CreateTexture(width, height, 1, 0, format, 0, slot, 0) == 0)
+        {
+            source->AddDirtyRect(0);
+            if (DAT_10f1fcf0->UpdateTexture(source, *slot) != 0)
+            {
+                (*slot)->Release();
+                *slot = 0;
+                return 0;
+            }
+            DAT_10f1fd90[index] = 1;
+            for (int j = 0; j < 0x200; j++)
+                DAT_10f0cd40[j]++;
+            DAT_10f0ff80 += size;
+            DAT_10f0cd40[index] = 0;
+            DAT_10f1de70[index] = size;
+            return *slot;
+        }
+        if (++attempts > 8)
+        {
+            *slot = 0;
+            return 0;
+        }
+        evict = 1;
+    }
+}

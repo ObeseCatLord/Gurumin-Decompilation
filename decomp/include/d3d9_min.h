@@ -38,7 +38,9 @@ struct IDirect3DDevice9
     virtual long __stdcall SetDialogBoxMode() = 0;
     virtual long __stdcall SetGammaRamp() = 0;
     virtual long __stdcall GetGammaRamp() = 0;
-    virtual long __stdcall CreateTexture() = 0;
+    virtual long __stdcall CreateTexture(unsigned int width, unsigned int height, unsigned int levels,
+                                         unsigned long usage, int format, int pool, struct IUnknownLike **texture,
+                                         void *sharedHandle) = 0;
     virtual long __stdcall CreateVolumeTexture() = 0;
     virtual long __stdcall CreateCubeTexture() = 0;
     virtual long __stdcall CreateVertexBuffer(unsigned int length, unsigned long usage, unsigned long fvf, int pool,
@@ -48,7 +50,7 @@ struct IDirect3DDevice9
     virtual long __stdcall CreateRenderTarget() = 0;
     virtual long __stdcall CreateDepthStencilSurface() = 0;
     virtual long __stdcall UpdateSurface() = 0;
-    virtual long __stdcall UpdateTexture() = 0;
+    virtual long __stdcall UpdateTexture(struct IUnknownLike *source, struct IUnknownLike *destination) = 0;
     virtual long __stdcall GetRenderTargetData(void *renderTarget, void *destSurface) = 0;
     virtual long __stdcall GetFrontBufferData() = 0;
     virtual long __stdcall StretchRect(void *source, const void *sourceRect, void *dest, const void *destRect,
@@ -145,4 +147,28 @@ struct IUnknownLike
     virtual long __stdcall QueryInterface() = 0;
     virtual unsigned long __stdcall AddRef() = 0;
     virtual unsigned long __stdcall Release() = 0;
+};
+
+// IDirect3DTexture9 up to AddDirtyRect (vtable order).
+struct IDirect3DTexture9Like : IUnknownLike
+{
+    virtual long __stdcall GetDevice() = 0;
+    virtual long __stdcall SetPrivateData() = 0;
+    virtual long __stdcall GetPrivateData() = 0;
+    virtual long __stdcall FreePrivateData() = 0;
+    virtual unsigned long __stdcall SetPriority() = 0;
+    virtual unsigned long __stdcall GetPriority() = 0;
+    virtual void __stdcall PreLoad() = 0;
+    virtual int __stdcall GetType() = 0;
+    virtual unsigned long __stdcall SetLOD() = 0;
+    virtual unsigned long __stdcall GetLOD() = 0;
+    virtual unsigned long __stdcall GetLevelCount() = 0;
+    virtual long __stdcall SetAutoGenFilterType() = 0;
+    virtual int __stdcall GetAutoGenFilterType() = 0;
+    virtual void __stdcall GenerateMipSubLevels() = 0;
+    virtual long __stdcall GetLevelDesc() = 0;
+    virtual long __stdcall GetSurfaceLevel() = 0;
+    virtual long __stdcall LockRect() = 0;
+    virtual long __stdcall UnlockRect() = 0;
+    virtual long __stdcall AddDirtyRect(const void *rect) = 0;
 };

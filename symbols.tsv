@@ -879,3 +879,4 @@ address	name	evidence
 1019e120	Node::BuildCollisionSpheres	one bounding sphere per triangle for collision nodes (decomp/src/scene_node.cpp)
 1016ac90	Camera_CollectPaths	fills the camera path tables from the kind-2 nodes of a scene (matched, decomp/src/camera_path_select.cpp)
 10023d30	Map_Unload	frees the map objects and models and clears the per-map tables (decomp/src/map_unload.cpp)
+10148590	TexturePool_Get	video-memory copy of a pooled buffer, created on demand with LRU eviction (decomp/src/buffer_pool.cpp)

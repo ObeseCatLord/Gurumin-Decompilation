@@ -876,3 +876,4 @@ address	name	evidence
 101a53b0	Node::Clone	copies a node and its whole subtree (names, matrices, poses, plugs, animation, mesh, skin, children) (matched, decomp/src/scene_node.cpp)
 1019d8e0	Node::ComputeBounds	box, centre and radius of each pack and of the node (decomp/src/scene_node.cpp)
 10190e30	EffectManager::Draw	draws the effect lists of a render pass, then the sprite tables and lights (decomp/src/char_effects.cpp)
+1019e120	Node::BuildCollisionSpheres	one bounding sphere per triangle for collision nodes (decomp/src/scene_node.cpp)

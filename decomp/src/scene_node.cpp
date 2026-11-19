@@ -19,6 +19,7 @@ struct Vec4
     float DistanceToSegment(const Vec4 *from, const Vec4 *to, Vec4 *closest);
     int InBox(const struct Box2 *box);  // 0x101ac6e0 (vec_math.cpp)
     void Copy(const Vec4 &source);      // 0x101acc20
+    float Distance(const struct LengthVector &other);  // 0x101ac590
 };
 
 // Axis-aligned box, 0x20 bytes (vec_math.cpp Box2).
@@ -50,10 +51,16 @@ struct NodeSaved
 
 struct KeyPair
 {
-    int data[2];
+    int count;
+    union
+    {
+        int *indices;            // index list: the vertex indices (three per triangle)
+        struct Vec4 *spheres;    // sphere list: centre and radius (w) of each triangle
+    };
     void M_101ad0e0();
     void Init();                                 // 0x101ad1b0
     void Copy(const KeyPair *source);            // 0x101ad160
+    int Resize(int count);                       // 0x101ad1c0 (IndexSpanList::Resize)
 };
 
 // A reference-counted cache entry (mesh_cache.cpp): the motion of a node points to one holding its cache slot.
@@ -272,6 +279,7 @@ struct Node
     int AllocMaterials(int count);
     int Clone(Node *source, int a, int b);
     int ComputeBounds();
+    int BuildCollisionSpheres();
 
     void M_10193d10(int index);
     void M_101913f0();
@@ -2254,5 +2262,70 @@ int Node::ComputeBounds()
         bounds[2].w = 1.0f;
         bounds[0].w = radius;
     }
+    return 1;
+}
+
+// A vertex of a pack, 0x70 bytes (position first).
+struct PackVertex
+{
+    float position[3];
+    char pad_000c[0x64];
+};
+
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
+
+// 0x1019e120. For collision nodes ("CA"/"CS"/"CT" names after a "CDL"/"OvF" prefix, flag 4 or flags 0xf00) builds
+// the sphere list of every pack: one sphere per triangle, centred in the triangle's bounding box, with 1.1 times
+// the distance to its farthest corner as radius. Recurses into the children. The MIN/MAX macros evaluate their
+// arguments twice, as in the original. Returns 1.
+int Node::BuildCollisionSpheres()
+{
+    LengthVector a;
+    LengthVector b;
+    LengthVector c;
+    int prefix = 0;
+    if (name[0] == 'C' && name[1] == 'D' && name[2] == 'L')
+        prefix = 6;
+    if (name[0] == 'O' && name[1] == 'v' && name[2] == 'F')
+        prefix = 7;
+    if (((name[prefix] == 'C' && name[prefix + 1] == 'A') || (name[prefix] == 'C' && name[prefix + 1] == 'S') ||
+         (name[prefix] == 'C' && name[prefix + 1] == 'T') || (flags & 4) != 0 || (flags & 0xf00) != 0) &&
+        packCount > 0)
+    {
+        M_101911e0(m_0070, packCount);
+        if (m_0070 != 0)
+            DAT_11b1ba40(m_0070);
+        m_0070 = (KeyPair *)DAT_11b0b938(packCount * sizeof(KeyPair), "m_vpackindexsp");
+        for (int p = 0; p < packCount; p++)
+        {
+            m_0070[p].Init();
+            m_0070[p].Resize(indexLists[p].count / 3);
+            for (int i = 0; i < indexLists[p].count; i += 3)
+            {
+                int first = indexLists[p].indices[i];
+                int second = indexLists[p].indices[i + 1];
+                int third = indexLists[p].indices[i + 2];
+                a.x = ((PackVertex *)packs[p].m_0070)[first].position[0];
+                a.y = ((PackVertex *)packs[p].m_0070)[first].position[1];
+                a.z = ((PackVertex *)packs[p].m_0070)[first].position[2];
+                b.x = ((PackVertex *)packs[p].m_0070)[second].position[0];
+                b.y = ((PackVertex *)packs[p].m_0070)[second].position[1];
+                b.z = ((PackVertex *)packs[p].m_0070)[second].position[2];
+                c.x = ((PackVertex *)packs[p].m_0070)[third].position[0];
+                c.y = ((PackVertex *)packs[p].m_0070)[third].position[1];
+                c.z = ((PackVertex *)packs[p].m_0070)[third].position[2];
+                m_0070[p].spheres[i / 3].x = (MAX(MAX(a.x, b.x), c.x) + MIN(MIN(a.x, b.x), c.x)) / 2.0f;
+                m_0070[p].spheres[i / 3].y = (MAX(MAX(a.y, b.y), c.y) + MIN(MIN(a.y, b.y), c.y)) / 2.0f;
+                m_0070[p].spheres[i / 3].z = (MAX(MAX(a.z, b.z), c.z) + MIN(MIN(a.z, b.z), c.z)) / 2.0f;
+                float da = m_0070[p].spheres[i / 3].Distance(a);
+                float db = m_0070[p].spheres[i / 3].Distance(b);
+                float dc = m_0070[p].spheres[i / 3].Distance(c);
+                m_0070[p].spheres[i / 3].w = MAX(MAX(da, db), dc) * 1.1f;
+            }
+        }
+    }
+    for (int child = 0; child < childCount; child++)
+        children[child]->BuildCollisionSpheres();
     return 1;
 }

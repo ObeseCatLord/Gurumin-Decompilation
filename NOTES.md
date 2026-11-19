@@ -329,3 +329,5 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Comparison operand order is visible: `count > to` gives `cmp eax(count), reg / jle`, `to < count` gives
   `cmp reg, [count] / jge` (Node::BlendFrames 0x1019b630). Matrices passed by value are copied with `rep movsd`
   onto the stack in argument order.
+- Reading the three triangle indices into locals once, and evaluating `MAX(...) + MIN(...)` in that order, matched
+  the original's load and compare sequence in Node::BuildCollisionSpheres 0x1019e120 (MIN/MAX macros evaluate twice).

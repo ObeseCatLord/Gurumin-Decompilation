@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (138)
+## 1. Walls to retry (139)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -139,6 +139,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
 - [ ] `1019c560` 298 — Node::ApplyMaterialColours: schedule only (the original loads the material pointer into edx and g before r); local-struct and declaration orders tried
 - [ ] `1019d8e0` 954 — Node::ComputeBounds: control flow and stores in place; the -999999 constant and the y min/max slots use other registers/slots (ecx and swapped 0x18/0x1c in the original), declaration orders tried
+- [ ] `1019e120` 1246 — Node::BuildCollisionSpheres: 14 bytes; identical except that the original encodes the indexed loads with the offset register as base ([ecx + ebx + 4] for vertices, [edi + edx + 4] for the pack lists), ours with the pointer register first (typed vertex struct tried)
 - [ ] `1019eeb0` 844 — Node::SetupSkinning (M_1019eeb0): identical except the bone != 0 test in the parent-name condition, which cl 13.00 here drops (the original keeps test eax, eax; je); local and re-read forms tried
 - [ ] `101acc60` 301 — DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
@@ -195,7 +196,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (200)
+## 4. Large functions (801-3000 bytes) (199)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -274,7 +275,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10037b40` 1232 bytes (float, calls 42)
 - [ ] `10192520` 1233 bytes (float, loops 1, calls 26)
 - [ ] `1014c960` 1234 bytes (float, calls 22)
-- [ ] `1019e120` 1246 bytes (float, loops 3, calls 12)
 - [ ] `10046f10` 1250 bytes (float, loops 1, calls 47)
 - [ ] `1001ed80` 1257 bytes (float, calls 11)
 - [ ] `100ed9b0` 1258 bytes Script_CompileStatement (loops 11, calls 22)

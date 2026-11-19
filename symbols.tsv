@@ -72,7 +72,7 @@ address	name	evidence
 101b2450	File_ReadPacked	u32 size + ExecUnpack into caller buffer
 101b24e0	File_ReadPackedImage	u32 size + BMPUnpack (wavelet) into RGB buffer
 101b22f0	File_Close	closes the File object
-100106e0	Save_Write	writes gdataNN.sav: thumbnail + state blocks, key = rand(), ItmDescramble-compatible scrambling
+100106e0	Save_Write	writes gdataNN.sav: thumbnail and state, scrambled with the base name and a random key (decomp/src/save_write.cpp, open)
 10173480	Texture_ReleaseAll	releases every registered texture and clears both name tables
 101734d0	Texture_OnLostDevice	calls TextureObject::Release (0x10169df0) on every registered texture
 10173510	Texture_OnResetDevice	recreates every registered texture (0x10169e10)

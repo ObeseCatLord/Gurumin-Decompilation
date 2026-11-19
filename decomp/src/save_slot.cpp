@@ -44,7 +44,7 @@ int FUN_1005cdc0(const char *name, int mode)
     return FUN_1003b2c0(path, mode);
 }
 
-extern "C" int FUN_100106e0(const char *path);  // Save_Write
+int FUN_100106e0(const char *path);  // Save_Write (save_write.cpp; C++ linkage)
 
 // Writes the save file `name` (e.g. "gdata01.sav") into the save folder.
 // DAT_10f60590 is the save directory prefix (with trailing backslash) set at start-up; Save_Write (0x100106e0)

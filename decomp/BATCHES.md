@@ -215,5 +215,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 151 | medium functions | 1003e710, 10161f80, 10163150 | |
 | 152 | large, mechanical | 1003e710 (game reset, 5401 bytes, mostly stores), 10161f80 (model record reset, needs the record layout) | |
 | 153 | medium functions | 1003b2c0 Save_Load, 101455d0 Font_Init, 10160a90 MmvPlayer::Open | Save_Load and MmvPlayer::Open matched; Font_Init (font object layout) left |
-| 154 | low-branch functions | 10146db0, 100106e0 Save_Write, 10010d10 | |
+| 154 | low-branch functions | 10146db0, 100106e0 Save_Write, 10010d10 Save_ReadSlotInfo | Save_Write open (unrolled loop registers); 10146db0 and Save_ReadSlotInfo (two save formats) left |
 | 155 | low-branch functions | 101603c0 SystemSav_ReadRecord, 1015fea0 SystemSav_WriteRecord, 10166950 Character_Load | |
+| 156 | save and system files | 10010d10 Save_ReadSlotInfo, 101603c0 SystemSav_ReadRecord, 101602d0 File_Checksum | |
+| 157 | medium functions | 1004f4f0, 10023900, 10055ee0 | |

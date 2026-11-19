@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (139)
+## 1. Walls to retry (140)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -55,6 +55,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1002a490` 685 — Block_Update: statements and layout identical; the original computes the block model address once into esi on the standing path and reuses it for the second IsClearAny, ours recomputes it (combined, nested and goto forms and a model pointer local tried)
 - [ ] `1002ebf0` 628 — DamageZone_Update: same tests; register allocation differs from the start (the original leaves index in its stack slot and reloads it, ours keeps it in ebx, which changes the flag-test layout and hides the loop-invariant (float)left the original hoists); else-if, nested and conditional forms of the flag test tried
 - [ ] `1002ee70` 473 — Char_UpdateShoves: identical except the original schedules the fadd of 3.1415 after the stack pop of the atan2 call (angle local and separate add tried)
+- [ ] `1002f050` 690 — Route_FollowGates: same statements and jump table; the original keeps the route row in ebx and the point in edi (cl 13.00 here esi/ebx); a separate next-point variable tried
 - [ ] `10034cc0` 429 — Party_BlocksMove: logic identical; the original copies the first atan2 result through a temporary and reloads the second in place (fld/fstp round trips); result locals and helper forms tried
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `10037090` 976 — ListBank::FindVariable: calls and the inline ReportError expansion match (listbank_vars.cpp sees ReportError as an inline member); the search loops keep the level in edi and spill this (cl 13.00 here keeps this in edi) and the original hoists the error flag into a local per level
@@ -156,12 +157,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (19)
+## 3. Medium functions (251-800 bytes) (18)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
 - [ ] `100e21a0` 671 bytes (float, loops 2, calls 19)
-- [ ] `1002f050` 690 bytes (float, calls 4)
 - [ ] `1014b750` 713 bytes (float, calls 16)
 - [ ] `100b1520` 736 bytes (float, loops 2, calls 19)
 - [ ] `10149100` 742 bytes (float, calls 17)

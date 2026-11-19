@@ -74,3 +74,100 @@ extern "C" int FUN_1002f320(int walker, int route, int point, int *outPoint, flo
     position[2] = z;
     return result;
 }
+
+// The game object (game.h Game) with the out-of-line copy of its flag test.
+struct Game
+{
+    int TestScriptFlag(int index);                   // 0x100022b0
+};
+
+extern "C" Game DAT_10874848;
+extern "C" int DAT_1020b430[][16];               // per walker AI state: [0] = walking back, [1] = wait counter
+extern "C" int FUN_100286b0(int value);          // Angle_Wrap: -4999..5000
+
+// 0x1002f050 (Route_FollowGates). Like Route_Follow for routes whose points pack x * 10000 + y and z * 10000 + value
+// (each part wrapped to -4999..5000) and carry a gate type and a parameter: stores the value, type and parameter in
+// *outValue, *outType and *outParam. Within 20 units of the point the walker moves on: type 0 to the next point in
+// its direction, 1 jumps to point `parameter` when script flag `value` is set, 2 stops at point 0 (parameter 0) or
+// turns back, 3 waits `parameter` frames first and 4 walks forwards again. Stores the point it heads for in
+// *outPoint and its coordinates in `position`. Returns 1 for the types 2 and 4 once reached, else 0.
+extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, float *position, int *outType,
+                            int *outParam, int *outValue)
+{
+    int x = DAT_10210fc0[route][point].x / 10000;
+    int result = 0;
+    if (x > 5000)
+        x -= 10000;
+    float fx = (float)x;
+    int y = DAT_10210fc0[route][point].x % 10000;
+    if (y > 5000)
+        y -= 10000;
+    float fy = (float)y;
+    int z = DAT_10210fc0[route][point].y / 10000;
+    if (z > 5000)
+        z -= 10000;
+    float fz = (float)z;
+    int value = DAT_10210fc0[route][point].y % 10000;
+    if (value > 5000)
+        value -= 10000;
+    *outValue = value;
+    *outType = DAT_10210fc0[route][point].z;
+    int parameter = DAT_10210fc0[route][point].code;
+    *outParam = parameter;
+    if (fx - 20.0f < position[0] && fx + 20.0f > position[0] && fy - 20.0f < position[1] &&
+        fy + 20.0f > position[1] && fz - 20.0f < position[2] && fz + 20.0f > position[2])
+    {
+        switch (*outType)
+        {
+        case 0:
+            if (DAT_1020b430[walker][0] != 0)
+                point--;
+            else
+                point++;
+            break;
+        case 1:
+            if (DAT_10874848.TestScriptFlag(*outValue) != 0)
+                point = parameter;
+            else if (DAT_1020b430[walker][0] != 0)
+                point--;
+            else
+                point++;
+            break;
+        case 2:
+            result = 1;
+            if (parameter != 0)
+            {
+                DAT_1020b430[walker][0] = 1;
+                point--;
+            }
+            else
+                point = 0;
+            break;
+        case 3:
+            if (DAT_1020b430[walker][1] == 0)
+                DAT_1020b430[walker][1] = parameter;
+            if (--DAT_1020b430[walker][1] < 1)
+            {
+                DAT_1020b430[walker][1] = 0;
+                if (DAT_1020b430[walker][0] != 0)
+                    point--;
+                else
+                    point++;
+            }
+            break;
+        case 4:
+            result = 1;
+            DAT_1020b430[walker][0] = 0;
+            point++;
+            break;
+        }
+        fx = (float)FUN_100286b0(DAT_10210fc0[route][point].x / 10000);
+        fy = (float)FUN_100286b0(DAT_10210fc0[route][point].x % 10000);
+        fz = (float)FUN_100286b0(DAT_10210fc0[route][point].y / 10000);
+    }
+    *outPoint = point;
+    position[0] = fx;
+    position[2] = fz;
+    position[1] = fy;
+    return result;
+}

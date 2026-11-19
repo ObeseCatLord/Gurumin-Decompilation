@@ -889,3 +889,4 @@ address	name	evidence
 1001d920	Carry_StackOnObject	puts the carried object on top of the nearest crate or box below it (matched, decomp/src/carry_stack.cpp)
 1000d6b0	KeyPrompt_DrawAll	draws the key prompt cell above every character that shows one (matched, decomp/src/key_prompt_draw.cpp)
 10192a00	Cylinder_Overlap	overlap test of the upright cylinders inscribed in two moved boxes (matched, decomp/src/box_overlap.cpp)
+100b9930	Enemy_DragToPit	turns an enemy to the player and drags it along until it fades out over the pit

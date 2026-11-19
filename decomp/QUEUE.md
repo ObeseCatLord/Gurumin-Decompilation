@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (124)
+## 1. Walls to retry (125)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -44,6 +44,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10024d00` 377 — Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
 - [ ] `1002a110` 559 — Char_WalkRoute: code identical; the original keeps the next route point in the slot parameter's stack home (frame 4 bytes smaller), ours gives it a local; declaration positions tried
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
+- [ ] `1002a490` 685 — Block_Update: statements and layout identical; the original computes the block model address once into esi on the standing path and reuses it for the second IsClearAny, ours recomputes it (combined, nested and goto forms and a model pointer local tried)
 - [ ] `1002ebf0` 628 — DamageZone_Update: same tests; register allocation differs from the start (the original leaves index in its stack slot and reloads it, ours keeps it in ebx, which changes the flag-test layout and hides the loop-invariant (float)left the original hoists); else-if, nested and conditional forms of the flag test tried
 - [ ] `1002ee70` 473 — Char_UpdateShoves: identical except the original schedules the fadd of 3.1415 after the stack pop of the atan2 call (angle local and separate add tried)
 - [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
@@ -142,7 +143,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (50)
+## 3. Medium functions (251-800 bytes) (49)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
@@ -168,7 +169,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000d6b0` 666 bytes (float, loops 1, calls 13)
 - [ ] `1001d920` 666 bytes (float, loops 1, calls 8)
 - [ ] `100e21a0` 671 bytes (float, loops 2, calls 19)
-- [ ] `1002a490` 685 bytes (float, calls 20)
 - [ ] `1016ac90` 687 bytes (loops 3, calls 13)
 - [ ] `1002f050` 690 bytes (float, calls 4)
 - [ ] `10016700` 694 bytes (float, loops 3, calls 12)

@@ -194,7 +194,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 130 | medium functions | 100b8220 Npc_Greet, 1002ebf0 DamageZone_Update, 100b9930 | Npc_Greet matched; DamageZone_Update open (index register); 100b9930 (enemy retreat behaviour) left |
 | 131 | medium functions | 10058500 Switch_UpdateEffects, 10192a00, 10045c30 | Switch_UpdateEffects matched; 10192a00 (cylinder overlap) and 10045c30 (NPC watching the player) left |
 | 132 | medium functions | 1004f250, 10057c40 Switch_Hold, 1000d6b0 | Switch_Hold open (slot register swap); 1004f250 (tutorial texture loader) and 1000d6b0 (key prompt drawing) left |
-| 133 | medium functions | 1001d920, 100e21a0, 1002a490 | |
+| 133 | medium functions | 1001d920, 100e21a0, 1002a490 Block_Update | Block_Update open (model address register); 1001d920 (camera target lock) and 100e21a0 (per-kind enemy hit reactions) left |
 | 134 | medium functions | 1002f050, 10016700, 1016b400 | |
 | 135 | medium functions | 10001170, 1014b750, 1016a980 | |
 | 136 | medium functions | 10148590, 100b1520, 10142dd0 | |
@@ -207,3 +207,5 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 143 | medium functions | 10055690 retry, 1013f070 neighbours: 10148590, 1014b750 | |
 | 144 | medium functions | 1019b350, 10037560, 1014e940 | |
 | 145 | medium functions | 1017c5f0, 10166520, 1005dbf0 | |
+| 146 | medium functions | 10165e00, 1000baf0, 10192200 | |
+| 147 | medium functions | 10048b70, 100b5f80, 1009dfd0 | |

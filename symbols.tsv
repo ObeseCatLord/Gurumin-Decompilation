@@ -835,3 +835,4 @@ address	name	evidence
 1002ebf0	DamageZone_Update	zone box hurts enemies 0x3a-0x5b, every step-th per frame (decomp/src/damage_zone.cpp)
 10058500	Switch_UpdateEffects	every 12 frames restarts the effects of visible held switch objects (decomp/src/switch_effects.cpp)
 10057c40	Switch_Hold	puts an object in a free switch hold slot, sets the holder's hold bit or object bonus (decomp/src/switches.cpp)
+1002a490	Block_Update	sinking block: drops when DAT_10db0544 < half, rises, pushes the player (decomp/src/pushing_platform.cpp)

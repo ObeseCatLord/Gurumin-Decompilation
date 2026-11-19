@@ -133,21 +133,14 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (6)
+## 2. Small functions (30-250 bytes) (3)
 
 - [ ] `1000cf80` 33 bytes
-- [ ] `10002300` 39 bytes Game::SetScriptFlag
-- [ ] `10008430` 45 bytes PointInRectEdges
-- [ ] `100022b0` 72 bytes Game::TestScriptFlag
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (64)
+## 3. Medium functions (251-800 bytes) (60)
 
-- [ ] `10002330` 262 bytes Game::ReadWordInLine (loops 6)
-- [ ] `10002190` 277 bytes Game::ReadWord (loops 8)
-- [ ] `100552f0` 285 bytes Game::ForEachActiveTrigger (loops 1, calls 2)
-- [ ] `10054610` 338 bytes Game::FindMapEntry (loops 4, calls 2)
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
 - [ ] `1000c020` 465 bytes (loops 8, calls 2)

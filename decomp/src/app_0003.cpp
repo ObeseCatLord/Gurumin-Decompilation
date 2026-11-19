@@ -341,12 +341,6 @@ int Game::IsQueuedEventReady()
         if (queuedEvents[i][0] > 0 && queuedEvents[i][1] == 0)
             ids[count++] = queuedEvents[i][0];
     }
-                TestScriptFlag(queuedTriggers[t].flags[0]) && TestScriptFlag(queuedTriggers[t].flags[1]) &&
-                TestScriptFlag(queuedTriggers[t].flags[2]) && TestScriptFlag(queuedTriggers[t].flags[3]))
-                return 1;
-        }
-    }
-#else
     for (int t = 0; t < queuedTriggerCount; t++)
     {
         for (int j = 0; j < count; j++)
@@ -358,6 +352,5 @@ int Game::IsQueuedEventReady()
                 return 1;
         }
     }
-#endif
     return 0;
 }

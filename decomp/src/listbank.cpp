@@ -63,6 +63,7 @@ struct ListBank
     int ReadArgument(char **text, char *word);
     int ReadWord(char **text, char *word);
     int FindCase(const char *value, char *text, char **found);
+    int FindLabel(const char *name, char *text, char **found);
     int ReadTerm(char **text, char *word);
     int CompileStatement(const char *statement);               // 0x100ed9b0
     int CompileText();
@@ -987,12 +988,11 @@ int ListBank::FindCase(const char *value, char *text, char **found)
             }
             text += 2;
         }
-        char c = *text;
-        if (c == '(')
+        if (*text == '(')
             parens++;
-        else if (c == ')')
+        else if (*text == ')')
             parens--;
-        if (c == '"')
+        if (*text == '"')
         {
             if (quoted == 1)
                 quoted = 0;
@@ -1001,12 +1001,74 @@ int ListBank::FindCase(const char *value, char *text, char **found)
         }
         if (quoted == 0 && parens == 0)
         {
-            if (c == '{')
+            if (*text == '{')
             {
                 braces++;
                 opened = 1;
             }
-            if (c == '}')
+            if (*text == '}')
+                braces--;
+        }
+        if (opened != 0 && braces == 0)
+            return 0;
+        count++;
+    }
+    return 0;
+}
+
+// 0x10055aa0 (ListBank::FindLabel). Looks for the label `name:` (for goto) directly inside the block that starts at
+// `text`, the same way FindCase looks for `case <value>`: outside quotes and parentheses and at brace depth 1, with
+// the colon right after the name. The word read there may end in spaces, tabs or the colon. On a match `found` is
+// set to the label's first character and 1 is returned; 0 when the block or the text ends, or on a parse error.
+int ListBank::FindLabel(const char *name, char *text, char **found)
+{
+    char word[0x100];
+    int quoted = 0;
+    int parens = 0;
+    int braces = 0;
+    int opened = 0;
+    int count = 0;
+    int length = strlen(name);
+    for (; text < &this->text[textLength]; text++)
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (quoted == 0 && parens == 0 && braces == 1 && count >= length - 1 && text[length + 1] == ':')
+        {
+            text++;
+            char *label = text;
+            ReadWord(&label, word);
+            for (int i = (int)strlen(word) - 1; i > 0; i--)
+            {
+                if (word[i] == ' ' || word[i] == '	' || word[i] == ':')
+                    word[i] = 0;
+            }
+            if (strcmp(name, word) == 0)
+            {
+                *found = text;
+                return 1;
+            }
+            text += 2;
+        }
+        if (*text == '(')
+            parens++;
+        else if (*text == ')')
+            parens--;
+        if (*text == '"')
+        {
+            if (quoted == 1)
+                quoted = 0;
+            else if (quoted == 0)
+                quoted = 1;
+        }
+        if (quoted == 0 && parens == 0)
+        {
+            if (*text == '{')
+            {
+                braces++;
+                opened = 1;
+            }
+            if (*text == '}')
                 braces--;
         }
         if (opened != 0 && braces == 0)

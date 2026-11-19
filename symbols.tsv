@@ -880,3 +880,5 @@ address	name	evidence
 1016ac90	Camera_CollectPaths	fills the camera path tables from the kind-2 nodes of a scene (matched, decomp/src/camera_path_select.cpp)
 10023d30	Map_Unload	frees the map objects and models and clears the per-map tables (decomp/src/map_unload.cpp)
 10148590	TexturePool_Get	video-memory copy of a pooled buffer, created on demand with LRU eviction (decomp/src/buffer_pool.cpp)
+1004f860	TutorialBook_PrevPage	loads the two previous unlocked tutorial pages, turns the sheet back (pagedown) or shows the first-page message
+10055aa0	ListBank::FindLabel	finds a goto label name: inside the block at the given text (matched, decomp/src/listbank.cpp)

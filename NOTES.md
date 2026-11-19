@@ -183,6 +183,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `sub reg, 5` came from the subtraction inside the macro argument.
 - Texture_Load (0x1001e1a0) is also an inline helper: functions that load a fixed texture expand it, including
   three `strlen` loops over the literal (0x10050460). `include/texture_load.h` holds it as `LoadTexture`.
+- **Jump threading** of character tests: with `char c = *text;` cl 13.00 knows after `c == '('` that `c != '"'`
+  and jumps past the later tests (blocks moved, about 15 bytes longer). Writing `*text == ...` in every test leaves
+  the threading out; the loads are still merged into one register later (ListBank::FindCase 0x100558d0,
+  ListBank::FindLabel 0x10055aa0).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

@@ -59,6 +59,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
 - [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
+- [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054770` 506 — Game::MarkKilled: same statements; like RaiseGameOverEvents the original walks the events with two pointers (&flags[1] and &ids[0]) and keeps this in ebp, cl 13.00 here one event pointer and this in ebx (pointer and indexed forms tried)
 - [ ] `10054970` 239 — Game::RaiseKskonEvents: same loop-pointer residue as 0x10054a60 (original biases the event pointer to flags[1], cl 13.00 here to argument)
@@ -69,7 +70,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10054f30` 476 — Game::RaiseLeverEvents: same loop-pointer residue as 0x10054a60
 - [ ] `10055110` 476 — Game::RaiseDoorEvents: same loop-pointer residue as 0x10054a60
 - [ ] `10055690` 566 — Game::IsQueuedEventReady: the unrolled collection loop matches; in the trigger loop the original steps a pointer equal to this + t*200 and addresses every field with its full offset, ours folds 0x1f9780 into the pointer; trigger-pointer and comparison-order forms tried
-- [ ] `100558d0` 449 — ListBank::FindCase: same statements; the original keeps the brace block once (after the quote block, re-zeroing ebx after opened = 1), cl 13.00 here copies it into the parenthesis path (jump threading, 15 bytes longer); else-if, combined-test and quote-order forms tried
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
@@ -148,17 +148,15 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 
-## 2. Small functions (30-250 bytes) (3)
+## 2. Small functions (30-250 bytes) (2)
 
 - [ ] `1000cf80` 33 bytes
-- [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (34)
+## 3. Medium functions (251-800 bytes) (33)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
-- [ ] `10055aa0` 496 bytes (loops 5, calls 2)
 - [ ] `100092c0` 535 bytes (float, loops 1, calls 6)
 - [ ] `10055ca0` 562 bytes (loops 6, calls 6)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)

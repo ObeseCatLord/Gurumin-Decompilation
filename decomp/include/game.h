@@ -8,7 +8,8 @@ struct GameTrigger
     int value;                  // 0x14: event id (for map events)
     char name[0x10];            // 0x18: event name, e.g. "GAMEOVER", "KSKON", "TALK", "OPEN"
     int argument;               // 0x28: what the event reacts to (for example the character or object id)
-    char pad_002c[0x9c];
+    int ids[5];                 // 0x2c: with `argument`, the six ids a "DEAD" event waits for
+    char pad_0040[0x88];
 };
 
 // Per-window entry table: 0x80 menu entries (a pointer to the variable an entry sets, or for value entries the
@@ -145,7 +146,7 @@ struct Game : Object
     int end;                    // 0x3ed984: text length
     char token[0x480];          // 0x3ed988: the token read last
     int queuedEvents[0x100][2]; // 0x3ede08: queued event ids (> 0) and whether each was handled (non-zero)
-    char pad_3ee608[0x80];
+    char killed[0x80];          // 0x3ee608: 1 for each id killed (entry 0 is always set)
     int currentMap;             // 0x3ee688: number of the loaded map
     int pad_3ee68c[2];
     int m_3ee694[4000];
@@ -182,6 +183,7 @@ struct Game : Object
     int RaiseDoorEvents(int argument, int on);
     int RegisterEvent(int id);  // 0x100020d0 (flag_list.cpp: FlagOwner::M_100020d0)
     int RaiseGameOverEvents();
+    int MarkKilled(int id);
     int FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value);
     int SetScriptFlag(int index, int value);
     int ReadWord();

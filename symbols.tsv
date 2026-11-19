@@ -862,3 +862,5 @@ address	name	evidence
 101670e0	WorldRenderer::WorldRenderer	constructs the map scene object (decomp/src/world_ctor.cpp)
 1017c9c0	WorldRenderer::Bind	resets the scene object for a new map and stores the model records, callback and data (decomp/src/world_ctor.cpp)
 10167390	WorldRenderer::StartFade	fades the screen to a target percent over n frames (decomp/src/world_ctor.cpp)
+10143e00	Render_FillRect	untextured rectangle on the 640x480 screen with colour, depth and opacity (decomp/src/engine_10143.cpp)
+10054770	Game::MarkKilled	marks an id killed and raises "DEAD" map events whose six ids are all killed (decomp/src/app_0003.cpp)

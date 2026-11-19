@@ -379,3 +379,4 @@ _sqrtf	10002010
 ?LoadCharacter@WorldRenderer@@QAEHPBD@Z	10166950
 ?StartFade@WorldRenderer@@QAEHHHH@Z	10167390
 ?TickFade@WorldRenderer@@QAEXXZ	10167400
+?MarkKilled@Game@@QAEHH@Z	10054770

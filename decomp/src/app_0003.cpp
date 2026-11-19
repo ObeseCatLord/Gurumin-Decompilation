@@ -179,6 +179,38 @@ int Game::RaiseGameOverEvents()
     return 0;
 }
 
+// Marks `id` as killed, then registers every map event named "DEAD" whose map is the current one (or 9999 = any),
+// whose four script flags pass and whose six ids (the argument and ids[0..4], clamped to 0x5f) are all killed.
+// Returns 0.
+int Game::MarkKilled(int id)
+{
+    killed[0] = 1;
+    killed[id] = 1;
+    for (int i = 0; i < mapEventCount; i++)
+    {
+        GameTrigger *event = &mapEvents[i];
+        if (strcmp(event->name, "DEAD") == 0 && (event->map == 9999 || event->map == currentMap) &&
+            TestScriptFlag(event->flags[0]) && TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
+            TestScriptFlag(event->flags[3]))
+        {
+            char count = killed[event->argument > 0x5e ? 0x5f : event->argument] != 0;
+            if (killed[event->ids[0] > 0x5e ? 0x5f : event->ids[0]] != 0)
+                count++;
+            if (killed[event->ids[1] > 0x5e ? 0x5f : event->ids[1]] != 0)
+                count++;
+            if (killed[event->ids[2] > 0x5e ? 0x5f : event->ids[2]] != 0)
+                count++;
+            if (killed[event->ids[3] > 0x5e ? 0x5f : event->ids[3]] != 0)
+                count++;
+            if (killed[event->ids[4] > 0x5e ? 0x5f : event->ids[4]] != 0)
+                count++;
+            if (count == 6)
+                RegisterEvent(event->value);
+        }
+    }
+    return 0;
+}
+
 // Finds the map entry for `map` that applies now (its map is 9999 or the current map, and all four script flags
 // pass) and copies its name, file and title strings and its value out (the three unused arguments are ignored).
 // Returns 1, or 0 when there is none.

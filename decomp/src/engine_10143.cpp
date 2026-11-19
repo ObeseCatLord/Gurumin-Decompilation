@@ -197,6 +197,54 @@ extern "C" int __stdcall FUN_10143bc0(int left, int top, int right, int bottom, 
     return 1;
 }
 
+// 0x10143e00 (Render_FillRect). Draws an untextured rectangle from (left, top) to (right, bottom) given on the
+// 640x480 screen in `colour` with opacity `alpha` (0..1) and depth `z`, after unbinding both texture stages (stage 0
+// passes the vertex colour through). Used for the screen fades and the cinema bars. Returns 1.
+extern "C" int FUN_10143e00(int left, int top, int right, int bottom, unsigned int colour, float z, float alpha)
+{
+    ColourVertex quad[4];
+    FUN_10143b50();
+    FUN_10143b80();
+    quad[3].v = quad[3].u = quad[2].v = quad[1].u = 0;
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    float x0 = (float)left * scaleX;
+    quad[0].x = x0;
+    quad[2].x = x0;
+    float y0 = (float)top * scaleY;
+    quad[0].y = y0;
+    quad[1].y = y0;
+    float x1 = (float)right * scaleX;
+    quad[1].x = x1;
+    quad[3].x = x1;
+    float y1 = (float)bottom * scaleY;
+    quad[2].y = y1;
+    quad[3].y = y1;
+    quad[2].u = quad[1].v = quad[0].v = quad[0].u = 0.001f;
+    int opacity = (int)(alpha * 255.0f);
+    if (opacity > 0xff)
+        opacity = 0xff;
+    else if (opacity < 0)
+        opacity = 0;
+    quad[0].diffuse = quad[1].diffuse = quad[2].diffuse = quad[3].diffuse = (opacity << 24) | colour;
+    quad[0].specular = quad[1].specular = quad[2].specular = quad[3].specular = 0xff000000;
+    quad[0].z = quad[1].z = quad[2].z = quad[3].z = z;
+    quad[0].rhw = quad[1].rhw = quad[2].rhw = quad[3].rhw = 1.0f;
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    FUN_1013ef90(0, 4, 3);                  // alpha: select argument 2
+    FUN_1013ef90(0, 5, 2);                  //   texture
+    FUN_1013ef90(0, 6, 0);                  //   diffuse
+    FUN_1013ef90(0, 1, 3);                  // colour: select argument 2
+    FUN_1013ef90(0, 2, 2);                  //   texture
+    FUN_1013ef90(0, 3, 0);                  //   diffuse
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(5, 2, quad, sizeof(ColourVertex));
+    return 1;
+}
+
 // 0x10144040. Draws a 34x34 blue square (0xff0000ff) in the top-left corner of the screen (from -1 to 33 in x and y), untextured
 // (stage 0 passes the vertex colour through), then sets 2D blend mode 6. Returns 1.
 extern "C" int FUN_10144040(void)

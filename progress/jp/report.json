@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 7.9083,
+  "fuzzy_match_percent": 7.9561,
   "total_code": "1720206",
-  "matched_code": "112617",
-  "matched_code_percent": 6.5467,
+  "matched_code": "113244",
+  "matched_code_percent": 6.5832,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 687,
-  "matched_functions_percent": 56.6832,
+  "matched_functions": 688,
+  "matched_functions_percent": 56.7657,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 201,
-  "complete_units": 124
+  "total_units": 203,
+  "complete_units": 125
  },
  "units": [
   {
@@ -3838,6 +3838,48 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/containers.cpp"
+   }
+  },
+  {
+   "name": "app/damage_zone",
+   "measures": {
+    "fuzzy_match_percent": 31.25,
+    "total_code": "628",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "628",
+     "fuzzy_match_percent": 31.25
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1002ebf0",
+     "size": "628",
+     "fuzzy_match_percent": 31.25,
+     "metadata": {
+      "virtual_address": "268626928"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/damage_zone.cpp"
    }
   },
   {
@@ -8569,6 +8611,48 @@
    }
   },
   {
+   "name": "app/npc_greet",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "627",
+    "matched_code": "627",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "627",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "627",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_100b8220",
+     "size": "627",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269189664"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/npc_greet.cpp"
+   }
+  },
+  {
    "name": "app/object_spawn",
    "measures": {
     "fuzzy_match_percent": 100.0,
@@ -13278,13 +13362,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1568713",
+    "total_code": "1567458",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 405,
+    "total_functions": 403,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -13297,7 +13381,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1568713",
+     "size": "1567458",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -13868,14 +13952,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268621024"
-     }
-    },
-    {
-     "name": "FUN_1002ebf0",
-     "size": "628",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268626928"
      }
     },
     {
@@ -15148,14 +15224,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269187856"
-     }
-    },
-    {
-     "name": "FUN_100b8220",
-     "size": "627",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269189664"
      }
     },
     {

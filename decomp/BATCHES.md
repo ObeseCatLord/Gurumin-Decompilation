@@ -191,7 +191,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 127 | medium functions | 100236c0 Overlay_DrawModel, 1000f5a0, 1001f270 | Overlay_DrawModel matched; 1000f5a0 (camera matrices from the map's camera node) and 1001f270 (nearest movie screen and its fade) left: many unnamed globals |
 | 128 | medium functions | 1017c9c0, 1015c450 DShowStream::Open, 101629f0 | DShowStream::Open open (cross-jumped failure messages); its Close (was SurfaceSet::Release) moved into dshow_stream.cpp; 1017c9c0 (big object reset) and 101629f0 (model constructor) need their class layouts first |
 | 129 | medium functions | 100ba040, 1019b630, 1003aef0 Bgm_Play | Bgm_Play matched; 100ba040 (talk prompt near NPCs, many globals) and 1019b630 (recursive bone blend) left |
-| 130 | medium functions | 100b8220, 1002ebf0, 100b9930 | |
+| 130 | medium functions | 100b8220 Npc_Greet, 1002ebf0 DamageZone_Update, 100b9930 | Npc_Greet matched; DamageZone_Update open (index register); 100b9930 (enemy retreat behaviour) left |
 | 131 | medium functions | 10058500, 10192a00, 10045c30 | |
 | 132 | medium functions | 1004f250, 10057c40, 1000d6b0 | |
 | 133 | medium functions | 1001d920, 100e21a0, 1002a490 | |
@@ -201,3 +201,5 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 137 | medium functions | 10149100, 10037560, 10144bf0 | |
 | 138 | medium functions | 1014e940 TextureObject::DrawFrameAlt, 1014ec30, 1017c5f0 | |
 | 139 | medium functions | 10166520, 1005dbf0, 10165e00 | |
+| 140 | medium functions | 10048b70, 10192200, 1000baf0 | |
+| 141 | medium functions | 100b5f80, 1009dfd0, 101453e0 Font_DrawGlyph | |

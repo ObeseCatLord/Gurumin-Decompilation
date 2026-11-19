@@ -3,12 +3,15 @@
 
 #include <string.h>
 
+#include <stdio.h>
+
 struct Vec4
 {
     float x;
     float y;
     float z;
     float w;
+    int InRect(const struct Box2 *box);          // 0x101ac7c0 (vec_math.cpp)
 };
 
 // Four floats with the Vec4 setter (0x101ac9c0).
@@ -42,6 +45,11 @@ struct EffectManager
     // Starts effect `effect` at `position`; the seven values are its options (colour, follow target, flags, ...;
     // callers mostly pass -1 and 0). Stores the effect handle in *handle.
     int M_10172350(int effect, Vec4 position, int a, int b, int c, int d, int e, int f, int g, int *handle);
+    int Draw(const struct Matrix4 &view, int unused, unsigned char pass);
+    int DrawRecord(int record, const struct Matrix4 &view, int unused, int pass);   // 0x10189530
+    int DrawSpriteA(int index, const struct Matrix4 &view, int unused);            // 0x101890f0
+    int DrawSpriteB(int index, const struct Matrix4 &view, int unused);            // 0x10189340
+    int DrawLight(int index, const struct Matrix4 &view, int unused);              // 0x10187520
 };
 
 extern "C" EffectManager DAT_10daaa80;
@@ -58,6 +66,8 @@ extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int a, int b, 
 struct TriangleBatch
 {
     int SetBuffer(void *buffer, int capacity);  // 0x10172a80
+    int Reset();                                // 0x10172aa0
+    void Flush();                               // 0x101733f0
 };
 
 // Effect slot tables.
@@ -67,11 +77,17 @@ struct EffectRecordA
     int next;                 // 0x04: next record of its list, -1 = last
     int id;                   // 0x08: -1 = free
     int parent;               // 0x0c: record this effect is attached to, -1 = none
-    char pad_0010[0x182];
+    char pad_0010[0x14];
+    Vec4 positions[0x16];     // 0x24: positions of the effect's parts
+    char pad_0184[0xa];
+    char part;                // 0x18e: the part whose position decides visibility
+    char pad_018f[3];
     short light;              // 0x192: entry of DAT_118e99f8 (0x4014-byte records) this effect uses, 0 = none
     char pad_0194[0xd];
     unsigned char flags;      // 0x1a1: 1 = also updated in the restricted pass, 2 = only updated when hidden effects are
-    char pad_01a2[0x1e];
+    char pad_01a2[4];
+    char drawn;               // 0x1a6: 1 once drawn this frame (list 1)
+    char pad_01a7[0x19];
     int owner;                // 0x1c0: character slot that started the effect
     char pad_01c4[0x14];
     int *pause;               // 0x1d8: when it points to a non-zero value the effect is paused
@@ -372,5 +388,110 @@ int EffectManager::Init()
         m_0010[i] = offsets[i];
     }
     FUN_1016f900();
+    return 0;
+}
+
+extern "C" struct Box2 DAT_10f668a8;                 // the visible area
+extern "C" float DAT_10f668c0;                       // its depth limit
+extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
+
+// Effect records whose slot is free must not be in a list: crash on purpose (fread on a null file).
+#define CHECK_RECORD(i)     if (DAT_1115cfe8[i].id == -1)         fread(0, 1, 1, 0)
+
+// 0x10190e30 (EffectManager::Draw). Draws the effects of render pass `pass`: pass 1 draws the list-1 effects whose
+// part is in the visible area and in front of its depth limit (+20), marking them drawn; other passes draw their own
+// list, pass 0 also the list-1 effects not drawn yet. Then the sprites of both tables in the pass's range, and in
+// pass 0 the effect lights. Returns 0.
+int EffectManager::Draw(const Matrix4 &view, int unused, unsigned char pass)
+{
+    FUN_1013f070(3, 1, 0xf);
+    FUN_1013f070(7, 1, 0);
+    FUN_1013f070(9, 0, 0);
+    int ranges[10] = {0, 0x1cc, 0x244, 0x2a8, 0x2f8, 0x1cc, 0x244, 0x2a8, 0x2f8, 0x348};   // first, then end per pass
+    DAT_1101c804.Reset();
+    int i;
+    if (pass == 1)
+    {
+        for (i = DAT_1101d820[1]; i > -1; i = DAT_1115cfe8[i].next)
+        {
+            if (DAT_1115cfe8[i].id == -1)
+                fread(0, 1, 1, 0);
+            else
+            {
+                if (DAT_1115cfe8[i].positions[DAT_1115cfe8[i].part].InRect(&DAT_10f668a8) != 0 &&
+                    DAT_10f668c0 + 20.0f > DAT_1115cfe8[i].positions[DAT_1115cfe8[i].part].z)
+                {
+                    FUN_1013f070(10, 1, 0);
+                    DrawRecord(i, view, unused, 1);
+                    DAT_1115cfe8[i].drawn = 1;
+                }
+                else
+                    DAT_1115cfe8[i].drawn = 0;
+                CHECK_RECORD(i);
+            }
+        }
+    }
+    else
+    {
+        for (i = DAT_1101d820[pass]; i > -1; i = DAT_1115cfe8[i].next)
+        {
+            if (DAT_1115cfe8[i].id == -1)
+                fread(0, 1, 1, 0);
+            else
+            {
+                FUN_1013f070(10, 1, 0);
+                DrawRecord(i, view, unused, pass);
+                CHECK_RECORD(i);
+            }
+        }
+        if (pass == 0)
+        {
+            for (i = DAT_1101d820[1]; i > -1; i = DAT_1115cfe8[i].next)
+            {
+                if (DAT_1115cfe8[i].id == -1)
+                    fread(0, 1, 1, 0);
+                else
+                {
+                    if (DAT_1115cfe8[i].drawn == 0)
+                    {
+                        FUN_1013f070(10, 1, 0);
+                        DrawRecord(i, view, unused, 0);
+                        DAT_1115cfe8[i].drawn = 1;
+                    }
+                    CHECK_RECORD(i);
+                }
+            }
+        }
+    }
+    FUN_1013f070(3, 1, 0xf);
+    FUN_1013f070(7, 1, 0);
+    FUN_1013f070(10, 1, 0);
+    int first = ranges[pass];
+    int end = ranges[pass + 5];
+    int sprite;
+    for (sprite = first; sprite < end; sprite++)
+    {
+        if (DAT_11134cc8[sprite].id != -1)
+            DrawSpriteA(sprite, view, unused);
+    }
+    FUN_1013f070(10, 1, 0);
+    for (sprite = first; sprite < end; sprite++)
+    {
+        if (DAT_118a8888[sprite].id != -1)
+            DrawSpriteB(sprite, view, unused);
+    }
+    if (pass == 0)
+    {
+        for (i = 0; i < 0x80; i++)
+        {
+            if (DAT_118e99f8[i].active != 0)
+                DrawLight(i, view, unused);
+        }
+    }
+    DAT_1101c804.Flush();
+    FUN_1013f070(0, 0, 0);
+    FUN_1013f070(9, 1, 0);
+    FUN_1013f070(0xc, 1, 0);
+    FUN_1013f070(10, 0, 0);
     return 0;
 }

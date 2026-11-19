@@ -864,3 +864,5 @@ address	name	evidence
 10167390	WorldRenderer::StartFade	fades the screen to a target percent over n frames (decomp/src/world_ctor.cpp)
 10143e00	Render_FillRect	untextured rectangle on the 640x480 screen with colour, depth and opacity (decomp/src/engine_10143.cpp)
 10054770	Game::MarkKilled	marks an id killed and raises "DEAD" map events whose six ids are all killed (decomp/src/app_0003.cpp)
+1001d2d0	DigitCounter_Update	three-digit counter on a model: digit nodes play Zaro..Nine / to0ne..toZaro motions (decomp/src/digit_counter.cpp)
+10034920	Bs003_SetVariant	loads one of five texture variants of the BS_003 model and puts them on its parts (matched, decomp/src/bs003_variant.cpp)

@@ -317,3 +317,6 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Structures with many member arrays (WorldRenderer, 0x1410d0 bytes) are easiest to lay out with a generator that
   takes (offset, size, declaration) rows and emits the padding; a constructor that constructs the members in order
   checks the layout (world_ctor.cpp).
+- Texture loads by literal name (`FUN_10174ce0(FUN_1013f8a0(name, 0), 0, 0)`) come from a one-line inline helper
+  (`LoadIti`, face_anim.cpp / bs003_variant.cpp); the full `LoadTexture` of texture_load.h is not inlined at /Ob1.
+  Repeated loads at the end of switch cases are cross-jumped into one call, so write each case in full.

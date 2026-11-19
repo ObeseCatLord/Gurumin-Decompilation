@@ -133,3 +133,4 @@ address	status	reason
 1016b050	open	Camera_SelectPath: body identical apart from the camera-target pointer register (eax vs ecx); the original pushes all four registers before the id == -1 test and stores the 0 as an immediate (no shrink-wrapping), cl 13.00 here shrink-wraps the early return; inverted if tried
 10143e00	open	Render_FillRect: 6 bytes; the original copies the second and third corner values through ecx and edx, ours through eax (corner locals, chained stores, declaration and statement orders tried)
 10054770	open	Game::MarkKilled: same statements; like RaiseGameOverEvents the original walks the events with two pointers (&flags[1] and &ids[0]) and keeps this in ebp, cl 13.00 here one event pointer and this in ebx (pointer and indexed forms tried)
+1001d2d0	open	DigitCounter_Update: blocks and cases in place; the original keeps the state offset (index * 0x40) in edi and the divisor 10 in ebx, ours swaps them (and pushes ebx/edi around the first test)

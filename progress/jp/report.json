@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 9.7488,
+  "fuzzy_match_percent": 9.8394,
   "total_code": "1720206",
-  "matched_code": "139730",
-  "matched_code_percent": 8.1229,
+  "matched_code": "140569",
+  "matched_code_percent": 8.1716,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 714,
-  "matched_functions_percent": 58.9109,
+  "matched_functions": 715,
+  "matched_functions_percent": 58.9934,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 217,
-  "complete_units": 132
+  "total_units": 219,
+  "complete_units": 133
  },
  "units": [
   {
@@ -2122,6 +2122,48 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/box_overlap.cpp"
+   }
+  },
+  {
+   "name": "app/bs003_variant",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "839",
+    "matched_code": "839",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "839",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "839",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10034920",
+     "size": "839",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268650784"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/bs003_variant.cpp"
    }
   },
   {
@@ -4296,6 +4338,48 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/dialog_yesno.cpp"
+   }
+  },
+  {
+   "name": "app/digit_counter",
+   "measures": {
+    "fuzzy_match_percent": 62.3438,
+    "total_code": "1154",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1154",
+     "fuzzy_match_percent": 62.3438
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1001d2d0",
+     "size": "1154",
+     "fuzzy_match_percent": 62.3438,
+     "metadata": {
+      "virtual_address": "268554960"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/digit_counter.cpp"
    }
   },
   {
@@ -14118,13 +14202,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1533682",
+    "total_code": "1531689",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 368,
+    "total_functions": 366,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14137,7 +14221,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1533682",
+     "size": "1531689",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -14415,14 +14499,6 @@
      }
     },
     {
-     "name": "FUN_1001d2d0",
-     "size": "1154",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268554960"
-     }
-    },
-    {
      "name": "FUN_1001d920",
      "size": "666",
      "fuzzy_match_percent": 0.0,
@@ -14684,14 +14760,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268648976"
-     }
-    },
-    {
-     "name": "FUN_10034920",
-     "size": "839",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268650784"
      }
     },
     {

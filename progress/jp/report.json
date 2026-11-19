@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.2058,
+  "fuzzy_match_percent": 11.2256,
   "total_code": "1720206",
   "matched_code": "154615",
   "matched_code_percent": 8.9882,
@@ -13401,14 +13401,14 @@
   {
    "name": "app/tutorial_page_next",
    "measures": {
-    "fuzzy_match_percent": 45.0053,
-    "total_code": "960",
+    "fuzzy_match_percent": 47.876,
+    "total_code": "1615",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 2,
+    "total_functions": 3,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -13421,8 +13421,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "960",
-     "fuzzy_match_percent": 45.0053
+     "size": "1615",
+     "fuzzy_match_percent": 47.876
     }
    ],
    "functions": [
@@ -13440,6 +13440,14 @@
      "fuzzy_match_percent": 46.2924,
      "metadata": {
       "virtual_address": "268761184"
+     }
+    },
+    {
+     "name": "_FUN_1004f250",
+     "size": "655",
+     "fuzzy_match_percent": 52.0833,
+     "metadata": {
+      "virtual_address": "268759632"
      }
     }
    ],
@@ -14722,13 +14730,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1504672",
+    "total_code": "1504017",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 335,
+    "total_functions": 334,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14741,7 +14749,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1504672",
+     "size": "1504017",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -15528,14 +15536,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268758368"
-     }
-    },
-    {
-     "name": "FUN_1004f250",
-     "size": "655",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268759632"
      }
     },
     {

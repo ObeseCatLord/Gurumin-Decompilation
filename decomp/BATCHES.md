@@ -262,6 +262,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 199 | medium functions | 100ba040, 100b9930, 1004f250 | 100b9930 Enemy_DragToPit open (one float copy) |
 | 201 | medium functions | 100ba040, 1004f250, 10045c30 | 100ba040 Npc_PlayGreeting open; pick.py now keeps line endings |
 | 202 | medium functions | 1004f250, 10045c30, 10037560 | 10045c30 Npc_WaitFacingAway matched (if/else calls, block-scoped turn, no pointer local) |
-| 203 | medium functions | 1004f250, 10037560, 10016700 | |
+| 203 | medium functions | 1004f250, 10037560, 10016700 | 1004f250 TutorialBook_Close open (registers) |
+| 204 | medium functions | 10037560, 10016700, 1014b750 | |
 | 200 | wall retries | float-compare walls, MarkKilled | MarkKilled and Vec4::InTriangle still open (register roles, return-block placement) |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

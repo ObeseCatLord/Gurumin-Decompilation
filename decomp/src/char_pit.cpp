@@ -93,8 +93,7 @@ extern "C" int FUN_100b9930(int index)
     position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     toPlayer.Copy(player - position);
     DAT_1020b430[index].frame++;
-    CharacterBody *body = &DAT_10db6ee8[index];
-    body->model.PlayMotion(1, 0, 5, 1.0f);
+    DAT_10db6ee8[index].model.PlayMotion(1, 0, 5, 1.0f);
     DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y);
     move.y = -180.0f;
     move.RotateZ(-DAT_10db6ee8[index].heading);
@@ -102,7 +101,7 @@ extern "C" int FUN_100b9930(int index)
         move.z = 5.0f;
     FUN_100241e0(index, move.x, move.y, move.z);
     move.z = 10.0f;
-    if (DAT_1020b430[index].frame < 0x96 && body->model.IsClearOfMapLimited(&move) == 0)
+    if (DAT_1020b430[index].frame < 0x96 && DAT_10db6ee8[index].model.IsClearOfMapLimited(&move) == 0)
         DAT_1020b430[index].frame = 0x96;
     int frames = DAT_1020b430[index].frame;
     if (frames > 0x96)
@@ -115,7 +114,7 @@ extern "C" int FUN_100b9930(int index)
     }
     if (frames >= 0xa5)
     {
-        body->model.SetPosition(-200000.0f, 0, 0);
+        DAT_10db6ee8[index].model.SetPosition(-200000.0f, 0, 0);
         DAT_10867e18[index].x = -200000.0f;
     }
     if (DAT_104bfe28 != 0 && DAT_104bfe24 - 25.0f > DAT_10db6ee8[index].matrix.m[14])

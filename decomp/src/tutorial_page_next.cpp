@@ -3,6 +3,7 @@
 // second book (DAT_104c03e8) show the placeholder dpartsbf.bmp instead.
 
 #include <string.h>
+#include "texture_load.h"
 
 // "最後のページです。" ("This is the last page."), Shift-JIS.
 #define LAST_PAGE_TEXT "\x8d\xc5\x8c\xe3\x82\xcc\x83\x79\x81\x5b\x83\x57\x82\xc5\x82\xb7\x81\x42"
@@ -44,6 +45,7 @@ extern "C" int DAT_10c62edc[0x1000];                 // script flags
 extern "C" Node *DAT_104c03cc;                       // the turning sheet
 extern "C" Node *DAT_104c03d0;                       // the right half
 extern "C" Node *DAT_104c03d4;                       // the left half
+extern "C" Node *DAT_104c03d8;                       // the book cover
 extern "C" int DAT_102239c8;                         // frames per animation step
 extern "C" int DAT_104bfd4c;
 extern "C" char DAT_104c01fc;
@@ -311,5 +313,85 @@ extern "C" int FUN_1004f860(void)
     }
     DAT_10836c70.ResetNext();
     FUN_1003ad20(0x3be, 0, 1.0f);
+    return 0;
+}
+
+// 0x1004f250 (TutorialBook_Close). Starts closing the book (state 5): loads the cover texture (LoadTexture, inline)
+// and the first two pages from the left one on, the sheet turns back ("pagedown") with the first page and the
+// cover, the halves stop ("stop0" with the second page, "stop2") and the cover closes ("close"); the book sound
+// 0x3bd plays. Returns 0.
+extern "C" int FUN_1004f250(void)
+{
+    DAT_104c03e4 = 5;
+    DAT_104c03e0 = 0;
+    int cover = LoadTexture(DAT_102028e8[0], 0);
+    int found = 0;
+    DAT_1030b870[0] = cover;
+    int left = cover;
+    int right = cover;
+    for (int i = DAT_102194c0; i < 0x22; i++)
+    {
+        int flag = DAT_1030c908[i];
+        if (flag == 0)
+            continue;
+        if (found == 0)
+        {
+            if (DAT_104c03e8 == 0 || flag == -1 || (flag > 0 && DAT_10874848.TestScriptFlag(flag) != 0))
+            {
+                left = FUN_1001e1a0(DAT_102028e8[i], 0);
+                DAT_1030b870[i] = left;
+            }
+            else
+            {
+                left = FUN_1001e1a0(DAT_10202a48, 0);
+                DAT_1030b870[0x16] = left;
+            }
+            found = 1;
+        }
+        else
+        {
+            if (DAT_104c03e8 != 0)
+            {
+                if (DAT_1030c908[i] == -1)
+                {
+                    right = FUN_1001e1a0(DAT_102028e8[i], 0);
+                    DAT_1030b870[i] = right;
+                }
+                else if (DAT_1030c908[i] > 0 && DAT_10874848.TestScriptFlag(DAT_1030c908[i]) != 0)
+                {
+                    right = FUN_1001e1a0(DAT_102028e8[i], 0);
+                    DAT_1030b870[i] = right;
+                }
+                else
+                {
+                    right = FUN_1001e1a0(DAT_10202a48, 0);
+                    DAT_1030b870[0x16] = right;
+                }
+            }
+            else
+            {
+                right = FUN_1001e1a0(DAT_102028e8[i], 0);
+                DAT_1030b870[i] = right;
+            }
+            break;
+        }
+    }
+    if (DAT_104c03cc != 0)
+    {
+        DAT_104c03cc->SetMaterialValue("paper2", left);
+        DAT_104c03cc->SetMaterialValue("paper", cover);
+        DAT_104c03cc->RestartColourPlugs("pagedown", DAT_102239c8 * 2);
+    }
+    if (DAT_104c03d0 != 0)
+    {
+        DAT_104c03d0->SetMaterialValue("paper", right);
+        DAT_104c03d0->RestartColourPlugs("stop0", DAT_102239c8 * 2);
+    }
+    if (DAT_104c03d4 != 0)
+        DAT_104c03d4->RestartColourPlugs("stop2", DAT_102239c8 * 2);
+    if (DAT_104c03d8 != 0)
+        DAT_104c03d8->RestartColourPlugs("close", DAT_102239c8 * 2);
+    DAT_10836c70.ResetNext();
+    FUN_1003ad20(0x3bd, 0, 1.0f);
     return 0;
 }

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (135)
+## 1. Walls to retry (136)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -60,6 +60,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
+- [ ] `1004f250` 655 — TutorialBook_Close draft: flow and calls match (LoadTexture inline for the cover); the page loop registers differ (original: first page in edi, second in ebp, name pointer in ebx), like the other TutorialBook functions; declaration orders tried
 - [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
 - [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
@@ -152,11 +153,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (22)
+## 3. Medium functions (251-800 bytes) (21)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
-- [ ] `1004f250` 655 bytes (loops 4, calls 19)
 - [ ] `100e21a0` 671 bytes (float, loops 2, calls 19)
 - [ ] `1002f050` 690 bytes (float, calls 4)
 - [ ] `10016700` 694 bytes (float, loops 3, calls 12)

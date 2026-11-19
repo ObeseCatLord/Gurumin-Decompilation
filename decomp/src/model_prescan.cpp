@@ -56,7 +56,8 @@ int Node::LoadIt3(const char *path, int a, int b)
     if (DAT_10f65538 != 0)
         DAT_10f65538(path, 0);
     GameFile file;
-    if (file.Open(path, "rb") != 0)
+    FILE *opened = file.Open(path, "rb");
+    if (opened != 0)
     {
         memset(name, 0, sizeof(name));
         int keySum = 0;

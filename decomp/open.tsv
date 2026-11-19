@@ -96,7 +96,6 @@ address	status	reason
 10012220	open	Model_ApplyCommands: logic identical; index/model registers swapped (ebp/ebx) and argument loads scheduled differently; two parameter orders tried
 10014d30	open	Helmet_FaceSettings: values and branches identical; the result is kept in esi (eax in the original) and the inline ScriptFlag uses other registers. An unused char buffer reproduces the original /GS cookie
 1003ab40	open	Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
-101abe30	open	Node::LoadIt3 (Model_LoadIt3): identical except the Open result is tested with cmp eax,ebx (zero register) in the original and test eax,eax in ours; FILE* return and earlier locals tried
 10199380	open	Node::FindBone: logic identical; the original keeps 0 in ebx (zero compares, trylevel store, then the loop counter) and frame in edx, ours tests against 0 and keeps frame in ebx; a counter declared at the top and the clamp spellings tried
 10194a10	open	Circle_Intersect (__stdcall): logic identical; the stack slots of d2 and disc are swapped and the original multiplies by d2 after storing (rb2 + ra2); k split, 2.0 factor and early returns tried
 10024d00	open	Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried

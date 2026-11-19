@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 8.4507,
+  "fuzzy_match_percent": 8.4513,
   "total_code": "1720206",
-  "matched_code": "119158",
-  "matched_code_percent": 6.927,
+  "matched_code": "119626",
+  "matched_code_percent": 6.9542,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 694,
-  "matched_functions_percent": 57.2607,
+  "matched_functions": 695,
+  "matched_functions_percent": 57.3432,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 208,
-  "complete_units": 126
+  "complete_units": 127
  },
  "units": [
   {
@@ -7835,28 +7835,28 @@
   {
    "name": "app/model_prescan",
    "measures": {
-    "fuzzy_match_percent": 98.5946,
+    "fuzzy_match_percent": 100.0,
     "total_code": "666",
-    "matched_code": "198",
-    "matched_code_percent": 29.7297,
+    "matched_code": "666",
+    "matched_code_percent": 100.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
     "total_functions": 2,
-    "matched_functions": 1,
-    "matched_functions_percent": 50.0,
-    "complete_code": "0",
-    "complete_code_percent": 0.0,
+    "matched_functions": 2,
+    "matched_functions_percent": 100.0,
+    "complete_code": "666",
+    "complete_code_percent": 100.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 0
+    "complete_units": 1
    },
    "sections": [
     {
      "name": ".text",
      "size": "666",
-     "fuzzy_match_percent": 98.5946
+     "fuzzy_match_percent": 100.0
     }
    ],
    "functions": [
@@ -7871,14 +7871,14 @@
     {
      "name": "?LoadIt3@Node@@QAEHPBDHH@Z",
      "size": "468",
-     "fuzzy_match_percent": 98.0,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270188080"
      }
     }
    ],
    "metadata": {
-    "complete": false,
+    "complete": true,
     "source_path": "decomp/src/model_prescan.cpp"
    }
   },

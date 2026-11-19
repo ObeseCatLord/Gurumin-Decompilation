@@ -1,15 +1,19 @@
 // test.dat: groups of words (each up to 31 characters) read at startup; FUN_1000c020 replaces them in message text.
 // A group starts after one skipped line and ends at an empty line or a ';' line.
 
+#include <mbctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 extern "C" int DAT_104c02b0;                    // number of groups read
 extern "C" int DAT_103084a8[0x80];              // number of words in each group
-// Word tables, indexed by group * 256 + word.
-extern "C" char DAT_1032d870[0x80 * 0x100][0x20];   // the words
-extern "C" char DAT_104487e8[0x80 * 0x100];         // length of each word
-extern "C" unsigned char DAT_1030ceb8[0x80 * 0x100];   // per word, set to 0xff when read
+// Word tables, per group and word.
+extern "C" char DAT_1032d870[0x80][0x100][0x20];    // the words
+extern "C" char DAT_104487e8[0x80][0x100];          // length of each word
+extern "C" unsigned char DAT_1030ceb8[0x80][0x100]; // replacement chosen for each word (0xff = not yet)
+extern "C" int DAT_10c66cc0;                    // non-zero = message words are replaced
+extern "C" int FUN_1013f880(void);               // the game's random number
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // Path_Data
 
 // 0x1000beb0 (TestDat_Load). Reads test.dat from the data folder into the word groups (more than 256 words in a group
@@ -35,10 +39,9 @@ extern "C" int TestDat_Load(void)
                 line[length - 1] = 0;
             if (line[0] == 0 || line[0] == ';')
                 break;
-            int slot = DAT_104c02b0 * 0x100 + count;
-            DAT_1030ceb8[slot] = 0xff;
-            strcpy(DAT_1032d870[slot], line);
-            DAT_104487e8[slot] = strlen(line);
+            DAT_1030ceb8[DAT_104c02b0][count] = 0xff;
+            strcpy(DAT_1032d870[DAT_104c02b0][count], line);
+            DAT_104487e8[DAT_104c02b0][count] = strlen(line);
             count++;
             if (count > 255)
                 fread(0, 1, 1, 0);
@@ -51,4 +54,77 @@ extern "C" int TestDat_Load(void)
     } while (line[0] != 0);
     fclose(file);
     return 1;
+}
+
+// 0x1000c020 (Text_Substitute). Copies message `text` to `out`, replacing words of the test.dat groups (when
+// DAT_10c66cc0 is set): at each double-byte character the longest group word that starts there is replaced by
+// another word of its group, picked at random the first time (up to ten tries to differ from the word itself) and
+// kept for that word afterwards. Text starting with '#' is copied without the '#' and without replacements.
+// Returns 1 when the text was copied unchanged, 0 after the replacement pass.
+extern "C" int FUN_1000c020(char *out, const char *text)
+{
+    if (text[0] == '#')
+    {
+        strcpy(out, text + 1);
+        return 1;
+    }
+    if (DAT_10c66cc0 == 0)
+    {
+        strcpy(out, text);
+        return 1;
+    }
+    *out = 0;
+    while (*text != 0)
+    {
+        if (_ismbblead((unsigned char)*text))
+        {
+            int best = 0;
+            int bestGroup;
+            int bestWord;
+            for (int group = 0; group < DAT_104c02b0; group++)
+            {
+                for (int word = 0; word < DAT_103084a8[group]; word++)
+                {
+                    if (DAT_104487e8[group][word] > best &&
+                        strncmp(text, DAT_1032d870[group][word], DAT_104487e8[group][word]) == 0)
+                    {
+                        best = DAT_104487e8[group][word];
+                        bestGroup = group;
+                        bestWord = word;
+                    }
+                }
+            }
+            if (best != 0)
+            {
+                int pick;
+                if (DAT_1030ceb8[bestGroup][bestWord] != 0xff)
+                    pick = DAT_1030ceb8[bestGroup][bestWord];
+                else
+                {
+                    // first use: another word of the group (at most ten tries)
+                    pick = bestWord;
+                    int tries = 0;
+                    while (pick == bestWord && tries < 10)
+                    {
+                        tries++;
+                        pick = FUN_1013f880() % DAT_103084a8[bestGroup];
+                        DAT_1030ceb8[bestGroup][bestWord] = pick;
+                    }
+                }
+                strcat(out, DAT_1032d870[bestGroup][pick]);
+                out += DAT_104487e8[bestGroup][pick];
+                text += best;
+            }
+            else
+            {
+                *out++ = *text++;
+                *out++ = *text++;
+            }
+        }
+        else
+            *out++ = *text++;
+        *out = 0;
+    }
+    *out = 0;
+    return 0;
 }

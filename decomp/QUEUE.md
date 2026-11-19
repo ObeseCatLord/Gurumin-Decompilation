@@ -21,7 +21,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10009050` 375 — Game::MoveCursor: logic identical; the original shares one stack slot for the int-to-float temporaries, the distance and the speed (frame 4 bytes smaller); shared-variable form tried
 - [ ] `100091d0` 239 — Game text draw (8x16 font): 6 bytes, row/column registers swapped (eax/ecx)
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
-- [ ] `1000beb0` 366 — TestDat_Load: logic identical; ecx/edx swapped for the word slot (operand orders tried)
+- [ ] `1000c020` 465 — Text_Substitute: 15 bytes; in the replacement path the original keeps out in edx (stored once at the loop bottom) and loads best before the copy, ours keeps text in the register and stores out on both paths; the word tables are 2-D now (that fixed the search loop); add orders and declaration orders tried
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
 - [ ] `1000ed20` 77 — original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 - [ ] `1000f360` 300 — face change: calls match; the original keeps index in esi and frame in edi (ours swapped) and indexes the face tables as flat int arrays [set*0x1c0+frame]
@@ -139,16 +139,14 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (60)
+## 3. Medium functions (251-800 bytes) (58)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
-- [ ] `1000c020` 465 bytes (loops 8, calls 2)
 - [ ] `101670e0` 465 bytes (loops 13, calls 14)
 - [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
 - [ ] `10055aa0` 496 bytes (loops 5, calls 2)
 - [ ] `10054770` 506 bytes (loops 1, calls 3)
-- [ ] `1009ddd0` 507 bytes (calls 11)
 - [ ] `10175a90` 507 bytes (loops 4, calls 6)
 - [ ] `1019e610` 526 bytes (loops 3, calls 12)
 - [ ] `100092c0` 535 bytes (float, loops 1, calls 6)

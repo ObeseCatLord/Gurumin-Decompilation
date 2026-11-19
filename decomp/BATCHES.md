@@ -231,5 +231,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 168 | world renderer | 10166950 WorldRenderer::LoadCharacter, 10167390, 1017cc90 | LoadCharacter matched (1488 bytes); 10167390/10167400 are WorldRenderer::StartFade/TickFade (moved from model_params.cpp; StartFade open, 16 bytes); 1017cc90 (draw lists, very large) left |
 | 170 | world renderer | 1017cc90 (draw-list builder), 10189000 WorldRenderer::Seek retry, 101692c0 | |
 | 169 | medium functions | 101453e0 Font_DrawGlyph, 10055aa0, 10054770 | 10054770 Game::MarkKilled open (two-pointer loop, as RaiseGameOverEvents); 10143e00 Render_FillRect open (6 bytes); 10055aa0 (label search) and Font_DrawGlyph left |
-| 171 | medium functions | 1019b630, 10055410, 1004f250 | |
+| 171 | table-like | 100144c0 Ability_GetDescription (generated from the asm skeleton), 1019b630, 10055410 | Ability_GetDescription matched (2146 bytes; int parameter); the others left |
+| 172 | table-like | 100b9bb0, 100b0f00, 100b0250 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

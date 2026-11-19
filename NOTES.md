@@ -307,3 +307,13 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   zero store for the 4th byte (no block copy); replay the stores against the image to recover the strings
   (Text_ToFullWidth 0x1015d520). Test order matters: `(c >= 0x7f && c < 0xa0) || c >= 0xe0` is not the same layout
   as its negation with the branches swapped.
+- `(flags & 0x80) == 0x80` on an unsigned value compiles to `test al, al / jns`; on an `int` it stays
+  `and ecx, 0x80 / cmp cl, 0x80` (Ability_GetDescription 0x100144c0, whose parameter is therefore `int`).
+- A loop that clears two arrays of the same length (`for (i < 0x42) { a[i] = 0; ...rest... }`) is split by cl:
+  the plain clear becomes a `rep stosd` scheduled into the code before the loop, which changes the loop's registers;
+  a separate `memset` before the loop does not give the same code (Map_ResetOnEnter 0x10023900).
+- Small local char buffers: the declared size changes the frame layout. `char number[8]` (only five bytes used)
+  matched WorldRenderer::LoadCharacter where `[5]`/`[6]` put it below another local.
+- Structures with many member arrays (WorldRenderer, 0x1410d0 bytes) are easiest to lay out with a generator that
+  takes (offset, size, declaration) rows and emits the padding; a constructor that constructs the members in order
+  checks the layout (world_ctor.cpp).

@@ -19,7 +19,7 @@ address	name	evidence
 10064630	Menu_SaveLoad	save/load/quit confirmation texts, gdata%02d.sav
 10112140	Menu_Main	main menu, shop, sound config, name entry, gdata%02d.sav
 10137b10	Screenshot_Capture	"%s\capture\capture%05d.jpg"
-100144c0	Ability_GetDescription	returns ability effect strings (attack x1.2, ...)
+100144c0	Ability_GetDescription	copies the effect text of the highest-priority ability bit and returns the bit (matched, decomp/src/ability_text.cpp)
 1013dfb0	GuruMain	DLL export called by game.exe
 101b2a28	sprintf	CRT
 101b3304	fopen	CRT (_fsopen wrapper)

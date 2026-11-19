@@ -96,17 +96,10 @@ struct AnimModel
     char pad_23e4[0x9c];
     float heading;
     char pad_2484[0x1510];
-    float m_3994;
-    int m_3998;
-    float m_399c;
-    float m_39a0;
-    int m_39a4;
     int M_101627d0(float x, float y, int mode);
     int M_101629b0(float y, float x);
     int FaceAway(const Vec4 &point);
     int FaceAwayFrom(AnimModel *other);
-    void M_10167400();
-    int M_10167390(int id, int value, int frames);
     int AddMotionSpeed(float speed);
     int PushMotionSpeed(float speed);
     int MoveTowards(float x, float y, int mode);
@@ -160,37 +153,6 @@ int AnimModel::FaceAwayFrom(AnimModel *other)
     otherPosition.Copy(other->world.GetTranslation());
     position.Copy(position - otherPosition);
     heading = (float)atan2(position.x, position.y);
-    return 0;
-}
-
-// Advances a timed value: adds the step to the current value each frame and snaps to the target when the
-// counter reaches zero.
-void AnimModel::M_10167400()
-{
-    if (m_3998 != 0)
-    {
-        m_39a0 += m_3994;
-        if (--m_3998 == 0)
-            m_39a0 = m_399c;
-    }
-}
-
-// Starts a timed change of the value at m_39a0 towards `value` over `frames` frames (0 = set at once),
-// remembering `id` in m_39a4. M_10167400 advances it each frame.
-int AnimModel::M_10167390(int id, int value, int frames)
-{
-    m_39a4 = id;
-    m_399c = value;
-    if (frames == 0)
-    {
-        m_39a0 = value;
-        m_399c = value;
-        m_3994 = 0;
-        m_3998 = 0;
-        return 0;
-    }
-    m_3998 = frames;
-    m_3994 = (value - m_39a0) / frames;
     return 0;
 }
 

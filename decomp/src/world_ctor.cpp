@@ -93,10 +93,13 @@ struct WorldRenderer
     int m_03984;
     int m_03988;
     char m_0398c;
-    char pad_0398d[0xf];
-    int m_0399c;
+    char pad_0398d[0x3];
+    int fadeColour;                                  // 0x3990: colour of the full-screen fade
+    float fadeStep;                                  // 0x3994: added to fadeAmount each frame
+    int fadeFrames;                                  // 0x3998: frames left of the fade
+    float fadeTarget;
     float fadeAmount;                                // 0x39a0: fade strength in percent (0 = off)
-    char pad_039a4[0x4];
+    int fadeMode;
     int m_039a8;
     char m_039ac[0x20][0x10][0x10];
     char pad_059ac[0x200];
@@ -184,7 +187,8 @@ struct WorldRenderer
     WorldRenderer();
     int Bind(ModelRecord *models, void *mapRoot, int *state, WorldCallback callback, void *data);
     int LoadCharacter(const char *path);
-    int M_10167390(int a, int b, int c);           // 0x10167390
+    int StartFade(int mode, int target, int frames);
+    void TickFade();
 };
 
 // 0x101670e0 (WorldRenderer::WorldRenderer). Constructs the members, clears the two 0x14-entry tables, the names and
@@ -213,7 +217,7 @@ extern "C" int FUN_101615d0(char *data, int size, const char *name, int sum, uns
 
 // 0x1017c9c0 (WorldRenderer::Bind). Resets the scene for a new map: the character slots get their default names
 // ("キャラ0".. as Shift-JIS), the three 1000-entry tables -9999, the map slots, textures, node tables and fade state
-// are cleared, M_10167390(0, 0, 0) runs, and the model records, callback and callback data are stored. mapRoot and
+// are cleared, StartFade(0, 0, 0) runs, and the model records, callback and callback data are stored. mapRoot and
 // state are not used. Returns 1.
 int WorldRenderer::Bind(ModelRecord *models, void *mapRoot, int *state, WorldCallback callback, void *data)
 {
@@ -273,9 +277,9 @@ int WorldRenderer::Bind(ModelRecord *models, void *mapRoot, int *state, WorldCal
     m_03868 = 900;
     this->data = data;
     m_03870 = 0;
-    m_0399c = 0;
+    fadeTarget = 0;
     fadeAmount = 0;
-    M_10167390(0, 0, 0);
+    StartFade(0, 0, 0);
     this->callback = callback;
     this->models = models;
     m_03864 = 0;
@@ -471,4 +475,35 @@ int WorldRenderer::LoadCharacter(const char *path)
         free(text);
     }
     return 1;
+}
+
+// 0x10167390 (WorldRenderer::StartFade). Fades the screen to `target` percent over `frames` frames (0 = at once),
+// remembering `mode`. TickFade advances it each frame.
+int WorldRenderer::StartFade(int mode, int target, int frames)
+{
+    float value = (float)target;
+    fadeMode = mode;
+    fadeTarget = value;
+    if (frames == 0)
+    {
+        fadeAmount = value;
+        fadeTarget = value;
+        fadeStep = 0;
+        fadeFrames = 0;
+        return 0;
+    }
+    fadeFrames = frames;
+    fadeStep = (value - fadeAmount) / frames;
+    return 0;
+}
+
+// 0x10167400 (WorldRenderer::TickFade). Adds the step to the fade each frame and snaps to the target on the last.
+void WorldRenderer::TickFade()
+{
+    if (fadeFrames != 0)
+    {
+        fadeAmount += fadeStep;
+        if (--fadeFrames == 0)
+            fadeAmount = fadeTarget;
+    }
 }

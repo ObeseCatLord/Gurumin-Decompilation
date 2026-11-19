@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 9.5839,
+  "fuzzy_match_percent": 9.584,
   "total_code": "1720206",
   "matched_code": "137584",
   "matched_code_percent": 7.9981,
@@ -15,7 +15,7 @@
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 216,
-  "complete_units": 132
+  "complete_units": 131
  },
  "units": [
   {
@@ -7857,16 +7857,16 @@
   {
    "name": "app/model_params",
    "measures": {
-    "fuzzy_match_percent": 91.6615,
-    "total_code": "3937",
-    "matched_code": "3071",
-    "matched_code_percent": 78.0036,
+    "fuzzy_match_percent": 91.7595,
+    "total_code": "3781",
+    "matched_code": "3019",
+    "matched_code_percent": 79.8466,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 21,
-    "matched_functions": 17,
-    "matched_functions_percent": 80.9524,
+    "total_functions": 19,
+    "matched_functions": 16,
+    "matched_functions_percent": 84.2105,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -7877,8 +7877,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "3937",
-     "fuzzy_match_percent": 91.6615
+     "size": "3781",
+     "fuzzy_match_percent": 91.7595
     }
    ],
    "functions": [
@@ -7912,22 +7912,6 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "269889024"
-     }
-    },
-    {
-     "name": "?M_10167400@AnimModel@@QAEXXZ",
-     "size": "52",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "269906944"
-     }
-    },
-    {
-     "name": "?M_10167390@AnimModel@@QAEHHHH@Z",
-     "size": "104",
-     "fuzzy_match_percent": 83.9286,
-     "metadata": {
-      "virtual_address": "269906832"
      }
     },
     {
@@ -13843,39 +13827,31 @@
   {
    "name": "app/world_ctor",
    "measures": {
-    "fuzzy_match_percent": 100.0,
-    "total_code": "2516",
-    "matched_code": "2516",
-    "matched_code_percent": 100.0,
+    "fuzzy_match_percent": 99.444,
+    "total_code": "2672",
+    "matched_code": "2568",
+    "matched_code_percent": 96.1078,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 3,
-    "matched_functions": 3,
-    "matched_functions_percent": 100.0,
-    "complete_code": "2516",
-    "complete_code_percent": 100.0,
+    "total_functions": 5,
+    "matched_functions": 4,
+    "matched_functions_percent": 80.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 1
+    "complete_units": 0
    },
    "sections": [
     {
      "name": ".text",
-     "size": "2516",
-     "fuzzy_match_percent": 100.0
+     "size": "2672",
+     "fuzzy_match_percent": 99.444
     }
    ],
    "functions": [
-    {
-     "name": "?Bind@WorldRenderer@@QAEHPAUModelRecord@@PAXPAHP6AXHH@Z1@Z",
-     "size": "581",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "269994432"
-     }
-    },
     {
      "name": "?LoadCharacter@WorldRenderer@@QAEHPBD@Z",
      "size": "1470",
@@ -13885,16 +13861,40 @@
      }
     },
     {
+     "name": "?StartFade@WorldRenderer@@QAEHHHH@Z",
+     "size": "104",
+     "fuzzy_match_percent": 85.7143,
+     "metadata": {
+      "virtual_address": "269906832"
+     }
+    },
+    {
+     "name": "?TickFade@WorldRenderer@@QAEXXZ",
+     "size": "52",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269906944"
+     }
+    },
+    {
      "name": "??0WorldRenderer@@QAE@XZ",
      "size": "465",
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "269906144"
      }
+    },
+    {
+     "name": "?Bind@WorldRenderer@@QAEHPAUModelRecord@@PAXPAHP6AXHH@Z1@Z",
+     "size": "581",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269994432"
+     }
     }
    ],
    "metadata": {
-    "complete": true,
+    "complete": false,
     "source_path": "decomp/src/world_ctor.cpp"
    }
   },

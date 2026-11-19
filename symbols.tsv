@@ -409,7 +409,7 @@ address	name	evidence
 10169760	ModelNames_FindFree	role from the decompiled source (decomp/src/model_misc.cpp)
 101627d0	AnimModel::SetMoveOffset	role from the decompiled source (decomp/src/model_params.cpp)
 101629b0	AnimModel::FaceDirection	role from the decompiled source (decomp/src/model_params.cpp)
-10167400	AnimModel::TickTimedValue	role from the decompiled source (decomp/src/model_params.cpp)
+10167400	WorldRenderer::TickFade	advances the screen fade one frame (decomp/src/world_ctor.cpp)
 101619a0	ModelTable_ClearFlags	role from the decompiled source (decomp/src/model_state.cpp)
 1013e6f0	Names_Set	role from the decompiled source (decomp/src/names_od.cpp)
 1019eca0	Node::ReapplyInfo	role from the decompiled source (decomp/src/node_pool.cpp)
@@ -861,3 +861,4 @@ address	name	evidence
 1016b050	Camera_SelectPath	makes the camera path with the given id current and starts it at the frame nearest the camera target (decomp/src/camera_path_select.cpp)
 101670e0	WorldRenderer::WorldRenderer	constructs the map scene object (decomp/src/world_ctor.cpp)
 1017c9c0	WorldRenderer::Bind	resets the scene object for a new map and stores the model records, callback and data (decomp/src/world_ctor.cpp)
+10167390	WorldRenderer::StartFade	fades the screen to a target percent over n frames (decomp/src/world_ctor.cpp)

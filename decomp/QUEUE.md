@@ -106,7 +106,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10164af0` 284 — ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
 - [ ] `10165020` 272 — bubble sort: ours stores count-1 in the dead parameter slot, the original in a separate local; a named local makes cl 13.00 unroll the inner loop by 4 (local inside/outside the loop, early return tried)
 - [ ] `10166870` 52 — same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
-- [ ] `10167390` 104 — AnimModel timed value setup: the rounded int-to-float temporary lands in the id parameter slot in ours, the value slot in the original
+- [ ] `10167390` 104 — WorldRenderer::StartFade: identical apart from the mode store, which the original schedules right after loading mode into edx (ours loads it into eax and stores it after the fstp); mode-first and conversion-local forms tried
 - [ ] `10169720` 40 — memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 - [ ] `10169c60` 399 — TextureObject::Create (MeshInstance in mesh_cache.cpp): statements identical; the original returns from the first size test before push esi (ours pushes first) and computes width*height*3 separately in the two speckle branches (ours computes it once before the branch); split tests and loop forms tried
 - [ ] `10169e10` 35 — register choice: original pushes the last argument from edx, VS2003 from ecx

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (126)
+## 1. Walls to retry (127)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -79,6 +79,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1013e790` 561 — Names_Expand (/Od unit src_od/names_od.cpp): code identical, only the stack slot of `p` differs (the original puts it below found/matches/best); function-scope declaration orders tried
 - [ ] `1013e9d0` 689 — Screenshot_ReadBackBuffer: identical except the row address in the 32-bit and 16-bit loops (original loads y then multiplies by the pitch, ours loads the pitch first); operand orders and index form tried
 - [ ] `10142b20` 519 — Joystick_IsButtonDown (__stdcall): same cases and code; the tail-merged axis tests are placed differently (the original keeps the full low-x test in the default-layout switch and jumps to it from the mapped cases, ours the other way round)
+- [ ] `10142dd0` 741 — Keyboard_IsButtonDown: same returns; in the original the default layout (map 0) of buttons 0, 2, 5, 7 and 10-13 shares the return blocks of the fixed maps 0x12, 1, 0x13, 2 and 0x14-0x17 and the blocks are laid out in another order; the plain nested switch here gives each its own block
 - [ ] `10143870` 366 — TextureObject::BeginRenderTo: identical except block placement (the original puts the shared return 0 right after the first test; nested and early-return forms tried)
 - [ ] `10143bc0` 572 — Render_DrawGradientQuad (__stdcall): identical except each scaled corner coordinate goes through the float temporary at esp+4 before the two stores (ours stores into the first vertex directly); local, cast, split and inline-helper forms tried
 - [ ] `10144040` 365 — blue corner quad: stores and calls identical; the original alternates ecx/eax for the constants (loads the next constant before the last stores of the previous one); chained and separate statements tried
@@ -144,7 +145,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (46)
+## 3. Medium functions (251-800 bytes) (45)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
@@ -177,7 +178,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019b350` 728 bytes (loops 2, calls 24)
 - [ ] `10148590` 731 bytes (loops 4, calls 6)
 - [ ] `100b1520` 736 bytes (float, loops 2, calls 19)
-- [ ] `10142dd0` 741 bytes
 - [ ] `10149100` 742 bytes (float, calls 17)
 - [ ] `10037560` 743 bytes (float, loops 3, calls 12)
 - [ ] `10144bf0` 749 bytes (float, loops 1, calls 12)

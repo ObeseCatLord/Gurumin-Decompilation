@@ -197,7 +197,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 133 | medium functions | 1001d920, 100e21a0, 1002a490 Block_Update | Block_Update open (model address register); 1001d920 (camera target lock) and 100e21a0 (per-kind enemy hit reactions) left |
 | 134 | medium functions | 1002f050, 10016700, 1016b400 Camera_TurnInput | Camera_TurnInput open (blend weight copy); 1002f050 (route point decoding) and 10016700 (ground height sampling) left |
 | 135 | medium functions | 10001170 Obj::Update, 1014b750, 1016a980 Camera_Reset | Obj::Update and Camera_Reset matched; 1014b750 (scaled texture quad) left |
-| 136 | medium functions | 10148590, 100b1520, 10142dd0 | |
+| 136 | medium functions | 10148590, 100b1520, 10142dd0 Keyboard_IsButtonDown | Keyboard_IsButtonDown open (shared return blocks); 10148590 (buffer pool eviction) and 100b1520 (enemy sight and alarm) left. Also matched from a scan: 10021380 Map_SetEntryFlags |
 | 137 | medium functions | 10149100, 10037560, 10144bf0 | |
 | 138 | medium functions | 1014e940 TextureObject::DrawFrameAlt, 1014ec30, 1017c5f0 | |
 | 139 | medium functions | 10166520, 1005dbf0, 10165e00 | |
@@ -213,3 +213,5 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 149 | medium functions | 1014ec30, 10144bf0, 10149100 | |
 | 150 | medium functions | 101670e0, 10169720 retry, 1015fea0 | |
 | 151 | medium functions | 1003e710, 10161f80, 10163150 | |
+| 152 | large, mechanical | 1003e710 (game reset, 5401 bytes, mostly stores), 10161f80 (model record reset, needs the record layout) | |
+| 153 | medium functions | 1003b2c0, 101455d0 Font_Init, 10160a90 Mmv_Open | |

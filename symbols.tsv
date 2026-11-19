@@ -840,3 +840,4 @@ address	name	evidence
 10001170	Obj::Update	mouse: cursor in 640x480, button states, double click, wheel direction (decomp/src/app_0001.cpp)
 1016a980	Camera_Reset	zeroes the camera vectors and clears camera flags and blend counters (decomp/src/camera_reset.cpp)
 10021380	Map_SetEntryFlags	sets script flags 0x400/0x418/0x43c/0x453/0x454 per map number (decomp/src/map_entry_flags.cpp)
+10142dd0	Keyboard_IsButtonDown	game button mapped to a DirectInput key, default layout for map 0 (decomp/src/joystick_buttons.cpp)

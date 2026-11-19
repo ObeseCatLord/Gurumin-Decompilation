@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 8.2643,
+  "fuzzy_match_percent": 8.2874,
   "total_code": "1720206",
   "matched_code": "117365",
   "matched_code_percent": 6.8227,
@@ -6067,14 +6067,14 @@
   {
    "name": "app/joystick_buttons",
    "measures": {
-    "fuzzy_match_percent": 36.1702,
-    "total_code": "519",
+    "fuzzy_match_percent": 46.4621,
+    "total_code": "1260",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 1,
+    "total_functions": 2,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -6087,8 +6087,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "519",
-     "fuzzy_match_percent": 36.1702
+     "size": "1260",
+     "fuzzy_match_percent": 46.4621
     }
    ],
    "functions": [
@@ -6098,6 +6098,14 @@
      "fuzzy_match_percent": 36.1702,
      "metadata": {
       "virtual_address": "269757216"
+     }
+    },
+    {
+     "name": "_FUN_10142dd0@8",
+     "size": "741",
+     "fuzzy_match_percent": 53.6706,
+     "metadata": {
+      "virtual_address": "269757904"
      }
     }
    ],
@@ -13554,13 +13562,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1561300",
+    "total_code": "1560559",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 396,
+    "total_functions": 395,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -13573,7 +13581,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1561300",
+     "size": "1560559",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -15736,14 +15744,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269756304"
-     }
-    },
-    {
-     "name": "FUN_10142dd0",
-     "size": "741",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269757904"
      }
     },
     {

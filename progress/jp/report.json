@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 10.9444,
+  "fuzzy_match_percent": 11.0218,
   "total_code": "1720206",
-  "matched_code": "149879",
-  "matched_code_percent": 8.7129,
+  "matched_code": "151211",
+  "matched_code_percent": 8.7903,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 733,
-  "matched_functions_percent": 60.4785,
+  "matched_functions": 735,
+  "matched_functions_percent": 60.6436,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 223,
-  "complete_units": 135
+  "total_units": 225,
+  "complete_units": 137
  },
  "units": [
   {
@@ -2658,6 +2658,48 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/camera_setup.cpp"
+   }
+  },
+  {
+   "name": "app/carry_stack",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "666",
+    "matched_code": "666",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "666",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "666",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1001d920",
+     "size": "666",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268556576"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/carry_stack.cpp"
    }
   },
   {
@@ -6502,6 +6544,48 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/joystick_buttons.cpp"
+   }
+  },
+  {
+   "name": "app/key_prompt_draw",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "666",
+    "matched_code": "666",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "666",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "666",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1000d6b0",
+     "size": "666",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268490416"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/key_prompt_draw.cpp"
    }
   },
   {
@@ -14538,13 +14622,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1508547",
+    "total_code": "1507215",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 341,
+    "total_functions": 339,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14557,7 +14641,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1508547",
+     "size": "1507215",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -14632,14 +14716,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268488609"
-     }
-    },
-    {
-     "name": "FUN_1000d6b0",
-     "size": "666",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268490416"
      }
     },
     {
@@ -14808,14 +14884,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268551792"
-     }
-    },
-    {
-     "name": "FUN_1001d920",
-     "size": "666",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268556576"
      }
     },
     {

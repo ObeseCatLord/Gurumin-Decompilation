@@ -254,7 +254,8 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 191 | small/medium functions | 1000cf80, 1004f860, 10017c55, 10055aa0 | 10055aa0 ListBank::FindLabel matched and FindCase 0x100558d0 with it (`*text` tests, no jump threading); 1004f860 TutorialBook_PrevPage open; 1000cf80/10017c55 are mis-sized fragments |
 | 192 | medium functions | 10055410, 10055ca0, 10161781 | 10055410 Game::RunQueuedEvents (trigger pointer taken after the id test) and 10055ca0 ListBank::SkipStatement (declaration order) matched; 10161781 is a fragment |
 | 193 | medium functions | 101453e0 Font_DrawGlyph, 100092c0, 1000f5a0 | 101453e0 and 100092c0 Game::DrawWindowMarks open (near-matches); the Game::Draw* colour argument is a float (callers push floats), retyped without losing matches |
-| 195 | medium functions | 1000f5a0, 1000d6b0, 1001d920 | |
+| 195 | medium functions | 1000f5a0, 1000d6b0, 1001d920 | 1001d920 Carry_StackOnObject and 1000d6b0 KeyPrompt_DrawAll matched (float comparison spellings) |
+| 197 | medium functions | 1000f5a0, 10045c30, 1004f250 | |
 | 194 | medium functions | 1001f270, 100ba040, 10055 neighbours | 1001f270 Map_SelectMovie open (registers; it is a C++ function, extern "C" drops its EH frame) |
 | 196 | medium functions | 100ba040, 100b9930, 10192a00 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

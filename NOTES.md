@@ -190,6 +190,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - **extern "C" means no EH frame**: under /GX cl 13.00 treats an `extern "C"` function as not throwing and drops the
   exception frame for its temporaries. A function whose temporary (a returned Matrix4) gets an fs:[0] frame and
   state stores is a C++ function (Map_SelectMovie 0x1001f270).
+- **Float comparison spellings** (fcomp, then the flag test): `a <= b` gives `test ah, 41h / jnp`, `!(a > b)` gives
+  `test ah, 41h / jne`; `a >= b` gives `test ah, 1`, while `a < b` used as a skip test gives `test ah, 5 / jnp`. Pick
+  the spelling from the flag test (KeyPrompt_DrawAll 0x1000d6b0: `!(x > -100000)` and `if (z < 0.9 || ...) continue`).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

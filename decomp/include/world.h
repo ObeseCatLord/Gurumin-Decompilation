@@ -58,7 +58,7 @@ struct Character
     float m_0d5c;             // 0xd5c: 1.0 when spawned (model alpha or scale)
     char pad_0d60[0x159c];
     struct RootNode *m_22fc;  // 0x22fc: root node of the model (0x22ec inside CharModel)
-    int pad_2300;
+    int m_2300;               // 0x2300: non-zero while the character is in use (key prompts are drawn)
     struct HeadNode *headNode;  // 0x2304: the model's head bone node (head_look.cpp, the player's at 0x10db91dc)
     char pad_2308[0x30];
     union

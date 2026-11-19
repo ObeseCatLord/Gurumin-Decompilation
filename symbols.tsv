@@ -886,3 +886,5 @@ address	name	evidence
 10055410	Game::RunQueuedEvents	moves the queued events into runningEvents and runs their queued triggers that pass (matched, decomp/src/app_0003.cpp)
 100092c0	Game::DrawWindowMarks	draws the scroll marks and the cursor of the three menu windows
 1001f270	Map_SelectMovie	picks the camera point nearest the player and switches the background movie
+1001d920	Carry_StackOnObject	puts the carried object on top of the nearest crate or box below it (matched, decomp/src/carry_stack.cpp)
+1000d6b0	KeyPrompt_DrawAll	draws the key prompt cell above every character that shows one (matched, decomp/src/key_prompt_draw.cpp)

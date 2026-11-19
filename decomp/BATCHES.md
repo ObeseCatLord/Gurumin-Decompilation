@@ -247,5 +247,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 184 | node and effect functions | 1019d8e0 Node::ComputeBounds, 10190e30 EffectManager::Draw, 1019dca0 | ComputeBounds and Draw open (register/scheduling residue); 1019dca0 (ray-triangle) left |
 | 185 | engine functions | 1019e120 Node::BuildCollisionSpheres, 1016ac90 Camera_CollectPaths, 10192200 | Camera_CollectPaths matched (first build); BuildCollisionSpheres open (14 bytes, address-mode operand order); 10192200 (collision geometry) left |
 | 186 | integer functions | 101455d0 Font_Init, 10023d30 Map_Unload, 10142790 | Font_Init (FontRenderer layout filled in) and Map_Unload open (register choice); 10142790 left |
-| 187 | integer functions | 10142790, 1014f1f0 TextureObject::Upload, 10148590 | |
+| 187 | integer functions | 10142790, 1014f1f0 TextureObject::Upload, 10148590 | 10148590 TexturePool_Get open; the other two left (DirectInput, pixel loops) |
+| 188 | wall retries | 1015cac0, 10169e10, 10034c80, 10166870, 1016b010 | four matched (float setter, method call, two store orders); 1016b010 left (eax/edx) |
+| 189 | wall retries | 1000ed20, 1016a090, 10012130, 1016b1e0 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

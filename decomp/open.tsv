@@ -1,11 +1,7 @@
 address	status	reason
 1000ed20	open	original decrements the global in eax; VS2003 copies to ecx first (scheduling)
 10015910	open	settings byte flags: cl 13.00 here threads the three mode tests (after mode == 0 it jumps past the others), the original tests each in turn; flag-array, local copy and (char)mode forms tried
-10034c80	open	two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
-1015cac0	open	same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
-10166870	open	same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
 10169720	open	memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
-10169e10	open	register choice: original pushes the last argument from edx, VS2003 from ecx
 1016b010	open	original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 1016b1e0	open	original clamps with a branchless setle/dec/and sequence; VS2003 branches (ternary and if forms tried)
 1016c300	open	control-flow layout of a three-way flag test differs (two source shapes tried)

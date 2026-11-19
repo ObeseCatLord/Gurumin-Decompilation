@@ -64,13 +64,12 @@ extern "C" int FUN_1001b840(int index)
 }
 
 // Starts character `index`'s defeat sequence unless it is already busy (DAT_10210d30); returns 1 when busy.
-// Not byte-identical yet (see open.tsv).
 extern "C" int FUN_10034c80(int index)
 {
     if (DAT_10210d30[index] != 0)
         return 1;
-    DAT_1020b430[index].m_003c = 1;
     DAT_10daab84[index].m_00a5 = 1;
+    DAT_1020b430[index].m_003c = 1;
     return 0;
 }
 

@@ -228,7 +228,7 @@ int MeshInstance::M_10169df0()
 int MeshInstance::M_10169e10()
 {
     if (m_0034 != 0)
-        return FUN_1014f1f0(m_002c, m_0030, m_0024, m_0020);
+        return Upload(m_002c, m_0030, m_0024, m_0020);
     return 1;
 }
 

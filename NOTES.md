@@ -331,3 +331,8 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   onto the stack in argument order.
 - Reading the three triangle indices into locals once, and evaluating `MAX(...) + MIN(...)` in that order, matched
   the original's load and compare sequence in Node::BuildCollisionSpheres 0x1019e120 (MIN/MAX macros evaluate twice).
+- A setter that loads the stored value before the index (`mov eax, [esp+4]; mov edx, [esp+8]`) when its twin loads
+  the index first stores a float: float copies go through integer registers in argument order (0x1015cac0).
+- Walls written down as "VS2003 does X" deserve a retry with cl 13.00: statement order of independent stores
+  does change the output (0x10034c80 matched with the two stores swapped, 0x10166870 with `m_00b8 = 0` first),
+  and a call that keeps `this` in ecx is a method call (MeshInstance::M_10169e10 calls Upload, not a free function).

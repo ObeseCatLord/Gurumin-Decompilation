@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (142)
+## 1. Walls to retry (138)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -53,7 +53,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1002a490` 685 — Block_Update: statements and layout identical; the original computes the block model address once into esi on the standing path and reuses it for the second IsClearAny, ours recomputes it (combined, nested and goto forms and a model pointer local tried)
 - [ ] `1002ebf0` 628 — DamageZone_Update: same tests; register allocation differs from the start (the original leaves index in its stack slot and reloads it, ours keeps it in ebx, which changes the flag-test layout and hides the loop-invariant (float)left the original hoists); else-if, nested and conditional forms of the flag test tried
 - [ ] `1002ee70` 473 — Char_UpdateShoves: identical except the original schedules the fadd of 3.1415 after the stack pop of the atan2 call (angle local and separate add tried)
-- [ ] `10034c80` 52 — two stores: VS2003 swaps which register holds idx*0x188 vs idx<<6 and the store order; source order has no effect
 - [ ] `10034cc0` 429 — Party_BlocksMove: logic identical; the original copies the first atan2 result through a temporary and reloads the second in place (fld/fstp round trips); result locals and helper forms tried
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
@@ -98,7 +97,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10148590` 731 — TexturePool_Get: statements and the 8x-unrolled LRU scan in place; the original keeps the constant 1 in ebx (found, evict and the pool flags are set from it), keeps found/age in ecx/edx, and pushes its registers only after the index checks; declaration orders tried
 - [ ] `1014b390` 233 — Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
 - [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
-- [ ] `1015cac0` 20 — same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
 - [ ] `101603c0` 1218 — SystemSav_ReadRecord: 20 bytes; the original places the -1 (other machine) return block before the 0 return that the early exits share, ours after it (nested, else and result-variable forms tried)
@@ -114,11 +112,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101649c0` 213 — lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
 - [ ] `10164af0` 284 — ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
 - [ ] `10165020` 272 — bubble sort: ours stores count-1 in the dead parameter slot, the original in a separate local; a named local makes cl 13.00 unroll the inner loop by 4 (local inside/outside the loop, early return tried)
-- [ ] `10166870` 52 — same stores; original issues 'xor edx,edx' before the first store, VS2003 after (scheduling)
 - [ ] `10167390` 104 — WorldRenderer::StartFade: identical apart from the mode store, which the original schedules right after loading mode into edx (ours loads it into eax and stores it after the fstp); mode-first and conversion-local forms tried
 - [ ] `10169720` 40 — memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 - [ ] `10169c60` 399 — TextureObject::Create (MeshInstance in mesh_cache.cpp): statements identical; the original returns from the first size test before push esi (ours pushes first) and computes width*height*3 separately in the two speckle branches (ours computes it once before the branch); split tests and loop forms tried
-- [ ] `10169e10` 35 — register choice: original pushes the last argument from edx, VS2003 from ecx
 - [ ] `1016a020` 109 — Playback bind to an owner's root node: same register residue as 0x1016a090 (original: ecx = -1, eax = 0, then a second zero in edi)
 - [ ] `1016a090` 97 — register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)
 - [ ] `1016a100` 280 — Playback::SetLayer: the original unrolls both 16-entry fills (zero kept in esi, -2 as immediates) and tests layer <= 0x8f; cl 13.00 here emits rep stosd (flat, nested 4x4, pointer and merged loops tried)
@@ -511,10 +507,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (0)
+## 6. Naming: matched functions without a readable name (3)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
+- [ ] `10034c80` 52 bytes (src/app_0011.cpp)
+- [ ] `1015cac0` 20 bytes (src/ime.cpp)
+- [ ] `10166870` 52 bytes (src/model_misc.cpp)
 
 ## 7. Comment pass (0 files)
 

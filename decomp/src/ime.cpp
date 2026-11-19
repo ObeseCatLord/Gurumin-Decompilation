@@ -10,9 +10,9 @@ struct StateArrays
 {
     char pad_0000[0x20];
     int m_0020[8];
-    int m_0040[8];
+    float m_0040[8];
     int M_1015caa0(int value, int index);
-    int M_1015cac0(int value, int index);
+    int M_1015cac0(float value, int index);
 };
 
 struct ImeContext
@@ -49,8 +49,8 @@ int StateArrays::M_1015caa0(int value, int index)
     return 1;
 }
 
-// Stores `value` in slot `index` of the second state array. Not byte-identical yet (see open.tsv).
-int StateArrays::M_1015cac0(int value, int index)
+// Stores `value` in slot `index` of the second state array (floats: the value is copied without the FPU).
+int StateArrays::M_1015cac0(float value, int index)
 {
     m_0040[index] = value;
     return 1;

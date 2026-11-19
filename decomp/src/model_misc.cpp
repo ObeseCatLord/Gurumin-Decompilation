@@ -111,13 +111,13 @@ void ModelObject::M_101687c0()
         m_3870--;
 }
 
-// Resets the rotation limits to +-45 degrees (0.785375 rad) on all three axes. Not byte-identical yet.
+// Resets the rotation limits to +-45 degrees (0.785375 rad) on all three axes.
 void ViewLimits::M_10166870()
 {
+    m_00b8 = 0;
     minimum[0] = -0.785375f;
     minimum[1] = -0.785375f;
     minimum[2] = -0.785375f;
-    m_00b8 = 0;
     maximum[0] = 0.785375f;
     maximum[1] = 0.785375f;
     maximum[2] = 0.785375f;

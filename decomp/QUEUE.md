@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (132)
+## 1. Walls to retry (133)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -30,6 +30,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10011dd0` 419 — Npc_StandOnGround: logic identical; register residue (state address in eax and its store before the DAT_102022b8 load in the original, edi and after in ours; the hit result in eax vs our temporaries); state local and store order tried
 - [ ] `10012130` 172 — Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
 - [ ] `10012220` 418 — Model_ApplyCommands: logic identical; index/model registers swapped (ebp/ebx) and argument loads scheduled differently; two parameter orders tried
+- [ ] `100135b0` 3600 — Map_ShowEquipment: same length and statements; in each part the original keeps the shared "show version a/ba" tail in the version 1 block and jumps to it from version 0, cl 13.00 here the other way round (if chain and switch tried)
 - [ ] `100143f0` 201 — helmet attach: 8 bytes; when Bip01 Head is missing the original returns through the shared epilogue with eax still 0 from Find, ours emits its own xor eax,eax / epilogue (return 0, return head, result-variable forms tried)
 - [ ] `10014d30` 1931 — Helmet_FaceSettings: values and branches identical; the result is kept in esi (eax in the original) and the inline ScriptFlag uses other registers. An unused char buffer reproduces the original /GS cookie
 - [ ] `10015710` 148 — Vis_IsCharacterVisible: 9 bytes; loop setup registers (original computes the box pointer in eax, then moves it to edi after i = 0); three loop shapes tried
@@ -403,7 +404,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10016ec0` 2970 bytes (float, loops 6, calls 56)
 - [ ] `10165240` 2986 bytes (float, loops 15, calls 68)
 
-## 5. Very large functions (over 3000 bytes) (112)
+## 5. Very large functions (over 3000 bytes) (111)
 
 - [ ] `100094e0` 3023 bytes (float, loops 2, calls 27)
 - [ ] `100fb7b0` 3089 bytes (float, loops 16, calls 57)
@@ -423,7 +424,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10022830` 3502 bytes (float, loops 4, calls 128)
 - [ ] `1005def0` 3516 bytes (float, loops 7, calls 54)
 - [ ] `10064630` 3598 bytes Menu_SaveLoad (loops 9, calls 94)
-- [ ] `100135b0` 3600 bytes (calls 204)
 - [ ] `101713f0` 3674 bytes (float, loops 5, calls 62)
 - [ ] `10170580` 3679 bytes (float, loops 5, calls 62)
 - [ ] `10187520` 3712 bytes (float, loops 3, calls 62)

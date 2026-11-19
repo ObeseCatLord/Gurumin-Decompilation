@@ -234,5 +234,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 171 | table-like | 100144c0 Ability_GetDescription (generated from the asm skeleton), 1019b630, 10055410 | Ability_GetDescription matched (2146 bytes; int parameter); the others left |
 | 172 | string-heavy | 1001d2d0 (digit counter), 10034920 (BS_003 variants), 100b9bb0 | 10034920 Bs003_SetVariant matched; 1001d2d0 DigitCounter_Update open (register swap); 100b9bb0 left |
 | 173 | string-heavy | 1001e4b0, 1017c160, 1004ed60 | 1017c160 ModelBank::CreateTextures matched (first build); others left |
-| 174 | string-heavy | 1001e4b0, 1001a990, 1004ed60 | |
+| 174 | string-heavy | 100135b0 Map_ShowEquipment, 1001e4b0, 1001a990 | Map_ShowEquipment open (3600 bytes, cross-jump direction); 1001e4b0 (records text) and 1001a990 (texture names by kind) left |
+| 175 | init-like | 1003b6e0 Costume_LoadPlayerModel, 100b0f00, 100b0250 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

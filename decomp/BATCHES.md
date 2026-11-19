@@ -240,5 +240,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 177 | save files | 10010d10 Save_ReadSlotInfo, 1001b0a0, 1004f250 | Save_ReadSlotInfo open (stack layout, as Save_ReadThumbnail); the others left |
 | 178 | node functions | 1019e610 Node::WeldVertices, 1004ed60, 10055410 | WeldVertices matched (first build); others left |
 | 179 | node functions | 1019eeb0, 1019b630, 1019b350 | 1019eeb0 Node::SetupSkinning open (one null test); Node::M_1019ece0 renamed Find (returns Node*); others left |
-| 180 | node functions | 1019b630, 1019b350, 1019b890 | |
+| 180 | node functions | 1019b350 Node::CopyMesh, 1019b630, 1019b890 | CopyMesh matched (Node bounds as a Vec4[3] union); others left |
+| 181 | node functions | 1019b630, 1019b890, 101a53b0 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

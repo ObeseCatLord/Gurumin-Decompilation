@@ -154,7 +154,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (38)
+## 3. Medium functions (251-800 bytes) (37)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `101453e0` 485 bytes Font_DrawGlyph (loops 3)
@@ -177,7 +177,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1002f050` 690 bytes (float, calls 4)
 - [ ] `10016700` 694 bytes (float, loops 3, calls 12)
 - [ ] `1014b750` 713 bytes (float, calls 16)
-- [ ] `1019b350` 728 bytes (loops 2, calls 24)
 - [ ] `10148590` 731 bytes (loops 4, calls 6)
 - [ ] `100b1520` 736 bytes (float, loops 2, calls 19)
 - [ ] `10149100` 742 bytes (float, calls 17)

@@ -18,6 +18,7 @@ struct Vec4
     // 0x101af260 (vec4.cpp): distance from this point to the segment from-to; the closest point goes to *closest.
     float DistanceToSegment(const Vec4 *from, const Vec4 *to, Vec4 *closest);
     int InBox(const struct Box2 *box);  // 0x101ac6e0 (vec_math.cpp)
+    void Copy(const Vec4 &source);      // 0x101acc20
 };
 
 // Axis-aligned box, 0x20 bytes (vec_math.cpp Box2).
@@ -50,6 +51,8 @@ struct KeyPair
 {
     int data[2];
     void M_101ad0e0();
+    void Init();                                 // 0x101ad1b0
+    void Copy(const KeyPair *source);            // 0x101ad160
 };
 
 struct TextureRef;
@@ -82,8 +85,10 @@ struct MeshData
     void Release();  // 0x10150a90 (mesh_release.cpp)
     void M_101476e0(int pack, int value);
     void M_10147690(int a, int b);
+    void Init();                                 // 0x10145a10
 };
 extern "C" int FUN_10169990(MeshData *mesh);
+extern "C" int FUN_10169970(MeshData *mesh);     // MeshCache_AddRef
 
 struct Keys
 {
@@ -125,6 +130,7 @@ struct PackHeader
     char pad_0018[0x58];
     int *m_0070;
     void M_101acfa0();
+    void Copy(const PackHeader *source);         // 0x101ad040
 };
 
 struct IndexList
@@ -184,13 +190,21 @@ struct Node
     struct Extra *m_02a8;
     char pad_02ac[0x24];
     unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
-    char pad_02d1[0x40f];
-    float boundsRadius;          // 0x6e0: radius of the node's mesh bounds
-    char pad_06e4[8];
-    int m_06ec;
-    char pad_06f0[0xc];
-    int m_06fc;
-    char pad_0700[4];
+    char pad_02d1[0x403];
+    union
+    {
+        Vec4 bounds[3];          // 0x6d4: bounding sphere (w = radius) and the two box corners
+        struct
+        {
+            char pad_bounds[0xc];
+            float boundsRadius;  // 0x6e0: radius of the node's mesh bounds
+            char pad_06e4[8];
+            int m_06ec;
+            char pad_06f0[0xc];
+            int m_06fc;
+            char pad_0700[4];
+        };
+    };
     char m_0704;
     char pad_0705[3];
     struct GlyphState *m_0708;
@@ -215,6 +229,7 @@ struct Node
 
     void M_10191d50();
     int M_1019eeb0(Node *root, Node **list, int *count);
+    int CopyMesh(Node *source, int slot);
     void M_101ab9d0(Node *root);
     int M_10191770();
     void Release();
@@ -1764,5 +1779,95 @@ int Node::M_1019eeb0(Node *root, Node **list, int *count)
     }
     for (int child = 0; child < childCount; child++)
         children[child]->M_1019eeb0(root, list, count);
+    return 1;
+}
+
+extern "C" MeshData *DAT_10fa7478[];                 // per mesh buffer slot: the mesh
+extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);   // the engine's memcpy
+extern "C" int FUN_10169840(const char *folder, const char *name, int *freeSlot);  // ModelNames_Find: slot of folder+name, -1 = none (a free slot in *freeSlot)
+extern "C" int FUN_10169760(void);                   // ModelNames_FindFree
+extern "C" int FUN_10169780(int slot, const char *folder, const char *name);   // ModelNames_SetJoined
+extern "C" int FUN_10174ce0(const char *path, int a, int b);  // Texture_LoadIti
+
+// 0x1019b350. Gives this node the mesh of `source`: with `slot` 0 the cached mesh of this node's folder and name is
+// shared when there is one (otherwise the free cache slot found is used); with `slot` non-zero a new name slot is
+// taken. Without a shared mesh the packs and index lists are copied, a new mesh is made and cached in the slot. Then the
+// materials are copied (loading their textures), and the flag at 0xa0 and the bounds. Returns 0 without a source,
+// else 1.
+int Node::CopyMesh(Node *source, int slot)
+{
+    if (source == 0)
+        return 0;
+    m_00a8 = 0;
+    if (source->packCount != 0)
+    {
+        if (slot == 0)
+        {
+            int found = FUN_10169840(folder, name, &slot);
+            if (found >= 0)
+            {
+                mesh = DAT_10fa7478[found];
+                packs = (PackHeader *)DAT_10ff2ff8[found];
+                indexLists = (KeyPair *)DAT_10fe01d8[found];
+                packCount = DAT_10fee5e0[found];
+                FUN_10169970(mesh);
+                goto copyMaterials;
+            }
+        }
+        else
+        {
+            slot = FUN_10169760();
+            FUN_10169780(slot, folder, name);
+        }
+        if (packs != 0)
+            M_101911b0(packs, packCount);
+        if (indexLists != 0)
+            M_101911e0(indexLists, packCount);
+        if (packs != 0)
+            DAT_11b1ba40(packs);
+        if (indexLists != 0)
+            DAT_11b1ba40(indexLists);
+        if (materials != 0)
+            DAT_11b1ba40(materials);
+        packs = (PackHeader *)DAT_11b0b938(source->packCount * sizeof(PackHeader), "m_vpack");
+        indexLists = (KeyPair *)DAT_11b0b938(source->packCount * sizeof(KeyPair), "m_vpackindex");
+        packCount = source->packCount;
+        for (int i = 0; i < packCount; i++)
+        {
+            packs[i].M_101acfa0();
+            packs[i].Copy(&source->packs[i]);
+            indexLists[i].Init();
+            indexLists[i].Copy(&source->indexLists[i]);
+        }
+        if (mesh != 0)
+            fread(0, 1, 1, 0);           // a node that still has a mesh here is a bug: crash on purpose
+        mesh = (MeshData *)DAT_11b0b938(0x50, "CpMCObj");
+        mesh->Init();
+        mesh->bufferSlot = slot;
+        if (slot >= 0)
+        {
+            DAT_10fa7478[slot] = mesh;
+            DAT_10ff2ff8[slot] = (int)packs;
+            DAT_10fe01d8[slot] = (int)indexLists;
+            DAT_10fee5e0[slot] = packCount;
+            FUN_10169970(mesh);
+        }
+    }
+copyMaterials:
+    if (source->materialCount != 0)
+    {
+        materials = (Material *)DAT_11b0b938(source->materialCount * 0x180, "m_material");
+        DAT_11b07530(materials, source->materials, source->materialCount * 0x180);
+        materialCount = source->materialCount;
+        for (int i = 0; i < materialCount; i++)
+        {
+            if (materials[i].textures[0][0] != 0)
+                FUN_10174ce0(materials[i].textures[0], 0, 0);
+        }
+    }
+    m_00a0 = source->m_00a0;
+    bounds[0].Copy(source->bounds[0]);
+    bounds[1].Copy(source->bounds[1]);
+    bounds[2].Copy(source->bounds[2]);
     return 1;
 }

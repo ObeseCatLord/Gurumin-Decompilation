@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 10.7392,
+  "fuzzy_match_percent": 10.7744,
   "total_code": "1720206",
   "matched_code": "147425",
   "matched_code_percent": 8.5702,
@@ -5409,16 +5409,16 @@
   {
    "name": "app/font_metrics",
    "measures": {
-    "fuzzy_match_percent": 77.4378,
-    "total_code": "241",
+    "fuzzy_match_percent": 68.6015,
+    "total_code": "1155",
     "matched_code": "154",
-    "matched_code_percent": 63.9004,
+    "matched_code_percent": 13.3333,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 2,
+    "total_functions": 3,
     "matched_functions": 1,
-    "matched_functions_percent": 50.0,
+    "matched_functions_percent": 33.3333,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
@@ -5429,8 +5429,8 @@
    "sections": [
     {
      "name": ".text",
-     "size": "241",
-     "fuzzy_match_percent": 77.4378
+     "size": "1155",
+     "fuzzy_match_percent": 68.6015
     }
    ],
    "functions": [
@@ -5448,6 +5448,14 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "269810992"
+     }
+    },
+    {
+     "name": "?Init@FontRenderer@@QAEHPAUHWND__@@PBD@Z",
+     "size": "914",
+     "fuzzy_match_percent": 66.2716,
+     "metadata": {
+      "virtual_address": "269768144"
      }
     }
    ],
@@ -14432,13 +14440,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1513583",
+    "total_code": "1512669",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 350,
+    "total_functions": 349,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14451,7 +14459,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1513583",
+     "size": "1512669",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -16502,14 +16510,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269767648"
-     }
-    },
-    {
-     "name": "FUN_101455d0",
-     "size": "914",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269768144"
      }
     },
     {

@@ -30,7 +30,7 @@ address	name	evidence
 101abd60	Model_LoadIt3Alt	error "no 3D data"
 101a58a0	It3_ParseChunks	compares chunk tags INFO/RTY2/LIG3/KAN3/INFS/MAT4/VPA2/CHID/MAN2/BONE/CAME/CDLO
 101a4a60	It3_ScanChunks	pre-pass over INFO/MAN2 chunks
-101455d0	Font_Init	ddfont8.dat, MS P Gothic, m_lpFont
+101455d0	Font_Init	ddfont8.dat, MS P Gothic, m_lpFont (FontRenderer::Init, decomp/src/font_metrics.cpp)
 1013b700	Game_Startup	reads every gurumin.def key (docs/config_keys.tsv), loads packs.dll, demo.sav/%s.sav
 10166950	WorldRenderer::LoadCharacter	resets the scene and reads the character's .itm message file ("##nnnnn text" lines) (decomp/src/world_ctor.cpp)
 101602d0	File_Checksum	sum/xor (seed 0xcc82) over a file in dwords

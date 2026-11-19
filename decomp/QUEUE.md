@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (140)
+## 1. Walls to retry (141)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -94,6 +94,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101441b0` 365 — black thumbnail-background quad: same register alternation residue as 0x10144040
 - [ ] `10144ee0` 377 — TextureObject::HalveRgb24: loop shape differs (the original keeps the row counter in memory and recomputes both row addresses with imul each pixel; cl 13.00 here strength-reduces them); pointer and indexed forms tried
 - [ ] `10145380` 87 — FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)
+- [ ] `101455d0` 914 — FontRenderer::Init (Font_Init): flow and calls in place; the original keeps 0 in edi and the path in ebx (ours the other way round) and compares the Open results with the zero register; its frame is 4 bytes smaller (result locals, FILE* result and goto form tried)
 - [ ] `1014b390` 233 — Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
 - [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
 - [ ] `1015cac0` 20 — same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
@@ -196,7 +197,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (198)
+## 4. Large functions (801-3000 bytes) (197)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -219,7 +220,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10144320` 907 bytes (float, calls 19)
 - [ ] `1000f7f0` 911 bytes (float, calls 31)
 - [ ] `100184e0` 911 bytes (float, calls 38)
-- [ ] `101455d0` 914 bytes Font_Init (loops 1, calls 32)
 - [ ] `10050df0` 921 bytes (float, calls 33)
 - [ ] `1001bb20` 925 bytes (float, loops 2, calls 23)
 - [ ] `10048e90` 938 bytes (float, loops 1, calls 25)

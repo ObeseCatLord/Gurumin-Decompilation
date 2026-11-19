@@ -10,13 +10,21 @@
 
 struct FontRenderer
 {
-    char pad_0000[8];
+    HFONT font;                 // 0x00: the Windows font (MS P Gothic, 17 pixels)
+    HBITMAP bitmap;             // 0x04: 512x64 bitmap selected into `dc`
     HDC dc;                     // 0x08: memory DC with the Windows font (used when no bitmap font is loaded)
-    char pad_000c[0x2380];
+    unsigned int *buffers[0x20];    // 0x0c: pixel buffer of each text texture
+    char texts[0x20][0x100];    // 0x8c: the text each texture holds
+    int textures[0x20];         // 0x208c: texture slots "tex00".."tex31"
+    int m_210c[0x20];
+    char pad_218c[0x80];
+    int m_220c[0x20];
+    char pad_228c[0x100];
     unsigned short *glyphs;     // 0x238c: normal font (ddfont8.dat), 72 words per glyph
     unsigned short *altGlyphs;  // 0x2390: alternative font (ddfont8s.dat, the small variant), may be missing
     int useAlt;                 // 0x2394: 1 = draw with the alternative font when it is loaded
 
+    int Init(HWND window, const char *path);
     int GlyphWidth(int x, int y, int color, unsigned short code, int a, int b);
     int DrawString(int x, int y, int color, const char *text, float a, int b);  // 0x1014f590; returns the width
     int TextWidth(const char *text, float scale);
@@ -60,4 +68,133 @@ int FontRenderer::TextWidth(const char *text, float scale)
         return (int)((float)size.cx * scale);
     }
     return (int)((float)DrawString(0, 0, 0, text, 0, 0) * scale);
+}
+
+#include <stdio.h>
+
+// The engine's file object (save_slot.cpp GameFile).
+struct GameFile
+{
+    FILE *handle;
+    char name[0x24];
+    GameFile();                                      // 0x101ad9e0
+    ~GameFile();                                     // 0x101b2570
+    FILE *Open(const char *path, const char *mode);  // 0x101b2310: the opened file, 0 on failure
+    void Close();                                    // 0x101b22f0
+    int Read(void *buffer, int size, int count);     // 0x101b23a0
+};
+
+extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
+extern "C" void *(*DAT_11b0b938)(int size, const char *tag);       // the engine's allocator
+extern "C" HWND DAT_10f6569c;                        // the game window
+extern "C" int DAT_10f654a4;                         // 1 = 32-bit textures
+extern "C" int DAT_1101d878;                         // set while creating shared textures
+extern "C" int FUN_10175c90(const char *name, int width, int height, const unsigned char *pixels, int alpha,
+                            int flags);              // Texture_CreateFromPixels
+
+// "ＭＳ Ｐゴシック" (MS P Gothic), Shift-JIS.
+#define FONT_FACE "\x82\x6c\x82\x72\x20\x82\x6f\x83\x53\x83\x56\x83\x62\x83\x4e"
+
+// 0x101455d0 (Font_Init). Loads the bitmap fonts: `path` (as given or in the data folder) or ddfont8s.dat as the
+// main font with ddfont8.dat as the alternative, or only ddfont8.dat. Then creates the Windows font with its DC and
+// bitmap, and the 32 text textures "tex00".."tex31" with their pixel buffers. Returns 1.
+int FontRenderer::Init(HWND window, const char *path)
+{
+    useAlt = 0;
+    GameFile file;
+    FILE *opened;
+    if (path != 0)
+    {
+        opened = file.Open(path, "rb");
+        if (opened != 0)
+            goto loadFont;
+        opened = file.Open(FUN_1013f8a0(path, 0), "rb");
+        if (opened != 0)
+            goto loadFont;
+    }
+    opened = file.Open(FUN_1013f8a0("ddfont8s.dat", 0), "rb");
+    if (opened != 0)
+    {
+    loadFont:
+        glyphs = (unsigned short *)DAT_11b0b938(0x211080, "m_lpFont");
+        file.Read(glyphs, 1, 0x211080);
+        file.Close();
+        altGlyphs = 0;
+        bitmap = 0;
+        dc = 0;
+        font = 0;
+        opened = file.Open(FUN_1013f8a0("ddfont8.dat", 0), "rb");
+        if (opened != 0)
+        {
+            altGlyphs = (unsigned short *)DAT_11b0b938(0x211080, "m_lpFont2");
+            file.Read(altGlyphs, 1, 0x211080);
+            file.Close();
+        }
+    }
+    else
+    {
+        opened = file.Open(FUN_1013f8a0("ddfont8.dat", 0), "rb");
+        if (opened != 0)
+        {
+            glyphs = (unsigned short *)DAT_11b0b938(0x211080, "m_lpFont");
+            file.Read(glyphs, 1, 0x211080);
+            file.Close();
+            altGlyphs = 0;
+            bitmap = 0;
+            dc = 0;
+            font = 0;
+        }
+    }
+    HWND gameWindow = DAT_10f6569c;
+    HDC windowDc = GetDC(gameWindow);
+    bitmap = CreateCompatibleBitmap(windowDc, 0x200, 0x40);
+    dc = CreateCompatibleDC(windowDc);
+    SelectObject(dc, bitmap);
+    ReleaseDC(gameWindow, windowDc);
+    LOGFONTA logFont;
+    memset(&logFont, 0, sizeof(logFont));
+    strcpy(logFont.lfFaceName, FONT_FACE);
+    logFont.lfPitchAndFamily = 0;
+    logFont.lfCharSet = SHIFTJIS_CHARSET;
+    logFont.lfHeight = 0x11;
+    logFont.lfWeight = 0xdac;
+    logFont.lfItalic = 0;
+    logFont.lfUnderline = 0;
+    logFont.lfStrikeOut = 0;
+    logFont.lfOutPrecision = 0;
+    logFont.lfClipPrecision = 0;
+    logFont.lfQuality = 0;
+    font = CreateFontIndirectA(&logFont);
+    SelectObject(dc, font);
+    for (int i = 0; i < 0x20; i++)
+    {
+        m_220c[i] = 0;
+        m_210c[i] = 0;
+        texts[i][0] = 0;
+        unsigned int *buffer;
+        int words;
+        if (DAT_10f654a4 != 0)
+        {
+            buffer = (unsigned int *)DAT_11b0b938(0x14000, "m_fontbuff");
+            words = 0x5000;
+        }
+        else
+        {
+            buffer = (unsigned int *)DAT_11b0b938(0xc000, "m_fontbuff");
+            words = 0x3000;
+        }
+        buffers[i] = buffer;
+        for (; words != 0; words--)
+            *buffer++ = 0;
+        char name[0x80];
+        sprintf(name, "tex%02d", i);
+        int creating = DAT_1101d878;
+        int deep = DAT_10f654a4;
+        DAT_1101d878 = 1;
+        DAT_10f654a4 = 0;
+        textures[i] = FUN_10175c90(name, 0x200, 0x20, (unsigned char *)buffers, (int)buffers, 0);
+        DAT_10f654a4 = deep;
+        DAT_1101d878 = creating;
+    }
+    return 1;
 }

@@ -1,21 +1,21 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.3062,
+  "fuzzy_match_percent": 11.3098,
   "total_code": "1720206",
-  "matched_code": "154615",
-  "matched_code_percent": 8.9882,
+  "matched_code": "154913",
+  "matched_code_percent": 9.0055,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 743,
-  "matched_functions_percent": 61.3036,
+  "matched_functions": 744,
+  "matched_functions_percent": 61.3861,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 230,
-  "complete_units": 138
+  "complete_units": 139
  },
  "units": [
   {
@@ -5391,7 +5391,7 @@
   {
    "name": "app/face_anim",
    "measures": {
-    "fuzzy_match_percent": 79.9342,
+    "fuzzy_match_percent": 94.0789,
     "total_code": "300",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -5412,14 +5412,14 @@
     {
      "name": ".text",
      "size": "300",
-     "fuzzy_match_percent": 79.9342
+     "fuzzy_match_percent": 94.0789
     }
    ],
    "functions": [
     {
      "name": "_FUN_1000f360",
      "size": "300",
-     "fuzzy_match_percent": 79.9342,
+     "fuzzy_match_percent": 94.0789,
      "metadata": {
       "virtual_address": "268497760"
      }
@@ -8999,42 +8999,42 @@
   {
    "name": "app/node_colours",
    "measures": {
-    "fuzzy_match_percent": 93.4211,
+    "fuzzy_match_percent": 100.0,
     "total_code": "298",
-    "matched_code": "0",
-    "matched_code_percent": 0.0,
+    "matched_code": "298",
+    "matched_code_percent": 100.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
     "total_functions": 1,
-    "matched_functions": 0,
-    "matched_functions_percent": 0.0,
-    "complete_code": "0",
-    "complete_code_percent": 0.0,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "298",
+    "complete_code_percent": 100.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
-    "complete_units": 0
+    "complete_units": 1
    },
    "sections": [
     {
      "name": ".text",
      "size": "298",
-     "fuzzy_match_percent": 93.4211
+     "fuzzy_match_percent": 100.0
     }
    ],
    "functions": [
     {
      "name": "?ApplyMaterialColours@Node@@QAEHXZ",
      "size": "298",
-     "fuzzy_match_percent": 93.4211,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270124384"
      }
     }
    ],
    "metadata": {
-    "complete": false,
+    "complete": true,
     "source_path": "decomp/src/node_colours.cpp"
    }
   },

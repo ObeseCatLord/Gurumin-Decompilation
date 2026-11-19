@@ -207,6 +207,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - **ListBank::ReportError is an inline member**: FindVariable (0x10037090) expands it once (printf, callback,
   FreeAll inline) and calls the out-of-line copy 0x100359c0 for its other error. Units that need the expansion
   declare it inline in their own ListBank view (listbank_vars.cpp); listbank.cpp keeps the out-of-line copy.
+- **Prefer repeated element access to a pointer local**: `T *p = &table[i]; p->a ... p->b` changes register and
+  load order; writing `table[i].a`, `table[i].b` lets cl make its own address register like the original
+  (Node::ApplyMaterialColours 0x1019c560, Npc_WaitFacingAway 0x10045c30, face change 0x1000f360 closer).
+  Not universal: Sound_Queue 0x10054550 keeps a pointer in the original.
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

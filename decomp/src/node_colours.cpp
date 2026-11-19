@@ -57,11 +57,10 @@ int Node::ApplyMaterialColours()
     {
         for (int j = 0; j < packs[i].partCount; j++)
         {
-            MeshMaterial *material = &materials[(int)packs[i].parts[j].material];
-            float r = material->colour[0];
-            float g = material->colour[1];
-            float b = material->colour[2];
-            float a = 0.0f < material->alpha ? material->alpha : 0;
+            float r = materials[(int)packs[i].parts[j].material].colour[0];
+            float g = materials[(int)packs[i].parts[j].material].colour[1];
+            float b = materials[(int)packs[i].parts[j].material].colour[2];
+            float a = 0.0f < materials[(int)packs[i].parts[j].material].alpha ? materials[(int)packs[i].parts[j].material].alpha : 0;
             packs[i].parts[j].colour.r = r;
             packs[i].parts[j].colour.g = g;
             packs[i].parts[j].colour.b = b;

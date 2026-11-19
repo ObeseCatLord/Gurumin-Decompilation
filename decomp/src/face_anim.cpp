@@ -53,13 +53,12 @@ extern "C" int FUN_1000f360(int index, int frame)
     }
     else
         DAT_10db6ed8[index].model.M_10161a20(LoadIti(DAT_1087664c[index].names[frame]));
-    FaceSet *set = &DAT_1087664c[DAT_10daaaec[index].faceSet];
-    int next = set->next[frame];
+    int next = DAT_1087664c[DAT_10daaaec[index].faceSet].next[frame];
     if (next == frame)
         DAT_1030c278[index] = 0;
     else
     {
-        DAT_1030c278[index] = set->delay[frame] + 1;
+        DAT_1030c278[index] = DAT_1087664c[DAT_10daaaec[index].faceSet].delay[frame] + 1;
         DAT_10447dd8[index] = next;
     }
     return 0;

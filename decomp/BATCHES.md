@@ -267,7 +267,8 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 205 | medium functions | 10016700, 1014b750, 100b1520 | 10016700 Ground_HeightAt open (float copy pattern shared with two other drafts) |
 | 206 | ListBank | 10037090, 100360f0 (1014b750 skipped: quad-draw register wall family) | 10037090 FindVariable open (search-loop registers; ReportError found to be inline) |
 | 208 | large functions | 100360f0, 100b9bb0, 10055ee0 | 100b9bb0 Enemy_PlayVoice open (jump threading); 100360f0 and 10055ee0 left (goto-heavy) |
-| 209 | wall retries | walls with a ternary or a pointer local (if/else calls, no pointer local) | |
+| 209 | wall retries | walls with a ternary or a pointer local (if/else calls, no pointer local) | 1019c560 Node::ApplyMaterialColours matched (no pointer local); 1000f360 down to an esi/edi swap |
+| 210 | wall retries | ternary walls: 1003ab40, 101ad350, 10169c60, 1016c300 | |
 | 207 | wall study | the fld/fstp float-copy pattern (100ba040, 100b9930, 10016700) | found for 10016700 (sum of two casts spills the first); the other two are a different copy, still open |
 | 200 | wall retries | float-compare walls, MarkKilled | MarkKilled and Vec4::InTriangle still open (register roles, return-block placement) |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

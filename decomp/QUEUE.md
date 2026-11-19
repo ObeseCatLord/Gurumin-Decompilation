@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (121)
+## 1. Walls to retry (122)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -83,6 +83,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10144ee0` 377 — TextureObject::HalveRgb24: loop shape differs (the original keeps the row counter in memory and recomputes both row addresses with imul each pixel; cl 13.00 here strength-reduces them); pointer and indexed forms tried
 - [ ] `10145380` 87 — FontRenderer::GlyphWidth: only the SJIS byte swap differs (original loads the short into ax and stores ah then al; four spellings tried give shr)
 - [ ] `1014b390` 233 — Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
+- [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
 - [ ] `1015cac0` 20 — same shape as 0x1015caa0 but the original loads value into eax and index into edx; VS2003 swaps them (int and float members tried)
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
@@ -139,7 +140,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 bytes (calls 1)
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (56)
+## 3. Medium functions (251-800 bytes) (55)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1016b050` 399 bytes (float, loops 2, calls 7)
@@ -154,7 +155,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
 - [ ] `1017c9c0` 581 bytes (loops 7, calls 2)
 - [ ] `1001f270` 588 bytes (float, loops 3, calls 15)
-- [ ] `1015c450` 589 bytes (loops 11, calls 19)
 - [ ] `101629f0` 597 bytes (loops 2, calls 30)
 - [ ] `100ba040` 604 bytes (float, loops 1, calls 15)
 - [ ] `1019b630` 604 bytes (loops 1, calls 6)

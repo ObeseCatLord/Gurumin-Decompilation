@@ -50,7 +50,6 @@
 ??0GameFile@@QAE@XZ	101ad9e0
 ?Shutdown@Input@@QAEHXZ	101437f0
 ?Release@FontSet@@QAEHXZ	10145970
-?Release@SurfaceSet@@QAEXXZ	101488b0
 ?GetResultString@ImeContext@@QAEHPAD@Z	1015d2e0
 ?GetCompositionString@ImeContext@@QAEHPAD@Z	1015d360
 ?LoadCandidates@ImeContext@@QAEKXZ	1015d430
@@ -358,3 +357,5 @@ _TestDat_Load	1000beb0
 ?FindCase@ListBank@@QAEHPBDPADPAPAD@Z	100558d0
 ?IsQueuedEventReady@Game@@QAEHXZ	10055690
 ?Overlay_DrawModel@@YAHXZ	100236c0
+?Close@DShowStream@@QAEXXZ	101488b0
+?Open@DShowStream@@QAEJPBD@Z	1015c450

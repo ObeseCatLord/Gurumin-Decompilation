@@ -187,7 +187,7 @@ address	name	evidence
 1013ed90	Object::Object	named in the decompiled source (decomp/obj_symbols.tsv)
 1013eda0	Object::~Object	named in the decompiled source (decomp/obj_symbols.tsv)
 101ad9e0	GameFile::GameFile	named in the decompiled source (decomp/obj_symbols.tsv)
-101488b0	SurfaceSet::Release	named in the decompiled source (decomp/obj_symbols.tsv)
+101488b0	DShowStream::Close	releases the five DirectShow stream interfaces (decomp/src/dshow_stream.cpp)
 1015d2e0	ImeContext::GetResultString	named in the decompiled source (decomp/obj_symbols.tsv)
 1015d360	ImeContext::GetCompositionString	named in the decompiled source (decomp/obj_symbols.tsv)
 1015d430	ImeContext::LoadCandidates	named in the decompiled source (decomp/obj_symbols.tsv)
@@ -830,3 +830,4 @@ address	name	evidence
 1000c020	Text_Substitute	replaces test.dat group words in message text with a random word of the same group (decomp/src/test_dat.cpp)
 10175a90	Texture_CreateCopy	named texture slot made from another texture object's pixels, size and alpha (decomp/src/texture_create.cpp)
 100236c0	Overlay_DrawModel	draws the overlay mode model with its camera, light and fade-in alpha (decomp/src/overlay_draw.cpp)
+1015c450	DShowStream::Open	opens a movie as an IAMMultiMediaStream with a DirectDraw surface sample (decomp/src/dshow_stream.cpp)

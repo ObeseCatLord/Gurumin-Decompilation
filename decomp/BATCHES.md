@@ -189,7 +189,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 125 | medium functions | 1000c020 Text_Substitute, 10054770, 1009ddd0 Kind4a_Update | Kind4a_Update matched; Text_Substitute open (15 bytes); 10054770 is Game::RaiseDeadEvents (same loop wall as the other Raise*Events), left |
 | 126 | medium functions | 10175a90 Texture_CreateCopy, 1019e610, 100092c0 | Texture_CreateCopy matched; 1019e610 (vertex de-duplication, three nested loops) and 100092c0 (window scroll arrows over Game's per-window field arrays) left |
 | 127 | medium functions | 100236c0 Overlay_DrawModel, 1000f5a0, 1001f270 | Overlay_DrawModel matched; 1000f5a0 (camera matrices from the map's camera node) and 1001f270 (nearest movie screen and its fade) left: many unnamed globals |
-| 128 | medium functions | 1017c9c0, 1015c450, 101629f0 | |
+| 128 | medium functions | 1017c9c0, 1015c450 DShowStream::Open, 101629f0 | DShowStream::Open open (cross-jumped failure messages); its Close (was SurfaceSet::Release) moved into dshow_stream.cpp; 1017c9c0 (big object reset) and 101629f0 (model constructor) need their class layouts first |
 | 129 | medium functions | 100ba040, 1019b630, 1003aef0 Bgm_Play | |
 | 130 | medium functions | 100b8220, 1002ebf0, 100b9930 | |
 | 131 | medium functions | 10058500, 10192a00, 10045c30 | |
@@ -197,3 +197,5 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 133 | medium functions | 1001d920, 100e21a0, 1002a490 | |
 | 134 | medium functions | 1002f050, 10016700, 1016b400 | |
 | 135 | medium functions | 10001170, 1014b750, 1016a980 | |
+| 136 | medium functions | 10148590, 100b1520, 10142dd0 | |
+| 137 | medium functions | 10149100, 10037560, 10144bf0 | |

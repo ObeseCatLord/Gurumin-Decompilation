@@ -12,12 +12,6 @@ struct Bounds
     float w;
 };
 
-struct SurfaceSet
-{
-    IUnknownLike *surfaces[5];
-    void Release();
-};
-
 extern "C" IDirect3DDevice9 *DAT_10f1fcf0;
 extern "C" IUnknownLike *DAT_10f0d5e0[0x5a0];
 extern "C" IUnknownLike *DAT_10f1c7f0[0x5a0];
@@ -153,26 +147,6 @@ extern "C" int FUN_10148520(int index)
         DAT_10f0cd40[index] = 0;
     }
     return 0;
-}
-
-// Releases the five surfaces of a set, last to first.
-void SurfaceSet::Release()
-{
-    if (surfaces[4] != 0)
-        surfaces[4]->Release();
-    surfaces[4] = 0;
-    if (surfaces[3] != 0)
-        surfaces[3]->Release();
-    surfaces[3] = 0;
-    if (surfaces[2] != 0)
-        surfaces[2]->Release();
-    surfaces[2] = 0;
-    if (surfaces[1] != 0)
-        surfaces[1]->Release();
-    surfaces[1] = 0;
-    if (surfaces[0] != 0)
-        surfaces[0]->Release();
-    surfaces[0] = 0;
 }
 
 extern "C" char DAT_10f60690[0x5a0];

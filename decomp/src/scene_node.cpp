@@ -32,6 +32,7 @@ struct Matrix
 {
     float m[16];
     Vec4 GetTranslation();  // 0x101ade80
+    Matrix();               // 0x101ae770
     ~Matrix();              // 0x1013eda0 (empty)
 };
 
@@ -55,8 +56,13 @@ struct KeyPair
     void Copy(const KeyPair *source);            // 0x101ad160
 };
 
-struct TextureRef;
+// A reference-counted cache entry (mesh_cache.cpp): the motion of a node points to one holding its cache slot.
+struct TextureRef
+{
+    int slot;
+};
 extern "C" int FUN_10169c00(TextureRef *texture);
+extern "C" int FUN_10169be0(TextureRef *texture);  // adds a reference
 
 struct Node;
 
@@ -98,12 +104,23 @@ struct Keys
 
 struct Channel
 {
-    int pad_0000;
+    int size;                    // size of the whole channel block in bytes
     Keys keys;
+};
+
+// A key track (vec4.cpp KeyTrack), 0x14 bytes.
+struct KeyTrack
+{
+    char data[0x14];
+    void Copy(const KeyTrack *source);           // 0x101ade10
 };
 
 struct Extra
 {
+    KeyTrack tracks[5];          // 0x00
+    char pad_0064[0xc];
+    int m_0070[4];               // 0x70
+    Matrix AnimatedMatrix(int frame);            // 0x101693f0 (node_extra.cpp)
     void M_10169660();
     void M_10169620();           // 0x10169620 (SlotLists::Clear): frees the extra data's lists
 };
@@ -188,7 +205,8 @@ struct Node
     int m_0294;                  // 0x294: number of frames
     char pad_0298[0x10];
     struct Extra *m_02a8;
-    char pad_02ac[0x24];
+    char pad_02ac[0x20];
+    int frame;                   // 0x2cc: current animation frame (-1, -2, ...: a stored pose)
     unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
     char pad_02d1[3];
     Matrix poses[16];            // 0x2d4: the current pose ([0]) and stored poses
@@ -232,6 +250,7 @@ struct Node
     int M_1019eeb0(Node *root, Node **list, int *count);
     int CopyMesh(Node *source, int slot);
     int BlendFrames(int from, int to, float t);
+    int CopyAnimation(Node *source, int slot);
     void M_101ab9d0(Node *root);
     int M_10191770();
     void Release();
@@ -1922,4 +1941,117 @@ int Node::BlendFrames(int from, int to, float t)
     for (int i = 0; i < childCount; i++)
         children[i]->BlendFrames(from, to, t);
     return 1;
+}
+
+extern "C" TextureRef *DAT_10fdf1d0[];                // per motion cache slot: the reference
+extern "C" Matrix *DAT_1101c820[];                    //   the frame matrices
+extern "C" int DAT_11017600[];                        //   the number of frames
+extern "C" int FUN_10169ab0(const char *folder, const char *name, int *freeSlot);  // motion name slot, -1 = none
+extern "C" int FUN_101699d0(void);                   // a free motion name slot
+extern "C" int FUN_101699f0(int slot, const char *folder, const char *name);       // names a motion slot
+
+// 0x1019b890. Gives this node the animation of `source`: the plug channels (copied whole), the extra key tracks
+// (the first three all from the source's second track, as in the original), the node matrix and the frame
+// matrices. With `slot` 0 the cached motion of this node's name is shared when there is one; otherwise a copy is
+// made and cached (in a new slot for `slot` non-zero). The pose the node had (its current frame or stored pose) is
+// kept in poses[15]. Returns 0.
+int Node::CopyAnimation(Node *source, int slot)
+{
+    Matrix current;
+    if (source != 0)
+    {
+        if (frame < 0)
+        {
+            int pose = -1 - frame;
+            if (pose >= 15)
+                pose = 15;
+            current = poses[pose];
+        }
+        else if ((flags & 0x100000) != 0 && m_02a8 != 0)
+            current = m_02a8->AnimatedMatrix(frame);
+        else if (frames != 0)
+        {
+            int index = frame;
+            if (m_0294 <= index)
+                index = m_0294 - 1;
+            current = frames[index];
+        }
+        else
+            current = matrix;
+    }
+    int g;
+    for (g = 0; g < 16; g++)
+    {
+        if (plugs[g] != 0)
+        {
+            DAT_11b1ba40(plugs[g]);
+            plugs[g] = 0;
+            plugType[g] = 0;
+        }
+    }
+    if (m_028c != 0)
+        M_10191210();
+    if (source == 0)
+        return 0;
+    strcpy(m_0050, source->m_0050);
+    for (g = 0; g < 16; g++)
+    {
+        if (source->plugs[g] != 0)
+        {
+            int size = source->plugs[g]->size;
+            plugs[g] = (Channel *)DAT_11b0b938(size, "->m_plugdata[g]");
+            memcpy(plugs[g], source->plugs[g], size);
+            plugType[g] = source->plugType[g];
+        }
+    }
+    if (source->m_02a8 != 0)
+    {
+        M_101949d0();
+        m_02a8->tracks[0].Copy(&source->m_02a8->tracks[1]);
+        m_02a8->tracks[1].Copy(&source->m_02a8->tracks[1]);
+        m_02a8->tracks[2].Copy(&source->m_02a8->tracks[1]);
+        m_02a8->tracks[3].Copy(&source->m_02a8->tracks[3]);
+        m_02a8->tracks[4].Copy(&source->m_02a8->tracks[4]);
+        m_02a8->m_0070[0] = source->m_02a8->m_0070[0];
+        m_02a8->m_0070[1] = source->m_02a8->m_0070[1];
+        m_02a8->m_0070[2] = source->m_02a8->m_0070[2];
+        m_02a8->m_0070[3] = source->m_02a8->m_0070[3];
+    }
+    matrix = source->matrix;
+    if (source->m_028c != 0)
+    {
+        int motionSlot = -1;
+        if (slot == 0)
+        {
+            int found = FUN_10169ab0(m_0050, name, &motionSlot);
+            if (found >= 0)
+            {
+                m_028c = DAT_10fdf1d0[found];
+                frames = DAT_1101c820[found];
+                m_0294 = DAT_11017600[found];
+                FUN_10169be0(m_028c);
+                goto keepPose;
+            }
+        }
+        else
+        {
+            motionSlot = FUN_101699d0();
+            FUN_101699f0(motionSlot, m_0050, name);
+        }
+        m_028c = (TextureRef *)DAT_11b0b938(4, "motion");
+        m_0294 = source->m_0294;
+        frames = (Matrix *)DAT_11b0b938(source->m_0294 << 6, "tmp[i]->m_animat");
+        memcpy(frames, source->frames, source->m_0294 << 6);
+        m_028c->slot = motionSlot;
+        if (motionSlot >= 0)
+        {
+            DAT_10fdf1d0[motionSlot] = m_028c;
+            DAT_1101c820[motionSlot] = frames;
+            DAT_11017600[motionSlot] = m_0294;
+            FUN_10169be0(m_028c);
+        }
+    }
+keepPose:
+    poses[15] = current;
+    return 0;
 }

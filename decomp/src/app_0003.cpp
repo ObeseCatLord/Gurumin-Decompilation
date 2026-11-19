@@ -386,3 +386,43 @@ int Game::IsQueuedEventReady()
     }
     return 0;
 }
+
+// 0x10055410 (Game::RunQueuedEvents). Takes the queued events not yet handled (id > 0, handled flag 0), moves all
+// queued ids into runningEvents (so events queued while these run are told apart, see RegisterEvent) and clears
+// the queue, then calls `callback` for every queued trigger of one of the taken events on the current map (or
+// 9999 = any) whose four script flags pass. Returns 1 when a trigger ran, else 0.
+int Game::RunQueuedEvents(void (*callback)(GameTrigger *trigger))
+{
+    int ids[0x100];
+    int count = 0;
+    int i;
+    for (i = 0; i < 0x100; i++)
+    {
+        if (queuedEvents[i][0] > 0 && queuedEvents[i][1] == 0)
+            ids[count++] = queuedEvents[i][0];
+    }
+    for (i = 0; i < 0x100; i++)
+        runningEvents[i] = queuedEvents[i][0];
+    for (i = 0; i < 0x100; i++)
+        queuedEvents[i][0] = 0;
+    int map = currentMap;
+    int ran = 0;
+    for (int t = 0; t < queuedTriggerCount; t++)
+    {
+        for (int j = 0; j < count; j++)
+        {
+            if (ids[j] == queuedTriggers[t].value)
+            {
+                GameTrigger *trigger = &queuedTriggers[t];
+                if ((trigger->map == 9999 || map == trigger->map) &&
+                    TestScriptFlag(trigger->flags[0]) && TestScriptFlag(trigger->flags[1]) &&
+                    TestScriptFlag(trigger->flags[2]) && TestScriptFlag(trigger->flags[3]))
+                {
+                    ran = 1;
+                    callback(trigger);
+                }
+            }
+        }
+    }
+    return ran;
+}

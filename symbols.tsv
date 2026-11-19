@@ -882,3 +882,5 @@ address	name	evidence
 10148590	TexturePool_Get	video-memory copy of a pooled buffer, created on demand with LRU eviction (decomp/src/buffer_pool.cpp)
 1004f860	TutorialBook_PrevPage	loads the two previous unlocked tutorial pages, turns the sheet back (pagedown) or shows the first-page message
 10055aa0	ListBank::FindLabel	finds a goto label name: inside the block at the given text (matched, decomp/src/listbank.cpp)
+10055ca0	ListBank::SkipStatement	moves past one statement (if/else, for, while, switch, block or up to a semicolon) (matched, decomp/src/listbank.cpp)
+10055410	Game::RunQueuedEvents	moves the queued events into runningEvents and runs their queued triggers that pass (matched, decomp/src/app_0003.cpp)

@@ -392,3 +392,5 @@ _sqrtf	10002010
 ?Init@FontRenderer@@QAEHPAUHWND__@@PBD@Z	101455d0
 ?M_1015cac0@StateArrays@@QAEHMH@Z	1015cac0
 ?FindLabel@ListBank@@QAEHPBDPADPAPAD@Z	10055aa0
+?SkipStatement@ListBank@@QAEHPAPAD@Z	10055ca0
+?RunQueuedEvents@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z	10055410

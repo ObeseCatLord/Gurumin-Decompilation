@@ -64,6 +64,7 @@ struct ListBank
     int ReadWord(char **text, char *word);
     int FindCase(const char *value, char *text, char **found);
     int FindLabel(const char *name, char *text, char **found);
+    int SkipStatement(char **text);
     int ReadTerm(char **text, char *word);
     int CompileStatement(const char *statement);               // 0x100ed9b0
     int CompileText();
@@ -1075,5 +1076,92 @@ int ListBank::FindLabel(const char *name, char *text, char **found)
             return 0;
         count++;
     }
+    return 0;
+}
+
+// "終わりまで来た。" ("Reached the end."), Shift-JIS.
+#define END_REACHED_TEXT "IíèÜÅ½B"
+
+// 0x10055ca0 (ListBank::SkipStatement). Moves `*text` past one statement: an `if` (with its `else` branch, both
+// skipped recursively), a `for`, `while` or `switch` statement, a `{ }` block or a plain statement ending in ';'
+// (outside quotes, parentheses and braces). Returns 1; reports an error and returns 0 when the script text ends
+// first (0 without a message after an earlier error).
+int ListBank::SkipStatement(char **text)
+{
+    char word[0x100];
+    char *p = *text;
+    int quoted = 0;
+    int parens = 0;
+    int count = 0;
+    int braces = 0;
+    int opened = 0;
+    char *end = &this->text[textLength];
+    for (; p < end; p++, count++)
+    {
+        if (m_3632c != 0)
+            return 0;
+        if (quoted == 0 && parens == 0 && braces == 0)
+        {
+            if (count >= 1 && p[-1] == 'i' && p[0] == 'f')
+            {
+                // skip the condition and the statement, then an `else` branch if one follows
+                *text = p;
+                SkipStatement(text);
+                char *after = *text;
+                char *next = after;
+                ReadWord(&next, word);
+                if (strcmp(word, "else") == 0)
+                {
+                    *text = next;
+                    SkipStatement(text);
+                    after = *text;
+                }
+                *text = after;
+                return 1;
+            }
+            if ((count >= 2 && p[-2] == 'f' && p[-1] == 'o' && p[0] == 'r') ||
+                (count >= 4 && p[-4] == 'w' && p[-3] == 'h' && p[-2] == 'i' && p[-1] == 'l' && p[0] == 'e') ||
+                (count >= 5 && p[-5] == 's' && p[-4] == 'w' && p[-3] == 'i' && p[-2] == 't' && p[-1] == 'c' &&
+                 p[0] == 'h'))
+            {
+                *text = p;
+                SkipStatement(text);
+                return 1;
+            }
+        }
+        if (*p == '(')
+            parens++;
+        else if (*p == ')')
+            parens--;
+        if (*p == '"')
+        {
+            if (quoted == 1)
+                quoted = 0;
+            else if (quoted == 0)
+                quoted = 1;
+        }
+        if (quoted == 0 && parens == 0)
+        {
+            if (*p == '{')
+            {
+                braces++;
+                opened = 1;
+            }
+            if (*p == '}')
+                braces--;
+            if (*p == ';' && braces == 0)
+            {
+                *text = p + 1;
+                return 1;
+            }
+        }
+        if (opened != 0 && braces == 0)
+        {
+            *text = p + 1;
+            return 1;
+        }
+    }
+    ReportError(END_REACHED_TEXT);
+    *text = p;
     return 0;
 }

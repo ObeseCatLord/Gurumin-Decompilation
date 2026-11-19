@@ -252,5 +252,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 189 | wall retries | 1000ed20, 1016a090, 10012130, 1016b1e0 | 1000ed20 (counter read into a local) and 1016b1e0 (two ternaries) matched; 1016a090 and 10012130 still open |
 | 190 | wall retries | 1016b010, 100e2080 family, 10015710, 101992f0 | all still open: control-flow, store-order, result-variable and flag variants leave the zero/1.0f register choice unchanged |
 | 191 | small/medium functions | 1000cf80, 1004f860, 10017c55, 10055aa0 | 10055aa0 ListBank::FindLabel matched and FindCase 0x100558d0 with it (`*text` tests, no jump threading); 1004f860 TutorialBook_PrevPage open; 1000cf80/10017c55 are mis-sized fragments |
-| 192 | medium functions | 10055410, 10055ca0, 10161781 | |
+| 192 | medium functions | 10055410, 10055ca0, 10161781 | 10055410 Game::RunQueuedEvents (trigger pointer taken after the id test) and 10055ca0 ListBank::SkipStatement (declaration order) matched; 10161781 is a fragment |
+| 193 | medium functions | 101453e0 Font_DrawGlyph, 100092c0, 1000f5a0 | |
+| 194 | medium functions | 1001f270, 100ba040, 10055 neighbours | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

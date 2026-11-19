@@ -144,7 +144,8 @@ struct Game : Object
     char *text;                 // 0x3ed97c: script text being tokenised
     int pos;                    // 0x3ed980: read position in `text`
     int end;                    // 0x3ed984: text length
-    char token[0x480];          // 0x3ed988: the token read last
+    char token[0x80];           // 0x3ed988: the token read last
+    int runningEvents[0x100];   // 0x3eda08: the queued event ids being run (RunQueuedEvents)
     int queuedEvents[0x100][2]; // 0x3ede08: queued event ids (> 0) and whether each was handled (non-zero)
     char killed[0x80];          // 0x3ee608: 1 for each id killed (entry 0 is always set)
     int currentMap;             // 0x3ee688: number of the loaded map
@@ -174,6 +175,7 @@ struct Game : Object
         return m_3ee694[index];
     }
     int IsQueuedEventReady();
+    int RunQueuedEvents(void (*callback)(GameTrigger *trigger));
     int ForEachActiveTrigger(void (*callback)(GameTrigger *trigger));
     int RaiseKskonEvents(int argument);
     int RaiseTalkEvents(int argument);

@@ -868,3 +868,4 @@ address	name	evidence
 10034920	Bs003_SetVariant	loads one of five texture variants of the BS_003 model and puts them on its parts (matched, decomp/src/bs003_variant.cpp)
 1017c160	ModelBank::CreateTextures	creates the shadow, lens-flare, cel and render-target textures (matched, decomp/src/model_bank.cpp)
 100135b0	Map_ShowEquipment	shows the chosen versions of the equipment parts and the house on the map model (decomp/src/map_equipment.cpp)
+1019e610	Node::WeldVertices	merges identical vertices of each pack and rewrites the indices (matched, decomp/src/node_sort_packs.cpp)

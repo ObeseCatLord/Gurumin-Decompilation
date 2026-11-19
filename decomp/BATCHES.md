@@ -238,5 +238,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 175 | init-like | 1003b6e0 Costume_LoadPlayerModel, 100b0f00, 100b0250 | none (branchy character logic); left |
 | 176 | save and system files | 1015fea0 SystemSav_WriteRecord, 101603c0 SystemSav_ReadRecord, 10015910 retry | WriteRecord matched (FILETIME times[4]); ReadRecord open (20 bytes, return block order); 10015910 still threads its tests |
 | 177 | save files | 10010d10 Save_ReadSlotInfo, 1001b0a0, 1004f250 | Save_ReadSlotInfo open (stack layout, as Save_ReadThumbnail); the others left |
-| 178 | medium functions | 1004ed60, 10055410, 1019e610 | |
+| 178 | node functions | 1019e610 Node::WeldVertices, 1004ed60, 10055410 | WeldVertices matched (first build); others left |
+| 179 | node functions | 1019b630, 1019b350, 1019eeb0 | |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

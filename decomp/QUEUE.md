@@ -152,11 +152,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (23)
+## 3. Medium functions (251-800 bytes) (22)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
-- [ ] `10045c30` 653 bytes (float, loops 2, calls 12)
 - [ ] `1004f250` 655 bytes (loops 4, calls 19)
 - [ ] `100e21a0` 671 bytes (float, loops 2, calls 19)
 - [ ] `1002f050` 690 bytes (float, calls 4)

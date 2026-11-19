@@ -891,3 +891,4 @@ address	name	evidence
 10192a00	Cylinder_Overlap	overlap test of the upright cylinders inscribed in two moved boxes (matched, decomp/src/box_overlap.cpp)
 100b9930	Enemy_DragToPit	turns an enemy to the player and drags it along until it fades out over the pit
 100ba040	Npc_PlayGreeting	plays the voice line of a kind-0x140 town character when the player walks up to it
+10045c30	Npc_WaitFacingAway	waits with its back to the player and walks off once the player comes near (matched, decomp/src/char_move.cpp)

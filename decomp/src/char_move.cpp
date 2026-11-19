@@ -2,6 +2,7 @@
 // (0x10db6ee8, 0x10 bytes into each Character of world.h), where all the fields used here fall inside one record.
 
 #include <math.h>
+#include <string.h>
 
 struct Vec4
 {
@@ -9,6 +10,9 @@ struct Vec4
     float y;
     float z;
     float w;
+    Vec4();                  // 0x101ac990: zero
+    void Copy(const Vec4 &source);             // 0x101acc20
+    void RotateZ(float angle);                 // 0x101ac300
     float LengthSquared3();  // 0x101ac6a0: x*x + y*y + z*z
     float Length2D();        // 0x101ac500: length of x/y
     void Fill(const float &value);
@@ -36,7 +40,8 @@ struct CharRecord
     Vec4 m_23b8;              // 0x23b8: current speed vector (compared against 1.0 below)
     char pad_23c8[0x10];
     Vec4 m_23d8;              // 0x23d8
-    char pad_23e8[0x98];
+    char pad_23e8[0x94];
+    float heading;            // 0x247c: facing angle in radians
     float targetHeading;      // 0x2480: angle the character turns towards
     char pad_2484[0x14];
     int m_2498;               // 0x2498: set to 1 by the scene start for the player
@@ -74,9 +79,10 @@ struct NpcState
     int state;                // 0x00: 0 = start, 1 = idling
     int wait;                 // 0x04: frames until the next voice line may play
     int talk;                 // 0x08: talk id: script number * 100 + line (line 0 = never speaks)
-    char pad_000c[0x2c];
+    int range;                // 0x0c: distance at which a waiting character reacts
+    char pad_0010[0x28];
     int m_0038;               // 0x38
-    int pad_003c;
+    int m_003c;
 };
 
 extern "C" NpcState DAT_1020b430[0x80];
@@ -180,6 +186,58 @@ extern "C" int FUN_100b5ae0(int index)
             FUN_1000d620(index, DAT_1020b430[index].talk / 100 * 1000 - 1 + DAT_1020b430[index].talk % 100, 60);
             DAT_1020b430[index].wait = 75;
         }
+    }
+    return 0;
+}
+
+// 0x10045c30 (Npc_WaitFacingAway). A character that waits with its back to the player: on the first frame it starts
+// idle motion 2 and takes its reaction distance from the talk id (line * 10). Then it keeps turning so that it
+// faces away from the player (idle motion 2 once it is within about one degree, else motion 0). When the player
+// comes closer than that distance (or the character was told to react, m_0038, and has a script number) its state
+// is reset to behaviour 0x1d with talk id 999 and it starts walking away (16 units along its facing). Returns 0.
+extern "C" int FUN_10045c30(int index)
+{
+    float distance = (DAT_10db6ee8[0].matrix.GetTranslation() - DAT_10db6ee8[index].matrix.GetTranslation()).Length2D();
+    NpcState *state = &DAT_1020b430[index];
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_1020b430[index].state = 1;
+        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_1020b430[index].range = DAT_1020b430[index].talk % 100 * 10;
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        return 0;
+    }
+    {
+        float turn = DAT_10db6ee8[index].heading - DAT_10db6ee8[index].targetHeading;
+        while (turn > 3.1415f)
+            turn -= 6.283f;
+        while (turn < -3.1415f)
+            turn += 6.283f;
+        float squared = turn * turn;
+        if (squared < 0.000304503f)
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        else
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+    }
+    DAT_10db6ee8[index].targetHeading =
+        Atan2(DAT_10db6ee8[0].matrix.m[12] - DAT_10db6ee8[index].matrix.m[12],
+              DAT_10db6ee8[0].matrix.m[13] - DAT_10db6ee8[index].matrix.m[13]) + 3.1415f;
+    if (distance < (float)DAT_1020b430[index].range ||
+        (DAT_1020b430[index].m_0038 != 0 && DAT_1020b430[index].talk / 100 != 0))
+    {
+        memset(state, 0, sizeof(NpcState));
+        DAT_1020b430[index].state = 2;
+        DAT_1020b430[index].wait = 0x1d;
+        DAT_1020b430[index].talk = 999;
+        DAT_1020b430[index].m_003c = 0xf;
+        DAT_10210b30[index] = 0;
+        DAT_10db6ee8[index].m_2498 = 1;
+        Vec4 step;
+        step.y = -16.0f;
+        step.RotateZ(-DAT_10db6ee8[index].heading);
+        FUN_100241e0(index, step.x, step.y, 0);
+        DAT_10db6ee8[index].m_23b8.Copy(step);
+        DAT_10db6ee8[index].AddMotionSpeed(20.0f);
     }
     return 0;
 }

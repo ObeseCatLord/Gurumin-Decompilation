@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 11.2447,
+  "fuzzy_match_percent": 11.2706,
   "total_code": "1720206",
   "matched_code": "154615",
   "matched_code_percent": 8.9882,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 227,
+  "total_units": 228,
   "complete_units": 138
  },
  "units": [
@@ -5792,6 +5792,48 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/game_reset.cpp"
+   }
+  },
+  {
+   "name": "app/ground_height",
+   "measures": {
+    "fuzzy_match_percent": 64.2442,
+    "total_code": "694",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "694",
+     "fuzzy_match_percent": 64.2442
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10016700",
+     "size": "694",
+     "fuzzy_match_percent": 64.2442,
+     "metadata": {
+      "virtual_address": "268527360"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/ground_height.cpp"
    }
   },
   {
@@ -14738,13 +14780,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1503274",
+    "total_code": "1502580",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 333,
+    "total_functions": 332,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -14757,7 +14799,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1503274",
+     "size": "1502580",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -14904,14 +14946,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268523872"
-     }
-    },
-    {
-     "name": "FUN_10016700",
-     "size": "694",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268527360"
      }
     },
     {

@@ -296,3 +296,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 232 | player | 1005dbf0 | Player_TakeDamage drafted (player_damage.cpp); its hurt-voice helper will not inline under cl 13.00 |
 | 233 | enemy behaviours | 10048e90 | Enemy_DropIn matched (switch with two cases carrying the same statement gives dec/je/dec/jne) |
 | 234 | enemy behaviours | 10049240, 10049b00 | Enemy_DropInWhenNear matched; 10049b00 (route position interpolation, 0x40 bytes per point) studied only |
+| 235 | enemy behaviours | 10046f10 | Enemy_AppearNearby matched in its own unit (enemy_blink.cpp) |

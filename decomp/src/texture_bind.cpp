@@ -599,7 +599,6 @@ int TextureObject::DrawCell(int left, int top, int right, int bottom, float u0, 
         vertices[3].x = bottomRight.x;
         vertices[3].y = bottomRight.y;
     }
-#if V != 2
     else
     {
         vertices[0].x = (float)left;
@@ -611,7 +610,6 @@ int TextureObject::DrawCell(int left, int top, int right, int bottom, float u0, 
         vertices[3].x = (float)right;
         vertices[3].y = (float)bottom;
     }
-#endif
     vertices[0].u = u0;
     vertices[0].v = v0;
     vertices[1].u = u1;

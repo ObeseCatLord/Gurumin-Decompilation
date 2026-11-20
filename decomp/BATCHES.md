@@ -310,3 +310,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 246 | attached meshes | 1000baf0 | MeshSlot::Draw matched (mesh_slots.cpp; double literals for the camera offsets) |
 | 247 | enemies | 100e21a0 | Enemy_DefaultStep drafted (enemy_react.cpp; zero register) |
 | 248 | walls retried | 1002ee70, 10034cc0, 10024d00 | Char_UpdateShoves and Party_BlocksMove matched with math.h atan2f; Enemy_CanReturnHome differs earlier |
+| 249 | enemy moves | 10027630 | Enemy_ChasePlayer drafted (enemy_chase.cpp) |

@@ -949,3 +949,4 @@ address	name	evidence
 101b0c10	Perspective	perspective projection matrix (near, far, field of view) (mesh_slots.cpp)
 101b13c0	Scaling	scale matrix (mesh_slots.cpp)
 100e21a0	Enemy_DefaultStep	turn to player, idle, pick a 65/35 action; special cases for characters 11/14/20 (decomp/src/enemy_react.cpp)
+10027630	Enemy_ChasePlayer	runs at the player with eased speed, ends when blocked, too far, at random or out of range (decomp/src/enemy_chase.cpp)

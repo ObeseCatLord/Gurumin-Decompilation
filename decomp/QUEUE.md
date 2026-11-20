@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (150)
+## 1. Walls to retry (151)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -51,6 +51,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100242c0` 487 — Char_ProbeAhead: logic identical; the original keeps the testOnly path's `return 1` block in place and the final test jumps back to it (ours puts it at the end); three return layouts tried
 - [ ] `100244b0` 502 — Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
 - [ ] `10024d00` 377 — Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
+- [ ] `10027630` 882 — Enemy_ChasePlayer (enemy_chase.cpp): all but the step setup identical; the original loads the heading and m_0010 (into eax) before storing -2/-8 into step.y and computes the speed pointer with lea; if/else, ternary and local forms tried
 - [ ] `1002a110` 559 — Char_WalkRoute: code identical; the original keeps the next route point in the slot parameter's stack home (frame 4 bytes smaller), ours gives it a local; declaration positions tried
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
 - [ ] `1002a490` 685 — Block_Update: statements and layout identical; the original computes the block model address once into esi on the standing path and reuses it for the second IsClearAny, ours recomputes it (combined, nested and goto forms and a model pointer local tried)
@@ -180,7 +181,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10165e00` 757 bytes (float, loops 2, calls 8)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (164)
+## 4. Large functions (801-3000 bytes) (163)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -190,7 +191,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014e5d0` 870 bytes (float, loops 1, calls 12)
 - [ ] `1014d4e0` 874 bytes TextureObject::DrawFrame (float, loops 1, calls 19)
 - [ ] `10055ee0` 881 bytes (loops 4, calls 17)
-- [ ] `10027630` 882 bytes (float, calls 27)
 - [ ] `100d2110` 894 bytes (float, loops 4, calls 12)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
 - [ ] `10144320` 907 bytes (float, calls 19)

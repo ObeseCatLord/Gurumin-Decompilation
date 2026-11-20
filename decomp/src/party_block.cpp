@@ -30,12 +30,6 @@ struct Character
     char pad_2378[0x124];
 };
 
-// atan2 on floats (an inline helper: both arguments are rounded to float first, the second one first).
-inline float Atan2(float y, float x)
-{
-    return (float)atan2(y, x);
-}
-
 // Absolute value of a float (an inline helper: its argument is rounded to float first).
 inline float AbsFloat(float value)
 {
@@ -59,8 +53,8 @@ extern "C" int FUN_10034cc0(int self, const Vec4 &step, int range)
         other.Copy(DAT_10db6ed8[DAT_101d67f0[i]].matrix.GetTranslation());
         float distance = (other - ahead).Length2D();
         float gain = distance - (other - DAT_10db6ed8[self].matrix.GetTranslation()).Length2D();
-        float heading = Atan2(step.x, step.y);
-        float toOther = Atan2(other.x - ahead.x, other.y - ahead.y);
+        float heading = atan2f(step.x, step.y);
+        float toOther = atan2f(other.x - ahead.x, other.y - ahead.y);
         if (distance < (float)range)
         {
             if (gain > 0.0f && AbsFloat(heading - toOther) < 0.25f)

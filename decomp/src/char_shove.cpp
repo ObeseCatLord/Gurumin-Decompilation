@@ -86,7 +86,7 @@ extern "C" int FUN_1002ee70(int slot)
                     step.x = (float)shove->stepX;
                     step.y = (float)shove->stepY;
                     if (shove->target / 10000 == 0)
-                        DAT_10db6ed8[shove->target % 10000].targetHeading = (float)atan2(step.x, step.y) + 3.1415f;
+                        DAT_10db6ed8[shove->target % 10000].targetHeading = atan2f(step.x, step.y) + 3.1415f;
                     if (shove->frames / 10000 == 0)
                     {
                         if (step.Length2D() >= 8.0f)

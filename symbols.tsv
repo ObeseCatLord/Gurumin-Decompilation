@@ -970,3 +970,5 @@ address	name	evidence
 10166520	ModelBank::DrawLensFlares	draws eight lens-flare discs per collected flare point along the line through the screen centre (matched, decomp/src/model_bank.cpp)
 
 10165e00	ModelBank::DrawShadows	draws the shadows of the first ten shadow casters (own targets or kage.bmp) (matched, decomp/src/model_bank.cpp)
+
+10166100	ModelBank::DrawShadowsInto	DrawShadows through the scene matrix (caster shadow matrix raised 6.1) (matched, decomp/src/model_bank.cpp)

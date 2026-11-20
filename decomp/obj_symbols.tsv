@@ -444,3 +444,4 @@ _FUN_101426d0@8	101426d0
 ?DrawLensFlares@ModelBank@@QAEHXZ	10166520
 ?DrawScreenCopy@TextureSlot@@QAEHHHHHMM@Z	1014b750
 ?DrawShadows@ModelBank@@QAEHPAUShadowScene@@HHH@Z	10165e00
+?DrawShadowsInto@ModelBank@@QAEHPAUShadowScene@@HHH@Z	10166100

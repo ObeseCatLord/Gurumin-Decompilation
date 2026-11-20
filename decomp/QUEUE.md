@@ -180,7 +180,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (149)
+## 4. Large functions (801-3000 bytes) (148)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f590` 865 bytes (float, loops 5, calls 11)
@@ -204,7 +204,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100509e0` 1035 bytes (float, calls 36)
 - [ ] `1016a480` 1045 bytes (float, loops 3, calls 6)
 - [ ] `1014fdd0` 1048 bytes (float, loops 3, calls 9)
-- [ ] `10166100` 1055 bytes (float, loops 2, calls 14)
 - [ ] `1014f900` 1070 bytes (float, loops 6, calls 12)
 - [ ] `101afe00` 1079 bytes (float, loops 2, calls 7)
 - [ ] `100e1c40` 1082 bytes Enemy_IsBusy (float, loops 1, calls 26)

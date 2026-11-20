@@ -23,6 +23,7 @@ struct Matrix4
     float m[16];
     void SetIdentity();                          // 0x101ae7a0
     void SetTranslation(Vec4 position);          // 0x101adef0
+    void Translate(float x, float y, float z);   // 0x101adec0
 };
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060 (vec4.cpp)
@@ -51,7 +52,9 @@ struct BankModel
     unsigned char opacity;  // 0x237a: 0 = no shadow
     char pad_237b[0x15];
     int timer;              // 0x2390: 99999 = no timeout
-    char pad_2394[0x108];
+    char pad_2394[0xa0];
+    Matrix4 shadowMatrix;   // 0x2434: the matrix the shadow is drawn with
+    char pad_2474[0x28];
     BankModel();            // 0x101629f0 (the model record constructor)
     ~BankModel();           // 0x10007e10
 };
@@ -98,6 +101,7 @@ struct ModelBank
     int CreateTextures();
     int DrawLensFlares();
     int DrawShadows(struct ShadowScene *scene, int a, int b, int c);
+    int DrawShadowsInto(struct ShadowScene *scene, int a, int b, int c);
 };
 
 // Empties the bank: clears the light list, the 0x80-entry table, every model record's id and the counters.
@@ -394,12 +398,83 @@ struct ModelData
 // The object the shadows are drawn by (its type is not known yet).
 struct ShadowScene
 {
+    char pad_0000[0x24c];
+    Matrix4 matrix;         // 0x24c
     int DrawShadow(int a, int b, int c, const Vec4 *p, const Vec4 *q, int texture, float scale, int size, int data,
                    BankModel *model, float modelScale);  // 0x101a29e0
 };
 
 extern "C" int DAT_10203438;                         // shadows switched on
 extern "C" int DAT_10f654d4;
+
+// 0x10166100 (ModelBank::DrawShadowsInto). Like DrawShadows, drawing each shadow with the caster's shadow matrix
+// raised 6.1 units, set as `scene`'s matrix, and with render state 9 off around it. A caster reset here also takes
+// its shadow matrix from its world matrix. Returns 0 when shadows are off or there is no scene, else 1.
+int ModelBank::DrawShadowsInto(ShadowScene *scene, int a, int b, int c)
+{
+    if (enabled == 0)
+        return 0;
+    if (scene == 0)
+        return 0;
+    if (DAT_10203438 == 0)
+        return 0;
+    if (DAT_10f654d4 == 0)
+        return 0;
+    if (DAT_10203434 != 0)
+    {
+        for (int i = 0; i < m_1884 && i < 10; i++)
+        {
+            if (litModels[casters[i]]->timer == 99999)
+            {
+                litModels[casters[i]]->m_17e8 = 0;
+                litModels[casters[i]]->matrix.SetIdentity();
+                litModels[casters[i]]->matrix.SetTranslation(*(const Vec4 *)params[litModels[casters[i]]->index]);
+                litModels[casters[i]]->shadowMatrix = litModels[casters[i]]->matrix;
+                litModels[casters[i]]->hidden = 0;
+                litModels[casters[i]]->opacity = 15;
+                litModels[casters[i]]->shadowScale = 1.0f;
+            }
+            if (litModels[casters[i]]->id2 != 0 && litModels[casters[i]]->hidden == 0 &&
+                litModels[casters[i]]->opacity > 0)
+            {
+                scene->matrix = litModels[casters[i]]->shadowMatrix;
+                scene->matrix.Translate(0, 0, 6.1f);
+                FUN_1013f070(9, 0, 0);
+                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadows[i], litModels[casters[i]]->scale,
+                                  (int)casterSize[i], ((ModelData *)litModels[casters[i]]->id2)->m_06e0,
+                                  litModels[casters[i]], litModels[casters[i]]->shadowScale);
+                FUN_1013f070(9, 1, 0);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < m_1884 && i < 10; i++)
+        {
+            if (litModels[casters[i]]->timer == 99999)
+            {
+                litModels[casters[i]]->m_17e8 = 0;
+                litModels[casters[i]]->matrix.SetIdentity();
+                litModels[casters[i]]->matrix.SetTranslation(*(const Vec4 *)params[litModels[casters[i]]->index]);
+                litModels[casters[i]]->shadowMatrix = litModels[casters[i]]->matrix;
+                litModels[casters[i]]->hidden = 0;
+                litModels[casters[i]]->opacity = 15;
+            }
+            if (litModels[casters[i]]->id2 != 0 && litModels[casters[i]]->hidden == 0 &&
+                litModels[casters[i]]->opacity > 0)
+            {
+                scene->matrix = litModels[casters[i]]->shadowMatrix;
+                scene->matrix.Translate(0, 0, 6.1f);
+                FUN_1013f070(9, 0, 0);
+                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadowTexture, litModels[casters[i]]->scale,
+                                  (int)casterSize[i], ((ModelData *)litModels[casters[i]]->id2)->m_06e0,
+                                  litModels[casters[i]], litModels[casters[i]]->shadowScale);
+                FUN_1013f070(9, 1, 0);
+            }
+        }
+    }
+    return 1;
+}
 
 // 0x10165e00 (ModelBank::DrawShadows). Draws the shadows of the first ten shadow casters through `scene`: with
 // shadow targets (DAT_10203434) each caster uses its own target, else all use kage.bmp. A caster without a timeout

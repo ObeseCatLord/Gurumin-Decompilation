@@ -951,3 +951,4 @@ address	name	evidence
 100e21a0	Enemy_DefaultStep	turn to player, idle, pick a 65/35 action; special cases for characters 11/14/20 (decomp/src/enemy_react.cpp)
 10027630	Enemy_ChasePlayer	runs at the player with eased speed, ends when blocked, too far, at random or out of range (decomp/src/enemy_chase.cpp)
 10050df0	Char_ProbeSideLedge	ground below, wall to the left and the ground beyond it; returns 0/1/2 (decomp/src/ledge_probe.cpp)
+10049650	Wave_Update	brings in the next waiting enemy of each wave group with flash 0x3f4 while fewer than two are in play (decomp/src/enemy_spawn.cpp)

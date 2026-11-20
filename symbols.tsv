@@ -933,3 +933,4 @@ address	name	evidence
 10046f10	Enemy_AppearNearby	hides until the player nears its home, appears at a random reachable spot and slides in half transparent (matched, decomp/src/enemy_blink.cpp)
 10044560	Enemy_Pendulum	drops in fading, swings on a 400-unit line about a pivot, lets go when it sees the player (matched, decomp/src/enemy_pendulum.cpp)
 101b1290	Vec4::RotateAxis	turns a vector about another vector by an angle (enemy_pendulum.cpp)
+100dfcf0	Char_RunBehaviour	shadow on the ground every 30 frames, then runs the behaviour chosen by CharState m_003c (matched, decomp/src/npc_dispatch.cpp)

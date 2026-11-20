@@ -298,3 +298,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 234 | enemy behaviours | 10049240, 10049b00 | Enemy_DropInWhenNear matched; 10049b00 (route position interpolation, 0x40 bytes per point) studied only |
 | 235 | enemy behaviours | 10046f10 | Enemy_AppearNearby matched in its own unit (enemy_blink.cpp) |
 | 236 | enemy behaviours | 10044560 | Enemy_Pendulum matched (own unit; one function-scope `frames` shared by two states gives the original slots; fields read directly instead of an `angle` local) |
+| 237 | behaviour dispatch | 100dfcf0 | Char_RunBehaviour matched (npc_dispatch.cpp): the behaviour table 1..0x31 now names every NPC behaviour by number |

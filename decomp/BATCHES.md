@@ -275,7 +275,8 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 214 | ListBank | 10036ca0 (1016fa40/10172780 were already done) | 10036ca0 RegisterBuiltin open (shrink-wrapping); builtin tables laid out in listbank_vars.cpp |
 | 215 | large functions | 1001b0a0, 100366c0, 10021e70 | 1001b0a0 Char_SelectKind open (register roles) |
 | 216 | large functions | 100366c0, 10021e70, 1001a990 | 1001a990 Char_AttachWeapon matched (switch on the model count, goto past for the default) |
-| 217 | large functions | 100366c0, 10021e70, 1004ed60 | |
+| 217 | large functions | 100366c0, 10021e70, 1004ed60 | studied: 100366c0 is ListBank::DeclareFunction (RegisterBuiltin's twin with parameter names at 0x1230c), 10021e70 the save menu's status digits; Enemy_PlayVoice switch forms retried (worse) |
+| 218 | large functions | 1004ed60, 100b0f00, 10143180 | |
 | 207 | wall study | the fld/fstp float-copy pattern (100ba040, 100b9930, 10016700) | found for 10016700 (sum of two casts spills the first); the other two are a different copy, still open |
 | 200 | wall retries | float-compare walls, MarkKilled | MarkKilled and Vec4::InTriangle still open (register roles, return-block placement) |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

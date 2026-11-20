@@ -299,3 +299,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 235 | enemy behaviours | 10046f10 | Enemy_AppearNearby matched in its own unit (enemy_blink.cpp) |
 | 236 | enemy behaviours | 10044560 | Enemy_Pendulum matched (own unit; one function-scope `frames` shared by two states gives the original slots; fields read directly instead of an `angle` local) |
 | 237 | behaviour dispatch | 100dfcf0 | Char_RunBehaviour matched (npc_dispatch.cpp): the behaviour table 1..0x31 now names every NPC behaviour by number |
+| 238 | NPC behaviours | 100451c0, 10044b10 | Npc_WalkRoute drafted (route_carrier.cpp, frame 8 bytes larger); 10044b10 (another route walker) studied only |

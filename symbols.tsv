@@ -934,3 +934,4 @@ address	name	evidence
 10044560	Enemy_Pendulum	drops in fading, swings on a 400-unit line about a pivot, lets go when it sees the player (matched, decomp/src/enemy_pendulum.cpp)
 101b1290	Vec4::RotateAxis	turns a vector about another vector by an angle (enemy_pendulum.cpp)
 100dfcf0	Char_RunBehaviour	shadow on the ground every 30 frames, then runs the behaviour chosen by CharState m_003c (matched, decomp/src/npc_dispatch.cpp)
+100451c0	Npc_WalkRoute	walks a map route at the route speed, pauses, fades out at marked points, carries a rider (decomp/src/route_carrier.cpp)

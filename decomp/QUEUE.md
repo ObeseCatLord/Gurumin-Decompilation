@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (142)
+## 1. Walls to retry (143)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -40,6 +40,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10016700` 694 — Ground_HeightAt: the spill copy of the first fabs comes from summing two casts in one expression (written so); left: cl 13.00 here evaluates the column term first (the original the row term, whatever the source order) and the weight is copied through edx before the > 1 test
 - [ ] `10017d30` 488 — RenderTarget_Probe: 2 bytes; the original compares the second UpdateImage result with the zero register (cmp eax, ebp), ours uses test eax, eax; !x and result-local forms tried
 - [ ] `10019310` 849 — Camera_Shift: same statements; block layout differs (the original keeps the shrink branch on the fallthrough of the counter tests and cross-jumps into the shift branch's final Copy) and the shift-goal subtraction loads its operands in another order; branch order swapped tried
+- [ ] `1001b0a0` 1106 — Char_SelectKind: same statements; register roles differ from the start (original: index in ebx, kind pointer in esi, the ten-thousands pair in ebp tested with a dec chain; cl 13.00 here keeps index in ebp and compiles that switch as a compare tree) and the original reloads the kind for the 0x55 test; kind-pointer local and if-chain forms tried
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `1001d2d0` 1154 — DigitCounter_Update: blocks and cases in place; the original keeps the state offset (index * 0x40) in edi and the divisor 10 in ebx, ours swaps them (and pushes ebx/edi around the first test)
@@ -180,7 +181,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (193)
+## 4. Large functions (801-3000 bytes) (192)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -232,7 +233,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100425f0` 1081 bytes (float, loops 1, calls 35)
 - [ ] `100e1c40` 1082 bytes Enemy_IsBusy (float, loops 1, calls 26)
 - [ ] `1000eed0` 1101 bytes (float, calls 25)
-- [ ] `1001b0a0` 1106 bytes (loops 1, calls 4)
 - [ ] `10098be0` 1120 bytes (float, loops 1, calls 31)
 - [ ] `1016be80` 1139 bytes (float, loops 2, calls 14)
 - [ ] `1019dca0` 1141 bytes (float, calls 27)

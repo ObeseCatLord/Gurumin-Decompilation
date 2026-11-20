@@ -401,3 +401,6 @@ _sqrtf	10002010
 ?FindVariable@ListBank@@QAEHPBDPAH11@Z	10037090
 ?Start@EffectManager@@QAEHHUVec4@@HHHHHPBUMatrix4@@PBUEffectOptions@@PAH@Z	10172350
 ?RegisterBuiltin@ListBank@@QAEHPBDFP6AHPAU1@H@Z@Z	10036ca0
+?Companion0_Update@@YAHH@Z	100b0250
+?Companion1_Update@@YAHH@Z	100b0880
+?Companion2_Update@@YAHH@Z	100b0f00

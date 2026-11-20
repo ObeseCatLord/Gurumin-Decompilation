@@ -215,6 +215,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `if (models == 1) ... else if (models == 2)` gets jump-threaded into each case; a second `switch (models)` keeps
   the stores and the dec chain of the original, and a `default:` that skips the work is a `goto` past it
   (Char_AttachWeapon 0x1001a990).
+- **A slot variable for scaled indexes**: Companion1/2_Update (0x100b0880, 0x100b0f00) index their word, dword,
+  state and record arrays through `int slot = index + k;` (`[slot + 2]`, kept in a register) and their byte arrays
+  as `[index + 3]` (folded into the displacement). Writing `index + 3` everywhere folds all of them.
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

@@ -907,3 +907,6 @@ address	name	evidence
 1015cac0	StateArrays::SetFloat	stores a float in slot `index` of the second state array (matched, decomp/src/ime.cpp)
 10166870	ViewLimits::Reset	resets the rotation limits to +-45 degrees (matched, decomp/src/model_misc.cpp)
 1016b1e0	Caption_SetLine	sets caption line 0..3 and restarts its timer (matched, decomp/src/camera.cpp)
+100b0250	Companion0_Update	companion 0 (slot index+2): health, waiting outside areas, down/revive cycle with effects 0x36d2/0x36d5
+100b0880	Companion1_Update	companion 1 (slot index+3) update (matched, decomp/src/companion_update.cpp)
+100b0f00	Companion2_Update	companion 2 (slot index+4) update (matched, decomp/src/companion_update.cpp)

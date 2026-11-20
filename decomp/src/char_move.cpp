@@ -35,7 +35,13 @@ struct CharRecord
     void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
     void AddMotionSpeed(float amount);                       // 0x101630b0 (AnimModel::AddMotionSpeed)
     void SetPosition(float x, float y, float z);             // 0x10162610: moves the model
-    char pad_0000[0x267];
+    int IsClearAny(const Vec4 *offset);                      // 0x101640b0 (AnimModel::IsClearAny)
+    int IsClearOfMapLimited(const Vec4 *offset);             // 0x101641b0 (AnimModel::IsClearOfMapLimited)
+    char pad_0000[0x70];
+    int nearCells;            // 0x70: collision cells near the character (the filter for DAT_11b002c0)
+    char pad_0074[0x19];
+    char m_008d;              // 0x8d: set while a child runs to the player (Npc_ChildFollow)
+    char pad_008e[0x1d9];
     char m_0267;              // 0x267: set to 1 while an NPC idles (FUN_100b5ae0)
     char pad_0268[0xae4];
     float m_0d4c;             // 0xd4c: 1.0 for the player (app_0013.cpp)
@@ -100,7 +106,7 @@ extern "C" char DAT_10255a88[0x80];
 extern "C" int FUN_1013f880(void);                                          // the game's random number
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 extern "C" int FUN_1000d620(int index, int key, int frames);                // KeyPrompt_Show
-extern "C" int FUN_1001b670(int index, float range, int a);                 // Enemies_WakeNearby
+extern "C" int FUN_1001b670(int index, float range, int count, ...);       // Enemies_WakeNearby
 extern "C" int FUN_10043cc0(int index);                                     // Char_ResetState
 
 // atan2 on floats (an inline helper: both arguments are rounded to float first, the second one first).
@@ -794,6 +800,108 @@ extern "C" int FUN_100b6290(int index)
                 FUN_100241e0(index, step.x, step.y, 0);
             if (marker.x < -20000.0f)
                 FUN_10043cc0(index);
+        }
+    }
+    DAT_10210b30[index] = 0;
+    return 0;
+}
+
+extern "C" int DAT_11b002c0;                  // collision filter of the current test (a character's nearCells)
+
+// 0x100b23b0 (Npc_ChildFollow). A child that idles (motion 2) until it sees the player (within its talk id's line
+// * 10 units, 18 degrees either side or 150 units, walls ignored) or is told to react: it shows prompt 15, plays
+// voice 0x20c and wakes the enemies of group 15 within 1500. It then turns to the player for 30 frames and runs to
+// them (motion 1, 16 units a frame, faster while blocked by the map). Once within 450 units it checks every ten
+// frames whether the line from 50 units behind it to 50 units short of the player is clear and it can stand; then its
+// state is reset. Returns 0.
+extern "C" int FUN_100b23b0(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    (player - self).Length();      // computed and not used
+    float distance = (player - self).Length2D();
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        DAT_1020b430[index].state = 1;
+        DAT_10210b30[index] = 0;
+        return 0;
+    }
+    if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        player.z += 50.0f;
+        self.z += 75.0f;
+        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+                                                         (float)(DAT_1020b430[index].talk * 10), 0.31415f, 150.0f, 0)) != 0 ||
+            DAT_10210b30[index] != 0)
+        {
+            FUN_1000d620(index, 15, 60);
+            FUN_10065b10(index, 0x20c, 0, 0);
+            DAT_1020b430[index].state = 2;
+            DAT_1020b430[index].wait = 0;
+            FUN_1001b670(index, 1500.0f, 1, 15);
+            DAT_10210b30[index] = 0;
+            return 0;
+        }
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        float target = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
+        DAT_1020b430[index].wait++;
+        DAT_10db6ee8[index].targetHeading = target;
+        float turn = DAT_10db6ee8[index].heading - target;
+        while (turn > 3.1415f)
+            turn -= 6.283f;
+        while (turn < -3.1415f)
+            turn += 6.283f;
+        if (turn < 0.01745f)
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        else
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+        if (DAT_1020b430[index].wait == 0x1e)
+        {
+            DAT_1020b430[index].wait = 0;
+            DAT_1020b430[index].state = 3;
+            DAT_10210b30[index] = 0;
+            return 0;
+        }
+    }
+    else if (DAT_1020b430[index].state == 3)
+    {
+        DAT_10db6ee8[index].m_008d = 1;
+        DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
+        Vec4 step;
+        step.Copy(player - self);
+        step.z = 0;
+        step.Normalize3();
+        step.Copy(step * 16.0f);
+        DAT_10db6ee8[index].targetHeading = atan2f(step.x, step.y) + 3.1415f;
+        FUN_100241e0(index, step.x, step.y, 0);
+        step.Copy(step * 6.0f);
+        if (DAT_10db6ee8[index].m_238c != 0 && DAT_10db6ee8[index].IsClearOfMapLimited(&step) == 0)
+            DAT_10db6ee8[index].AddMotionSpeed(30.0f);
+        if (distance < 450.0f)
+        {
+            Vec4 from;
+            Vec4 to;
+            Vec4 hit;
+            from.Copy(self - player);
+            from.z = 0;
+            from.Normalize3();
+            from.Copy(from * 50.0f);
+            to.Copy(player - from);
+            from.Copy(from + self);
+            DAT_11b002c0 = DAT_10db6ee8[index].nearCells;
+            to.z += 50.0f;
+            from.z += 50.0f;
+            if (DAT_104c0380 % 10 == index % 10 && DAT_10255f08 != 0 &&
+                DAT_10255f08->Collide(0, 4, &from, &to, &hit) == 0 && DAT_10db6ee8[index].IsClearOfMapLimited(0) != 0 &&
+                DAT_10db6ee8[index].IsClearAny(0) != 0)
+                FUN_10043cc0(index);
+            DAT_11b002c0 = 0;
         }
     }
     DAT_10210b30[index] = 0;

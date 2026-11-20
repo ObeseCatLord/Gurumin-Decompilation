@@ -19,6 +19,9 @@ struct Vec4
     void Fill(const float &value);
     void Set(float x, float y, float z, float w);   // 0x101ac9c0
     Vec4 operator-(const Vec4 &other) const;   // 0x101aca40
+    Vec4 operator+(const Vec4 &other) const;   // 0x101ac9e0
+    Vec4 operator*(const float &scale) const;  // 0x101acb00 (x/y/z only)
+    Vec4 Normalize3();       // 0x101af080: normalises x/y/z in place (a zero vector stays zero), returns a copy
 };
 
 struct CharMatrix
@@ -85,7 +88,8 @@ struct NpcState
     int wait;                 // 0x04: frames until the next voice line may play
     int talk;                 // 0x08: talk id: script number * 100 + line (line 0 = never speaks)
     int range;                // 0x0c: distance at which a waiting character reacts
-    char pad_0010[0x28];
+    int target;               // 0x10: character the messenger runs to (Npc_RunToMarker)
+    char pad_0014[0x24];
     int m_0038;               // 0x38
     int m_003c;
 };
@@ -617,5 +621,181 @@ extern "C" int FUN_100b3430(int index)
             DAT_10daab84[index].m_00a5 = 0;
         }
     }
+    return 0;
+}
+
+// 0x100b1ff0 (Npc_FaceAndTalk). An NPC that keeps facing the player (motion 2 once within one degree, else motion
+// 0) and now and then (when its talk line is set and no prompt is showing) shows talk prompt line - 1 for 60
+// frames, then waits 120 frames. Once it saw the player (m_0038) or is told to react (DAT_10210b30), it shows
+// prompt 15, plays voice 0x20c, wakes the enemies within 1500 and turns to the player for 30 frames before its state
+// is reset. Returns 0.
+extern "C" int FUN_100b1ff0(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    (player - self).Length();      // computed and not used
+    (player - self).Length2D();    // computed and not used
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        DAT_1020b430[index].state = 1;
+    }
+    else if (DAT_1020b430[index].state == 1)
+    {
+        if (DAT_1020b430[index].m_0038 != 0 || DAT_10210b30[index] != 0)
+        {
+            FUN_1000d620(index, 15, 60);
+            FUN_10065b10(index, 0x20c, 0, 0);
+            DAT_1020b430[index].state = 2;
+            DAT_1020b430[index].wait = 0;
+            FUN_1001b670(index, 1500.0f, 0);
+        }
+        float target = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
+        DAT_10db6ee8[index].targetHeading = target;
+        float turn = DAT_10db6ee8[index].heading - target;
+        while (turn > 3.1415f)
+            turn -= 6.283f;
+        while (turn < -3.1415f)
+            turn += 6.283f;
+        float squared = turn * turn;
+        if (squared < 0.000304503f)
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        else
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+        if (DAT_1020b430[index].talk > 0 && DAT_1020b430[index].range == 0 && FUN_1013f880() % 10000 < 50)
+        {
+            DAT_1020b430[index].range = 120;
+            FUN_1000d620(index, DAT_1020b430[index].talk - 1, 60);
+        }
+        if (DAT_1020b430[index].range > 0)
+        {
+            DAT_1020b430[index].range--;
+            DAT_10210b30[index] = 0;
+            return 0;
+        }
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        float target = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
+        DAT_10db6ee8[index].targetHeading = target;
+        float turn = DAT_10db6ee8[index].heading - target;
+        DAT_1020b430[index].wait++;
+        while (turn > 3.1415f)
+            turn -= 6.283f;
+        while (turn < -3.1415f)
+            turn += 6.283f;
+        if (turn < 0.01745f)
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        else
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+        if (DAT_1020b430[index].wait == 0x1e)
+            FUN_10043cc0(index);
+    }
+    DAT_10210b30[index] = 0;
+    return 0;
+}
+
+extern "C" char DAT_1021f3c0[0x80];           // slot kind of each character (',' = free marker, 'Q' = taken marker)
+
+// 0x100b6290 (Npc_RunToMarker). A messenger: on its first frame it claims the nearest free marker among characters
+// 0x5c..0x7b (kind ',' becomes 'Q'; with none it restarts with m_003c 1). It idles (motion 2) until it sees the
+// player (Char_CanSee as in Npc_WatchForPlayer) or is told to react: then it shows prompt 15, plays voice 0x20c,
+// wakes the enemies within 1500, turns to the player and speeds up its motion. After 10 frames it runs (motion 1)
+// towards the marker at 24 units a frame; within 150 units it is placed 75 units short of the marker, frees it and
+// starts over with m_003c 0x1f. A marker that was moved away (x below -20000) resets its state. Returns 0.
+extern "C" int FUN_100b6290(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        DAT_1020b430[index].state = 1;
+        Vec4 marker;
+        float nearestDistance = 99999.0f;
+        int nearest = -1;
+        for (int i = 0x5c; i < 0x7c; i++)
+        {
+            if (DAT_1021f3c0[i] == ',')
+            {
+                marker.Copy(DAT_10db6ee8[i].matrix.GetTranslation());
+                if (nearest == -1)
+                {
+                    nearest = i;
+                    nearestDistance = (self - marker).Length2D();
+                }
+                else if ((self - marker).Length2D() < nearestDistance)
+                {
+                    nearest = i;
+                    nearestDistance = (self - marker).Length2D();
+                }
+            }
+        }
+        if (nearest != -1)
+        {
+            DAT_1021f3c0[nearest] = 'Q';
+            DAT_1020b430[index].target = nearest;
+        }
+        else
+        {
+            DAT_1020b430[index].state = 0;
+            DAT_1020b430[index].m_003c = 1;
+        }
+    }
+    else if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        player.z += 50.0f;
+        self.z += 75.0f;
+        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+                                                         (float)(DAT_1020b430[index].talk * 10), 1.099525f, 250.0f, 1)) != 0 ||
+            DAT_10210b30[index] != 0)
+        {
+            FUN_1000d620(index, 15, 60);
+            FUN_10065b10(index, 0x20c, 0, 0);
+            DAT_1020b430[index].state = 2;
+            DAT_1020b430[index].wait = 0;
+            FUN_1001b670(index, 1500.0f, 0);
+            DAT_10db6ee8[index].targetHeading = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
+            DAT_10db6ee8[index].AddMotionSpeed(20.0f);
+        }
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        if (++DAT_1020b430[index].wait > 10)
+        {
+            Vec4 marker;
+            Vec4 step;
+            marker.Copy(DAT_10db6ee8[DAT_1020b430[index].target].matrix.GetTranslation());
+            step.Copy(marker - self);
+            step.Normalize3();
+            step.Copy(step * 24.0f);
+            DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
+            DAT_10db6ee8[index].targetHeading = atan2f(step.x, step.y) + 3.1415f;
+            if ((self - marker).Length2D() < 150.0f)
+            {
+                step.Copy(self - marker);
+                step.Normalize3();
+                step.Copy(step * 75.0f);
+                step.Copy(step + marker);
+                DAT_10db6ee8[index].SetPosition(step.x, step.y, marker.z);
+                DAT_1021f3c0[DAT_1020b430[index].target] = ',';
+                DAT_1020b430[index].state = 0;
+                DAT_1020b430[index].wait = 0;
+                DAT_1020b430[index].talk = 0;
+                DAT_1020b430[index].m_0038 = 0;
+                DAT_1020b430[index].m_003c = 0x1f;
+            }
+            else
+                FUN_100241e0(index, step.x, step.y, 0);
+            if (marker.x < -20000.0f)
+                FUN_10043cc0(index);
+        }
+    }
+    DAT_10210b30[index] = 0;
     return 0;
 }

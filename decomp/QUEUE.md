@@ -181,7 +181,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (185)
+## 4. Large functions (801-3000 bytes) (183)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -206,7 +206,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100360f0` 939 bytes (loops 4, calls 1)
 - [ ] `1014c080` 943 bytes (float, loops 1, calls 23)
 - [ ] `10026730` 950 bytes (float, loops 6, calls 13)
-- [ ] `100b1ff0` 951 bytes (float, loops 4, calls 21)
 - [ ] `10049b00` 954 bytes (float, loops 6, calls 10)
 - [ ] `10192c90` 975 bytes (float, loops 1, calls 16)
 - [ ] `1014ade0` 980 bytes (float, loops 3, calls 20)
@@ -239,7 +238,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101af4c0` 1182 bytes KeyBank::Sample (float, loops 1, calls 7)
 - [ ] `10011520` 1188 bytes (float, loops 4, calls 8)
 - [ ] `1004d4b0` 1188 bytes (float, loops 3, calls 2)
-- [ ] `100b6290` 1189 bytes (float, loops 1, calls 44)
 - [ ] `10038070` 1195 bytes (float, loops 2, calls 37)
 - [ ] `10042140` 1195 bytes (float, loops 2, calls 33)
 - [ ] `1005f750` 1200 bytes (float, loops 4, calls 28)

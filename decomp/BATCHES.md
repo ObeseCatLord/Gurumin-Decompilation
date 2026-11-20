@@ -284,3 +284,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 200 | wall retries | float-compare walls, MarkKilled | MarkKilled and Vec4::InTriangle still open (register roles, return-block placement) |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |
 | 222 | NPC behaviours | 100b5f80, 100b5c30, 100b5550, 100b3430 | Npc_AlertWhenSeen, Npc_TurnWhenSeen (C++, EH for the effect matrix) and Npc_RiseWhenSeen matched; Npc_GreetWhenNear open (index/record offset registers swapped) |
+| 223 | NPC behaviours | 100b1ff0, 100b6290 | Npc_FaceAndTalk and Npc_RunToMarker matched (Vec4 0x101af080 normalises in place) |

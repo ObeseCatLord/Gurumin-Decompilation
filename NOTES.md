@@ -211,6 +211,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   load order; writing `table[i].a`, `table[i].b` lets cl make its own address register like the original
   (Node::ApplyMaterialColours 0x1019c560, Npc_WaitFacingAway 0x10045c30, face change 0x1000f360 closer).
   Not universal: Sound_Queue 0x10054550 keeps a pointer in the original.
+- **Switch on a value the cases set**: when a switch sets a count (`models = 1` / `2`) that later selects the work,
+  `if (models == 1) ... else if (models == 2)` gets jump-threaded into each case; a second `switch (models)` keeps
+  the stores and the dec chain of the original, and a `default:` that skips the work is a `goto` past it
+  (Char_AttachWeapon 0x1001a990).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

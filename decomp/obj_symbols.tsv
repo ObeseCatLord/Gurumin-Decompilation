@@ -421,3 +421,4 @@ _sqrtf	10002010
 ?DrawFrameAlt@TextureObject@@QAEXHHHHHMHH@Z	1014e940
 ?DrawFrameAltTinted@TextureObject@@QAEHHHHHMMHHI@Z	1014ec30
 ?DrawFrameAltPlain@TextureObject@@QAEHHHHHMMHHI@Z	10144bf0
+?DrawFrameAltStretched@TextureObject@@QAEHHHHHMMHH@Z	1014e5d0

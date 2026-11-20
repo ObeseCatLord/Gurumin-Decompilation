@@ -942,3 +942,6 @@ address	name	evidence
 10019d80	Camera_Between	two-character shot: position at one head, target at another (or ahead of the first), eased like Camera_Ease (matched, decomp/src/camera_follow.cpp)
 100184e0	Camera_ItemStand	shot of the item stand (kagudai) sinking with sparkle 0x75f, camera turning slowly (matched, decomp/src/camera_follow.cpp)
 1000f5a0	Map_BuildTopView	overhead projection from the map node bounds; sets pit/visible areas and projects the camera (matched, decomp/src/map_view.cpp)
+1000f7f0	Map_DrawTopView	draws the map and effects into the overhead pass, then rebuilds the camera and view matrices (matched, decomp/src/map_view.cpp)
+101b1c20	LookAt	builds a camera matrix from eye, target and up (map_view.cpp)
+101b10f0	Multiply	matrix product into a new matrix (map_view.cpp)

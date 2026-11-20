@@ -24,11 +24,17 @@ struct Matrix4
 };
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
+Matrix4 LookAt(Vec4 eye, Vec4 target, const Vec4 *up, int a);        // 0x101b1c20
+Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);         // 0x101b10f0
 
 // A scene node (scene_node.cpp Node), only what is used here.
+struct DrawList;
+
 struct Node
 {
-    char pad_0000[0x1cc];
+    char name[0xac];          // 0x00: node name ("CDLnn" for collision regions)
+    unsigned flags;           // 0xac: 0x20 = not drawn
+    char pad_00b0[0x11c];
     Matrix4 local;            // 0x1cc: matrix relative to the parent
     char pad_020c[0x4d8];
     Vec4 boundsMin;           // 0x6e4: lower corner of the node's box
@@ -37,6 +43,28 @@ struct Node
     int childCount;           // 0x750
     char pad_0754[0x1000];
     Node *children[0x40];     // 0x1754
+    char pad_1854[0x10];
+    void *vis;                // 0x1864: visibility cells (0 = none)
+    void QueueDraw(DrawList *list, const Matrix4 *view, const Vec4 *direction, int a, const Vec4 *colour,
+                   int b);                       // 0x10199e20
+};
+
+// A character record (char_move.cpp CharRecord); only its address is used here.
+struct CharRecord
+{
+    char data[0x249c];
+};
+
+// The model bank at 0x10804bf8 (model_bank.cpp).
+struct ModelBank
+{
+    // 0x10164c10: a direction for model `model` from the camera position and target (0 when the bank is off).
+    const Vec4 *M_10164c10(CharRecord *model, Vec4 *position, Vec4 *target);
+};
+
+struct EffectManager
+{
+    int Draw(const Matrix4 &view, const Matrix4 *camera, unsigned char pass);   // 0x10190e30
 };
 
 extern "C" Node *DAT_104c007c;    // the map's model
@@ -84,4 +112,95 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
     DAT_10f65688.Copy(Project(DAT_10f65688, projection));
     DAT_10f668e8.Copy(Project(DAT_10f668e8, projection));
     return map;
+}
+
+extern "C" CharRecord DAT_10db6ee8[0x80];
+extern "C" ModelBank DAT_10804bf8;
+extern "C" EffectManager DAT_10daaa80;
+extern "C" DrawList DAT_10836ec8;          // the overhead pass's draw list
+extern "C" Matrix4 DAT_108392d8;           // the current view-projection matrix
+extern "C" Matrix4 DAT_10836330;           // the camera matrix
+extern "C" Matrix4 DAT_10866da8;           // the projection of the main view
+extern "C" Matrix4 DAT_104c03f8;           // a second projection
+extern "C" Matrix4 DAT_10836cd8;           // the camera under that projection
+extern "C" Vec4 DAT_118e69e8;              // camera position
+extern "C" Vec4 DAT_118e6cb8;              // camera target
+extern "C" Vec4 DAT_10da90d0;              // current colour
+extern "C" Vec4 DAT_10f66918;              // the overhead pass's area: minimum corner
+extern "C" Vec4 DAT_10f66928;              // maximum corner
+extern "C" int DAT_102022c4;               // non-zero = draw the overhead pass
+extern "C" int DAT_10f654cc;               // non-zero when off-screen render targets are supported
+extern "C" int DAT_10f65520;               // 1 while the overhead pass draws
+extern "C" int DAT_10f655bc;               // 1 while the map nodes are queued for it
+extern "C" int DAT_10daaad0;               // 1 while the effects draw into it
+extern "C" char DAT_11affdd8[100];         // per collision region "CDLnn": 1 = enabled
+extern "C" void FUN_1013f070(int mode, int a, int b);              // sets a 2D/3D render state
+extern "C" void FUN_10199860(void);                                // RenderQueue_Clear
+extern "C" int FUN_101999a0(DrawList *list, const Matrix4 *view, Vec4 *lights, unsigned int pass);  // DrawList_DrawPass
+
+// 0x1000f7f0 (Map_DrawTopView). Builds the overhead view of the map; when the overhead pass is on (and render
+// targets work, and the map node is not a switched-off collision region) it draws the map (with its model hidden)
+// into the pass's draw list over the visible area widened by 1100 units (1200 below, 2000 above), then the effects,
+// resetting the render states around each step. Then the camera matrix is rebuilt from the camera position and
+// target (y up) and the view-projection matrices from it.
+void FUN_1000f7f0(void)
+{
+    Matrix4 view;
+    Node *map = FUN_1000f5a0(&view, DAT_108392d8);
+    if (map != 0)
+    {
+        if (DAT_102022c4 != 0 && DAT_10f654cc != 0)
+        {
+            DAT_10f65520 = 1;
+            if (DAT_10255f08->vis == 0 || map->name[0] != 'C' || map->name[1] != 'D' || map->name[2] != 'L' ||
+                DAT_11affdd8[map->name[3] * 10 + map->name[4]] != 0)
+            {
+                FUN_1013f070(0, 0, 0);
+                FUN_1013f070(10, 0, 0);
+                FUN_1013f070(3, 1, 15);
+                FUN_10199860();
+                unsigned flags = DAT_104c007c->flags;
+                DAT_104c007c->flags = flags | 0x20;
+                DAT_10f655bc = 1;
+                DAT_10f66918.Copy(DAT_10f668a8);
+                DAT_10f66928.Copy(DAT_10f668b8);
+                DAT_10f66918.z -= 1200.0f;
+                DAT_10f66918.x -= 1100.0f;
+                DAT_10f66918.y -= 1100.0f;
+                DAT_10f66928.z += 2000.0f;
+                DAT_10f66928.x += 1100.0f;
+                DAT_10f66928.y += 1100.0f;
+                DAT_10255f08->QueueDraw(&DAT_10836ec8, &view,
+                                        DAT_10804bf8.M_10164c10(&DAT_10db6ee8[0], &DAT_118e69e8, &DAT_118e6cb8), -1,
+                                        &DAT_10da90d0, 0);
+                DAT_104c007c->flags = flags;
+                DAT_10f655bc = 0;
+                FUN_1013f070(0, 0, 0);
+                FUN_1013f070(10, 0, 0);
+                FUN_1013f070(3, 1, 15);
+                FUN_101999a0(&DAT_10836ec8, &view, &DAT_10f65688, 0);
+                DAT_10f65520 = 0;
+                FUN_1013f070(0, 0, 0);
+                FUN_1013f070(10, 0, 0);
+                FUN_1013f070(3, 1, 15);
+                DAT_10daaad0 = 1;
+                DAT_10daaa80.Draw(view, &DAT_10836330, 0);
+                DAT_10daaad0 = 0;
+                FUN_1013f070(0, 0, 0);
+                FUN_1013f070(10, 0, 0);
+                FUN_1013f070(3, 1, 15);
+            }
+        }
+        DAT_10f655bc = 0;
+        DAT_10f65520 = 0;
+        Vec4 up;
+        up.x = 0;
+        up.y = 1.0f;
+        up.z = 0;
+        DAT_10f65688.Copy(DAT_118e69e8);
+        DAT_10f668e8.Copy(DAT_118e6cb8);
+        DAT_10836330 = LookAt(DAT_10f65688, DAT_10f668e8, &up, 0);
+        DAT_108392d8 = Multiply(DAT_10866da8, DAT_10836330);
+        DAT_10836cd8 = Multiply(DAT_104c03f8, DAT_10836330);
+    }
 }

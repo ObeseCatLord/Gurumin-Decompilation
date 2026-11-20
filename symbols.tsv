@@ -50,6 +50,7 @@ address	name	evidence
 10143b50	Render_UnbindTexture0	SetTexture(0, NULL) once
 10143b80	Render_UnbindTexture1	SetTexture(1, NULL) once
 101446b0	Render_UnbindTextures	SetTexture(0..3, NULL)
+10144bf0	TextureObject::DrawFrameAltPlain	untextured DrawFrameAlt shape in a given RGB colour (matched, decomp/src/texture_bind.cpp)
 10148310	TexCache_Clear	clears the 512-entry texture cache arrays (0x10f1bff0 textures, 0x10f0cd40 ages)
 10148350	TexCache_ReleaseAll	Release() every cached texture, subtract sizes from 0x10f0ff80
 101483f0	TexCache_Age	increments every cache entry's age
@@ -774,6 +775,7 @@ address	name	evidence
 1014d4e0	TextureObject::DrawFrame	draws a nine-part frame around a rectangle (callee, named from decomp/src/game_panels.cpp)
 1014d850	TextureObject::DrawFillAlt	panel background of the alternative style (callee, named from decomp/src/game_panels.cpp)
 1014e940	TextureObject::DrawFrameAlt	frame of the alternative panel style: one 18-point triangle fan with cut corners, scaled from 640x480 (matched, decomp/src/texture_bind.cpp)
+1014ec30	TextureObject::DrawFrameAltTinted	DrawFrameAlt in a given RGB colour (matched, decomp/src/texture_bind.cpp)
 1003ab40	Pickup_Collect	counts a collected pickup and banks every hundred (open, decomp/src/pickups.cpp)
 101995a0	Node::Draw	culls and draws a node's mesh, then its children and draw callback (matched, decomp/src/node_draw.cpp)
 101999a0	DrawList_DrawPass	draws the queued nodes of one pass with their colours and light sets (matched, decomp/src/draw_list.cpp)

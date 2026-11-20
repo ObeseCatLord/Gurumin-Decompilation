@@ -76,6 +76,10 @@ struct TextureObject
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
     int DrawFrameAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
+    int DrawFrameAltTinted(int left, int top, int right, int bottom, float z, float alpha, int textured, int border,
+                           unsigned int rgb);
+    int DrawFrameAltPlain(int left, int top, int right, int bottom, float z, float alpha, int vertexAlpha,
+                          int border, unsigned int rgb);
     int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);
     int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
                       const unsigned short *palette);
@@ -578,6 +582,123 @@ int TextureObject::DrawFrameAlt(int left, int top, int right, int bottom, float 
         vertices[i].x = x * scaleX;
         vertices[i].y = y * scaleY;
         vertices[i].colour = a << 24 | 0xffffff;
+        vertices[i].specular = 0xff000000;
+        vertices[i].z = z;
+        vertices[i].rhw = 1.0f;
+        vertices[i].u = x / texWidth;
+        vertices[i].v = y / texHeight;
+    }
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(6 /* D3DPT_TRIANGLEFAN */, 16, vertices, 0x20);
+    return 1;
+}
+
+// 0x1014ec30 (TextureObject::DrawFrameAltTinted). DrawFrameAlt in the colour `rgb` (0xRRGGBB) instead of white.
+int TextureObject::DrawFrameAltTinted(int left, int top, int right, int bottom, float z, float alpha, int textured,
+                                      int border, unsigned int rgb)
+{
+    PanelVertex vertices[34];
+    if (textured != 0)
+    {
+        BindStage0();
+        FUN_1013ef90(0, 4, 4);              // alpha: modulate
+        FUN_1013ef90(0, 5, 2);              //   texture
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+    }
+    else
+    {
+        FUN_10143b50();
+        FUN_1013ef90(0, 4, 4);              // alpha: modulate
+        FUN_1013ef90(0, 5, 0);              //   diffuse
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+    }
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    left += 8 - border;
+    top += 8 - border;
+    right += border - 8;
+    bottom += border - 8;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    int a = (int)(alpha * 255.0f);
+    if (a > 255)
+        a = 255;
+    else if (a < 0)
+        a = 0;
+    int xs[18] = {left + 10, left, left + 2, left + 4, left + 8, right - 8, right - 4, right - 2, right,
+                  right, right - 2, right - 4, right - 8, left + 8, left + 4, left + 2, left, left};
+    int ys[18] = {top + 10, top + 8, top + 4, top + 2, top, top, top + 2, top + 4, top + 8,
+                  bottom - 8, bottom - 4, bottom - 2, bottom, bottom, bottom - 2, bottom - 4, bottom - 8, top + 8};
+    float texWidth = (float)width;
+    float texHeight = (float)height;
+    for (int i = 0; i < 18; i++)
+    {
+        float x = (float)xs[i];
+        float y = (float)ys[i];
+        vertices[i].x = x * scaleX;
+        vertices[i].y = y * scaleY;
+        vertices[i].colour = a << 24 | rgb;
+        vertices[i].specular = 0xff000000;
+        vertices[i].z = z;
+        vertices[i].rhw = 1.0f;
+        vertices[i].u = x / texWidth;
+        vertices[i].v = y / texHeight;
+    }
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(6 /* D3DPT_TRIANGLEFAN */, 16, vertices, 0x20);
+    return 1;
+}
+
+// 0x10144bf0 (TextureObject::DrawFrameAltPlain). The DrawFrameAlt shape in the colour `rgb` with no texture bound
+// in either case; `vertexAlpha` only switches the stage 0 alpha operation from modulate to "select argument 2".
+int TextureObject::DrawFrameAltPlain(int left, int top, int right, int bottom, float z, float alpha, int vertexAlpha,
+                                     int border, unsigned int rgb)
+{
+    PanelVertex vertices[34];
+    if (vertexAlpha != 0)
+    {
+        FUN_10143b50();
+        FUN_1013ef90(0, 4, 3);              // alpha: the vertex alpha (select argument 2)
+        FUN_1013ef90(0, 5, 2);
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+    }
+    else
+    {
+        FUN_10143b50();
+        FUN_1013ef90(0, 4, 4);              // alpha: modulate
+        FUN_1013ef90(0, 5, 0);              //   diffuse
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+    }
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    left += 8 - border;
+    top += 8 - border;
+    right += border - 8;
+    bottom += border - 8;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    int a = (int)(alpha * 255.0f);
+    if (a > 255)
+        a = 255;
+    else if (a < 0)
+        a = 0;
+    int xs[18] = {left + 10, left, left + 2, left + 4, left + 8, right - 8, right - 4, right - 2, right,
+                  right, right - 2, right - 4, right - 8, left + 8, left + 4, left + 2, left, left};
+    int ys[18] = {top + 10, top + 8, top + 4, top + 2, top, top, top + 2, top + 4, top + 8,
+                  bottom - 8, bottom - 4, bottom - 2, bottom, bottom, bottom - 2, bottom - 4, bottom - 8, top + 8};
+    float texWidth = (float)width;
+    float texHeight = (float)height;
+    for (int i = 0; i < 18; i++)
+    {
+        float x = (float)xs[i];
+        float y = (float)ys[i];
+        vertices[i].x = x * scaleX;
+        vertices[i].y = y * scaleY;
+        vertices[i].colour = a << 24 | rgb;
         vertices[i].specular = 0xff000000;
         vertices[i].z = z;
         vertices[i].rhw = 1.0f;

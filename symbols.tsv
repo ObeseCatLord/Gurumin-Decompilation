@@ -937,3 +937,5 @@ address	name	evidence
 100451c0	Npc_WalkRoute	walks a map route at the route speed, pauses, fades out at marked points, carries a rider (decomp/src/route_carrier.cpp)
 10047a10	Npc_RideBehindMarker	rides behind the nearest marker character, cutting inside its turns (decomp/src/npc_ride.cpp)
 100469d0	Npc_Held	held by a spell with sparkle effects until released; flash 0x2265 / 0x1390 on release (matched, decomp/src/npc_frozen.cpp)
+10047440	Npc_PushCart	pushes a cart back and forth, turning its EEQ_25 wheel node; dust effect 0x2df (decomp/src/npc_wheel.cpp)
+101b1ad0	RotationX	builds a rotation matrix about X (npc_wheel.cpp)

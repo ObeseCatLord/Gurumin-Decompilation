@@ -302,3 +302,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 238 | NPC behaviours | 100451c0, 10044b10 | Npc_WalkRoute drafted (route_carrier.cpp, frame 8 bytes larger); 10044b10 (another route walker) studied only |
 | 239 | NPC behaviours | 10047a10, 100b4930 | Npc_RideBehindMarker drafted (4 bytes); sqrtf/atan2f order; Npc_RideAlarm down to its register swap |
 | 240 | NPC behaviours | 100469d0, 10043fc0 | Npc_Held matched (npc_frozen.cpp: if/else around the two Start calls, ModelState follow flag as a bitfield); 10043fc0 studied only |
+| 241 | NPC behaviours | 10047440 | Npc_PushCart drafted (npc_wheel.cpp; a spilled pointer local in the original) |

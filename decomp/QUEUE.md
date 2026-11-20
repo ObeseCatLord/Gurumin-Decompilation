@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (150)
+## 1. Walls to retry (151)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -67,6 +67,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `100451c0` 1644 — Npc_WalkRoute (route_carrier.cpp): flow and calls line up; the original frame is 8 bytes smaller: the float temporaries (speed, 0.1/0.9 factors, heading) reuse the slots of the Route_Follow results (reached, action), which cl 13.00 here keeps apart
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
+- [ ] `10047440` 1473 — Npc_PushCart (npc_wheel.cpp): flow and calls line up; the original keeps the pointer to DAT_10210b30[index] in a stack slot (it reuses ebx for the slot kind after Char_ResetState) and pushes -1 before reading fs:[0]; cl 13.00 here folds the pointer back into [index*4], so the frame is 4 bytes smaller
 - [ ] `10047a10` 1598 — Npc_RideBehindMarker (npc_ride.cpp): 4 bytes; the marker heading copy lives in the slot of the cached distance pointer in the original, cl 13.00 here puts it in the turn variable's slot
 - [ ] `1004f250` 655 — TutorialBook_Close draft: flow and calls match (LoadTexture inline for the cover); the page loop registers differ (original: first page in edi, second in ebp, name pointer in ebx), like the other TutorialBook functions; declaration orders tried
 - [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
@@ -183,7 +184,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000baf0` 794 bytes (float, calls 28)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (168)
+## 4. Large functions (801-3000 bytes) (167)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -264,7 +265,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10027da0` 1461 bytes (float, calls 37)
 - [ ] `100a77f0` 1463 bytes (float, loops 6, calls 36)
 - [ ] `100a7db0` 1471 bytes (float, calls 42)
-- [ ] `10047440` 1473 bytes (float, calls 36)
 - [ ] `100366c0` 1495 bytes (loops 8, calls 21)
 - [ ] `101643c0` 1520 bytes (float, loops 12, calls 9)
 - [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)

@@ -14,6 +14,7 @@ struct Vec4
     void Copy(const Vec4 &source);             // 0x101acc20
     void RotateZ(float angle);                 // 0x101ac300
     float LengthSquared3();  // 0x101ac6a0: x*x + y*y + z*z
+    float Length();          // 0x101ac4e0: length of x/y/z
     float Length2D();        // 0x101ac500: length of x/y
     void Fill(const float &value);
     Vec4 operator-(const Vec4 &other) const;   // 0x101aca40
@@ -239,5 +240,64 @@ extern "C" int FUN_10045c30(int index)
         DAT_10db6ee8[index].m_23b8.Copy(step);
         DAT_10db6ee8[index].AddMotionSpeed(20.0f);
     }
+    return 0;
+}
+
+extern "C" int FUN_10043e20(const Vec4 *target, const Vec4 *eye, float heading, float range, float angleRange,
+                            float nearRange, int checkWalls);           // Char_CanSee
+
+// 0x100b1520 (Npc_WatchForPlayer). A guard-like NPC that idles (motion 2) until it sees the player: from its head
+// (75 above its origin) towards the player's head (50 above), within its talk id's line * 10 units, 63 degrees either
+// side of its facing or 250 units. When it has seen the player (remembered in m_0038) or was told to react, it
+// shows prompt 15 for 60 frames, plays voice 0x20c, wakes the enemies within 1500 and starts turning: from then on
+// it faces the player (idle motion 2 once within one degree, else motion 0) and after 30 frames its state is reset.
+// Returns 0.
+extern "C" int FUN_100b1520(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    (player - self).Length();      // computed and not used
+    (player - self).Length2D();    // computed and not used
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        DAT_1020b430[index].state = 1;
+    }
+    else if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        player.z += 50.0f;
+        self.z += 75.0f;
+        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+                                                         (float)(DAT_1020b430[index].talk * 10), 1.099525f, 250.0f, 1)) != 0 ||
+            DAT_10210b30[index] != 0)
+        {
+            FUN_1000d620(index, 15, 60);
+            FUN_10065b10(index, 0x20c, 0, 0);
+            DAT_1020b430[index].state = 2;
+            DAT_1020b430[index].wait = 0;
+            FUN_1001b670(index, 1500.0f, 0);
+        }
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        float target = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
+        DAT_1020b430[index].wait++;
+        DAT_10db6ee8[index].targetHeading = target;
+        float turn = DAT_10db6ee8[index].heading - target;
+        while (turn > 3.1415f)
+            turn -= 6.283f;
+        while (turn < -3.1415f)
+            turn += 6.283f;
+        if (turn < 0.01745f)
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        else
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+        if (DAT_1020b430[index].wait == 0x1e)
+            FUN_10043cc0(index);
+    }
+    DAT_10210b30[index] = 0;
     return 0;
 }

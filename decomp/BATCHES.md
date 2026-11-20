@@ -279,7 +279,7 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 218 | large functions + near-miss | 1004ed60, 100b0f00, 10143180, 100091d0 | studied only: 1004ed60 TutorialBook_Open (same register family as the other book functions), 100b0f00 (EH, enemy state), 10143180 input any-key poll; DrawDebugText statement orders tried |
 | 219 | naming + study | the five unnamed matched functions; 100b0250/100b0880/100b0f00 | named all five; 100b0250, 100b0880 and 100b0f00 are three near-identical companion updates (EH, ~1600 bytes each), left for a dedicated batch |
 | 220 | companion updates | 100b0250, 100b0880, 100b0f00 | Companion1_Update and Companion2_Update matched; Companion0_Update open (20 bytes, idle-branch temporaries) |
-| 221 | large functions | 1015f4e0, 10147a20, 1005ecb0 | |
+| 221 | large functions | 1015f4e0, 10147a20, 1005ecb0, 100b1520 | Npc_WatchForPlayer matched (one shared `DAT_10210b30[index] = 0` at the end instead of one per return kept ebp free of a cached zero); the other three studied only |
 | 207 | wall study | the fld/fstp float-copy pattern (100ba040, 100b9930, 10016700) | found for 10016700 (sum of two casts spills the first); the other two are a different copy, still open |
 | 200 | wall retries | float-compare walls, MarkKilled | MarkKilled and Vec4::InTriangle still open (register roles, return-block placement) |
 | 165 | medium functions | 10055ee0, 10146db0, 10010d10 Save_ReadSlotInfo | |

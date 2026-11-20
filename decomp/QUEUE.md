@@ -161,13 +161,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (18)
+## 3. Medium functions (251-800 bytes) (17)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
 - [ ] `100e21a0` 671 bytes (float, loops 2, calls 19)
 - [ ] `1014b750` 713 bytes (float, calls 16)
-- [ ] `100b1520` 736 bytes (float, loops 2, calls 19)
 - [ ] `10149100` 742 bytes (float, calls 17)
 - [ ] `10144bf0` 749 bytes (float, loops 1, calls 12)
 - [ ] `1014e940` 749 bytes TextureObject::DrawFrameAlt (float, loops 1, calls 12)

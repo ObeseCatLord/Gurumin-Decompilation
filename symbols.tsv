@@ -910,3 +910,4 @@ address	name	evidence
 100b0250	Companion0_Update	companion 0 (slot index+2): health, waiting outside areas, down/revive cycle with effects 0x36d2/0x36d5
 100b0880	Companion1_Update	companion 1 (slot index+3) update (matched, decomp/src/companion_update.cpp)
 100b0f00	Companion2_Update	companion 2 (slot index+4) update (matched, decomp/src/companion_update.cpp)
+100b1520	Npc_WatchForPlayer	NPC idles until Char_CanSee spots the player, then voice 0x20c and turns to face (matched, decomp/src/char_move.cpp)

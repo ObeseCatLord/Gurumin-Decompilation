@@ -218,6 +218,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - **A slot variable for scaled indexes**: Companion1/2_Update (0x100b0880, 0x100b0f00) index their word, dword,
   state and record arrays through `int slot = index + k;` (`[slot + 2]`, kept in a register) and their byte arrays
   as `[index + 3]` (folded into the displacement). Writing `index + 3` everywhere folds all of them.
+- **A zero kept in ebp means too many zero stores**: when ours holds 0 in ebp (`xor ebp,ebp`, `push ebp`, `mov [..],ebp`)
+  and the original uses immediates, look for a store repeated before each `return`. Npc_WatchForPlayer (0x100b1520)
+  clears `DAT_10210b30[index]` once at the end of an if/else-if chain; the compiler duplicates the epilogue itself.
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

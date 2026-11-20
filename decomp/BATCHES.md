@@ -287,3 +287,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 223 | NPC behaviours | 100b1ff0, 100b6290 | Npc_FaceAndTalk and Npc_RunToMarker matched (Vec4 0x101af080 normalises in place) |
 | 224 | NPC behaviours | 100b23b0 | Npc_ChildFollow matched (per-return clears here, so the zero lives in ebp as in the original) |
 | 225 | NPC behaviours | 100b4f00 | Npc_PopUp matched (C++, EH; a clamp written into a second float keeps the self-copy; `max(min(x, 20), 0)` macros) |
+| 226 | NPC behaviours | 100b4300 | Npc_RaiseAlarm drafted (33 bytes, zero register around the alarm); the `||` form of a call test made cl 13.00 inline atan2f |

@@ -336,12 +336,15 @@ struct EffectManager
 struct CollisionWorld
 {
     int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
+    int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,
+                float *t);                                              // 0x101a9670
 };
 
-// A character slot record (world.h CharSlot): only the "seen" flag is used here.
+// A character slot record (world.h CharSlot).
 struct CharSlot
 {
-    char pad_0000[0xa5];
+    int kind;                 // 0x00: behaviour kind (0x62 = enemy)
+    char pad_0004[0xa1];
     char m_00a5;              // 0xa5: set every frame while the watcher below runs
     char pad_00a6[0xe2];
 };
@@ -1047,5 +1050,122 @@ int FUN_100b4f00(int index)
         if (DAT_10db6ee8[index].m_238c != 0)
             FUN_10043cc0(index);
     }
+    return 0;
+}
+
+// Per-slot state table at 0x10daaaec, 0x188 bytes per slot (actor_scan.cpp ActorSlot).
+struct ActorSlot
+{
+    int health;               // 0x00
+    int maxHealth;            // 0x04: initial value of health
+    char pad_0008[0x180];
+};
+
+struct Game
+{
+    int RegisterFlag(int id);                        // 0x100020d0 (FlagOwner::Register)
+};
+
+extern "C" ActorSlot DAT_10daaaec[0x80];
+extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated
+extern "C" char DAT_10468730[0x80];
+extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
+extern "C" Game DAT_10874848;
+extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a);   // ColourFade_Start
+
+// 0x100b4300 (Npc_RaiseAlarm). A lookout that idles (motion 2) until it sees the player (within the talk id's
+// hundreds * 200 units) or is hurt or flagged in DAT_10468730: it shows prompt 15, plays voice 0x20c and wakes the
+// enemies within 1500 (and with talk line set, registers flag line + 300). From then on it keeps waking them and
+// flashes the screen red every 30 frames; the first two flashes also sound alarm 0x207 unless an earlier enemy of
+// kind 0x62 with m_003c 11 or 12 is already raising it. While the scripts run it turns to face the player whenever
+// it can see them. Returns 0.
+extern "C" int FUN_100b4300(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    (player - self).Length();      // computed and not used
+    (player - self).Length2D();    // computed and not used
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        DAT_10210b30[index] = 0;
+        DAT_1020b430[index].state = 1;
+        return 0;
+    }
+    if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        player.z += 50.0f;
+        self.z += 75.0f;
+        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+                                                         (float)(DAT_1020b430[index].talk / 100 * 200), 1.099525f, 250.0f, 1)) != 0 ||
+            DAT_10468730[index] != 0 || DAT_10daaaec[index].health < DAT_10daaaec[index].maxHealth)
+        {
+            FUN_1000d620(index, 15, 60);
+            FUN_10065b10(index, 0x20c, 0, 0);
+            DAT_1020b430[index].state = 2;
+            DAT_1020b430[index].wait = 0;
+            FUN_1001b670(index, 1500.0f, 0);
+            if (DAT_1020b430[index].talk % 100 != 0)
+            {
+                DAT_10874848.RegisterFlag(DAT_1020b430[index].talk % 100 + 300);
+                DAT_10210b30[index] = 0;
+                return 0;
+            }
+        }
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        FUN_1001b670(index, 1500.0f, 0);
+        if (++DAT_1020b430[index].wait == 15)
+        {
+            if (DAT_1020b430[index].range < 2)
+            {
+                DAT_1020b430[index].range++;
+                int i;
+                for (i = 0x3a; i < index; i++)
+                {
+                    if (DAT_10db6ee8[i].matrix.m[12] > -20000.0f && DAT_10210d30[i] == 0 && DAT_10daab84[i].kind == 0x62 &&
+                        (DAT_1020b430[i].m_003c == 11 || DAT_1020b430[i].m_003c == 12) &&
+                        (DAT_1020b430[i].m_0038 != 0 || DAT_1020b430[i].state == 2))
+                        break;
+                }
+                if (i == index)
+                    FUN_1003ad20(0x207, 0, 1.0f);
+            }
+            FUN_1000ec70(15, 1.0f, 0.5f, 0.5f, 1.0f);
+        }
+        else if (DAT_1020b430[index].wait == 30)
+        {
+            FUN_1000ec70(15, 1.0f, 1.0f, 1.0f, 1.0f);
+            DAT_1020b430[index].wait = 0;
+        }
+        if (DAT_1032d69c != 0)
+        {
+            Vec4 from;
+            Vec4 to;
+            from.Copy(player);
+            to.Copy(self);
+            from.z += 75.0f;
+            to.z += 75.0f;
+            Vec4 hit;
+            int visible = DAT_10255f08 == 0 || DAT_10255f08->RayCast(0, 4, 0x4000000, &from, &to, &hit, 0) == 0;
+            if (visible)
+                DAT_10db6ee8[index].targetHeading = atan2f(player.x - self.x, player.y - self.y) + 3.1415f;
+            float turn = DAT_10db6ee8[index].heading - DAT_10db6ee8[index].targetHeading;
+            while (turn > 3.1415f)
+                turn -= 6.283f;
+            while (turn < -3.1415f)
+                turn += 6.283f;
+            turn = (float)fabs(turn);
+            if (turn > 0.01745f)
+                DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+            else
+                DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        }
+    }
+    DAT_10210b30[index] = 0;
     return 0;
 }

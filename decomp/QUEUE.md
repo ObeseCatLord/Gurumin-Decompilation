@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (145)
+## 1. Walls to retry (146)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -77,6 +77,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
 - [ ] `100b0250` 1583 — Companion0_Update: all but the idle branch identical; there the original takes eax/ecx for the first block's temporaries and edx/eax for the second (cl 13.00 here edx/eax and ecx/edx); its twins 0x100b0880 and 0x100b0f00 match with the same branch; slot-variable, local and early-return forms tried
+- [ ] `100b4300` 1583 — Npc_RaiseAlarm (char_move.cpp): all but the alarm block identical; the original pushes an immediate 0 for Sound_PlayEffect and re-zeroes edi after the red flash, cl 13.00 here re-zeroes edi before the sound. The `||` spelling of the line-of-sight test makes cl 13.00 inline atan2f (a larger frame); the `visible` local keeps it a call
 - [ ] `100b5550` 840 — Npc_GreetWhenNear (char_move.cpp): same flow and calls; the original keeps index in edi and the record offset in ebx (cl 13.00 here swaps them), which also moves one fadd in the facing step; condition and facing spellings tried
 - [ ] `100b9930` 637 — Enemy_DragToPit: identical except the heading store: the original rounds atan2 into the dead parameter slot and copies it with fld/fstp before the RotateZ setup, cl 13.00 here copies it through edx after; direct cast, Atan2 wrapper and local forms tried
 - [ ] `100b9bb0` 867 — Enemy_PlayVoice: same switch (jump table plus the 0x1e4.. range); the original keeps 15 and 0x2d in ebx/ebp, recomputes index*16+slot for every access and tests the cooldown kinds in turn, cl 13.00 here threads the kind tests after the reset stores; 2-D, flat and re-read kind forms tried
@@ -181,7 +182,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (181)
+## 4. Large functions (801-3000 bytes) (180)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -277,7 +278,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101643c0` 1520 bytes (float, loops 12, calls 9)
 - [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)
 - [ ] `10057ee0` 1550 bytes (float, loops 1, calls 52)
-- [ ] `100b4300` 1583 bytes (float, loops 4, calls 30)
 - [ ] `10047a10` 1598 bytes (float, loops 7, calls 52)
 - [ ] `10193d10` 1600 bytes (float, loops 3, calls 26)
 - [ ] `100564d0` 1611 bytes (float, loops 2, calls 33)

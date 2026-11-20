@@ -926,3 +926,4 @@ address	name	evidence
 10098be0	Enemy_ShoveAndBlast	idles, walks after the player, attacks with effect 0x61 and sound 0x151; reacting chains two attacks (matched, decomp/src/char_move.cpp)
 10048b70	Char_SwingDoor	door on a character slot: root node turned about Y by talk*45 degrees, effect 0x2db, swings shut in state 2 (matched, decomp/src/char_move.cpp)
 101b1bb0	RotationY	builds a rotation matrix about Y (m[0]=cos, m[2]=sin, m[8]=-sin, m[10]=cos)
+10045830	Npc_SleepUntilWoken	sleeper woken by sight, a running player, DAT_104c00e0 or DAT_102550e0; looks around, prompts 4/9 (matched, decomp/src/npc_sleep.cpp)

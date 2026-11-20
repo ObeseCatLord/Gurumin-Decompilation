@@ -292,3 +292,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 228 | enemy behaviours | 1009dfd0 | Enemy_FollowAndBlast matched (`rand() % 100 <= 2`, the record matrix is now the shared Matrix4 view) |
 | 229 | enemy behaviours | 1009d100, 10098be0 | Enemy_ChaseAndBlast and Enemy_ShoveAndBlast matched (the latter with a direct `atan2` call where cl 13.00 would not expand `Atan2`) |
 | 230 | character behaviours | 10048b70 | Char_SwingDoor matched (C++, EH; root node matrix = saved matrix * RotationY 0x101b1bb0) |
+| 231 | character behaviours | 10045830 | Npc_SleepUntilWoken matched in its own unit (npc_sleep.cpp): a new CharRecord member in char_move.cpp flipped Npc_PopUp |

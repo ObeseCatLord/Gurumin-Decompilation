@@ -35,6 +35,16 @@ struct Matrix4
     Matrix4 operator*(const Matrix4 &other);     // 0x101b0670: matrix product
 };
 
+// A model's motion playback state (model_state.cpp Playback), only the fields used here.
+struct Playback
+{
+    char pad_0000[0x1c];
+    int layer;                // 0x1c: layer playing (-1 = none)
+    int frame;                // 0x20: current frame
+    char pad_0024[0x7c50];
+    int blending;             // 0x7c74: non-zero while blending into another layer
+};
+
 // A model node, only its local matrix is used here.
 struct Node
 {
@@ -60,7 +70,7 @@ struct CharRecord
     char m_0266;
     char m_0267;              // 0x267: set to 1 while an NPC idles (FUN_100b5ae0)
     char pad_0268[0x30];
-    int m_0298;               // 0x298: collision filter while this enemy moves (copied to DAT_1101d880)
+    Playback *motion;         // 0x298: the model's motion playback state
     char pad_029c[0xab0];
     float m_0d4c;             // 0xd4c: 1.0 for the player (app_0013.cpp)
     char pad_0d50[0x159c];
@@ -1316,7 +1326,7 @@ struct ModelState
     ModelState();                 // 0x101668b0
 };
 
-extern "C" int DAT_1101d880;                  // collision filter of the moving character
+extern "C" Playback *DAT_1101d880;            // motion playback of the character being moved
 
 // 0x10098be0 (Enemy_ShoveAndBlast). An enemy that idles (motion 2) and now and then (3 in 100, at most every 100
 // frames) either attacks or starts walking (talk 2): walking it follows the player (motion 0, 5 units a frame)
@@ -1425,8 +1435,8 @@ extern "C" int FUN_10098be0(int index)
 // 0x1009dfd0 (Enemy_FollowAndBlast). An enemy that walks towards the player (motion 0, 5 units a frame) while
 // farther than 120 units, else idles (motion 2). Now and then (3 in 100, at most every 100 frames) it turns away
 // from the player and plays attack motion 4 for 60 frames: after 30 of them it plays sound 0x150 and starts effect
-// 0x46 (scale 1.5, kind 1) from its own matrix. Being told to react (DAT_10210b30) cancels the attack. Its m_0298
-// is the collision filter for the rest of the frame. Returns 0.
+// 0x46 (scale 1.5, kind 1) from its own matrix. Being told to react (DAT_10210b30) cancels the attack. Its motion
+// playback is left in DAT_1101d880 (cleared at the start). Returns 0.
 extern "C" int FUN_1009dfd0(int index)
 {
     DAT_1101d880 = 0;
@@ -1486,7 +1496,7 @@ extern "C" int FUN_1009dfd0(int index)
         else
             DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
     }
-    DAT_1101d880 = DAT_10db6ee8[index].m_0298;
+    DAT_1101d880 = DAT_10db6ee8[index].motion;
     return 0;
 }
 

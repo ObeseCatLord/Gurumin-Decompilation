@@ -45,7 +45,9 @@ struct CharRecord
     char m_0267;              // 0x267: set to 1 while an NPC idles (FUN_100b5ae0)
     char pad_0268[0xae4];
     float m_0d4c;             // 0xd4c: 1.0 for the player (app_0013.cpp)
-    char pad_0d50[0x15d8];
+    char pad_0d50[0x159c];
+    void *root;               // 0x22ec: root node of the model (0 = no model loaded)
+    char pad_22f0[0x38];
     CharMatrix matrix;        // 0x2328: world matrix
     char pad_2368[0x24];
     int m_238c;               // 0x238c: Character::m_239c (1 = ?; app_0011.cpp plays the idle motion when non-zero)
@@ -94,8 +96,9 @@ struct NpcState
     int wait;                 // 0x04: frames until the next voice line may play
     int talk;                 // 0x08: talk id: script number * 100 + line (line 0 = never speaks)
     int range;                // 0x0c: distance at which a waiting character reacts
-    int target;               // 0x10: character the messenger runs to (Npc_RunToMarker)
-    char pad_0014[0x24];
+    int target;               // 0x10: character the messenger runs to (Npc_RunToMarker); alarm raised (Npc_RideAlarm)
+    int m_0014;               // 0x14: alarm flashes so far (Npc_RideAlarm)
+    char pad_0018[0x20];
     int m_0038;               // 0x38
     int m_003c;
 };
@@ -1164,6 +1167,121 @@ extern "C" int FUN_100b4300(int index)
                 DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
             else
                 DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        }
+    }
+    DAT_10210b30[index] = 0;
+    return 0;
+}
+
+extern "C" float DAT_10255160[0x80][4];
+
+// 0x100b4930 (Npc_RideAlarm). A lookout that rides along with the nearest marker character (kind ',' with a model,
+// among 0x5c..0x7b; with none m_003c becomes 11): it keeps its distance behind the marker (stored in DAT_10255160)
+// as the marker turns, moving at most 12 units a frame, faces the marker's way (motion 2 once it stands still within
+// one degree, else motion 0) and is reset when the marker goes away. When it sees the player (within the talk id's
+// hundreds * 200 units) or is told to react it shows prompt 15, plays voice 0x20c, wakes the enemies within 1500,
+// registers flag line + 300 and from then on raises the alarm: waking the enemies every frame and, twice, alarm 0x207
+// with a red flash every 30 frames. Returns 0.
+extern "C" int FUN_100b4930(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    (player - self).Length();      // computed and not used
+    (player - self).Length2D();    // computed and not used
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        DAT_1020b430[index].state = 1;
+        float nearestSquared = 99999.0f;
+        int nearest = -1;
+        Vec4 marker;
+        for (int i = 0x5c; i < 0x7c; i++)
+        {
+            if (DAT_1021f3c0[i] == ',' && DAT_10db6ee8[i].root != 0)
+            {
+                marker.Copy(DAT_10db6ee8[i].matrix.GetTranslation());
+                if ((marker - self).LengthSquared3() < nearestSquared)
+                {
+                    nearest = i;
+                    nearestSquared = (marker - self).LengthSquared3();
+                }
+            }
+        }
+        DAT_1020b430[index].range = nearest;
+        DAT_10255160[index][0] = (float)sqrt(nearestSquared);
+        if (nearest == -1)
+            DAT_1020b430[index].m_003c = 11;
+    }
+    else if (DAT_1020b430[index].state == 1)
+    {
+        Vec4 place;
+        Vec4 step;
+        place.y = -DAT_10255160[index][0];
+        place.RotateZ(3.1415f - DAT_10db6ee8[DAT_1020b430[index].range].heading);
+        place.Copy(place + DAT_10db6ee8[DAT_1020b430[index].range].matrix.GetTranslation());
+        step.Copy(place - self);
+        if (step.Length() > 12.0f)
+        {
+            step.Normalize3();
+            step.Copy(step * 12.0f);
+            place.Copy(self + step);
+        }
+        DAT_10db6ee8[index].SetPosition(place.x, place.y, place.z);
+        float turn = DAT_10db6ee8[DAT_1020b430[index].range].heading;
+        DAT_10db6ee8[index].targetHeading = turn;
+        turn -= DAT_10db6ee8[index].heading;
+        while (turn > 3.1415f)
+            turn -= 6.283f;
+        while (turn < -3.1415f)
+            turn += 6.283f;
+        turn = (float)fabs(turn);
+        if (turn > 0.01756f || (place - self).LengthSquared3() > 4.0f)
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+        else
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        if (DAT_1020b430[index].target == 0)
+        {
+            player.z += 50.0f;
+            self.z += 75.0f;
+            if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+                                                             (float)(DAT_1020b430[index].talk / 100 * 200), 1.099525f, 250.0f, 1)) != 0 ||
+                DAT_10210b30[index] != 0)
+            {
+                FUN_1000d620(index, 15, 60);
+                FUN_10065b10(index, 0x20c, 0, 0);
+                DAT_1020b430[index].wait = 0;
+                DAT_1020b430[index].target = 1;
+                FUN_1001b670(index, 1500.0f, 0);
+                if (DAT_1020b430[index].talk % 100 != 0)
+                    DAT_10874848.RegisterFlag(DAT_1020b430[index].talk % 100 + 300);
+            }
+        }
+        if (DAT_10db6ee8[DAT_1020b430[index].range].matrix.m[12] < -20000.0f)
+            FUN_10043cc0(index);
+    }
+    if (DAT_1020b430[index].target != 0)
+    {
+        FUN_1001b670(index, 1500.0f, 0);
+        if (++DAT_1020b430[index].wait == 15)
+        {
+            if (DAT_1020b430[index].m_0014 < 2)
+            {
+                FUN_1003ad20(0x207, 0, 1.0f);
+                FUN_1000ec70(15, 1.0f, 0.5f, 0.5f, 1.0f);
+                DAT_10210b30[index] = 0;
+                return 0;
+            }
+        }
+        else if (DAT_1020b430[index].wait == 30)
+        {
+            if (DAT_1020b430[index].m_0014 < 2)
+            {
+                FUN_1000ec70(15, 1.0f, 1.0f, 1.0f, 1.0f);
+                DAT_1020b430[index].m_0014++;
+            }
+            DAT_1020b430[index].wait = 0;
         }
     }
     DAT_10210b30[index] = 0;

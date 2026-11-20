@@ -920,3 +920,4 @@ address	name	evidence
 100b23b0	Npc_ChildFollow	child: sees the player, wakes group 15, turns, runs to the player until a clear spot within 450 (matched, decomp/src/char_move.cpp)
 100b4f00	Npc_PopUp	bobs in place, rises and sinks back with effect 0x2d5; jumps out (voice 0x20c) when the player is near (matched, decomp/src/char_move.cpp)
 100b4300	Npc_RaiseAlarm	lookout: sees the player or is hurt, wakes enemies, red flashes and alarm 0x207, registers flag line+300 (decomp/src/char_move.cpp)
+100b4930	Npc_RideAlarm	lookout riding behind the nearest marker character; alarm 0x207 and red flashes once it sees the player (decomp/src/char_move.cpp)

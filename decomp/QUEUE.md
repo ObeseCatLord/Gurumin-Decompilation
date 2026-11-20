@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (147)
+## 1. Walls to retry (148)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -76,6 +76,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10055110` 476 — Game::RaiseDoorEvents: same inline-budget residue as 0x10054d50
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
+- [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
 - [ ] `100b0250` 1583 — Companion0_Update: all but the idle branch identical; there the original takes eax/ecx for the first block's temporaries and edx/eax for the second (cl 13.00 here edx/eax and ecx/edx); its twins 0x100b0880 and 0x100b0f00 match with the same branch; slot-variable, local and early-return forms tried
 - [ ] `100b4300` 1583 — Npc_RaiseAlarm (char_move.cpp): all but the alarm block identical; the original pushes an immediate 0 for Sound_PlayEffect and re-zeroes edi after the red flash, cl 13.00 here re-zeroes edi before the sound. The `||` spelling of the line-of-sight test makes cl 13.00 inline atan2f (a larger frame); the `visible` local keeps it a call
 - [ ] `100b4930` 1473 — Npc_RideAlarm (char_move.cpp): same flow and calls; the original keeps index in ebx and the marker loop counter in ebp (cl 13.00 here swaps them), and stores the marker distance after the -1 test; declaration orders tried
@@ -164,7 +165,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (14)
+## 3. Medium functions (251-800 bytes) (13)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1000f5a0` 577 bytes (float, calls 21)
@@ -176,7 +177,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014ec30` 749 bytes (float, loops 1, calls 12)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 - [ ] `10166520` 751 bytes (float, loops 2, calls 10)
-- [ ] `1005dbf0` 753 bytes (float, calls 18)
 - [ ] `10165e00` 757 bytes (float, loops 2, calls 8)
 - [ ] `1000baf0` 794 bytes (float, calls 28)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)

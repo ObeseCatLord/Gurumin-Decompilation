@@ -293,3 +293,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 229 | enemy behaviours | 1009d100, 10098be0 | Enemy_ChaseAndBlast and Enemy_ShoveAndBlast matched (the latter with a direct `atan2` call where cl 13.00 would not expand `Atan2`) |
 | 230 | character behaviours | 10048b70 | Char_SwingDoor matched (C++, EH; root node matrix = saved matrix * RotationY 0x101b1bb0) |
 | 231 | character behaviours | 10045830 | Npc_SleepUntilWoken matched in its own unit (npc_sleep.cpp): a new CharRecord member in char_move.cpp flipped Npc_PopUp |
+| 232 | player | 1005dbf0 | Player_TakeDamage drafted (player_damage.cpp); its hurt-voice helper will not inline under cl 13.00 |

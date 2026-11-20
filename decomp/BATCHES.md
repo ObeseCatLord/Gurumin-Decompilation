@@ -325,3 +325,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 261 | texture | 1014b750 | TextureObject::DrawScreenCopy matched (texture_bind.cpp; first build) |
 | 262 | texture | 1014c080 | DrawQuad one byte off (texture_bind.cpp; SIB operand order), recorded |
 | 263 | texture | 10144320 | TextureObject::DrawThroughShader matched (texture_bind.cpp; descending chained coordinates, MIN(size, screen)) |
+| 264 | texture | 10149100 | SwapTarget_DrawPreview matched (texture_bind.cpp; divisions inline in the chained coordinates) |

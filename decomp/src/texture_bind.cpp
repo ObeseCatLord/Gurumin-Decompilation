@@ -31,7 +31,7 @@ struct D3DTexture : IUnknownLike
     virtual void __stdcall Slot15() = 0;
     virtual void __stdcall Slot16() = 0;
     virtual void __stdcall Slot17() = 0;
-    virtual void __stdcall Slot18() = 0;
+    virtual long __stdcall GetSurfaceLevel(unsigned int level, struct D3DSurface **surface) = 0;
     virtual long __stdcall LockRect(unsigned int level, LockedRect *locked, const void *rect, unsigned long flags) = 0;
     virtual long __stdcall UnlockRect(unsigned int level) = 0;
 };
@@ -59,10 +59,10 @@ struct TextureObject
     D3DSurface *surface;     // 0x04: surface of a render-target texture (or a second part), may be 0
     int width;               // 0x08: texture width in pixels
     int height;              // 0x0c: texture height in pixels
-    int pad_0010;
+    int target;              // 0x10: 1 = R5G6B5 render target, 2 = A8R8G8B8 render target, else 0
     int poolIndex;           // 0x14: buffer pool index of the frames
     int pad_0018;
-    int poolSlot;            // 0x1c: non-zero when the frames live in the buffer pool
+    int poolSlot;            // 0x1c: non-zero when the frames live in the buffer pool (1 = R5G6B5, 2 = A4R4G4B4)
     char pad_0020[0x18];
     int BindStage0();
     int BindStage1();
@@ -73,6 +73,7 @@ struct TextureObject
     int CaptureRgbFirst(unsigned char *out);
     int BeginRenderTo(int width, int height, int offset);
     int HalveRgb24(unsigned char *pixels, int width, int height);
+    int Upload(int width, int height, unsigned char *pixels, const unsigned char *alpha);
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
     int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);
@@ -447,6 +448,107 @@ int TextureObject::CaptureRgbFirst(unsigned char *out)
 extern "C" int DAT_10f6548c;
 extern "C" int DAT_10f654cc;              // non-zero when off-screen render targets are supported
 extern "C" int DAT_10f65478;              // non-zero while an off-screen target is set up
+extern "C" int FUN_10148410(void);   // BufferPool_Alloc
+
+// 0x1014f1f0 (TextureObject::Upload). (Re)creates this texture at width x height and forgets it as a bound texture.
+// `alpha` chooses the kind: 0 = a system-memory R5G6B5 texture filled from the 24-bit B, G, R `pixels`; 1 or 2 = an
+// empty R5G6B5 or A8R8G8B8 render target with its surface; any other value points to a second 24-bit image whose
+// first byte per pixel is the alpha of a system-memory A4R4G4B4 texture filled from `pixels`. System-memory textures
+// get a buffer pool index (they are copied into the pool when bound). Returns 0 when Direct3D fails, else 1 (also
+// without a device).
+int TextureObject::Upload(int width, int height, unsigned char *pixels, const unsigned char *alpha)
+{
+    if (DAT_10f6550c == this)
+        DAT_10f6550c = (TextureObject *)1;
+    if (DAT_10f65510 == this)
+        DAT_10f65510 = (TextureObject *)1;
+    if (DAT_10f1fcf0 == 0)
+        return 1;
+    poolSlot = 0;
+    this->width = width;
+    this->height = height;
+    target = 0;
+    if (alpha == 0)
+    {
+        if (DAT_10f1fcf0->CreateTexture(width, height, 1, 0, 0x17 /* D3DFMT_R5G6B5 */, 2 /* D3DPOOL_SYSTEMMEM */,
+                                        (IUnknownLike **)&texture, 0) != 0)
+            return 0;
+        pad_0018 = 0;
+        poolSlot = 1;
+        surface = 0;
+        int levels = 1;
+        for (int level = 0; level < levels; level++)
+        {
+            LockedRect locked;
+            if (texture->LockRect(level, &locked, 0, 0x800 /* D3DLOCK_NOSYSLOCK */) != 0)
+                return 0;
+            int offset = 0;
+            for (int y = 0; y < height; y++)
+            {
+                unsigned short *row = (unsigned short *)((char *)locked.bits + locked.pitch * y);
+                for (int x = 0; x < width; x++)
+                {
+                    unsigned short r = pixels[offset + x * 3 + 2];
+                    unsigned short g = pixels[offset + x * 3 + 1];
+                    row[x] = (unsigned short)((((r & 0xfff8) << 5 | g) & 0xfffc) << 3 | pixels[offset + x * 3] >> 3);
+                }
+                offset += width * 3;
+            }
+            texture->UnlockRect(level);
+            if (level < levels - 1)
+            {
+                HalveRgb24(pixels, width, height);
+                width /= 2;
+                height /= 2;
+            }
+        }
+    }
+    else if (alpha == (const unsigned char *)2)
+    {
+        target = 2;
+        if (DAT_10f1fcf0->CreateTexture(width, height, 1, 1 /* D3DUSAGE_RENDERTARGET */, 0x15 /* D3DFMT_A8R8G8B8 */,
+                                        0, (IUnknownLike **)&texture, 0) != 0)
+            return 0;
+        return texture->GetSurfaceLevel(0, &surface) == 0;
+    }
+    else if (alpha == (const unsigned char *)1)
+    {
+        target = 1;
+        if (DAT_10f1fcf0->CreateTexture(width, height, 1, 1 /* D3DUSAGE_RENDERTARGET */, 0x17 /* D3DFMT_R5G6B5 */,
+                                        0, (IUnknownLike **)&texture, 0) != 0)
+            return 0;
+        return texture->GetSurfaceLevel(0, &surface) == 0;
+    }
+    else
+    {
+        if (DAT_10f1fcf0->CreateTexture(width, height, 1, 0, 0x1a /* D3DFMT_A4R4G4B4 */, 2 /* D3DPOOL_SYSTEMMEM */,
+                                        (IUnknownLike **)&texture, 0) != 0)
+            return 0;
+        pad_0018 = 0;
+        poolSlot = 2;
+        LockedRect locked;
+        texture->LockRect(0, &locked, 0, 0x800 /* D3DLOCK_NOSYSLOCK */);
+        surface = 0;
+        int offset = 0;
+        for (int y = 0; y < height; y++)
+        {
+            unsigned short *row = (unsigned short *)((char *)locked.bits + locked.pitch * y);
+            for (int x = 0; x < width; x++)
+            {
+                unsigned short r = pixels[offset + x * 3 + 2];
+                unsigned short g = pixels[offset + x * 3 + 1];
+                row[x] = (unsigned short)((((r & 0xfff0) << 4 | g) & 0xfff0) |
+                                          (unsigned short)(alpha[offset + x * 3] >> 4) << 12 |
+                                          pixels[offset + x * 3] >> 4);
+            }
+            offset += width * 3;
+        }
+        texture->UnlockRect(0);
+    }
+    poolIndex = FUN_10148410();
+    return 1;
+}
+
 extern "C" int DAT_10202b24;              // back-buffer width
 extern "C" int DAT_10202b28;              // back-buffer height
 extern "C" void *DAT_10f08d38;            // depth buffer for off-screen targets

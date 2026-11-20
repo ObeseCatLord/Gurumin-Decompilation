@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (151)
+## 1. Walls to retry (152)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -71,6 +71,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f250` 655 — TutorialBook_Close draft: flow and calls match (LoadTexture inline for the cover); the page loop registers differ (original: first page in edi, second in ebp, name pointer in ebx), like the other TutorialBook functions; declaration orders tried
 - [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
 - [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
+- [ ] `10050df0` 921 — Char_ProbeSideLedge (ledge_probe.cpp): statements and slots line up (inner block for the ground probe, fabsf); the original falls through from the distance test into the shared *wallDistance = -1 block, cl 13.00 here keeps it at the end and the -200000 marker is stored one instruction later
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054770` 506 — Game::MarkKilled: same statements; like RaiseGameOverEvents the original walks the events with two pointers (&flags[1] and &ids[0]) and keeps this in ebp, cl 13.00 here one event pointer and this in ebx (pointer and indexed forms tried)
 - [ ] `10054d50` 476 — Game::RaiseFireEvents: the event-pointer form of the other Raise* functions fixes the loop pointer, but cl 13.00 inlines no TestScriptFlag here (the original expands flags[0] once per loop and calls the rest), even compiled alone; swapped loop order and a function-scope pointer tried
@@ -181,7 +182,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10165e00` 757 bytes (float, loops 2, calls 8)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (163)
+## 4. Large functions (801-3000 bytes) (162)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -194,7 +195,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d2110` 894 bytes (float, loops 4, calls 12)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
 - [ ] `10144320` 907 bytes (float, calls 19)
-- [ ] `10050df0` 921 bytes (float, calls 33)
 - [ ] `1001bb20` 925 bytes (float, loops 2, calls 23)
 - [ ] `100360f0` 939 bytes (loops 4, calls 1)
 - [ ] `1014c080` 943 bytes (float, loops 1, calls 23)

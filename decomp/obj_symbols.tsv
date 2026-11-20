@@ -429,3 +429,7 @@ _sqrtf	10002010
 ?DrawCell@TextureObject@@QAEHHHHHMMMMMMM@Z	1014bc60
 ?DrawCell@TextureObject@@QAEXHHHHMMMMHMH@Z	1014bc60
 ?DrawCell@TextureObject@@QAEXHHHHMMMMHMM@Z	1014bc60
+?DrawTinted@TextureObject@@QAEHHHHHMMMMMMMM@Z	1014c430
+?DrawTinted@TextureObject@@QAEXHHHHMMMMHMMH@Z	1014c430
+?DrawTinted@TextureObject@@QAEXHHHHMMMMHHMH@Z	1014c430
+?DrawTinted@TextureObject@@QAEXHHHHMMMMMMMH@Z	1014c430

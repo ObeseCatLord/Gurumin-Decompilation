@@ -8,8 +8,9 @@
 struct TextureObject
 {
     char pad_0000[0x38];
-    void DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int colour, float unused, float alpha, int b);  // `unused` is never read
-    void DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int frame, float alpha, int b);
+    // DrawTinted: z, alpha (0..1), angle in radians, grey level of the specular colour (0..1).
+    void DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int z, float alpha, float angle, int grey);
+    void DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int z, float alpha, int angle);
     void DrawFill(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
     void DrawFrame(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
     void DrawFillAlt(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);

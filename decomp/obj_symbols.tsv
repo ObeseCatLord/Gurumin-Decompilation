@@ -403,4 +403,6 @@ _sqrtf	10002010
 ?RegisterBuiltin@ListBank@@QAEHPBDFP6AHPAU1@H@Z@Z	10036ca0
 ?Companion0_Update@@YAHH@Z	100b0250
 ?Companion1_Update@@YAHH@Z	100b0880
+?FUN_100b5c30@@YAHH@Z	100b5c30
+?FUN_100b5f80@@YAHH@Z	100b5f80
 ?Companion2_Update@@YAHH@Z	100b0f00

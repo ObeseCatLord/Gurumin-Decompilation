@@ -911,3 +911,7 @@ address	name	evidence
 100b0880	Companion1_Update	companion 1 (slot index+3) update (matched, decomp/src/companion_update.cpp)
 100b0f00	Companion2_Update	companion 2 (slot index+4) update (matched, decomp/src/companion_update.cpp)
 100b1520	Npc_WatchForPlayer	NPC idles until Char_CanSee spots the player, then voice 0x20c and turns to face (matched, decomp/src/char_move.cpp)
+100b3430	Npc_RiseWhenSeen	waits 400 below ground, rises (voice 0x208) or moves on when the player is visible and near (matched, decomp/src/char_move.cpp)
+100b5550	Npc_GreetWhenNear	idle NPC with voices 0x2a3/0x209..; reacts within talk/100*100, effect sound 0x20c, faces the player (decomp/src/char_move.cpp)
+100b5c30	Npc_TurnWhenSeen	Npc_AlertWhenSeen that also turns to face the player (matched, decomp/src/char_move.cpp)
+100b5f80	Npc_AlertWhenSeen	line-of-sight check every 10 frames; voice 0x2d0, effect 0x3f4, group timer 2 (matched, decomp/src/char_move.cpp)

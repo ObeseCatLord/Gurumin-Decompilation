@@ -17,6 +17,7 @@ struct Vec4
     float Length();          // 0x101ac4e0: length of x/y/z
     float Length2D();        // 0x101ac500: length of x/y
     void Fill(const float &value);
+    void Set(float x, float y, float z, float w);   // 0x101ac9c0
     Vec4 operator-(const Vec4 &other) const;   // 0x101aca40
 };
 
@@ -30,9 +31,12 @@ struct CharRecord
 {
     void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
     void AddMotionSpeed(float amount);                       // 0x101630b0 (AnimModel::AddMotionSpeed)
+    void SetPosition(float x, float y, float z);             // 0x10162610: moves the model
     char pad_0000[0x267];
     char m_0267;              // 0x267: set to 1 while an NPC idles (FUN_100b5ae0)
-    char pad_0268[0x20c0];
+    char pad_0268[0xae4];
+    float m_0d4c;             // 0xd4c: 1.0 for the player (app_0013.cpp)
+    char pad_0d50[0x15d8];
     CharMatrix matrix;        // 0x2328: world matrix
     char pad_2368[0x24];
     int m_238c;               // 0x238c: Character::m_239c (1 = ?; app_0011.cpp plays the idle motion when non-zero)
@@ -299,5 +303,319 @@ extern "C" int FUN_100b1520(int index)
             FUN_10043cc0(index);
     }
     DAT_10210b30[index] = 0;
+    return 0;
+}
+
+struct Matrix4
+{
+    float m[16];
+    Matrix4();                                   // 0x101ae770
+    ~Matrix4();                                  // 0x1013eda0 (empty)
+    void SetIdentity();                          // 0x101ae7a0
+    void SetTranslation(Vec4 position);          // 0x101adef0
+};
+
+struct EffectOptions;
+
+struct EffectManager
+{
+    int Start(int effect, Vec4 position, int parent, int unused, int matrixOwner, int value, int frame,
+              const Matrix4 *matrix, const EffectOptions *options, int *pause);  // 0x10172350
+};
+
+struct CollisionWorld
+{
+    int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
+};
+
+// A character slot record (world.h CharSlot): only the "seen" flag is used here.
+struct CharSlot
+{
+    char pad_0000[0xa5];
+    char m_00a5;              // 0xa5: set every frame while the watcher below runs
+    char pad_00a6[0xe2];
+};
+
+extern "C" CharSlot DAT_10daab84[0x80];
+extern "C" EffectManager DAT_10daaa80;
+extern "C" CollisionWorld *DAT_10255f08;
+extern "C" unsigned short DAT_104c0380;       // frame counter
+extern "C" int DAT_102199b8[0x80];            // per-character group timer (char_reset.cpp)
+
+// 0x100b5c30 (Npc_TurnWhenSeen). Npc_AlertWhenSeen below with one step more: when it reacts, the character also
+// turns at once to face the player (heading and target heading). Returns 0.
+int FUN_100b5c30(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    float distance = (player - self).Length2D();
+    DAT_10daab84[index].m_00a5 = 1;
+    int visible = 0;
+    if (DAT_104c0380 % 10 == index % 10)
+    {
+        Vec4 from;
+        Vec4 to;
+        Vec4 hit;
+        from.Copy(self);
+        from.z += 50.0f;
+        to.Copy(player);
+        to.z += 50.0f;
+        if (DAT_10255f08 == 0 || DAT_10255f08->Collide(0, 4, &from, &to, &hit) == 0)
+            visible = 1;
+    }
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z);
+        DAT_10db6ee8[index].m_0d4c = 0;
+        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_1020b430[index].state = 1;
+    }
+    else if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].m_0d4c = 0;
+        if (distance < (float)(DAT_1020b430[index].talk % 100 * 10) && visible != 0)
+        {
+            DAT_102199b8[index] = 2;
+            float target = atan2f(player.x - self.x, player.y - self.y) + 3.1415f;
+            DAT_10db6ee8[index].targetHeading = target;
+            DAT_10db6ee8[index].heading = target;
+            if ((DAT_1020b430[index].talk / 100 & 2) == 0)
+                FUN_10065b10(index, 0x2d0, 0, 0);
+            if ((DAT_1020b430[index].talk / 100 & 1) == 0)
+            {
+                Matrix4 matrix;
+                Vec4 position;
+                matrix.SetIdentity();
+                matrix.SetTranslation(DAT_10db6ee8[index].matrix.GetTranslation());
+                DAT_10daaa80.Start(0x3f4, position, -1, -1, 0, 0, 0, &matrix, 0, 0);
+            }
+            FUN_10043cc0(index);
+        }
+    }
+    return 0;
+}
+
+// 0x100b5f80 (Npc_AlertWhenSeen). Places character `index` where it stands on its first frame; afterwards, once
+// every ten frames (the frame counter's units equal the character's), it checks whether nothing blocks the line from
+// its head to the player's head (50 above each origin). When the player is that visible and nearer than the talk
+// id's line * 10 units, it sets its group timer to 2, plays voice 0x2d0 (unless the talk id's hundreds have bit 2),
+// starts effect 0x3f4 at its position (unless they have bit 1) and its state is reset. Returns 0.
+int FUN_100b5f80(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    float distance = (player - self).Length2D();
+    DAT_10daab84[index].m_00a5 = 1;
+    int visible = 0;
+    if (DAT_104c0380 % 10 == index % 10)
+    {
+        Vec4 from;
+        Vec4 to;
+        Vec4 hit;
+        from.Copy(self);
+        from.z += 50.0f;
+        to.Copy(player);
+        to.z += 50.0f;
+        if (DAT_10255f08 == 0 || DAT_10255f08->Collide(0, 4, &from, &to, &hit) == 0)
+            visible = 1;
+    }
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z);
+        DAT_10db6ee8[index].m_0d4c = 0;
+        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_1020b430[index].state = 1;
+    }
+    else if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].m_0d4c = 0;
+        if (distance < (float)(DAT_1020b430[index].talk % 100 * 10) && visible != 0)
+        {
+            DAT_102199b8[index] = 2;
+            if ((DAT_1020b430[index].talk / 100 & 2) == 0)
+                FUN_10065b10(index, 0x2d0, 0, 0);
+            if ((DAT_1020b430[index].talk / 100 & 1) == 0)
+            {
+                Matrix4 matrix;
+                Vec4 position;
+                matrix.SetIdentity();
+                matrix.SetTranslation(DAT_10db6ee8[index].matrix.GetTranslation());
+                DAT_10daaa80.Start(0x3f4, position, -1, -1, 0, 0, 0, &matrix, 0, 0);
+            }
+            FUN_10043cc0(index);
+        }
+    }
+    return 0;
+}
+
+extern "C" Vec4 DAT_118e6cb8;                 // camera target
+extern "C" int DAT_104bf8f8[0x7c];            // key prompt shown (app_0008.cpp)
+extern "C" int DAT_1021d138[0x7c];            // key prompt id
+extern "C" int DAT_1021f740[0x7c];            // key prompt frames left
+extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);  // Sound_PlayEffect
+
+// 0x100b5550 (Npc_GreetWhenNear). An idling NPC that greets: it plays voice 0x2a3 (speeding up its motion) now and
+// then while m_238c is set, and voice 0x209..0x20b with its talk prompt (line - 1, or line + 1979 past 20) every
+// 75 frames or more. While it has not reacted yet it reacts when told to (DAT_10210b30), when it already saw the
+// player (m_0038) or when the player comes within the talk id's hundreds * 100 units: it wakes the enemies within
+// 800, plays effect 0x20c at its position (when within 2500 of the camera target, or always for characters below
+// 0x3a), shows prompt 15 for 60 frames and turns to face the player for 30 frames before its state is reset.
+// Returns 0.
+extern "C" int FUN_100b5550(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    float distanceSquared = (player - self).LengthSquared3();
+    if (DAT_1020b430[index].state < 2 &&
+        (DAT_10210b30[index] != 0 || DAT_1020b430[index].m_0038 != 0 ||
+         distanceSquared < (float)(DAT_1020b430[index].talk / 100 * (DAT_1020b430[index].talk / 100) * 10000)))
+    {
+        FUN_1001b670(index, 800.0f, 0);
+        DAT_10210b30[index] = 0;
+        DAT_1020b430[index].state = 2;
+        DAT_1020b430[index].wait = 0;
+        float cameraSquared = (DAT_10db6ee8[index].matrix.GetTranslation() - DAT_118e6cb8).LengthSquared3();
+        if (cameraSquared < 6250000.0f || index < 0x3a)
+        {
+            Vec4 position;
+            position.Set(DAT_10db6ee8[index].matrix.m[12], DAT_10db6ee8[index].matrix.m[13],
+                         DAT_10db6ee8[index].matrix.m[14], 0);
+            FUN_1003ad20(0x20c, &position, 1.0f);
+        }
+        if (DAT_104bf8f8[index] == 0 || DAT_1021d138[index] != 15)
+        {
+            DAT_104bf8f8[index] = 1;
+            DAT_1021d138[index] = 15;
+        }
+        DAT_1021f740[index] = 60;
+    }
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_1020b430[index].state = 1;
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        return 0;
+    }
+    if (DAT_1020b430[index].state == 1)
+    {
+        if (DAT_10db6ee8[index].m_238c != 0 && FUN_1013f880() % 10000 < 100)
+        {
+            FUN_10065b10(index, 0x2a3, 0, 0);
+            DAT_10db6ee8[index].AddMotionSpeed(24.0f);
+        }
+        if (DAT_1020b430[index].talk % 100 > 0 && DAT_1020b430[index].wait == 0 && FUN_1013f880() % 10000 < 200)
+        {
+            FUN_10065b10(index, FUN_1013f880() % 3 + 0x209, 0, 0);
+            int line = DAT_1020b430[index].talk % 100;
+            if (line > 20)
+                FUN_1000d620(index, line + 1979, 60);
+            else
+                FUN_1000d620(index, line - 1, 60);
+            DAT_1020b430[index].wait = 75;
+        }
+        if (DAT_1020b430[index].wait > 0)
+        {
+            DAT_1020b430[index].wait--;
+            return 0;
+        }
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        DAT_10db6ee8[index].targetHeading = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
+        if (++DAT_1020b430[index].wait > 30)
+            FUN_10043cc0(index);
+    }
+    return 0;
+}
+
+// 0x100b3430 (Npc_RiseWhenSeen). A character that waits 400 units below the ground where it was placed. Once every ten
+// frames it checks the line from 350 below its origin to the player's head (50 above the player's origin). The talk
+// id's units say what happens when that line is clear: 0 = within 800 units it rises (state 2: m_0d4c grows to 1
+// over 15 frames, m_2498 set, voice 0x208) and its state is reset; 1 or 2 = within 1300 units it moves back up and
+// starts again with the talk id's remaining digits and m_003c set to 5 or 6. Returns 0.
+extern "C" int FUN_100b3430(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    float distance = (player - self).Length2D();
+    DAT_10daab84[index].m_00a5 = 1;
+    int visible = 0;
+    if (DAT_104c0380 % 10 == index % 10)
+    {
+        Vec4 from;
+        Vec4 to;
+        Vec4 hit;
+        from.Copy(self);
+        from.z -= 350.0f;
+        to.Copy(player);
+        to.z += 50.0f;
+        if (DAT_10255f08 == 0 || DAT_10255f08->Collide(0, 4, &from, &to, &hit) == 0)
+            visible = 1;
+    }
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z + 400.0f);
+        DAT_10db6ee8[index].m_0d4c = 0;
+        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_1020b430[index].state = 1;
+        return 0;
+    }
+    if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].m_0d4c = 0;
+        if (DAT_1020b430[index].talk % 10 == 0)
+        {
+            if (distance < 800.0f && visible != 0)
+            {
+                DAT_1020b430[index].state = 2;
+                DAT_1020b430[index].wait = 0;
+                DAT_10db6ee8[index].m_2498 = 1;
+                FUN_10065b10(index, 0x208, 0, 0);
+                return 0;
+            }
+        }
+        else if (DAT_1020b430[index].talk % 10 == 1)
+        {
+            if (distance < 1300.0f && visible != 0)
+            {
+                DAT_1020b430[index].talk /= 10;
+                DAT_1020b430[index].m_003c = 5;
+                DAT_1020b430[index].state = 0;
+                DAT_1020b430[index].wait = 0;
+                DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z - 400.0f);
+                return 0;
+            }
+        }
+        else if (DAT_1020b430[index].talk % 10 == 2)
+        {
+            if (distance < 1300.0f && visible != 0)
+            {
+                DAT_1020b430[index].talk /= 10;
+                DAT_1020b430[index].m_003c = 6;
+                DAT_1020b430[index].state = 0;
+                DAT_1020b430[index].wait = 0;
+                DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z - 400.0f);
+                return 0;
+            }
+        }
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        DAT_1020b430[index].wait++;
+        DAT_10db6ee8[index].m_0d4c = (float)DAT_1020b430[index].wait / 15.0f;
+        if (DAT_1020b430[index].wait == 15)
+        {
+            DAT_10db6ee8[index].m_0d4c = 1.0f;
+            FUN_10043cc0(index);
+            DAT_10daab84[index].m_00a5 = 0;
+        }
+    }
     return 0;
 }

@@ -324,3 +324,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 260 | texture | 1014c430 | TextureObject::DrawTinted matched (texture_bind.cpp; caller parameter names corrected in game_panels.cpp) |
 | 261 | texture | 1014b750 | TextureObject::DrawScreenCopy matched (texture_bind.cpp; first build) |
 | 262 | texture | 1014c080 | DrawQuad one byte off (texture_bind.cpp; SIB operand order), recorded |
+| 263 | texture | 10144320 | TextureObject::DrawThroughShader matched (texture_bind.cpp; descending chained coordinates, MIN(size, screen)) |

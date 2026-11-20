@@ -128,7 +128,7 @@ struct IDirect3DDevice9
     virtual long __stdcall SetIndices() = 0;
     virtual long __stdcall GetIndices() = 0;
     virtual long __stdcall CreatePixelShader() = 0;
-    virtual long __stdcall SetPixelShader() = 0;
+    virtual long __stdcall SetPixelShader(void *shader) = 0;
     virtual long __stdcall GetPixelShader() = 0;
     virtual long __stdcall SetPixelShaderConstantF() = 0;
     virtual long __stdcall GetPixelShaderConstantF() = 0;

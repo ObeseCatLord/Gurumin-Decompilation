@@ -50,6 +50,7 @@ address	name	evidence
 10143b50	Render_UnbindTexture0	SetTexture(0, NULL) once
 10143b80	Render_UnbindTexture1	SetTexture(1, NULL) once
 101446b0	Render_UnbindTextures	SetTexture(0..3, NULL)
+10144320	TextureObject::DrawThroughShader	binds three textures and draws the back buffer through the crossfade pixel shader (matched, decomp/src/texture_bind.cpp)
 10144bf0	TextureObject::DrawFrameAltPlain	untextured DrawFrameAlt shape in a given RGB colour (matched, decomp/src/texture_bind.cpp)
 10148310	TexCache_Clear	clears the 512-entry texture cache arrays (0x10f1bff0 textures, 0x10f0cd40 ages)
 10148350	TexCache_ReleaseAll	Release() every cached texture, subtract sizes from 0x10f0ff80

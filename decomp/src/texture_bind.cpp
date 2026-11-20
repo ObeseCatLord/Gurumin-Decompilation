@@ -78,6 +78,7 @@ struct TextureObject
     int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);
     int DrawQuad(const struct Vec4 *positions, const struct Vec4 *uvs, const struct Vec4 *colours,
                  const struct Vec4 *speculars, float alpha, int skip);
+    int DrawThroughShader(TextureObject *second, TextureObject *third);
     int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
                  float alpha, float angle);
     int DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
@@ -607,6 +608,86 @@ int TextureObject::DrawScreenCopy(int left, int top, int right, int bottom, floa
     DAT_10f0d5c8++;
     DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 2, vertices, 0x20);
     return 1;
+}
+
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
+
+// A pre-transformed vertex with four texture coordinate pairs (FVF 0x4c4), 0x38 bytes.
+struct ShaderVertex
+{
+    float x;
+    float y;
+    float z;
+    float rhw;
+    unsigned int colour;
+    unsigned int specular;
+    float u0, v0;
+    float u1, v1;
+    float u2, v2;
+    float u3, v3;
+};
+
+extern "C" float DAT_10202b18;  // size of the square crossfade targets
+extern "C" void *DAT_10f1fd0c;  // the crossfade pixel shader
+
+// 0x10144320 (TextureObject::DrawThroughShader). Binds this texture to stage 0, `second` to stage 1 and `third` to
+// stage 2 and draws the whole back buffer as one quad through the crossfade pixel shader. The four texture
+// coordinate pairs all cover the part of the square targets the size of the screen (half a texel in from each edge).
+// The shader and stages 1 to 3 are cleared afterwards. Returns 0.
+int TextureObject::DrawThroughShader(TextureObject *second, TextureObject *third)
+{
+    ShaderVertex vertices[4];
+    DAT_10f1fcf0->SetTexture(0, texture);
+    DAT_10f1fcf0->SetTexture(1, second->texture);
+    DAT_10f1fcf0->SetTexture(2, third->texture);
+    float width = (float)DAT_10202b34;
+    float height = (float)DAT_10202b38;
+    vertices[0].x = 0.0f;
+    vertices[0].y = 0.0f;
+    vertices[1].x = width;
+    vertices[1].y = 0.0f;
+    vertices[2].x = 0.0f;
+    vertices[2].y = height;
+    vertices[3].x = width;
+    vertices[3].y = height;
+    vertices[0].u3 = vertices[0].u2 = vertices[0].u1 = vertices[0].u0 =
+        0.5f / DAT_10202b18;
+    vertices[0].v3 = vertices[0].v2 = vertices[0].v1 = vertices[0].v0 =
+        0.5f / DAT_10202b18;
+    vertices[1].u3 = vertices[1].u2 = vertices[1].u1 = vertices[1].u0 =
+        (MIN(DAT_10202b18, width) - 0.5f) / DAT_10202b18;
+    vertices[1].v3 = vertices[1].v2 = vertices[1].v1 = vertices[1].v0 =
+        0.5f / DAT_10202b18;
+    vertices[2].u3 = vertices[2].u2 = vertices[2].u1 = vertices[2].u0 =
+        0.5f / DAT_10202b18;
+    vertices[2].v3 = vertices[2].v2 = vertices[2].v1 = vertices[2].v0 =
+        (MIN(DAT_10202b18, height) - 0.5f) / DAT_10202b18;
+    vertices[3].u3 = vertices[3].u2 = vertices[3].u1 = vertices[3].u0 =
+        (MIN(DAT_10202b18, width) - 0.5f) / DAT_10202b18;
+    vertices[3].v3 = vertices[3].v2 = vertices[3].v1 = vertices[3].v0 =
+        (MIN(DAT_10202b18, height) - 0.5f) / DAT_10202b18;
+    vertices[0].colour = vertices[1].colour = vertices[2].colour = vertices[3].colour = 0xffffffff;
+    vertices[0].specular = vertices[1].specular = vertices[2].specular = vertices[3].specular = 0xff000000;
+    vertices[0].z = vertices[1].z = vertices[2].z = vertices[3].z = 1.0f;
+    vertices[0].rhw = vertices[1].rhw = vertices[2].rhw = vertices[3].rhw = 1.0f;
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x4c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    FUN_1013ef90(0, 4, 4);                  // alpha: modulate
+    FUN_1013ef90(0, 5, 2);                  //   texture
+    FUN_1013ef90(0, 6, 0);                  //   diffuse
+    FUN_1013ef90(0, 1, 4);                  // colour: modulate
+    FUN_1013ef90(0, 2, 2);                  //   texture
+    FUN_1013ef90(0, 3, 0);                  //   diffuse
+    DAT_10f1fcf0->SetPixelShader(DAT_10f1fd0c);
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 2, vertices, 0x38);
+    DAT_10f1fcf0->SetPixelShader(0);
+    FUN_10143b80();
+    DAT_10f1fcf0->SetTexture(2, 0);
+    DAT_10f1fcf0->SetTexture(3, 0);
+    return 0;
 }
 
 // A vector with the 4D vector class's helpers used here.

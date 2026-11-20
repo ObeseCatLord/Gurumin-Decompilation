@@ -32,6 +32,14 @@ struct Matrix4
     void SetIdentity();                          // 0x101ae7a0
     void SetTranslation(Vec4 position);          // 0x101adef0
     Vec4 GetTranslation();                       // 0x101ade80
+    Matrix4 operator*(const Matrix4 &other);     // 0x101b0670: matrix product
+};
+
+// A model node, only its local matrix is used here.
+struct Node
+{
+    char pad_0000[0x1cc];
+    Matrix4 local;            // 0x1cc: matrix relative to the parent node
 };
 
 struct CharRecord
@@ -56,7 +64,7 @@ struct CharRecord
     char pad_029c[0xab0];
     float m_0d4c;             // 0xd4c: 1.0 for the player (app_0013.cpp)
     char pad_0d50[0x159c];
-    void *root;               // 0x22ec: root node of the model (0 = no model loaded)
+    Node *root;               // 0x22ec: root node of the model (0 = no model loaded)
     char pad_22f0[0x38];
     Matrix4 matrix;          // 0x2328: world matrix
     char pad_2368[0x24];
@@ -1541,6 +1549,62 @@ extern "C" int FUN_1009d100(int index)
         }
         else
             DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+    }
+    return 0;
+}
+
+extern "C" Matrix4 DAT_10868838[0x80][6];     // saved node matrices of each character
+Matrix4 RotationY(float angle);               // 0x101b1bb0
+
+// 0x10048b70 (Char_SwingDoor). A door on a character slot: its model's root matrix is saved on the first frame and
+// then turned about Y by the talk id's units * 45 degrees. While open (state 1) it may rise (m_0010 set: m_0014 / 2
+// units a frame, counting m_0014 down) and shows effect 0x2db at its position. Closing (state 2, set by the scripts)
+// it swings 10 degrees a frame towards 0 or 360 degrees; once shut (with the scripts loaded) its state is reset.
+// Returns 0.
+int FUN_10048b70(int index)
+{
+    DAT_10db6ee8[index].m_2498 = 0;
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_1020b430[index].range = DAT_1020b430[index].talk % 10 * 45;
+        DAT_10868838[index][0] = DAT_10db6ee8[index].root->local;
+        DAT_1020b430[index].state = 1;
+    }
+    else if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].root->local = DAT_10868838[index][0] * RotationY((float)DAT_1020b430[index].range * 3.1415f / 180.0f);
+        if (DAT_1020b430[index].m_0010 != 0)
+            DAT_10db6ee8[index].matrix.m[14] += (float)(DAT_1020b430[index].m_0014-- / 2);
+        Matrix4 matrix;
+        Vec4 position;
+        matrix.SetIdentity();
+        matrix.SetTranslation(DAT_10db6ee8[index].matrix.GetTranslation());
+        DAT_10daaa80.Start(0x2db, position, -1, -1, 0, 0, 0, &matrix, 0, 0);
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        DAT_10db6ee8[index].m_2498 = 1;
+        if (DAT_1020b430[index].range > 180)
+        {
+            if (DAT_1020b430[index].range < 360)
+            {
+                DAT_1020b430[index].range += 10;
+                if (DAT_1020b430[index].range >= 360)
+                    DAT_1020b430[index].range = 0;
+            }
+        }
+        else if (DAT_1020b430[index].range > 0)
+        {
+            DAT_1020b430[index].range -= 10;
+            if (DAT_1020b430[index].range <= 0)
+                DAT_1020b430[index].range = 0;
+        }
+        DAT_10db6ee8[index].root->local = DAT_10868838[index][0] * RotationY((float)DAT_1020b430[index].range * 3.1415f / 180.0f);
+        if (DAT_1020b430[index].range == 0 && DAT_1032d69c != 0)
+        {
+            DAT_10db6ee8[index].m_2498 = 1;
+            FUN_10043cc0(index);
+        }
     }
     return 0;
 }

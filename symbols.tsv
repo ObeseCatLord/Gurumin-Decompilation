@@ -924,3 +924,5 @@ address	name	evidence
 1009dfd0	Enemy_FollowAndBlast	walks to the player; sometimes turns away and starts effect 0x46 with sound 0x150 (matched, decomp/src/char_move.cpp)
 1009d100	Enemy_ChaseAndBlast	runs/walks to the player; sometimes turns away and starts effect 0x5e with sound 0x14f (matched, decomp/src/char_move.cpp)
 10098be0	Enemy_ShoveAndBlast	idles, walks after the player, attacks with effect 0x61 and sound 0x151; reacting chains two attacks (matched, decomp/src/char_move.cpp)
+10048b70	Char_SwingDoor	door on a character slot: root node turned about Y by talk*45 degrees, effect 0x2db, swings shut in state 2 (matched, decomp/src/char_move.cpp)
+101b1bb0	RotationY	builds a rotation matrix about Y (m[0]=cos, m[2]=sin, m[8]=-sin, m[10]=cos)

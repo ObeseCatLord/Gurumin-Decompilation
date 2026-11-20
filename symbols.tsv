@@ -945,3 +945,6 @@ address	name	evidence
 1000f7f0	Map_DrawTopView	draws the map and effects into the overhead pass, then rebuilds the camera and view matrices (matched, decomp/src/map_view.cpp)
 101b1c20	LookAt	builds a camera matrix from eye, target and up (map_view.cpp)
 101b10f0	Multiply	matrix product into a new matrix (map_view.cpp)
+1000baf0	MeshSlot::Draw	queues an attached model with the view or its own fixed 4:3 camera (matched, decomp/src/mesh_slots.cpp)
+101b0c10	Perspective	perspective projection matrix (near, far, field of view) (mesh_slots.cpp)
+101b13c0	Scaling	scale matrix (mesh_slots.cpp)

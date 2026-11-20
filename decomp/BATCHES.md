@@ -307,3 +307,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 243 | camera | 100184e0 | Camera_ItemStand matched (camera_follow.cpp) |
 | 244 | map view | 1000f5a0 | Map_BuildTopView matched (map_view.cpp) |
 | 245 | map view | 1000f7f0 | Map_DrawTopView matched (map_view.cpp, a void function) |
+| 246 | attached meshes | 1000baf0 | MeshSlot::Draw matched (mesh_slots.cpp; double literals for the camera offsets) |

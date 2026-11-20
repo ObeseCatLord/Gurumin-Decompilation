@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (141)
+## 1. Walls to retry (142)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -58,6 +58,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1002f050` 690 — Route_FollowGates: same statements and jump table; the original keeps the route row in ebx and the point in edi (cl 13.00 here esi/ebx); a separate next-point variable tried
 - [ ] `10034cc0` 429 — Party_BlocksMove: logic identical; the original copies the first atan2 result through a temporary and reloads the second in place (fld/fstp round trips); result locals and helper forms tried
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
+- [ ] `10036ca0` 987 — ListBank::RegisterBuiltin (Script_RegisterBuiltin): flow, calls and the inline ReportError expansion match (listbank_vars.cpp); the original frame is 4 bytes smaller and pushes ebx/esi/edi only before the parameter loop (shrink-wrapped), cl 13.00 here at the start; separate loop variables and split error returns tried
 - [ ] `10037090` 976 — ListBank::FindVariable: calls and the inline ReportError expansion match (listbank_vars.cpp sees ReportError as an inline member); the search loops keep the level in edi and spill this (cl 13.00 here keeps this in edi) and the original hoists the error flag into a local per level
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
 - [ ] `10037560` 743 — ListBank::AssignValue: statements and calls match; frame 8 bytes larger (the original puts the (float)(int) conversion temporary in the keyword index slot and the atof result in the value buffer) and the int-variable type-0 store is placed after the type tests; block scopes, an int local and kind forms tried
@@ -179,7 +180,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 - [ ] `10048b70` 799 bytes (float, calls 16)
 
-## 4. Large functions (801-3000 bytes) (194)
+## 4. Large functions (801-3000 bytes) (193)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -211,7 +212,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10049b00` 954 bytes (float, loops 6, calls 10)
 - [ ] `10192c90` 975 bytes (float, loops 1, calls 16)
 - [ ] `1014ade0` 980 bytes (float, loops 3, calls 20)
-- [ ] `10036ca0` 987 bytes Script_RegisterBuiltin (loops 7, calls 11)
 - [ ] `10051190` 988 bytes (float, calls 5)
 - [ ] `100279b0` 998 bytes (float, calls 36)
 - [ ] `10029cf0` 999 bytes (float, loops 2, calls 3)

@@ -400,3 +400,4 @@ _sqrtf	10002010
 ?AssignValue@ListBank@@QAEHPBDPBUScriptValue@@D@Z	10037560
 ?FindVariable@ListBank@@QAEHPBDPAH11@Z	10037090
 ?Start@EffectManager@@QAEHHUVec4@@HHHHHPBUMatrix4@@PBUEffectOptions@@PAH@Z	10172350
+?RegisterBuiltin@ListBank@@QAEHPBDFP6AHPAU1@H@Z@Z	10036ca0

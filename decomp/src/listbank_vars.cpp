@@ -6,6 +6,7 @@
 #include <string.h>
 
 typedef void (*ParserCallback)(int code, int value);
+typedef int (*BuiltinHandler)(struct ListBank *bank, int id);
 
 // The script parser (listbank.cpp ListBank), with the array dimension tables of the declared variables.
 struct ListBank
@@ -20,8 +21,18 @@ struct ListBank
     int sizes[8][0x80][8];    // 0x640c: size of each array dimension
     char dimensions[8][0x80]; // 0xe40c: number of array dimensions (0 = not an array)
     char m_e80c[8][0x80];
-    char pad_ec0c[0x1b9c0];
-    int pad_2a5cc[4];
+    char builtinNames[0x100][0x20];       // 0xec0c: names of the registered builtin functions
+    char builtinReturnTypes[0x100];       // 0x10c0c: 0 = int, 1 = float, 2 = string
+    char builtinParamTypes[0x100][0x10];  // 0x10d0c: parameter types (+10 = by reference, 0xff = end)
+    short builtinIds[0x100];              // 0x11d0c
+    BuiltinHandler builtinHandlers[0x100];// 0x11f0c
+    char pad_1230c[0x10000];
+    char builtinParamCounts[0x100];       // 0x2230c
+    char pad_2240c[0x81c0];
+    int pad_2a5cc;
+    int compiling;            // 0x2a5d0
+    int builtinCount;         // 0x2a5d4: registered builtin functions
+    int pad_2a5d8;
     int counts[8];            // 0x2a5dc: variables declared per nesting level
     char pad_2a5fc[0x4004];
     char text[0x7d00];        // 0x2e600: script text being parsed
@@ -30,8 +41,12 @@ struct ListBank
     int depth;                // 0x36324: current nesting level
     int pad_36328;
     int m_3632c;              // 0x3632c: set once an error was reported
+    ListBank *self;           // 0x36330
 
     int GetIndexPart(const char *name, char *part, int n);    // 0x10036560
+    int ReadWord(char **text, char *word);                    // 0x10035e80
+    int ReadTerm(char **text, char *word);                    // 0x10035fa0
+    char ReadType(char **text);                               // 0x100364a0 (type_parse.cpp)
     int Evaluate(const char *expression, char type);         // 0x100caf90
     int FreeAll();                                            // 0x10007d50
     // 0x100359c0 (listbank.cpp): reports a parse error and frees the script buffers. Returns 0.
@@ -47,6 +62,7 @@ struct ListBank
         return 0;
     }
     int FindVariable(const char *name, int *index, int *group, int *element);
+    int RegisterBuiltin(const char *signature, short id, BuiltinHandler handler);
 };
 
 // "添え字の範囲を超えています。" ("The index is out of range."), Shift-JIS.
@@ -136,5 +152,89 @@ int ListBank::FindVariable(const char *name, int *index, int *group, int *elemen
             }
         }
     }
+    return 0;
+}
+
+// "型が異常です。" ("The type is wrong."), Shift-JIS.
+#define BAD_TYPE_TEXT "^ªÙíÅ·B"
+// "関数名が重複してます。" ("The function name is a duplicate."), Shift-JIS.
+#define DUPLICATE_NAME_TEXT "Ö¼ªd¡µÄÜ·B"
+// "対応する括弧がありません。" ("There is no matching bracket."), Shift-JIS.
+#define NO_BRACKET_TEXT "Î·éÊª èÜ¹ñB"
+
+// 0x10036ca0 (ListBank::RegisterBuiltin, Script_RegisterBuiltin). Registers a builtin script function from its
+// C-like signature, such as "int name(int, &float, string)": the return type, the name and up to 16 parameter types
+// ("&" before a type adds 10: passed by reference) with the handler and its id. A name already registered with the
+// same parameter types, an unknown type or missing brackets is reported (the latter also clears the last result).
+// Returns 1 when registered, 0 otherwise.
+int ListBank::RegisterBuiltin(const char *signature, short id, BuiltinHandler handler)
+{
+    char params[0x100];
+    char word[0x100];
+    builtinHandlers[builtinCount] = handler;
+    char *cursor = (char *)signature;
+    builtinIds[builtinCount] = id;
+    builtinReturnTypes[builtinCount] = ReadType(&cursor);
+    ReadWord(&cursor, builtinNames[builtinCount]);
+    for (int j = 0; j < 0x10; j++)
+        builtinParamTypes[builtinCount][j] = (char)0xff;
+    strcpy(params, cursor);
+    cursor = params;
+    if (params[0] != '(')
+        ReportError(NO_BRACKET_TEXT);
+    else
+    {
+        params[0] = ' ';
+        if (params[strlen(params) - 1] == ')')
+        {
+            params[strlen(params) - 1] = ' ';
+            int i = 0;
+            builtinParamTypes[builtinCount][0] = (char)0xff;
+            do
+            {
+                if (m_3632c != 0)
+                    return 0;
+                ReadTerm(&cursor, word);
+                builtinParamTypes[builtinCount][i] = 0;
+                if (word[0] == '&')
+                {
+                    builtinParamTypes[builtinCount][i - 1] += 10;
+                    ReadTerm(&cursor, word);
+                }
+                builtinParamCounts[builtinCount] = (char)i;
+                if (word[0] == 0)
+                    break;
+                if (strcmp(word, "int") != 0)
+                {
+                    if (strcmp(word, "float") == 0)
+                        builtinParamTypes[builtinCount][i] += 1;
+                    else if (strcmp(word, "string") == 0)
+                        builtinParamTypes[builtinCount][i] += 2;
+                    else
+                    {
+                        builtinParamTypes[builtinCount][i] = 0;
+                        ReportError(BAD_TYPE_TEXT);
+                    }
+                }
+                i++;
+                builtinParamCounts[builtinCount] = (char)i;
+                builtinParamTypes[builtinCount][i] = (char)0xff;
+            } while (i < 0x10);
+            for (int k = 0; k < builtinCount; k++)
+            {
+                if (strcmp(builtinNames[k], builtinNames[builtinCount]) == 0 &&
+                    memcmp(builtinParamTypes[builtinCount], builtinParamTypes[k], 0x10) == 0)
+                    return ReportError(DUPLICATE_NAME_TEXT);
+            }
+            builtinCount++;
+            return 1;
+        }
+        ReportError(NO_BRACKET_TEXT);
+        self->resultType = 0;
+        *self->result = 0;
+        return 0;
+    }
+    self->resultType = 0;
+    *self->result = 0;
     return 0;
 }

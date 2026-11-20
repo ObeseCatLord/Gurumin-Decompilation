@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (154)
+## 1. Walls to retry (155)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -113,6 +113,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101455d0` 914 — FontRenderer::Init (Font_Init): flow and calls in place; the original keeps 0 in edi and the path in ebx (ours the other way round) and compares the Open results with the zero register; its frame is 4 bytes smaller (result locals, FILE* result and goto form tried)
 - [ ] `10148590` 731 — TexturePool_Get: statements and the 8x-unrolled LRU scan in place; the original keeps the constant 1 in ebx (found, evict and the pool flags are set from it), keeps found/age in ecx/edx, and pushes its registers only after the index checks; declaration orders tried
 - [ ] `1014b390` 233 — Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
+- [ ] `1014c080` 943 — TextureObject::DrawQuad (texture_bind.cpp): one byte off; reading speculars[i].y the original addresses [ecx+eax] (pointer register first), cl 13.00 here [eax+ecx]; reference locals and separate specular variables tried
 - [ ] `1014d850` 1429 — TextureObject::DrawFillAlt (texture_bind.cpp): loop and calls line up; the original keeps 1 and 0 in esi/ecx while filling the shade table (and later for the render states), spills i & 1 and indexes the arrays with a byte offset, cl 13.00 here schedules the array setup differently and the frame is 0xc smaller; array declaration orders and colour forms tried
 - [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
@@ -180,7 +181,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10165e00` 757 bytes (float, loops 2, calls 8)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (154)
+## 4. Large functions (801-3000 bytes) (153)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -192,7 +193,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10144320` 907 bytes (float, calls 19)
 - [ ] `1001bb20` 925 bytes (float, loops 2, calls 23)
 - [ ] `100360f0` 939 bytes (loops 4, calls 1)
-- [ ] `1014c080` 943 bytes (float, loops 1, calls 23)
 - [ ] `10026730` 950 bytes (float, loops 6, calls 13)
 - [ ] `10049b00` 954 bytes (float, loops 6, calls 10)
 - [ ] `10192c90` 975 bytes (float, loops 1, calls 16)

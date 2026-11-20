@@ -76,6 +76,8 @@ struct TextureObject
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
     int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);
+    int DrawQuad(const struct Vec4 *positions, const struct Vec4 *uvs, const struct Vec4 *colours,
+                 const struct Vec4 *speculars, float alpha, int skip);
     int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
                  float alpha, float angle);
     int DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
@@ -617,6 +619,89 @@ struct Vec4
     Vec4();                                      // 0x101ac990: zero
     void RotateZ(float angle);                   // 0x101ac300
 };
+
+// 0x1014c080 (TextureObject::DrawQuad). Draws a two-triangle strip from four points: `positions` give x and y in
+// 640x480 screen coordinates (scaled to the back buffer), depth and rhw; `uvs` the texture coordinates; `colours`
+// and `speculars` the vertex colours as 0..1 RGBA (the alpha capped at 1 and multiplied by `alpha`; the specular
+// colour without alpha). Texture times vertex colour, no culling, stages 1 to 3 off. Returns 0 (drawing nothing) as
+// soon as a depth is outside 0..1, else 1; with `skip` it draws nothing and returns 1.
+int TextureObject::DrawQuad(const Vec4 *positions, const Vec4 *uvs, const Vec4 *colours, const Vec4 *speculars,
+                            float alpha, int skip)
+{
+    PanelVertex vertices[4];
+    BindStage0();
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    if (skip == 0)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            vertices[i].x = scaleX * positions[i].x;
+            vertices[i].y = scaleY * positions[i].y;
+            vertices[i].z = positions[i].z;
+            vertices[i].rhw = positions[i].w;
+            vertices[i].u = uvs[i].x;
+            vertices[i].v = uvs[i].y;
+            float opacity = 1.0f > colours[i].w ? colours[i].w : 1.0f;
+            int a = (int)(opacity * alpha * 255.0f);
+            if (a > 255)
+                a = 255;
+            else if (a < 0)
+                a = 0;
+            int r = (int)(colours[i].x * 255.0f);
+            if (r > 255)
+                r = 255;
+            else if (r < 0)
+                r = 0;
+            int g = (int)(colours[i].y * 255.0f);
+            if (g > 255)
+                g = 255;
+            else if (g < 0)
+                g = 0;
+            int b = (int)(colours[i].z * 255.0f);
+            if (b > 255)
+                b = 255;
+            else if (b < 0)
+                b = 0;
+            vertices[i].colour = ((a << 8 | r) << 8 | g) << 8 | b;
+            r = (int)(speculars[i].x * 255.0f);
+            if (r > 255)
+                r = 255;
+            else if (r < 0)
+                r = 0;
+            g = (int)(speculars[i].y * 255.0f);
+            if (g > 255)
+                g = 255;
+            else if (g < 0)
+                g = 0;
+            b = (int)(speculars[i].z * 255.0f);
+            if (b > 255)
+                b = 255;
+            else if (b < 0)
+                b = 0;
+            vertices[i].specular = (r << 8 | g) << 8 | b;
+            if (vertices[i].z < 0.0f || vertices[i].z > 1.0f)
+                return 0;
+        }
+        FUN_1013ef30(0x16, 1);              // D3DRS_CULLMODE = D3DCULL_NONE
+        FUN_1013ef30(0x8d, 1);              // D3DRS_COLORVERTEX
+        DAT_10f1fcf0->SetFVF(0x1c4);
+        DAT_10f1fcf0->SetVertexShader(0);
+        FUN_1013ef30(0x91, 1);              // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+        FUN_1013ef90(0, 4, 4);              // alpha: modulate
+        FUN_1013ef90(0, 5, 2);              //   texture
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+        FUN_1013ef90(0, 1, 4);              // colour: modulate
+        FUN_1013ef90(0, 2, 2);              //   texture
+        FUN_1013ef90(0, 3, 0);              //   diffuse
+        FUN_10143b80();
+        DAT_10f1fcf0->SetTexture(2, 0);
+        DAT_10f1fcf0->SetTexture(3, 0);
+        DAT_10f0d5c8++;
+        DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 2, vertices, 0x20);
+    }
+    return 1;
+}
 
 // 0x1014bc60 (TextureObject::DrawCell). Draws the cell u0..u1, v0..v1 of this texture into the screen rectangle
 // left..right, top..bottom (back-buffer pixels, no 640x480 scaling) as a two-triangle strip, turned by `angle`

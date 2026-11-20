@@ -1233,7 +1233,7 @@ extern "C" int FUN_100b4930(int index)
             }
         }
         DAT_1020b430[index].range = nearest;
-        DAT_10255160[index][0] = (float)sqrt(nearestSquared);
+        DAT_10255160[index][0] = sqrtf(nearestSquared);
         if (nearest == -1)
             DAT_1020b430[index].m_003c = 11;
     }

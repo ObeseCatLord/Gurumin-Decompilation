@@ -231,6 +231,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   (npc_sleep.cpp for Npc_SleepUntilWoken) instead of changing the view other matches depend on.
 - **`dec / je / dec / jne` for "1 or 2"**: a switch whose cases 1 and 2 each carry the same statement
   (Enemy_DropIn 0x10048e90). Shared case labels compile to a range check, `x == 1 || x == 2` to two compares.
+- **`sqrtf` and `atan2f` from math.h**: where `(float)sqrt(x)` stores its result after a following compare
+  and `Atan2(...)` keeps the result in a temporary, the inline math.h float versions give the original order
+  (Npc_RideBehindMarker 0x10047a10, Npc_RideAlarm 0x100b4930).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

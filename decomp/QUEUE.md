@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (149)
+## 1. Walls to retry (150)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -67,6 +67,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `100451c0` 1644 — Npc_WalkRoute (route_carrier.cpp): flow and calls line up; the original frame is 8 bytes smaller: the float temporaries (speed, 0.1/0.9 factors, heading) reuse the slots of the Route_Follow results (reached, action), which cl 13.00 here keeps apart
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
+- [ ] `10047a10` 1598 — Npc_RideBehindMarker (npc_ride.cpp): 4 bytes; the marker heading copy lives in the slot of the cached distance pointer in the original, cl 13.00 here puts it in the turn variable's slot
 - [ ] `1004f250` 655 — TutorialBook_Close draft: flow and calls match (LoadTexture inline for the cover); the page loop registers differ (original: first page in edi, second in ebp, name pointer in ebx), like the other TutorialBook functions; declaration orders tried
 - [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
 - [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
@@ -80,7 +81,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
 - [ ] `100b0250` 1583 — Companion0_Update: all but the idle branch identical; there the original takes eax/ecx for the first block's temporaries and edx/eax for the second (cl 13.00 here edx/eax and ecx/edx); its twins 0x100b0880 and 0x100b0f00 match with the same branch; slot-variable, local and early-return forms tried
 - [ ] `100b4300` 1583 — Npc_RaiseAlarm (char_move.cpp): all but the alarm block identical; the original pushes an immediate 0 for Sound_PlayEffect and re-zeroes edi after the red flash, cl 13.00 here re-zeroes edi before the sound. The `||` spelling of the line-of-sight test makes cl 13.00 inline atan2f (a larger frame); the `visible` local keeps it a call
-- [ ] `100b4930` 1473 — Npc_RideAlarm (char_move.cpp): same flow and calls; the original keeps index in ebx and the marker loop counter in ebp (cl 13.00 here swaps them), and stores the marker distance after the -1 test; declaration orders tried
+- [ ] `100b4930` 1473 — Npc_RideAlarm (char_move.cpp): same flow and calls; the original keeps index in ebx and the marker loop counter in ebp (cl 13.00 here swaps them); with sqrtf for the marker distance the rest matches
 - [ ] `100b5550` 840 — Npc_GreetWhenNear (char_move.cpp): same flow and calls; the original keeps index in edi and the record offset in ebx (cl 13.00 here swaps them), which also moves one fadd in the facing step; condition and facing spellings tried
 - [ ] `100b9930` 637 — Enemy_DragToPit: identical except the heading store: the original rounds atan2 into the dead parameter slot and copies it with fld/fstp before the RotateZ setup, cl 13.00 here copies it through edx after; direct cast, Atan2 wrapper and local forms tried
 - [ ] `100b9bb0` 867 — Enemy_PlayVoice: same switch (jump table plus the 0x1e4.. range); the original keeps 15 and 0x2d in ebx/ebp, recomputes index*16+slot for every access and tests the cooldown kinds in turn, cl 13.00 here threads the kind tests after the reset stores; 2-D, flat and re-read kind forms tried
@@ -182,7 +183,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000baf0` 794 bytes (float, calls 28)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (170)
+## 4. Large functions (801-3000 bytes) (169)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -269,7 +270,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101643c0` 1520 bytes (float, loops 12, calls 9)
 - [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)
 - [ ] `10057ee0` 1550 bytes (float, loops 1, calls 52)
-- [ ] `10047a10` 1598 bytes (float, loops 7, calls 52)
 - [ ] `10193d10` 1600 bytes (float, loops 3, calls 26)
 - [ ] `100564d0` 1611 bytes (float, loops 2, calls 33)
 - [ ] `10051e20` 1618 bytes (float, loops 2, calls 37)

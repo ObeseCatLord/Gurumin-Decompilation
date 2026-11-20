@@ -237,6 +237,12 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - **A float argument chosen by a condition**: where the original pushes the value straight from the FPU into one
   shared call, write two calls in if/else (the compiler tail-merges them). A ternary argument, or assigning a
   variable first, goes through a stack temporary (Shaga_Create 0x100425f0, Npc_Held 0x100469d0).
+- **Calls cross-jumped from both branches**: when both arms end in the same calls (the pushes merge at a `jmp`)
+  and the argument pops of three calls come as one `add esp`, repeat the last call in each arm instead of writing
+  it once after the if/else; the shared form pushes the saved registers too early (TextureObject::DrawFrameAlt
+  0x1014e940).
+- **Vertex loops**: the loop pointer starts at the second field the body writes (DrawFrameAlt writes x then y; the
+  original pointer is &y).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

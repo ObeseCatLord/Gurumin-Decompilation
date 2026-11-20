@@ -315,3 +315,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 251 | enemy waves | 10049650 | Wave_Update drafted (enemy_spawn.cpp; stack slot order) |
 | 252 | shaga | 100425f0 | Shaga_Create matched (shaga_spawn.cpp; if/else RotateZ calls) |
 | 253 | shaga | 10042140 | Shaga_BreakOff matched (shaga_spawn.cpp; base-kind switch, case 0x10 placed after 0x31) |
+| 254 | texture | 1014e940 | TextureObject::DrawFrameAlt matched (texture_bind.cpp; last state call repeated in both arms, x then y) |

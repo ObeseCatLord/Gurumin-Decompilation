@@ -948,3 +948,4 @@ address	name	evidence
 1000baf0	MeshSlot::Draw	queues an attached model with the view or its own fixed 4:3 camera (matched, decomp/src/mesh_slots.cpp)
 101b0c10	Perspective	perspective projection matrix (near, far, field of view) (mesh_slots.cpp)
 101b13c0	Scaling	scale matrix (mesh_slots.cpp)
+100e21a0	Enemy_DefaultStep	turn to player, idle, pick a 65/35 action; special cases for characters 11/14/20 (decomp/src/enemy_react.cpp)

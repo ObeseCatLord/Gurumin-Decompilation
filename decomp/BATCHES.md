@@ -308,3 +308,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 244 | map view | 1000f5a0 | Map_BuildTopView matched (map_view.cpp) |
 | 245 | map view | 1000f7f0 | Map_DrawTopView matched (map_view.cpp, a void function) |
 | 246 | attached meshes | 1000baf0 | MeshSlot::Draw matched (mesh_slots.cpp; double literals for the camera offsets) |
+| 247 | enemies | 100e21a0 | Enemy_DefaultStep drafted (enemy_react.cpp; zero register) |

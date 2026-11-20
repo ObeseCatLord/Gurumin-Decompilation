@@ -25,13 +25,30 @@ struct NodeMatrix
 {
     float m[16];
     Vec4 GetTranslation();                       // 0x101ade80
+    void SetIdentity();                          // 0x101ae7a0
+    void SetTranslation(Vec4 position);          // 0x101adef0
 };
 
-// A scene node (scene_node.cpp Node), only its world matrix.
+// A scene node (scene_node.cpp Node), only what is used here.
 struct Node
 {
-    char pad_0000[0x24c];
+    char pad_0000[0x1cc];
+    NodeMatrix local;         // 0x1cc: matrix relative to the parent
+    char pad_020c[0x40];
     NodeMatrix world;         // 0x24c
+    char pad_028c[0x4c0];
+    Node *parent;             // 0x74c
+    Node *Find(const char *name, int index);     // 0x1019ece0
+    void SetFlags(unsigned flags);               // 0x1019b130
+    void ClearFlags(unsigned flags);             // 0x1019b1b0
+};
+
+struct EffectOptions;
+
+struct EffectManager
+{
+    int Start(int effect, Vec4 position, int parent, int unused, const NodeMatrix *owner, int value, int frame,
+              const NodeMatrix *matrix, const EffectOptions *options, int *pause);  // 0x10172350
 };
 
 extern "C" Vec4 DAT_118e6cb8;     // camera target
@@ -47,6 +64,77 @@ extern "C" Vec4 DAT_10f65688;
 extern "C" int DAT_104c0358;      // 1 once the camera vectors were set up
 extern "C" Node *DAT_104c039c;    // the node the camera follows (0 = none)
 extern "C" void FUN_1016a8d0(void);
+
+extern "C" Node *DAT_10255f08;     // the map's root node
+extern "C" EffectManager DAT_10daaa80;
+extern "C" int DAT_1020b430[0x80][16];        // character 0's state: [3] counts the frames of this shot
+extern "C" Node *DAT_1021bdf8[0x80][9];       // character 0: [0] = the stand's parent node
+extern "C" NodeMatrix DAT_10868838[0x80][6];  // character 0: [0] = the matrix the sparkle follows
+extern "C" int DAT_10c6356c;      // the shot's point as integers (z + 115)
+extern "C" int DAT_10c63570;
+extern "C" int DAT_10c63574;
+
+// 0x100184e0 (Camera_ItemStand). The shot of the item stand ("kagudai") rising: on the first call it finds the
+// stand in the map (setting flag 0x20 on its parent and clearing it on its "itemkagu" item) and keeps its parent node. Every 65
+// frames it starts sparkle 0x75f on a matrix 115 units above the target goal; the stand's parent follows the target
+// goal 50 units lower. The position goal turns slowly about the target goal (-0.012 rad a frame) and after 90
+// frames the target goal sinks (to 4 units a frame from frame 120). The target and position then move 20 %
+// towards their goals plus 80 % towards their previous values, and the copies are refreshed. Returns 0.
+extern "C" int FUN_100184e0(void)
+{
+    if (DAT_104c0358 == 0)
+    {
+        FUN_1016a8d0();
+        DAT_104c0358 = 1;
+        DAT_1020b430[0][3] = 0;
+        Node *stand;
+        if (DAT_10255f08 != 0 && (stand = DAT_10255f08->Find("@kagudai", 0)) != 0)
+        {
+            DAT_1021bdf8[0][0] = stand->parent;
+            DAT_1021bdf8[0][0]->SetFlags(0x20);
+            Node *item = stand->Find("@itemkagu", 0);
+            if (item != 0)
+                item->ClearFlags(0x20);
+        }
+    }
+    if (DAT_1020b430[0][3] % 65 == 0)
+    {
+        Vec4 position;
+        DAT_10daaa80.Start(0x75f, position, -1, -1, &DAT_10868838[0][0], 0, 0, 0, 0, 0);
+    }
+    DAT_1020b430[0][3]++;
+    if (DAT_1021bdf8[0][0] != 0)
+    {
+        DAT_1021bdf8[0][0]->local.SetTranslation(DAT_10edbd48);
+        DAT_1021bdf8[0][0]->local.m[14] -= 50.0f;
+    }
+    DAT_10868838[0][0].SetIdentity();
+    DAT_10868838[0][0].m[14] = DAT_10edbd48.z + 115.0f;
+    DAT_10868838[0][0].m[12] = DAT_10edbd48.x;
+    DAT_10868838[0][0].m[13] = DAT_10edbd48.y;
+    DAT_10c6356c = (int)DAT_10edbd48.x;
+    DAT_10c63570 = (int)DAT_10edbd48.y;
+    DAT_10c63574 = (int)DAT_10edbd48.z + 115;
+    Vec4 offset;
+    offset.Copy(DAT_10866d98 - DAT_10edbd48);
+    offset.RotateZ(-0.012f);
+    DAT_10866d98.Copy(DAT_10edbd48 + offset);
+    if (DAT_1020b430[0][3] > 120)
+        DAT_10edbd48.z -= 4.0f;
+    else if (DAT_1020b430[0][3] > 90)
+        DAT_10edbd48.z -= (float)(DAT_1020b430[0][3] - 90) * 4.0f / 30.0f;
+    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8).Scaled(0.2f) +
+                      (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.8f));
+    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8).Scaled(0.2f) +
+                      (DAT_104d29d8 - DAT_118e69e8).Scaled(0.8f));
+    DAT_118e6c78.Copy(DAT_118e6cb8);
+    DAT_11af3e28.Copy(DAT_118e69e8);
+    DAT_10f668e8.Copy(DAT_118e6cb8);
+    DAT_10f65688.Copy(DAT_118e69e8);
+    DAT_104d29d8.Copy(DAT_118e69e8);
+    DAT_10f08aa0.Copy(DAT_118e6cb8);
+    return 0;
+}
 
 // 0x10018fb0 (Camera_Ease). On the first call sets the goals from the current camera (the target goal from the
 // followed node when there is one) and every camera vector from them. Then each frame the target goal follows the

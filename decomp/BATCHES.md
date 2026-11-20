@@ -295,3 +295,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 231 | character behaviours | 10045830 | Npc_SleepUntilWoken matched in its own unit (npc_sleep.cpp): a new CharRecord member in char_move.cpp flipped Npc_PopUp |
 | 232 | player | 1005dbf0 | Player_TakeDamage drafted (player_damage.cpp); its hurt-voice helper will not inline under cl 13.00 |
 | 233 | enemy behaviours | 10048e90 | Enemy_DropIn matched (switch with two cases carrying the same statement gives dec/je/dec/jne) |
+| 234 | enemy behaviours | 10049240, 10049b00 | Enemy_DropInWhenNear matched; 10049b00 (route position interpolation, 0x40 bytes per point) studied only |

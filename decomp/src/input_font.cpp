@@ -47,9 +47,9 @@ struct EffectDesc
 struct Input
 {
     ComObject *directInput;
+    InputDevice *joystick;
     InputDevice *keyboard;
     InputDevice *mouse;
-    InputDevice *joystick;
     char pad_0010[0x14];
     int m_0024;
     int m_0028;
@@ -89,13 +89,18 @@ int Input::Rumble(float divisor, int milliseconds)
     return 1;
 }
 
-// Unacquires and releases the keyboard, mouse and joystick devices and the DirectInput object.
+// Unacquires and releases the joystick, keyboard and mouse devices and the DirectInput object.
 int Input::Shutdown()
 {
     if (DAT_10f65578 != 0)
     {
         DAT_10f65578->Release();
         DAT_10f65578 = 0;
+    }
+    if (joystick != 0)
+    {
+        joystick->Unacquire();
+        joystick->Release();
     }
     if (keyboard != 0)
     {
@@ -107,17 +112,12 @@ int Input::Shutdown()
         mouse->Unacquire();
         mouse->Release();
     }
-    if (joystick != 0)
-    {
-        joystick->Unacquire();
-        joystick->Release();
-    }
     if (directInput != 0)
         directInput->Release();
     directInput = 0;
+    joystick = 0;
     keyboard = 0;
     mouse = 0;
-    joystick = 0;
     m_0024 = 0;
     m_0028 = 0;
     return 0;

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (155)
+## 1. Walls to retry (156)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -100,6 +100,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1013e4f0` 431 — GameWindow::WindowProc (the base RenderWindow::WindowProc 0x1013e450 is DefWindowProc): an inline base WindowProc called from each case duplicates the tails like the original but cl 13.00 then propagates message constants and does not cache window/wParam in ebx/edi; has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `1013e790` 561 — Names_Expand (/Od unit src_od/names_od.cpp): code identical, only the stack slot of `p` differs (the original puts it below found/matches/best); function-scope declaration orders tried
 - [ ] `1013e9d0` 689 — Screenshot_ReadBackBuffer: identical except the row address in the 32-bit and 16-bit loops (original loads y then multiplies by the pitch, ours loads the pitch first); operand orders and index form tried
+- [ ] `10142790` 846 — Input::Update (input_poll.cpp): two bytes off; after the force-feedback EnumDevices the original compares the result with the zero register (cmp eax, ebx), cl 13.00 here test eax, eax; result locals and other spellings tried (a local changes the whole register allocation)
 - [ ] `10142b20` 519 — Joystick_IsButtonDown (__stdcall): same cases and code; the tail-merged axis tests are placed differently (the original keeps the full low-x test in the default-layout switch and jumps to it from the mapped cases, ours the other way round)
 - [ ] `10142dd0` 741 — Keyboard_IsButtonDown: same returns; in the original the default layout (map 0) of buttons 0, 2, 5, 7 and 10-13 shares the return blocks of the fixed maps 0x12, 1, 0x13, 2 and 0x14-0x17 and the blocks are laid out in another order; the plain nested switch here gives each its own block
 - [ ] `10143870` 366 — TextureObject::BeginRenderTo: identical except block placement (the original puts the shared return 0 right after the first test; nested and early-return forms tried)
@@ -180,11 +181,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10165e00` 757 bytes (float, loops 2, calls 8)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (151)
+## 4. Large functions (801-3000 bytes) (150)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
-- [ ] `10142790` 846 bytes (loops 1, calls 24)
 - [ ] `1014f590` 865 bytes (float, loops 5, calls 11)
 - [ ] `10055ee0` 881 bytes (loops 4, calls 17)
 - [ ] `100d2110` 894 bytes (float, loops 4, calls 12)

@@ -24,10 +24,14 @@ struct Vec4
     Vec4 Normalize3();       // 0x101af080: normalises x/y/z in place (a zero vector stays zero), returns a copy
 };
 
-struct CharMatrix
+struct Matrix4
 {
     float m[16];             // m[12], m[13], m[14]: the position
-    Vec4 GetTranslation();   // 0x101ade80
+    Matrix4();                                   // 0x101ae770
+    ~Matrix4();                                  // 0x1013eda0 (empty)
+    void SetIdentity();                          // 0x101ae7a0
+    void SetTranslation(Vec4 position);          // 0x101adef0
+    Vec4 GetTranslation();                       // 0x101ade80
 };
 
 struct CharRecord
@@ -37,18 +41,22 @@ struct CharRecord
     void SetPosition(float x, float y, float z);             // 0x10162610: moves the model
     int IsClearAny(const Vec4 *offset);                      // 0x101640b0 (AnimModel::IsClearAny)
     int IsClearOfMapLimited(const Vec4 *offset);             // 0x101641b0 (AnimModel::IsClearOfMapLimited)
+    int FaceAwayFrom(CharRecord *other);                     // 0x10162e00 (AnimModel::FaceAwayFrom)
+    int Push(float x, float y, float z);                     // 0x101628f0 (AnimModel::Push)
     char pad_0000[0x70];
     int nearCells;            // 0x70: collision cells near the character (the filter for DAT_11b002c0)
     char pad_0074[0x19];
     char m_008d;              // 0x8d: set while a child runs to the player (Npc_ChildFollow)
     char pad_008e[0x1d9];
     char m_0267;              // 0x267: set to 1 while an NPC idles (FUN_100b5ae0)
-    char pad_0268[0xae4];
+    char pad_0268[0x30];
+    int m_0298;               // 0x298: collision filter while this enemy moves (copied to DAT_1101d880)
+    char pad_029c[0xab0];
     float m_0d4c;             // 0xd4c: 1.0 for the player (app_0013.cpp)
     char pad_0d50[0x159c];
     void *root;               // 0x22ec: root node of the model (0 = no model loaded)
     char pad_22f0[0x38];
-    CharMatrix matrix;        // 0x2328: world matrix
+    Matrix4 matrix;          // 0x2328: world matrix
     char pad_2368[0x24];
     int m_238c;               // 0x238c: Character::m_239c (1 = ?; app_0011.cpp plays the idle motion when non-zero)
     char pad_2390[0x18];
@@ -64,6 +72,7 @@ struct CharRecord
 };
 
 extern "C" CharRecord DAT_10db6ee8[0x80];
+typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
 
 // 0x100241e0 (Character_SetMove). Sets the movement vector of character `index` from (x, y, z): half of it in the
 // state where m_2498 is 1 and m_238c is not 1, otherwise 0.7 of it, doubled to 1.4 while the character is nearly
@@ -318,15 +327,6 @@ extern "C" int FUN_100b1520(int index)
     DAT_10210b30[index] = 0;
     return 0;
 }
-
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                   // 0x101ae770
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    void SetIdentity();                          // 0x101ae7a0
-    void SetTranslation(Vec4 position);          // 0x101adef0
-};
 
 struct EffectOptions;
 
@@ -1061,7 +1061,9 @@ struct ActorSlot
 {
     int health;               // 0x00
     int maxHealth;            // 0x04: initial value of health
-    char pad_0008[0x180];
+    char pad_0008[4];
+    int m_000c;               // 0x0c: passed to the effects it starts
+    char pad_0010[0x178];
 };
 
 struct Game
@@ -1285,5 +1287,90 @@ extern "C" int FUN_100b4930(int index)
         }
     }
     DAT_10210b30[index] = 0;
+    return 0;
+}
+
+// Effect start parameters (model_state.cpp ModelState), only the fields set here.
+struct ModelState
+{
+    int m_0000;
+    int m_0004;                   // 0x04: owner's slot value (ActorSlot m_000c)
+    float m_0008;                 // 0x08: scale
+    char m_000c;
+    char m_000d;
+    char m_000e;                  // 0x0e: effect kind
+    char pad_000f[0x1d];
+    int m_002c;                   // 0x2c: owner slot
+    char pad_0030[0x14];
+    ModelState();                 // 0x101668b0
+};
+
+extern "C" int DAT_1101d880;                  // collision filter of the moving character
+
+// 0x1009dfd0 (Enemy_FollowAndBlast). An enemy that walks towards the player (motion 0, 5 units a frame) while
+// farther than 120 units, else idles (motion 2). Now and then (3 in 100, at most every 100 frames) it turns away
+// from the player and plays attack motion 4 for 60 frames: after 30 of them it plays sound 0x150 and starts effect
+// 0x46 (scale 1.5, kind 1) from its own matrix. Being told to react (DAT_10210b30) cancels the attack. Its m_0298
+// is the collision filter for the rest of the frame. Returns 0.
+extern "C" int FUN_1009dfd0(int index)
+{
+    DAT_1101d880 = 0;
+    Vec4 toPlayer;
+    Vec4 self;
+    Vec4 player;
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    toPlayer.Copy(player - self);
+    if (DAT_10210b30[index] != 0)
+    {
+        DAT_10210b30[index] = 0;
+        DAT_1020b430[index].talk = 0;
+        DAT_1020b430[index].wait = 0;
+    }
+    if (DAT_1020b430[index].talk == 1)
+    {
+        DAT_10db6ee8[index].FaceAwayFrom(&DAT_10db6ee8[0]);
+        if (DAT_1020b430[index].range != 0)
+            DAT_1020b430[index].range--;
+        if (DAT_1020b430[index].range == 0)
+            DAT_1020b430[index].talk = 0;
+        if (DAT_1020b430[index].range == 30)
+        {
+            Vec4 offset;
+            offset.Fill(0.0f);
+            ModelState options;
+            options.m_0000 = 0;
+            options.m_0004 = DAT_10daaaec[index].m_000c;
+            options.m_0008 = 1.5f;
+            options.m_002c = index;
+            options.m_000e = 1;
+            FUN_10065b10(index, 0x150, 0, 0);
+            FUN_1001d8b0(index, 0x46, offset, -1, -1, 0, 0, 0, &DAT_10db6ee8[index].matrix, &options);
+        }
+    }
+    else
+    {
+        if (DAT_1020b430[index].wait != 0)
+            DAT_1020b430[index].wait--;
+        if (FUN_1013f880() % 100 <= 2 && DAT_1020b430[index].wait == 0)
+        {
+            DAT_10db6ee8[index].FaceAwayFrom(&DAT_10db6ee8[0]);
+            DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
+            DAT_1020b430[index].wait = 100;
+            DAT_1020b430[index].talk = 1;
+            DAT_1020b430[index].range = 60;
+        }
+        else if (toPlayer.Length() > 120.0f)
+        {
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+            toPlayer.Normalize3();
+            toPlayer.Copy(toPlayer * 5.0f);
+            DAT_10db6ee8[index].Push(toPlayer.x, toPlayer.y, 0);
+            DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y) + 3.1415f;
+        }
+        else
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+    }
+    DAT_1101d880 = DAT_10db6ee8[index].m_0298;
     return 0;
 }

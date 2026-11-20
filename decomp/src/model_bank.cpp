@@ -81,6 +81,7 @@ struct ModelBank
     int AddLitModel(BankModel *model);
     int AddFlarePoint(Vec4 position, const Matrix4 *viewProjection);
     int CreateTextures();
+    int DrawLensFlares();
 };
 
 // Empties the bank: clears the light list, the 0x80-entry table, every model record's id and the counters.
@@ -225,6 +226,7 @@ struct TextureSlot
 {
     char pad_0000[0x38];
     int UpdateImage(int flags);                      // 0x10169f70
+    int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);  // 0x1014b750
 };
 
 extern "C" TextureSlot DAT_118d0ba8[1600];
@@ -324,5 +326,44 @@ int ModelBank::CreateTextures()
         else if (minimap2 < 0 || saveBuffer2 < 0 || mirror2 < 0 || minimap < 0 || saveBuffer < 0 || mirror < 0)
             return 0;
     }
+    return 1;
+}
+
+extern "C" int DAT_1020343c;                         // lens flares switched on
+extern "C" int FUN_1013f880(void);                   // the game's random number
+
+// 0x10166520 (ModelBank::DrawLensFlares). For every flare point collected this frame draws eight discs from the lens
+// textures on the line from the point through the screen centre: each with its size (half-width in 640x480 pixels,
+// scaled by the point's brightness), position along the line and opacity; the first disc flickers a little.
+// Returns 0 when the bank or the flares are off, else 1.
+int ModelBank::DrawLensFlares()
+{
+    if (enabled == 0)
+        return 0;
+    if (DAT_1020343c == 0)
+        return 0;
+    FUN_1013f070(0, 1, 0);
+    FUN_1013f070(9, 0, 0);
+    int sizes[10] = {220, 100, 50, 30, 20, 20, 80, 160};
+    int steps[10] = {0, -4, 4, 6, 8, 11, 15, 19};
+    int lenses[10] = {0, 3, 1, 2, 3, 2, 2, 1};
+    float alphas[10] = {0.0f, 0.4f, 0.4f, 0.4f, 0.3f, 0.2f, 0.2f, 0.15f};
+    alphas[0] = (float)(FUN_1013f880() % 10) / 200.0f + 0.25f;
+    for (int flare = 0; flare < flareCount; flare++)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            float size = (float)sizes[i] * flareAlpha[flare];
+            float step = (float)steps[i];
+            DAT_118d0ba8[lens[lenses[i]]].DrawScreenCopy(
+                (int)(flareScreen[flare].x * 320.0f + 320.0f - size - step * flareScreen[flare].x * 32.0f),
+                (int)(240.0f - flareScreen[flare].y * 240.0f - size + step * flareScreen[flare].y * 24.0f),
+                (int)(size - step * flareScreen[flare].x * 32.0f + flareScreen[flare].x * 320.0f + 320.0f),
+                (int)(step * flareScreen[flare].y * 24.0f + size - flareScreen[flare].y * 240.0f + 240.0f),
+                0.0f, alphas[i]);
+        }
+    }
+    FUN_1013f070(0, 0, 0);
+    FUN_1013f070(9, 1, 0);
     return 1;
 }

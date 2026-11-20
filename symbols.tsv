@@ -966,3 +966,5 @@ address	name	evidence
 10049650	Wave_Update	brings in the next waiting enemy of each wave group with flash 0x3f4 while fewer than two are in play (decomp/src/enemy_spawn.cpp)
 10042140	Shaga_BreakOff	equipment piece breaking off a character: EEQR.it3 + model in a free shaga slot, launched from its facing, scaled for base kinds 0x10/0x31 (matched, decomp/src/shaga_spawn.cpp)
 100425f0	Shaga_Create	builds a flying equipment-shard model (EEQR.it3 + model) in a free shaga slot with a random spin and launch velocity (matched, decomp/src/shaga_spawn.cpp)
+
+10166520	ModelBank::DrawLensFlares	draws eight lens-flare discs per collected flare point along the line through the screen centre (matched, decomp/src/model_bank.cpp)

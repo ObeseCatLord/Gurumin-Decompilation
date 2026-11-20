@@ -243,6 +243,11 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   0x1014e940).
 - **Vertex loops**: the loop pointer starts at the second field the body writes (DrawFrameAlt writes x then y; the
   original pointer is &y).
+- **Early returns placed in the middle**: when the `return 0` block sits right after the guard tests (before the body)
+  instead of being shared at the end, each test was its own `if (...) return 0;` (ModelBank::DrawLensFlares
+  0x10166520, ModelBank::DrawShadows 0x10165e00).
+- **Initialised local tables**: the order the compiler writes repeated values depends on the declaration order of the
+  tables, which is not simply their stack order; try permutations (DrawLensFlares: sizes, steps, lenses, alphas).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

@@ -330,3 +330,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 266 | input | 10142790 (+10142670, 10142690, 101426d0) | Input::Update two bytes off (new input_poll.cpp); its three enumeration callbacks matched; input_font.cpp device names corrected |
 | 267 | texture | 1014f1f0 | TextureObject::Upload draft recorded (texture_bind.cpp; frame and pointer induction) |
 | 268 | lens | 10166520 | ModelBank::DrawLensFlares matched (model_bank.cpp; table declaration order sizes, steps, lenses, alphas; separate early returns) |
+| 269 | shadow | 10165e00 | ModelBank::DrawShadows matched (model_bank.cpp; separate early returns, repeated litModels[casters[i]] reads) |

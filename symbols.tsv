@@ -968,3 +968,5 @@ address	name	evidence
 100425f0	Shaga_Create	builds a flying equipment-shard model (EEQR.it3 + model) in a free shaga slot with a random spin and launch velocity (matched, decomp/src/shaga_spawn.cpp)
 
 10166520	ModelBank::DrawLensFlares	draws eight lens-flare discs per collected flare point along the line through the screen centre (matched, decomp/src/model_bank.cpp)
+
+10165e00	ModelBank::DrawShadows	draws the shadows of the first ten shadow casters (own targets or kage.bmp) (matched, decomp/src/model_bank.cpp)

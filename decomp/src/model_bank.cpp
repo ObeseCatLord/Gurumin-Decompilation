@@ -21,6 +21,8 @@ struct Vec4
 struct Matrix4
 {
     float m[16];
+    void SetIdentity();                          // 0x101ae7a0
+    void SetTranslation(Vec4 position);          // 0x101adef0
 };
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060 (vec4.cpp)
@@ -34,15 +36,27 @@ struct BankModel
     float scale;            // 0x260: model scale, 1.0 when added
     char pad_0264[0xc];
     int index;              // 0x270: the record's own index in the bank
-    char pad_0274[0x2078];
+    char pad_0274[0xad8];
+    float shadowScale;      // 0xd4c: passed to the shadow drawing
+    char pad_0d50[0xa98];
+    char m_17e8;            // 0x17e8
+    char pad_17e9[0xa9b];
+    int hidden;             // 0x2284: non-zero = no shadow
+    char pad_2288[0x64];
     int id;                 // 0x22ec: model id (0 = free record)
-    int id2;                // 0x22f0: copy of the id
-    char pad_22f4[0x9c];
+    int id2;                // 0x22f0: copy of the id (the model's data)
+    char pad_22f4[0x34];
+    Matrix4 matrix;         // 0x2328: world matrix
+    char pad_2368[0x12];
+    unsigned char opacity;  // 0x237a: 0 = no shadow
+    char pad_237b[0x15];
     int timer;              // 0x2390: 99999 = no timeout
     char pad_2394[0x108];
     BankModel();            // 0x101629f0 (the model record constructor)
     ~BankModel();           // 0x10007e10
 };
+
+typedef char check_bankmodel[sizeof(BankModel) == 0x249c ? 1 : -1];
 
 struct ModelBank
 {
@@ -51,10 +65,11 @@ struct ModelBank
     int shadows[10];        // 0x0280: the shadow render targets "shadow0".."shadow9"
     char pad_02a8[0x1d8];
     int shadowTexture;      // 0x0480: kage.bmp
-    Vec4 m_0484[0x80];      // 0x0484
-    Vec4 m_0c84[0x80];      // 0x0c84
-    char pad_1484[0x400];
-    int m_1884;             // 0x1884
+    Vec4 m_0484[0x80];      // 0x0484: per shadow caster (passed to the shadow drawing)
+    Vec4 m_0c84[0x80];      // 0x0c84: per shadow caster
+    float casterSize[0x80]; // 0x1484: per shadow caster
+    int casters[0x80];      // 0x1684: shadow casters (indexes into litModels)
+    int m_1884;             // 0x1884: number of shadow casters
     Vec4 lighting[0xb00];   // 0x1888: 22 vectors of light parameters for each entry of litModels
     Vec4 m_c888[0x16];      // 0xc888
     BankModel models[16];   // 0xc9e8
@@ -82,6 +97,7 @@ struct ModelBank
     int AddFlarePoint(Vec4 position, const Matrix4 *viewProjection);
     int CreateTextures();
     int DrawLensFlares();
+    int DrawShadows(struct ShadowScene *scene, int a, int b, int c);
 };
 
 // Empties the bank: clears the light list, the 0x80-entry table, every model record's id and the counters.
@@ -365,5 +381,74 @@ int ModelBank::DrawLensFlares()
     }
     FUN_1013f070(0, 0, 0);
     FUN_1013f070(9, 1, 0);
+    return 1;
+}
+
+// The model data a record's id2 points to, only the field used here.
+struct ModelData
+{
+    char pad_0000[0x6e0];
+    int m_06e0;
+};
+
+// The object the shadows are drawn by (its type is not known yet).
+struct ShadowScene
+{
+    int DrawShadow(int a, int b, int c, const Vec4 *p, const Vec4 *q, int texture, float scale, int size, int data,
+                   BankModel *model, float modelScale);  // 0x101a29e0
+};
+
+extern "C" int DAT_10203438;                         // shadows switched on
+extern "C" int DAT_10f654d4;
+
+// 0x10165e00 (ModelBank::DrawShadows). Draws the shadows of the first ten shadow casters through `scene`: with
+// shadow targets (DAT_10203434) each caster uses its own target, else all use kage.bmp. A caster without a timeout
+// is first reset: identity matrix at its position parameter, shown, opacity 15 (with targets also shadow scale 1).
+// Casters with model data that are shown and not transparent are drawn. Returns 0 when shadows are off, else 1.
+int ModelBank::DrawShadows(ShadowScene *scene, int a, int b, int c)
+{
+    if (enabled == 0)
+        return 0;
+    if (DAT_10203438 == 0)
+        return 0;
+    if (DAT_10f654d4 == 0)
+        return 0;
+    if (DAT_10203434 != 0)
+    {
+        for (int i = 0; i < m_1884 && i < 10; i++)
+        {
+            if (litModels[casters[i]]->timer == 99999)
+            {
+                litModels[casters[i]]->m_17e8 = 2;
+                litModels[casters[i]]->matrix.SetIdentity();
+                litModels[casters[i]]->matrix.SetTranslation(*(const Vec4 *)params[litModels[casters[i]]->index]);
+                litModels[casters[i]]->hidden = 0;
+                litModels[casters[i]]->opacity = 15;
+                litModels[casters[i]]->shadowScale = 1.0f;
+            }
+            BankModel *model = litModels[casters[i]];
+            if (model->id2 != 0 && model->hidden == 0 && model->opacity > 0)
+                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadows[i], model->scale, (int)casterSize[i],
+                                  ((ModelData *)model->id2)->m_06e0, model, model->shadowScale);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < m_1884 && i < 10; i++)
+        {
+            if (litModels[casters[i]]->timer == 99999)
+            {
+                litModels[casters[i]]->m_17e8 = 2;
+                litModels[casters[i]]->matrix.SetIdentity();
+                litModels[casters[i]]->matrix.SetTranslation(*(const Vec4 *)params[litModels[casters[i]]->index]);
+                litModels[casters[i]]->hidden = 0;
+                litModels[casters[i]]->opacity = 15;
+            }
+            BankModel *model = litModels[casters[i]];
+            if (model->id2 != 0 && model->hidden == 0 && model->opacity > 0)
+                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadowTexture, model->scale, (int)casterSize[i],
+                                  ((ModelData *)model->id2)->m_06e0, model, model->shadowScale);
+        }
+    }
     return 1;
 }

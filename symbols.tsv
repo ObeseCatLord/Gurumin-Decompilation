@@ -251,6 +251,7 @@ address	name	evidence
 1013e470	RenderWindow::RenderWindow	matched decompiled source (decomp/obj_symbols.tsv)
 100359c0	ListBank::ReportError	matched decompiled source (decomp/obj_symbols.tsv)
 1014b670	TextureObject::BindStage0	matched decompiled source (decomp/obj_symbols.tsv)
+1014b750	TextureObject::DrawScreenCopy	draws the whole texture into a 640x480 rectangle, cropped to the back-buffer size (matched, decomp/src/texture_bind.cpp)
 1014b6e0	TextureObject::BindStage1	matched decompiled source (decomp/obj_symbols.tsv)
 1014f520	TextureObject::Release	matched decompiled source (decomp/obj_symbols.tsv)
 10191a30	Node::FindRecursive	matched decompiled source (decomp/obj_symbols.tsv)

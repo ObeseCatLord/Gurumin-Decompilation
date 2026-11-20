@@ -433,3 +433,4 @@ _sqrtf	10002010
 ?DrawTinted@TextureObject@@QAEXHHHHMMMMHMMH@Z	1014c430
 ?DrawTinted@TextureObject@@QAEXHHHHMMMMHHMH@Z	1014c430
 ?DrawTinted@TextureObject@@QAEXHHHHMMMMMMMH@Z	1014c430
+?DrawScreenCopy@TextureObject@@QAEHHHHHMM@Z	1014b750

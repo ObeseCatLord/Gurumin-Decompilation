@@ -75,6 +75,7 @@ struct TextureObject
     int HalveRgb24(unsigned char *pixels, int width, int height);
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
+    int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);
     int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
                  float alpha, float angle);
     int DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
@@ -542,6 +543,69 @@ struct PanelVertex
 };
 
 extern "C" void FUN_10143b50(void);                                   // Render_UnbindTexture0
+
+extern "C" int DAT_10202b24;  // back-buffer width set at device creation
+extern "C" int DAT_10202b28;  // back-buffer height
+
+// 0x1014b750 (TextureObject::DrawScreenCopy). Draws this whole texture into the rectangle left..right, top..bottom
+// (640x480 screen coordinates, scaled to the back buffer) as a two-triangle strip, with counter-clockwise culling.
+// When the texture is wider or taller than the back buffer, only the part the size of the back buffer is used (a
+// copy of the screen in a larger texture). The texture coordinates start at 0.001. White at `alpha` (0..1), texture
+// times vertex colour; stage 1 off. Returns 1.
+int TextureObject::DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha)
+{
+    PanelVertex vertices[4];
+    BindStage0();
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    float uMax = 1.0f;
+    float vMax = 1.0f;
+    if (DAT_10202b24 < width)
+        uMax = (float)DAT_10202b24 / (float)width;
+    if (DAT_10202b28 < height)
+        vMax = (float)DAT_10202b28 / (float)height;
+    vertices[0].x = (float)left * scaleX;
+    vertices[0].y = (float)top * scaleY;
+    vertices[1].x = (float)right * scaleX;
+    vertices[1].y = (float)top * scaleY;
+    vertices[2].x = (float)left * scaleX;
+    vertices[2].y = (float)bottom * scaleY;
+    vertices[3].x = (float)right * scaleX;
+    vertices[3].y = (float)bottom * scaleY;
+    vertices[0].u = 0.001f;
+    vertices[0].v = 0.001f;
+    vertices[1].u = uMax;
+    vertices[1].v = 0.001f;
+    vertices[2].u = 0.001f;
+    vertices[2].v = vMax;
+    vertices[3].u = uMax;
+    vertices[3].v = vMax;
+    int a = (int)(alpha * 255.0f);
+    if (a > 255)
+        a = 255;
+    else if (a < 0)
+        a = 0;
+    vertices[0].colour = vertices[1].colour = vertices[2].colour = vertices[3].colour = a << 24 | 0xffffff;
+    vertices[0].specular = vertices[1].specular = vertices[2].specular = vertices[3].specular = 0xff000000;
+    vertices[0].z = vertices[1].z = vertices[2].z = vertices[3].z = z;
+    vertices[0].rhw = vertices[1].rhw = vertices[2].rhw = vertices[3].rhw = 1.0f;
+    FUN_1013ef30(0x16, 3);                  // D3DRS_CULLMODE = D3DCULL_CCW
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    FUN_1013ef90(0, 4, 4);                  // alpha: modulate
+    FUN_1013ef90(0, 5, 2);                  //   texture
+    FUN_1013ef90(0, 6, 0);                  //   diffuse
+    FUN_1013ef90(0, 1, 4);                  // colour: modulate
+    FUN_1013ef90(0, 2, 2);                  //   texture
+    FUN_1013ef90(0, 3, 0);                  //   diffuse
+    FUN_1013ef90(1, 1, 1);                  // stage 1 off
+    FUN_1013ef90(1, 4, 1);
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 2, vertices, 0x20);
+    return 1;
+}
 
 // A vector with the 4D vector class's helpers used here.
 struct Vec4

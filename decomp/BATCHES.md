@@ -322,3 +322,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 258 | texture | 1014d850 | DrawFillAlt draft recorded (texture_bind.cpp; array setup scheduling) |
 | 259 | texture | 1014bc60 | TextureObject::DrawCell matched (texture_bind.cpp; per-vertex corner/UV order, chained colour/specular/z/rhw) |
 | 260 | texture | 1014c430 | TextureObject::DrawTinted matched (texture_bind.cpp; caller parameter names corrected in game_panels.cpp) |
+| 261 | texture | 1014b750 | TextureObject::DrawScreenCopy matched (texture_bind.cpp; first build) |

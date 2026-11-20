@@ -941,3 +941,4 @@ address	name	evidence
 101b1ad0	RotationX	builds a rotation matrix about X (npc_wheel.cpp)
 10019d80	Camera_Between	two-character shot: position at one head, target at another (or ahead of the first), eased like Camera_Ease (matched, decomp/src/camera_follow.cpp)
 100184e0	Camera_ItemStand	shot of the item stand (kagudai) sinking with sparkle 0x75f, camera turning slowly (matched, decomp/src/camera_follow.cpp)
+1000f5a0	Map_BuildTopView	overhead projection from the map node bounds; sets pit/visible areas and projects the camera (matched, decomp/src/map_view.cpp)

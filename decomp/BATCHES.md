@@ -305,3 +305,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 241 | NPC behaviours | 10047440 | Npc_PushCart drafted (npc_wheel.cpp; a spilled pointer local in the original) |
 | 242 | camera | 10019d80, 100b1800 | Camera_Between matched (camera_follow.cpp); 100b1800 (group chat NPC, three unrolled scans) studied only |
 | 243 | camera | 100184e0 | Camera_ItemStand matched (camera_follow.cpp) |
+| 244 | map view | 1000f5a0 | Map_BuildTopView matched (map_view.cpp) |

@@ -75,6 +75,7 @@ struct TextureObject
     int HalveRgb24(unsigned char *pixels, int width, int height);
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
+    int DrawFrame(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
     int DrawFrameAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
     int DrawFrameAltStretched(int left, int top, int right, int bottom, float z, float alpha, int textured,
                               int border);
@@ -536,6 +537,75 @@ struct PanelVertex
 };
 
 extern "C" void FUN_10143b50(void);                                   // Render_UnbindTexture0
+
+// 0x1014d4e0 (TextureObject::DrawFrame). Draws the speech-balloon panel: one triangle fan (21 points) from the
+// centre of the rectangle left..right, top..bottom pulled 8 - `border` pixels inwards, with the corners cut off in
+// steps of 2, 4 and 8 pixels and a tail 20 + `border` pixels long below the middle of the bottom edge. The points are
+// given in 640x480 screen coordinates and scaled to the back buffer; the texture repeats every 64 pixels. White at
+// `alpha` (0..1), with this texture times the vertex colour when `textured`, else untextured; depth writes on.
+// Returns 1.
+int TextureObject::DrawFrame(int left, int top, int right, int bottom, float z, float alpha, int textured, int border)
+{
+    PanelVertex vertices[34];
+    if (textured != 0)
+    {
+        BindStage0();
+        FUN_1013ef90(0, 1, 4);              // colour: modulate
+        FUN_1013ef90(0, 2, 2);              //   texture
+        FUN_1013ef90(0, 3, 0);              //   diffuse
+        FUN_1013ef90(0, 4, 4);              // alpha: modulate
+        FUN_1013ef90(0, 5, 2);              //   texture
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+    }
+    else
+    {
+        FUN_10143b50();
+        FUN_1013ef90(0, 1, 4);              // colour: modulate
+        FUN_1013ef90(0, 2, 2);              //   texture
+        FUN_1013ef90(0, 3, 0);              //   diffuse
+        FUN_1013ef90(0, 4, 4);              // alpha: modulate
+        FUN_1013ef90(0, 5, 0);              //   diffuse
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+    }
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    left += 8 - border;
+    top += 8 - border;
+    right += border - 8;
+    bottom += border - 8;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    int a = (int)(alpha * 255.0f);
+    if (a > 255)
+        a = 255;
+    else if (a < 0)
+        a = 0;
+    int xs[21] = {(left + right) / 2, left, left + 2, left + 4, left + 8, right - 8, right - 4, right - 2, right,
+                  right, right - 2, right - 4, right - 8, (left + right) / 2 + 6 + border, (left + right) / 2,
+                  (left + right) / 2 - border - 6, left + 8, left + 4, left + 2, left, left};
+    int ys[21] = {(top + bottom) / 2, top + 8, top + 4, top + 2, top, top, top + 2, top + 4, top + 8,
+                  bottom - 8, bottom - 4, bottom - 2, bottom, bottom, bottom + 20 + border, bottom, bottom,
+                  bottom - 2, bottom - 4, bottom - 8, top + 8};
+    for (int i = 0; i < 21; i++)
+    {
+        float x = (float)xs[i];
+        float y = (float)ys[i];
+        vertices[i].x = x * scaleX;
+        vertices[i].y = y * scaleY;
+        vertices[i].colour = a << 24 | 0xffffff;
+        vertices[i].specular = 0xff000000;
+        vertices[i].z = z;
+        vertices[i].rhw = 1.0f;
+        vertices[i].u = x / 64.0f;
+        vertices[i].v = y / 64.0f;
+    }
+    FUN_1013ef30(0xe, 1);                   // D3DRS_ZWRITEENABLE
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(6 /* D3DPT_TRIANGLEFAN */, 19, vertices, 0x20);
+    return 1;
+}
 
 // 0x1014e5d0 (TextureObject::DrawFrameAltStretched). DrawFrameAlt with the texture stretched over the frame instead
 // of mapped pixel for pixel: the texture coordinates run from 5 / size across the frame's size + 15.

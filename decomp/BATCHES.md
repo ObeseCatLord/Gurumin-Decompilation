@@ -318,3 +318,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 254 | texture | 1014e940 | TextureObject::DrawFrameAlt matched (texture_bind.cpp; last state call repeated in both arms, x then y) |
 | 255 | texture | 1014ec30, 10144bf0 | DrawFrameAltTinted and DrawFrameAltPlain matched (texture_bind.cpp; DrawFrameAlt with an RGB colour) |
 | 256 | texture | 1014e5d0 | DrawFrameAltStretched matched (texture_bind.cpp; loop invariants as named locals just before the loop) |
+| 257 | texture | 1014d4e0 | TextureObject::DrawFrame matched (texture_bind.cpp; balloon fan, first build) |

@@ -922,3 +922,5 @@ address	name	evidence
 100b4300	Npc_RaiseAlarm	lookout: sees the player or is hurt, wakes enemies, red flashes and alarm 0x207, registers flag line+300 (decomp/src/char_move.cpp)
 100b4930	Npc_RideAlarm	lookout riding behind the nearest marker character; alarm 0x207 and red flashes once it sees the player (decomp/src/char_move.cpp)
 1009dfd0	Enemy_FollowAndBlast	walks to the player; sometimes turns away and starts effect 0x46 with sound 0x150 (matched, decomp/src/char_move.cpp)
+1009d100	Enemy_ChaseAndBlast	runs/walks to the player; sometimes turns away and starts effect 0x5e with sound 0x14f (matched, decomp/src/char_move.cpp)
+10098be0	Enemy_ShoveAndBlast	idles, walks after the player, attacks with effect 0x61 and sound 0x151; reacting chains two attacks (matched, decomp/src/char_move.cpp)

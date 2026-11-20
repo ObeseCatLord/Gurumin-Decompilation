@@ -47,7 +47,9 @@ struct CharRecord
     int nearCells;            // 0x70: collision cells near the character (the filter for DAT_11b002c0)
     char pad_0074[0x19];
     char m_008d;              // 0x8d: set while a child runs to the player (Npc_ChildFollow)
-    char pad_008e[0x1d9];
+    char pad_008e[0x1d7];
+    char m_0265;              // 0x265: set every frame by Enemy_ShoveAndBlast
+    char m_0266;
     char m_0267;              // 0x267: set to 1 while an NPC idles (FUN_100b5ae0)
     char pad_0268[0x30];
     int m_0298;               // 0x298: collision filter while this enemy moves (copied to DAT_1101d880)
@@ -105,7 +107,8 @@ struct NpcState
     int wait;                 // 0x04: frames until the next voice line may play
     int talk;                 // 0x08: talk id: script number * 100 + line (line 0 = never speaks)
     int range;                // 0x0c: distance at which a waiting character reacts
-    int target;               // 0x10: character the messenger runs to (Npc_RunToMarker); alarm raised (Npc_RideAlarm)
+    int m_0010;               // 0x10: per behaviour: marker to run to (Npc_RunToMarker), alarm raised (Npc_RideAlarm),
+                              //       attacks left to chain (Enemy_ShoveAndBlast)
     int m_0014;               // 0x14: alarm flashes so far (Npc_RideAlarm)
     char pad_0018[0x20];
     int m_0038;               // 0x38
@@ -750,7 +753,7 @@ extern "C" int FUN_100b6290(int index)
         if (nearest != -1)
         {
             DAT_1021f3c0[nearest] = 'Q';
-            DAT_1020b430[index].target = nearest;
+            DAT_1020b430[index].m_0010 = nearest;
         }
         else
         {
@@ -782,7 +785,7 @@ extern "C" int FUN_100b6290(int index)
         {
             Vec4 marker;
             Vec4 step;
-            marker.Copy(DAT_10db6ee8[DAT_1020b430[index].target].matrix.GetTranslation());
+            marker.Copy(DAT_10db6ee8[DAT_1020b430[index].m_0010].matrix.GetTranslation());
             step.Copy(marker - self);
             step.Normalize3();
             step.Copy(step * 24.0f);
@@ -795,7 +798,7 @@ extern "C" int FUN_100b6290(int index)
                 step.Copy(step * 75.0f);
                 step.Copy(step + marker);
                 DAT_10db6ee8[index].SetPosition(step.x, step.y, marker.z);
-                DAT_1021f3c0[DAT_1020b430[index].target] = ',';
+                DAT_1021f3c0[DAT_1020b430[index].m_0010] = ',';
                 DAT_1020b430[index].state = 0;
                 DAT_1020b430[index].wait = 0;
                 DAT_1020b430[index].talk = 0;
@@ -1243,7 +1246,7 @@ extern "C" int FUN_100b4930(int index)
             DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
         else
             DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
-        if (DAT_1020b430[index].target == 0)
+        if (DAT_1020b430[index].m_0010 == 0)
         {
             player.z += 50.0f;
             self.z += 75.0f;
@@ -1254,7 +1257,7 @@ extern "C" int FUN_100b4930(int index)
                 FUN_1000d620(index, 15, 60);
                 FUN_10065b10(index, 0x20c, 0, 0);
                 DAT_1020b430[index].wait = 0;
-                DAT_1020b430[index].target = 1;
+                DAT_1020b430[index].m_0010 = 1;
                 FUN_1001b670(index, 1500.0f, 0);
                 if (DAT_1020b430[index].talk % 100 != 0)
                     DAT_10874848.RegisterFlag(DAT_1020b430[index].talk % 100 + 300);
@@ -1263,7 +1266,7 @@ extern "C" int FUN_100b4930(int index)
         if (DAT_10db6ee8[DAT_1020b430[index].range].matrix.m[12] < -20000.0f)
             FUN_10043cc0(index);
     }
-    if (DAT_1020b430[index].target != 0)
+    if (DAT_1020b430[index].m_0010 != 0)
     {
         FUN_1001b670(index, 1500.0f, 0);
         if (++DAT_1020b430[index].wait == 15)
@@ -1306,6 +1309,110 @@ struct ModelState
 };
 
 extern "C" int DAT_1101d880;                  // collision filter of the moving character
+
+// 0x10098be0 (Enemy_ShoveAndBlast). An enemy that idles (motion 2) and now and then (3 in 100, at most every 100
+// frames) either attacks or starts walking (talk 2): walking it follows the player (motion 0, 5 units a frame)
+// between 120 and 800 units away, else goes back to idling. An attack (motion 4 for 35 frames) keeps it turned away
+// from the player and starts effect 0x61 with sound 0x151 after 20 frames; being told to react (DAT_10210b30)
+// starts an attack that chains into a second one. Returns 0.
+extern "C" int FUN_10098be0(int index)
+{
+    Vec4 toPlayer;
+    Vec4 self;
+    Vec4 player;
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    DAT_10db6ee8[index].m_0265 = 1;
+    toPlayer.Copy(player - self);
+    if (DAT_10210b30[index] != 0)
+    {
+        DAT_10210b30[index] = 0;
+        DAT_1020b430[index].talk = 0;
+        DAT_1020b430[index].wait = 0;
+        DAT_1020b430[index].m_0010 = 2;
+        DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
+        DAT_1020b430[index].wait = 100;
+        DAT_1020b430[index].talk = 1;
+        DAT_1020b430[index].range = 35;
+        DAT_1020b430[index].m_0010 = 2;
+    }
+    if (DAT_1020b430[index].talk == 1)
+    {
+        if (DAT_1020b430[index].range != 0)
+            DAT_1020b430[index].range--;
+        DAT_10db6ee8[index].FaceAwayFrom(&DAT_10db6ee8[0]);
+        if (DAT_1020b430[index].range == 15)
+        {
+            Vec4 offset;
+            offset.Fill(0.0f);
+            ModelState options;
+            options.m_0000 = 0;
+            options.m_0004 = DAT_10daaaec[index].m_000c;
+            options.m_0008 = 1.5f;
+            options.m_002c = index;
+            options.m_000e = 1;
+            FUN_10065b10(index, 0x151, 0, 0);
+            FUN_1001d8b0(index, 0x61, offset, -1, -1, 0, 0, 0, &DAT_10db6ee8[index].matrix, &options);
+        }
+        if (DAT_1020b430[index].range == 0 && DAT_1020b430[index].m_0010 == 2)
+        {
+            DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
+            DAT_1020b430[index].wait = 100;
+            DAT_1020b430[index].talk = 1;
+            DAT_1020b430[index].range = 35;
+            DAT_1020b430[index].m_0010 = 1;
+        }
+        else if (DAT_1020b430[index].range == 0)
+            DAT_1020b430[index].talk = 0;
+    }
+    else if (DAT_1020b430[index].talk == 0)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        if (DAT_1020b430[index].wait != 0)
+            DAT_1020b430[index].wait--;
+        DAT_1020b430[index].m_0010 = 2;
+        if (FUN_1013f880() % 100 <= 2 && DAT_1020b430[index].wait == 0)
+        {
+            DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
+            DAT_1020b430[index].wait = 100;
+            DAT_1020b430[index].talk = 1;
+            DAT_1020b430[index].range = 35;
+        }
+        else if (FUN_1013f880() % 100 <= 2 && DAT_1020b430[index].wait == 0)
+        {
+            DAT_1020b430[index].talk = 2;
+            DAT_1020b430[index].wait = 100;
+        }
+    }
+    else
+    {
+        if (DAT_1020b430[index].wait != 0)
+            DAT_1020b430[index].wait--;
+        DAT_1020b430[index].m_0010 = 2;
+        if (FUN_1013f880() % 100 <= 2 && DAT_1020b430[index].wait == 0)
+        {
+            DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
+            DAT_1020b430[index].wait = 100;
+            DAT_1020b430[index].talk = 1;
+            DAT_1020b430[index].range = 35;
+        }
+        else if (toPlayer.Length() > 120.0f && toPlayer.Length() < 800.0f)
+        {
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+            toPlayer.Normalize3();
+            toPlayer.Copy(toPlayer * 5.0f);
+            DAT_10db6ee8[index].Push(toPlayer.x, toPlayer.y, 0);
+            DAT_10db6ee8[index].targetHeading = (float)atan2(toPlayer.x, toPlayer.y) + 3.1415f;
+        }
+        else
+        {
+            DAT_1020b430[index].talk = 0;
+            DAT_1020b430[index].wait = 100;
+            DAT_10db6ee8[index].PlayMotion(2, 0, 14, 1.0f);
+        }
+    }
+    return 0;
+}
 
 // 0x1009dfd0 (Enemy_FollowAndBlast). An enemy that walks towards the player (motion 0, 5 units a frame) while
 // farther than 120 units, else idles (motion 2). Now and then (3 in 100, at most every 100 frames) it turns away
@@ -1372,5 +1479,68 @@ extern "C" int FUN_1009dfd0(int index)
             DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
     }
     DAT_1101d880 = DAT_10db6ee8[index].m_0298;
+    return 0;
+}
+
+// 0x1009d100 (Enemy_ChaseAndBlast). Like Enemy_FollowAndBlast: it runs to the player (motion 1, 15 units a frame)
+// while farther than 300 units, walks (motion 0, 5 units) while farther than 120, else idles. Now and then (3 in
+// 100, at most every 100 frames) it turns away from the player, plays sound 0x14f and starts effect 0x5e (scale 1.5,
+// kind 1) from its own matrix, then stands idle for 30 frames. Returns 0.
+extern "C" int FUN_1009d100(int index)
+{
+    Vec4 toPlayer;
+    Vec4 self;
+    Vec4 player;
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    toPlayer.Copy(player - self);
+    if (DAT_1020b430[index].talk == 1)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        if (DAT_1020b430[index].range != 0)
+            DAT_1020b430[index].range--;
+        if (DAT_1020b430[index].range == 0)
+            DAT_1020b430[index].talk = 0;
+    }
+    else
+    {
+        if (DAT_1020b430[index].wait != 0)
+            DAT_1020b430[index].wait--;
+        if (FUN_1013f880() % 100 <= 2 && DAT_1020b430[index].wait == 0)
+        {
+            DAT_10db6ee8[index].FaceAwayFrom(&DAT_10db6ee8[0]);
+            Vec4 offset;
+            offset.Fill(0.0f);
+            ModelState options;
+            options.m_0000 = 0;
+            options.m_0004 = DAT_10daaaec[index].m_000c;
+            options.m_0008 = 1.5f;
+            options.m_002c = index;
+            options.m_000e = 1;
+            FUN_10065b10(index, 0x14f, 0, 0);
+            FUN_1001d8b0(index, 0x5e, offset, -1, -1, 0, 0, 0, &DAT_10db6ee8[index].matrix, &options);
+            DAT_1020b430[index].wait = 100;
+            DAT_1020b430[index].talk = 1;
+            DAT_1020b430[index].range = 30;
+        }
+        else if (toPlayer.Length() > 300.0f)
+        {
+            DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
+            toPlayer.Normalize3();
+            toPlayer.Copy(toPlayer * 5.0f * 3.0f);
+            DAT_10db6ee8[index].Push(toPlayer.x, toPlayer.y, 0);
+            DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y) + 3.1415f;
+        }
+        else if (toPlayer.Length() > 120.0f)
+        {
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+            toPlayer.Normalize3();
+            toPlayer.Copy(toPlayer * 5.0f);
+            DAT_10db6ee8[index].Push(toPlayer.x, toPlayer.y, 0);
+            DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y) + 3.1415f;
+        }
+        else
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+    }
     return 0;
 }

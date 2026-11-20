@@ -290,3 +290,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 226 | NPC behaviours | 100b4300 | Npc_RaiseAlarm drafted (33 bytes, zero register around the alarm); the `||` form of a call test made cl 13.00 inline atan2f |
 | 227 | NPC behaviours | 100b4930 | Npc_RideAlarm drafted (25 bytes: index/loop counter registers swapped); `if (a > c || b > d) X else Y` reproduces the original block order |
 | 228 | enemy behaviours | 1009dfd0 | Enemy_FollowAndBlast matched (`rand() % 100 <= 2`, the record matrix is now the shared Matrix4 view) |
+| 229 | enemy behaviours | 1009d100, 10098be0 | Enemy_ChaseAndBlast and Enemy_ShoveAndBlast matched (the latter with a direct `atan2` call where cl 13.00 would not expand `Atan2`) |

@@ -221,6 +221,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - **A zero kept in ebp means too many zero stores**: when ours holds 0 in ebp (`xor ebp,ebp`, `push ebp`, `mov [..],ebp`)
   and the original uses immediates, look for a store repeated before each `return`. Npc_WatchForPlayer (0x100b1520)
   clears `DAT_10210b30[index]` once at the end of an if/else-if chain; the compiler duplicates the epilogue itself.
+- **An inline helper the compiler will not expand**: cl 13.00 sometimes emits a call to a small inline helper
+  (`Atan2`, math.h `atan2f`) instead of expanding it, for reasons not tied to function size or position in the
+  file. Where the original has the expanded code, call the library function directly: Enemy_ShoveAndBlast
+  (0x10098be0) matches with `(float)atan2(x, y)`. Npc_RaiseAlarm shows the reverse (the original calls atan2f).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

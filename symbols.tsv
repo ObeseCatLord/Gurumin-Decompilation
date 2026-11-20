@@ -952,3 +952,4 @@ address	name	evidence
 10027630	Enemy_ChasePlayer	runs at the player with eased speed, ends when blocked, too far, at random or out of range (decomp/src/enemy_chase.cpp)
 10050df0	Char_ProbeSideLedge	ground below, wall to the left and the ground beyond it; returns 0/1/2 (decomp/src/ledge_probe.cpp)
 10049650	Wave_Update	brings in the next waiting enemy of each wave group with flash 0x3f4 while fewer than two are in play (decomp/src/enemy_spawn.cpp)
+100425f0	Shaga_Create	builds a flying equipment-shard model (EEQR.it3 + model) in a free shaga slot with a random spin and launch velocity (matched, decomp/src/shaga_spawn.cpp)

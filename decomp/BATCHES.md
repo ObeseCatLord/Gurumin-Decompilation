@@ -313,3 +313,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 249 | enemy moves | 10027630 | Enemy_ChasePlayer drafted (enemy_chase.cpp) |
 | 250 | collision probes | 10050df0 | Char_ProbeSideLedge drafted (ledge_probe.cpp) |
 | 251 | enemy waves | 10049650 | Wave_Update drafted (enemy_spawn.cpp; stack slot order) |
+| 252 | shaga | 100425f0 | Shaga_Create matched (shaga_spawn.cpp; if/else RotateZ calls) |

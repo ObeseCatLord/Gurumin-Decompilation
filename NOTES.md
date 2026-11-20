@@ -234,6 +234,9 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - **`sqrtf` and `atan2f` from math.h**: where `(float)sqrt(x)` stores its result after a following compare
   and `Atan2(...)` keeps the result in a temporary, the inline math.h float versions give the original order
   (Npc_RideBehindMarker 0x10047a10, Npc_RideAlarm 0x100b4930).
+- **A float argument chosen by a condition**: where the original pushes the value straight from the FPU into one
+  shared call, write two calls in if/else (the compiler tail-merges them). A ternary argument, or assigning a
+  variable first, goes through a stack temporary (Shaga_Create 0x100425f0, Npc_Held 0x100469d0).
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

@@ -902,3 +902,8 @@ address	name	evidence
 10036ca0	ListBank::RegisterBuiltin	registers a builtin script function from its C-like signature (return type, name, parameter types)
 1001b0a0	Char_SelectKind	sets a character kind from its script code digit pairs and resets its AI state when the kind changed
 1001a990	Char_AttachWeapon	loads a weapon's hand models (EEQ_19..24) under the Bip01 hand bones (matched, decomp/src/weapon_attach.cpp)
+1000ed20	ColourBlend_Step	advances the screen colour blend one step and snaps to the target on the last frame (matched, decomp/src/app_0009.cpp)
+10034c80	Char_StartDefeat	starts a character's defeat sequence unless it is busy (matched, decomp/src/app_0011.cpp)
+1015cac0	StateArrays::SetFloat	stores a float in slot `index` of the second state array (matched, decomp/src/ime.cpp)
+10166870	ViewLimits::Reset	resets the rotation limits to +-45 degrees (matched, decomp/src/model_misc.cpp)
+1016b1e0	Caption_SetLine	sets caption line 0..3 and restarts its timer (matched, decomp/src/camera.cpp)

@@ -303,3 +303,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 239 | NPC behaviours | 10047a10, 100b4930 | Npc_RideBehindMarker drafted (4 bytes); sqrtf/atan2f order; Npc_RideAlarm down to its register swap |
 | 240 | NPC behaviours | 100469d0, 10043fc0 | Npc_Held matched (npc_frozen.cpp: if/else around the two Start calls, ModelState follow flag as a bitfield); 10043fc0 studied only |
 | 241 | NPC behaviours | 10047440 | Npc_PushCart drafted (npc_wheel.cpp; a spilled pointer local in the original) |
+| 242 | camera | 10019d80, 100b1800 | Camera_Between matched (camera_follow.cpp); 100b1800 (group chat NPC, three unrolled scans) studied only |

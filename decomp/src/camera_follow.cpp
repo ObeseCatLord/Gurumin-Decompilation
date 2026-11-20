@@ -14,6 +14,7 @@ struct Vec4
     Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
     Vec4 Scaled(const float &factor);            // 0x101acb00
     Vec4();                                      // 0x101ac990: zero
+    float Length();                              // 0x101ac4e0: length of x/y/z
     float Length2D();                            // 0x101ac500: length of x/y
     void RotateZ(float angle);                   // 0x101ac300
     void Fill(const float &value);               // 0x101acc40: sets all four components
@@ -128,6 +129,84 @@ extern "C" int FUN_10019310(void)
     DAT_10edbd48.Copy(DAT_10da93f0);
     DAT_118e6cb8.Copy(DAT_118e6cb8 + DAT_10edbd48.Scaled(0.5f) + (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.5f));
     DAT_118e69e8.Copy(DAT_118e69e8 + DAT_10866d98.Scaled(0.5f) + (DAT_104d29d8 - DAT_118e69e8).Scaled(0.5f));
+    DAT_118e6c78.Copy(DAT_118e6cb8);
+    DAT_11af3e28.Copy(DAT_118e69e8);
+    DAT_10f668e8.Copy(DAT_118e6cb8);
+    DAT_10f65688.Copy(DAT_118e69e8);
+    DAT_104d29d8.Copy(DAT_118e69e8);
+    DAT_10f08aa0.Copy(DAT_118e6cb8);
+    return 0;
+}
+
+// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
+struct CharRecord
+{
+    char pad_0000[0x22f4];
+    Node *head;               // 0x22f4: the model's head node (0 = none)
+    char pad_22f8[0x30];
+    NodeMatrix matrix;        // 0x2328: world matrix
+    char pad_2368[0x114];
+    float heading;            // 0x247c: facing angle in radians
+    char pad_2480[0x1c];
+};
+
+typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+
+extern "C" CharRecord DAT_10db6ee8[0x80];
+extern "C" float DAT_10da93e0;    // the character the camera stands at (rounded to an index)
+extern "C" float DAT_10da93e4;    // the character it looks at (rounded; below 0 = in front of the first)
+extern "C" float DAT_10da93e8;    // how much the target rises with the distance (per cent)
+
+// 0x10019d80 (Camera_Between). A two-character shot: the position goal is the head of character DAT_10da93e0
+// (35 units above its head node, or 75 above it without one), the target goal the head of character DAT_10da93e4
+// the same way, or 600 units ahead of and 60 below the first when that is negative. The target goal rises by
+// DAT_10da93e8 per cent of the distance between them. The target and position then move 20 % towards their goals
+// plus 80 % towards their previous values, and the copies are refreshed. Returns 0.
+extern "C" int FUN_10019d80(void)
+{
+    if (DAT_104c0358 == 0)
+    {
+        FUN_1016a8d0();
+        DAT_104c0358 = 1;
+    }
+    int first = (int)(DAT_10da93e0 + 0.5f);
+    first = first > 0 ? first : 0;
+    float rounded = DAT_10da93e4 < 0.0f ? DAT_10da93e4 - 0.5f : DAT_10da93e4 + 0.5f;
+    int second = (int)rounded;
+    if (DAT_10db6ee8[first].head != 0)
+    {
+        DAT_10866d98.Copy(DAT_10db6ee8[first].head->world.GetTranslation());
+        DAT_10866d98.z += 35.0f;
+    }
+    else
+    {
+        DAT_10866d98.Copy(DAT_10db6ee8[first].matrix.GetTranslation());
+        DAT_10866d98.z += 75.0f;
+    }
+    if (second < 0)
+    {
+        DAT_10edbd48.Fill(0.0f);
+        DAT_10edbd48.y = -600.0f;
+        DAT_10edbd48.z = -60.0f;
+        DAT_10edbd48.RotateZ(-DAT_10db6ee8[first].heading);
+        DAT_10edbd48.Copy(DAT_10edbd48 + DAT_10866d98);
+    }
+    else if (DAT_10db6ee8[second].head != 0)
+    {
+        DAT_10edbd48.Copy(DAT_10db6ee8[second].head->world.GetTranslation());
+        DAT_10edbd48.z += 35.0f;
+    }
+    else
+    {
+        DAT_10edbd48.Copy(DAT_10db6ee8[second].matrix.GetTranslation());
+        DAT_10edbd48.z += 75.0f;
+    }
+    if (DAT_10866d98.x > -20000.0f)
+        DAT_10edbd48.z += (DAT_10866d98 - DAT_10edbd48).Length() * DAT_10da93e8 * 0.01f;
+    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8).Scaled(0.2f) +
+                      (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.8f));
+    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8).Scaled(0.2f) +
+                      (DAT_104d29d8 - DAT_118e69e8).Scaled(0.8f));
     DAT_118e6c78.Copy(DAT_118e6cb8);
     DAT_11af3e28.Copy(DAT_118e69e8);
     DAT_10f668e8.Copy(DAT_118e6cb8);

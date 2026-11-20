@@ -939,3 +939,4 @@ address	name	evidence
 100469d0	Npc_Held	held by a spell with sparkle effects until released; flash 0x2265 / 0x1390 on release (matched, decomp/src/npc_frozen.cpp)
 10047440	Npc_PushCart	pushes a cart back and forth, turning its EEQ_25 wheel node; dust effect 0x2df (decomp/src/npc_wheel.cpp)
 101b1ad0	RotationX	builds a rotation matrix about X (npc_wheel.cpp)
+10019d80	Camera_Between	two-character shot: position at one head, target at another (or ahead of the first), eased like Camera_Ease (matched, decomp/src/camera_follow.cpp)

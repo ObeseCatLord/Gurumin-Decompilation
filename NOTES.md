@@ -229,6 +229,8 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   CharRecord flips Npc_PopUp (0x100b4f00) from matching to an ebx/ebp swap, while extra extern declarations do
   not. A function that needs another field of a shared view can go into its own unit with its own view
   (npc_sleep.cpp for Npc_SleepUntilWoken) instead of changing the view other matches depend on.
+- **`dec / je / dec / jne` for "1 or 2"**: a switch whose cases 1 and 2 each carry the same statement
+  (Enemy_DropIn 0x10048e90). Shared case labels compile to a range check, `x == 1 || x == 2` to two compares.
 
 ## Source style (2026-11-17)
 - Comment generously: a header comment per file, and a comment above every function saying what it does, who calls

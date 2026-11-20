@@ -294,3 +294,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 230 | character behaviours | 10048b70 | Char_SwingDoor matched (C++, EH; root node matrix = saved matrix * RotationY 0x101b1bb0) |
 | 231 | character behaviours | 10045830 | Npc_SleepUntilWoken matched in its own unit (npc_sleep.cpp): a new CharRecord member in char_move.cpp flipped Npc_PopUp |
 | 232 | player | 1005dbf0 | Player_TakeDamage drafted (player_damage.cpp); its hurt-voice helper will not inline under cl 13.00 |
+| 233 | enemy behaviours | 10048e90 | Enemy_DropIn matched (switch with two cases carrying the same statement gives dec/je/dec/jne) |

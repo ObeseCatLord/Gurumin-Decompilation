@@ -1618,3 +1618,96 @@ int FUN_10048b70(int index)
     }
     return 0;
 }
+
+extern "C" char DAT_1021f9c0[0x80];
+extern "C" short DAT_103153b0[0x80];
+extern "C" unsigned char DAT_102550e0[0x80];  // non-zero = wake at once (the character's level elsewhere)
+
+// 0x10048e90 (Enemy_DropIn). An enemy that drops in from above: on its first frame it is refilled if defeated and
+// placed 200 units ahead and 650 below where it stands (talk id's units 1 or 2 also set DAT_103153b0 to 150), with
+// its group timer set to 1. Then it rises in an arc over 20 frames (up 4 * frames left, back 16 * (t/20)^2) and
+// keeps moving that way (1.25 times as fast) until it stands on the map: then it turns to the player when the talk
+// id has tens, shows prompt 15 when it has hundreds, and its state is reset. Nothing happens while it is moved
+// away (z below -20000). Returns 0.
+extern "C" int FUN_10048e90(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    DAT_1021f9c0[index] = 0;
+    DAT_10255a88[index] = 0;
+    DAT_102550e0[index] = 0;
+    if (DAT_1020b430[index].state != 0 && DAT_10daaaec[index].health <= 0)
+        DAT_1021f9c0[index] = 1;
+    if (DAT_10db6ee8[index].matrix.m[14] < -20000.0f)
+        return 0;
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_10db6ee8[index].m_0d4c = 1.0f;
+        DAT_10db6ee8[index].m_2498 = 0;
+        switch (DAT_1020b430[index].talk % 10)
+        {
+        case 1:
+            DAT_103153b0[index] = 150;
+            break;
+        case 2:
+            DAT_103153b0[index] = 150;
+            break;
+        }
+        if (DAT_10daaaec[index].health <= 0)
+        {
+            DAT_10daaaec[index].health = DAT_10daaaec[index].maxHealth;
+            DAT_10210d30[index] = 0;
+        }
+        DAT_1020b430[index].state = 1;
+        Vec4 place;
+        place.y = 200.0f;
+        place.RotateZ(-DAT_10db6ee8[index].heading);
+        place.z = -650.0f;
+        place.Copy(place + self);
+        DAT_10db6ee8[index].SetPosition(place.x, place.y, place.z);
+        DAT_102199b8[index] = 1;
+        return 0;
+    }
+    if (DAT_1020b430[index].state == 1)
+    {
+        DAT_10db6ee8[index].m_008d = 1;
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        Vec4 step;
+        int t = DAT_1020b430[index].wait;
+        if (t >= 20)
+            t = 20;
+        step.y = (float)t / 20.0f;
+        step.y *= step.y;
+        step.y *= -16.0f;
+        step.RotateZ(-DAT_10db6ee8[index].heading);
+        step.z = (float)(20 - DAT_1020b430[index].wait) * 4.0f;
+        if (++DAT_1020b430[index].wait == 20)
+        {
+            DAT_10db6ee8[index].m_2498 = 1;
+            DAT_10db6ee8[index].m_238c = 0;
+        }
+        else if (DAT_1020b430[index].wait < 20)
+        {
+            step.Copy(step + self);
+            DAT_10db6ee8[index].SetPosition(step.x, step.y, step.z);
+            DAT_10db6ee8[index].m_23b8.Copy(step);
+            return 0;
+        }
+        step.Copy(step * 1.25f);
+        FUN_100241e0(index, step.x, step.y, 0);
+        if (DAT_10db6ee8[index].m_238c != 0 && DAT_10db6ee8[index].IsClearOfMapLimited(0) != 0)
+        {
+            DAT_10db6ee8[index].m_008d = 0;
+            if (DAT_1020b430[index].talk / 10 % 10 != 0)
+                DAT_10db6ee8[index].targetHeading = atan2f(player.x - self.x, player.y - self.y) + 3.1415f;
+            if (DAT_1020b430[index].talk / 100 != 0)
+                FUN_1000d620(index, 15, 60);
+            DAT_1021f9c0[index] = 1;
+            DAT_10255a88[index] = 1;
+            FUN_10043cc0(index);
+        }
+    }
+    return 0;
+}

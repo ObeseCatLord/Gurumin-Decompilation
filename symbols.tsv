@@ -928,3 +928,4 @@ address	name	evidence
 101b1bb0	RotationY	builds a rotation matrix about Y (m[0]=cos, m[2]=sin, m[8]=-sin, m[10]=cos)
 10045830	Npc_SleepUntilWoken	sleeper woken by sight, a running player, DAT_104c00e0 or DAT_102550e0; looks around, prompts 4/9 (matched, decomp/src/npc_sleep.cpp)
 1005dbf0	Player_TakeDamage	health, hurt voice, rumble, game over movie and hit effect 0xc (decomp/src/player_damage.cpp)
+10048e90	Enemy_DropIn	placed 650 below, rises in an arc over 20 frames and lands; prompt 15 / turns to the player (matched, decomp/src/char_move.cpp)

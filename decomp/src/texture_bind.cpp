@@ -76,6 +76,7 @@ struct TextureObject
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
     int DrawFrame(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
+    int DrawFillAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
     int DrawFrameAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
     int DrawFrameAltStretched(int left, int top, int right, int bottom, float z, float alpha, int textured,
                               int border);
@@ -604,6 +605,80 @@ int TextureObject::DrawFrame(int left, int top, int right, int bottom, float z, 
     FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
     DAT_10f0d5c8++;
     DAT_10f1fcf0->DrawPrimitiveUP(6 /* D3DPT_TRIANGLEFAN */, 19, vertices, 0x20);
+    return 1;
+}
+
+// 0x1014d850 (TextureObject::DrawFillAlt). Fills the alternative panel inside DrawFrameAlt's outline with a soft
+// edge: a triangle strip zigzagging between an outer ring (the frame outline, alpha 0) and an inner ring 3 pixels
+// further in (alpha `alpha`), each of 17 points. The rectangle is pulled 8 - `border` pixels inwards; the points are
+// given in 640x480 screen coordinates and scaled to the back buffer, and the texture is mapped pixel for pixel. The
+// colour of each point comes from a table of four (all white). Returns 1.
+int TextureObject::DrawFillAlt(int left, int top, int right, int bottom, float z, float alpha, int textured,
+                               int border)
+{
+    PanelVertex vertices[68];
+    if (textured != 0)
+    {
+        BindStage0();
+        FUN_1013ef90(0, 4, 4);              // alpha: modulate
+        FUN_1013ef90(0, 5, 2);              //   texture
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+    }
+    else
+    {
+        FUN_10143b50();
+        FUN_1013ef90(0, 4, 4);              // alpha: modulate
+        FUN_1013ef90(0, 5, 0);              //   diffuse
+        FUN_1013ef90(0, 6, 0);              //   diffuse
+    }
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    left += 8 - border;
+    top += 8 - border;
+    right += border - 8;
+    bottom += border - 8;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    int a = (int)(alpha * 255.0f);
+    if (a > 255)
+        a = 255;
+    else if (a < 0)
+        a = 0;
+    unsigned int colours[4] = {0xffffff, 0xffffff, 0xffffff, 0xffffff};
+    int shades[34] = {1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1,
+                      1, 1, 1, 1, 1, 1, 2, 0, 0, 0, 0, 0, 0, 2, 1, 1, 1};
+    // Points 0..16: the inner ring; 17..33: the outer ring.
+    int ys[34] = {top + 11, top + 7, top + 5, top + 3, top + 3, top + 5, top + 7, top + 11, bottom - 12, bottom - 8,
+                  bottom - 6, bottom - 4, bottom - 4, bottom - 6, bottom - 8, bottom - 12, top + 11,
+                  top + 8, top + 4, top + 2, top, top, top + 2, top + 4, top + 8, bottom - 8, bottom - 4,
+                  bottom - 2, bottom, bottom, bottom - 2, bottom - 4, bottom - 8, top + 8};
+    int xs[34] = {left + 3, left + 5, left + 7, left + 11, right - 11, right - 7, right - 5, right - 3, right - 3,
+                  right - 5, right - 7, right - 11, left + 11, left + 7, left + 5, left + 3, left + 3,
+                  left, left + 2, left + 4, left + 8, right - 8, right - 4, right - 2, right, right, right - 2,
+                  right - 4, right - 8, left + 8, left + 4, left + 2, left, left};
+    float texWidth = (float)width;
+    float texHeight = (float)height;
+    for (int i = 0; i < 34; i++)
+    {
+        int point = (i & 1) * 17 + i / 2;
+        float x = (float)xs[point];
+        float y = (float)ys[point];
+        vertices[i].x = x * scaleX;
+        vertices[i].y = y * scaleY;
+        vertices[i].u = x / texWidth;
+        vertices[i].v = y / texHeight;
+        if ((i & 1) != 0)
+            vertices[i].colour = colours[shades[point]] | a << 24;
+        else
+            vertices[i].colour = colours[shades[point]];
+        vertices[i].specular = 0xff000000;
+        vertices[i].z = z;
+        vertices[i].rhw = 1.0f;
+    }
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 32, vertices, 0x20);
     return 1;
 }
 

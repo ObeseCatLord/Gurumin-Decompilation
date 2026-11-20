@@ -75,6 +75,8 @@ struct TextureObject
     int HalveRgb24(unsigned char *pixels, int width, int height);
     int DrawTriangles(const void *vertices, int triangles);
     int DrawStrip(struct ScreenVertex *vertices, int count);
+    int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
+                 float alpha, float angle);
     int DrawFrame(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
     int DrawFillAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
     int DrawFrameAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
@@ -538,6 +540,109 @@ struct PanelVertex
 };
 
 extern "C" void FUN_10143b50(void);                                   // Render_UnbindTexture0
+
+// A vector with the 4D vector class's helpers used here.
+struct Vec4
+{
+    float x;
+    float y;
+    float z;
+    float w;
+    Vec4();                                      // 0x101ac990: zero
+    void RotateZ(float angle);                   // 0x101ac300
+};
+
+// 0x1014bc60 (TextureObject::DrawCell). Draws the cell u0..u1, v0..v1 of this texture into the screen rectangle
+// left..right, top..bottom (back-buffer pixels, no 640x480 scaling) as a two-triangle strip, turned by `angle`
+// radians about the rectangle's centre unless it is 0. White at `alpha` (0..1), texture times vertex colour.
+// Returns 1.
+int TextureObject::DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
+                            float alpha, float angle)
+{
+    PanelVertex vertices[4];
+    BindStage0();
+    if (angle != 0.0f)
+    {
+        Vec4 topLeft;
+        Vec4 bottomRight;
+        Vec4 topRight;
+        Vec4 bottomLeft;
+        Vec4 centre;
+        centre.x = (float)(left + right) * 0.5f;
+        centre.y = (float)(top + bottom) * 0.5f;
+        topLeft.x = (float)left - centre.x;
+        topLeft.y = (float)top - centre.y;
+        bottomRight.x = (float)right - centre.x;
+        bottomRight.y = (float)bottom - centre.y;
+        topRight.x = (float)right - centre.x;
+        topRight.y = (float)top - centre.y;
+        bottomLeft.x = (float)left - centre.x;
+        bottomLeft.y = (float)bottom - centre.y;
+        topLeft.RotateZ(angle);
+        bottomRight.RotateZ(angle);
+        topRight.RotateZ(angle);
+        bottomLeft.RotateZ(angle);
+        topLeft.x += centre.x;
+        topLeft.y += centre.y;
+        bottomRight.x += centre.x;
+        bottomRight.y += centre.y;
+        topRight.x += centre.x;
+        topRight.y += centre.y;
+        bottomLeft.x += centre.x;
+        bottomLeft.y += centre.y;
+        vertices[0].x = topLeft.x;
+        vertices[0].y = topLeft.y;
+        vertices[1].x = topRight.x;
+        vertices[1].y = topRight.y;
+        vertices[2].x = bottomLeft.x;
+        vertices[2].y = bottomLeft.y;
+        vertices[3].x = bottomRight.x;
+        vertices[3].y = bottomRight.y;
+    }
+#if V != 2
+    else
+    {
+        vertices[0].x = (float)left;
+        vertices[0].y = (float)top;
+        vertices[1].x = (float)right;
+        vertices[1].y = (float)top;
+        vertices[2].x = (float)left;
+        vertices[2].y = (float)bottom;
+        vertices[3].x = (float)right;
+        vertices[3].y = (float)bottom;
+    }
+#endif
+    vertices[0].u = u0;
+    vertices[0].v = v0;
+    vertices[1].u = u1;
+    vertices[1].v = v0;
+    vertices[2].u = u0;
+    vertices[2].v = v1;
+    vertices[3].u = u1;
+    vertices[3].v = v1;
+    int a = (int)(alpha * 255.0f);
+    if (a > 255)
+        a = 255;
+    else if (a < 0)
+        a = 0;
+    vertices[0].colour = vertices[1].colour = vertices[2].colour = vertices[3].colour = a << 24 | 0xffffff;
+    vertices[0].specular = vertices[1].specular = vertices[2].specular = vertices[3].specular = 0xff000000;
+    vertices[0].z = vertices[1].z = vertices[2].z = vertices[3].z = z;
+    vertices[0].rhw = vertices[1].rhw = vertices[2].rhw = vertices[3].rhw = 1.0f;
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    FUN_1013ef90(0, 4, 4);                  // alpha: modulate
+    FUN_1013ef90(0, 5, 2);                  //   texture
+    FUN_1013ef90(0, 6, 0);                  //   diffuse
+    FUN_1013ef90(0, 1, 4);                  // colour: modulate
+    FUN_1013ef90(0, 2, 2);                  //   texture
+    FUN_1013ef90(0, 3, 0);                  //   diffuse
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 2, vertices, 0x20);
+    return 1;
+}
 
 // 0x1014d4e0 (TextureObject::DrawFrame). Draws the speech-balloon panel: one triangle fan (21 points) from the
 // centre of the rectangle left..right, top..bottom pulled 8 - `border` pixels inwards, with the corners cut off in

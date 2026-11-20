@@ -426,3 +426,6 @@ _sqrtf	10002010
 ?DrawFrame@TextureObject@@QAEXHHHHHMHH@Z	1014d4e0
 ?DrawFillAlt@TextureObject@@QAEHHHHHMMHH@Z	1014d850
 ?DrawFillAlt@TextureObject@@QAEXHHHHHMHH@Z	1014d850
+?DrawCell@TextureObject@@QAEHHHHHMMMMMMM@Z	1014bc60
+?DrawCell@TextureObject@@QAEXHHHHMMMMHMH@Z	1014bc60
+?DrawCell@TextureObject@@QAEXHHHHMMMMHMM@Z	1014bc60

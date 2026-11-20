@@ -907,3 +907,145 @@ extern "C" int FUN_100b23b0(int index)
     DAT_10210b30[index] = 0;
     return 0;
 }
+
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
+// The last position and step of each character (route_walk.cpp StepRecord); here the position holds the
+// character's own move vector.
+struct LastPosition
+{
+    Vec4 position;
+    Vec4 step;
+    char pad_0020[0x20];
+};
+
+extern "C" LastPosition DAT_10802bf8[0x80];
+extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner,
+                            int value, int frame, const Matrix4 *matrix, const void *options);  // Char_StartEffect
+extern "C" int FUN_100246b0(const Vec4 *from, const Vec4 *to, Vec4 *hit, int testOnly, const char *name);  // Collision_RayCast
+
+// 0x100b4f00 (Npc_PopUp). A character that bobs up and down where it was placed (motion = the talk id's tens,
+// 4 units over a 25-frame cycle) and pops up out of reach: once it has risen above its start height plus the talk
+// id's hundreds * 50 it sinks back (dropping at most 20 units a frame, with effect 0x2d5 every frame but each
+// third after 43 frames) until it is back at the start. When it is told to react, the player comes within the talk
+// id's units * 100 or it already saw the player, it shows prompt 15, jumps forward (20 units along its heading,
+// voice 0x20c) and keeps moving until it lands somewhere it can stand with the player in sight (state 4), where
+// it stops and its state is reset once its motion is done. Returns 0.
+int FUN_100b4f00(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    float distance = (player - self).Length();
+    if (DAT_1020b430[index].state < 3 &&
+        (DAT_10210b30[index] != 0 || distance < (float)(DAT_1020b430[index].talk % 10 * 100) ||
+         DAT_1020b430[index].m_0038 != 0))
+    {
+        DAT_10210b30[index] = 0;
+        DAT_1020b430[index].state = 3;
+        DAT_1020b430[index].wait = 0;
+        if (DAT_104bf8f8[index] == 0 || DAT_1021d138[index] != 15)
+        {
+            DAT_104bf8f8[index] = 1;
+            DAT_1021d138[index] = 15;
+        }
+        DAT_1021f740[index] = 60;
+        DAT_10db6ee8[index].m_2498 = 1;
+    }
+    if (DAT_1020b430[index].state == 0)
+    {
+        DAT_1020b430[index].state = 1;
+        DAT_1020b430[index].range = (int)self.z;
+        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_10db6ee8[index].m_008d = 1;
+    }
+    else if (DAT_1020b430[index].state == 1)
+    {
+        DAT_1020b430[index].wait++;
+        DAT_10db6ee8[index].PlayMotion(DAT_1020b430[index].talk / 10 % 10, 0, 5, 1.0f);
+        int phase = DAT_1020b430[index].wait % 25;
+        DAT_1020b430[index].wait = phase;
+        if (phase > 7 && phase < 18)
+            DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z + 4.0f);
+        else if (phase < 8)
+            DAT_10db6ee8[index].SetPosition(self.x, self.y, (float)phase / 8.0f * 4.0f + self.z);
+        else if (phase > 17)
+            DAT_10db6ee8[index].SetPosition(self.x, self.y, (float)(25 - phase) / 8.0f * 4.0f + self.z);
+        if (self.z > (float)(DAT_1020b430[index].range + DAT_1020b430[index].talk / 100 * 50))
+        {
+            DAT_1020b430[index].state = 2;
+            DAT_1020b430[index].wait = 0;
+        }
+    }
+    else if (DAT_1020b430[index].state == 2)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        float start = (float)DAT_1020b430[index].range;
+        DAT_1020b430[index].wait++;
+        if (start + 50.0f > self.z)
+        {
+            float speed = (self.z - start) / 50.0f * 20.0f;
+            float drop = 1.0f < speed ? speed : 1.0f;
+            DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z - drop);
+        }
+        else
+            DAT_10db6ee8[index].SetPosition(self.x, self.y,
+                                            self.z - (float)max(min(DAT_1020b430[index].wait - 40, 20), 0));
+        if (DAT_1020b430[index].wait > 43 && DAT_1020b430[index].wait % 3 != 0)
+        {
+            Vec4 offset;
+            Matrix4 matrix;
+            offset.Fill(0.0f);
+            matrix.SetIdentity();
+            matrix.SetTranslation(self);
+            FUN_1001d8b0(index, 0x2d5, offset, -1, -1, 0, 0, 0, &matrix, 0);
+        }
+        if (self.z < (float)DAT_1020b430[index].range)
+        {
+            DAT_1020b430[index].state = 1;
+            DAT_1020b430[index].wait = 0;
+        }
+    }
+    else if (DAT_1020b430[index].state == 3)
+    {
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        if (DAT_1020b430[index].wait == 0)
+        {
+            DAT_10802bf8[index].position.Fill(0.0f);
+            DAT_10802bf8[index].position.y = -20.0f;
+            DAT_10802bf8[index].position.RotateZ(3.1415f - DAT_10db6ee8[index].heading);
+            DAT_10db6ee8[index].m_23b8.Copy(DAT_10802bf8[index].position);
+            DAT_10db6ee8[index].AddMotionSpeed(20.0f);
+            FUN_10065b10(index, 0x20c, 0, 0);
+            DAT_10db6ee8[index].m_008d = 1;
+            DAT_1020b430[index].wait++;
+        }
+        else if (DAT_104c0380 % 10 == index % 10)
+        {
+            Vec4 eye;
+            Vec4 head;
+            eye.Copy(player);
+            head.Copy(self);
+            eye.z += 75.0f;
+            head.z += 50.0f;
+            if (DAT_10db6ee8[index].IsClearOfMapLimited(0) != 0 && FUN_100246b0(&eye, &head, 0, 1, 0) == 0)
+            {
+                DAT_10db6ee8[index].m_008d = 0;
+                DAT_1020b430[index].state = 4;
+            }
+        }
+        FUN_100241e0(index, DAT_10802bf8[index].position.x, DAT_10802bf8[index].position.y,
+                     DAT_10802bf8[index].position.z);
+    }
+    else if (DAT_1020b430[index].state == 4)
+    {
+        FUN_100241e0(index, DAT_10802bf8[index].position.x, DAT_10802bf8[index].position.y,
+                     DAT_10802bf8[index].position.z);
+        DAT_10db6ee8[index].m_008d = 0;
+        if (DAT_10db6ee8[index].m_238c != 0)
+            FUN_10043cc0(index);
+    }
+    return 0;
+}

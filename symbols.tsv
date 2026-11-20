@@ -918,3 +918,4 @@ address	name	evidence
 100b1ff0	Npc_FaceAndTalk	faces the player, random talk prompt every 120 frames; reacts with voice 0x20c (matched, decomp/src/char_move.cpp)
 100b6290	Npc_RunToMarker	claims the nearest free marker slot (kind ,), runs there after seeing the player (matched, decomp/src/char_move.cpp)
 100b23b0	Npc_ChildFollow	child: sees the player, wakes group 15, turns, runs to the player until a clear spot within 450 (matched, decomp/src/char_move.cpp)
+100b4f00	Npc_PopUp	bobs in place, rises and sinks back with effect 0x2d5; jumps out (voice 0x20c) when the player is near (matched, decomp/src/char_move.cpp)

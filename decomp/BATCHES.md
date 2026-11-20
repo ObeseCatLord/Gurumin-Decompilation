@@ -297,3 +297,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 233 | enemy behaviours | 10048e90 | Enemy_DropIn matched (switch with two cases carrying the same statement gives dec/je/dec/jne) |
 | 234 | enemy behaviours | 10049240, 10049b00 | Enemy_DropInWhenNear matched; 10049b00 (route position interpolation, 0x40 bytes per point) studied only |
 | 235 | enemy behaviours | 10046f10 | Enemy_AppearNearby matched in its own unit (enemy_blink.cpp) |
+| 236 | enemy behaviours | 10044560 | Enemy_Pendulum matched (own unit; one function-scope `frames` shared by two states gives the original slots; fields read directly instead of an `angle` local) |

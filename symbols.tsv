@@ -931,3 +931,5 @@ address	name	evidence
 10048e90	Enemy_DropIn	placed 650 below, rises in an arc over 20 frames and lands; prompt 15 / turns to the player (matched, decomp/src/char_move.cpp)
 10049240	Enemy_DropInWhenNear	waits hidden until the player is within 800, then drops in like Enemy_DropIn (matched, decomp/src/char_move.cpp)
 10046f10	Enemy_AppearNearby	hides until the player nears its home, appears at a random reachable spot and slides in half transparent (matched, decomp/src/enemy_blink.cpp)
+10044560	Enemy_Pendulum	drops in fading, swings on a 400-unit line about a pivot, lets go when it sees the player (matched, decomp/src/enemy_pendulum.cpp)
+101b1290	Vec4::RotateAxis	turns a vector about another vector by an angle (enemy_pendulum.cpp)

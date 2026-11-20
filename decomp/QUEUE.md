@@ -181,7 +181,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000baf0` 794 bytes (float, calls 28)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (173)
+## 4. Large functions (801-3000 bytes) (172)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1014f1f0` 806 bytes TextureObject::Upload (loops 8, calls 10)
@@ -260,7 +260,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1015f4e0` 1429 bytes (loops 12, calls 31)
 - [ ] `101ab3e0` 1437 bytes (float, loops 3, calls 37)
 - [ ] `10029730` 1440 bytes (float, calls 9)
-- [ ] `10044560` 1449 bytes (float, calls 34)
 - [ ] `10034210` 1460 bytes (float, loops 5, calls 42)
 - [ ] `10027da0` 1461 bytes (float, calls 37)
 - [ ] `100a77f0` 1463 bytes (float, loops 6, calls 36)

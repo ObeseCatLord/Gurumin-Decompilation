@@ -1,14 +1,7 @@
 // Constructors of the animation containers. The bodies are empty: all the work is done by the member
 // constructors (Vec4, KeyTrack, Matrix4, ModelState), which the compiler calls in declaration order.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-};
+#include "vec4.h"
 
 // One animated channel: `count` key frames with frame numbers, values and per-key flags (containers.cpp).
 struct KeyTrack

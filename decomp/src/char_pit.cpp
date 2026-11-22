@@ -1,16 +1,6 @@
 // An enemy dragged towards the player and into a pit (behaviour step run from 0x100dfcf0).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                          // 0x101ac990: zero
-    void Copy(const Vec4 &source);                   // 0x101acc20
-    Vec4 operator-(const Vec4 &other) const;         // 0x101aca40
-    void RotateZ(float angle);                       // 0x101ac300
-};
+#include "vec4.h"
 
 struct Matrix4
 {

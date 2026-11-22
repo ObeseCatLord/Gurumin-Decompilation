@@ -8,38 +8,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-
-    Vec4();
-    Vec4(float x, float y, float z, float w);
-    void Set(float x, float y, float z, float w);
-    void Copy(const Vec4 &source);
-    void Fill(const float &value);
-    float Length();
-    float Distance(const Vec4 &other);   // 0x101ac590 (vec_math.cpp)
-    float DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest);
-    void RotateX(float angle);   // 0x101ac440 (vec_math.cpp)
-    void RotateY(float angle);   // 0x101ac3a0
-    void RotateZ(float angle);   // 0x101ac300
-    void Mirror(const Vec4 &normal);
-    Vec4 operator+(const Vec4 &other) const;
-    Vec4 operator-(const Vec4 &other) const;
-    Vec4 operator*(const Vec4 &other) const;
-    Vec4 Scaled(const float &scale);
-    Vec4 Divided(const float &divisor);
-    Vec4 operator/(const int &divisor) const;
-    float DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b);
-    float DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2);
-    float DistanceToLine(const Vec4 &a, const Vec4 &b);
-    float DistanceSquaredToLine(const Vec4 &a, const Vec4 &b);
-    int InTriangle(const Vec4 &a, const Vec4 &b, const Vec4 &c);
-};
+#include "vec4.h"
 
 // Dot product of the x/y/z parts of two vectors (free function, cdecl; 0x101ac200).
 extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b)
@@ -145,7 +114,7 @@ Vec4 Vec4::operator*(const Vec4 &other) const
 }
 
 // Returns this vector times `scale` (x/y/z; the result's w stays 0).
-Vec4 Vec4::Scaled(const float &scale)
+Vec4 Vec4::operator*(const float &scale) const
 {
     Vec4 result;
     result.x = scale * x;
@@ -212,7 +181,7 @@ float Vec4::DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b)
         return Vec3_LengthSquared(&(a - *this));
     if (t > 1.0f)
         return Vec3_LengthSquared(&(b - *this));
-    return Vec3_LengthSquared(&(a + direction.Scaled(t) - *this));
+    return Vec3_LengthSquared(&(a + direction * t - *this));
 }
 
 // Distance from this point to the segment a-b (x/y/z); the closest point of the segment is stored in `closest`.
@@ -230,7 +199,7 @@ float Vec4::DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest)
         closest.Copy(b);
         return Distance(b);
     }
-    closest.Copy(a + direction.Scaled(t));
+    closest.Copy(a + direction * t);
     return Vec3_Length(&(closest - *this));
 }
 
@@ -240,7 +209,7 @@ float Vec4::DistanceToLine(const Vec4 &a, const Vec4 &b)
 {
     Vec4 direction = b - a;
     float t = (Vec3_Dot(this, &direction) - Vec3_Dot(&a, &direction)) / Vec3_LengthSquared(&direction);
-    return Vec3_Length(&(a + direction.Scaled(t) - *this));
+    return Vec3_Length(&(a + direction * t - *this));
 }
 
 // 0x101af1d0. Squared distance from this point to the infinite line through a and b (x/y/z).
@@ -248,7 +217,7 @@ float Vec4::DistanceSquaredToLine(const Vec4 &a, const Vec4 &b)
 {
     Vec4 direction = b - a;
     float t = (Vec3_Dot(this, &direction) - Vec3_Dot(&a, &direction)) / Vec3_LengthSquared(&direction);
-    return Vec3_LengthSquared(&(a + direction.Scaled(t) - *this));
+    return Vec3_LengthSquared(&(a + direction * t - *this));
 }
 
 // 0x101aeee0. 1 when this point, projected onto the plane of triangle a-b-c, lies strictly inside the triangle

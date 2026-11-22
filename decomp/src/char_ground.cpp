@@ -1,18 +1,7 @@
 // Putting a character on the ground below it. The character records are viewed from their model part at
 // 0x10db6ee8 (like char_move.cpp).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    Vec4 Normalized3();                          // 0x101af080: returns the normalised copy
-    Vec4 Scaled(const float &factor);            // 0x101acb00
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 struct CharMatrix
 {
@@ -85,7 +74,7 @@ extern "C" int FUN_10011dd0(int index)
             Vec4 direction = *DAT_10804bf8.M_10164c10(&DAT_10db6ee8[index], &DAT_118e69e8, &DAT_118e6cb8);
             direction.Normalized3();
             float distance = 1000.0f;
-            from.Copy(from - direction.Scaled(distance));
+            from.Copy(from - direction * distance);
             int hit = DAT_10255f08->CastSegment(0, 0x4000000, &from, &top, &ground, 0);
             ground.y = from.y;
             ground.x = from.x;
@@ -117,7 +106,7 @@ extern "C" int FUN_1001c090(int index, int force)
         Vec4 direction = *DAT_10804bf8.M_10164c10(&DAT_10db6ee8[index], &DAT_118e69e8, &DAT_118e6cb8);
         direction.Normalized3();
         float distance = 1000.0f;
-        from.Copy(from - direction.Scaled(distance));
+        from.Copy(from - direction * distance);
         if (DAT_10255f08 != 0 && DAT_10255f08->CastSegment(0, 0x4000000, &from, &top, &ground, 0) != 0)
         {
             ground.x = from.x;

@@ -3,26 +3,7 @@
 
 #include <math.h>
 #include <string.h>
-
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                  // 0x101ac990: zero
-    void Copy(const Vec4 &source);             // 0x101acc20
-    void RotateZ(float angle);                 // 0x101ac300
-    float LengthSquared3();  // 0x101ac6a0: x*x + y*y + z*z
-    float Length();          // 0x101ac4e0: length of x/y/z
-    float Length2D();        // 0x101ac500: length of x/y
-    void Fill(const float &value);
-    void Set(float x, float y, float z, float w);   // 0x101ac9c0
-    Vec4 operator-(const Vec4 &other) const;   // 0x101aca40
-    Vec4 operator+(const Vec4 &other) const;   // 0x101ac9e0
-    Vec4 operator*(const float &scale) const;  // 0x101acb00 (x/y/z only)
-    Vec4 Normalize3();       // 0x101af080: normalises x/y/z in place (a zero vector stays zero), returns a copy
-};
+#include "vec4.h"
 
 struct Matrix4
 {
@@ -805,14 +786,14 @@ extern "C" int FUN_100b6290(int index)
             Vec4 step;
             marker.Copy(DAT_10db6ee8[DAT_1020b430[index].m_0010].matrix.GetTranslation());
             step.Copy(marker - self);
-            step.Normalize3();
+            step.Normalized3();
             step.Copy(step * 24.0f);
             DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
             DAT_10db6ee8[index].targetHeading = atan2f(step.x, step.y) + 3.1415f;
             if ((self - marker).Length2D() < 150.0f)
             {
                 step.Copy(self - marker);
-                step.Normalize3();
+                step.Normalized3();
                 step.Copy(step * 75.0f);
                 step.Copy(step + marker);
                 DAT_10db6ee8[index].SetPosition(step.x, step.y, marker.z);
@@ -903,7 +884,7 @@ extern "C" int FUN_100b23b0(int index)
         Vec4 step;
         step.Copy(player - self);
         step.z = 0;
-        step.Normalize3();
+        step.Normalized3();
         step.Copy(step * 16.0f);
         DAT_10db6ee8[index].targetHeading = atan2f(step.x, step.y) + 3.1415f;
         FUN_100241e0(index, step.x, step.y, 0);
@@ -917,7 +898,7 @@ extern "C" int FUN_100b23b0(int index)
             Vec4 hit;
             from.Copy(self - player);
             from.z = 0;
-            from.Normalize3();
+            from.Normalized3();
             from.Copy(from * 50.0f);
             to.Copy(player - from);
             from.Copy(from + self);
@@ -1247,7 +1228,7 @@ extern "C" int FUN_100b4930(int index)
         step.Copy(place - self);
         if (step.Length() > 12.0f)
         {
-            step.Normalize3();
+            step.Normalized3();
             step.Copy(step * 12.0f);
             place.Copy(self + step);
         }
@@ -1417,7 +1398,7 @@ extern "C" int FUN_10098be0(int index)
         else if (toPlayer.Length() > 120.0f && toPlayer.Length() < 800.0f)
         {
             DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
-            toPlayer.Normalize3();
+            toPlayer.Normalized3();
             toPlayer.Copy(toPlayer * 5.0f);
             DAT_10db6ee8[index].Push(toPlayer.x, toPlayer.y, 0);
             DAT_10db6ee8[index].targetHeading = (float)atan2(toPlayer.x, toPlayer.y) + 3.1415f;
@@ -1488,7 +1469,7 @@ extern "C" int FUN_1009dfd0(int index)
         else if (toPlayer.Length() > 120.0f)
         {
             DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
-            toPlayer.Normalize3();
+            toPlayer.Normalized3();
             toPlayer.Copy(toPlayer * 5.0f);
             DAT_10db6ee8[index].Push(toPlayer.x, toPlayer.y, 0);
             DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y) + 3.1415f;
@@ -1544,7 +1525,7 @@ extern "C" int FUN_1009d100(int index)
         else if (toPlayer.Length() > 300.0f)
         {
             DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
-            toPlayer.Normalize3();
+            toPlayer.Normalized3();
             toPlayer.Copy(toPlayer * 5.0f * 3.0f);
             DAT_10db6ee8[index].Push(toPlayer.x, toPlayer.y, 0);
             DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y) + 3.1415f;
@@ -1552,7 +1533,7 @@ extern "C" int FUN_1009d100(int index)
         else if (toPlayer.Length() > 120.0f)
         {
             DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
-            toPlayer.Normalize3();
+            toPlayer.Normalized3();
             toPlayer.Copy(toPlayer * 5.0f);
             DAT_10db6ee8[index].Push(toPlayer.x, toPlayer.y, 0);
             DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y) + 3.1415f;

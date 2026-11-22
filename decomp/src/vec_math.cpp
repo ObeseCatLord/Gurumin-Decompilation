@@ -5,6 +5,7 @@
 // arguments of inline helpers are spilled to the stack. Matrices are row-major 4x4 with the translation in m[12..14]
 // (Direct3D convention: row vectors multiplied on the left).
 #include <math.h>
+#include "vec4.h"
 
 // Three floats; used where only x/y/z matter (positions, directions).
 struct Vec3
@@ -12,33 +13,6 @@ struct Vec3
     float x;
     float y;
     float z;
-};
-
-// Four floats; w is usually 1 for points and 0 for directions, and is ignored by most helpers here.
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();  // 0x101ac990: zero vector
-    float Length2D();
-    float Distance2D(Vec4 other);
-    float LengthSquared3();
-    int InRect(const struct Box2 *box);
-    int InBox(const struct Box2 *box);
-    int InBoxMargin(const struct Box2 *box, float margin);
-    float DistanceSquared(const Vec4 &other);
-    float Distance(const Vec4 &other);
-    float DistanceZWeighted(const Vec4 &other);
-    void Normalize();
-    void RotateZ(float angle);
-    void RotateY(float angle);
-    void RotateX(float angle);
-    void Copy(const Vec4 &source);  // 0x101acc20
-    void Fill(const float &value);  // 0x101acc40
-    Vec4 Normalized3();
-    Vec4 operator-(const Vec4 &other) const;  // 0x101aca40
 };
 
 // Axis-aligned box given by its minimum and maximum corners.

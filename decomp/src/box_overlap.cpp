@@ -3,19 +3,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-    Vec4 operator+(const Vec4 &other) const;     // 0x101ac9e0
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-    Vec4 Scaled(const float &factor);            // 0x101acb00
-};
+#include "vec4.h"
 
 struct Box
 {
@@ -60,8 +48,8 @@ extern "C" int __stdcall FUN_10191fd0(const Box *first, const Vec4 *firstOffset,
     {
         Vec4 centreA;
         Vec4 centreB;
-        centreA.Copy((a[0] + a[1]).Scaled(0.5f));
-        centreB.Copy((b[0] + b[1]).Scaled(0.5f));
+        centreA.Copy((a[0] + a[1]) * 0.5f);
+        centreB.Copy((b[0] + b[1]) * 0.5f);
         centreDelta->Copy(centreA - centreB);
     }
     if (negatedDelta != 0)

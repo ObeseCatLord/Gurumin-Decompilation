@@ -2,24 +2,7 @@
 // towards their goals every frame, and the results are copied to the other camera vectors.
 
 #include <math.h>
-
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Copy(const Vec4 &source);               // 0x101acc20
-    Vec4 operator+(const Vec4 &other) const;     // 0x101ac9e0
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-    Vec4 Scaled(const float &factor);            // 0x101acb00
-    Vec4();                                      // 0x101ac990: zero
-    float Length();                              // 0x101ac4e0: length of x/y/z
-    float Length2D();                            // 0x101ac500: length of x/y
-    void RotateZ(float angle);                   // 0x101ac300
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-    Vec4 Divided(const float &divisor);          // 0x101acb60
-};
+#include "vec4.h"
 
 struct NodeMatrix
 {
@@ -123,10 +106,10 @@ extern "C" int FUN_100184e0(void)
         DAT_10edbd48.z -= 4.0f;
     else if (DAT_1020b430[0][3] > 90)
         DAT_10edbd48.z -= (float)(DAT_1020b430[0][3] - 90) * 4.0f / 30.0f;
-    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8).Scaled(0.2f) +
-                      (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.8f));
-    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8).Scaled(0.2f) +
-                      (DAT_104d29d8 - DAT_118e69e8).Scaled(0.8f));
+    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8) * 0.2f +
+                      (DAT_10f08aa0 - DAT_118e6cb8) * 0.8f);
+    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8) * 0.2f +
+                      (DAT_104d29d8 - DAT_118e69e8) * 0.8f);
     DAT_118e6c78.Copy(DAT_118e6cb8);
     DAT_11af3e28.Copy(DAT_118e69e8);
     DAT_10f668e8.Copy(DAT_118e6cb8);
@@ -162,10 +145,10 @@ extern "C" int FUN_10018fb0(void)
     }
     if (DAT_104c039c != 0)
         DAT_10edbd48.Copy(DAT_104c039c->world.GetTranslation());
-    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8).Scaled(0.15f) +
-                      (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.85f));
-    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8).Scaled(0.15f) +
-                      (DAT_104d29d8 - DAT_118e69e8).Scaled(0.85f));
+    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8) * 0.15f +
+                      (DAT_10f08aa0 - DAT_118e6cb8) * 0.85f);
+    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8) * 0.15f +
+                      (DAT_104d29d8 - DAT_118e69e8) * 0.85f);
     DAT_118e6c78.Copy(DAT_118e6cb8);
     DAT_11af3e28.Copy(DAT_118e69e8);
     DAT_10f668e8.Copy(DAT_118e6cb8);
@@ -200,8 +183,8 @@ extern "C" int FUN_10019310(void)
     DAT_10edbd48.Copy(DAT_118e6cb8);
     if (DAT_104c035c == 0 || --DAT_104c035c == 0)
     {
-        DAT_108393d8.Copy(DAT_108393d8.Scaled(0.6f));
-        DAT_10da93f0.Copy(DAT_10da93f0.Scaled(0.6f));
+        DAT_108393d8.Copy(DAT_108393d8 * 0.6f);
+        DAT_10da93f0.Copy(DAT_10da93f0 * 0.6f);
     }
     else
     {
@@ -210,13 +193,13 @@ extern "C" int FUN_10019310(void)
         int half = (int)((float)DAT_104c035c * -0.5f);
         positionStep.Copy((DAT_10802be8 - DAT_10866d98).Divided((float)(1 - half)));
         targetStep.Copy((DAT_10c67ff0 - DAT_10edbd48).Divided((float)(1 - half)));
-        DAT_108393d8.Copy(DAT_108393d8.Scaled(0.85f) + positionStep.Scaled(0.15f));
-        DAT_10da93f0.Copy(DAT_10da93f0.Scaled(0.85f) + targetStep.Scaled(0.15f));
+        DAT_108393d8.Copy(DAT_108393d8 * 0.85f + positionStep * 0.15f);
+        DAT_10da93f0.Copy(DAT_10da93f0 * 0.85f + targetStep * 0.15f);
     }
     DAT_10866d98.Copy(DAT_108393d8);
     DAT_10edbd48.Copy(DAT_10da93f0);
-    DAT_118e6cb8.Copy(DAT_118e6cb8 + DAT_10edbd48.Scaled(0.5f) + (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.5f));
-    DAT_118e69e8.Copy(DAT_118e69e8 + DAT_10866d98.Scaled(0.5f) + (DAT_104d29d8 - DAT_118e69e8).Scaled(0.5f));
+    DAT_118e6cb8.Copy(DAT_118e6cb8 + DAT_10edbd48 * 0.5f + (DAT_10f08aa0 - DAT_118e6cb8) * 0.5f);
+    DAT_118e69e8.Copy(DAT_118e69e8 + DAT_10866d98 * 0.5f + (DAT_104d29d8 - DAT_118e69e8) * 0.5f);
     DAT_118e6c78.Copy(DAT_118e6cb8);
     DAT_11af3e28.Copy(DAT_118e69e8);
     DAT_10f668e8.Copy(DAT_118e6cb8);
@@ -291,10 +274,10 @@ extern "C" int FUN_10019d80(void)
     }
     if (DAT_10866d98.x > -20000.0f)
         DAT_10edbd48.z += (DAT_10866d98 - DAT_10edbd48).Length() * DAT_10da93e8 * 0.01f;
-    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8).Scaled(0.2f) +
-                      (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.8f));
-    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8).Scaled(0.2f) +
-                      (DAT_104d29d8 - DAT_118e69e8).Scaled(0.8f));
+    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8) * 0.2f +
+                      (DAT_10f08aa0 - DAT_118e6cb8) * 0.8f);
+    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8) * 0.2f +
+                      (DAT_104d29d8 - DAT_118e69e8) * 0.8f);
     DAT_118e6c78.Copy(DAT_118e6cb8);
     DAT_11af3e28.Copy(DAT_118e69e8);
     DAT_10f668e8.Copy(DAT_118e6cb8);
@@ -325,11 +308,11 @@ extern "C" int FUN_1001a0d0(void)
     DAT_10866d98.Copy(offset);
     DAT_10edbd48.Copy(DAT_10da93f0);
     if (DAT_1021c624 != 0)
-        DAT_10edbd48.Copy(DAT_10edbd48.Scaled(0.95f) + DAT_1021c624->world.GetTranslation().Scaled(0.05f));
-    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8).Scaled(0.2f) +
-                      (DAT_10f08aa0 - DAT_118e6cb8).Scaled(0.8f));
-    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8).Scaled(0.2f) +
-                      (DAT_104d29d8 - DAT_118e69e8).Scaled(0.8f));
+        DAT_10edbd48.Copy(DAT_10edbd48 * 0.95f + DAT_1021c624->world.GetTranslation() * 0.05f);
+    DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8) * 0.2f +
+                      (DAT_10f08aa0 - DAT_118e6cb8) * 0.8f);
+    DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8) * 0.2f +
+                      (DAT_104d29d8 - DAT_118e69e8) * 0.8f);
     DAT_118e6c78.Copy(DAT_118e6cb8);
     DAT_11af3e28.Copy(DAT_118e69e8);
     DAT_10f668e8.Copy(DAT_118e6cb8);

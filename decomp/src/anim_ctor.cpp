@@ -2,14 +2,7 @@
 // constructed in declaration order, then the scale values set to 1 and the motion fields cleared. Fields are named
 // by offset (see anim_reset.cpp for the full list of what AnimModel::ResetState clears).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-};
+#include "vec4.h"
 
 // Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
 struct Matrix4

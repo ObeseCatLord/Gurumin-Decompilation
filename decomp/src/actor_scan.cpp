@@ -3,20 +3,7 @@
 
 #include "world.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    Vec4 operator+(const Vec4 &other) const;
-    Vec4 operator-(const Vec4 &other) const;
-    Vec4 Scaled(const float &scale);
-    float Length2D();  // 0x101ac500: length of x/y
-    float LengthSquared3();  // 0x101ac6a0: x*x + y*y + z*z
-};
+#include "vec4.h"
 
 // Per-slot state table at 0x10daaaec, 0x188 bytes per slot (CharSlot in world.h starts 0x98 bytes later).
 struct ActorSlot
@@ -122,7 +109,7 @@ extern "C" int FUN_1001bec0(const Vec4 *position, Vec4 *velocity)
             float distanceAfter = delta.Length2D();
             if (distance < 400.0f && distance > distanceAfter)
             {
-                velocity->Copy(velocity->Scaled(0.05f));
+                velocity->Copy(*velocity * 0.05f);
                 return 0;
             }
         }

@@ -135,7 +135,7 @@ _Vec3_LengthSquared	101ac220
 ?DistanceSquared@Vec4@@QAEMABU1@@Z	101ac650
 ?Distance@Vec4@@QAEMABU1@@Z	101ac590
 ?DistanceZWeighted@Vec4@@QAEMABU1@@Z	101ac5f0
-?Scaled@Vec4@@QAE?AU1@ABM@Z	101acb00
+??DVec4@@QBE?AU0@ABM@Z	101acb00
 ?Divided@Vec4@@QAE?AU1@ABM@Z	101acb60
 ?Translate@Matrix4@@QAEXMMM@Z	101adec0
 ?SetRotationZ@Matrix4@@QAEXM@Z	101ae710

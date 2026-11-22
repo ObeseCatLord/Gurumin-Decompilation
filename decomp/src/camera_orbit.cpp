@@ -3,20 +3,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Fill(const float &value);
-    void Copy(const Vec4 &source);
-    void RotateZ(float angle);
-    float Length2D();
-    Vec4 operator+(const Vec4 &other) const;
-    Vec4 operator-(const Vec4 &other) const;
-};
+#include "vec4.h"
 
 extern "C" Vec4 DAT_11af3e28;  // camera position
 extern "C" Vec4 DAT_118e6c78;  // camera target

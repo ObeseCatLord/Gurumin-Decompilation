@@ -1,15 +1,7 @@
 // Camera matrices: the projection (perspective with the 4:3 aspect correction) and the view (look-at with roll).
 // C++ rather than extern "C": the function keeps an exception frame for its matrix temporaries.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                         // 0x101ac990
-    void Set(float x, float y, float z, float w);   // 0x101ac9c0
-};
+#include "vec4.h"
 
 // Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
 struct Matrix4

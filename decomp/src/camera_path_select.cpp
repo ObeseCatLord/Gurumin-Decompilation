@@ -5,18 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "vec4.h"
 
-
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                          // 0x101ac990: zero
-    void Copy(const Vec4 &source);                   // 0x101acc20
-    float DistanceZWeighted(const Vec4 &other);      // 0x101ac5f0: distance with z counted twice
-};
 
 struct Matrix4
 {

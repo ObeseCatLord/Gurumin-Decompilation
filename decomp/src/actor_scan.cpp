@@ -1,5 +1,5 @@
 // Scans over the character slots 0x3a..0x7b (the enemy range). Slot kind 3 in DAT_1021f3c0 marks a live enemy.
-// A position (m_2368.x) below -49999 means the character was moved out of the world (retired, see char_retire.cpp).
+// A position (matrix._41) below -49999 means the character was moved out of the world (retired, see char_retire.cpp).
 
 #include "world.h"
 
@@ -24,7 +24,7 @@ extern "C" int FUN_10011c60(void)
 {
     for (int i = 0x3a; i < 0x7c; i++)
     {
-        if (DAT_1021f3c0[i] == 3 && i >= 0x3a && DAT_10db6ed8[i].m_2368.x > -49999.0f && DAT_10daaaec[i].m_0000 > 0 &&
+        if (DAT_1021f3c0[i] == 3 && i >= 0x3a && DAT_10db6ed8[i].matrix._41 > -49999.0f && DAT_10daaaec[i].m_0000 > 0 &&
             DAT_10210d30[i] == 0 && DAT_10db6ed8[i].m_22fc != 0 && DAT_10daaaec[i].m_009c == 0)
             DAT_10daaaec[i].m_0000 = 0;
     }
@@ -39,7 +39,7 @@ extern "C" int FUN_10011cd0(void)
     {
         if (DAT_1021f3c0[i] == 3 && i >= 0x3a)
         {
-            if ((DAT_10db6ed8[i].m_2368.x < -50000.0f || (DAT_10daaaec[i].m_0000 <= 0 && DAT_10210d30[i] == 2)) &&
+            if ((DAT_10db6ed8[i].matrix._41 < -50000.0f || (DAT_10daaaec[i].m_0000 <= 0 && DAT_10210d30[i] == 2)) &&
                 DAT_10db6ed8[i].m_22fc != 0)
                 return i;
         }

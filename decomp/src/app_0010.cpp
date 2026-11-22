@@ -81,7 +81,8 @@ extern "C" int FUN_100121e0(int index)
 // Adds character `index`'s position to the list of positions the camera keeps in view.
 extern "C" int FUN_100143c0(int index)
 {
-    DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ed8[index].m_2368;
+    // the camera list holds Vec3 pointers; the matrix's translation row (_41, _42, _43) is the character's position
+    DAT_1032d5b8[DAT_1049f0f0] = (Vec3 *)&DAT_10db6ed8[index].matrix._41;
     DAT_1021bbc0[DAT_1049f0f0] = 0;
     DAT_1049f0f0++;
     return 1;

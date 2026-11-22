@@ -37,10 +37,10 @@ extern "C" int FUN_10024e80(int index, float dx, float dy)
     float rangeX = (float)DAT_102110b0[index].rangeX;
     float rangeY = (float)DAT_102110b0[index].rangeY;
     if (DAT_102110b0[index].limitX == 1 && rangeX != 0.0f &&
-        AbsFloat(dx + DAT_10db6ed8[index].m_2368.x - DAT_10802bf8[index].position.x) > rangeX)
+        AbsFloat(dx + DAT_10db6ed8[index].matrix._41 - DAT_10802bf8[index].position.x) > rangeX)
         return 1;
     if (DAT_102110b0[index].limitY == 1 && rangeY != 0.0f &&
-        AbsFloat(dy + DAT_10db6ed8[index].m_2368.y - DAT_10802bf8[index].position.y) > rangeY)
+        AbsFloat(dy + DAT_10db6ed8[index].matrix._42 - DAT_10802bf8[index].position.y) > rangeY)
         return 1;
     return 0;
 }

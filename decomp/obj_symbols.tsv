@@ -35,7 +35,6 @@
 ?LastFrame@KeyTrack@@QAEHXZ	101adc90
 ?HasFrame@KeyTrack@@QAEHH@Z	101adcb0
 ?GetTranslation@Matrix4@@QAE?AUVec4@@XZ	101ade80
-?SetTranslation@Matrix4@@QAEXMMMM@Z	101adef0
 ?ResetRotation@Matrix4@@QAEXXZ	101adf10
 ?SetIdentity@Matrix4@@QAEXXZ	101ae7a0
 ?SetRotationTransposed@Matrix4@@QAEXABU1@@Z	101ae7e0
@@ -445,3 +444,7 @@ _FUN_101426d0@8	101426d0
 ?DrawScreenCopy@TextureSlot@@QAEHHHHHMM@Z	1014b750
 ?DrawShadows@ModelBank@@QAEHPAUShadowScene@@HHH@Z	10165e00
 ?DrawShadowsInto@ModelBank@@QAEHPAUShadowScene@@HHH@Z	10166100
+?StartProximityPass@Node@@QAEHPAMPAUMatrix4@@HMH@Z	101a2370
+?TagRegion@Node@@QAEHPBUBox2@@PAY0EA@$$CBDPAUMatrix4@@@Z	10199cd0
+?Draw@MeshSlot@@QAEHABUMatrix4@@@Z	1000baf0
+?SetTranslation@Matrix4@@QAEXUVec4@@@Z	101adef0

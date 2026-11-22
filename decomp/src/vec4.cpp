@@ -242,12 +242,7 @@ int Vec4::InTriangle(const Vec4 &a, const Vec4 &b, const Vec4 &c)
     return 0;
 }
 
-// Row-major 4x4 matrix (vec_math.cpp); the translation is in m[12..14].
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();
-};
+#include "matrix4.h"
 
 // 0x101ade80. Returns the translation row as a vector (w stays 0).
 Vec4 Matrix4::GetTranslation()
@@ -492,7 +487,6 @@ int KeyBank::Set(int frame, float x, float y, float z, float w)
     return i;
 }
 
-
 // Length of all four components; an inline helper whose float arguments are spilled to the stack (as in
 // vec_math.cpp).
 inline float Length4(float x, float y, float z, float w)
@@ -518,7 +512,6 @@ Vec4 QuatFromAxisAngle(Vec4 &axis, float angle)
     result.z = axis.z / length;
     return result;
 }
-
 
 // Difference a - b between two angles in radians, taking the shorter way round. Both angles are first folded into
 // -pi..pi (in steps of pi, as the game does; pi = 3.1415), then the differences a - b and a - b +- 2pi are compared.

@@ -28,7 +28,7 @@ extern "C" int FUN_1001d920(void)
     if (DAT_104bfdd8 >= 0x5c)
     {
         if (DAT_104c0388 != DAT_104bfdd8 ||
-            (DAT_104c0384 >= 0x5c && DAT_10db6ed8[DAT_104c0384].m_2368.x < -20000.0f))
+            (DAT_104c0384 >= 0x5c && DAT_10db6ed8[DAT_104c0384].matrix._41 < -20000.0f))
         {
             DAT_104c0384 = 0;
             DAT_104c0388 = DAT_104bfdd8;
@@ -69,7 +69,7 @@ extern "C" int FUN_1001d920(void)
             DAT_10867df8.z -= position.z;
             return 0;
         }
-        if (DAT_10db6ed8[DAT_104bfdd8].m_2368.x > -20000.0f)
+        if (DAT_10db6ed8[DAT_104bfdd8].matrix._41 > -20000.0f)
         {
             DAT_10867df8.x = position.x;
             DAT_10867df8.y = position.y;

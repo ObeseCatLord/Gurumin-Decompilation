@@ -3,13 +3,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();
-    ~Matrix4();
-    void SetIdentity();
-};
+#include "matrix4.h"
 
 struct CollisionWorld
 {
@@ -154,7 +148,7 @@ extern "C" int FUN_1001a450(int slot, const Vec4 *point)
 struct HeadNode
 {
     char pad_0000[0x24c];
-    CharMatrix worldMatrix;   // 0x24c
+    Matrix4 worldMatrix;   // 0x24c
 };
 
 // Root node of a character model (scene_node.cpp Node).
@@ -186,9 +180,9 @@ extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, 
     }
     else
     {
-        from.x = DAT_10db6ed8[index].m_2368.x;
-        from.y = DAT_10db6ed8[index].m_2368.y;
-        from.z = DAT_10db6ed8[index].m_2368.z;
+        from.x = DAT_10db6ed8[index].matrix._41;
+        from.y = DAT_10db6ed8[index].matrix._42;
+        from.z = DAT_10db6ed8[index].matrix._43;
         from.w = DAT_10db6ed8[index].matrix.m[15];
     }
     if (offset != 0)
@@ -233,9 +227,9 @@ extern "C" int FUN_100244b0(int index, float angle, Vec4 *ground, float depth, i
     }
     else
     {
-        from.x = DAT_10db6ed8[index].m_2368.x;
-        from.y = DAT_10db6ed8[index].m_2368.y;
-        from.z = DAT_10db6ed8[index].m_2368.z;
+        from.x = DAT_10db6ed8[index].matrix._41;
+        from.y = DAT_10db6ed8[index].matrix._42;
+        from.z = DAT_10db6ed8[index].matrix._43;
         from.w = DAT_10db6ed8[index].matrix.m[15];
     }
     if (offset != 0)
@@ -280,9 +274,9 @@ extern "C" int FUN_10024750(int index, Vec4 *ground, float depth, int fromHead, 
     }
     else
     {
-        from.x = DAT_10db6ed8[index].m_2368.x;
-        from.y = DAT_10db6ed8[index].m_2368.y;
-        from.z = DAT_10db6ed8[index].m_2368.z;
+        from.x = DAT_10db6ed8[index].matrix._41;
+        from.y = DAT_10db6ed8[index].matrix._42;
+        from.z = DAT_10db6ed8[index].matrix._43;
         from.w = DAT_10db6ed8[index].matrix.m[15];
         if (fromHead != 0)
             from.z += 30.0f;

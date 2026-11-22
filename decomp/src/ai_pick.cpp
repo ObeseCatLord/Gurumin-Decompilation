@@ -8,13 +8,7 @@
 
 extern "C" int FUN_1013f880(void);
 
-struct Matrix
-{
-    float m[16];
-    Matrix();
-    ~Matrix();
-    void SetIdentity();
-};
+#include "matrix4.h"
 
 // Attached mesh slots (64 at 0x10edbe08, 0xb08 bytes each): extra models such as held items.
 struct MeshSlot
@@ -166,7 +160,7 @@ int UpdateMeshSlots()
         if (DAT_10edbe08[i].mesh != 0)
             DAT_10edbe08[i].M_10037b40(DAT_108392d8, DAT_10836330);
     }
-    Matrix identity;
+    Matrix4 identity;
     identity.SetIdentity();
     return 0;
 }

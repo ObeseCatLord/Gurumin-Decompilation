@@ -7,14 +7,8 @@ struct Vec3
     float z;
 };
 
-#include "vec4.h"
+#include "matrix4.h"
 
-// A character's world matrix (row-major; the translation m[12..14] is the character's position).
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();  // 0x101ade80 (vec4.cpp: Matrix4::GetTranslation)
-};
 
 struct CharModel
 {
@@ -61,15 +55,7 @@ struct Character
     int m_2300;               // 0x2300: non-zero while the character is in use (key prompts are drawn)
     struct HeadNode *headNode;  // 0x2304: the model's head bone node (head_look.cpp, the player's at 0x10db91dc)
     char pad_2308[0x30];
-    union
-    {
-        CharMatrix matrix;    // 0x2338: world matrix
-        struct
-        {
-            char pad_matrix[0x30];
-            Vec3 m_2368;      // 0x2368: position (the matrix translation)
-        };
-    };
+    Matrix4 matrix;           // 0x2338: world matrix; matrix._41/_42/_43 (0x2368) is the character's position
     char pad_2378[0x24];
     int m_239c;
     char pad_23a0[0xec];

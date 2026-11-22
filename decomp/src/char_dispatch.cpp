@@ -24,7 +24,7 @@ extern "C" int FUN_1009c070(int index);
 // updates are not suspended. Always returns 0.
 extern "C" int FUN_101148b0(int index)
 {
-    if (DAT_10db6ed8[index].m_2368.x > -50000.0f && DAT_104bfe78 == 0)
+    if (DAT_10db6ed8[index].matrix._41 > -50000.0f && DAT_104bfe78 == 0)
     {
         switch (DAT_10daab84[index].m_0000)
         {

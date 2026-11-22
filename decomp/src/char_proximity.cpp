@@ -40,7 +40,7 @@ extern "C" int FUN_1001b670(int index, float radius, int count, ...)
     for (int i = 0x3a; i < 0x5c; i++)
     {
         if (DAT_10daab84[i].m_0000 == 0x62 && DAT_1021f3c0[i] == 3 && DAT_10db6ed8[i].m_22fc != 0 &&
-            DAT_10db6ed8[i].m_2368.x > -20000.0f && DAT_1020b430[i].m_0000 == 0)
+            DAT_10db6ed8[i].matrix._41 > -20000.0f && DAT_1020b430[i].m_0000 == 0)
         {
             if (count != 0)
             {

@@ -65,8 +65,8 @@ extern "C" int FUN_100286b0(int angle)
 // Moves character `index` to the position of character `index - 2` (a follower placed on its leader).
 extern "C" int FUN_100347d0(int index)
 {
-    DAT_10db6ed8[index].model.M_10162610(DAT_10db6ed8[index - 2].m_2368.x, DAT_10db6ed8[index - 2].m_2368.y,
-                                         DAT_10db6ed8[index - 2].m_2368.z);
+    DAT_10db6ed8[index].model.M_10162610(DAT_10db6ed8[index - 2].matrix._41, DAT_10db6ed8[index - 2].matrix._42,
+                                         DAT_10db6ed8[index - 2].matrix._43);
     return 0;
 }
 

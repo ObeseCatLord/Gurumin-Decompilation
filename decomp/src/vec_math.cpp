@@ -26,13 +26,7 @@ struct Plane
     float Distance(const Vec4 *point);
 };
 
-struct Matrix4
-{
-    float m[16];  // row-major; m[12], m[13], m[14] = translation
-    Matrix4();
-    void Translate(float x, float y, float z);
-    void SetRotationZ(float angle);
-};
+#include "matrix4.h"
 
 // x*x + y*y + z*z. An inline helper in the original source: its three float arguments are evaluated right to left
 // and spilled to the stack, which is what gives callers their z, y, x copy order.

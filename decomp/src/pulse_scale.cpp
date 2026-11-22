@@ -3,11 +3,7 @@
 #include <stdlib.h>
 #include "world.h"
 
-struct Matrix4
-{
-    float m[16];
-    ~Matrix4();
-};
+#include "matrix4.h"
 
 // Pose object of a character (pointer table DAT_1021bdf8, 0x24 bytes per character); matrix at 0x1cc.
 struct Pose

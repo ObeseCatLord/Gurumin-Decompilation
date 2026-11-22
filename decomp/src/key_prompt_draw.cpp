@@ -5,17 +5,14 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-};
+#include "matrix4.h"
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 
 struct HeadNode
 {
     char pad_0000[0x24c];
-    CharMatrix worldMatrix;                          // 0x24c
+    Matrix4 worldMatrix;                          // 0x24c
 };
 
 struct TextureObject
@@ -42,7 +39,7 @@ extern "C" int FUN_1000d6b0(const Matrix4 *view)
     for (int i = 0; i < 0x7c; i++)
     {
         Character *character = &DAT_10db6ed8[i];
-        if (character->m_2300 == 0 || DAT_104bf8f8[i] == 0 || !(character->m_2368.x > -100000.0f))
+        if (character->m_2300 == 0 || DAT_104bf8f8[i] == 0 || !(character->matrix._41 > -100000.0f))
         {
             DAT_104bf8f8[i] = 0;
             continue;

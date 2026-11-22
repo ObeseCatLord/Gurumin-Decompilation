@@ -82,15 +82,7 @@ struct KeyBank
     int Insert(int frame, float x, float y, float z, float w);
 };
 
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();
-    void SetTranslation(float x, float y, float z, float w);
-    void ResetRotation();
-    void SetIdentity();
-    void SetRotationTransposed(const Matrix4 &source);
-};
+#include "matrix4.h"
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" void (*DAT_11b1ba40)(void *);
@@ -221,12 +213,12 @@ int KeyTrack::HasFrame(int frame)
     return 0;
 }
 
-// Sets the translation row.
-void Matrix4::SetTranslation(float x, float y, float z, float w)
+// Sets the translation row to position.x/y/z (position.w is ignored; m[15] is left as it is).
+void Matrix4::SetTranslation(Vec4 position)
 {
-    m[12] = x;
-    m[13] = y;
-    m[14] = z;
+    m[MATRIX_TRANSLATION_X] = position.x;
+    m[MATRIX_TRANSLATION_Y] = position.y;
+    m[MATRIX_TRANSLATION_Z] = position.z;
 }
 
 // Sets the upper-left 3x3 block to identity (translation kept).

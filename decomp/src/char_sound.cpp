@@ -16,7 +16,7 @@ extern "C" int FUN_10065b10(int index, int sound, int always, int optional)
     if (distanceSquared < 2500.0f * 2500.0f || index < 0x3a || always != 0)
     {
         Vec4 position;
-        position.Set(DAT_10db6ed8[index].m_2368.x, DAT_10db6ed8[index].m_2368.y, DAT_10db6ed8[index].m_2368.z, 0);
+        position.Set(DAT_10db6ed8[index].matrix._41, DAT_10db6ed8[index].matrix._42, DAT_10db6ed8[index].matrix._43, 0);
         if (optional != 0)
         {
             if (DAT_104c0332 == 0)

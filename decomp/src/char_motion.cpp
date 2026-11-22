@@ -30,7 +30,7 @@ extern "C" void FUN_100123d0(void)
 {
     for (int i = 0; i < 0x5c; i++)
     {
-        if (i != 0 && DAT_10db6ed8[i].m_2368.x < -50000.0f)
+        if (i != 0 && DAT_10db6ed8[i].matrix._41 < -50000.0f)
             continue;
         if (DAT_10daab84[i].m_0004 != 0 && DAT_10daab84[i - 1].m_000c == 0)
             continue;

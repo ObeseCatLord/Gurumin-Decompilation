@@ -3,6 +3,17 @@
 Rewrite this file at the end of every session (keep it short: state, not history). The next session starts by
 reading it, then `AGENTS.md`.
 
+## Standing instructions (keep this section when rewriting the file)
+- **Autonomous run (user, 2026-11-22):** work without waiting for approval; do not stop to ask questions a sensible
+  default answers. When this session's task is done (or it can go no further), rewrite this file, commit and push,
+  and end the turn; the orchestrating session starts the next one with the continuation prompt below.
+- **Human-readable above all:** no magic numbers (named constants, enums or a comment saying what each value is),
+  comments on every function (what it does, who calls it), on struct fields and on non-obvious logic, informative
+  function and variable names (rename `FUN_`/`M_`/`DAT_` and `m_XXXX` when the evidence supports a name), early
+  returns and plain loops. Comments and names never change compiled bytes; if a readable spelling loses a match,
+  keep the readable one only when it is a comment/name change, otherwise record the function in `open.tsv`.
+- Hard rules from `AGENTS.md` (typed members, one declaration per type, no fakematches, never commit a lost match).
+
 ## Progress (2026-11-22, `progress/jp/report.json`)
 | measure | value |
 |---|---|
@@ -49,4 +60,6 @@ Under AGENTS.md rules 1-2 most matches are still MATCH-PENDING until their other
 Matrix4/Matrix declarations, write `include/matrix4.h`, then hand groups of about 22 files to parallel Sonnet
 subagents (disjoint files, per-file baseline/convert/rebuild/revert-on-loss). After each batch run
 `python tools/build_all.py --report ../progress/jp/report.json` and `python tools/check_matches.py` from `decomp/`.
-Commit and push only when it exits 0. Rewrite HANDOFF.md at the end with the Fully linked / Matched / Fuzzy numbers."
+Commit and push only when it exits 0. Keep everything human-readable (named constants instead of magic numbers,
+liberal comments, informative names). Rewrite HANDOFF.md at the end with the Fully linked / Matched / Fuzzy numbers,
+keeping its Standing instructions section and a continuation prompt for the next task."

@@ -57,6 +57,12 @@ Function names: `symbols.tsv` (apply to Ghidra with `re/apply_symbols.bat`).
 - Ghidra: `re\run_ghidra_export.bat` (APP.dll), `re\run_ghidra_packs.bat` (packs.dll); exports land in `re\export\`
   (local only).
 
+## Contributing
+Contributions from people and from AI agents are welcome. Start with [`AGENTS.md`](AGENTS.md): the rules every
+change follows (typed struct members instead of fixed offsets, each type declared once in a shared header, no
+fakematches, commented source) and the build commands. `CLAUDE.md` points Claude Code there; `NOTES.md` holds the
+findings so far. You need your own copy of the game and VS .NET 2002 (cl 13.00.9466).
+
 ## Roadmap
 Decompilation and naming come first. Planned once they are far enough along (details in
 [`docs/ROADMAP.md`](docs/ROADMAP.md)):

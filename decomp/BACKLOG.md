@@ -8,6 +8,23 @@ files, 210 methods still called `M_<address>` and 483 globals still called `DAT_
 Rules for every task: readable source first (no fakematches; a readable near-match goes to `open.tsv`), comments on
 every function, build with `build_all.py --report`, `sync_symbols.py`, `gen_queue.py`, then commit and push.
 
+## Phase 0: one declaration per type and global (AGENTS.md rules 1 and 2)
+
+Added 2026-11-22. Matched code declares structs per file (`Vec4` in about 110 files, `CharRecord` in about 20, each
+with its own padding) and every global as a local `extern "C"`. Under AGENTS.md those functions are MATCH-PENDING
+until fixed. Raw offset casts left on 2026-11-22: `listbank.cpp` lines 760, 773 and 796 (`(char *)this + 0x2240c`);
+retype those members first.
+
+1. Move the small value types first: `Vec4`, `Matrix4`, `Node`, the D3D interface views, into `decomp/include/`;
+   replace each per-file copy with an include, building every file after each type (`build_all.py`) and checking
+   that every file keeps its `MATCH` lines.
+2. Merge the struct views into one full definition each (`CharRecord`, `NpcState`, `TextureObject`, `ModelBank`,
+   `BankModel`, `Game`): union the known fields, check every offset with a `sizeof`/offset assertion, and resolve
+   conflicting field names from the evidence.
+3. Move the `extern "C"` globals into headers next to their owner type, one declaration each.
+4. Teach `build_all.py` to report "matched under the rules" (no per-file type or global declarations in the
+   function's file) next to the byte count.
+
 ## Phase A: finish the medium functions (251-800 bytes)
 
 1. Effect manager family (char_effects.cpp): `EffectManager::Step` 0x10184440, `M_10172350` (start effect),

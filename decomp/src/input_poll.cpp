@@ -90,6 +90,31 @@ struct PropertyDword
     unsigned long data;
 };
 
+// DIDEVICEINSTANCEA (the start; the rest is names and usage).
+struct DeviceInstance
+{
+    unsigned long size;
+    GUID instanceGuid;
+    GUID productGuid;
+};
+
+// DIDEVICEOBJECTINSTANCEA (the start).
+struct DeviceObjectInstance
+{
+    unsigned long size;
+    GUID typeGuid;
+    unsigned long offset;
+    unsigned long type;
+    unsigned long flags;             // DIDOI_FFACTUATOR (1): the object takes force-feedback output
+};
+
+// DIEFFECTINFOA (the start).
+struct EffectInfo
+{
+    unsigned long size;
+    GUID guid;
+};
+
 // DIMOUSESTATE.
 struct MouseState
 {
@@ -136,7 +161,7 @@ extern "C" long __stdcall DirectInput8Create(HINSTANCE instance, unsigned long v
 // 0x10142670 (Input_CountForceAxes). EnumObjects callback: counts the force-feedback actuator axes. Continues.
 extern "C" int __stdcall FUN_10142670(const void *object, void *context)
 {
-    if ((((const unsigned long *)object)[7] & 1) != 0)   // DIDEVICEOBJECTINSTANCE.dwFlags & DIDOI_FFACTUATOR
+    if ((((const DeviceObjectInstance *)object)->flags & 1) != 0)   // DIDOI_FFACTUATOR
         ((Input *)context)->forceAxes++;
     return 1;
 }
@@ -145,7 +170,7 @@ extern "C" int __stdcall FUN_10142670(const void *object, void *context)
 extern "C" int __stdcall FUN_10142690(const void *info, void *context)
 {
     Input *input = (Input *)context;
-    input->effectGuid = *(const GUID *)((const char *)info + 4);   // DIEFFECTINFO.guid
+    input->effectGuid = ((const EffectInfo *)info)->guid;
     input->effectFound = 1;
     return 0;
 }
@@ -154,7 +179,8 @@ extern "C" int __stdcall FUN_10142690(const void *info, void *context)
 extern "C" int __stdcall FUN_101426d0(const void *instance, void *context)
 {
     Input *input = (Input *)context;
-    return input->directInput->CreateDevice(*(const GUID *)((const char *)instance + 4), &input->joystick, 0) < 0;
+    return input->directInput->CreateDevice(((const DeviceInstance *)instance)->instanceGuid, &input->joystick,
+                                            0) < 0;
 }
 
 // 0x10142790 (Input::Update). The first call creates DirectInput and enumerates the attached game controllers

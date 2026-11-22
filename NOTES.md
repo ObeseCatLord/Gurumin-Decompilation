@@ -405,3 +405,18 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `counter--` copies to another register first (0x1000ed20). A clamp written as two ternaries through a second
   variable (`int c = x > 0 ? x : 0; int slot = c > 3 ? 3 : c;`) gives the branchless low clamp and a
   `mov esi, 3 / cmp / jg / mov esi, eax` high clamp (0x1016b1e0).
+
+## 2026-11-22: one shared Vec4 (include/vec4.h)
+- Replacing the per-file Vec4 copies with `include/vec4.h` (out-of-line `Vec4()` at 0x101ac990, so Vec4 is non-POD)
+  changed no codegen in 109 files, including the 27 whose copies had no constructor: uninitialised `Vec4` locals,
+  Vec4 arrays and extern Vec4 globals do not pull in a constructor call there. Reference vs pointer parameters
+  (`DistanceToSegment`) and `const` on `operator*` change only the mangled name.
+- Exception: `npc_greet.cpp` Npc_Greet (0x100b8220). With the shared header and no other change the compiler keeps
+  `&DAT_10254390[index]` in ebx (extra push, frame +4). The member set or order of the declaration tips register
+  allocation, so declaration order can matter even for out-of-line methods (open.tsv).
+- A union member cannot have a constructor (C2620): `scene_node.cpp`'s `bounds` union became plain `Vec4 bounds[3]`.
+  The int fields that overlaid it were floats (first vertex z); a float-to-float field copy compiles to the same
+  `mov` pair as the int copy did.
+- `char_params.h` `ParamVector::operator=` sits at 0x101acc20 (Vec4::Copy), and the implicit copy assignment
+  0x100357a0 calls it per member. This suggests Vec4::Copy is really `Vec4 &operator=(const Vec4 &)`. Unconfirmed,
+  because no source file uses ParamVector yet.

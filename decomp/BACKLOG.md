@@ -18,6 +18,9 @@ retype those members first.
 1. Move the small value types first: `Vec4`, `Matrix4`, `Node`, the D3D interface views, into `decomp/include/`;
    replace each per-file copy with an include, building every file after each type (`build_all.py`) and checking
    that every file keeps its `MATCH` lines.
+   Status 2026-11-22: `Vec4` and `Box2` done (`include/vec4.h`, 110 files) except `npc_greet.cpp` (open.tsv
+   100b8220). Still duplicated: `Vec3` (world.h, vec_math.cpp), `ParamVector` (char_params.h, maybe Vec4 with
+   `operator=` = Copy). Next: `Matrix4`.
 2. Merge the struct views into one full definition each (`CharRecord`, `NpcState`, `TextureObject`, `ModelBank`,
    `BankModel`, `Game`): union the known fields, check every offset with a `sizeof`/offset assertion, and resolve
    conflicting field names from the evidence.

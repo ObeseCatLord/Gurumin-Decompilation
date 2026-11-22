@@ -1,18 +1,7 @@
 // Turning characters towards a target heading, and pushing them.
 #include "world.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    Vec4 operator-(const Vec4 &other) const;
-    Vec4 Scaled(const float &scale);
-    Vec4 Normalized3();  // 0x101af080: normalises x/y/z in place
-};
+#include "vec4.h"
 
 extern "C" int DAT_104c00d0;  // when non-zero, the player (character 0) cannot be pushed
 
@@ -46,7 +35,7 @@ extern "C" int FUN_10011b70(int strength, char flag, int index, const Vec4 *poin
     direction.Normalized3();
     if ((index != 0 || DAT_104c00d0 == 0) && (direction.x != 0.0f || direction.y != 0.0f || direction.z != 0.0f))
     {
-        direction.Copy(direction.Scaled((float)strength));
+        direction.Copy(direction * (float)strength);
         DAT_10db6ed8[index].model.SetPendingPush(direction.x, direction.y, 0, flag);
     }
     return 0;

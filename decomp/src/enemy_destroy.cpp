@@ -1,15 +1,7 @@
 // Destroying a character (an enemy or a breakable object). The character records are viewed from their model part
 // at 0x10db6ee8 (like char_move.cpp).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Set(float x, float y, float z, float w);   // 0x101ac9c0
-};
+#include "vec4.h"
 
 struct CharMatrix
 {

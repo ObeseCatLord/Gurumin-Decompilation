@@ -9,17 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Fill(const float &value);
-    void Copy(const Vec4 &other);
-    void Transform(const struct Matrix4 &matrix);
-};
+#include "vec4.h"
 
 struct VertexPack
 {

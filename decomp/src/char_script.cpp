@@ -1,15 +1,7 @@
 // Characters driven by a step script (FUN_10029cf0 runs one step). The character records are viewed from their
 // model part at 0x10db6ee8 here (like char_move.cpp), where all the fields used lie inside one record.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-};
+#include "vec4.h"
 
 struct Vec3
 {

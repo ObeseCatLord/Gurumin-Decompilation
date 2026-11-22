@@ -1,21 +1,7 @@
 // A swinging enemy (0x10044560, called from the behaviour dispatch 0x100dfcf0): it drops from 500 units above its
 // place to 100 above it, then swings on a 400 unit line from there like a pendulum until it sees the player.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void RotateZ(float angle);                   // 0x101ac300
-    void RotateAxis(const Vec4 &axis, float angle);  // 0x101b1290: turns about `axis`
-    float LengthSquared3();                      // 0x101ac6a0: x*x + y*y + z*z
-    float Length2D();                            // 0x101ac500: length of x/y
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-    Vec4 operator+(const Vec4 &other) const;     // 0x101ac9e0
-};
+#include "vec4.h"
 
 struct Matrix4
 {

@@ -1,15 +1,7 @@
 // Drawing the short-lived effect sprites (the two EffectRecordB tables of char_effects.cpp): each record is one
 // textured square, fading out over its lifetime, queued in the effect sprite batch.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-};
+#include "vec4.h"
 
 struct Matrix4
 {

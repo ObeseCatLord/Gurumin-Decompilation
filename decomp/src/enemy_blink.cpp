@@ -2,23 +2,7 @@
 // hidden far away until the player comes near its home, picks a random spot around the home that it can stand on
 // and slides into place while fading in.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-    void RotateX(float angle);                   // 0x101ac440
-    void RotateZ(float angle);                   // 0x101ac300
-    float LengthSquared3();                      // 0x101ac6a0: x*x + y*y + z*z
-    Vec4 Normalize3();                           // 0x101af080: normalises x/y/z in place, returns a copy
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-    Vec4 operator+(const Vec4 &other) const;     // 0x101ac9e0
-    Vec4 operator*(const float &scale) const;    // 0x101acb00 (x/y/z only)
-};
+#include "vec4.h"
 
 struct Matrix4
 {
@@ -121,7 +105,7 @@ extern "C" int FUN_10046f10(int index)
                     if (DAT_10255f08->RayCast(0, 4, 0, &spot, &probe, &hit, 0) != 0)
                     {
                         spot.Copy(probe - hit);
-                        spot.Normalize3();
+                        spot.Normalized3();
                         spot.Copy(spot * 75.0f);
                         spot.Copy(hit + spot);
                         if ((spot - probe).LengthSquared3() < 250000.0f)

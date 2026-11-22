@@ -1,18 +1,7 @@
 // The default enemy step (0x100e21a0, called from the enemy and scene updates): turn to the player, idle, then
 // pick an action. Characters 11, 12, 14, 20 and 25 and those above 0x39 have small special cases.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void RotateZ(float angle);                   // 0x101ac300
-    Vec4 operator+(const Vec4 &other) const;     // 0x101ac9e0
-    Vec4 operator*(const float &scale) const;    // 0x101acb00 (x/y/z only)
-};
+#include "vec4.h"
 
 struct Matrix4
 {

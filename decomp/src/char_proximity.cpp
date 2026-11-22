@@ -3,17 +3,7 @@
 #include <stdarg.h>
 #include "world.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    float LengthSquared3();                      // 0x101ac6a0
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 extern "C" int FUN_10043cc0(int index);
 extern "C" char DAT_1021f3c0[0x80];   // slot kind (3 = enemy)

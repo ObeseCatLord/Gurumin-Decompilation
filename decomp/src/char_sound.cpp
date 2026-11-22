@@ -1,17 +1,7 @@
 // Sound effects played at a character's position.
 #include "world.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Set(float x, float y, float z, float w);
-    Vec4 operator-(const Vec4 &other) const;
-    float LengthSquared3();  // 0x101ac6a0: x*x + y*y + z*z
-};
+#include "vec4.h"
 
 extern "C" Vec4 DAT_118e6cb8;  // the player's position here (player_reset.cpp calls it the player velocity)
 extern "C" char DAT_104c0332;  // when set, sounds requested with `optional` are skipped

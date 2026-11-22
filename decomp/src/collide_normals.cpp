@@ -1,17 +1,6 @@
 // Averaging the collision normals of a model's collision nodes against the world.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;                  // for a node's bounds: the sphere radius
-    Vec4();
-    void Copy(const Vec4 &source);
-    Vec4 operator+(const Vec4 &other) const;
-    Vec4 Scaled(const float &scale);
-    Vec4 Normalized3();       // 0x101af080: normalises x/y/z in place
-};
+#include "vec4.h"
 
 struct Matrix4
 {
@@ -63,7 +52,7 @@ extern "C" int FUN_10024ac0(Node *node, const Vec4 *offset, Matrix4 *matrix, Vec
             float weight = 1.0f / (float)hits;
             float keep = 1.0f - weight;
             normal->Normalized3();
-            average->Copy(average->Scaled(keep) + normal->Scaled(weight));
+            average->Copy(*average * keep + *normal * weight);
             average->Normalized3();
         }
     }

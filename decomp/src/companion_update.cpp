@@ -2,16 +2,7 @@
 // slot index + 2 + k and keeps its health and revival state in the owner's records. The three updates are the
 // same code for k = 0, 1 and 2.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                          // 0x101ac990: zero
-    void Copy(const Vec4 &source);                   // 0x101acc20
-    Vec4 operator-(const Vec4 &other) const;         // 0x101aca40
-};
+#include "vec4.h"
 
 struct Matrix4
 {

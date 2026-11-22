@@ -1,15 +1,6 @@
 // Effect model: an animated model (node tree + key frames) played at a position, e.g. hit sparks or magic effects.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                            // 0x101ac990: zero vector
-    void Set(float x, float y, float z, float w);      // 0x101ac9c0
-    void Copy(const Vec4 &source);                     // 0x101acc20
-};
+#include "vec4.h"
 
 struct Matrix4
 {

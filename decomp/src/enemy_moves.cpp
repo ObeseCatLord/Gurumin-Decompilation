@@ -4,18 +4,7 @@
 #include <math.h>
 #include "world.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    void Fill(const float &value);
-    Vec4 operator-(const Vec4 &other) const;
-    float Length2D();  // 0x101ac500: length of x/y
-};
+#include "vec4.h"
 
 // Per-slot start vectors, 0x40 bytes (char_shots.cpp, char_leash.cpp).
 struct StartVectors

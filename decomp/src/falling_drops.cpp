@@ -3,15 +3,7 @@
 
 struct Matrix4;
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                        // 0x101ac990: zero
-    void Copy(const Vec4 &source);                 // 0x101acc20
-};
+#include "vec4.h"
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060 (vec4.cpp)
 

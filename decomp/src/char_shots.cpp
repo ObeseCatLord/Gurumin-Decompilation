@@ -2,16 +2,7 @@
 // use; a helper slot is free while its state (CharState::m_0000) is 0.
 #include "world.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    void RotateZ(float angle);  // 0x101ac300
-};
+#include "vec4.h"
 
 // The world collision (scene root node); see collide_query.cpp.
 struct CollisionWorld

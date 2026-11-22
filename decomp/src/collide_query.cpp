@@ -1,22 +1,7 @@
 // Collision queries against the world (DAT_10255f08).
 #include "world.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Set(float x, float y, float z, float w);
-    void Copy(const Vec4 &source);
-    Vec4 operator+(const Vec4 &other) const;
-    Vec4 operator-(const Vec4 &other) const;
-    Vec4 Scaled(const float &scale);
-    void Fill(const float &value);
-    float Length();  // 0x101ac4e0: length of x/y/z
-    void RotateZ(float angle);  // 0x101ac300
-};
+#include "vec4.h"
 
 struct Matrix4
 {
@@ -86,7 +71,7 @@ extern "C" int FUN_10024c40(const Vec4 *position, Vec4 *direction, float depth, 
     Vec4 from;
     Vec4 to;
     Vec4 hit;
-    from.Copy(direction->Scaled((float)distance));
+    from.Copy(*direction * (float)distance);
     from.Copy(from + *position);
     to.Copy(from);
     from.z += 90.0f;
@@ -145,7 +130,7 @@ extern "C" int FUN_1001a450(int slot, const Vec4 *point)
         Vec4 low;
         Vec4 high;
         Vec4 hit;
-        low.Copy(DAT_10802bf8[slot].vector.Scaled(15.0f));
+        low.Copy(DAT_10802bf8[slot].vector * 15.0f);
         low.Copy(low + *point);
         high.Copy(low);
         high.z += 50.0f;

@@ -3,22 +3,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-    void RotateZ(float angle);                   // 0x101ac300
-    float Length();                              // 0x101ac4e0: length of x/y/z
-    float Length2D();                            // 0x101ac500: length of x/y
-    Vec4 Normalize3();                           // 0x101af080: normalises x/y/z in place, returns a copy
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-    Vec4 operator*(const float &scale) const;    // 0x101acb00 (x/y/z only)
-};
+#include "vec4.h"
 
 struct Matrix4
 {
@@ -94,7 +79,7 @@ extern "C" int FUN_10027630(int index, int wander)
             *speed += 0.1f;
         else if (step.Length() < *speed)
             *speed -= 0.1f;
-        step.Normalize3();
+        step.Normalized3();
         step.Copy(step * *speed);
         DAT_10db6ee8[index].matrix.m[12] += step.x;
         DAT_10db6ee8[index].matrix.m[13] += step.y;

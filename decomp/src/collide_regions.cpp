@@ -1,15 +1,7 @@
 // Collision against the flagged regions of a model: every node with flag 0x4 (visible) whose x/y bounds contain
 // the position is tested in turn.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-};
+#include "vec4.h"
 
 struct Node
 {

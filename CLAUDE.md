@@ -8,5 +8,6 @@ confirmed findings and the compiler habits that decide matches.
   in `AGENTS.md`).
 - Work from `decomp/QUEUE.md`; record near-misses in `decomp/open.tsv`; log each batch in `decomp/BATCHES.md`.
 - Keep each file's own line endings (see `AGENTS.md`).
-- Long-term memory: if `willow` (willow-substrate) is installed, its hooks give recall across sessions. Durable
-  project facts still belong in `NOTES.md` or `AGENTS.md`, where every collaborator can read them.
+- Start from `decomp/HANDOFF.md` and rewrite it before the session ends (state, next steps, continuation prompt).
+- Plan in plan mode; delegate implementation to Sonnet subagents with self-contained briefs; verify their results.
+- Use `trail skeleton/callers/ask` (if installed) instead of reading whole files.

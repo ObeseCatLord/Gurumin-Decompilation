@@ -70,6 +70,21 @@ Experiment flags go in `GURUMIN_CFLAGS`. Later compilers (VS .NET 2003) schedule
 row in `decomp/obj_symbols.tsv` (`<mangled name><TAB><address>`) so the build can compare it; get the mangled name
 from the compiled object. Give every function a readable name in `symbols.tsv`.
 
+## Working efficiently (tokens are the budget)
+
+- **Start each session from `decomp/HANDOFF.md`**: what is done, what is in progress, what comes next, and a
+  continuation prompt. Rewrite it at the end of every session, and keep `NOTES.md`, `BACKLOG.md` and
+  `open.tsv` accurate, so no session has to rediscover state.
+- **Plan with the strong model, execute with the cheaper one.** Plan in plan mode (Claude Code `opusplan`: Opus
+  plans, Sonnet executes), then hand implementation to subagents (Sonnet) with self-contained briefs: the files,
+  the exact steps, the commands, and what done looks like. The orchestrator verifies results (the build's
+  `MATCH` lines, the report) instead of redoing the work.
+- **Find code without reading whole files.** If Trail (`trail`, <https://github.com/trailhq/Trail-Code>) is set
+  up, use `trail skeleton <file>`, `trail callers <symbol>` and `trail ask "<question>"` before opening a file;
+  read only the lines you need. Without it, `grep -n` and ranged reads.
+- Keep tool output short (`| tail`, `| grep MATCH`); do not paste whole disassemblies when a diff of the
+  differing lines will do.
+
 ## Workflow for one batch
 
 1. Pick work from `decomp/QUEUE.md` (walls to retry, then functions by size). Check `decomp/open.tsv` and `NOTES.md`.

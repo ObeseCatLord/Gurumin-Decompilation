@@ -2,23 +2,17 @@
 
 #include "vec4.h"
 
-struct Matrix
-{
-    float m[16];
-    Matrix();
-    ~Matrix();
-    void SetIdentity();
-};
+#include "matrix4.h"
 
-Matrix LookAt(Vec4 eye, Vec4 target, const Vec4 *up, int a);                   // 0x101b1c20
-Matrix Perspective(float nearPlane, float farPlane, float fieldOfView);          // 0x101b0c10
-Matrix Scaling(float x, float y, float z);                                       // 0x101b13c0
-Matrix Multiply(const Matrix &left, const Matrix &right);                        // 0x101b10f0
+Matrix4 LookAt(Vec4 eye, Vec4 target, const Vec4 *up, int a);                   // 0x101b1c20
+Matrix4 Perspective(float nearPlane, float farPlane, float fieldOfView);          // 0x101b0c10
+Matrix4 Scaling(float x, float y, float z);                                       // 0x101b13c0
+Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);                        // 0x101b10f0
 
 // A model node, only the call used here.
 struct Node
 {
-    void QueueDraw(const Matrix *parent, const Matrix *view, const Vec4 *direction, int a, const Vec4 *colour,
+    void QueueDraw(const Matrix4 *parent, const Matrix4 *view, const Vec4 *direction, int a, const Vec4 *colour,
                    int b);                       // 0x10199e20
 };
 
@@ -34,18 +28,18 @@ struct MeshSlot
     int frame;                // 0x34: frames since it was attached
     int pad_0038;
     int ownCamera;            // 0x3c: non-zero = drawn with its own fixed camera
-    Matrix matrix;            // 0x40: placement of the model
+    Matrix4 matrix;            // 0x40: placement of the model
     char pad_0080[0xa88];
-    int Draw(const Matrix &view);                // 0x1000baf0
+    int Draw(const Matrix4 &view);                // 0x1000baf0
 };
 
 extern "C" MeshSlot DAT_10edbe08[0x40];
-extern "C" Matrix DAT_108392d8;
+extern "C" Matrix4 DAT_108392d8;
 
 // 0x1000baf0 (MeshSlot::Draw). Queues the slot's model for drawing once it is visible and its delay has passed:
 // with `view`, or with its own camera (480 units back and 120 up, looking at the origin, a 45 degree perspective from
 // 20 to 5000 units squeezed to 4:3) and an identity placement. Returns 0 for a free slot, else 1.
-int MeshSlot::Draw(const Matrix &view)
+int MeshSlot::Draw(const Matrix4 &view)
 {
     if (mesh == 0)
         return 0;
@@ -53,11 +47,11 @@ int MeshSlot::Draw(const Matrix &view)
     {
         if (ownCamera != 0)
         {
-            Matrix result;
-            Matrix unused1;
-            Matrix camera;
-            Matrix projection;
-            Matrix unused2;
+            Matrix4 result;
+            Matrix4 unused1;
+            Matrix4 camera;
+            Matrix4 projection;
+            Matrix4 unused2;
             Vec4 up;
             Vec4 target;
             Vec4 eye;
@@ -83,7 +77,7 @@ int MeshSlot::Draw(const Matrix &view)
 // Updates every used mesh slot with the world matrix DAT_108392d8. The identity matrix is unused.
 int ResetMeshSlots()
 {
-    Matrix identity;
+    Matrix4 identity;
     identity.SetIdentity();
     for (int i = 0; i < 0x40; i++)
     {

@@ -1,10 +1,6 @@
 // Destructor of the scene node body (0x18a0 bytes per node).
 
-struct Member
-{
-    float m[16];
-    ~Member();
-};
+#include "matrix4.h"
 
 struct Element
 {
@@ -15,11 +11,11 @@ struct Element
 struct NodeBody
 {
     char pad_0000[0x1cc];
-    Member m_01cc;
-    Member m_020c;
-    Member m_024c;
+    Matrix4 m_01cc;
+    Matrix4 m_020c;
+    Matrix4 m_024c;
     char pad_028c[0x48];
-    Member m_02d4[0x10];
+    Matrix4 m_02d4[0x10];
     ~NodeBody();
 };
 

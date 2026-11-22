@@ -5,13 +5,7 @@
 #include <stdlib.h>
 #include "vec4.h"
 
-// Matrix4 with the engine's empty destructor (node_bones.cpp).
-struct Matrix4
-{
-    float m[16];
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 Matrix4 TranslationMatrix(float x, float y, float z);   // 0x101b1360
 

@@ -3,11 +3,7 @@
 
 #include "vec4.h"
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 struct CharModel
 {
@@ -23,7 +19,7 @@ struct Character
     char pad_0011[0x293];
     int m_02a4;                   // 0x2a4: 1 while the character walks a route
     char pad_02a8[0x2090];
-    CharMatrix matrix;            // 0x2338: world matrix (translation at 0x2368)
+    Matrix4 matrix;            // 0x2338: world matrix (translation at 0x2368)
     int m_2378;                   // 0x2378: set to 30 while walking
     char pad_237c[0x4c];
     Vec4 m_23c8;                  // 0x23c8: zeroed while walking

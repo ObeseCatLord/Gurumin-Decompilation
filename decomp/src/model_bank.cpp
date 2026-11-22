@@ -10,13 +10,7 @@ struct Node
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    void SetIdentity();                          // 0x101ae7a0
-    void SetTranslation(Vec4 position);          // 0x101adef0
-    void Translate(float x, float y, float z);   // 0x101adec0
-};
+#include "matrix4.h"
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060 (vec4.cpp)
 // 0x101ae4d0 (View_ContainsPoint, vec4.cpp): 1 when `point` transformed by `matrix` lies inside the view volume, widened by `margin`.

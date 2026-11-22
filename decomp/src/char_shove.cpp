@@ -6,11 +6,7 @@
 
 #include "vec4.h"
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 struct CharModel
 {
@@ -23,7 +19,7 @@ struct Character
     char pad_0000[0x10];
     CharModel model;              // 0x10
     char pad_0011[0x2327];
-    CharMatrix matrix;            // 0x2338: world matrix (translation at 0x2368)
+    Matrix4 matrix;            // 0x2338: world matrix (translation at 0x2368)
     char pad_2378[0x118];
     float targetHeading;          // 0x2490: angle the character turns towards
     char pad_2494[8];

@@ -5,12 +5,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();
-    void SetTranslation(Vec4 position);  // 0x101adef0
-};
+#include "matrix4.h"
 
 // 0x101ae060: transforms `point` by `matrix` and divides by w (projection to -1..1 screen space).
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);

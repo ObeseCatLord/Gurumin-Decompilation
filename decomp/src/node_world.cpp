@@ -2,13 +2,7 @@
 // world matrix. Matrix4 has the engine's constructor and empty destructor, so the matrix temporaries get an
 // exception frame.
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                   // 0x101ae770
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    Matrix4 operator*(const Matrix4 &other);     // 0x101b0670: matrix product
-};
+#include "matrix4.h"
 
 // A node's animation data (node_extra.cpp NodeExtra).
 struct NodeExtra

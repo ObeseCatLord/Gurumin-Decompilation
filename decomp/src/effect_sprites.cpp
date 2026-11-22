@@ -3,10 +3,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-};
+#include "matrix4.h"
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 

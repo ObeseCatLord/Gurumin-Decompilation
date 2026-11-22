@@ -1,11 +1,6 @@
 // Scene node constructor.
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();
-    ~Matrix4();
-};
+#include "matrix4.h"
 
 #include "vec4.h"
 

@@ -3,12 +3,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    ~Matrix4();                                      // 0x1013eda0 (empty)
-    Vec4 GetTranslation();                           // 0x101ade80
-};
+#include "matrix4.h"
 
 struct NodeExtra
 {

@@ -3,12 +3,7 @@
 
 #include "vec4.h"
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-    void SetTranslation(Vec4 position);          // 0x101adef0
-};
+#include "matrix4.h"
 
 struct CharRecord
 {
@@ -16,9 +11,9 @@ struct CharRecord
     char pad_0000[0x267];
     char m_0267;              // 0x267: 1 while an NPC idles (char_move.cpp)
     char pad_0268[0x20c0];
-    CharMatrix matrix;        // 0x2328: world matrix
+    Matrix4 matrix;        // 0x2328: world matrix
     char pad_2368[0xcc];
-    CharMatrix m_2434;        // 0x2434: a second matrix that receives the ground position
+    Matrix4 m_2434;        // 0x2434: a second matrix that receives the ground position
     char pad_2474[0x28];
 };
 

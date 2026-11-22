@@ -45,12 +45,7 @@ AnimChannels::AnimChannels()
 {
 }
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();
-    ~Matrix4();
-};
+#include "matrix4.h"
 
 // Declared throw(): the original leaves out the EH state update before this constructor, so its compiler knew it
 // cannot throw (most likely because the constructor was defined in the same file, see NOTES.md).

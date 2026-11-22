@@ -2,25 +2,16 @@
 // its children draw, then the node's draw callback runs. The thirteen draw arguments after the view matrix are passed
 // through unchanged (to MeshData::Draw, the children and the callback).
 
-struct Matrix4
-{
-    float m[16];
-};
+#include "matrix4.h"
 
 #include "vec4.h"
-
-struct NodeMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
 
 struct MeshData
 {
     int SetRange(int first, int last);           // 0x10146d90 (SlotTable::M_10146d90)
     void UploadBones(Matrix4 *bones, int count, Matrix4 *world, int view);   // 0x10145a50
     // 0x10151150: draws the mesh with the world matrix and the pass-through arguments.
-    int Draw(NodeMatrix *world, const Matrix4 *view, int a4, int a0a0, int a5, int a6, int a7, int a8, int a9,
+    int Draw(Matrix4 *world, const Matrix4 *view, int a4, int a0a0, int a5, int a6, int a7, int a8, int a9,
              int a10, int a11, int a12, int a14);
 };
 
@@ -32,7 +23,7 @@ struct NodeSkin
     int boneCount;            // 0x5618
 };
 
-typedef void (*NodeDrawCallback)(NodeMatrix *world, const Matrix4 *view, int a3, int a4, int a5, int a6, int a7,
+typedef void (*NodeDrawCallback)(Matrix4 *world, const Matrix4 *view, int a3, int a4, int a5, int a6, int a7,
                                  int a8, int a9, int a10, int a11, int a12, int a13, int a14);
 
 struct Node
@@ -49,7 +40,7 @@ struct Node
                               // 0x8000 = skip the subtree
     float cullMargin;         // 0x0b0: margin of the view-volume test
     char pad_00b4[0x198];
-    NodeMatrix world;         // 0x24c: world matrix
+    Matrix4 world;         // 0x24c: world matrix
     char pad_028c[0x448];
     Vec4 boundsCentre;        // 0x6d4
     char pad_06e4[0x24];

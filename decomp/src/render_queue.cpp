@@ -3,10 +3,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-};
+#include "matrix4.h"
 
 struct Block80
 {

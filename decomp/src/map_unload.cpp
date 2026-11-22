@@ -6,11 +6,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    void SetIdentity();                          // 0x101ae7a0
-};
+#include "matrix4.h"
 
 struct Node
 {

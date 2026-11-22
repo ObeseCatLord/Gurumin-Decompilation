@@ -3,11 +3,7 @@
 
 #include "vec4.h"
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 struct CharRecord
 {
@@ -19,7 +15,7 @@ struct CharRecord
     int m_0288;               // 0x288: set to 6 when destroyed
     int m_028c;               // 0x28c: cleared when destroyed
     char pad_0290[0x2098];
-    CharMatrix matrix;        // 0x2328: world matrix
+    Matrix4 matrix;        // 0x2328: world matrix
     char pad_2368[0x118];
     float targetHeading;      // 0x2480: angle the character turns towards
     char pad_2484[0x18];

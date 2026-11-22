@@ -11,19 +11,13 @@
 
 #include "vec4.h"
 
-struct Matrix
-{
-    float m[16];
-    Vec4 GetTranslation();  // 0x101ade80
-    Matrix();               // 0x101ae770
-    ~Matrix();              // 0x1013eda0 (empty)
-};
+#include "matrix4.h"
 
 struct NodeSaved
 {
     char pad_0000[0x20];
     int m_0020;
-    Matrix matrix;
+    Matrix4 matrix;
     char pad_0064[0x34];
     int m_0098[8];
     int m_00b8;
@@ -59,14 +53,14 @@ struct GlyphState
 {
     char pad_0000[0x84];
     char parentName[0x40];      // 0x84: name of the node this one is bound to
-    Matrix m_00c4;
+    Matrix4 m_00c4;
     int pad_0104;
     char linkNames[0x40][0x40]; // 0x108: names of the linked nodes
     Node *links[0x40];          // 0x1108: nodes this skinned node depends on (m_5618 of them)
     Node *bones[0x44];
     char boneNames[0x44][0x40]; // 0x1318: names of the bones
-    Matrix bindPose[0x44];
-    Matrix m_3518[0x44];
+    Matrix4 bindPose[0x44];
+    Matrix4 m_3518[0x44];
     char pad_4618[0x1000];
     int m_5618;
     void Clear();               // 0x10166810: empties the skin data
@@ -116,7 +110,7 @@ struct Extra
     KeyTrack tracks[5];          // 0x00
     char pad_0064[0xc];
     int m_0070[4];               // 0x70
-    Matrix AnimatedMatrix(int frame);            // 0x101693f0 (node_extra.cpp)
+    Matrix4 AnimatedMatrix(int frame);            // 0x101693f0 (node_extra.cpp)
     void M_10169660();
     void M_10169620();           // 0x10169620 (SlotLists::Clear): frees the extra data's lists
 };
@@ -158,7 +152,7 @@ struct IndexList
 
 struct KeyPair;
 
-Matrix InverseMatrix(const Matrix &matrix);      // 0x101b0d40 (node_bones.cpp)
+Matrix4 InverseMatrix(const Matrix4 &matrix);      // 0x101b0d40 (node_bones.cpp)
 
 struct Node
 {
@@ -197,12 +191,12 @@ struct Node
     int m_01c0;
     int m_01c4;
     int m_01c8;
-    Matrix matrix;
-    Matrix inverseMatrix;        // 0x20c: inverse of `matrix`
-    Matrix worldMatrix;          // 0x24c: the node's matrix in world space
+    Matrix4 matrix;
+    Matrix4 inverseMatrix;        // 0x20c: inverse of `matrix`
+    Matrix4 worldMatrix;          // 0x24c: the node's matrix in world space
 
     struct TextureRef *m_028c;
-    Matrix *frames;              // 0x290: the node's matrix for each animation frame
+    Matrix4 *frames;              // 0x290: the node's matrix for each animation frame
     int m_0294;                  // 0x294: number of frames
     char pad_0298[0x10];
     struct Extra *m_02a8;
@@ -210,7 +204,7 @@ struct Node
     int frame;                   // 0x2cc: current animation frame (-1, -2, ...: a stored pose)
     unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
     char pad_02d1[3];
-    Matrix poses[16];            // 0x2d4: the current pose ([0]) and stored poses
+    Matrix4 poses[16];            // 0x2d4: the current pose ([0]) and stored poses
     Vec4 bounds[3];              // 0x6d4: bounding sphere (w = radius) and the two box corners
     char m_0704;
     char pad_0705[3];
@@ -267,8 +261,8 @@ struct Node
     void M_10191dd0();
     void M_10191e10();
     int M_101944d0();
-    int M_10194f40(float *position, Matrix *matrix, int a, float radius, int b, int depth);
-    int StartProximityPass(float *position, Matrix *matrix, int a, float radius, int b);
+    int M_10194f40(float *position, Matrix4 *matrix, int a, float radius, int b, int depth);
+    int StartProximityPass(float *position, Matrix4 *matrix, int a, float radius, int b);
     int ReleaseSavedStates();
     // Puts the saved matrix back when the saved block holds one, and marks the block empty.
     void RestoreSavedMatrix()
@@ -334,9 +328,8 @@ struct Node
     void ReleaseUniqueMeshData();
     void CollectStatic(Node *collector);
     int Rename(const char *newName, const char *oldName);
-    int TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix *matrix);
+    int TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix4 *matrix);
 };
-
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" void (*DAT_11b1ba40)(void *);
@@ -416,11 +409,10 @@ int Node::M_101944d0()
     return 1;
 }
 
-
 // Starts a proximity pass over the subtree: clears m_00a8 everywhere, remembers `radius` and runs the recursive
 // pass M_10194f40 from depth 0. Returns 1. (It sits here, after M_101944d0, because the compiler keeps `this` in
 // edx across that call only when it can see M_101944d0's body.)
-int Node::StartProximityPass(float *position, Matrix *matrix, int a, float radius, int b)
+int Node::StartProximityPass(float *position, Matrix4 *matrix, int a, float radius, int b)
 {
     M_101944d0();
     DAT_11b044f8 = radius;
@@ -804,7 +796,6 @@ int Node::M_1019ed10(const char *name, int value)
         return FindPrefixRecursiveStripped(name + 1, &result);
     return FindRecursiveStripped(name, &result);
 }
-
 
 // Runs the special pass marking (M_1019d600) and the follow-up pass (ClearSpecialPassOnLinks).
 int Node::M_101a8760()
@@ -1560,7 +1551,7 @@ void Node::MakeNameUnique()
 // 0x10199cd0. Finds the first of the 64 regions (`boxes`, with names in `names`; an empty name = unused) that
 // contains the position of `matrix`, or of this node when `matrix` is 0, and prefixes this node's name with
 // "CDL<region>-". Returns 1 when a region was found, else 0.
-int Node::TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix *matrix)
+int Node::TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix4 *matrix)
 {
     char tagged[256];
     int i;
@@ -1889,7 +1880,7 @@ copyMaterials:
 }
 
 // 0x101b1420: `out` = a blended towards b by t (mode 1: rotation interpolated for skeleton roots).
-Matrix *MatrixBlend(Matrix *out, Matrix a, Matrix b, float t, int mode);
+Matrix4 *MatrixBlend(Matrix4 *out, Matrix4 a, Matrix4 b, float t, int mode);
 
 // 0x1019b630. Sets the current pose of this node and its subtree to frame `from` (a stored pose for -1, -2, ...)
 // blended towards frame `to` by `t`. The skeleton root "Bip01" (when DAT_11b04508 is set) and "charbase..." nodes
@@ -1939,7 +1930,7 @@ int Node::BlendFrames(int from, int to, float t)
 }
 
 extern "C" TextureRef *DAT_10fdf1d0[];                // per motion cache slot: the reference
-extern "C" Matrix *DAT_1101c820[];                    //   the frame matrices
+extern "C" Matrix4 *DAT_1101c820[];                    //   the frame matrices
 extern "C" int DAT_11017600[];                        //   the number of frames
 extern "C" int FUN_10169ab0(const char *folder, const char *name, int *freeSlot);  // motion name slot, -1 = none
 extern "C" int FUN_101699d0(void);                   // a free motion name slot
@@ -1952,7 +1943,7 @@ extern "C" int FUN_101699f0(int slot, const char *folder, const char *name);    
 // kept in poses[15]. Returns 0.
 int Node::CopyAnimation(Node *source, int slot)
 {
-    Matrix current;
+    Matrix4 current;
     if (source != 0)
     {
         if (frame < 0)
@@ -2035,7 +2026,7 @@ int Node::CopyAnimation(Node *source, int slot)
         }
         m_028c = (TextureRef *)DAT_11b0b938(4, "motion");
         m_0294 = source->m_0294;
-        frames = (Matrix *)DAT_11b0b938(source->m_0294 << 6, "tmp[i]->m_animat");
+        frames = (Matrix4 *)DAT_11b0b938(source->m_0294 << 6, "tmp[i]->m_animat");
         memcpy(frames, source->frames, source->m_0294 << 6);
         m_028c->slot = motionSlot;
         if (motionSlot >= 0)

@@ -2,12 +2,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                         // 0x101ae770
-    ~Matrix4();                                        // 0x1013eda0 (empty, shared with other empty destructors)
-};
+#include "matrix4.h"
 
 // Key-frame bank (containers.cpp); it has a destructor, so constructing it opens an EH state.
 struct KeyBank

@@ -5,11 +5,7 @@
 
 #include "vec4.h"
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 // Motion playback state of a model (world.h MotionState).
 struct MotionState
@@ -26,7 +22,7 @@ struct CharRecord
     char pad_0000[0x298];
     MotionState *motion;      // 0x298: the model's motion playback state
     char pad_029c[0x208c];
-    CharMatrix matrix;        // 0x2328: world matrix
+    Matrix4 matrix;        // 0x2328: world matrix
     char pad_2368[0x118];
     float targetHeading;      // 0x2480: angle the character turns towards
     char pad_2484[0x14];

@@ -5,11 +5,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];             // m[12], m[13], m[14]: the position
-    Vec4 GetTranslation();   // 0x101ade80
-};
+#include "matrix4.h"
 
 // A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
 struct CharRecord

@@ -420,3 +420,18 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - `char_params.h` `ParamVector::operator=` sits at 0x101acc20 (Vec4::Copy), and the implicit copy assignment
   0x100357a0 calls it per member. This suggests Vec4::Copy is really `Vec4 &operator=(const Vec4 &)`. Unconfirmed,
   because no source file uses ParamVector yet.
+
+## 2026-11-22: one shared Matrix4 (include/matrix4.h)
+- `include/matrix4.h` replaced every per-file `Matrix4`/`Matrix`/`CharMatrix`/`NodeMatrix` copy (77 files plus
+  `world.h`) with no codegen change, including about 45 files whose copies had no constructor or destructor: giving
+  them `Matrix4()` (0x101ae770) and `~Matrix4()` (0x1013eda0) changed nothing, because they only use matrices through
+  pointers, references and members of records they never construct.
+- `SetTranslation` takes the `Vec4` its callers pass by value (16 bytes on the stack, the same as four floats); the
+  definer in containers.cpp matches with either spelling. `SetPosition(x, y, z)` at 0x101adec0 in map_view.cpp is
+  `Translate`.
+- A class with a constructor cannot sit in a union (C2620), so the `Character` position union in world.h (and the
+  one in pushing_platform.cpp) became plain `Matrix4 matrix`, and the position is `matrix._41/_42/_43` through the
+  D3DMATRIX-style element names the header adds beside `m[16]`. The camera list `DAT_1032d5b8` stores `Vec3 *`, so
+  `&matrix._41` is cast there until Vec3 is shared.
+- `node_dtor.cpp` `NodeBody::~NodeBody` destroys Matrix4 members with the shared empty destructor; its other member
+  type `Element` (float v[4] with an out-of-line destructor) looks like Vec4 with an empty destructor. Unconfirmed.

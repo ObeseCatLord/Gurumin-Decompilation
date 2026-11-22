@@ -2,12 +2,7 @@
 // has the engine's constructor and empty destructor, like in node_bones.cpp, because IdentityMatrix() returns a
 // temporary.
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();    // 0x101ae770
-    ~Matrix4();   // 0x1013eda0 (empty)
-};
+#include "matrix4.h"
 
 Matrix4 IdentityMatrix();  // 0x101b0ba0
 

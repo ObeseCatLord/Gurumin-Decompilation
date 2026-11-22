@@ -7,13 +7,7 @@
 
 #include "vec4.h"
 
-// Matrix4 with the engine's empty destructor (node_bones.cpp).
-struct Matrix4
-{
-    float m[16];
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    void SetIdentity();                          // 0x101ae7a0
-};
+#include "matrix4.h"
 
 Matrix4 IdentityMatrix();                        // 0x101b0ba0
 
@@ -1376,5 +1370,4 @@ extern "C" void FUN_1003e710(void)
   memset(DAT_1032d67c, 0, sizeof(DAT_1032d67c));
   DAT_1032d4b0 = 0;
 }
-
 

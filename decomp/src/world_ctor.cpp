@@ -7,13 +7,7 @@
 
 #include "vec4.h"
 
-// Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                       // 0x101ae770
-    ~Matrix4();                                      // 0x1013eda0 (empty)
-};
+#include "matrix4.h"
 
 // A fixed key-frame bank (vec4.cpp KeyBank), 0xa84 bytes.
 struct KeyBank

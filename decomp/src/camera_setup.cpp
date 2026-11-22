@@ -3,14 +3,7 @@
 
 #include "vec4.h"
 
-// Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                      // 0x101ae770
-    ~Matrix4();                                     // 0x1013eda0 (empty)
-    Matrix4 operator*(const Matrix4 &other);        // 0x101b0670: matrix product
-};
+#include "matrix4.h"
 
 Matrix4 ScaleMatrix(float x, float y, float z);                              // 0x101b13c0
 Matrix4 PerspectiveMatrix(float nearPlane, float farPlane, float fov);       // 0x101b0c10

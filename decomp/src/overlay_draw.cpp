@@ -4,15 +4,7 @@
 
 #include "vec4.h"
 
-// Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                   // 0x101ae770
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    void SetIdentity();                          // 0x101ae7a0
-    Matrix4 operator*(const Matrix4 &other);     // 0x101b0670: matrix product
-};
+#include "matrix4.h"
 
 // A model node tree (scene_node.cpp Node).
 struct OverlayModel

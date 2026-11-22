@@ -5,15 +5,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];             // m[12], m[13], m[14]: the position
-    Matrix4();                                   // 0x101ae770
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    void SetIdentity();                          // 0x101ae7a0
-    void SetTranslation(Vec4 position);          // 0x101adef0
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 struct EffectOptions;
 

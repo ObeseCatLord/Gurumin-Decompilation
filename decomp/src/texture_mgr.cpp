@@ -27,12 +27,7 @@ struct ZeroVec
     ZeroVec();
 };
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();
-    ~Matrix4();  // 0x1013eda0 (empty)
-};
+#include "matrix4.h"
 
 struct Transform
 {

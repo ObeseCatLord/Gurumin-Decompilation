@@ -4,21 +4,15 @@
 #include <math.h>
 #include "vec4.h"
 
-struct NodeMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-    void SetIdentity();                          // 0x101ae7a0
-    void SetTranslation(Vec4 position);          // 0x101adef0
-};
+#include "matrix4.h"
 
 // A scene node (scene_node.cpp Node), only what is used here.
 struct Node
 {
     char pad_0000[0x1cc];
-    NodeMatrix local;         // 0x1cc: matrix relative to the parent
+    Matrix4 local;         // 0x1cc: matrix relative to the parent
     char pad_020c[0x40];
-    NodeMatrix world;         // 0x24c
+    Matrix4 world;         // 0x24c
     char pad_028c[0x4c0];
     Node *parent;             // 0x74c
     Node *Find(const char *name, int index);     // 0x1019ece0
@@ -30,8 +24,8 @@ struct EffectOptions;
 
 struct EffectManager
 {
-    int Start(int effect, Vec4 position, int parent, int unused, const NodeMatrix *owner, int value, int frame,
-              const NodeMatrix *matrix, const EffectOptions *options, int *pause);  // 0x10172350
+    int Start(int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame,
+              const Matrix4 *matrix, const EffectOptions *options, int *pause);  // 0x10172350
 };
 
 extern "C" Vec4 DAT_118e6cb8;     // camera target
@@ -52,7 +46,7 @@ extern "C" Node *DAT_10255f08;     // the map's root node
 extern "C" EffectManager DAT_10daaa80;
 extern "C" int DAT_1020b430[0x80][16];        // character 0's state: [3] counts the frames of this shot
 extern "C" Node *DAT_1021bdf8[0x80][9];       // character 0: [0] = the stand's parent node
-extern "C" NodeMatrix DAT_10868838[0x80][6];  // character 0: [0] = the matrix the sparkle follows
+extern "C" Matrix4 DAT_10868838[0x80][6];  // character 0: [0] = the matrix the sparkle follows
 extern "C" int DAT_10c6356c;      // the shot's point as integers (z + 115)
 extern "C" int DAT_10c63570;
 extern "C" int DAT_10c63574;
@@ -158,7 +152,6 @@ extern "C" int FUN_10018fb0(void)
     return 0;
 }
 
-
 extern "C" Vec4 DAT_108393d8;     // the point the camera orbits (w: its heading)
 extern "C" Vec4 DAT_10da93f0;     // the orbit centre (the player's position)
 extern "C" Node *DAT_1021c624;    // a node the target goal drifts towards (0 = none)
@@ -215,7 +208,7 @@ struct CharRecord
     char pad_0000[0x22f4];
     Node *head;               // 0x22f4: the model's head node (0 = none)
     char pad_22f8[0x30];
-    NodeMatrix matrix;        // 0x2328: world matrix
+    Matrix4 matrix;        // 0x2328: world matrix
     char pad_2368[0x114];
     float heading;            // 0x247c: facing angle in radians
     char pad_2480[0x1c];

@@ -7,12 +7,7 @@
 #include <string.h>
 #include "vec4.h"
 
-
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();                           // 0x101ade80
-};
+#include "matrix4.h"
 
 // A key track (vec4.cpp KeyTrack), 0x14 bytes: its frames are sorted, so the last one is the length.
 struct KeyTrack

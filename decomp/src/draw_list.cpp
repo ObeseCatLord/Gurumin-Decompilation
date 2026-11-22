@@ -1,10 +1,7 @@
 // The deferred draw list: nodes queued during the scene walk (with their pass, colour and extra parameters) and drawn
 // later pass by pass.
 
-struct Matrix4
-{
-    float m[16];
-};
+#include "matrix4.h"
 
 #include "vec4.h"
 

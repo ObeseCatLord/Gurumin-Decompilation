@@ -4,13 +4,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                   // 0x101ae770
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    Matrix4 operator*(const Matrix4 &other);     // 0x101b0670: matrix product
-};
+#include "matrix4.h"
 
 Matrix4 ScaleMatrix(float x, float y, float z);         // 0x101b13c0
 Matrix4 RotationMatrix(const Vec4 &quaternion);         // 0x101b08c0

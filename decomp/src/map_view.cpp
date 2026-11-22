@@ -3,16 +3,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                   // 0x101ae770
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    void SetIdentity();                          // 0x101ae7a0
-    void SetTranslation(Vec4 position);          // 0x101adef0
-    void SetPosition(float x, float y, float z);    // 0x101adec0
-    Matrix4 operator*(const Matrix4 &other);     // 0x101b0670: matrix product
-};
+#include "matrix4.h"
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 Matrix4 LookAt(Vec4 eye, Vec4 target, const Vec4 *up, int a);        // 0x101b1c20
@@ -88,7 +79,7 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
     Matrix4 projection;
     view = map->local;
     DAT_104bfe24 = map->boundsMin.z;
-    view.SetPosition(0, 0, (map->boundsMax.z + map->boundsMin.z) * 0.5f);
+    view.Translate(0, 0, (map->boundsMax.z + map->boundsMin.z) * 0.5f);
     projection.SetIdentity();
     projection.m[14] = view.m[14] + view.m[14];
     DAT_10f65594 = view.m[14];

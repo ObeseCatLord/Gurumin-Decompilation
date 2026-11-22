@@ -4,16 +4,12 @@
 
 #include "vec4.h"
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 // Character record viewed from its world matrix (0x10db6ee8 + 0x2328), 0x249c bytes.
 struct CharMatrixView
 {
-    CharMatrix matrix;
+    Matrix4 matrix;
     char pad_0040[0x249c - 0x40];
 };
 

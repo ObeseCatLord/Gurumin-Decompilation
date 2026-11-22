@@ -11,11 +11,7 @@ struct Vec3
     float z;
 };
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 struct AnimModel
 {
@@ -36,15 +32,7 @@ struct Character
     char pad_0011[0x22eb];
     RootNode *root;               // 0x22fc
     char pad_2300[0x38];
-    union
-    {
-        CharMatrix matrix;        // 0x2338: world matrix
-        struct
-        {
-            char pad_matrix[0x30];
-            Vec3 position;        // 0x2368: the matrix translation
-        };
-    };
+    Matrix4 matrix;               // 0x2338: world matrix; matrix._41/_42/_43 (0x2368) is the position
     char pad_2378[0x40];
     Vec4 move;                    // 0x23b8: the move of this frame
     char pad_23c8[0xd4];
@@ -91,11 +79,12 @@ extern "C" int FUN_1002a490(int index)
 {
     if (DAT_1020b430[index].state == 0)
     {
-        DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ed8[index].position;
+        // the camera list holds Vec3 pointers; the matrix's translation row (_41, _42, _43) is the position
+        DAT_1032d5b8[DAT_1049f0f0] = (Vec3 *)&DAT_10db6ed8[index].matrix._41;
         DAT_1021bbc0[DAT_1049f0f0] = 0;
         DAT_1049f0f0++;
         DAT_1020b430[index].state = 1;
-        DAT_10db6ed8[index].model.SetPosition(DAT_10db6ed8[index].position.x, DAT_10db6ed8[index].position.y,
+        DAT_10db6ed8[index].model.SetPosition(DAT_10db6ed8[index].matrix._41, DAT_10db6ed8[index].matrix._42,
                                               5000.0f);
         DAT_10db6ed8[index].root->M_10194730(0x41, 0x200);
         DAT_10db6ed8[index].root->M_10194730(0x41, 0x400);
@@ -105,12 +94,12 @@ extern "C" int FUN_1002a490(int index)
         if (DAT_10db0544 < DAT_10db0548 / 2)
         {
             DAT_1020b430[index].state = 2;
-            DAT_10db6ed8[index].model.SetPosition(DAT_10db6ed8[index].position.x, DAT_10db6ed8[index].position.y,
+            DAT_10db6ed8[index].model.SetPosition(DAT_10db6ed8[index].matrix._41, DAT_10db6ed8[index].matrix._42,
                                                   -2000.0f);
         }
     }
-    else if (DAT_10db6ed8[index].position.z < -120.0f)
-        DAT_10db6ed8[index].position.z += 5.0f;
+    else if (DAT_10db6ed8[index].matrix._43 < -120.0f)
+        DAT_10db6ed8[index].matrix._43 += 5.0f;
     else
     {
         Vec4 player;
@@ -125,17 +114,17 @@ extern "C" int FUN_1002a490(int index)
             away.x = 1.0f;
         if (DAT_10db9380[0].locked == 2 &&
             DAT_10db6ed8[index].model.IsClearAny(&(DAT_10db6ed8[0].move * -1.0f)) == 0 &&
-            DAT_10db9380[0].locked == 2 && DAT_10db6ed8[0].position.z > -140.0f)
+            DAT_10db9380[0].locked == 2 && DAT_10db6ed8[0].matrix._43 > -140.0f)
         {
             // standing on the block: lifted onto it and moved outwards
-            DAT_10db6ed8[0].position.z = block.z + 12.0f;
-            DAT_10db6ed8[0].position.x = away.x * 3.0f + DAT_10db6ed8[0].position.x;
-            DAT_10db6ed8[0].position.y = away.y * 3.0f + DAT_10db6ed8[0].position.y;
+            DAT_10db6ed8[0].matrix._43 = block.z + 12.0f;
+            DAT_10db6ed8[0].matrix._41 = away.x * 3.0f + DAT_10db6ed8[0].matrix._41;
+            DAT_10db6ed8[0].matrix._42 = away.y * 3.0f + DAT_10db6ed8[0].matrix._42;
         }
         else if (DAT_10db6ed8[index].model.IsClearAny(0) == 0)
         {
-            DAT_10db6ed8[0].position.x = DAT_10db6ed8[0].position.x - away.x * 10.0f;
-            DAT_10db6ed8[0].position.y = DAT_10db6ed8[0].position.y - away.y * 10.0f;
+            DAT_10db6ed8[0].matrix._41 = DAT_10db6ed8[0].matrix._41 - away.x * 10.0f;
+            DAT_10db6ed8[0].matrix._42 = DAT_10db6ed8[0].matrix._42 - away.y * 10.0f;
         }
     }
     DAT_10802bf8[index].position.Copy(DAT_10db6ed8[index].matrix.GetTranslation());

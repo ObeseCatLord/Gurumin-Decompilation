@@ -3,11 +3,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();  // 0x101ade80
-};
+#include "matrix4.h"
 
 // Effect manager (0x10daaa80, char_effects.cpp); M_10184170 clears all running effects.
 struct EffectManager

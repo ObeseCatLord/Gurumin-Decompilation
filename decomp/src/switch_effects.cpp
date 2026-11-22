@@ -13,11 +13,7 @@ struct ModelState
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 // A map object that can be held as a switch.
 struct SwitchObject

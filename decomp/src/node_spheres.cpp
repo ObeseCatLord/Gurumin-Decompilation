@@ -3,11 +3,7 @@
 
 #include "vec4.h"
 
-struct Matrix
-{
-    float m[16];
-    Vec4 GetTranslation();    // 0x101ade80
-};
+#include "matrix4.h"
 
 struct Node
 {
@@ -15,7 +11,7 @@ struct Node
     int m_00a8;               // 0xa8: non-zero when the node has collision
     unsigned int flags;       // 0xac: 0x400 = test this node itself, not its children
     char pad_00b0[0x19c];
-    Matrix worldMatrix;       // 0x24c
+    Matrix4 worldMatrix;       // 0x24c
     char pad_028c[0x448];
     Vec4 bounds;              // 0x6d4: bounding sphere (centre relative to the node, radius in w)
     char pad_06e4[0x20];

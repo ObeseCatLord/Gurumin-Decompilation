@@ -4,13 +4,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                       // 0x101ae770
-    ~Matrix4();                                      // 0x1013eda0 (empty)
-    Vec4 GetTranslation();                           // 0x101ade80
-};
+#include "matrix4.h"
 
 Matrix4 RotationZ(float angle);                      // 0x101b1b40
 

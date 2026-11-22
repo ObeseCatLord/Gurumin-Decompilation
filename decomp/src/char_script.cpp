@@ -10,18 +10,14 @@ struct Vec3
     float z;
 };
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();  // 0x101ade80
-};
+#include "matrix4.h"
 
 struct CharRecord
 {
     char pad_0000[0xd4c];
     float alpha;              // 0xd4c: model opacity (Character::m_0d5c)
     char pad_0d50[0x15d8];
-    CharMatrix matrix;        // 0x2328: world matrix
+    Matrix4 matrix;        // 0x2328: world matrix
     Vec3 position;            // 0x2358: the matrix translation
     char pad_2364[0x134];
     int m_2498;               // 0x2498

@@ -4,11 +4,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();                           // 0x101ade80
-};
+#include "matrix4.h"
 
 // A ground object with a height map (only the fields used here).
 struct GroundObject

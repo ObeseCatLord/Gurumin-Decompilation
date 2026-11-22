@@ -67,15 +67,11 @@ extern "C" int FUN_100165e0(int mode)
 // The look-around target point and the player's position and heading.
 #include "vec4.h"
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();      // 0x101ade80
-};
+#include "matrix4.h"
 
 extern "C" Vec4 DAT_10802ac8;          // where the player's head looks
 extern "C" int DAT_10c6358c;           // look-around step: 0..9 = one side, -1..-9 = the other side
-extern "C" CharMatrix DAT_10db9210;    // the player's world matrix (character 0)
+extern "C" Matrix4 DAT_10db9210;    // the player's world matrix (character 0)
 extern "C" float DAT_10db9364;         // the player's heading (character 0)
 
 // 0x10019210 (Player_LookAround). Moves the head-look target to a point 1000 units to one side of the player and

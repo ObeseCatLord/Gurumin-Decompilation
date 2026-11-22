@@ -23,10 +23,7 @@ struct CharModel
     void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
 };
 
-struct Matrix4
-{
-    float m[16];
-};
+#include "matrix4.h"
 
 // A character record (world.h Character), only the fields used here.
 struct Character

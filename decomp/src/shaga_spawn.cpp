@@ -6,14 +6,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                   // 0x101ae770
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    void SetTranslation(Vec4 position);          // 0x101adef0
-    Matrix4 operator*(const Matrix4 &other);     // 0x101b0670: matrix product
-};
+#include "matrix4.h"
 
 Matrix4 RotationX(float angle);                  // 0x101b1ad0
 Matrix4 RotationZ(float angle);                  // 0x101b1b40

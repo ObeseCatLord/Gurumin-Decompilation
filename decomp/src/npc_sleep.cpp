@@ -6,11 +6,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 // A model's motion playback state (model_state.cpp Playback), only the fields used here.
 struct Playback

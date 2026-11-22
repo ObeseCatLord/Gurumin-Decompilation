@@ -1,13 +1,7 @@
 // Bone lookups in a model's node tree. Matrix4 here has the engine's constructor and (empty) destructor, so
 // functions that hold matrices by value get an exception frame and need C++ linkage.
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();    // 0x101ae770
-    ~Matrix4();   // 0x1013eda0 (empty)
-    Matrix4 operator*(const Matrix4 &other);   // 0x101b0670: matrix product
-};
+#include "matrix4.h"
 
 Matrix4 IdentityMatrix();  // 0x101b0ba0
 

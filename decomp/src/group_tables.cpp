@@ -15,10 +15,7 @@ extern "C" Formation DAT_1049efdc[6];
 extern "C" int DAT_1042dea8[0x5c];  // per-character group numbers (characters 0..0x5b)
 extern "C" int DAT_102199b8[0x5c];  // per-character group timers
 
-struct Matrix4
-{
-    float m[16];  // row-major; m[12], m[13], m[14] = translation
-};
+#include "matrix4.h"
 
 extern "C" int DAT_102108d0[6];       // owner of each attached matrix (0 = free)
 extern "C" Matrix4 DAT_10f08880[6];   // attached matrices

@@ -5,16 +5,7 @@
 #include <string.h>
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];             // m[12], m[13], m[14]: the position
-    Matrix4();                                   // 0x101ae770
-    ~Matrix4();                                  // 0x1013eda0 (empty)
-    void SetIdentity();                          // 0x101ae7a0
-    void SetTranslation(Vec4 position);          // 0x101adef0
-    Vec4 GetTranslation();                       // 0x101ade80
-    Matrix4 operator*(const Matrix4 &other);     // 0x101b0670: matrix product
-};
+#include "matrix4.h"
 
 // A model's motion playback state (model_state.cpp Playback), only the fields used here.
 struct Playback

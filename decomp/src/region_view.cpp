@@ -5,10 +5,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-};
+#include "matrix4.h"
 
 // A vertex of a region's water surface, 0x70 bytes (only its position is used here).
 struct RegionVertex

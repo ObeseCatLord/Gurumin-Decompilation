@@ -5,17 +5,13 @@
 
 #include "vec4.h"
 
-struct CharMatrix
-{
-    float m[16];
-    Vec4 GetTranslation();                       // 0x101ade80
-};
+#include "matrix4.h"
 
 // A character record (world.h Character), only its world matrix.
 struct Character
 {
     char pad_0000[0x2338];
-    CharMatrix matrix;            // 0x2338
+    Matrix4 matrix;            // 0x2338
     char pad_2378[0x124];
 };
 

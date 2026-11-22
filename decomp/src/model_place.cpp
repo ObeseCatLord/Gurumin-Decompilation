@@ -4,13 +4,7 @@
 
 #include "vec4.h"
 
-struct Matrix4
-{
-    float m[16];
-    Matrix4();                                      // 0x101ae770
-    ~Matrix4();                                     // 0x1013eda0 (empty)
-    void SetTranslation(Vec4 position);             // 0x101adef0
-};
+#include "matrix4.h"
 
 Matrix4 IdentityMatrix();                           // 0x101b0ba0
 

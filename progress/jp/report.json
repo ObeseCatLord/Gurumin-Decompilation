@@ -8653,7 +8653,7 @@
    ],
    "functions": [
     {
-     "name": "?Draw@MeshSlot@@QAEHABUMatrix@@@Z",
+     "name": "?Draw@MeshSlot@@QAEHABUMatrix4@@@Z",
      "size": "794",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12091,7 +12091,7 @@
      }
     },
     {
-     "name": "?StartProximityPass@Node@@QAEHPAMPAUMatrix@@HMH@Z",
+     "name": "?StartProximityPass@Node@@QAEHPAMPAUMatrix4@@HMH@Z",
      "size": "54",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12531,7 +12531,7 @@
      }
     },
     {
-     "name": "?TagRegion@Node@@QAEHPBUBox2@@PAY0EA@$$CBDPAUMatrix@@@Z",
+     "name": "?TagRegion@Node@@QAEHPBUBox2@@PAY0EA@$$CBDPAUMatrix4@@@Z",
      "size": "235",
      "fuzzy_match_percent": 100.0,
      "metadata": {

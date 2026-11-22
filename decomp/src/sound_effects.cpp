@@ -2,12 +2,7 @@
 
 #include <stdio.h>
 
-struct Vec3
-{
-    float x;
-    float y;
-    float z;
-};
+#include "vec3.h"
 
 extern "C" int DAT_104bfe6c;     // non-zero in the mode where only positional sounds are turned down
 extern "C" int DAT_104c01b0;     // non-zero = sound effects off

@@ -82,7 +82,7 @@ extern "C" int FUN_100121e0(int index)
 extern "C" int FUN_100143c0(int index)
 {
     // the camera list holds Vec3 pointers; the matrix's translation row (_41, _42, _43) is the character's position
-    DAT_1032d5b8[DAT_1049f0f0] = (Vec3 *)&DAT_10db6ed8[index].matrix._41;
+    DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ed8[index].matrix.translation;
     DAT_1021bbc0[DAT_1049f0f0] = 0;
     DAT_1049f0f0++;
     return 1;

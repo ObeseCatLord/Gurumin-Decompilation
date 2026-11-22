@@ -1,12 +1,7 @@
 // Head tracking of the player character: the head bone's parent node gets a saved-state block whose rotation limits
 // bound how far the head may turn towards its target (Node::M_101948f0 enters the tracking state 0x400000).
 
-struct Vec3
-{
-    float x;
-    float y;
-    float z;
-};
+#include "vec3.h"
 
 // Saved-state block of a node (scene_node.cpp NodeSaved, 0xdc bytes).
 struct NodeSaved

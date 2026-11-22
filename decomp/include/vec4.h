@@ -55,6 +55,13 @@ struct Vec4
     int InTriangle(const Vec4 &a, const Vec4 &b, const Vec4 &c);
 };
 
+// Free cdecl helpers on the x/y/z part of a Vec4 (w is ignored; the original names them after three-component
+// vectors). Vec3_Dot and Vec3_LengthSquared are defined in vec4.cpp, next to the functions that pass them local
+// vectors (see the note there); Vec3_Length in vec_math.cpp.
+extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b);   // 0x101ac200: a.x*b.x + a.y*b.y + a.z*b.z
+extern "C" float Vec3_LengthSquared(const Vec4 *v);        // 0x101ac220: x*x + y*y + z*z
+extern "C" float Vec3_Length(const Vec4 *v);               // 0x101ae890: sqrt(x*x + y*y + z*z)
+
 // Axis-aligned box given by its minimum and maximum corners.
 struct Box2
 {

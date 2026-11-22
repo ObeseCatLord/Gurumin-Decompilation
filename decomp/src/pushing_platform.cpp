@@ -4,12 +4,7 @@
 
 #include "vec4.h"
 
-struct Vec3
-{
-    float x;
-    float y;
-    float z;
-};
+#include "vec3.h"
 
 #include "matrix4.h"
 
@@ -80,7 +75,7 @@ extern "C" int FUN_1002a490(int index)
     if (DAT_1020b430[index].state == 0)
     {
         // the camera list holds Vec3 pointers; the matrix's translation row (_41, _42, _43) is the position
-        DAT_1032d5b8[DAT_1049f0f0] = (Vec3 *)&DAT_10db6ed8[index].matrix._41;
+        DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ed8[index].matrix.translation;
         DAT_1021bbc0[DAT_1049f0f0] = 0;
         DAT_1049f0f0++;
         DAT_1020b430[index].state = 1;

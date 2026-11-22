@@ -6,6 +6,7 @@
 #ifndef GURUMIN_MATRIX4_H
 #define GURUMIN_MATRIX4_H
 
+#include "vec3.h"
 #include "vec4.h"
 
 // Indices into Matrix4::m of the translation row.
@@ -28,6 +29,17 @@ struct Matrix4
             float _21, _22, _23, _24;  // row 2: y axis
             float _31, _32, _33, _34;  // row 3: z axis
             float _41, _42, _43, _44;  // row 4: translation x, y, z and 1
+        };
+        struct        // the same rows as x/y/z vectors (the fourth column after each)
+        {
+            Vec3 axisX;          // row 1 x/y/z
+            float axisXW;        // _14
+            Vec3 axisY;          // row 2 x/y/z
+            float axisYW;        // _24
+            Vec3 axisZ;          // row 3 x/y/z
+            float axisZW;        // _34
+            Vec3 translation;    // row 4 x/y/z: the position (_41, _42, _43)
+            float translationW;  // _44
         };
     };
 

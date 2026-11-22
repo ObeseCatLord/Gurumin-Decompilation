@@ -27,7 +27,6 @@ extern "C" float Vec3_LengthSquared(const Vec4 *v)
 {
     return LengthSquared(v->x, v->y, v->z);
 }
-extern "C" float Vec3_Length(const Vec4 *v);                   // 0x101ae890 (x/y/z only)
 
 // 0x101ac4e0. Length of the x/y/z part.
 float Vec4::Length()

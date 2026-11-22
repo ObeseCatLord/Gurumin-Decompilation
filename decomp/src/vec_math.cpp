@@ -7,13 +7,7 @@
 #include <math.h>
 #include "vec4.h"
 
-// Three floats; used where only x/y/z matter (positions, directions).
-struct Vec3
-{
-    float x;
-    float y;
-    float z;
-};
+#include "vec3.h"
 
 // Plane a*x + b*y + c*z + d = 0, stored in a Vec4 (x = a, y = b, z = c, w = d).
 struct Plane
@@ -34,10 +28,6 @@ inline float LengthSquared(float x, float y, float z)
 {
     return x * x + y * y + z * z;
 }
-
-// Defined in vec4.cpp (they must sit in the same file as the functions that pass them local vectors).
-extern "C" float Vec3_Dot(const Vec3 *a, const Vec3 *b);
-extern "C" float Vec3_LengthSquared(const Vec3 *v);
 
 // Length of the x/y part only (distance on the ground plane from the origin).
 float Vec4::Length2D()
@@ -119,8 +109,8 @@ int Vec4::InBox(const Box2 *box)
     return 1;
 }
 
-// Length of a Vec3 (free function, cdecl).
-extern "C" float Vec3_Length(const Vec3 *v)
+// Length of the x/y/z part of a vector (free function, cdecl; declared in vec4.h).
+extern "C" float Vec3_Length(const Vec4 *v)
 {
     return (float)sqrt(Vec3_LengthSquared(v));
 }
@@ -330,7 +320,7 @@ void Vec4::Normalize()
 Vec4 Vec4::Normalized3()
 {
     Vec4 result;
-    float length = Vec3_Length((const Vec3 *)this);
+    float length = Vec3_Length(this);
     if (length == 0.0f)
     {
         float zero = 0;

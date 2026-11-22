@@ -22,12 +22,7 @@ struct DamageZone
     char pad_0040[0xc0];
 };
 
-struct Vec3
-{
-    float x;
-    float y;
-    float z;
-};
+#include "vec3.h"
 
 // A character record (world.h Character), only the fields used here.
 struct Character

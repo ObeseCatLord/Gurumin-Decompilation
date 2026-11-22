@@ -3,12 +3,7 @@
 
 #include "vec4.h"
 
-struct Vec3
-{
-    float x;
-    float y;
-    float z;
-};
+#include "vec3.h"
 
 #include "matrix4.h"
 

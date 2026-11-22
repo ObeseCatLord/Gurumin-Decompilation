@@ -7,7 +7,7 @@ struct Vec3
     float z;
 };
 
-struct Vec4;  // defined by each source file
+#include "vec4.h"
 
 // A character's world matrix (row-major; the translation m[12..14] is the character's position).
 struct CharMatrix
@@ -107,16 +107,6 @@ struct CharState
     int m_003c;
 };
 
-// Four floats with the Vec4 setter (0x101ac9c0); world.h users define their own Vec4, so it has its own name here.
-struct Float4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Set(float x, float y, float z, float w);
-};
-
 struct EffectSlot
 {
     int id;
@@ -126,7 +116,7 @@ struct EffectSlot
     int m_0010;
     char pad_0014[8];
     char name[0xc0];          // 0x1c: model or motion name
-    Float4 position;          // 0xdc
+    Vec4 position;            // 0xdc
     int m_00ec;
     int active;
     char pad_00f4[8];

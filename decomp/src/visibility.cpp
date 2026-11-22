@@ -4,25 +4,7 @@
 #include <string.h>
 #include "world.h"
 
-struct VisBox;
-
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    int InBox(const VisBox *box);
-    int InBoxMargin(const VisBox *box, float margin);  // 0x101ac740
-};
-
-struct VisBox
-{
-    Vec4 min;
-    Vec4 max;
-};
+#include "vec4.h"
 
 struct VisCell
 {
@@ -33,7 +15,7 @@ struct VisCell
 struct VisData
 {
     VisCell cells[0x40];
-    VisBox boxes[0x40];
+    Box2 boxes[0x40];
 };
 
 struct VisNode
@@ -55,7 +37,7 @@ int VisNode::UpdateVisibleCells()
     if (vis != 0)
     {
         Vec4 eye;
-        VisBox *box = vis->boxes;
+        Box2 *box = vis->boxes;
         if (DAT_10f65520 != 0)
             eye.Copy(DAT_10f66908);
         else
@@ -83,7 +65,7 @@ extern "C" int FUN_10015860(Vec4 pos)
     VisData *vis = DAT_10255f08->vis;
     if (vis == 0)
         return 1;
-    VisBox *box = vis->boxes;
+    Box2 *box = vis->boxes;
     for (int i = 0; i < 0x40; i++, box++)
     {
         if (DAT_11afffe8[i] != 0 && pos.InBox(box))
@@ -122,7 +104,7 @@ extern "C" int FUN_100157b0(int index)
     if (DAT_10255f08->vis == 0)
         return 1;
     pos.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
-    VisBox *box = DAT_10255f08->vis->boxes;
+    Box2 *box = DAT_10255f08->vis->boxes;
     for (; i < 0x40; i++, box++)
     {
         DAT_1021d338[index][i] = 0;

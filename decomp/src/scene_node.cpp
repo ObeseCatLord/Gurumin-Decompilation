@@ -9,25 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    // 0x101af260 (vec4.cpp): distance from this point to the segment from-to; the closest point goes to *closest.
-    float DistanceToSegment(const Vec4 *from, const Vec4 *to, Vec4 *closest);
-    int InBox(const struct Box2 *box);  // 0x101ac6e0 (vec_math.cpp)
-    void Copy(const Vec4 &source);      // 0x101acc20
-    float Distance(const struct LengthVector &other);  // 0x101ac590
-};
-
-// Axis-aligned box, 0x20 bytes (vec_math.cpp Box2).
-struct Box2
-{
-    Vec4 min;
-    Vec4 max;
-};
+#include "vec4.h"
 
 struct Matrix
 {
@@ -88,6 +70,13 @@ struct GlyphState
     char pad_4618[0x1000];
     int m_5618;
     void Clear();               // 0x10166810: empties the skin data
+};
+
+// A vertex of a pack, 0x70 bytes (position first).
+struct PackVertex
+{
+    float position[3];
+    char pad_000c[0x64];
 };
 
 struct MeshData
@@ -156,7 +145,7 @@ struct PackHeader
     float boxMin[4];             // 0x20: (w = 1)
     float boxMax[4];             // 0x30
     char pad_0040[0x30];
-    int *m_0070;                 // 0x70: the vertices, 0x1c floats each (position first)
+    PackVertex *vertices;        // 0x70: the vertices
     void M_101acfa0();
     void Copy(const PackHeader *source);         // 0x101ad040
 };
@@ -222,20 +211,7 @@ struct Node
     unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
     char pad_02d1[3];
     Matrix poses[16];            // 0x2d4: the current pose ([0]) and stored poses
-    union
-    {
-        Vec4 bounds[3];          // 0x6d4: bounding sphere (w = radius) and the two box corners
-        struct
-        {
-            char pad_bounds[0xc];
-            float boundsRadius;  // 0x6e0: radius of the node's mesh bounds
-            char pad_06e4[8];
-            int m_06ec;
-            char pad_06f0[0xc];
-            int m_06fc;
-            char pad_0700[4];
-        };
-    };
+    Vec4 bounds[3];              // 0x6d4: bounding sphere (w = radius) and the two box corners
     char m_0704;
     char pad_0705[3];
     struct GlyphState *m_0708;
@@ -473,7 +449,7 @@ int Node::CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float
         }
         else if (m_00a8 != 0)
         {
-            if (worldMatrix.GetTranslation().DistanceToSegment(from, to, closest) < boundsRadius * 0.578f + range)
+            if (worldMatrix.GetTranslation().DistanceToSegment(*from, *to, *closest) < bounds[0].w * 0.578f + range)
             {
                 if (found != 0)
                 {
@@ -1324,8 +1300,8 @@ int Node::SetMaterialValue(const char *material, int value)
 int Node::CreateChildCopies()
 {
     Node *created[0x20];
-    m_06ec = packs->m_0070[2];
-    m_06fc = packs->m_0070[2];
+    bounds[1].z = packs->vertices[0].position[2];
+    bounds[2].z = packs->vertices[0].position[2];
     m_1858 = 1;
     for (int i = 0; i < 0x20; i++)
     {
@@ -2157,17 +2133,6 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     return 1;
 }
 
-// A vector with the engine's constructor and length (vec4.cpp Vec4; Node::bounds uses the plain Vec4 above).
-struct LengthVector
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    LengthVector();                                  // 0x101ac990: zero
-    float Length();                                  // 0x101ac4e0: length of x/y/z
-};
-
 // 0x1019d8e0. Computes the bounds of this node's packs (box corners and centre; the radius only for packs that
 // already have one, nodes with flag 4, and "CS"/"CA"/"CT" nodes, after a "CDL"/"OvF" prefix of 6/7 characters) and
 // of the whole node (bounds: sphere and box). Returns 1.
@@ -2194,22 +2159,22 @@ int Node::ComputeBounds()
             float packMinX = 999999.0f;
             float packMinY = 999999.0f;
             float packMinZ = 999999.0f;
-            const float *vertex = (const float *)packs[i].m_0070;
+            const PackVertex *vertex = packs[i].vertices;
             for (int j = 0; j < packs[i].vertexCount; j++)
             {
-                if (vertex[0] < packMinX)
-                    packMinX = vertex[0];
-                if (vertex[0] > packMaxX)
-                    packMaxX = vertex[0];
-                if (vertex[1] < packMinY)
-                    packMinY = vertex[1];
-                if (vertex[1] > packMaxY)
-                    packMaxY = vertex[1];
-                if (vertex[2] < packMinZ)
-                    packMinZ = vertex[2];
-                if (vertex[2] > packMaxZ)
-                    packMaxZ = vertex[2];
-                vertex += 0x1c;
+                if (vertex->position[0] < packMinX)
+                    packMinX = vertex->position[0];
+                if (vertex->position[0] > packMaxX)
+                    packMaxX = vertex->position[0];
+                if (vertex->position[1] < packMinY)
+                    packMinY = vertex->position[1];
+                if (vertex->position[1] > packMaxY)
+                    packMaxY = vertex->position[1];
+                if (vertex->position[2] < packMinZ)
+                    packMinZ = vertex->position[2];
+                if (vertex->position[2] > packMaxZ)
+                    packMaxZ = vertex->position[2];
+                vertex++;
             }
             if (packMinX < minX)
                 minX = packMinX;
@@ -2237,14 +2202,14 @@ int Node::ComputeBounds()
             if (packs[i].radius != 0.0f || (flags & 4) != 0 ||
                 (name[prefix] == 'C' && (name[prefix + 1] == 'S' || name[prefix + 1] == 'A' || name[prefix + 1] == 'T')))
             {
-                LengthVector size;
+                Vec4 size;
                 size.x = packMaxX - packMinX;
                 size.y = packMaxY - packMinY;
                 size.z = packMaxZ - packMinZ;
                 packs[i].radius = size.Length() / 2.0f;
             }
         }
-        LengthVector size;
+        Vec4 size;
         size.x = maxX - minX;
         size.y = maxY - minY;
         size.z = maxZ - minZ;
@@ -2265,13 +2230,6 @@ int Node::ComputeBounds()
     return 1;
 }
 
-// A vertex of a pack, 0x70 bytes (position first).
-struct PackVertex
-{
-    float position[3];
-    char pad_000c[0x64];
-};
-
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
@@ -2281,9 +2239,9 @@ struct PackVertex
 // arguments twice, as in the original. Returns 1.
 int Node::BuildCollisionSpheres()
 {
-    LengthVector a;
-    LengthVector b;
-    LengthVector c;
+    Vec4 a;
+    Vec4 b;
+    Vec4 c;
     int prefix = 0;
     if (name[0] == 'C' && name[1] == 'D' && name[2] == 'L')
         prefix = 6;
@@ -2306,15 +2264,15 @@ int Node::BuildCollisionSpheres()
                 int first = indexLists[p].indices[i];
                 int second = indexLists[p].indices[i + 1];
                 int third = indexLists[p].indices[i + 2];
-                a.x = ((PackVertex *)packs[p].m_0070)[first].position[0];
-                a.y = ((PackVertex *)packs[p].m_0070)[first].position[1];
-                a.z = ((PackVertex *)packs[p].m_0070)[first].position[2];
-                b.x = ((PackVertex *)packs[p].m_0070)[second].position[0];
-                b.y = ((PackVertex *)packs[p].m_0070)[second].position[1];
-                b.z = ((PackVertex *)packs[p].m_0070)[second].position[2];
-                c.x = ((PackVertex *)packs[p].m_0070)[third].position[0];
-                c.y = ((PackVertex *)packs[p].m_0070)[third].position[1];
-                c.z = ((PackVertex *)packs[p].m_0070)[third].position[2];
+                a.x = packs[p].vertices[first].position[0];
+                a.y = packs[p].vertices[first].position[1];
+                a.z = packs[p].vertices[first].position[2];
+                b.x = packs[p].vertices[second].position[0];
+                b.y = packs[p].vertices[second].position[1];
+                b.z = packs[p].vertices[second].position[2];
+                c.x = packs[p].vertices[third].position[0];
+                c.y = packs[p].vertices[third].position[1];
+                c.z = packs[p].vertices[third].position[2];
                 m_0070[p].spheres[i / 3].x = (MAX(MAX(a.x, b.x), c.x) + MIN(MIN(a.x, b.x), c.x)) / 2.0f;
                 m_0070[p].spheres[i / 3].y = (MAX(MAX(a.y, b.y), c.y) + MIN(MIN(a.y, b.y), c.y)) / 2.0f;
                 m_0070[p].spheres[i / 3].z = (MAX(MAX(a.z, b.z), c.z) + MIN(MIN(a.z, b.z), c.z)) / 2.0f;

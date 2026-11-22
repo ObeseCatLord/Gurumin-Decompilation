@@ -55,4 +55,11 @@ struct Vec4
     int InTriangle(const Vec4 &a, const Vec4 &b, const Vec4 &c);
 };
 
+// Axis-aligned box given by its minimum and maximum corners.
+struct Box2
+{
+    Vec4 min;
+    Vec4 max;
+};
+
 #endif

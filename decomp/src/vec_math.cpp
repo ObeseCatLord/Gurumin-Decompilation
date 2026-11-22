@@ -15,13 +15,6 @@ struct Vec3
     float z;
 };
 
-// Axis-aligned box given by its minimum and maximum corners.
-struct Box2
-{
-    Vec4 min;
-    Vec4 max;
-};
-
 // Plane a*x + b*y + c*z + d = 0, stored in a Vec4 (x = a, y = b, z = c, w = d).
 struct Plane
 {

@@ -77,8 +77,8 @@ from the compiled object. Give every function a readable name in `symbols.tsv`.
   `open.tsv` accurate, so no session has to rediscover state.
 - **Plan with the strong model, execute with the cheaper one.** Plan in plan mode (Claude Code `opusplan`: Opus
   plans, Sonnet executes), then hand implementation to subagents (Sonnet) with self-contained briefs: the files,
-  the exact steps, the commands, and what done looks like. The orchestrator verifies results (the build's
-  `MATCH` lines, the report) instead of redoing the work.
+  the exact steps, the commands, and what done looks like. `tools/check_matches.py` is the safety net: no batch
+  is committed while it reports a lost match, so verification costs no model tokens.
 - **Find code without reading whole files.** If Trail (`trail`, <https://github.com/trailhq/Trail-Code>) is set
   up, use `trail skeleton <file>`, `trail callers <symbol>` and `trail ask "<question>"` before opening a file;
   read only the lines you need. Without it, `grep -n` and ranged reads.
@@ -93,8 +93,9 @@ from the compiled object. Give every function a readable name in `symbols.tsv`.
 4. Iterate with `build.bat` and `sbs.py` until `MATCH`. Patterns that worked before are in `NOTES.md`; add new ones.
 5. If it will not match readably, record it in `decomp/open.tsv` (`<address><TAB>open<TAB><reason>`) and move on.
 6. After the batch:
-   - `python tools/build_all.py --report ../progress/jp/report.json`, then `python tools/sync_symbols.py`, then
-     `python tools/gen_queue.py`;
+   - `python tools/build_all.py --report ../progress/jp/report.json`, then `python tools/check_matches.py` (exits 1
+     and lists `LOST` functions if any match was lost: fix or revert before committing; never commit a loss), then
+     `python tools/sync_symbols.py`, then `python tools/gen_queue.py`;
    - add a row to `decomp/BATCHES.md`;
    - check `git diff --stat` for whole-file line-ending changes (below), commit and push.
 

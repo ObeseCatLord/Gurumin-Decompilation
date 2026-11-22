@@ -26,7 +26,7 @@ A first attempt converted 109 of 111 files with a script and lost 26 matches; it
 
 ## Next steps
 1. Finish the Vec4 merge file by file in small groups; after each group run `python tools/build_all.py --report
-   ../progress/jp/report.json` and compare every function with the previous report (no match may be lost).
+   ../progress/jp/report.json` and `python tools/check_matches.py` (it must exit 0: no match may be lost).
 2. Then `Matrix4`, `Node`, the D3D interface views, `CharRecord`, `NpcState`, `TextureObject`, `ModelBank`.
 3. Then return to `QUEUE.md`.
 
@@ -34,4 +34,5 @@ A first attempt converted 109 of 111 files with a script and lost 26 matches; it
 "Continue the Gurumin Phase 0 type merge. Read `decomp/HANDOFF.md` and `AGENTS.md`. Plan the Vec4 merge in plan
 mode (groups of about 15 files, the include placed before the first struct that uses Vec4, rename Scaled and
 Normalize3 calls), then hand each group to a Sonnet subagent with the exact steps and the rule that no MATCH may be
-lost. Verify each group's report yourself, commit after each green group, and rewrite HANDOFF.md at the end."
+lost. After each group run build_all.py and tools/check_matches.py; commit only when it exits 0, and rewrite
+HANDOFF.md at the end."

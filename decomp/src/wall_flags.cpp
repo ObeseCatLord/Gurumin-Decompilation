@@ -2,14 +2,7 @@
 // compass direction) and wall nodes wall_<dir>; a wall is made solid (node flag 0x20) while the player's
 // movement touches its probe.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-};
+#include "vec4.h"
 
 struct Node
 {

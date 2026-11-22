@@ -5,14 +5,7 @@
 #include <string.h>
 #include "char_params.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-};
+#include "vec4.h"
 
 // Matrix4 with the engine's empty destructor (node_bones.cpp).
 struct Matrix4

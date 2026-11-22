@@ -3,18 +3,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    float Length2D();                            // 0x101ac500: length of x/y
-    Vec4 operator+(const Vec4 &other) const;     // 0x101ac9e0
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 struct CharMatrix
 {

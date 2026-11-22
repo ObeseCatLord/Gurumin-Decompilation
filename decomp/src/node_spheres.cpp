@@ -1,19 +1,7 @@
 // Bounding-sphere overlap test between two scene nodes (kept apart from scene_node.cpp, whose Vec4 has no
 // constructor or operators).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;                  // the sphere's radius when the vector is a node's bounds (Node 0x6d4..0x6e0)
-    Vec4();
-    void Copy(const Vec4 &source);
-    Vec4 operator+(const Vec4 &other) const;
-    Vec4 operator-(const Vec4 &other) const;
-    float DistanceSquared(const Vec4 &other);  // 0x101ac650
-    void Fill(const float &value);
-};
+#include "vec4.h"
 
 struct Matrix
 {

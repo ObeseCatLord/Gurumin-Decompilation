@@ -1,15 +1,6 @@
 // Triangle helpers built on Vec4 subtraction and Cross.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    Vec4 operator-(const Vec4 &other) const;  // 0x101aca40 (component-wise difference, w included)
-};
+#include "vec4.h"
 
 // Plane a*x + b*y + c*z + d = 0 (vec_math.cpp).
 struct Plane

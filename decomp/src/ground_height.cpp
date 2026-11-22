@@ -2,16 +2,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                          // 0x101ac990: zero
-    void Copy(const Vec4 &source);                   // 0x101acc20
-    float Distance(const Vec4 &other);               // 0x101ac590
-};
+#include "vec4.h"
 
 struct Matrix4
 {

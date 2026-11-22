@@ -3,19 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    Vec4 operator-(const Vec4 &other) const;
-    Vec4 operator+(const Vec4 &other) const;
-    float LengthSquared3();  // 0x101ac6a0
-    void Fill(const float &value);
-};
+#include "vec4.h"
 
 struct Matrix4
 {

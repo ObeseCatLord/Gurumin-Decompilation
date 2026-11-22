@@ -1,18 +1,7 @@
 // Keeping the "shaga" effect models (shaga_spawn.cpp) out of the world collision. C++ rather than extern "C": the
 // function keeps an exception frame for its Matrix4 local.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    Vec4 operator+(const Vec4 &other) const;
-    Vec4 Scaled(const float &scale);
-    Vec4 Normalized3();                         // 0x101af080: normalises x/y/z in place
-};
+#include "vec4.h"
 
 // Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
 struct Matrix4
@@ -61,7 +50,7 @@ int Shaga_PushOut(int index)
         if (DAT_10255f08->Query(&identity, &position, DAT_1030cd98[index] + 1.0f, &normal, &hitId, 0, 0) == 0)
             break;
         normal.Normalized3();
-        normal.Copy(normal.Scaled(5.0f));
+        normal.Copy(normal * 5.0f);
         position.Copy(position + normal);
         steps++;
     } while (steps < 10);

@@ -1,14 +1,7 @@
 // Queue of nodes to draw this frame (up to 0x40 entries). Each entry stores the node, flags, two vectors,
 // the current light colour and optional 0x80-byte extra data and matrix (each pool holds up to 0x30).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Copy(const Vec4 &source);
-};
+#include "vec4.h"
 
 struct Matrix4
 {

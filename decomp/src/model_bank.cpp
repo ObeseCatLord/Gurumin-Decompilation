@@ -8,15 +8,7 @@ struct Node
     Node *Find(const char *name, int index);  // 0x1019ece0: the index-th node called `name` in the subtree, or 0
 };
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-};
+#include "vec4.h"
 
 struct Matrix4
 {

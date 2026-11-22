@@ -1,15 +1,6 @@
 // Route lengths: each entry of the map table at 0x10210fc0 (see map_icons.cpp) holds a route of up to 15 points.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    float Length();                              // 0x101ac4e0: length of x/y/z
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 // A route point: a position and a code. The code's low four digits (as a signed value, 5001..9999 meaning
 // -4999..-1) are an extra cost of the point; the digits above them (signed the same way) modulo 4 above 1 end the

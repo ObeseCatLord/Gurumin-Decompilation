@@ -4,19 +4,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    float LengthSquared3();                      // 0x101ac6a0: x*x + y*y + z*z
-    float Length();                              // 0x101ac4e0: length of x/y/z
-    float Length2D();                            // 0x101ac500: length of x/y
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 struct Matrix4
 {

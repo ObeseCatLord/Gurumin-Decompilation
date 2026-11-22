@@ -7,14 +7,7 @@
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-};
+#include "vec4.h"
 
 // A scene node (scene_node.cpp Node): its name and the corners of its bounds.
 struct Node

@@ -1,15 +1,7 @@
 // A character held in place by a spell (0x100469d0, behaviour 0x18 of Char_RunBehaviour 0x100dfcf0): it sparkles
 // until the scripts release it, then it is freed with a flash and its state is reset.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-};
+#include "vec4.h"
 
 struct Matrix4
 {

@@ -1,13 +1,6 @@
 // Small allocators over fixed tables.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Copy(const Vec4 &source);
-};
+#include "vec4.h"
 
 extern "C" unsigned int DAT_104c013c;
 extern "C" char DAT_10254c40[0x400];

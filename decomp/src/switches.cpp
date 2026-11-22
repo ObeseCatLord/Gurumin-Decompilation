@@ -2,20 +2,13 @@
 // (DAT_10255b08): a character slot (< 0x80) or 0x80 + an object index; DAT_1030bbf8 marks the slot as used.
 
 #include "world.h"
+#include "vec4.h"
 
 // Map object (0x10874848) that animates the switch nodes ("LEVERON" and its off state).
 struct MapObject
 {
     int M_10054f30(int node, int on);
     int M_10055110(int id, int on);   // switches the map gimmick with `id` on or off
-};
-
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
 };
 
 

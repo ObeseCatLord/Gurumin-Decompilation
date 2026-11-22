@@ -1,15 +1,6 @@
 // Attached mesh slots (see ai_pick.cpp for the slot table).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void Set(float x, float y, float z, float w);   // 0x101ac9c0
-};
+#include "vec4.h"
 
 struct Matrix
 {

@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include "world.h"
+#include "vec4.h"
 
 // Root node of a character model (scene_node.cpp Node).
 struct RootNode
@@ -12,12 +13,6 @@ struct RootNode
     void M_10194630(int value, int mask);
     void M_101946b0(int value, int mask);
     void M_10194730(int value, int mask);
-};
-
-struct Vec4
-{
-    float x, y, z, w;
-    void Set(float x, float y, float z, float w);
 };
 
 extern "C" int DAT_1021f338;

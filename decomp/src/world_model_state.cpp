@@ -1,12 +1,6 @@
 // Saved node states of the world's models (WorldRenderer at 0x10836c70; see world_frame.cpp for its other fields).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-};
+#include "vec4.h"
 
 // A node's saved block (scene_node.cpp NodeSaved): the state flag and a box used by the target state.
 struct NodeSaved

@@ -21,14 +21,7 @@ struct GameFile
     int Read(void *buffer, int size, int count);     // 0x101b23a0
 };
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                          // 0x101ac990: zero
-};
+#include "vec4.h"
 
 extern "C" char DAT_10f60590[];  // save directory prefix, e.g. "SaveData\\"
 int FUN_1003b2c0(const char *path, int mode);

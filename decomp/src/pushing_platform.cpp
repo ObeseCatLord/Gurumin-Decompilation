@@ -2,19 +2,7 @@
 // DAT_10db0544 falls below half of DAT_10db0548, rises back by 5 units a frame and then shoves the player out of
 // the way.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    float Length2D();                            // 0x101ac500: length of x/y
-    Vec4 Scaled(const float &factor);            // 0x101acb00
-    Vec4 Normalized3();                          // 0x101af080: returns the normalised copy
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 struct Vec3
 {
@@ -136,7 +124,7 @@ extern "C" int FUN_1002a490(int index)
         else
             away.x = 1.0f;
         if (DAT_10db9380[0].locked == 2 &&
-            DAT_10db6ed8[index].model.IsClearAny(&DAT_10db6ed8[0].move.Scaled(-1.0f)) == 0 &&
+            DAT_10db6ed8[index].model.IsClearAny(&(DAT_10db6ed8[0].move * -1.0f)) == 0 &&
             DAT_10db9380[0].locked == 2 && DAT_10db6ed8[0].position.z > -140.0f)
         {
             // standing on the block: lifted onto it and moved outwards

@@ -3,14 +3,7 @@
 
 #include <string.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Fill(const float &value);                   // 0x101acc40: sets all four components
-};
+#include "vec4.h"
 
 // A character slot record (world.h CharSlot): only the kind is used here.
 struct CharSlot

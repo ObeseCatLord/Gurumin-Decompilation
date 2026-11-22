@@ -2,21 +2,7 @@
 // Debris_Spawn, slots 128-255 the thrown pieces of Debris_SpawnFrom and Debris_SpawnFromCharacter. FUN_1000e340 draws
 // them (rotation from `spin`, position and scale per slot).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Set(float x, float y, float z, float w);   // 0x101ac9c0
-    void Copy(const Vec4 &source);                  // 0x101acc20
-    void Fill(const float &value);                  // 0x101acc40: sets all four components
-    Vec4 Normalized3();                             // 0x101af080: returns the normalised copy
-    Vec4 Scaled(const float &factor);               // 0x101acb00
-    void RotateZ(float angle);                      // 0x101ac300
-    void RotateX(float angle);                      // 0x101ac440
-    void RotateY(float angle);                      // 0x101ac3a0
-};
+#include "vec4.h"
 
 // A character record (world.h Character, base 0x10db6ed8), only the model scale used here.
 struct CharacterScale
@@ -101,7 +87,7 @@ extern "C" int FUN_1000df10(float x, float y, float z, const Vec4 *direction, in
     DAT_10c66ef0[i].Copy(*direction);
     DAT_10c66ef0[i].Normalized3();
     float amount = 25.0f;
-    DAT_10c66ef0[i].Copy(DAT_10c66ef0[i].Scaled(amount));
+    DAT_10c66ef0[i].Copy(DAT_10c66ef0[i] * amount);
     amount = (float)(FUN_1013f880() % 10 - 5);
     DAT_10c66ef0[i].RotateZ(amount * 0.28f);
     amount = (float)(FUN_1013f880() % 10 - 5);
@@ -139,7 +125,7 @@ extern "C" int FUN_1000e130(float x, float y, float z, const Vec4 *direction, in
     DAT_10c66ef0[i].Copy(*direction);
     DAT_10c66ef0[i].Normalized3();
     float amount = 25.0f;
-    DAT_10c66ef0[i].Copy(DAT_10c66ef0[i].Scaled(amount));
+    DAT_10c66ef0[i].Copy(DAT_10c66ef0[i] * amount);
     amount = (float)(FUN_1013f880() % 10 - 5);
     DAT_10c66ef0[i].RotateZ(amount * 0.1528f);
     amount = (float)(FUN_1013f880() % 10 - 5);

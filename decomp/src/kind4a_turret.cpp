@@ -1,15 +1,7 @@
 // Character kind 0x4a: a stationary attacker that idles in motion 2 and now and then (or when hit) plays one of
 // its attack motions 4-6; 20 frames before an attack ends it fires effect 0x352 from its own matrix.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-};
+#include "vec4.h"
 
 // Effect start parameters (model_state.cpp ModelState), only the fields set here.
 struct ModelState

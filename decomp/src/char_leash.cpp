@@ -2,13 +2,7 @@
 #include <math.h>
 #include "world.h"
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-};
+#include "vec4.h"
 
 // Per-slot position record, 0x40 bytes (char_shots.cpp); here the start position of each character.
 struct SlotPosition

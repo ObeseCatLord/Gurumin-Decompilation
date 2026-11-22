@@ -1,17 +1,7 @@
 // Choosing the background movie of the map (run from 0x100ba2a0): the camera point nearest to the player picks
 // the movie, which is opened into the movie player and rendered into the movie texture.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                          // 0x101ac990
-    void Copy(const Vec4 &other);                    // 0x101acc20
-    Vec4 operator-(const Vec4 &other) const;         // 0x101aca40
-    float LengthSquared3();                          // 0x101ac6a0
-};
+#include "vec4.h"
 
 struct Matrix4
 {

@@ -1,14 +1,7 @@
 // Resetting the camera state when a map starts: the camera vectors are zeroed and the camera flags and blend
 // counters cleared (most of these globals are only named where they are used).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-};
+#include "vec4.h"
 
 extern "C" int DAT_10203440;
 extern "C" int DAT_10203444;

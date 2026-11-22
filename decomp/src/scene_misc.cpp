@@ -10,15 +10,7 @@ struct Object
     ~Object();
 };
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Fill(const float &value);
-};
+#include "vec4.h"
 
 struct Scene
 {

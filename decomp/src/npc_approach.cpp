@@ -3,15 +3,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    float Length();                              // 0x101ac4e0: length of x/y/z
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 struct CharMatrix
 {

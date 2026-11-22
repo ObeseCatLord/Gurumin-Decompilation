@@ -1,16 +1,7 @@
 // The overhead view of the map (0x1000f5a0, called by 0x1000f7f0): a matrix that looks straight down on the map
 // node, and the map's bounds copied to the pit and visible-area globals.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void Set(float x, float y, float z, float w);   // 0x101ac9c0
-};
+#include "vec4.h"
 
 struct Matrix4
 {

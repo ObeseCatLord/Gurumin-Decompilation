@@ -7,14 +7,7 @@ struct Matrix4
     ~Matrix4();
 };
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-};
+#include "vec4.h"
 
 struct SceneNode
 {

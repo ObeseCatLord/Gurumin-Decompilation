@@ -3,15 +3,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-};
+#include "vec4.h"
 
 struct Matrix4
 {

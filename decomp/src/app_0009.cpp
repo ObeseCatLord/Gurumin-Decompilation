@@ -2,18 +2,7 @@
 
 #include <string.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Set(float x, float y, float z, float w);
-    void Copy(const Vec4 &source);
-    Vec4 operator+(const Vec4 &other) const;
-    Vec4 operator-(const Vec4 &other) const;
-    Vec4 operator*(const float &scale) const;   // 0x101acb00 (x/y/z only)
-};
+#include "vec4.h"
 
 extern "C" void FUN_1000f360(int, int);
 extern "C" void FUN_10001c50(int);

@@ -1,14 +1,7 @@
 // The player taking damage (0x1005dbf0, called by enemy attacks, traps and map hazards): health and the anti-tamper
 // copies, the hurt voice, rumble, the game over movie and the hit effect.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-};
+#include "vec4.h"
 
 struct Matrix4
 {

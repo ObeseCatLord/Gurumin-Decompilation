@@ -65,16 +65,7 @@ extern "C" int FUN_100165e0(int mode)
 }
 
 // The look-around target point and the player's position and heading.
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Copy(const Vec4 &source);
-    Vec4 operator+(const Vec4 &other) const;
-    void RotateZ(float angle);  // 0x101ac300
-};
+#include "vec4.h"
 
 struct CharMatrix
 {

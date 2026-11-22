@@ -1,17 +1,6 @@
 // Colour and fog parameters that change over time.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Set(float x, float y, float z, float w);  // 0x101ac9c0
-    Vec4 operator+(const Vec4 &other);              // 0x101ac9e0 (component-wise sum)
-    void Copy(const Vec4 &source);                  // 0x101acc20
-    Vec4 operator-(const Vec4 &other);              // 0x101aca40 (component-wise difference)
-    Vec4 Scaled(const float &scale);                // 0x101acb00
-};
+#include "vec4.h"
 
 extern "C" int DAT_10f08d30[2];   // frames left for each of the two colour blends (0 = idle)
 extern "C" Vec4 DAT_10f66978[2];  // current colours
@@ -49,7 +38,7 @@ extern "C" void FUN_1013fa10(int index, int frames, float z, float y, float x, f
     }
     DAT_10f65828[index].Set(x, y, z, w);
     float step = 1.0f / (float)frames;
-    DAT_10f657c4[index].Copy((DAT_10f65828[index] - DAT_10f66978[index]).Scaled(step));
+    DAT_10f657c4[index].Copy((DAT_10f65828[index] - DAT_10f66978[index]) * step);
     DAT_10f08d30[index] = frames;
 }
 

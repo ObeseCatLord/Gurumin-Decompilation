@@ -848,16 +848,7 @@ extern "C" int FUN_10149100(void)
     return 1;
 }
 
-// A vector with the 4D vector class's helpers used here.
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void RotateZ(float angle);                   // 0x101ac300
-};
+#include "vec4.h"
 
 // 0x1014c080 (TextureObject::DrawQuad). Draws a two-triangle strip from four points: `positions` give x and y in
 // 640x480 screen coordinates (scaled to the back buffer), depth and rhw; `uvs` the texture coordinates; `colours`

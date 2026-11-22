@@ -3,16 +3,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void RotateZ(float angle);                   // 0x101ac300
-};
+#include "vec4.h"
 
 struct Matrix4
 {

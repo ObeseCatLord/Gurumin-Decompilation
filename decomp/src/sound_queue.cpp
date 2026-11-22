@@ -1,14 +1,7 @@
 // Delayed sound effects: up to 10 sounds wait for their delay to run out before they are played with
 // FUN_1003ad20 (Sound_PlayEffect: id, optional position, volume).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Copy(const Vec4 &source);
-};
+#include "vec4.h"
 
 extern "C" int DAT_10447310[10];   // frames left before the sound plays (0 = free slot)
 extern "C" int DAT_1021a398[10];   // sound id

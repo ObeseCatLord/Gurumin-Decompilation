@@ -5,14 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                          // 0x101ac990: zero
-};
+#include "vec4.h"
 
 // Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
 struct Matrix4

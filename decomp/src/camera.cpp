@@ -2,13 +2,7 @@
 
 #include <string.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-};
+#include "vec4.h"
 
 struct Fader
 {

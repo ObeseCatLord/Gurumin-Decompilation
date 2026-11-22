@@ -166,17 +166,7 @@ int Game::DrawDebugText(const char *text, int x, int y)
     return 1;
 }
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-    void Copy(const Vec4 &source);
-    Vec4 Scaled(const float &scale);
-    float Length();                  // 0x101ac4e0: length of x/y/z
-};
+#include "vec4.h"
 
 Vec4 Normalize3(const Vec4 &v);      // 0x101b1180: v scaled to unit length (x/y/z)
 
@@ -211,7 +201,7 @@ int Game::MoveCursor()
         m_7638 = m_7630;
         return 1;
     }
-    step.Copy(step.Scaled(speed));
+    step.Copy(step * speed);
     m_7638 += (int)step.x;
     m_763c += (int)step.y;
     return 1;

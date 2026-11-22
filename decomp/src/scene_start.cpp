@@ -1,14 +1,7 @@
 // Starting a scene (map entry): the player's position and velocity are saved, the world object (0x10c68000,
 // world_frame.cpp) is bound to the loaded map and the player character file is loaded.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Copy(const Vec4 &source);
-};
+#include "vec4.h"
 
 struct Matrix4
 {

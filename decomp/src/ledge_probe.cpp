@@ -3,22 +3,7 @@
 
 #include <math.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-    void RotateZ(float angle);                   // 0x101ac300
-    float Length();                              // 0x101ac4e0: length of x/y/z
-    Vec4 Normalize3();                           // 0x101af080: normalises x/y/z in place, returns a copy
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-    Vec4 operator+(const Vec4 &other) const;     // 0x101ac9e0
-    Vec4 operator*(const float &scale) const;    // 0x101acb00 (x/y/z only)
-};
+#include "vec4.h"
 
 // A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
 struct CharRecord
@@ -63,7 +48,7 @@ extern "C" int FUN_10050df0(int index, Vec4 *wall, Vec4 *ground, float *wallDist
     side.y = reach;
     side.RotateZ(-DAT_10db6ee8[index].heading - 1.5708f);
     forward.Copy(side);
-    forward.Normalize3();
+    forward.Normalized3();
     *drop = -1.0f;
     {
         Vec4 top;

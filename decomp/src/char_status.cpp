@@ -2,15 +2,7 @@
 // FUN_100b0250's opening and closing parts, but here the status arrays are read for character `index + 3` while the
 // matrix, the offset vector and the state byte belong to character `index` (the original mixes the two indexes).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Copy(const Vec4 &source);               // 0x101acc20
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 struct CharMatrix
 {

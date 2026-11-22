@@ -1,15 +1,6 @@
 // Transforming a point by a matrix through matrix products (the engine's way, with matrix temporaries).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4(float x, float y, float z, float w);   // 0x101ac9a0
-    void Copy(const Vec4 &source);
-    Vec4 operator+(const Vec4 &other) const;
-};
+#include "vec4.h"
 
 // Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
 struct Matrix4

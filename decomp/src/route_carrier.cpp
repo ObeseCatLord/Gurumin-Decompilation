@@ -3,20 +3,7 @@
 // A character that walks one of the map's routes (0x100451c0, behaviour 9 of Char_RunBehaviour 0x100dfcf0),
 // optionally carrying another character on its back.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-    Vec4 Normalize3();                           // 0x101af080: normalises x/y/z in place, returns a copy
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-    Vec4 operator+(const Vec4 &other) const;     // 0x101ac9e0
-    Vec4 operator*(const float &scale) const;    // 0x101acb00 (x/y/z only)
-};
+#include "vec4.h"
 
 struct Matrix4
 {
@@ -203,7 +190,7 @@ extern "C" int FUN_100451c0(int index)
             }
         }
         step.Copy(target - self);
-        step.Normalize3();
+        step.Normalized3();
         step.Copy(step * (float)DAT_1020b430[index].speed);
         DAT_10802bf8[index].position.Copy(DAT_10802bf8[index].position * 0.9f + step * 0.1f);
         Vec4 position;

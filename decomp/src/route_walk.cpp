@@ -1,19 +1,7 @@
 // A character walking its route: each frame the next route target is looked up (0x100286d0) and the character
 // steps towards it at walking or running speed.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-    void Copy(const Vec4 &source);               // 0x101acc20
-    void Fill(const float &value);               // 0x101acc40: sets all four components
-    Vec4 Scaled(const float &factor);            // 0x101acb00
-    Vec4 Normalized3();                          // 0x101af080: returns the normalised copy
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 struct CharMatrix
 {
@@ -112,9 +100,9 @@ extern "C" int FUN_1002a110(int slot, int run)
         if (step.x != 0.0f || step.y != 0.0f || step.z != 0.0f)
             step.Normalized3();
         if (run != 0)
-            step.Copy(step.Scaled(12.0f));
+            step.Copy(step * 12.0f);
         else
-            step.Copy(step.Scaled(5.0f));
+            step.Copy(step * 5.0f);
         DAT_10db6ed8[slot].matrix.m[12] += step.x;
         DAT_10db6ed8[slot].matrix.m[13] += step.y;
         DAT_10db6ed8[slot].matrix.m[14] += step.z;

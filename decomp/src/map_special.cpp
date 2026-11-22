@@ -1,14 +1,7 @@
 // Map-specific per-frame updates of maps 0x15..0x18 (DAT_10c62ed0 = current map). C++ rather than extern "C":
 // the function keeps an exception frame for its Matrix4 local.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();
-};
+#include "vec4.h"
 
 // Matrix4 with the engine's constructor and empty destructor (node_bones.cpp).
 struct Matrix4

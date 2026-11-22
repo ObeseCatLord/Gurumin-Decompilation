@@ -2,14 +2,7 @@
 // each of which can be replaced by another track. Matrix4 has the engine's constructor and empty destructor, so the
 // function holding matrices by value gets an exception frame.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                      // 0x101ac990: zero
-};
+#include "vec4.h"
 
 struct Matrix4
 {

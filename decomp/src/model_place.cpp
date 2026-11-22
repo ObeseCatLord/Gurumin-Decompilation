@@ -2,16 +2,7 @@
 // resetting its motion state. Matrix4 has the engine's constructor and empty destructor because IdentityMatrix()
 // returns a temporary (see anim_unload.cpp).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    Vec4();                                         // 0x101ac990: zero
-    void Set(float x, float y, float z, float w);   // 0x101ac9c0
-    void Fill(const float &value);                  // 0x101acc40: sets all four components
-};
+#include "vec4.h"
 
 struct Matrix4
 {

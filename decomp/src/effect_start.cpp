@@ -1,15 +1,7 @@
 // Starting an effect: an effect definition (by script id) gets a free record in one of the five effect lists
 // (char_effects.cpp updates and draws them). This unit lays out the record fields the start fills in.
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Copy(const Vec4 &source);                   // 0x101acc20
-    void Fill(const float &value);                   // 0x101acc40: sets all four components
-};
+#include "vec4.h"
 
 struct Matrix4
 {

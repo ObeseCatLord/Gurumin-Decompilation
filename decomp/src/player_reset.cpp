@@ -1,13 +1,6 @@
 // Player movement state reset (used when a map starts or the player respawns).
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    void Fill(const float &value);  // 0x101acc40: sets all four components
-};
+#include "vec4.h"
 
 extern "C" Vec4 DAT_118e69e8;   // player position
 extern "C" Vec4 DAT_118e6cb8;   // player velocity

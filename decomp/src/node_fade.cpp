@@ -5,15 +5,7 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    float LengthSquared3();                      // 0x101ac6a0
-    Vec4 operator-(const Vec4 &other) const;     // 0x101aca40
-};
+#include "vec4.h"
 
 struct Matrix4
 {

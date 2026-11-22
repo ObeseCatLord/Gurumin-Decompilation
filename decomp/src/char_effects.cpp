@@ -5,14 +5,7 @@
 
 #include <stdio.h>
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-    int InRect(const struct Box2 *box);          // 0x101ac7c0 (vec_math.cpp)
-};
+#include "vec4.h"
 
 // Four floats with the Vec4 setter (0x101ac9c0).
 struct Colour4

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "vec4.h"
+#include "key_track.h"
 
 // Dot product of the x/y/z parts of two vectors (free function, cdecl; 0x101ac200).
 extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b)
@@ -365,27 +366,12 @@ extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float marg
     return 1;
 }
 
-// Fixed key-frame bank (containers.cpp). Its constructor lives here, next to Vec4(), for the same reason as the
-// operators above: the compiler keeps the array pointer in edx across the Vec4() calls of its value array.
-struct KeyBank
-{
-    int m_0000[0x80];
-    Vec4 m_0200[0x80];
-    char flags[0x80];
-    int m_0a80;
-    KeyBank();
-    void Clear();  // 0x101ad730
-    int Insert(int frame, float x, float y, float z, float w);
-    int Set(int frame, float x, float y, float z, float w);
-};
-
 // 0x101af420. Constructor: constructs the 0x80 key values and empties the bank.
 KeyBank::KeyBank()
 {
     Clear();
 }
 
-#include "key_track.h"
 
 // Grows the three key arrays by `extra` entries, keeping their contents. Returns nothing; the capacity grows.
 void KeyTrack::Reserve(int extra)
@@ -419,26 +405,26 @@ void KeyTrack::Reserve(int extra)
 int KeyBank::Insert(int frame, float x, float y, float z, float w)
 {
     int i;
-    for (i = 0; i < m_0a80; i++)
+    for (i = 0; i < count; i++)
     {
-        if (m_0000[i] == frame)
+        if (frames[i] == frame)
             break;
-        if (m_0000[i] > frame)
+        if (frames[i] > frame)
             break;
     }
-    for (int j = m_0a80 - 1; j >= i; j--)
+    for (int j = count - 1; j >= i; j--)
     {
-        m_0000[j + 1] = m_0000[j];
-        m_0200[j + 1].Copy(m_0200[j]);
+        frames[j + 1] = frames[j];
+        values[j + 1].Copy(values[j]);
         flags[j + 1] = flags[j];
     }
-    m_0200[i].x = x;
-    m_0200[i].y = y;
-    m_0200[i].z = z;
-    m_0200[i].w = w;
-    m_0000[i] = frame;
+    values[i].x = x;
+    values[i].y = y;
+    values[i].z = z;
+    values[i].w = w;
+    frames[i] = frame;
     flags[i] = 0;
-    m_0a80++;
+    count++;
     return i;
 }
 
@@ -447,32 +433,32 @@ int KeyBank::Insert(int frame, float x, float y, float z, float w)
 int KeyBank::Set(int frame, float x, float y, float z, float w)
 {
     int i;
-    for (i = 0; i < m_0a80; i++)
+    for (i = 0; i < count; i++)
     {
-        if (m_0000[i] == frame)
+        if (frames[i] == frame)
         {
-            m_0200[i].x = x;
-            m_0200[i].y = y;
-            m_0200[i].z = z;
-            m_0200[i].w = w;
+            values[i].x = x;
+            values[i].y = y;
+            values[i].z = z;
+            values[i].w = w;
             return 1;
         }
-        if (m_0000[i] > frame)
+        if (frames[i] > frame)
             break;
     }
-    for (int j = m_0a80 - 1; j >= i; j--)
+    for (int j = count - 1; j >= i; j--)
     {
-        m_0000[j + 1] = m_0000[j];
-        m_0200[j + 1].Copy(m_0200[j]);
+        frames[j + 1] = frames[j];
+        values[j + 1].Copy(values[j]);
         flags[j + 1] = flags[j];
     }
-    m_0200[i].x = x;
-    m_0200[i].y = y;
-    m_0200[i].z = z;
-    m_0200[i].w = w;
-    m_0000[i] = frame;
+    values[i].x = x;
+    values[i].y = y;
+    values[i].z = z;
+    values[i].w = w;
+    frames[i] = frame;
     flags[i] = 0;
-    m_0a80++;
+    count++;
     return i;
 }
 

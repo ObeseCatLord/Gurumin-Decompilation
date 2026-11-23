@@ -5,18 +5,11 @@
 
 #include <string.h>
 
-struct KeyList
-{
-    char keys[0xa00];
-    char flags[0x84];
-    void Clear();
-    int Add(int frame, int a, int b, int c, int d);
-    int Sample(int frame, float *x, float *y, float *z, float *w, int flags);  // KeyBank::Sample 0x101af4c0
-};
+#include "key_track.h"
 
 struct AnimTrack
 {
-    KeyList keys;
+    KeyBank keys;
     int last;
     int first;
     int m_008;                // current frame while playing
@@ -62,15 +55,15 @@ struct AnimModel
 
     int M_10161a20(int count);
     void M_10161a60();
-    int M_10161af0(int frame, int a, int b, int c);
+    int M_10161af0(int frame, float x, float y, float z);
     int M_10161b40(int a, int b);
     void M_10161b60();
-    int M_10161b90(int frame, int value);
+    int M_10161b90(int frame, float value);
     int M_10161be0(int a, int b);
     void M_10161f30();
     int M_10161f60(int a, int b);
     int M_101628b0(int a, int b, int c, char d);
-    int M_10161a90(int frame, int a, int b, int c, char flag);
+    int M_10161a90(int frame, float x, float y, float z, char flag);
     int StepTrackA();
 };
 
@@ -106,9 +99,9 @@ void AnimModel::M_10161a60()
 }
 
 // Adds key (a, b, c) at `frame` to track C and widens its frame range.
-int AnimModel::M_10161af0(int frame, int a, int b, int c)
+int AnimModel::M_10161af0(int frame, float x, float y, float z)
 {
-    trackC.keys.Add(frame, a, b, c, 0);
+    trackC.keys.Set(frame, x, y, z, 0);
     if (trackC.last < frame + 1)
         trackC.last = frame + 1;
     if (trackC.first > frame)
@@ -135,9 +128,9 @@ void AnimModel::M_10161b60()
 }
 
 // Adds a motion key at `frame` to track A (key flag 4 = motion frame) and widens its frame range.
-int AnimModel::M_10161b90(int frame, int value)
+int AnimModel::M_10161b90(int frame, float value)
 {
-    trackA.keys.flags[trackA.keys.Add(frame, value, 0, 0, 0)] = 4;
+    trackA.keys.flags[trackA.keys.Set(frame, value, 0, 0, 0)] = KEY_FLAG_MOTION;
     if (trackA.last < frame)
         trackA.last = frame;
     if (trackA.first > frame)
@@ -184,9 +177,9 @@ int AnimModel::M_101628b0(int a, int b, int c, char d)
     return 0;
 }
 // Adds key (a, b, c) at `frame` to track C with key flag `flag`.
-int AnimModel::M_10161a90(int frame, int a, int b, int c, char flag)
+int AnimModel::M_10161a90(int frame, float x, float y, float z, char flag)
 {
-    trackC.keys.flags[trackC.keys.Add(frame, a, b, c, 0)] = flag;
+    trackC.keys.flags[trackC.keys.Set(frame, x, y, z, 0)] = flag;
     if (trackC.last < frame + 1)
         trackC.last = frame + 1;
     if (trackC.first > frame)

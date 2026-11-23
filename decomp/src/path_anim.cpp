@@ -1,15 +1,11 @@
 // Objects that move along a key-framed path.
 
-struct KeyBank
-{
-    int Sample(int frame, float *x, float *y, float *z, float *w, int flags);
-};
+#include "key_track.h"
 
 struct PathMover
 {
     char pad_0000[0x17ec];
     KeyBank path;
-    char pad_17ed[0xa83];
     int endFrame;
     int startFrame;
     int frame;

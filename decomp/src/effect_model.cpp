@@ -4,15 +4,7 @@
 
 #include "matrix4.h"
 
-// Key-frame bank (containers.cpp); it has a destructor, so constructing it opens an EH state.
-struct KeyBank
-{
-    char pad_0000[0xa84];
-    KeyBank();                                         // 0x101af420
-    ~KeyBank();
-    void Clear();                                      // 0x101ad730
-    int Insert(int frame, float x, float y, float z, float w);  // 0x101ad760
-};
+#include "key_track.h"
 
 #include "node.h"
 

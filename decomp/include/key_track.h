@@ -34,4 +34,26 @@ struct KeyTrack
     int Sample(int frame, float *x, float *y, float *z, float *w, int rotation);
 };
 
+// Capacity of a KeyBank.
+#define KEY_BANK_SIZE 0x80
+
+// A fixed key-frame bank (0xa84 bytes): up to 0x80 keys kept sorted by frame, used while loading and inside motion
+// channels (anim_model.h), effect models and the world's tables. Constructor and Insert/Set in vec4.cpp, the rest in
+// containers.cpp; Sample at 0x101af4c0.
+struct KeyBank
+{
+    int frames[KEY_BANK_SIZE];     // 0x000: frame number of each key, ascending
+    Vec4 values[KEY_BANK_SIZE];    // 0x200: value of each key
+    char flags[KEY_BANK_SIZE];     // 0xa00: KEY_FLAG_* bits of each key
+    int count;                     // 0xa80: keys in use
+
+    KeyBank();                                                     // 0x101af420: one zero key at frame 0
+    void Clear();                                                  // 0x101ad730: back to one zero key at frame 0
+    int Insert(int frame, float x, float y, float z, float w);     // 0x101ad760
+    int Set(int frame, float x, float y, float z, float w);        // 0x101ad820
+    int CopyTo(KeyTrack *target);                                  // 0x101af450: appends every key to `target`
+    // 0x101af4c0: the value at `frame` (flags as KeyTrack::Sample's `rotation`).
+    int Sample(int frame, float *x, float *y, float *z, float *w, int flags);
+};
+
 #endif

@@ -9,13 +9,7 @@
 
 #include "matrix4.h"
 
-// A fixed key-frame bank (vec4.cpp KeyBank), 0xa84 bytes.
-struct KeyBank
-{
-    char data[0xa84];
-    KeyBank();                                       // 0x101af420
-    void Clear();                                    // 0x101ad730
-};
+#include "key_track.h"
 
 // The engine's file object (save_slot.cpp GameFile).
 struct GameFile

@@ -15,18 +15,6 @@
 
 #include "key_track.h"
 
-struct KeyBank
-{
-    int m_0000[0x80];
-    Vec4 m_0200[0x80];
-    char flags[0x80];
-    int m_0a80;
-    KeyBank();
-    void Clear();
-    int CopyTo(KeyTrack *target);
-    int Insert(int frame, float x, float y, float z, float w);
-};
-
 #include "matrix4.h"
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
@@ -91,10 +79,10 @@ int IndexList::CopyFrom(const IndexList *source)
 // Empties the bank, leaving one zero key at frame 0 as the default value.
 void KeyBank::Clear()
 {
-    m_0a80 = 0;
-    m_0000[0] = 0;
+    count = 0;
+    frames[0] = 0;
     float zero = 0;
-    m_0200[0].Fill(zero);
+    values[0].Fill(zero);
 }
 
 // Frees the three key arrays (only when they were allocated) and empties the track.
@@ -227,9 +215,9 @@ int KeyBank::CopyTo(KeyTrack *target)
 {
     target->Free();
     target->Init();
-    for (int i = 0; i < m_0a80; i++)
+    for (int i = 0; i < count; i++)
     {
-        target->AddKey(m_0000[i], m_0200[i].x, m_0200[i].y, m_0200[i].z, m_0200[i].w);
+        target->AddKey(frames[i], values[i].x, values[i].y, values[i].z, values[i].w);
         target->flags[i] = flags[i];
     }
     return 0;

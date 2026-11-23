@@ -1,0 +1,310 @@
+// An animated model (0x249c bytes): a loaded node tree with its motion playback, three key-framed motion channels, a
+// world matrix, movement vectors and collision state. Every character is one: the character models are the array
+// DAT_10db6ee8 (world.h's Character views the same records 0x10 bytes earlier). Methods: anim_model.cpp (channels),
+// anim_reset.cpp (ResetState), anim_unload.cpp (Unload), anim_ctor.cpp (constructor), model_params.cpp (movement,
+// facing, holding, collision tests), model_place.cpp (Teleport, SetPosition), path_anim.cpp (StepPath),
+// texture_mgr.cpp (LoadModel, PlayMotion, UpdateCollision) and scene_misc.cpp (playback settings).
+// This is the one declaration of these types: include this header, never redeclare them.
+#ifndef GURUMIN_ANIM_MODEL_H
+#define GURUMIN_ANIM_MODEL_H
+
+#include "vec4.h"
+#include "matrix4.h"
+#include "key_track.h"
+
+struct Node;
+
+// Number of motion layers a Playback tracks.
+#define PLAYBACK_LAYER_COUNT 0x90
+// Playback::layer while blending into nextLayer.
+#define PLAYBACK_BLENDING_LAYER 0x90
+
+// The motion playback state of a model (0x7c84 bytes, `AnimModel::motion`): which layer (motion) plays, the frame,
+// and per-layer frame ranges and values. Init, SetLayer, Play and friends are in model_state.cpp; the layer-slot
+// setters at 0x1016a220-0x1016a2a0 in mesh_cache.cpp (LayerTable).
+struct Playback
+{
+    int m_0000;
+    float m_0004;                                  // 0x04: frame position (-1 while blending)
+    float m_0008;                                  // 0x08: playback speed (1.0)
+    char m_000c;
+    char pad_000d[3];
+    int m_0010;
+    int m_0014;
+    int m_0018;
+    int layer;                                     // 0x1c: layer playing (PLAYBACK_BLENDING_LAYER while blending, -1 none)
+    int frame;                                     // 0x20: current frame
+    int m_0024;
+    int m_0028;
+    int m_002c[16];
+    int m_006c[16];                                // -1 = unused
+    int m_00ac[PLAYBACK_LAYER_COUNT];              // 0xac: 1 while the layer is active
+    int m_02ec[PLAYBACK_LAYER_COUNT];              // 0x2ec: first frame
+    int m_052c[PLAYBACK_LAYER_COUNT];              // 0x52c: last frame
+    int m_076c[PLAYBACK_LAYER_COUNT];
+    int m_09ac[PLAYBACK_LAYER_COUNT];
+    int m_0bec;
+    int m_0bf0[PLAYBACK_LAYER_COUNT];              // 0xbf0: playback direction (+1 forwards, -1 backwards)
+    int m_0e30[PLAYBACK_LAYER_COUNT];
+    int m_1070[PLAYBACK_LAYER_COUNT][16];          // 0x1070: per-layer values, cleared when the layer starts
+    int m_3470[PLAYBACK_LAYER_COUNT][16];
+    int m_5870[PLAYBACK_LAYER_COUNT][16];          // 0x5870: per-layer values, -2 (unused) when the layer starts
+    int m_7c70;
+    int blending;                                  // 0x7c74: non-zero while blending into nextLayer
+    int m_7c78;
+    int nextLayer;                                 // 0x7c7c: layer being blended into
+    Node *m_7c80;
+
+    void Init();                                                       // 0x10169f90
+    void M_1016a020(void *owner);                                      // binds the playback to its model
+    int SetLayer(int layer, int a, int first, int last, int b, int c); // 0x1016a100
+    int Play(int layer, int restart, int blendFrames, float speed);    // 0x1016a2e0
+};
+
+// One key-framed motion channel of a model (0xa98 bytes): a key bank and its playback range.
+struct MotionChannels
+{
+    KeyBank keys;             // 0x000
+    int last;                 // 0xa84: last frame (exclusive for track C)
+    int first;                // 0xa88: first frame (10000 when empty)
+    int frame;                // 0xa8c: current frame while playing
+    int playing;              // 0xa90: 1 while playing
+    int looping;              // 0xa94: 1 = loop back to `first` at the end
+};
+
+// Values of AnimModel::holdState.
+#define HOLD_FREE 0
+#define HOLD_HOLDING 1
+#define HOLD_RELEASED 2
+
+struct AnimModel
+{
+    Vec4 m_0000;
+    char pad_0010[2];
+    char m_0012;
+    char pad_0013[5];
+    Matrix4 m_0018;
+    Vec4 m_0058;
+    int m_0068;
+    char m_006c;
+    char pad_006d[3];
+    union
+    {
+        char *nearCells;      // 0x70: characters: row of DAT_1021d338 (map cells near it), 0 = no visibility data
+        int collisionFilter;  // 0x70: collision filter of the model's tests (DAT_11b002c0, model_params.cpp)
+    };
+    char m_0074;
+    char m_0075;
+    char m_0076;
+    char m_0077;
+    int m_0078;
+    int m_007c;
+    int m_0080;
+    unsigned char speedDivisor;  // 0x84: slows every motion of this model down (0 = no division)
+    char pad_0085[7];
+    char m_008c;
+    char m_008d;              // 0x8d: set while a child runs to the player (Npc_ChildFollow)
+    char pad_008e[2];
+    Vec4 m_0090;
+    Vec4 m_00a0;
+    float m_00b0;             // 0xb0: height the model was placed at
+    Vec4 m_00b4[12];
+    Vec4 m_0174[6];
+    int m_01d4;
+    Matrix4 m_01d8;
+    char pad_0218[4];
+    Vec4 scale;               // 0x21c: model scale
+    Vec4 m_022c;
+    int m_023c;
+    char m_0240;
+    char pad_0241[3];
+    int m_0244;
+    float holdWeight;         // 0x248: blend weight while holding (at most 0.9)
+    Vec4 m_024c;
+    int m_025c;
+    float m_0260;
+    char m_0264;
+    char important;           // 0x265: motion changes are flagged important (DAT_11b04508); set by Enemy_ShoveAndBlast
+    char m_0266;
+    char m_0267;              // 0x267: 1 while an NPC idles; set every frame by the kind updates
+    int m_0268;
+    int m_026c;
+    // 0x270-0x290: values whose meaning depends on the character's kind (each struct names one kind's use).
+    union
+    {
+        struct
+        {
+            int m_0270;
+            int m_0274;
+            int m_0278;
+            int m_027c;
+        };
+        struct
+        {
+            int switchNode;   // 0x270: node id of the switch this character works (switches.cpp)
+        };
+        struct
+        {
+            int zone;         // 0x270: the zone a zone character runs (damage_zone.cpp)
+        };
+        struct
+        {
+            int scriptFlag;   // 0x270: script flag set when it is destroyed, 0 = none (enemy_destroy.cpp)
+            int leftModel;    // 0x274: index of the model left behind (path table DAT_10894698)
+        };
+        struct
+        {
+            int pad_burst;
+            int burst;        // 0x274: 1 once the balloon has burst (balloon_burst.cpp)
+            int blastAngle;   // 0x278: direction of the blast (1/1000 radians)
+            int blastPush;    // 0x27c: strength of the push
+        };
+    };
+    char pad_0280[8];
+    int m_0288;               // 0x288: set to 6 when destroyed
+    int m_028c;               // 0x28c: cleared when destroyed
+    int m_0290;
+    union
+    {
+        int m_0294;           // 0x294: 1 while held in its pose (npc_frozen.cpp)
+        int holding;          // 0x294: 1 while a sleeper holds its sleeping frame (npc_sleep.cpp)
+        int walkingRoute;     // 0x294: 1 while the character walks a route (route_walk.cpp)
+    };
+    Playback *motion;         // 0x298: the motion playback state (freed by Unload)
+    float speedScale;         // 0x29c: motion speed scale (1.0)
+    char m_02a0;
+    char m_02a1;
+    char m_02a2;
+    unsigned char loadCount;  // 0x2a3: number of models loaded so far (stops counting at 3)
+    char holdState;           // 0x2a4: HOLD_*
+    char pad_02a5[3];
+    int m_02a8;
+    MotionChannels trackA;    // 0x2ac: motion keys (KEY_FLAG_MOTION)
+    int m_0d44;
+    int m_0d48;
+    float alpha;              // 0xd4c: 1.0 when spawned (model alpha)
+    MotionChannels trackB;    // 0xd50
+    char m_17e8;
+    char locked;              // 0x17e9: non-zero = SetPendingPush ignores pushes
+    char pad_17ea[2];
+    MotionChannels trackC;    // 0x17ec: path keys (path_anim.cpp StepPath)
+    int m_2284;
+    char m_2288;              // 0x2288: flag of the pending push
+    char pad_2289[3];
+    Vec4 m_228c;              // 0x228c: pending push (x, y, z), see SetPendingPush
+    int m_229c;               // 0x229c: blend frames, 8 when unset
+    int m_22a0;
+    char pad_22a4[8];
+    char m_22ac;
+    char pad_22ad[0x3f];
+    Node *root;               // 0x22ec: the model's node tree (its entry in the model table)
+    int m_22f0;               // 0x22f0: non-zero while the character is in use (key prompts are drawn)
+    Node *headNode;           // 0x22f4: the head bone node (0 = none)
+    int m_22f8;
+    int m_22fc;
+    Node *swapNode1;          // 0x2300: nodes whose materials M_10161a20 swaps (0 = none)
+    Node *swapNode2;          // 0x2304
+    Node *collider;           // 0x2308: the map collision this model moves against
+    char pad_230c[0xc];
+    int m_2318;
+    int m_231c;
+    char pad_2320[8];
+    Matrix4 matrix;           // 0x2328: world matrix; matrix.translation is the position
+    union
+    {
+        int motionFrame;      // 0x2368: frame of the motion file shown now (held while sleeping)
+        float radius;         // 0x2368: collision radius (UpdateCollision)
+    };
+    float motionSpeed;        // 0x236c: current motion playback speed (at most 60)
+    float m_2370;             // 0x2370: height the model was placed at
+    int m_2374;
+    char m_2378;
+    char m_2379;
+    char m_237a;
+    char pad_237b;
+    float m_237c;
+    int m_2380;
+    int m_2384;               // 0x2384: collision result, cleared before each update
+    int m_2388;               // 0x2388: 1 once a speed change is pending
+    int m_238c;               // 0x238c: non-zero = play the idle motion (app_0011.cpp)
+    int m_2390;               // 0x2390: limit for map collision tests
+    int m_2394;
+    Vec4 holdOffset;          // 0x2398: position relative to the held model
+    Vec4 move;                // 0x23a8: movement impulse applied by the next update (Character_SetMove)
+    Vec4 velocity;            // 0x23b8: current movement
+    Vec4 m_23c8;
+    Vec4 m_23d8;              // 0x23d8: x, y = target of MoveTowards / M_101627d0; z holds their int `mode`
+    Vec4 m_23e8;
+    Vec4 m_23f8;
+    Vec4 m_2408;
+    int m_2418;
+    char pad_241c[4];
+    Vec4 m_2420;
+    int m_2430;
+    Matrix4 m_2434;           // 0x2434: a second matrix that receives the ground position (char_ground.cpp)
+    char m_2474;
+    char pad_2475[3];
+    int m_2478;
+    float heading;            // 0x247c: facing angle in radians
+    float targetHeading;      // 0x2480: angle the character turns towards
+    int m_2484;
+    char pad_2488[4];
+    int m_248c;
+    int pad_2490;
+    int m_2494;               // 0x2494: cleared by LoadModel
+    int mode;                 // 0x2498: 1 = normal (set by the scene start for the player), 2 = over the pit area
+
+    AnimModel();                                                   // 0x101629f0 (anim_ctor.cpp)
+    int M_10161a20(int texture);                                   // 0x10161a20: material swap
+    void M_10161a60();                                             // clears track C
+    int M_10161a90(int frame, float x, float y, float z, char flag);
+    int M_10161af0(int frame, float x, float y, float z);          // adds a key to track C
+    int M_10161b40(int a, int b);                                  // track C's playback options
+    void M_10161b60();                                             // clears track A
+    int M_10161b90(int frame, float value);                        // adds a motion key to track A
+    int M_10161be0(int a, int b);
+    int StepTrackA();                                              // 0x10161c00
+    int SnapPosition(float step, float offset);                    // 0x10161cb0
+    int SnapHeight(float step, float offset);                      // 0x10161e40
+    void M_10161f30();
+    int M_10161f60(int a, int b);
+    int ResetState();                                              // 0x10161f80 (anim_reset.cpp)
+    int UpdateCollision();                                         // 0x10162390 (texture_mgr.cpp)
+    int Teleport(float x, float y, float z);                       // 0x10162420 (model_place.cpp)
+    int SetPosition(float x, float y, float z);                    // 0x10162610 (model_place.cpp)
+    int M_101627d0(float x, float y, int mode);
+    int MoveTowards(float x, float y, int mode);                   // 0x10162800
+    // 0x101628b0: queues a push (x, y, z) with `flag` unless the model is locked.
+    int SetPendingPush(float x, float y, float z, char flag);
+    int Push(float x, float y, float z);                           // 0x101628f0
+    int M_101629b0(float y, float x);
+    int Unload();                                                  // 0x10162c50 (anim_unload.cpp)
+    int SnapHeadingToSide();                                       // 0x10162d50
+    int FaceAwayFrom(AnimModel *other);                            // 0x10162e00
+    int FaceAway(const Vec4 &point);                               // 0x10162ea0
+    int ScreenPosition(int *x, int *y, const Matrix4 &viewProjection);  // 0x10162f50
+    int PushMotionSpeed(float speed);                              // 0x10163000
+    int AddMotionSpeed(float speed);                               // 0x101630b0
+    int HoldAtSpine(int on, float amount);                         // 0x10163c70
+    int Hold(int on, float amount, AnimModel *other);              // 0x10163d60
+    int IsClear(const Vec4 *offset);                               // 0x10163e90
+    int IsClearFlagged(const Vec4 *offset);                        // 0x10163f90
+    int IsClearAny(const Vec4 *offset);                            // 0x101640b0: 0 when the move collides
+    int IsClearOfMapLimited(const Vec4 *offset);                   // 0x101641b0
+    int IsClearOfMap(const Vec4 *offset);                          // 0x101642c0
+    int StepPath();                                                // 0x10175e80 (path_anim.cpp): follows track C
+    int LoadModel(const char *path);                               // 0x1017aeb0 (texture_mgr.cpp)
+    int SetPlayback(int a, int b, int c, int d, int e, int f);     // 0x1017af40 (scene_misc.cpp)
+    int SetLayerOffset(int layer, int slot, int x, int y);         // 0x1017afb0
+    int SetLayerSource(void *source, int slot, int value);         // 0x1017b020
+    int SetLayerParameter(int layer, int slot, int value);         // 0x1017b080
+    void PlayMotion(int motion, int a, int b, float speed);        // 0x1017b0e0 (texture_mgr.cpp)
+    int M_1017b160();
+    int M_1017b1c0();
+    int M_1017b9b0(const char *path);
+};
+
+// The character models (one per character slot; slot 0 is the player).
+extern "C" AnimModel DAT_10db6ee8[0x80];
+
+#endif

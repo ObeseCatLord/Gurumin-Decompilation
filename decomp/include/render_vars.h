@@ -15,6 +15,8 @@ struct IUnknownLike;   // com_min.h
 struct MeshData;   // mesh.h
 struct Node;   // node.h
 
+struct TextureRef;   // texture_ref.h
+
 extern "C" int DAT_10202b08;                              // debug keys enabled
 extern "C" int DAT_10202b0c;                              // number of frame buffers
 extern "C" float DAT_10202b18;                            // largest viewport size (both width and height); size of the square crossfade targets
@@ -142,6 +144,7 @@ extern "C" int DAT_10fa73f8[32];                          // their definitions
 extern "C" MeshData *DAT_10fa7478[];                      // per mesh buffer slot: the mesh
 extern "C" char DAT_10fada90[0xc80][0x20];
 extern "C" char DAT_10fdeb90[1600];                       // reference count per texture slot
+extern "C" TextureRef *DAT_10fdf1d0[];                   // per motion cache slot: the shared reference (scene_node.cpp)
 extern "C" int DAT_10fe01d8[];
 extern "C" int DAT_10feb3e0[0xc80];                       // per mesh buffer slot: 1 = owned by a single node; reference count of each model name
 extern "C" int DAT_10fee5e0[];

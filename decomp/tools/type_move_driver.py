@@ -14,7 +14,8 @@ with different texts are struct views: they need a merge by hand and stay where 
 Headers: the types a file alone defines go to include/<snake_case_type>.h when there is one, otherwise to
 include/<file stem>.h (or <stem>_types.h when that name is taken); a type shared by identical copies gets its own
 include/<snake_case_type>.h. Each header carries the comment lines above each definition, the `#include` lines that
-came before the first definition in the source file, and the `#define` constants the definitions use. The source file
+came before the last definition in the source file (tools/prune_header_includes.py
+drops the ones a header does not need), and the `#define` constants the definitions use. The source file
 gets `#include "<header>"` where its first moved definition stood.
 
 After the rewrite each file is built with build.bat and compared with HEAD's report.json: a file that loses a match,
@@ -203,11 +204,15 @@ def rewrite(f, raw, moved, headers, written):
     """Return (new source text, {header: text}) for file f."""
     newline = "\r\n" if "\r\n" in raw else "\n"
     first = min(b.start for b in moved)
-    include_lines = [l.strip() for l in raw[:first].splitlines() if re.match(r"\s*#include\s*[<\"]", l)]
+    last = max(b.start for b in moved)
+    include_lines = [l.strip() for l in raw[:last].splitlines() if re.match(r"\s*#include\s*[<\"]", l)]
     used = set(re.findall(r"\w+", " ".join(b.normalized for b in moved)))
     defines, define_spans = [], []
-    for m in re.finditer(r"^[ \t]*#define[ \t]+(\w+)\b[^\n]*\n?", raw[:first], re.M):
-        if m.group(1) in used:
+    # constants and single-line typedefs (callback types) the moved definitions use go with them
+    pattern = r"^[ \t]*(?:#define[ \t]+(\w+)\b[^\n]*|typedef[^;{\n]*?\(?\s*\**\s*(\w+)\s*\)?\s*(?:\([^;{\n]*\))?\s*;[^\n]*)\n?"
+    inside = lambda pos: any(b.start <= pos < b.end for b in moved)
+    for m in re.finditer(pattern, raw[:last], re.M):
+        if (m.group(1) or m.group(2)) in used and not inside(m.start()):
             defines.append(m.group(0).rstrip("\r\n"))
             define_spans.append((m.start(), m.end()))
     by_header = collections.OrderedDict()

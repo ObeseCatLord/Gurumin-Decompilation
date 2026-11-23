@@ -2,14 +2,7 @@
 
 #include "vec4.h"
 
-// Plane a*x + b*y + c*z + d = 0 (vec_math.cpp).
-struct Plane
-{
-    float a;
-    float b;
-    float c;
-    float d;
-};
+#include "plane.h"
 
 Vec4 Cross(const Vec4 &a, const Vec4 &b);
 

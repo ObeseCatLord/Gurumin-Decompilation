@@ -19,11 +19,7 @@ struct Node;
 
 #include "mesh.h"
 
-// A reference-counted cache entry (mesh_cache.cpp): the motion of a node points to one holding its cache slot.
-struct TextureRef
-{
-    int slot;
-};
+#include "texture_ref.h"
 extern "C" int FUN_10169c00(TextureRef *texture);
 extern "C" int FUN_10169be0(TextureRef *texture);  // adds a reference
 
@@ -32,17 +28,7 @@ struct Node;
 extern "C" int FUN_10169990(MeshData *mesh);
 extern "C" int FUN_10169970(MeshData *mesh);     // MeshCache_AddRef
 
-struct Keys
-{
-    void M_101ad690();
-    void M_101ad5c0(int a, const char *motion, int frames);
-};
-
-struct Channel
-{
-    int size;                    // size of the whole channel block in bytes
-    Keys keys;
-};
+#include "node_channel.h"
 
 #include "key_track.h"
 
@@ -418,8 +404,8 @@ int Node::RestartColourPlugs(const char *motion, int frames)
     {
         if (plugType[6 + i] != 0 && plugType[6 + i] == 0x4ee33)
         {
-            plugs[6 + i]->keys.M_101ad690();
-            plugs[6 + i]->keys.M_101ad5c0(0, motion, frames);
+            plugs[6 + i]->keys.Clear();
+            plugs[6 + i]->keys.InsertByName(0, motion, frames);
         }
     }
     return 0;
@@ -1623,7 +1609,6 @@ int Node::BlendFrames(int from, int to, float t)
     return 1;
 }
 
-extern "C" TextureRef *DAT_10fdf1d0[];                // per motion cache slot: the reference
 extern "C" int FUN_10169ab0(const char *folder, const char *name, int *freeSlot);  // motion name slot, -1 = none
 extern "C" int FUN_101699d0(void);                   // a free motion name slot
 extern "C" int FUN_101699f0(int slot, const char *folder, const char *name);       // names a motion slot

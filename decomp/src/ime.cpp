@@ -6,41 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct StateArrays
-{
-    char pad_0000[0x20];
-    int m_0020[8];
-    float m_0040[8];
-    int M_1015caa0(int value, int index);
-    int M_1015cac0(float value, int index);
-};
-
-struct ImeContext
-{
-    HWND window;
-    HIMC context;
-    int pad_0008;
-    CANDIDATELIST *buffer;
-
-    ImeContext();
-    int Release();
-    int Attach(HWND target);
-    int IsOpen();
-    int SetOpen(BOOL open);
-    int GetConversion(DWORD *conversion, DWORD *sentence);
-    int SetConversion(const DWORD *conversion, const DWORD *sentence);
-    LONG GetCompositionValue();
-    LONG M_1015d400();
-    DWORD GetSelection();
-    const char *GetCandidate(int index);
-    DWORD GetPageStart();
-    DWORD GetCount();
-    DWORD GetPageSize();
-    int GetResultString(char *out);
-    int GetCompositionString(char *out);
-    DWORD LoadCandidates();
-    int GetModeText(char *out);
-};
+#include "ime.h"
 
 // Stores `value` in slot `index` of the first state array.
 int StateArrays::M_1015caa0(int value, int index)
@@ -288,23 +254,6 @@ extern "C" int FUN_1015fd30(void)
     return 0;
 }
 
-// IME hooks inside the game window object DAT_10f65698 (RenderWindow, window_create.cpp): WindowProc calls these
-// callbacks on WM_IME_COMPOSITION and sets the two flags.
-typedef void (*ImeCallback)();
-
-struct ImeWindowHooks
-{
-    void *vtable;
-    HWND window;                       // 0x04
-    int active;
-    HINSTANCE instance;
-    int compositionResult;             // 0x10: a result string arrived
-    int compositionEnded;              // 0x14: the composition string changed
-    ImeCallback onCompositionString;   // 0x18
-    ImeCallback onCompositionResult;   // 0x1c
-    ImeCallback onCursorPos;           // 0x20
-    ImeCallback onAttributes;          // 0x24
-};
 
 extern "C" ImeWindowHooks DAT_10f65698;
 extern "C" void FUN_1015f3e0();        // reads the composition string

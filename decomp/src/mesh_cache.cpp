@@ -5,10 +5,7 @@
 
 #include "mesh_ref.h"
 
-struct TextureRef
-{
-    int index;
-};
+#include "texture_ref.h"
 
 #include "anim_model.h"
 
@@ -48,14 +45,14 @@ extern "C" int FUN_101699d0(void)
 // Adds a reference to a shared texture file and returns the new count.
 extern "C" int FUN_10169be0(const TextureRef *texture)
 {
-    int index = texture->index;
+    int index = texture->slot;
     return ++DAT_10faae88[index];
 }
 
 // Releases one reference to a shared texture file (freeing the name at 0). Returns the remaining count.
 extern "C" int FUN_10169c00(const TextureRef *texture)
 {
-    int index = texture->index;
+    int index = texture->slot;
     if (index < 0)
         return 0;
     if (--DAT_10faae88[index] <= 0)

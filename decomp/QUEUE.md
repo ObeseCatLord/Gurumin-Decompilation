@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (161)
+## 1. Walls to retry (163)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -90,6 +90,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100b9bb0` 867 — Enemy_PlayVoice: same switch (jump table plus the 0x1e4.. range); the original keeps 15 and 0x2d in ebx/ebp, recomputes index*16+slot for every access and tests the cooldown kinds in turn, cl 13.00 here threads the kind tests after the reset stores; 2-D, flat and re-read kind forms tried
 - [ ] `100ba040` 604 — Npc_PlayGreeting: same statements; the original copies the AbsFloat result into the height local with fld/fstp (cl 13.00 here stores it directly) and places the new-greeting block after the walked-away block (goto and flag forms tried)
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
+- [ ] `100d2110` 894 — Enemy_SeekShaga (shaga_seek.cpp): body identical; ebx/edi pushed before the FUN_100aa820 call (original: after the step test) and the pair branch's count++ cross-jumps into the single branch; early-return, nested-if, local-placement and candidate-spelling variants tried
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2110` 143 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e21a0` 671 — Enemy_DefaultStep (enemy_react.cpp): same flow, calls and switch; the original keeps 0 in ebx for its stores, compares and the switch (sub eax, ebx), cl 13.00 here uses immediates
@@ -159,6 +160,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
+- [ ] `1019bdd0` 1032 — Node::ProjectPlanarUVs (scene_node.cpp, rule-clean): 42 bytes off, x87 scheduling only: in four places the original loads the next vertex index (mov ecx,[esp+..]) before the fmul by PLANAR_UV_SCALE, and stores the loop index right after add ecx,3 instead of after the cmp; operand order and outer index declarations tried
 - [ ] `1019d8e0` 954 — Node::ComputeBounds: control flow and stores in place; the -999999 constant and the y min/max slots use other registers/slots (ecx and swapped 0x18/0x1c in the original), declaration orders tried
 - [ ] `1019e120` 1246 — Node::BuildCollisionSpheres: 14 bytes; identical except that the original encodes the indexed loads with the offset register as base ([ecx + ebx + 4] for vertices, [edi + edx + 4] for the pack lists), ours with the pointer register first (typed vertex struct tried)
 - [ ] `1019eeb0` 844 — Node::SetupSkinning (M_1019eeb0): identical except the bone != 0 test in the parent-name condition, which cl 13.00 here drops (the original keeps test eax, eax; je); local and re-read forms tried
@@ -183,10 +185,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (140)
+## 4. Large functions (801-3000 bytes) (136)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `100d2110` 894 bytes (float, loops 4, calls 12)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
 - [ ] `1001bb20` 925 bytes (float, loops 2, calls 23)
 - [ ] `100360f0` 939 bytes (loops 4, calls 1)
@@ -196,7 +197,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100279b0` 998 bytes (float, calls 36)
 - [ ] `10029cf0` 999 bytes (float, loops 2, calls 3)
 - [ ] `1000c720` 1032 bytes (float, loops 2, calls 22)
-- [ ] `1019bdd0` 1032 bytes (float, loops 2, calls 19)
 - [ ] `1000e340` 1035 bytes (float, loops 1, calls 23)
 - [ ] `100509e0` 1035 bytes (float, calls 36)
 - [ ] `1016a480` 1045 bytes (float, loops 3, calls 6)
@@ -271,9 +271,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10028fa0` 1900 bytes (float, calls 11)
 - [ ] `100a8ac0` 1912 bytes (float, calls 58)
 - [ ] `1013f070` 1928 bytes (float, loops 3, calls 89)
-- [ ] `1017b210` 1944 bytes (float, loops 3, calls 52)
 - [ ] `100b7360` 1953 bytes (float, loops 3, calls 46)
-- [ ] `1017b9b0` 1961 bytes (float, loops 3, calls 53)
 - [ ] `100b1800` 1977 bytes (float, loops 8, calls 31)
 - [ ] `1014ddf0` 2003 bytes (float, calls 63)
 - [ ] `1007b870` 2009 bytes (float, calls 27)

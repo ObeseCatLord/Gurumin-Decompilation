@@ -90,7 +90,8 @@ struct AnimModel
     Vec4 m_0000;
     char pad_0010[2];
     char m_0012;
-    char pad_0013[5];
+    char m_0013;
+    char pad_0014[4];
     Matrix4 m_0018;
     Vec4 m_0058;
     int m_0068;
@@ -109,7 +110,8 @@ struct AnimModel
     int m_007c;
     int m_0080;
     unsigned char speedDivisor;  // 0x84: slows every motion of this model down (0 = no division)
-    char pad_0085[7];
+    char pad_0085[3];
+    int m_0088;               // 0x88: cleared by CloneModel
     char m_008c;
     char m_008d;              // 0x8d: set while a child runs to the player (Npc_ChildFollow)
     char pad_008e[2];
@@ -126,10 +128,10 @@ struct AnimModel
     int m_023c;
     char m_0240;
     char pad_0241[3];
-    int m_0244;
+    Node *spineNode;          // 0x244: the "Bip01 Spine" bone (loadedRoot when the model has none; CloneModel)
     float holdWeight;         // 0x248: blend weight while holding (at most 0.9)
     Vec4 m_024c;
-    int m_025c;
+    int m_025c;               // 0x25c: random value 0..499 picked by CloneModel
     float uniformScale;       // 0x260: uniform model scale (1.0; model_bank.cpp passes it to the shadow drawing)
     char m_0264;
     char important;           // 0x265: motion changes are flagged important (DAT_11b04508); set by Enemy_ShoveAndBlast
@@ -209,15 +211,16 @@ struct AnimModel
     Node *loadedRoot;         // 0x22f0: the same node tree as root while the model is in use, 0 when free (key
                               // prompts are drawn only for loaded characters; model_bank.cpp reads its model data)
     Node *headNode;           // 0x22f4: the head bone node (0 = none)
-    int m_22f8;
-    int m_22fc;
+    Node *leftToeNode;        // 0x22f8: the "Bip01 L Toe0" bone (loadedRoot when the model has none)
+    Node *rightToeNode;       // 0x22fc: the "Bip01 R Toe0" bone (loadedRoot when the model has none)
     Node *swapNode1;          // 0x2300: nodes whose materials M_10161a20 swaps (0 = none)
     Node *swapNode2;          // 0x2304
     Node *collider;           // 0x2308: the map collision this model moves against
     char pad_230c[0xc];
-    int m_2318;
+    float colliderReach;      // 0x2318: 0.578 * the bounding radius of the collision node (CloneModel)
     int m_231c;
-    char pad_2320[8];
+    int m_2320;               // 0x2320: cleared by CloneModel
+    Node *bipNode;            // 0x2324: the "Bip01" bone (0 = no node tree)
     Matrix4 matrix;           // 0x2328: world matrix; matrix.translation is the position
     union
     {
@@ -313,7 +316,8 @@ struct AnimModel
     void PlayMotion(int motion, int a, int b, float speed);        // 0x1017b0e0 (texture_mgr.cpp)
     int M_1017b160();
     int M_1017b1c0();
-    int M_1017b9b0(const char *path);
+    int CloneModel(AnimModel *source, int unused);                 // 0x1017b210 (anim_clone.cpp)
+    int LoadFile(const char *path);                                // 0x1017b9b0 (anim_clone.cpp)
 };
 
 // The character models (one per character slot; slot 0 is the player).

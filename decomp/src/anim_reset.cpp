@@ -15,7 +15,7 @@ int AnimModel::ResetState()
     m_0012 = 0;
     m_0077 = 0;
     m_008c = 0;
-    m_0244 = 0;
+    spineNode = 0;
     m_008d = 0;
     m_006c = 0;
     m_00b0 = 0;

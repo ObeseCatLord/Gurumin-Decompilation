@@ -272,7 +272,7 @@ struct Node
     int M_10194f40(float *position, Matrix4 *matrix, int a, float radius, int b, int depth);  // 0x10194f40
     int StartProximityPass(float *position, Matrix4 *matrix, int a, float radius, int b);     // 0x101a2370
     // 0x1019f340: tests a moving model (probe points) against this collision node (model_params.cpp).
-    int M_1019f340(int mask, Matrix4 *world, int a, int b, int *out5, Vec4 *probe, int probeCount, int *hitCount,
+    int M_1019f340(int mask, Matrix4 *world, int a, float reach, int *out5, Vec4 *probe, int probeCount, int *hitCount,
                    Vec4 *hitPoint, Vec4 *hitNormal, int limit, int *out12, int c, int d, int e);
     int UpdateVisibleCells();                             // 0x10199be0 (visibility.cpp)
     int TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matrix4 *matrix);  // 0x10199cd0

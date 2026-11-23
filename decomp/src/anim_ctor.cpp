@@ -38,6 +38,6 @@ AnimModel::AnimModel()
     matrix = IdentityMatrix();
     m_2418 = 0;
     headNode = 0;
-    m_22f8 = 0;
-    m_22fc = 0;
+    leftToeNode = 0;
+    rightToeNode = 0;
 }

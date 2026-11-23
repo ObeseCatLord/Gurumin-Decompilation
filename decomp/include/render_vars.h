@@ -164,7 +164,7 @@ extern "C" TextureRef *DAT_10fdf1d0[];                   // per motion cache slo
 extern "C" int DAT_10fe01d8[];
 extern "C" int DAT_10feb3e0[0xc80];                       // per mesh buffer slot: 1 = owned by a single node; reference count of each model name
 extern "C" int DAT_10fee5e0[];
-extern "C" int DAT_10ff19e8[0x100];                       // collision data of each model table entry; per model: its collision data
+extern "C" Matrix4 *DAT_10ff19e8[0x100];                  // world matrix of each model table entry (AnimModel::matrix)
 extern "C" int DAT_10ff1dec;                              // batches still pending this frame
 extern "C" int DAT_10ff1df8[0x47e];                       // 1 once a definition's resources are loaded
 extern "C" int DAT_10ff2ff8[];

@@ -982,3 +982,6 @@ address	name	evidence
 10192200	BoxCylinder_Overlap	box against the upright cylinder inscribed in a second box (matched, decomp/src/box_overlap.cpp)
 10192c90	CylinderSphere_Overlap	upright cylinder in a moved box against a moved sphere (open, decomp/src/box_overlap.cpp)
 10192520	BoxSphere_Overlap	moved box against a moved sphere in three views, with push axes (open, decomp/src/box_overlap.cpp)
+1019bdd0	Node::ProjectPlanarUVs	matched decompiled source (decomp/obj_symbols.tsv)
+1017b210	AnimModel::CloneModel	matched decompiled source (decomp/obj_symbols.tsv)
+1017b9b0	AnimModel::LoadFile	matched decompiled source (decomp/obj_symbols.tsv)

@@ -486,3 +486,5 @@ _FUN_101426d0@8	101426d0
 ?SetBlend@TriangleBatch@@QAEHHH@Z	10173450
 ?AddVertices@TriangleBatch@@QAEHPAUTextureObject@@PAXH@Z	10188eb0
 ?ProjectPlanarUVs@Node@@QAEHH@Z	1019bdd0
+?CloneModel@AnimModel@@QAEHPAU1@H@Z	1017b210
+?LoadFile@AnimModel@@QAEHPBD@Z	1017b9b0

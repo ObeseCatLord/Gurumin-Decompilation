@@ -51,7 +51,7 @@ Under AGENTS.md rules 1-2 most matches are still MATCH-PENDING until their other
 - One Python driver per type, kept outside the repo (Node: `node_merge_driver.py`; AnimModel: `am_driver.py`; Character: `ch_driver.py`, all in the session
   notes folder; copy and adapt them). For each file it builds a baseline, removes the local struct block (plus the comment
   lines directly above it), writes `#include "<type>.h"` where the struct stood, renames the view's fields and
-  methods to the header's names (matched by offset and by address), rebuilds with `cmd /c <absolute path>uild.bat <file>`, adds
+  methods to the header's names (matched by offset and by address), rebuilds with `cmd /c <absolute path to build.bat> <file>`, adds
   `obj_symbols.tsv` rows for renamed definitions, and compares matched addresses; on a loss or a compile error it
   runs `git checkout -- <file>` and logs why. Three copies run in parallel on disjoint file lists. Node: 41 of 45
   files converted unattended, the other four took a few minutes by hand.

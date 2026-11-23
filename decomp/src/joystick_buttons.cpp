@@ -1,15 +1,16 @@
 // Reading the game's buttons from a DirectInput joystick state: each game button is mapped (DAT_10f1bef0) to an
 // axis direction or a joystick button, with a default layout for map 0.
 
+#include "dinput_min.h"
 #include "joy_state.h"
 
 #include "ui_vars.h"
 
 // An axis counts as pushed towards its low or high end past the dead zone around the centre (128 in 1/256 units).
-// 0x10142b20 (Joystick_IsButtonDown). Whether game button `button` is down in `state`: maps 1-4 are the y and x
+// 0x10142b20 (Input::IsJoystickButtonDown). Whether game button `button` is down in `state`: maps 1-4 are the y and x
 // directions, 5-8 and 21-24 the z, rz, rx and ry directions (when the stick has that axis; otherwise the next
 // mapping is tried), 9-20 joystick buttons 0-11. Map 0 uses the default layout of each game button.
-extern "C" int __stdcall FUN_10142b20(int button, const JoyState *state)
+int Input::IsJoystickButtonDown(int button, const JoyState *state)
 {
     switch (DAT_10f1bef0[button])
     {
@@ -109,11 +110,11 @@ extern "C" int __stdcall FUN_10142b20(int button, const JoyState *state)
 }
 
 
-// 0x10142dd0 (Keyboard_IsButtonDown). Whether game button `button` is down in the DirectInput key array `keys`
+// 0x10142dd0 (Input::IsKeyboardButtonDown). Whether game button `button` is down in the DirectInput key array `keys`
 // (non-zero = down, bit 7 of the key). Map 0 uses the default layout of each game button; maps 1-0x21 are fixed
 // keys (arrows, Enter, Space, letters, F1-F6, the numeric keypad), 5 and 6 being left Shift or left Ctrl, each also
 // accepting right Ctrl.
-extern "C" int __stdcall FUN_10142dd0(int button, const unsigned char *keys)
+int Input::IsKeyboardButtonDown(int button, const unsigned char *keys)
 {
     switch (DAT_10f60c30[button])
     {

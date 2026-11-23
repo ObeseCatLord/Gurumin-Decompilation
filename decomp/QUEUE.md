@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (202)
+## 1. Walls to retry (205)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -130,6 +130,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10142790` 846 — Input::Update (input_poll.cpp): two bytes off; after the force-feedback EnumDevices the original compares the result with the zero register (cmp eax, ebx), cl 13.00 here test eax, eax; result locals and other spellings tried (a local changes the whole register allocation)
 - [ ] `10142b20` 519 — Joystick_IsButtonDown (__stdcall): same cases and code; the tail-merged axis tests are placed differently (the original keeps the full low-x test in the default-layout switch and jumps to it from the mapped cases, ours the other way round)
 - [ ] `10142dd0` 741 — Keyboard_IsButtonDown: same returns; in the original the default layout (map 0) of buttons 0, 2, 5, 7 and 10-13 shares the return blocks of the fixed maps 0x12, 1, 0x13, 2 and 0x14-0x17 and the blocks are laid out in another order; the plain nested switch here gives each its own block
+- [ ] `10143180` 1633 — Input::ReadControls (input_controls.cpp, 1648 vs 1632 bytes): the axis clamp keeps a redundant second cmp eax,-0x80; jg (ours folds it) and the join after the X/Y axis branches is laid out the other way round (original: X tail jumps to the join, Y falls into it); nested ifs, unsigned and && clamps, branch nesting tried
 - [ ] `10143870` 366 — TextureObject::BeginRenderTo: identical except block placement (the original puts the shared return 0 right after the first test; nested and early-return forms tried)
 - [ ] `10143bc0` 572 — Render_DrawGradientQuad (__stdcall): identical except each scaled corner coordinate goes through the float temporary at esp+4 before the two stores (ours stores into the first vertex directly); local, cast, split and inline-helper forms tried
 - [ ] `10143e00` 566 — Render_FillRect: 6 bytes; the original copies the second and third corner values through ecx and edx, ours through eax (corner locals, chained stores, declaration and statement orders tried)
@@ -140,8 +141,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101453e0` 485 — Font_DrawGlyph draft: same loops (the right-column fills come out as the same rep stosd/stosw); the original swaps the code bytes through ah, spills the glyph index into the code parameter slot and evaluates the coverage shift twice (imul 3 in both branches), cl 13.00 here keeps the index in ebx and reuses the shifted word; int/char/unsigned short pixel spellings tried
 - [ ] `101455d0` 914 — FontRenderer::Init (Font_Init): flow and calls in place; the original keeps 0 in edi and the path in ebx (ours the other way round) and compares the Open results with the zero register; its frame is 4 bytes smaller (result locals, FILE* result and goto form tried)
 - [ ] `10148590` 731 — TexturePool_Get: statements and the 8x-unrolled LRU scan in place; the original keeps the constant 1 in ebx (found, evict and the pool flags are set from it), keeps found/age in ecx/edx, and pushes its registers only after the index checks; declaration orders tried
+- [ ] `10148b00` 1534 — TextureManager::CreateDevice (src_od/render_device.cpp, /Od unit, 1495 vs 1534 bytes): instructions match with the frame masked; only the /GS local layout differs (original: createdCaps, flags, display mode, rect and window above the cookie, the adapter identifier and hardware caps below; ours puts the two scalars above and the structs below, frame 0x704 vs 0x700); 60 declaration orders, inner blocks and caps padding types change nothing. The caller in mmv_texreg.cpp still declares it as extern "C" FUN_10148b00
 - [ ] `1014b390` 233 — Render_ResetState: the original keeps the memset of the viewport before the struct copy; cl 13.00 here drops it as a dead store (earlier note: 1 kept in esi)
 - [ ] `1014c080` 943 — TextureObject::DrawQuad (texture_bind.cpp): one byte off; reading speculars[i].y the original addresses [ecx+eax] (pointer register first), cl 13.00 here [eax+ecx]; reference locals and separate specular variables tried
+- [ ] `1014ce40` 1685 — TextureObject::DrawFill (texture_fill.cpp, 1728 vs 1685 bytes): bubble strip of 40 vertices complete; the original pushes all four registers in the prologue, spills left/right/top, hoists left+3/right-3/bottom-4 and stores the xs, ys, shades and colour tables grouped by value (frame 0x794 vs ours 0x70c, 0x88 short: maybe another local array); initializer orders, element stores, branch swap and vertices[44] tried
 - [ ] `1014d850` 1429 — TextureObject::DrawFillAlt (texture_bind.cpp): loop and calls line up; the original keeps 1 and 0 in esi/ecx while filling the shade table (and later for the render states), spills i & 1 and indexes the arrays with a byte offset, cl 13.00 here schedules the array setup differently and the frame is 0xc smaller; array declaration orders and colour forms tried
 - [ ] `1014f1f0` 806 — TextureObject::Upload (texture_bind.cpp): calls and branches line up; the original frame is 8 bytes larger (separate slots for the two lock rectangles and a row counter in memory) and its pixel loops step three separately reduced source pointers; index spellings and declaration placements tried
 - [ ] `1014f900` 1070 — FontRenderer::DrawStringToPixels (font_metrics.cpp, rule-clean, 1072 vs 1070 bytes): the proportional "s" pad loop keeps its column counter in the colour parameter slot (0x44, incremented through a register) and the final four-pixel fill keeps its pointer in edx; loop forms, function-scope column/row and tail pointer forms tried
@@ -223,14 +226,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (69)
+## 4. Large functions (801-3000 bytes) (65)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)
-- [ ] `10143180` 1633 bytes (calls 42)
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
-- [ ] `100627d0` 1685 bytes (float, loops 1, calls 35)
-- [ ] `1014ce40` 1685 bytes TextureObject::DrawFill (float, loops 1, calls 19)
 - [ ] `10044b10` 1711 bytes (float, loops 2, calls 44)
 - [ ] `10065450` 1714 bytes (float, loops 6, calls 42)
 - [ ] `101501f0` 1755 bytes (float, loops 10, calls 19)

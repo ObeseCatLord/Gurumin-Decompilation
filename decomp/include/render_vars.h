@@ -5,6 +5,7 @@
 #define GURUMIN_RENDER_VARS_H
 
 #include "d3d9_min.h"
+#include "render_device.h"
 #include "matrix4.h"
 #include "model_def.h"
 #include "vec4.h"
@@ -74,10 +75,8 @@ extern "C" D3DVIEWPORT9_ DAT_10f0ece0;                    // saved viewport
 extern "C" int DAT_10f0edf8;
 extern "C" IUnknownLike *DAT_10f0ee00[16][0x46];          // vertex/index buffers of the 16 draw lists (FUN_1014ddf0)
 extern "C" int DAT_10f0ff80;
-extern "C" char DAT_10f0ff84[];                           // the D3DPRESENT_PARAMETERS used for Reset
 extern "C" int DAT_10f140c0;
 extern "C" int DAT_10f141d4;                              // number of texture switches this frame (statistics)
-extern "C" IUnknownLike *DAT_10f141d8;                    // the IDirect3D9 object
 extern "C" IUnknownLike *DAT_10f141dc;                    // the back buffer surface
 extern "C" unsigned long DAT_10f141e0[8][0x100];
 extern "C" int DAT_10f181e0[0x5a0];

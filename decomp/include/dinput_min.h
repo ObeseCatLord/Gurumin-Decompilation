@@ -138,6 +138,8 @@ struct MouseState
     unsigned char buttons[4];
 };
 
+struct JoyState;
+
 // The input devices (one global object).
 struct Input
 {
@@ -156,6 +158,9 @@ struct Input
     int Shutdown();                                  // 0x101437f0 (input_font.cpp): releases the devices
     int Rumble(float divisor, int milliseconds);     // 0x10142700 (input_font.cpp): starts the rumble effect
     int Update();                                    // 0x10142790 (input_poll.cpp): creates or polls the devices
+    int ReadControls(int control);                   // 0x10143180 (input_controls.cpp): stick axes and button mask
+    int IsJoystickButtonDown(int button, const JoyState *state);       // 0x10142b20 (joystick_buttons.cpp)
+    int IsKeyboardButtonDown(int button, const unsigned char *keys);   // 0x10142dd0 (joystick_buttons.cpp)
 };
 
 // The game's input devices.

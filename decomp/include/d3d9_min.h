@@ -23,7 +23,7 @@ struct IDirect3DDevice9
     virtual unsigned int __stdcall GetAvailableTextureMem() = 0;
     virtual long __stdcall EvictManagedResources() = 0;
     virtual long __stdcall GetDirect3D() = 0;
-    virtual long __stdcall GetDeviceCaps() = 0;
+    virtual long __stdcall GetDeviceCaps(struct D3DCAPS9_ *caps) = 0;
     virtual long __stdcall GetDisplayMode() = 0;
     virtual long __stdcall GetCreationParameters() = 0;
     virtual long __stdcall SetCursorProperties() = 0;

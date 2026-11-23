@@ -13,6 +13,7 @@ struct TextureManager
     int M_10173480();
     int M_101734d0();
     int M_10173510();
+    int CreateDevice();   // 0x10148b00 (Render_CreateDevice, src_od/render_device.cpp)
     int OnLostDevice();   // 0x1014b2a0 (render_reset.cpp Render_OnLostDevice)
     int OnResetDevice();  // 0x1013fbb0 (Render_OnResetDevice)
     int Shutdown();       // 0x1015c730: unloads the textures and shuts the renderer down (render_shutdown.cpp)

@@ -97,7 +97,7 @@ def main():
     all_functions = []  # every compared function with its rules_clean flag, for the report's total measures
     seen = set()
     sources = [(p, os.path.basename(p), []) for p in sorted(glob.glob(os.path.join(root, "src", "*.cpp")))]
-    sources += [(p, os.path.join("..", "src_od", os.path.basename(p)), ["/Od", "/Oi"])
+    sources += [(p, os.path.join("..", "src_od", os.path.basename(p)), ["/Od", "/Oi", "/Op-"])  # the /Od units were built without /Op (fcomp compares)
                 for p in sorted(glob.glob(os.path.join(root, "src_od", "*.cpp")))]
     for path, build_name, flags in sources:
         name = os.path.basename(path)

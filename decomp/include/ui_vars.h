@@ -80,6 +80,7 @@ extern "C" int DAT_10f1bef0[];                            // per game button: wh
 extern "C" int DAT_10f60c30[];                            // per game button: the key it is mapped to (0 = default)
 extern "C" int DAT_10f654a4;                              // non-zero = 32-bit colour mode (else R5G6B5); 1 = 32-bit textures
 extern "C" int DAT_10f6555c;                              // mouse wheel movement accumulated
+extern "C" int DAT_10f65560;                              // joystick sensitivity: the axis range is 256 minus this
 extern "C" int DAT_10f65564;                              // non-zero when force feedback is enabled
 extern "C" int DAT_10f65568;                              // the joystick has force feedback
 extern "C" unsigned char DAT_10f6556c;                    // axes present: 1 = z, 2 = rz, 4 = rx, 8 = ry

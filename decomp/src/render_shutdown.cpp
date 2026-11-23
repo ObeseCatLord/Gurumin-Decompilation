@@ -82,7 +82,7 @@ int TextureManager::PumpAndRecover()
     {
         OnLostDevice();
         FUN_101734d0();
-        if (DAT_10f1fcf0->Reset(DAT_10f0ff84) != 0)
+        if (DAT_10f1fcf0->Reset(&DAT_10f0ff84) != 0)
             MessageBoxA(0, "\x83\x8a\x83X\x83g\x83" "A" "\x8e\xb8\x94s", "err", 0);  // "restore failed"
         OnResetDevice();
         FUN_10173510();

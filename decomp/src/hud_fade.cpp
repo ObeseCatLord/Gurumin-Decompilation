@@ -4,7 +4,6 @@
 
 #include "texture_object.h"
 
-extern "C" Game DAT_104b7200;
 extern "C" int DAT_104bfd78;
 extern "C" int DAT_104bf8c0;
 extern "C" int DAT_104bff00;

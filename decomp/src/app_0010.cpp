@@ -12,7 +12,6 @@ struct NamedPath
     char path[0x4b34];
 };
 
-extern "C" Game DAT_104b7200;
 extern "C" int DAT_104c01b0;
 extern "C" short DAT_10447338[0x44c];
 extern "C" int FUN_10001b40(void);

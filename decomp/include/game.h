@@ -197,11 +197,11 @@ struct Game : Object
     int ConfirmWindow(int id);
     int SetWindowScroll(int id, int value);
     int SetWindowLastItem(int id, int count);
-    int DrawPanel(int x, int y, int w, int h, int frame, float alpha);
-    int DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha);
-    int DrawLabelledNumber(int value, int x, int y, int frame, float fade, float scale, float alpha);  // 0x10008a30
-    int DrawNumber(int value, int x, int y, int frame, float fade, float scale, float alpha);     // 0x10008c40
-    int DrawNumberAlt(int value, int x, int y, int frame, float fade, float scale, float alpha);  // 0x10008df0
+    int DrawPanel(int x, int y, int w, int h, float z, float alpha);
+    int DrawPanelAlt(int x, int y, int w, int h, float z, float alpha);
+    int DrawLabelledNumber(int value, int x, int y, float z, float fade, float scale, float alpha);  // 0x10008a30
+    int DrawNumber(int value, int x, int y, float z, float fade, float scale, float alpha);     // 0x10008c40
+    int DrawNumberAlt(int value, int x, int y, float z, float fade, float scale, float alpha);  // 0x10008df0
     int MoveCursor();  // 0x10009050 (game_panels.cpp)
     int DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade);  // fade: passed to DrawTinted, unused there
     int DrawCursor(int x, int y, float fade, int frame);
@@ -231,3 +231,10 @@ inline int Game::FindSlot(int id)
     } while (slot < 3);
     return slot;
 }
+
+// The game object.
+extern "C" Game DAT_104b7200;
+// A second object the script-flag code runs on with the Game layout (TestScriptFlag's out-of-line copy and
+// RegisterEvent are called with this address). Its relation to DAT_104b7200 is not settled yet: the two addresses
+// are 0x3bd648 bytes apart, less than the size of Game.
+extern "C" Game DAT_10874848;

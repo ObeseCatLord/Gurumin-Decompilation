@@ -1,11 +1,7 @@
 // The name banners shown when a map starts: one or two framed panels with a name in outlined text, fading in with
 // the counter DAT_104bf8d8 (full at 15).
 
-struct Game
-{
-    // 0x10008880 (game_panels.cpp): draws a framed panel in the alternative style.
-    int DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha);
-};
+#include "game.h"
 
 struct TextRenderer
 {
@@ -14,7 +10,6 @@ struct TextRenderer
     int DrawOutlined(int x, int y, const char *text, int colour, int a, float alpha, float scale);
 };
 
-extern "C" Game DAT_104b7200;
 extern "C" TextRenderer DAT_1020e538;   // the game's text renderer
 extern "C" char DAT_10210ae8[];         // first banner text (empty = none)
 extern "C" char DAT_1020e0f8[];         // second banner text (empty = none)

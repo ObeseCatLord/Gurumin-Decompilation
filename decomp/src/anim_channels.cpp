@@ -1,5 +1,5 @@
 // Constructors of the animation containers. The bodies are empty: all the work is done by the member
-// constructors (Vec4, KeyTrack, Matrix4, ModelState), which the compiler calls in declaration order.
+// constructors (Vec4, KeyTrack, Matrix4, EffectOptions), which the compiler calls in declaration order.
 
 #include "vec4.h"
 
@@ -38,13 +38,7 @@ AnimChannels::AnimChannels()
 
 #include "matrix4.h"
 
-// Declared throw(): the original leaves out the EH state update before this constructor, so its compiler knew it
-// cannot throw (most likely because the constructor was defined in the same file, see NOTES.md).
-struct ModelState
-{
-    char pad_0000[0x30];
-    ModelState() throw();
-};
+#include "effect_manager.h"
 
 // A placed model: bounding vectors, three matrices (world, local, previous) and its animation state.
 struct ModelInstance
@@ -63,7 +57,7 @@ struct ModelInstance
     Matrix4 m_0104;
     Matrix4 m_0144;
     char pad_0184[0x10];
-    ModelState state;
+    EffectOptions state;
     ModelInstance();
 };
 

@@ -45,7 +45,7 @@ struct EffectOptions
     int m_0038;
     int m_003c;
     int m_0040;
-    EffectOptions();                                 // 0x101668b0 (model_state.cpp)
+    EffectOptions() throw();                         // 0x101668b0 (model_state.cpp); callers know it cannot throw
 };
 
 struct EffectManager

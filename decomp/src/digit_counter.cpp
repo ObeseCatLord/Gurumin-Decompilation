@@ -4,18 +4,13 @@
 
 #include "node.h"
 
-// The game object (game.h Game), only the event call.
-struct Game
-{
-    int RegisterEvent(int id);                       // 0x100020d0
-};
+#include "game.h"
 
 #include "char_state.h"
 
 extern "C" Node *DAT_10255f08;                       // the counter model
 extern "C" int DAT_104bf8a4;                         // frames of a digit motion
 extern "C" int DAT_10c62edc[0x1000];                 // script flags
-extern "C" Game DAT_10874848;
 
 // 0x1001d2d0 (DigitCounter_Update). One frame of the counter of character slot `index`. Idle: when flag 0x9c2 is
 // one more than the count the digits start turning (phase 1); any other change shows the new value at once. While

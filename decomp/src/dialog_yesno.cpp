@@ -3,7 +3,6 @@
 
 #include "game.h"
 
-extern "C" Game DAT_104b7200;
 extern "C" int FUN_1000cb30(const char *text);
 extern "C" int FUN_1000cb90(const char *text);
 

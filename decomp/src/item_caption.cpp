@@ -10,6 +10,8 @@
 
 #include <string.h>
 
+#include "game.h"
+
 
 
 // The start of each item record (the item table, ItemInfo in other files, is viewed from 0x40 bytes further on).
@@ -64,16 +66,6 @@ struct TextRenderer
 
 
 
-struct Game
-
-{
-
-    int TestScriptFlag(int index);   // 0x100022b0: the out-of-line copy (game.h)
-
-};
-
-
-
 extern "C" ItemName DAT_1088e670[];
 
 extern "C" ItemText DAT_108f667c[];
@@ -81,8 +73,6 @@ extern "C" ItemText DAT_108f667c[];
 extern "C" ItemInfo DAT_1088e6b0[];
 
 extern "C" TextRenderer DAT_1020e538;
-
-extern "C" Game DAT_10874848;
 
 extern "C" unsigned char DAT_104c02cc;           // caption scroll timer
 

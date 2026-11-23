@@ -34,15 +34,11 @@ struct MoviePlayer
 
 #include "dinput_min.h"
 
-struct Game
-{
-    int RaiseGameOverEvents();                       // 0x10054a60
-};
+#include "game.h"
 
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" MoviePlayer DAT_10f08ab0;
 extern "C" int DAT_10202478;                  // texture slot the movies are decoded into
-extern "C" Game DAT_10874848;
 extern "C" int DAT_104bfe78;                  // 1 once the game over has started
 extern "C" int DAT_104bfe1c;
 extern "C" int DAT_104bfd78;

@@ -70,7 +70,7 @@ extern "C" int FUN_101619a0(void)
 }
 
 // Constructor (see anim_channels.cpp for why callers treat it as throw()).
-EffectOptions::EffectOptions()
+EffectOptions::EffectOptions() throw()
 {
     owner = 0;
     settings[7] = 0;

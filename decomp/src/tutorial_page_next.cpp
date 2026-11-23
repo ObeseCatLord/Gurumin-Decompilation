@@ -12,18 +12,13 @@
 
 #include "node.h"
 
-// The game object (game.h Game), here with the out-of-line copy of its flag test.
-struct Game
-{
-    int TestScriptFlag(int index);                   // 0x100022b0
-};
+#include "game.h"
 
 struct FrameTimer
 {
     int ResetNext();                                 // 0x1013eee0 (FrameTimer_ResetNext)
 };
 
-extern "C" Game DAT_10874848;
 extern "C" FrameTimer DAT_10836c70;
 extern "C" int DAT_104c03e8;                         // non-zero in the second book
 extern "C" int DAT_102194c0;                         // the left page shown

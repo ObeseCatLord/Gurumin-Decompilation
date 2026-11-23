@@ -69,8 +69,9 @@ struct TextureObject
     void Restore();                                  // 0x10169e10: restores the texture data
     void Unload();                                   // 0x10169e40: releases the slot's texture
     int UpdateImage(int flags);                      // 0x10169f70: makes the texture the render target (0 = failed)
-    // DrawFill (game_panels.cpp): fills a panel area; address not yet identified.
-    void DrawFill(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
+    // 0x1014ce40 (named from game_panels.cpp, not yet defined in a source file): fills the panel background; the
+    // parameters follow DrawFrame's.
+    int DrawFill(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
 };
 
 // Every texture slot.

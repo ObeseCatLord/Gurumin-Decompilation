@@ -42,10 +42,7 @@ struct ActorSlot
     char pad_0004[0x184];
 };
 
-struct Game
-{
-    int TestScriptFlag(int index);   // 0x100022b0: the out-of-line copy (game.h)
-};
+#include "game.h"
 
 #include "char_state.h"
 
@@ -54,7 +51,6 @@ extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" SavedPosition DAT_10867e18[0x80];
 extern "C" int DAT_10210d30[0x80];               // non-zero = the character is being defeated
 extern "C" char DAT_1020d540[0x80];              // per zone character: also hurt enemies that are away
-extern "C" Game DAT_10874848;
 extern "C" int FUN_100119d0(int index, int damage, int a);   // shows the damage on character `index`
 
 // 0x1002ebf0 (DamageZone_Update). One frame of zone character `index`: unless its zone's on flag is clear or its

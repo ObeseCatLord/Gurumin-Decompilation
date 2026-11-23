@@ -76,13 +76,8 @@ extern "C" int FUN_1002f320(int walker, int route, int point, int *outPoint, flo
     return result;
 }
 
-// The game object (game.h Game) with the out-of-line copy of its flag test.
-struct Game
-{
-    int TestScriptFlag(int index);                   // 0x100022b0
-};
+#include "game.h"
 
-extern "C" Game DAT_10874848;
 extern "C" int FUN_100286b0(int value);          // Angle_Wrap: -4999..5000
 
 // 0x1002f050 (Route_FollowGates). Like Route_Follow for routes whose points pack x * 10000 + y and z * 10000 + value

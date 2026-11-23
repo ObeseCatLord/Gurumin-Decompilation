@@ -4,37 +4,25 @@
 #include <stdio.h>
 #include <string.h>
 #include "game.h"
+#include "texture_object.h"
 
-struct TextureObject
-{
-    char pad_0000[0x38];
-    // DrawTinted: z, alpha (0..1), angle in radians, grey level of the specular colour (0..1).
-    void DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int z, float alpha, float angle, int grey);
-    void DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int z, float alpha, int angle);
-    void DrawFill(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
-    void DrawFrame(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
-    void DrawFillAlt(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
-    void DrawFrameAlt(int left, int top, int right, int bottom, int frame, float alpha, int a, int b);
-};
-
-extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" void FUN_1013f070(int, int, int);
 
 // Draws a framed panel at (x, y, w, h): the frame from texMenu14 and the half-transparent fill from texMenu15.
-int Game::DrawPanel(int x, int y, int w, int h, int frame, float alpha)
+int Game::DrawPanel(int x, int y, int w, int h, float z, float alpha)
 {
     FUN_1013f070(2, 0, 0);
-    DAT_118d0ba8[texMenu14].DrawFrame(x, y, x + w, y + h, frame, alpha, 1, 0);
-    DAT_118d0ba8[texMenu15].DrawFill(x, y, x + w, y + h, frame, alpha * 0.5f, 1, 0);
+    DAT_118d0ba8[texMenu14].DrawFrame(x, y, x + w, y + h, z, alpha, 1, 0);
+    DAT_118d0ba8[texMenu15].DrawFill(x, y, x + w, y + h, z, alpha * 0.5f, 1, 0);
     return 0;
 }
 
 // Same as DrawPanel with the frame from texMenu4 (the alternative panel style).
-int Game::DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha)
+int Game::DrawPanelAlt(int x, int y, int w, int h, float z, float alpha)
 {
     FUN_1013f070(2, 0, 0);
-    DAT_118d0ba8[texMenu4].DrawFrameAlt(x, y, x + w, y + h, frame, alpha, 1, 0);
-    DAT_118d0ba8[texMenu15].DrawFillAlt(x, y, x + w, y + h, frame, alpha * 0.5f, 1, 0);
+    DAT_118d0ba8[texMenu4].DrawFrameAlt(x, y, x + w, y + h, z, alpha, 1, 0);
+    DAT_118d0ba8[texMenu15].DrawFillAlt(x, y, x + w, y + h, z, alpha * 0.5f, 1, 0);
     return 0;
 }
 
@@ -70,7 +58,7 @@ int Game::DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade)
 
 // 0x10008a30. DrawNumber with a label in front: the text is two cells longer, the label (three digit cells wide, u
 // 0.1875-0.4453 on row v 0.625-0.6875 of texMenu1) fills the first cells and the digits use row v 0.6875-0.75.
-int Game::DrawLabelledNumber(int value, int x, int y, int frame, float fade, float scale, float alpha)
+int Game::DrawLabelledNumber(int value, int x, int y, float z, float fade, float scale, float alpha)
 {
     char text[256];
     sprintf(text, "%d", value);
@@ -79,7 +67,7 @@ int Game::DrawLabelledNumber(int value, int x, int y, int frame, float fade, flo
     int digitWidth = (int)(scale * 11.2f);
     int halfHeight = (int)((float)digitWidth * 0.75f);
     DAT_118d0ba8[texMenu1].DrawTinted(x - halfWidth, y - halfHeight, x - halfWidth + digitWidth * 3, y + halfHeight,
-                                      0.1875f, 0.625f, 0.4453125f, 0.6875f, frame, fade, alpha, 0);
+                                      0.1875f, 0.625f, 0.4453125f, 0.6875f, z, fade, alpha, 0);
     for (int i = 2; i < length; i++)
     {
         int digit = text[i - 2] - '0';
@@ -90,7 +78,7 @@ int Game::DrawLabelledNumber(int value, int x, int y, int frame, float fade, flo
         int left = x - halfWidth + i * digitWidth;
         DAT_118d0ba8[texMenu1].DrawTinted(left, y - halfHeight, left + digitWidth, y + halfHeight,
                                           (float)((digit + 3) * 16) / 256.0f, 0.6875f,
-                                          (float)((digit + 4) * 16) / 256.0f, 0.75f, frame, fade, alpha, 0);
+                                          (float)((digit + 4) * 16) / 256.0f, 0.75f, z, fade, alpha, 0);
     }
     return 0;
 }
@@ -98,7 +86,7 @@ int Game::DrawLabelledNumber(int value, int x, int y, int frame, float fade, flo
 // 0x10008c40. Draws `value` in decimal centred on (x, y) with the digits of texMenu1 (16-pixel cells, row
 // v 0.8125-0.875, digit d at u (d + 3) / 16), `scale` setting the digit size (11.2 pixels wide at 1.0, 3/4 as high
 // above and below y), faded by `alpha`.
-int Game::DrawNumber(int value, int x, int y, int frame, float fade, float scale, float alpha)
+int Game::DrawNumber(int value, int x, int y, float z, float fade, float scale, float alpha)
 {
     char text[256];
     sprintf(text, "%d", value);
@@ -116,13 +104,13 @@ int Game::DrawNumber(int value, int x, int y, int frame, float fade, float scale
         int left = x - halfWidth + i * digitWidth;
         DAT_118d0ba8[texMenu1].DrawTinted(left, y - halfHeight, left + digitWidth, y + halfHeight,
                                           (float)((digit + 3) * 16) / 256.0f, 0.8125f,
-                                          (float)((digit + 4) * 16) / 256.0f, 0.875f, frame, fade, alpha, 0);
+                                          (float)((digit + 4) * 16) / 256.0f, 0.875f, z, fade, alpha, 0);
     }
     return 0;
 }
 
 // 0x10008df0. DrawNumber with the digit row above it (v 0.75-0.8125).
-int Game::DrawNumberAlt(int value, int x, int y, int frame, float fade, float scale, float alpha)
+int Game::DrawNumberAlt(int value, int x, int y, float z, float fade, float scale, float alpha)
 {
     char text[256];
     sprintf(text, "%d", value);
@@ -140,7 +128,7 @@ int Game::DrawNumberAlt(int value, int x, int y, int frame, float fade, float sc
         int left = x - halfWidth + i * digitWidth;
         DAT_118d0ba8[texMenu1].DrawTinted(left, y - halfHeight, left + digitWidth, y + halfHeight,
                                           (float)((digit + 3) * 16) / 256.0f, 0.75f,
-                                          (float)((digit + 4) * 16) / 256.0f, 0.8125f, frame, fade, alpha, 0);
+                                          (float)((digit + 4) * 16) / 256.0f, 0.8125f, z, fade, alpha, 0);
     }
     return 0;
 }

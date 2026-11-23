@@ -987,16 +987,12 @@ struct ActorSlot
     char pad_0010[0x178];
 };
 
-struct Game
-{
-    int RegisterFlag(int id);                        // 0x100020d0 (FlagOwner::Register)
-};
+#include "game.h"
 
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated
 extern "C" char DAT_10468730[0x80];
 extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
-extern "C" Game DAT_10874848;
 extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a);   // ColourFade_Start
 
 // 0x100b4300 (Npc_RaiseAlarm). A lookout that idles (motion 2) until it sees the player (within the talk id's
@@ -1036,7 +1032,7 @@ extern "C" int FUN_100b4300(int index)
             FUN_1001b670(index, 1500.0f, 0);
             if (DAT_1020b430[index].talk % 100 != 0)
             {
-                DAT_10874848.RegisterFlag(DAT_1020b430[index].talk % 100 + 300);
+                DAT_10874848.RegisterEvent(DAT_1020b430[index].talk % 100 + 300);
                 DAT_10210b30[index] = 0;
                 return 0;
             }
@@ -1178,7 +1174,7 @@ extern "C" int FUN_100b4930(int index)
                 DAT_1020b430[index].action = 1;
                 FUN_1001b670(index, 1500.0f, 0);
                 if (DAT_1020b430[index].talk % 100 != 0)
-                    DAT_10874848.RegisterFlag(DAT_1020b430[index].talk % 100 + 300);
+                    DAT_10874848.RegisterEvent(DAT_1020b430[index].talk % 100 + 300);
             }
         }
         if (DAT_10db6ee8[DAT_1020b430[index].range].matrix.m[12] < -20000.0f)

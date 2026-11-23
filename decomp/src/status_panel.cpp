@@ -1,10 +1,6 @@
 // A five-line text panel at the lower right of the screen (state DAT_1020c330).
 
-struct Game
-{
-    // 0x10008880 (game_panels.cpp): draws a framed panel in the alternative style.
-    int DrawPanelAlt(int x, int y, int w, int h, int frame, float alpha);
-};
+#include "game.h"
 
 struct TextRenderer
 {
@@ -12,7 +8,6 @@ struct TextRenderer
     int DrawOutlined(int x, int y, const char *text, int colour, int a, float alpha, float scale);
 };
 
-extern "C" Game DAT_104b7200;
 extern "C" TextRenderer DAT_1020e538;   // the game's text renderer
 extern "C" int DAT_1020c330;            // panel state, 0 = hidden; the text shows in states 8..22
 extern "C" char DAT_1020dc80;           // when 4 or more, the last line is yellow

@@ -7,12 +7,7 @@
 
 #include "texture_object.h"
 
-struct Game
-{
-    char pad_0000[8];
-    int texMenu1;             // 0x08: the menu texture sheet
-    int DrawDebugText(const char *text, int x, int y);   // 0x100091d0: debug-font text (game_panels.cpp)
-};
+#include "game.h"
 
 // The engine object at 0x10836c70.
 struct Engine
@@ -21,7 +16,6 @@ struct Engine
     int PumpAndRecover();              // 0x1015c850 (render_shutdown.cpp)
 };
 
-extern "C" Game DAT_104b7200;
 extern "C" Engine DAT_10836c70;
 extern "C" int DAT_10f6552c;          // 1 once WM_QUIT was received
 extern "C" DWORD DAT_104c032c;        // tick count of the last update

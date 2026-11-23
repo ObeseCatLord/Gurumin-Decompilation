@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.6578,
+  "fuzzy_match_percent": 14.6553,
   "total_code": "1720206",
   "matched_code": "199043",
   "matched_code_percent": 11.5709,
@@ -4535,7 +4535,7 @@
   {
    "name": "app/damage_zone",
    "measures": {
-    "fuzzy_match_percent": 31.25,
+    "fuzzy_match_percent": 24.256,
     "total_code": "628",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -4556,14 +4556,14 @@
     {
      "name": ".text",
      "size": "628",
-     "fuzzy_match_percent": 31.25
+     "fuzzy_match_percent": 24.256
     }
    ],
    "functions": [
     {
      "name": "_FUN_1002ebf0",
      "size": "628",
-     "fuzzy_match_percent": 31.25,
+     "fuzzy_match_percent": 24.256,
      "metadata": {
       "virtual_address": "268626928"
      }
@@ -6263,7 +6263,7 @@
    ],
    "functions": [
     {
-     "name": "?DrawPanel@Game@@QAEHHHHHHM@Z",
+     "name": "?DrawPanel@Game@@QAEHHHHHMM@Z",
      "size": "144",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -6271,7 +6271,7 @@
      }
     },
     {
-     "name": "?DrawPanelAlt@Game@@QAEHHHHHHM@Z",
+     "name": "?DrawPanelAlt@Game@@QAEHHHHHMM@Z",
      "size": "141",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -6295,7 +6295,7 @@
      }
     },
     {
-     "name": "?DrawLabelledNumber@Game@@QAEHHHHHMMM@Z",
+     "name": "?DrawLabelledNumber@Game@@QAEHHHHMMMM@Z",
      "size": "528",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -6303,7 +6303,7 @@
      }
     },
     {
-     "name": "?DrawNumber@Game@@QAEHHHHHMMM@Z",
+     "name": "?DrawNumber@Game@@QAEHHHHMMMM@Z",
      "size": "425",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -6311,7 +6311,7 @@
      }
     },
     {
-     "name": "?DrawNumberAlt@Game@@QAEHHHHHMMM@Z",
+     "name": "?DrawNumberAlt@Game@@QAEHHHHMMMM@Z",
      "size": "425",
      "fuzzy_match_percent": 100.0,
      "metadata": {

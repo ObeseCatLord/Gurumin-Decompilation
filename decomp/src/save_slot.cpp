@@ -125,8 +125,6 @@ extern "C" float DAT_108029b8;                   // where the player starts (x, 
 extern "C" float DAT_108029bc;
 extern "C" float DAT_108029c0;
 extern "C" int DAT_104bfd50;
-extern "C" char DAT_10daac2d[];                  // the player's name
-extern "C" int DAT_10daabb4;
 extern "C" int FUN_1013e6f0(int a, const char *text, const char *name);
 extern "C" int FUN_100154c0(int value);
 extern "C" void FUN_10015910(void);
@@ -223,9 +221,9 @@ int FUN_1003b2c0(const char *path, int mode)
         DAT_108029b8 = x;
         DAT_108029bc = y;
         DAT_108029c0 = z;
-        FUN_1013e6f0(0, "\x83p\x83\x8a\x83\x93", DAT_10daac2d);
+        FUN_1013e6f0(0, "\x83p\x83\x8a\x83\x93", DAT_10daaae8[0].name);
         DAT_10db6ee8[0].Teleport(x, y, z);
-        FUN_100154c0(DAT_10daabb4);
+        FUN_100154c0(DAT_10daaae8[0].helmet);
         DAT_104bfd50 = 1;
         FUN_10015910();
         FUN_1000e750();

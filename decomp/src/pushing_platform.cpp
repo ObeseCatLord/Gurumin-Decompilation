@@ -1,6 +1,6 @@
 // A sinking block (character behaviour run from 0x100f9670): it waits high above the map, drops to the ground once
-// DAT_10db0544 falls below half of DAT_10db0548, rises back by 5 units a frame and then shoves the player out of
-// the way.
+// the health of character slot BLOCK_TRIGGER_SLOT falls below half of its maximum, rises back by 5 units a frame
+// and then shoves the player out of the way.
 
 #include "vec4.h"
 
@@ -20,6 +20,10 @@ struct CharMoveLock
 };
 
 #include "char_state.h"
+#include "char_slot.h"
+
+// The character slot whose health falling below half drops the waiting blocks.
+#define BLOCK_TRIGGER_SLOT 59
 
 // A 0x40-byte record per character slot (route_walk.cpp StepRecord): the position of the last frame.
 struct LastPosition
@@ -30,15 +34,13 @@ struct LastPosition
 
 extern "C" CharMoveLock DAT_10db9380[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" int DAT_10db0544;
-extern "C" int DAT_10db0548;
 extern "C" int DAT_1049f0f0;                     // number of entries in the two lists below
 extern "C" Vec3 *DAT_1032d5b8[];                 // positions of the characters moved by routes
 extern "C" char DAT_1021bbc0[];
 
 // 0x1002a490 (Block_Update). One frame of block `index`. On the first call it is listed with the moved characters,
 // placed 5000 units up and node state 0x41 is set (masks 0x200 and 0x400). While waiting it drops to z -2000 once
-// DAT_10db0544 is below half of DAT_10db0548. Below z -120 it rises 5 units a frame; above it pushes the player
+// the health of character slot BLOCK_TRIGGER_SLOT is below half of its maximum. Below z -120 it rises 5 units a frame; above it pushes the player
 // away from its centre: while the player stands on something and the reversed player move is clear, the player
 // is lifted onto the block (block z + 12) and moved 3 units outwards, otherwise, when the block is blocked, it is
 // moved 10 units towards the block's centre. The position is remembered for the next frame. Returns 0.
@@ -58,7 +60,7 @@ extern "C" int FUN_1002a490(int index)
     }
     else if (DAT_1020b430[index].state == 1)
     {
-        if (DAT_10db0544 < DAT_10db0548 / 2)
+        if (DAT_10daaae8[BLOCK_TRIGGER_SLOT].stats[STAT_HEALTH] < DAT_10daaae8[BLOCK_TRIGGER_SLOT].stats[STAT_MAX_HEALTH] / 2)
         {
             DAT_1020b430[index].state = 2;
             DAT_10db6ee8[index].SetPosition(DAT_10db6ee8[index].matrix._41, DAT_10db6ee8[index].matrix._42,

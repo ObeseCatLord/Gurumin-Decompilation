@@ -1,11 +1,12 @@
 // Picking up a counted item: a pickup effect goes into the ring of 32 effect slots (app_0009.cpp draws them) and the
-// counter at 0x10daab04 goes up; each full hundred is banked in DAT_10c64ad8 (up to 300, or 400 with DAT_10c64ad0).
+// player's pickup counter (CharSlot stats[STAT_PICKUPS]) goes up; each full hundred is banked in DAT_10c64ad8 (up to 300, or 400 with DAT_10c64ad0).
+
+#include "char_slot.h"
 
 extern "C" int DAT_10210fb8;          // next slot of the pickup effect ring
 extern "C" int DAT_10255040[0x20];    // effect kind of each slot (0 = free)
 extern "C" int DAT_102196f0[0x20];
 extern "C" int DAT_1020d5c8[0x20];
-extern "C" int DAT_10daab04;          // the counter (0..99)
 extern "C" int DAT_10c64ad8;          // banked hundreds
 extern "C" int DAT_10c64ad0;          // non-zero = the bank holds 400
 extern "C" int DAT_10c655f0;          // current costume
@@ -28,7 +29,7 @@ extern "C" void FUN_1003ab40(int id, int quiet)
     DAT_10210fb8++;
     if (DAT_10210fb8 > 31)
         DAT_10210fb8 = 0;
-    int count = DAT_10daab04 + 1;
+    int count = DAT_10daaae8[0].stats[STAT_PICKUPS] + 1;
     if (DAT_10c655f0 == 11)
         count++;
     else if (DAT_104c02c8 & 0x800000)
@@ -46,7 +47,7 @@ extern "C" void FUN_1003ab40(int id, int quiet)
             count = 0;
         }
     }
-    DAT_10daab04 = count;
+    DAT_10daaae8[0].stats[STAT_PICKUPS] = count;
     DAT_104c0119 = 8;
     FUN_1000e750();
 }

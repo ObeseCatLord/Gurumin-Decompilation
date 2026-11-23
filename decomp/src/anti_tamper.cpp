@@ -22,7 +22,7 @@ extern "C" int DAT_104684b0[115];
 // AntiTamper_StoreValues: refreshes the guard copies of the ten single values (slots 0..9).
 extern "C" int FUN_1000e750(void)
 {
-    DAT_104684b0[0] = GUARD_VALUE(0, DAT_10daaae8[0].stats[STAT_GUARDED_A]);
+    DAT_104684b0[0] = GUARD_VALUE(0, DAT_10daaae8[0].stats[STAT_PICKUPS]);
     DAT_104684b0[1] = GUARD_VALUE(1, DAT_10daaae8[0].stats[STAT_GUARDED_B]);
     DAT_104684b0[2] = GUARD_VALUE(2, DAT_10daaae8[0].stats[STAT_HEALTH]);
     DAT_104684b0[3] = GUARD_VALUE(3, DAT_10daaae8[0].stats[STAT_MAX_HEALTH]);
@@ -70,7 +70,7 @@ extern "C" int FUN_1000e870(void)
     DAT_104c034c++;
     if (DAT_11b044f0 != 0)
         TAMPER();
-    if (DAT_104684b0[0] != GUARD_VALUE(0, DAT_10daaae8[0].stats[STAT_GUARDED_A]))
+    if (DAT_104684b0[0] != GUARD_VALUE(0, DAT_10daaae8[0].stats[STAT_PICKUPS]))
         TAMPER();
     if (DAT_104684b0[1] != GUARD_VALUE(1, DAT_10daaae8[0].stats[STAT_GUARDED_B]))
         TAMPER();

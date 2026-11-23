@@ -9,8 +9,6 @@ extern "C" int DAT_1030b668[0x80];
 extern "C" int DAT_104679a0[0x80];
 extern "C" int DAT_10314ec0[0x80];
 extern "C" int DAT_1021f440[0x80];
-extern "C" int DAT_10daaaf8[];
-extern "C" int DAT_10daaafc[];
 
 // Splits the packed value: digits from 100000 up go to the formation number (CharState m_0004[1]), the
 // middle four digits (value / 10 % 10000) to CharState m_003c. When those middle digits are not zero the
@@ -31,8 +29,8 @@ extern "C" int FUN_1001b5b0(int index)
             if (DAT_1030b668[index] == 0)
                 DAT_1030b668[index] = -1;
             DAT_104679a0[index] = DAT_10daaae8[index].m_0143;
-            DAT_10314ec0[index] = DAT_10daaaf8[index * 0x62];
-            DAT_1021f440[index] = DAT_10daaafc[index * 0x62];
+            DAT_10314ec0[index] = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
+            DAT_1021f440[index] = DAT_10daaae8[index].stats[STAT_VALUE_4];
         }
         DAT_10daaae8[index].kind = 0x62;
     }

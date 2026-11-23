@@ -12,6 +12,7 @@ Matrix4 RotationZ(float angle);                      // 0x101b1b40
 
 #include "anim_model.h"
 #include "char_state.h"
+#include "char_slot.h"
 
 // The last position and step of each character (route_walk.cpp StepRecord).
 struct LastPosition
@@ -31,14 +32,6 @@ extern "C" unsigned char DAT_104686b0[0x80];         // display state (2 = down,
 extern "C" unsigned char DAT_1020d4c0[0x80];
 extern "C" char DAT_1042d9e8[0x80];                  // set when the character was hit this frame
 extern "C" char DAT_1021f3c0[0x80];                  // kind of each character slot
-// The owner's companion records (inside the owner's 0x188-byte character slot, one set per companion).
-extern "C" int DAT_10daadfc[0x80][0x62];             // companion 0: health (2000 = down, 70000 = full)
-extern "C" int DAT_10daae00[0x80][0x62];             // companion 0: maximum health
-extern "C" int DAT_10daae0c[0x80][0x62];
-extern "C" int DAT_10daaaf0[0x80][0x62];
-extern "C" int DAT_10daaafc[0x80][0x62];
-extern "C" char DAT_10daaf39[0x80][0x188];           // companion 0: 1 while down
-extern "C" char DAT_10daaf3a[0x80][0x188];           // companion 0: 1 while waiting outside the play area
 extern "C" Vec4 DAT_10f08080[0x80];
 extern "C" Vec4 DAT_10836c74;
 extern "C" int DAT_104c00e0;
@@ -129,13 +122,13 @@ int Companion0_Update(int index)
                 if (DAT_1021bdf8[index + 2][1] != 0)
                 {
                     DAT_1021bdf8[index + 2][1]->ClearFlags(0x20);
-                    int health = DAT_10daadfc[index][0] + 200;
+                    int health = DAT_10daaae8[index + 2].stats[STAT_HEALTH] + 200;
                     if (DAT_1020b430[index].companionHealthCap + 2000 <= health)
                         health = DAT_1020b430[index].companionHealthCap + 2000;
                     DAT_1020b430[index + 2].reviveHealth = health;
-                    DAT_10daadfc[index][0] = DAT_10daae00[index][0];
+                    DAT_10daaae8[index + 2].stats[STAT_HEALTH] = DAT_10daaae8[index + 2].stats[STAT_MAX_HEALTH];
                     DAT_10db6ee8[index + 2].root->M_10194730(0x2f, 0x400);
-                    DAT_10daaf39[index][0] = 0;
+                    DAT_10daaae8[index + 2].m_0141 = 0;
                     DAT_1021f3c0[index + 2] = 3;
                 }
                 DAT_104686b0[index + 2] = 2;
@@ -145,7 +138,7 @@ int Companion0_Update(int index)
     }
     else
     {
-        int health = DAT_10daadfc[index][0];
+        int health = DAT_10daaae8[index + 2].stats[STAT_HEALTH];
         if (health > 70000)
         {
             int special = DAT_104c00e0;
@@ -153,15 +146,15 @@ int Companion0_Update(int index)
             if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[index + 2].hideCount == 0 &&
                 DAT_10c655f0 != 6)
             {
-                DAT_10daaf3a[index][0] = 1;
-                DAT_10daaf39[index][0] = 0;
+                DAT_10daaae8[index + 2].held = 1;
+                DAT_10daaae8[index + 2].m_0141 = 0;
                 DAT_10802bf8[index + 2].position.z = 0;
             }
             else
             {
-                DAT_10daaf3a[index][0] = 0;
-                DAT_10daae0c[index][0] = 999;
-                DAT_10daaf39[index][0] = 0;
+                DAT_10daaae8[index + 2].held = 0;
+                DAT_10daaae8[index + 2].stats[STAT_VALUE_4] = 999;
+                DAT_10daaae8[index + 2].m_0141 = 0;
                 if (DAT_1020b430[index].keepCompanionUp == 0)
                     DAT_10802bf8[index + 2].position.z = -50.0f;
                 if (special != 0 && (area == 0x13 || area == 0x30))
@@ -173,27 +166,27 @@ int Companion0_Update(int index)
             {
                 unsigned char shown = DAT_104686b0[index + 2];
                 DAT_1042d9e8[index + 2] = 0;
-                DAT_10daadfc[index][0] = health - 1;
+                DAT_10daaae8[index + 2].stats[STAT_HEALTH] = health - 1;
                 if (shown > 6)
                     DAT_104686b0[index + 2] = 6;
             }
-            if (DAT_10daadfc[index][0] < DAT_10daae00[index][0] - 5 ||
-                (DAT_10c635f8 == 1 && DAT_10daadfc[index][0] < DAT_10daae00[index][0]))
+            if (DAT_10daaae8[index + 2].stats[STAT_HEALTH] < DAT_10daaae8[index + 2].stats[STAT_MAX_HEALTH] - 5 ||
+                (DAT_10c635f8 == 1 && DAT_10daaae8[index + 2].stats[STAT_HEALTH] < DAT_10daaae8[index + 2].stats[STAT_MAX_HEALTH]))
             {
                 int revived = DAT_1020b430[index + 2].reviveHealth;
                 DAT_1020b430[index + 2].downMode = 1;
-                DAT_10daaf3a[index][0] = 0;
+                DAT_10daaae8[index + 2].held = 0;
                 if (revived == 0)
-                    revived = DAT_10daaaf0[index][0] + 2000;
-                DAT_10daadfc[index][0] = revived;
-                DAT_10daae0c[index][0] = DAT_10daaafc[index][0];
+                    revived = DAT_10daaae8[index].stats[STAT_MAX_HEALTH] + 2000;
+                DAT_10daaae8[index + 2].stats[STAT_HEALTH] = revived;
+                DAT_10daaae8[index + 2].stats[STAT_VALUE_4] = DAT_10daaae8[index].stats[STAT_VALUE_4];
                 DAT_104686b0[index + 2] = 0x1e;
                 DAT_10802bf8[index + 2].position.z = 0;
             }
         }
         else if (health > 2000)
         {
-            DAT_10daaf39[index][0] = 0;
+            DAT_10daaae8[index + 2].m_0141 = 0;
             if (DAT_104686b0[index + 2] == 7)
             {
                 if (DAT_1020d4c0[index + 2] > 4)
@@ -212,8 +205,8 @@ int Companion0_Update(int index)
         }
         else
         {
-            DAT_10daadfc[index][0] = 2000;
-            DAT_10daaf39[index][0] = 1;
+            DAT_10daaae8[index + 2].stats[STAT_HEALTH] = 2000;
+            DAT_10daaae8[index + 2].m_0141 = 1;
         }
     }
     return 0;
@@ -299,13 +292,13 @@ int Companion1_Update(int index)
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                 {
                     DAT_1021bdf8[slot + 2][1]->ClearFlags(0x20);
-                    int health = DAT_10daadfc[slot][0] + 200;
+                    int health = DAT_10daaae8[slot + 2].stats[STAT_HEALTH] + 200;
                     if (DAT_1020b430[index].companionHealthCap + 2000 <= health)
                         health = DAT_1020b430[index].companionHealthCap + 2000;
                     DAT_1020b430[slot + 2].reviveHealth = health;
-                    DAT_10daadfc[slot][0] = DAT_10daae00[slot][0];
+                    DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = DAT_10daaae8[slot + 2].stats[STAT_MAX_HEALTH];
                     DAT_10db6ee8[slot + 2].root->M_10194730(0x2f, 0x400);
-                    DAT_10daaf39[slot][0] = 0;
+                    DAT_10daaae8[slot + 2].m_0141 = 0;
                     DAT_1021f3c0[index + 3] = 3;
                 }
                 DAT_1020b430[slot + 2].downMode = 2;
@@ -315,23 +308,23 @@ int Companion1_Update(int index)
     }
     else
     {
-        int health = DAT_10daadfc[slot][0];
+        int health = DAT_10daaae8[slot + 2].stats[STAT_HEALTH];
         if (health > 70000)
         {
             int special = DAT_104c00e0;
             int area = DAT_104c00e8;
-            DAT_10daaf39[slot][0] = 0;
+            DAT_10daaae8[slot + 2].m_0141 = 0;
             if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[slot + 2].hideCount == 0 &&
                 DAT_10c655f0 != 6)
             {
-                DAT_10daaf3a[slot][0] = 1;
-                DAT_10daaf39[slot][0] = 0;
+                DAT_10daaae8[slot + 2].held = 1;
+                DAT_10daaae8[slot + 2].m_0141 = 0;
                 DAT_10802bf8[slot + 2].position.z = 0;
             }
             else
             {
-                DAT_10daaf3a[slot][0] = 0;
-                DAT_10daae0c[slot][0] = 999;
+                DAT_10daaae8[slot + 2].held = 0;
+                DAT_10daaae8[slot + 2].stats[STAT_VALUE_4] = 999;
                 if (DAT_1020b430[index].keepCompanionUp == 0)
                     DAT_10802bf8[slot + 2].position.z = -50.0f;
                 if (special != 0 && (area == 0x13 || area == 0x30))
@@ -343,28 +336,28 @@ int Companion1_Update(int index)
             {
                 unsigned char shown = DAT_104686b0[index + 3];
                 DAT_1042d9e8[index + 3] = 0;
-                DAT_10daadfc[slot][0] = health - 1;
+                DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = health - 1;
                 if (shown > 6)
                     DAT_104686b0[index + 3] = 6;
             }
-            if (DAT_10daadfc[slot][0] < DAT_10daae00[slot][0] - 5 ||
-                (DAT_10c635f8 == 1 && DAT_10daadfc[slot][0] < DAT_10daae00[slot][0]))
+            if (DAT_10daaae8[slot + 2].stats[STAT_HEALTH] < DAT_10daaae8[slot + 2].stats[STAT_MAX_HEALTH] - 5 ||
+                (DAT_10c635f8 == 1 && DAT_10daaae8[slot + 2].stats[STAT_HEALTH] < DAT_10daaae8[slot + 2].stats[STAT_MAX_HEALTH]))
             {
                 int revived = DAT_1020b430[slot + 2].reviveHealth;
                 DAT_1020b430[slot + 2].downMode = 1;
-                DAT_10daaf3a[slot][0] = 0;
+                DAT_10daaae8[slot + 2].held = 0;
                 if (revived != 0)
-                    DAT_10daadfc[slot][0] = revived;
+                    DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = revived;
                 else
-                    DAT_10daadfc[slot][0] = DAT_10daaaf0[index][0] + 2000;
-                DAT_10daae0c[slot][0] = DAT_10daaafc[index][0];
+                    DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = DAT_10daaae8[index].stats[STAT_MAX_HEALTH] + 2000;
+                DAT_10daaae8[slot + 2].stats[STAT_VALUE_4] = DAT_10daaae8[index].stats[STAT_VALUE_4];
                 DAT_104686b0[index + 3] = 0x1e;
                 DAT_10802bf8[slot + 2].position.z = 0;
             }
         }
         else if (health > 2000)
         {
-            DAT_10daaf39[slot][0] = 0;
+            DAT_10daaae8[slot + 2].m_0141 = 0;
             if (DAT_104686b0[index + 3] == 7)
             {
                 if (DAT_1020d4c0[index + 3] > 4)
@@ -383,8 +376,8 @@ int Companion1_Update(int index)
         }
         else
         {
-            DAT_10daadfc[slot][0] = 2000;
-            DAT_10daaf39[slot][0] = 1;
+            DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = 2000;
+            DAT_10daaae8[slot + 2].m_0141 = 1;
         }
     }
     return 0;
@@ -468,13 +461,13 @@ int Companion2_Update(int index)
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                 {
                     DAT_1021bdf8[slot + 2][1]->ClearFlags(0x20);
-                    int health = DAT_10daadfc[slot][0] + 200;
+                    int health = DAT_10daaae8[slot + 2].stats[STAT_HEALTH] + 200;
                     if (DAT_1020b430[index].companionHealthCap + 2000 <= health)
                         health = DAT_1020b430[index].companionHealthCap + 2000;
                     DAT_1020b430[slot + 2].reviveHealth = health;
-                    DAT_10daadfc[slot][0] = DAT_10daae00[slot][0];
+                    DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = DAT_10daaae8[slot + 2].stats[STAT_MAX_HEALTH];
                     DAT_10db6ee8[slot + 2].root->M_10194730(0x2f, 0x400);
-                    DAT_10daaf39[slot][0] = 0;
+                    DAT_10daaae8[slot + 2].m_0141 = 0;
                     DAT_1021f3c0[index + 4] = 3;
                 }
                 DAT_1020b430[slot + 2].downMode = 2;
@@ -484,22 +477,22 @@ int Companion2_Update(int index)
     }
     else
     {
-        int health = DAT_10daadfc[slot][0];
+        int health = DAT_10daaae8[slot + 2].stats[STAT_HEALTH];
         if (health > 70000)
         {
             int special = DAT_104c00e0;
             int area = DAT_104c00e8;
-            DAT_10daaf39[slot][0] = 0;
+            DAT_10daaae8[slot + 2].m_0141 = 0;
             if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[slot + 2].hideCount == 0 &&
                 DAT_10c655f0 != 6)
             {
-                DAT_10daaf3a[slot][0] = 1;
-                DAT_10daaf39[slot][0] = 0;
+                DAT_10daaae8[slot + 2].held = 1;
+                DAT_10daaae8[slot + 2].m_0141 = 0;
             }
             else
             {
-                DAT_10daaf3a[slot][0] = 0;
-                DAT_10daae0c[slot][0] = 999;
+                DAT_10daaae8[slot + 2].held = 0;
+                DAT_10daaae8[slot + 2].stats[STAT_VALUE_4] = 999;
                 if (special != 0 && (area == 0x13 || area == 0x30))
                     DAT_1020b430[slot + 2].hideCount = 2;
                 else
@@ -509,27 +502,27 @@ int Companion2_Update(int index)
             {
                 unsigned char shown = DAT_104686b0[index + 4];
                 DAT_1042d9e8[index + 4] = 0;
-                DAT_10daadfc[slot][0] = health - 1;
+                DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = health - 1;
                 if (shown > 6)
                     DAT_104686b0[index + 4] = 6;
             }
-            if (DAT_10daadfc[slot][0] < DAT_10daae00[slot][0] - 10 ||
-                (DAT_10c635f8 == 1 && DAT_10daadfc[slot][0] < DAT_10daae00[slot][0]))
+            if (DAT_10daaae8[slot + 2].stats[STAT_HEALTH] < DAT_10daaae8[slot + 2].stats[STAT_MAX_HEALTH] - 10 ||
+                (DAT_10c635f8 == 1 && DAT_10daaae8[slot + 2].stats[STAT_HEALTH] < DAT_10daaae8[slot + 2].stats[STAT_MAX_HEALTH]))
             {
                 DAT_1020b430[slot + 2].downMode = 1;
                 int revived = DAT_1020b430[slot + 2].reviveHealth;
-                DAT_10daaf3a[slot][0] = 0;
+                DAT_10daaae8[slot + 2].held = 0;
                 if (revived != 0)
-                    DAT_10daadfc[slot][0] = revived;
+                    DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = revived;
                 else
-                    DAT_10daadfc[slot][0] = DAT_10daaaf0[index][0] + 2000;
-                DAT_10daae0c[slot][0] = DAT_10daaafc[index][0];
+                    DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = DAT_10daaae8[index].stats[STAT_MAX_HEALTH] + 2000;
+                DAT_10daaae8[slot + 2].stats[STAT_VALUE_4] = DAT_10daaae8[index].stats[STAT_VALUE_4];
                 DAT_104686b0[index + 4] = 0x3c;
             }
         }
         else if (health > 2000)
         {
-            DAT_10daaf39[slot][0] = 0;
+            DAT_10daaae8[slot + 2].m_0141 = 0;
             if (DAT_104686b0[index + 4] == 7)
             {
                 if (DAT_1020d4c0[index + 4] > 4)
@@ -548,8 +541,8 @@ int Companion2_Update(int index)
         }
         else
         {
-            DAT_10daadfc[slot][0] = 2000;
-            DAT_10daaf39[slot][0] = 1;
+            DAT_10daaae8[slot + 2].stats[STAT_HEALTH] = 2000;
+            DAT_10daaae8[slot + 2].m_0141 = 1;
         }
     }
     return 0;

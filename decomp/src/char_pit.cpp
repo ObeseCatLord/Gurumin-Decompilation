@@ -7,17 +7,8 @@
 #include "anim_model.h"
 
 #include "char_state.h"
+#include "char_slot.h"
 
-// A character slot record (world.h CharSlot) seen from 0x64 bytes earlier.
-struct CharSlotFlags
-{
-    int busy;                                        // 0x00
-    char pad_0004[0x105];
-    char m_0109;                                     // 0x109 (CharSlot m_00a5)
-    char pad_010a[0x7e];
-};
-
-extern "C" CharSlotFlags DAT_10daab20[0x80];
 extern "C" char DAT_1021f9c0[0x80];
 extern "C" Vec4 DAT_10867e18[0x80];
 extern "C" int DAT_104bfe28;                         // non-zero when the map has a pit
@@ -40,8 +31,8 @@ inline float Atan2(float y, float x)
 // x/y lie inside the pit area its mode is 2, else 1. Returns 0.
 extern "C" int FUN_100b9930(int index)
 {
-    DAT_10daab20[index].busy = 1;
-    DAT_10daab20[index].m_0109 = 1;
+    DAT_10daaae8[index].stats[STAT_BUSY] = 1;
+    DAT_10daaae8[index].m_0141 = 1;
     DAT_1021f9c0[index] = 0;
     Vec4 player;
     Vec4 position;

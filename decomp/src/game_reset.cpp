@@ -591,7 +591,6 @@ extern "C" Vec4 DAT_10c67f30;
 extern "C" Vec4 DAT_10c67f50;
 extern "C" Vec4 DAT_10da9150;
 extern "C" Vec4 DAT_10daaad4;
-extern "C" int DAT_10daabb4;
 extern "C" int DAT_10db9368;
 extern "C" Vec4 DAT_10edbd38;
 extern "C" Vec4 DAT_10edbdd8;
@@ -780,7 +779,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104c0194 = 0;
   DAT_104b7200.M_100082e0();
   DAT_10daaae8[0] = DAT_10db4408;
-  FUN_100154c0(DAT_10daabb4);
+  FUN_100154c0(DAT_10daaae8[0].helmet);
   DAT_10f654b4 = 0;
   DAT_10f654b8 = 0;
   DAT_104c0128 = 0;

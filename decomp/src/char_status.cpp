@@ -5,6 +5,7 @@
 #include "vec4.h"
 
 #include "matrix4.h"
+#include "char_slot.h"
 
 // Character record viewed from its world matrix (0x10db6ee8 + 0x2328), 0x249c bytes.
 struct CharMatrixView
@@ -13,21 +14,12 @@ struct CharMatrixView
     char pad_0040[0x249c - 0x40];
 };
 
-// Per-character life record, 0x188 bytes (the same stride as CharSlot in world.h).
-struct CharLife
-{
-    int life;                 // 0x00: hit points
-    char pad_0004[0x139];
-    char down;                // 0x13d: 1 once the life has run out
-    char pad_013e[0x4a];
-};
 
 extern "C" short DAT_103153b4[];      // a per-character counter, at most 15
 extern "C" int DAT_10219778[];        // a per-character level, at most 5
 extern "C" unsigned char DAT_10315352[];   // a per-character flag, cleared every frame
 extern "C" unsigned char DAT_102550e2[];   // a per-character value; the larger of it and DAT_102550e0 is kept
 extern "C" unsigned char DAT_102550e0[];
-extern "C" CharLife DAT_10daadfc[];
 extern "C" char DAT_104686b2[];       // per-character mode (7 = the mode handled here)
 extern "C" unsigned char DAT_1020d4c2[];   // per-character count compared with 4
 extern "C" char DAT_1020d4c0[];       // per-character state written here (4 or 6)
@@ -51,9 +43,9 @@ extern "C" int FUN_1001a840(int index)
     unsigned char value = DAT_102550e2[index + 3];
     if (value != 0)
         DAT_102550e0[index] = DAT_102550e0[index] >= value ? DAT_102550e0[index] : value;
-    if (DAT_10daadfc[status].life > 0)
+    if (DAT_10daaae8[status + 2].stats[STAT_HEALTH] > 0)
     {
-        DAT_10daadfc[status].down = 0;
+        DAT_10daaae8[status + 2].m_0141 = 0;
         if (DAT_104686b2[index + 3] == 7)
         {
             if (DAT_1020d4c2[index + 3] > 4)
@@ -71,8 +63,8 @@ extern "C" int FUN_1001a840(int index)
     }
     else
     {
-        DAT_10daadfc[status].life = 0;
-        DAT_10daadfc[status].down = 1;
+        DAT_10daaae8[status + 2].stats[STAT_HEALTH] = 0;
+        DAT_10daaae8[status + 2].m_0141 = 1;
     }
     return 0;
 }

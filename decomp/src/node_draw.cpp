@@ -23,8 +23,9 @@ extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float marg
 // bounds centre with its margin, unless flag 0x40), then its mesh range is reset, its bones uploaded when it is
 // skinned and the mesh drawn. Then every child draws with this node's world matrix as the parent, and the draw
 // callback runs. Returns 1, or 0 when the subtree is skipped.
-int Node::Draw(const Matrix4 *parent, const Matrix4 *view, int a3, int a4, int a5, int a6, int a7, int a8, int a9,
-               int a10, int a11, int a12, int a13, int a14)
+int Node::Draw(const Matrix4 *parent, const Matrix4 *view, int a3, const Matrix4 *shadowMatrix, float shadowX,
+               float shadowY, float shadowZ, int shadowTexture, float shadowScale, int shadowSize,
+               const Vec4 *lightDirection, float modelSize, AnimModel *model, float alpha)
 {
     Vec4 centre;
     centre.Copy(bounds);
@@ -41,12 +42,15 @@ int Node::Draw(const Matrix4 *parent, const Matrix4 *view, int a3, int a4, int a
             mesh->SetRange(0, 0x400);
             if (skin != 0 && skin->boneCount != 0)
                 mesh->UploadBones(skin->skinMatrices, skin->boneCount, (Matrix4 *)&worldMatrix, (int)view);
-            mesh->Draw(&worldMatrix, view, a4, drawMode, a5, a6, a7, a8, a9, a10, a11, a12, a14);
+            mesh->Draw(&worldMatrix, view, shadowMatrix, drawMode, shadowX, shadowY, shadowZ, shadowTexture,
+                       shadowScale, shadowSize, lightDirection, modelSize, alpha);
         }
     }
     for (int i = 0; i < childCount; i++)
-        children[i]->Draw((Matrix4 *)&worldMatrix, view, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
+        children[i]->Draw((Matrix4 *)&worldMatrix, view, a3, shadowMatrix, shadowX, shadowY, shadowZ, shadowTexture,
+                          shadowScale, shadowSize, lightDirection, modelSize, model, alpha);
     if (drawCallback != 0)
-        drawCallback(&worldMatrix, view, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
+        drawCallback(&worldMatrix, view, a3, shadowMatrix, shadowX, shadowY, shadowZ, shadowTexture, shadowScale,
+                     shadowSize, lightDirection, modelSize, model, alpha);
     return 1;
 }

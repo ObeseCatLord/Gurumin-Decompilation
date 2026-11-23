@@ -282,14 +282,14 @@ int ModelBank::DrawLensFlares()
     return 1;
 }
 
-#include "model_bank_types.h"
+#include "node.h"
 
 
 
 // 0x10166100 (ModelBank::DrawShadowsInto). Like DrawShadows, drawing each shadow with the caster's shadow matrix
-// raised 6.1 units, set as `scene`'s matrix, and with render state 9 off around it. A caster reset here also takes
+// raised 6.1 units, set as `scene`'s world matrix, and with render state 9 off around it. A caster reset here also takes
 // its shadow matrix from its world matrix. Returns 0 when shadows are off or there is no scene, else 1.
-int ModelBank::DrawShadowsInto(ShadowScene *scene, int a, int b, int c)
+int ModelBank::DrawShadowsInto(Node *scene, const Matrix4 *parent, const Matrix4 *view, int a3)
 {
     if (enabled == 0)
         return 0;
@@ -316,11 +316,11 @@ int ModelBank::DrawShadowsInto(ShadowScene *scene, int a, int b, int c)
             if (litModels[casters[i]]->loadedRoot != 0 && litModels[casters[i]]->shadowHidden == 0 &&
                 litModels[casters[i]]->shadowOpacity > 0)
             {
-                scene->matrix = litModels[casters[i]]->shadowMatrix;
-                scene->matrix.Translate(0, 0, 6.1f);
+                scene->worldMatrix = litModels[casters[i]]->shadowMatrix;
+                scene->worldMatrix.Translate(0, 0, 6.1f);
                 FUN_1013f070(9, 0, 0);
-                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadows[i], litModels[casters[i]]->uniformScale,
-                                  (int)casterSize[i], ((ModelData *)litModels[casters[i]]->loadedRoot)->m_06e0,
+                scene->DrawShadow(parent, view, a3, &m_0484[i], &m_0c84[i], shadows[i], litModels[casters[i]]->uniformScale,
+                                  (int)casterSize[i], litModels[casters[i]]->loadedRoot->bounds.w,
                                   litModels[casters[i]], litModels[casters[i]]->alpha);
                 FUN_1013f070(9, 1, 0);
             }
@@ -342,11 +342,11 @@ int ModelBank::DrawShadowsInto(ShadowScene *scene, int a, int b, int c)
             if (litModels[casters[i]]->loadedRoot != 0 && litModels[casters[i]]->shadowHidden == 0 &&
                 litModels[casters[i]]->shadowOpacity > 0)
             {
-                scene->matrix = litModels[casters[i]]->shadowMatrix;
-                scene->matrix.Translate(0, 0, 6.1f);
+                scene->worldMatrix = litModels[casters[i]]->shadowMatrix;
+                scene->worldMatrix.Translate(0, 0, 6.1f);
                 FUN_1013f070(9, 0, 0);
-                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadowTexture, litModels[casters[i]]->uniformScale,
-                                  (int)casterSize[i], ((ModelData *)litModels[casters[i]]->loadedRoot)->m_06e0,
+                scene->DrawShadow(parent, view, a3, &m_0484[i], &m_0c84[i], shadowTexture, litModels[casters[i]]->uniformScale,
+                                  (int)casterSize[i], litModels[casters[i]]->loadedRoot->bounds.w,
                                   litModels[casters[i]], litModels[casters[i]]->alpha);
                 FUN_1013f070(9, 1, 0);
             }
@@ -359,7 +359,7 @@ int ModelBank::DrawShadowsInto(ShadowScene *scene, int a, int b, int c)
 // shadow targets (DAT_10203434) each caster uses its own target, else all use kage.bmp. A caster without a timeout
 // is first reset: identity matrix at its position parameter, shown, opacity 15 (with targets also shadow scale 1).
 // Casters with model data that are shown and not transparent are drawn. Returns 0 when shadows are off, else 1.
-int ModelBank::DrawShadows(ShadowScene *scene, int a, int b, int c)
+int ModelBank::DrawShadows(Node *scene, const Matrix4 *parent, const Matrix4 *view, int a3)
 {
     if (enabled == 0)
         return 0;
@@ -382,8 +382,8 @@ int ModelBank::DrawShadows(ShadowScene *scene, int a, int b, int c)
             }
             AnimModel *model = litModels[casters[i]];
             if (model->loadedRoot != 0 && model->shadowHidden == 0 && model->shadowOpacity > 0)
-                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadows[i], model->uniformScale, (int)casterSize[i],
-                                  ((ModelData *)model->loadedRoot)->m_06e0, model, model->alpha);
+                scene->DrawShadow(parent, view, a3, &m_0484[i], &m_0c84[i], shadows[i], model->uniformScale, (int)casterSize[i],
+                                  model->loadedRoot->bounds.w, model, model->alpha);
         }
     }
     else
@@ -400,8 +400,8 @@ int ModelBank::DrawShadows(ShadowScene *scene, int a, int b, int c)
             }
             AnimModel *model = litModels[casters[i]];
             if (model->loadedRoot != 0 && model->shadowHidden == 0 && model->shadowOpacity > 0)
-                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadowTexture, model->uniformScale, (int)casterSize[i],
-                                  ((ModelData *)model->loadedRoot)->m_06e0, model, model->alpha);
+                scene->DrawShadow(parent, view, a3, &m_0484[i], &m_0c84[i], shadowTexture, model->uniformScale, (int)casterSize[i],
+                                  model->loadedRoot->bounds.w, model, model->alpha);
         }
     }
     return 1;

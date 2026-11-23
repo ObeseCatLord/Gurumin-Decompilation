@@ -323,7 +323,7 @@ _TestDat_Load	1000beb0
 ?DrawCursor@Game@@QAEHHHMH@Z	10008fa0
 ?DrawBalloon@Game@@QAEHHHHHHHM@Z	10008910
 ?DrawDebugText@Game@@QAEHPBDHH@Z	100091d0
-?Draw@Node@@QAEHPBUMatrix4@@0HHHHHHHHHHHH@Z	101995a0
+?Draw@Node@@QAEHPBUMatrix4@@0H0MMMHMHPBUVec4@@MPAUAnimModel@@M@Z	101995a0
 ?LoadIt3@Node@@QAEHPBDHH@Z	101abe30
 ?SetupSkins@Node@@QAEHPAU1@@Z	101ab9d0
 ?AnimatedMatrix@NodeExtra@@QAE?AUMatrix4@@H@Z	101693f0
@@ -427,8 +427,8 @@ _FUN_101426d0@8	101426d0
 ?Upload@TextureObject@@QAEHHHPAEPBE@Z	1014f1f0
 ?DrawLensFlares@ModelBank@@QAEHXZ	10166520
 ?DrawScreenCopy@TextureSlot@@QAEHHHHHMM@Z	1014b750
-?DrawShadows@ModelBank@@QAEHPAUShadowScene@@HHH@Z	10165e00
-?DrawShadowsInto@ModelBank@@QAEHPAUShadowScene@@HHH@Z	10166100
+?DrawShadows@ModelBank@@QAEHPAUNode@@PBUMatrix4@@1H@Z	10165e00
+?DrawShadowsInto@ModelBank@@QAEHPAUNode@@PBUMatrix4@@1H@Z	10166100
 ?StartProximityPass@Node@@QAEHPAMPAUMatrix4@@HMH@Z	101a2370
 ?TagRegion@Node@@QAEHPBUBox2@@PAY0EA@$$CBDPAUMatrix4@@@Z	10199cd0
 ?Draw@EffectModel@@QAEHABUMatrix4@@@Z	1000baf0
@@ -490,3 +490,5 @@ _FUN_101426d0@8	101426d0
 ?LoadFile@AnimModel@@QAEHPBD@Z	1017b9b0
 ?SegmentHitsMesh@Node@@QAEHPAUVec4@@0@Z	101a8780
 ?IntersectTriangle@Node@@QAEHPBUVec4@@0PAU2@10PAM22000@Z	1019dca0
+?RenderShadowTexture@Node@@QAEHPBUMatrix4@@HHPBUVec4@@1HMMM@Z	101a24e0
+?DrawShadow@Node@@QAEHPBUMatrix4@@0HPBUVec4@@1HMHMPAUAnimModel@@M@Z	101a29e0

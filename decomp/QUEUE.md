@@ -186,7 +186,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (133)
+## 4. Large functions (801-3000 bytes) (131)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
@@ -223,9 +223,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001ed80` 1257 bytes (float, calls 11)
 - [ ] `100ed9b0` 1258 bytes Script_CompileStatement (loops 11, calls 22)
 - [ ] `1004ed60` 1262 bytes (loops 4, calls 43)
-- [ ] `101a24e0` 1267 bytes (float, calls 50)
 - [ ] `101446f0` 1273 bytes (float, calls 17)
-- [ ] `101a29e0` 1359 bytes (float, calls 50)
 - [ ] `1001dc20` 1397 bytes (float, loops 5, calls 18)
 - [ ] `1004cf20` 1416 bytes (float, loops 4, calls 41)
 - [ ] `10150bb0` 1421 bytes (float, loops 3, calls 37)

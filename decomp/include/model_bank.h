@@ -10,7 +10,6 @@
 #include "anim_model.h"
 
 struct Node;
-struct ShadowScene;
 
 // Number of model records in the bank.
 #define MODEL_BANK_SIZE 16
@@ -58,8 +57,8 @@ struct ModelBank
     int AddFlarePoint(Vec4 position, const Matrix4 *viewProjection);
     int CreateTextures();
     int DrawLensFlares();
-    int DrawShadows(struct ShadowScene *scene, int a, int b, int c);
-    int DrawShadowsInto(struct ShadowScene *scene, int a, int b, int c);
+    int DrawShadows(Node *scene, const Matrix4 *parent, const Matrix4 *view, int a3);
+    int DrawShadowsInto(Node *scene, const Matrix4 *parent, const Matrix4 *view, int a3);
 };
 
 // The model bank.

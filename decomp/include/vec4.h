@@ -61,6 +61,8 @@ struct Vec4
 extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b);   // 0x101ac200: a.x*b.x + a.y*b.y + a.z*b.z
 extern "C" float Vec3_LengthSquared(const Vec4 *v);        // 0x101ac220: x*x + y*y + z*z
 extern "C" float Vec3_Length(const Vec4 *v);               // 0x101ae890: sqrt(x*x + y*y + z*z)
+// 0x101b1180: normalises v's x/y/z in place (a zero-length v becomes all zero) and returns a copy of it.
+Vec4 Vec3_Normalized(Vec4 *v);
 
 // Axis-aligned box given by its minimum and maximum corners.
 struct Box2

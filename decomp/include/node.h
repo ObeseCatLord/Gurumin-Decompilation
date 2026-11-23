@@ -23,11 +23,14 @@ struct NodeSkin;     // skinning data: bones and skin matrices (node_data.h)
 struct NodeSaved;    // saved-state block (node_data.h)
 struct GameFile;     // an open data file (model_prescan.cpp)
 struct VisData;      // visibility cells and their boxes (visibility.cpp)
+struct AnimModel;    // an animated model (anim_model.h)
 
 // Called instead of the normal mesh drawing when set (node_draw.cpp passes the node's world matrix, the view matrix and
 // Draw's own arguments).
-typedef void (*NodeDrawCallback)(Matrix4 *world, const Matrix4 *view, int a3, int a4, int a5, int a6, int a7,
-                                 int a8, int a9, int a10, int a11, int a12, int a13, int a14);
+typedef void (*NodeDrawCallback)(Matrix4 *world, const Matrix4 *view, int a3, const Matrix4 *shadowMatrix,
+                                 float shadowX, float shadowY, float shadowZ, int shadowTexture,
+                                 float shadowScale, int shadowSize, const Vec4 *lightDirection, float modelSize,
+                                 AnimModel *model, float alpha);
 
 // Limits of the fixed-size arrays in a node.
 enum NodeLimits
@@ -251,11 +254,23 @@ struct Node
     int SetupSkins(Node *root);                           // 0x101ab9d0
 
     // Drawing
-    int Draw(const Matrix4 *parent, const Matrix4 *view, int a3, int a4, int a5, int a6, int a7, int a8, int a9,
-             int a10, int a11, int a12, int a13, int a14);  // 0x101995a0 (node_draw.cpp)
+    // 0x101995a0 (node_draw.cpp). The arguments after `view` pass through to the mesh; the shadow pass
+    // (DrawShadow) fills them with its projector matrix, the shadow's centre, texture, scale and size, the light
+    // direction, the caster's size, model and opacity.
+    int Draw(const Matrix4 *parent, const Matrix4 *view, int a3, const Matrix4 *shadowMatrix, float shadowX, float shadowY, float shadowZ, int shadowTexture,
+             float shadowScale, int shadowSize, const Vec4 *lightDirection, float modelSize, AnimModel *model,
+             float alpha);
     // 0x10199e20: queues the subtree for drawing under `parent` with `view` (map_view.cpp, mesh_slots.cpp).
     void QueueDraw(const Matrix4 *parent, const Matrix4 *view, const Vec4 *direction, int a, const Vec4 *colour,
                    int b);
+    // 0x101a29e0: draws the subtree as the shadow of a caster at `casterPosition` lit from `lightPosition`, with
+    // its world matrix as the shadow's place on the ground (shadow_texture.cpp, called by ModelBank).
+    int DrawShadow(const Matrix4 *parent, const Matrix4 *view, int a3, const Vec4 *casterPosition,
+                   const Vec4 *lightPosition, int texture, float scale, int size, float casterSize,
+                   AnimModel *model, float alpha);
+    // 0x101a24e0: draws the subtree into shadow texture slot `texture`, seen from the light (shadow_texture.cpp).
+    int RenderShadowTexture(const Matrix4 *parent, int a2, int a3, const Vec4 *casterPosition,
+                            const Vec4 *lightPosition, int texture, float casterSize, float a8, float a9);
 
     // Collision
     // 0x101a8e60: tests the segment `from`-`to` against this subtree's triangles (nodes whose flags share a bit

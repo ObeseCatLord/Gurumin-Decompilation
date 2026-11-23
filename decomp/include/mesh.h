@@ -116,8 +116,9 @@ struct MeshData
     void Release();                                                                // 0x10150a90 (mesh_release.cpp)
     int M_10150bb0(VertexPack *packs, IndexList *indexLists, int packCount, Material *materials, int flags);
     // 0x10151150: draws the mesh with the world matrix and the pass-through arguments (node_draw.cpp).
-    int Draw(Matrix4 *worldMatrix, const Matrix4 *view, int a4, int a0a0, int a5, int a6, int a7, int a8, int a9,
-             int a10, int a11, int a12, int a14);
+    int Draw(Matrix4 *worldMatrix, const Matrix4 *view, const Matrix4 *shadowMatrix, int drawMode, float shadowX,
+             float shadowY, float shadowZ, int shadowTexture, float shadowScale, int shadowSize,
+             const Vec4 *lightDirection, float modelSize, float alpha);
     // 0x10151ba0: draws the mesh with the world matrix and the given lighting parameters (draw_list.cpp).
     int DrawLit(Matrix4 *world, const Matrix4 *view, int mode, const void *lights, Vec4 *a, Vec4 *b);
 };

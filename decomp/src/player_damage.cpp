@@ -8,11 +8,7 @@
 struct Matrix4;
 struct EffectOptions;
 
-struct EffectManager
-{
-    int Start(int effect, Vec4 position, int parent, int unused, int matrixOwner, int value, int frame,
-              const Matrix4 *matrix, const EffectOptions *options, int *pause);  // 0x10172350
-};
+#include "effect_manager.h"
 
 #include "anim_model.h"
 
@@ -47,7 +43,6 @@ struct Game
 };
 
 extern "C" ActorSlot DAT_10daaaec[0x80];
-extern "C" EffectManager DAT_10daaa80;
 extern "C" MoviePlayer DAT_10f08ab0;
 extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" int DAT_10202478;                  // texture slot the movies are decoded into

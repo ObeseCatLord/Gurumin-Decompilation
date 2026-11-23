@@ -17,10 +17,7 @@ Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);         // 0x101b10
 
 #include "model_bank.h"
 
-struct EffectManager
-{
-    int Draw(const Matrix4 &view, const Matrix4 *camera, unsigned char pass);   // 0x10190e30
-};
+#include "effect_manager.h"
 
 extern "C" Node *DAT_104c007c;    // the map's model
 extern "C" Node *DAT_10255f08;    // the map's root node
@@ -69,7 +66,6 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
     return map;
 }
 
-extern "C" EffectManager DAT_10daaa80;
 extern "C" Matrix4 DAT_10836ec8;           // parent matrix of the overhead pass (identity, set in game_reset.cpp)
 extern "C" Matrix4 DAT_108392d8;           // the current view-projection matrix
 extern "C" Matrix4 DAT_10836330;           // the camera matrix

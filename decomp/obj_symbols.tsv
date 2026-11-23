@@ -54,7 +54,7 @@
 ?LoadCandidates@ImeContext@@QAEKXZ	1015d430
 ??1MmvPlayer@@QAE@XZ	101608c0
 ?Close@MmvPlayer@@QAEXXZ	101609b0
-??0ModelState@@QAE@XZ	101668b0
+??0EffectOptions@@QAE@XZ	101668b0
 ?Clear@NodeSkin@@QAEXXZ	10166810
 ??0ColorTables@@QAE@XZ	10172780
 ??1Widget@@QAE@XZ	10172990
@@ -376,7 +376,7 @@ _sqrtf	10002010
 ?CopyAnimation@Node@@QAEHPAU1@H@Z	1019b890
 ?Clone@Node@@QAEHPAU1@HH@Z	101a53b0
 ?ComputeBounds@Node@@QAEHXZ	1019d8e0
-?Draw@EffectManager@@QAEHABUMatrix4@@HE@Z	10190e30
+?Draw@EffectManager@@QAEHABUMatrix4@@PBU2@E@Z	10190e30
 ?BuildCollisionSpheres@Node@@QAEHXZ	1019e120
 ?Init@FontRenderer@@QAEHPAUHWND__@@PBD@Z	101455d0
 ?M_1015cac0@StateArrays@@QAEHMH@Z	1015cac0
@@ -388,7 +388,7 @@ _sqrtf	10002010
 ?Map_SelectMovie@@YAHXZ	1001f270
 ?AssignValue@ListBank@@QAEHPBDPBUScriptValue@@D@Z	10037560
 ?FindVariable@ListBank@@QAEHPBDPAH11@Z	10037090
-?Start@EffectManager@@QAEHHUVec4@@HHHHHPBUMatrix4@@PBUEffectOptions@@PAH@Z	10172350
+?Start@EffectManager@@QAEHHUVec4@@HHPBUMatrix4@@HH1PBUEffectOptions@@PAH@Z	10172350
 ?RegisterBuiltin@ListBank@@QAEHPBDFP6AHPAU1@H@Z@Z	10036ca0
 ?Companion0_Update@@YAHH@Z	100b0250
 ?Companion1_Update@@YAHH@Z	100b0880
@@ -398,7 +398,6 @@ _sqrtf	10002010
 ?FUN_10048b70@@YAHH@Z	10048b70
 ?Companion2_Update@@YAHH@Z	100b0f00
 ?FUN_100469d0@@YAHH@Z	100469d0
-?Start@EffectManager@@QAEHHUVec4@@HHPBUMatrix4@@HH1PBUModelState@@PAH@Z	10172350
 ?FUN_10047440@@YAHH@Z	10047440
 ?FUN_1000f5a0@@YAPAUNode@@PAUMatrix4@@ABU2@@Z	1000f5a0
 ?FUN_1000f7f0@@YAXXZ	1000f7f0
@@ -471,3 +470,5 @@ _FUN_101426d0@8	101426d0
 ?SetPendingPush@AnimModel@@QAEHMMMD@Z	101628b0
 ?M_101627d0@AnimModel@@QAEHMMH@Z	101627d0
 ?M_101629b0@AnimModel@@QAEHMM@Z	101629b0
+?DrawSpriteA@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	101890f0
+?DrawSpriteB@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	10189340

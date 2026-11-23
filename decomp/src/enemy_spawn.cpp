@@ -9,11 +9,7 @@
 
 struct EffectOptions;
 
-struct EffectManager
-{
-    int Start(int effect, Vec4 position, int parent, int unused, int matrixOwner, int value, int frame,
-              const Matrix4 *matrix, const EffectOptions *options, int *pause);  // 0x10172350
-};
+#include "effect_manager.h"
 
 #include "anim_model.h"
 
@@ -21,7 +17,6 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-extern "C" EffectManager DAT_10daaa80;
 extern "C" char DAT_1049efb0[10][10];         // the wave groups: character of each slot (0 = empty)
 extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated
 extern "C" Vec4 DAT_10867e18[0x80];           // where a character in play was placed

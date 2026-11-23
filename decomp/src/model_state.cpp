@@ -14,36 +14,7 @@ struct SceneNode
     int M_1019b630(int fromFrame, int toFrame, int frames);   // 0x1019b630: sets up a blend between two frames
 };
 
-struct ModelState
-{
-    int m_0000;
-    int m_0004;
-    float m_0008;
-    char m_000c;
-    char m_000d;
-    char m_000e;
-    char pad_000f;
-    int m_0010;
-    int m_0014;
-    int m_0018;
-    int m_001c;
-    int m_0020;
-    char m_0024;
-    char m_0025;
-    char m_0026;
-    char m_0027;
-    char m_0028;
-    char m_0029;
-    char pad_002a;
-    char m_002b;
-    int m_002c;
-    int pad_0030;
-    int m_0034;
-    int m_0038;
-    int m_003c;
-    int m_0040;
-    ModelState();
-};
+#include "effect_manager.h"
 
 struct Playback
 {
@@ -99,26 +70,26 @@ extern "C" int FUN_101619a0(void)
 }
 
 // Constructor (see anim_channels.cpp for why callers treat it as throw()).
-ModelState::ModelState()
+EffectOptions::EffectOptions()
 {
-    m_002c = 0;
-    m_002b = 0;
+    owner = 0;
+    settings[7] = 0;
     m_0004 = 0xa2c2a;
-    m_0028 = 0;
-    m_0029 = 0;
-    m_0024 = 0;
+    settings[4] = 0;
+    settings[5] = 0;
+    settings[0] = 0;
     m_0008 = 1.0f;
-    m_0025 = 0;
-    m_0027 = 0;
+    settings[1] = 0;
+    settings[3] = 0;
     m_0034 = 0;
     m_0038 = 0;
     m_003c = 0;
     m_0040 = 0;
     m_0000 = 0;
-    m_0026 = 1;
+    settings[2] = 1;
     m_000e = 0;
-    m_000d = 0;
-    m_000c = 0;
+    flags = 0;
+    list = 0;
     m_0010 = 0;
     m_0014 = 0;
     m_0018 = 0;

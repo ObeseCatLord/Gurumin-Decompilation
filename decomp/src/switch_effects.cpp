@@ -2,14 +2,7 @@
 // units of the camera target and visible starts its effect again (attached to the object, or at its position),
 // or, for objects with flag 0x20, releases its holder.
 
-// Effect start parameters (model_state.cpp ModelState), only the field set here.
-struct ModelState
-{
-    char pad_0000[0xd];
-    char m_000d;                  // 0x0d: 1 = the effect follows its attachment
-    char pad_000e[0x36];
-    ModelState();                 // 0x101668b0
-};
+#include "effect_manager.h"
 
 #include "vec4.h"
 
@@ -24,19 +17,12 @@ struct SwitchObject
     Matrix4 matrix;               // 0x24c: world matrix
 };
 
-struct EffectManager
-{
-    // 0x10172350 (char_effects.cpp): starts effect `effect` at `position`.
-    int M_10172350(int effect, Vec4 position, int a, int b, int c, int d, int e, int f, int g, int *handle);
-};
-
 extern "C" SwitchObject *DAT_1030bbf8[0x80];     // object of each used hold slot (0 = unused)
 extern "C" int DAT_10255b08[0x80];               // holder of each slot
 extern "C" int DAT_10219fc0[0x80];               // effect kind of each slot (0, 1 or 2)
 extern "C" int DAT_1042e0a8[0x80];               // 1 once the slot's effect was started
 extern "C" unsigned int DAT_104bf890;            // frame counter
 extern "C" Vec4 DAT_118e6cb8;                    // camera target
-extern "C" EffectManager DAT_10daaa80;
 extern "C" int FUN_10015860(Vec4 position);      // Vis_IsVisible
 extern "C" int FUN_10057b90(int holder);         // Switch_Release
 
@@ -64,24 +50,24 @@ extern "C" int FUN_10058500(void)
                         if (DAT_10219fc0[slot] == 0)
                         {
                             position.Fill(0.0f);
-                            ModelState state;
-                            state.m_000d = 1;
-                            DAT_10daaa80.M_10172350(0x65, position, -1, -1, (int)&DAT_1030bbf8[slot]->matrix, 0, 0,
-                                                    0, (int)&state, 0);
+                            EffectOptions state;
+                            state.flags = 1;
+                            DAT_10daaa80.Start(0x65, position, -1, -1, &DAT_1030bbf8[slot]->matrix, 0, 0,
+                                                    0, &state, 0);
                         }
                         if (DAT_10219fc0[slot] == 1)
                         {
-                            ModelState state;
-                            state.m_000d = 1;
+                            EffectOptions state;
+                            state.flags = 1;
                             position.Copy(DAT_1030bbf8[slot]->matrix.GetTranslation());
-                            DAT_10daaa80.M_10172350(0x6a, position, -1, -1, 0, 0, 0, 0, (int)&state, 0);
+                            DAT_10daaa80.Start(0x6a, position, -1, -1, 0, 0, 0, 0, &state, 0);
                         }
                         if (DAT_10219fc0[slot] == 2)
                         {
-                            ModelState state;
-                            state.m_000d = 1;
+                            EffectOptions state;
+                            state.flags = 1;
                             position.Copy(DAT_1030bbf8[slot]->matrix.GetTranslation());
-                            DAT_10daaa80.M_10172350(0x86b, position, -1, -1, 0, 0, 0, 0, (int)&state, 0);
+                            DAT_10daaa80.Start(0x86b, position, -1, -1, 0, 0, 0, 0, &state, 0);
                         }
                     }
                 }

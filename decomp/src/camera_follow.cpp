@@ -11,11 +11,7 @@
 
 struct EffectOptions;
 
-struct EffectManager
-{
-    int Start(int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame,
-              const Matrix4 *matrix, const EffectOptions *options, int *pause);  // 0x10172350
-};
+#include "effect_manager.h"
 
 extern "C" Vec4 DAT_118e6cb8;     // camera target
 extern "C" Vec4 DAT_118e69e8;     // camera position
@@ -32,7 +28,6 @@ extern "C" Node *DAT_104c039c;    // the node the camera follows (0 = none)
 extern "C" void FUN_1016a8d0(void);
 
 extern "C" Node *DAT_10255f08;     // the map's root node
-extern "C" EffectManager DAT_10daaa80;
 extern "C" Node *DAT_1021bdf8[0x80][9];       // character 0: [0] = the stand's parent node
 extern "C" Matrix4 DAT_10868838[0x80][6];  // character 0: [0] = the matrix the sparkle follows
 extern "C" int DAT_10c6356c;      // the shot's point as integers (z + 115)

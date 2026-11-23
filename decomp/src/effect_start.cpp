@@ -5,29 +5,7 @@
 
 #include "matrix4.h"
 
-// Start options a caller may pass (0x44 bytes, copied into the record).
-struct EffectOptions
-{
-    int m_0000;
-    int m_0004;
-    int m_0008;
-    unsigned char list;                              // 0x0c: effect list when the definition leaves it open
-    char m_000d;
-    char m_000e;
-    char pad_000f;
-    int m_0010;
-    char pad_0014[0x10];
-    char m_0024;
-    char m_0025;
-    char m_0026;
-    char m_0027;
-    char m_0028;
-    char m_0029;
-    char m_002a;
-    char pad_002b;
-    int m_002c;
-    char pad_0030[0x14];
-};
+#include "effect_manager.h"
 
 // An effect record (char_effects.cpp EffectRecordA), 0x1dc bytes.
 struct EffectRecord
@@ -48,7 +26,7 @@ struct EffectRecord
     char pad_00c4[0x40];
     Matrix4 matrix;           // 0x104: the caller's matrix, identity without one
     char pad_0144[0x40];
-    int matrixOwner;          // 0x184
+    const Matrix4 *matrixOwner;// 0x184
     int m_0188;
     short m_018c;
     char part;                // 0x18e: 1 at the start
@@ -75,13 +53,6 @@ struct EffectDef
     char pad_0260[0x178];
 };
 
-struct EffectManager
-{
-    void LoadDefinition(int definition);             // 0x1016fa40
-    int Start(int effect, Vec4 position, int parent, int unused, int matrixOwner, int value, int frame,
-              const Matrix4 *matrix, const EffectOptions *options, int *pause);
-};
-
 extern "C" EffectDef DAT_1101dfdc[0x47e];
 extern "C" EffectRecord DAT_1115cfe8[0x348];
 extern "C" int DAT_110186a8[32];                     // recently started script ids
@@ -99,7 +70,7 @@ extern "C" int FUN_10161920(const char *name);       // Texture_FindByName
 // start frame, the caller's matrix and options (or defaults) and the pause flag. Looks up the texture and loads
 // the definition's resources on first use. Returns 1 for effects of kind 2 and 4, 0 otherwise or when there is no
 // definition or free record.
-int EffectManager::Start(int effect, Vec4 position, int parent, int unused, int matrixOwner, int value, int frame,
+int EffectManager::Start(int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame,
                          const Matrix4 *matrix, const EffectOptions *options, int *pause)
 {
     int i;
@@ -167,7 +138,7 @@ int EffectManager::Start(int effect, Vec4 position, int parent, int unused, int 
     if (DAT_10ff1df8[definition] == 0)
         LoadDefinition(definition);
     DAT_1115cfe8[index].m_0188 = value;
-    DAT_1115cfe8[index].matrixOwner = matrixOwner;
+    DAT_1115cfe8[index].matrixOwner = owner;
     DAT_1115cfe8[index].serial = DAT_1101de60;
     DAT_1115cfe8[index].parent = parent;
     DAT_1115cfe8[index].id = definition;
@@ -188,19 +159,19 @@ int EffectManager::Start(int effect, Vec4 position, int parent, int unused, int 
     }
     else
     {
-        DAT_1115cfe8[index].options.m_0028 = 0;
-        DAT_1115cfe8[index].options.m_0024 = 0;
-        DAT_1115cfe8[index].options.m_0025 = 0;
-        DAT_1115cfe8[index].options.m_0026 = 0;
+        DAT_1115cfe8[index].options.settings[4] = 0;
+        DAT_1115cfe8[index].options.settings[0] = 0;
+        DAT_1115cfe8[index].options.settings[1] = 0;
+        DAT_1115cfe8[index].options.settings[2] = 0;
         DAT_1115cfe8[index].options.m_000e = 0;
-        DAT_1115cfe8[index].options.m_0029 = 0;
+        DAT_1115cfe8[index].options.settings[5] = 0;
         DAT_1115cfe8[index].options.m_0008 = 0;
-        DAT_1115cfe8[index].options.m_0027 = 0;
-        DAT_1115cfe8[index].options.m_002a = 0;
+        DAT_1115cfe8[index].options.settings[3] = 0;
+        DAT_1115cfe8[index].options.settings[6] = 0;
         DAT_1115cfe8[index].options.m_0010 = 0;
         DAT_1115cfe8[index].options.m_0004 = 0;
         DAT_1115cfe8[index].options.m_0000 = 0;
-        DAT_1115cfe8[index].options.m_002c = 0;
+        DAT_1115cfe8[index].options.owner = 0;
         DAT_1115cfe8[index].options.list = DAT_1101dfdc[definition].list;
     }
     DAT_1115cfe8[index].part = 1;

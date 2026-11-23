@@ -256,11 +256,7 @@ extern "C" int FUN_100b1520(int index)
 
 struct EffectOptions;
 
-struct EffectManager
-{
-    int Start(int effect, Vec4 position, int parent, int unused, int matrixOwner, int value, int frame,
-              const Matrix4 *matrix, const EffectOptions *options, int *pause);  // 0x10172350
-};
+#include "effect_manager.h"
 
 struct CollisionWorld
 {
@@ -279,7 +275,6 @@ struct CharSlot
 };
 
 extern "C" CharSlot DAT_10daab84[0x80];
-extern "C" EffectManager DAT_10daaa80;
 extern "C" CollisionWorld *DAT_10255f08;
 extern "C" unsigned short DAT_104c0380;       // frame counter
 extern "C" int DAT_102199b8[0x80];            // per-character group timer (char_reset.cpp)
@@ -1216,21 +1211,6 @@ extern "C" int FUN_100b4930(int index)
     return 0;
 }
 
-// Effect start parameters (model_state.cpp ModelState), only the fields set here.
-struct ModelState
-{
-    int m_0000;
-    int m_0004;                   // 0x04: owner's slot value (ActorSlot m_000c)
-    float m_0008;                 // 0x08: scale
-    char m_000c;
-    char m_000d;
-    char m_000e;                  // 0x0e: effect kind
-    char pad_000f[0x1d];
-    int m_002c;                   // 0x2c: owner slot
-    char pad_0030[0x14];
-    ModelState();                 // 0x101668b0
-};
-
 extern "C" Playback *DAT_1101d880;            // motion playback of the character being moved
 
 // 0x10098be0 (Enemy_ShoveAndBlast). An enemy that idles (motion 2) and now and then (3 in 100, at most every 100
@@ -1268,11 +1248,11 @@ extern "C" int FUN_10098be0(int index)
         {
             Vec4 offset;
             offset.Fill(0.0f);
-            ModelState options;
+            EffectOptions options;
             options.m_0000 = 0;
             options.m_0004 = DAT_10daaaec[index].m_000c;
             options.m_0008 = 1.5f;
-            options.m_002c = index;
+            options.owner = index;
             options.m_000e = 1;
             FUN_10065b10(index, 0x151, 0, 0);
             FUN_1001d8b0(index, 0x61, offset, -1, -1, 0, 0, 0, &DAT_10db6ee8[index].matrix, &options);
@@ -1368,11 +1348,11 @@ extern "C" int FUN_1009dfd0(int index)
         {
             Vec4 offset;
             offset.Fill(0.0f);
-            ModelState options;
+            EffectOptions options;
             options.m_0000 = 0;
             options.m_0004 = DAT_10daaaec[index].m_000c;
             options.m_0008 = 1.5f;
-            options.m_002c = index;
+            options.owner = index;
             options.m_000e = 1;
             FUN_10065b10(index, 0x150, 0, 0);
             FUN_1001d8b0(index, 0x46, offset, -1, -1, 0, 0, 0, &DAT_10db6ee8[index].matrix, &options);
@@ -1434,11 +1414,11 @@ extern "C" int FUN_1009d100(int index)
             DAT_10db6ee8[index].FaceAwayFrom(&DAT_10db6ee8[0]);
             Vec4 offset;
             offset.Fill(0.0f);
-            ModelState options;
+            EffectOptions options;
             options.m_0000 = 0;
             options.m_0004 = DAT_10daaaec[index].m_000c;
             options.m_0008 = 1.5f;
-            options.m_002c = index;
+            options.owner = index;
             options.m_000e = 1;
             FUN_10065b10(index, 0x14f, 0, 0);
             FUN_1001d8b0(index, 0x5e, offset, -1, -1, 0, 0, 0, &DAT_10db6ee8[index].matrix, &options);

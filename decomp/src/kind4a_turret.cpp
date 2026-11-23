@@ -3,20 +3,7 @@
 
 #include "vec4.h"
 
-// Effect start parameters (model_state.cpp ModelState), only the fields set here.
-struct ModelState
-{
-    int m_0000;
-    int m_0004;                   // 0x04: owner's slot value (ActorSlot m_000c)
-    float m_0008;                 // 0x08: scale
-    char m_000c;
-    char m_000d;
-    char m_000e;                  // 0x0e: effect kind (6 here)
-    char pad_000f[0x1d];
-    int m_002c;                   // 0x2c: owner slot
-    char pad_0030[0x14];
-    ModelState();                 // 0x101668b0
-};
+#include "effect_manager.h"
 
 #include "anim_model.h"
 
@@ -68,11 +55,11 @@ extern "C" int FUN_1009ddd0(int slot)
         {
             Vec4 position;
             position.Fill(0.0f);
-            ModelState shot;
+            EffectOptions shot;
             shot.m_0000 = 0;
             shot.m_0004 = DAT_10daaaec[slot].m_000c;
             shot.m_0008 = 1.5f;
-            shot.m_002c = slot;
+            shot.owner = slot;
             shot.m_000e = 6;
             FUN_10065b10(slot, 0x154, 0, 0);
             FUN_1001d8b0(slot, 0x352, position, -1, -1, 0, 0, 0, (int)&DAT_10db6ee8[slot].matrix, (int)&shot);

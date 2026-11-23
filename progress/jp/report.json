@@ -2951,7 +2951,7 @@
      }
     },
     {
-     "name": "?Draw@EffectManager@@QAEHABUMatrix4@@HE@Z",
+     "name": "?Draw@EffectManager@@QAEHABUMatrix4@@PBU2@E@Z",
      "size": "884",
      "fuzzy_match_percent": 83.4821,
      "metadata": {
@@ -5011,7 +5011,7 @@
    ],
    "functions": [
     {
-     "name": "?DrawSpriteA@EffectManager@@QAEHHABUMatrix4@@H@Z",
+     "name": "?DrawSpriteA@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z",
      "size": "579",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -5019,7 +5019,7 @@
      }
     },
     {
-     "name": "?DrawSpriteB@EffectManager@@QAEHHABUMatrix4@@H@Z",
+     "name": "?DrawSpriteB@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z",
      "size": "490",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -5061,7 +5061,7 @@
    ],
    "functions": [
     {
-     "name": "?Start@EffectManager@@QAEHHUVec4@@HHHHHPBUMatrix4@@PBUEffectOptions@@PAH@Z",
+     "name": "?Start@EffectManager@@QAEHHUVec4@@HHPBUMatrix4@@HH1PBUEffectOptions@@PAH@Z",
      "size": "1068",
      "fuzzy_match_percent": 68.9366,
      "metadata": {
@@ -9521,7 +9521,7 @@
      }
     },
     {
-     "name": "??0ModelState@@QAE@XZ",
+     "name": "??0EffectOptions@@QAE@XZ",
      "size": "82",
      "fuzzy_match_percent": 100.0,
      "metadata": {

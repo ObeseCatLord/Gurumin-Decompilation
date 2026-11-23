@@ -5,11 +5,7 @@
 
 #include "matrix4.h"
 
-// Effect manager (0x10daaa80, char_effects.cpp); M_10184170 clears all running effects.
-struct EffectManager
-{
-    int M_10184170();
-};
+#include "effect_manager.h"
 
 typedef int (*SceneCallback)(int code, int value);
 
@@ -68,7 +64,6 @@ extern "C" void FUN_100cc1d0(const char *characterFile, int value)
     DAT_10db9380 = 1;
 }
 
-extern "C" EffectManager DAT_10daaa80;
 extern "C" void FUN_100123d0(void);              // Chars_ReloadModels
 extern "C" int FUN_1015c9e0(int mode);           // Screen_StartTransition (0 = end the transition)
 extern "C" int FUN_10001b40(void);               // SoundArc_Message221
@@ -91,7 +86,7 @@ extern "C" void FUN_1003a6c0(void)
     {
         FUN_100123d0();
         FUN_1015c9e0(0);
-        DAT_10daaa80.M_10184170();
+        DAT_10daaa80.Reset();
         DAT_104bfeb0 = 0;
         DAT_104c00e0 = 0;
         DAT_104c0108 = 0;

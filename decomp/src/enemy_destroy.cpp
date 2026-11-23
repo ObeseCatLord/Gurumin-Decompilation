@@ -7,11 +7,7 @@
 
 #include "anim_model.h"
 
-struct EffectManager
-{
-    // 0x10172350 (char_effects.cpp): starts effect `effect` at `position`.
-    int M_10172350(int effect, Vec4 position, int a, int b, int c, int d, int e, int f, int g, int *handle);
-};
+#include "effect_manager.h"
 
 // The engine object at 0x10836c70 (engine_1013e.cpp).
 struct Engine
@@ -19,7 +15,6 @@ struct Engine
     int ResetFrameTimer();                       // 0x1013eee0: FrameTimer_ResetNext
 };
 
-extern "C" EffectManager DAT_10daaa80;
 extern "C" Engine DAT_10836c70;
 extern "C" char DAT_10894698[][0x124];   // model paths
 extern "C" char DAT_1021f3c0[0x80];      // slot kind
@@ -42,7 +37,7 @@ extern "C" int FUN_100541f0(int index)
     FUN_1003ad20(0x336, DAT_10db6ee8[index].matrix.GetTranslation(), 1.0f);
     Vec4 top = DAT_10db6ee8[index].matrix.GetTranslation();
     top.z += 50.0f;
-    DAT_10daaa80.M_10172350(0x28a, top, -1, 0, 0, 0, 0, 0, 0, 0);
+    DAT_10daaa80.Start(0x28a, top, -1, 0, 0, 0, 0, 0, 0, 0);
     if (DAT_10c62ed0 < 100)
         FUN_100119d0(index, 10, 1);
     if (DAT_10db6ee8[index].m_028c == 0)

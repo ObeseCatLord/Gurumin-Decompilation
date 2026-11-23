@@ -39,10 +39,7 @@ struct EffectTable
 
 #include "model_bank.h"
 
-struct EffectManager
-{
-    void M_10184170();                           // 0x10184170
-};
+#include "effect_manager.h"
 
 struct EmptyObject
 {
@@ -597,7 +594,6 @@ extern "C" Vec4 DAT_10c67ef0[4];
 extern "C" Vec4 DAT_10c67f30;
 extern "C" Vec4 DAT_10c67f50;
 extern "C" Vec4 DAT_10da9150;
-extern "C" EffectManager DAT_10daaa80;
 extern "C" Vec4 DAT_10daaad4;
 extern "C" int DAT_10daabb4;
 extern "C" CharParams DAT_10db4408;                 // their starting values
@@ -770,7 +766,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104c018c = 0;
   DAT_102024ac = -1;
   DAT_10836ec8 = IdentityMatrix();
-  DAT_10daaa80.M_10184170();
+  DAT_10daaa80.Reset();
   DAT_104c0350 = 0;
   DAT_104c037c = 0;
   DAT_104c0380 = 0;

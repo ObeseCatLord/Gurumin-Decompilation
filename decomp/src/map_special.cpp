@@ -5,11 +5,7 @@
 
 #include "matrix4.h"
 
-struct EffectManager
-{
-    // 0x10172350: starts effect `effect` at `position`; `attach` is an optional matrix to place it with.
-    int Start(int effect, Vec4 position, int a, int b, int c, int d, int e, Matrix4 *attach, int g, int *handle);
-};
+#include "effect_manager.h"
 
 // Map object that raises script events (switches.cpp MapObject).
 struct MapObject
@@ -20,7 +16,6 @@ struct MapObject
 extern "C" int DAT_10c6505c;           // map script timer: > 0 running, 0 = raise the end event, < 0 = ended
 extern "C" int DAT_10c62ed0;           // current map
 extern "C" Matrix4 DAT_10e40204;       // world matrix of the object the map 0x18 effect is placed on
-extern "C" EffectManager DAT_10daaa80;
 extern "C" MapObject DAT_10874848;
 extern "C" void FUN_1007dab0(void);
 extern "C" void FUN_10053020(void);

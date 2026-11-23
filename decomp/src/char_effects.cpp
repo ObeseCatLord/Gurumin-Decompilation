@@ -7,51 +7,14 @@
 
 #include "vec4.h"
 
-// Four floats with the Vec4 setter (0x101ac9c0).
-struct Colour4
-{
-    float r;
-    float g;
-    float b;
-    float a;
-    void Set(float r, float g, float b, float a);
-};
+#include "effect_manager.h"
 
-struct EffectManager
-{
-    Colour4 colour;           // 0x00: overall effect colour (white after Init)
-    int m_0010[6];            // 0x10: start offset of each of the six effect groups
-    int pad_0028[2];
-    int m_0030[6];            // 0x30: current offset of each group (reset to the start)
-    int m_0048;
-    int m_004c;
-    int m_0050;               // 0x50: number of running effects
-    int Reset();
-    int Init();
-    void M_1016fab0();
-    int ClearTables();
-    int RemoveOwnedBy(int owner);
-    int RemoveChildren(int parent);
-    int RemoveOfType(int type);
-    void Step(int record, int list);  // 0x10184440: advances one effect
-    int Update(int restricted, int includeHidden, int ignorePause);
-    // Starts effect `effect` at `position`; the seven values are its options (colour, follow target, flags, ...;
-    // callers mostly pass -1 and 0). Stores the effect handle in *handle.
-    int M_10172350(int effect, Vec4 position, int a, int b, int c, int d, int e, int f, int g, int *handle);
-    int Draw(const struct Matrix4 &view, int unused, unsigned char pass);
-    int DrawRecord(int record, const struct Matrix4 &view, int unused, int pass);   // 0x10189530
-    int DrawSpriteA(int index, const struct Matrix4 &view, int unused);            // 0x101890f0
-    int DrawSpriteB(int index, const struct Matrix4 &view, int unused);            // 0x10189340
-    int DrawLight(int index, const struct Matrix4 &view, int unused);              // 0x10187520
-};
-
-extern "C" EffectManager DAT_10daaa80;
 extern "C" int DAT_10219770[0x80];  // effect handle of each character slot
 
 // Starts effect `effect` at `position` for character slot `index` and records its handle in that slot.
-extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int a, int b, int c, int d, int e, int f, int g)
+extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame, const Matrix4 *matrix, const EffectOptions *options)
 {
-    DAT_10daaa80.M_10172350(effect, position, a, b, c, d, e, f, g, &DAT_10219770[index]);
+    DAT_10daaa80.Start(effect, position, parent, unused, owner, value, frame, matrix, options, &DAT_10219770[index]);
     return 0;
 }
 
@@ -395,7 +358,7 @@ extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render s
 // part is in the visible area and in front of its depth limit (+20), marking them drawn; other passes draw their own
 // list, pass 0 also the list-1 effects not drawn yet. Then the sprites of both tables in the pass's range, and in
 // pass 0 the effect lights. Returns 0.
-int EffectManager::Draw(const Matrix4 &view, int unused, unsigned char pass)
+int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned char pass)
 {
     FUN_1013f070(3, 1, 0xf);
     FUN_1013f070(7, 1, 0);
@@ -415,7 +378,7 @@ int EffectManager::Draw(const Matrix4 &view, int unused, unsigned char pass)
                     DAT_10f668c0 + 20.0f > DAT_1115cfe8[i].positions[DAT_1115cfe8[i].part].z)
                 {
                     FUN_1013f070(10, 1, 0);
-                    DrawRecord(i, view, unused, 1);
+                    DrawRecord(i, view, camera, 1);
                     DAT_1115cfe8[i].drawn = 1;
                 }
                 else
@@ -433,7 +396,7 @@ int EffectManager::Draw(const Matrix4 &view, int unused, unsigned char pass)
             else
             {
                 FUN_1013f070(10, 1, 0);
-                DrawRecord(i, view, unused, pass);
+                DrawRecord(i, view, camera, pass);
                 CHECK_RECORD(i);
             }
         }
@@ -448,7 +411,7 @@ int EffectManager::Draw(const Matrix4 &view, int unused, unsigned char pass)
                     if (DAT_1115cfe8[i].drawn == 0)
                     {
                         FUN_1013f070(10, 1, 0);
-                        DrawRecord(i, view, unused, 0);
+                        DrawRecord(i, view, camera, 0);
                         DAT_1115cfe8[i].drawn = 1;
                     }
                     CHECK_RECORD(i);
@@ -465,20 +428,20 @@ int EffectManager::Draw(const Matrix4 &view, int unused, unsigned char pass)
     for (sprite = first; sprite < end; sprite++)
     {
         if (DAT_11134cc8[sprite].id != -1)
-            DrawSpriteA(sprite, view, unused);
+            DrawSpriteA(sprite, view, camera);
     }
     FUN_1013f070(10, 1, 0);
     for (sprite = first; sprite < end; sprite++)
     {
         if (DAT_118a8888[sprite].id != -1)
-            DrawSpriteB(sprite, view, unused);
+            DrawSpriteB(sprite, view, camera);
     }
     if (pass == 0)
     {
         for (i = 0; i < 0x80; i++)
         {
             if (DAT_118e99f8[i].active != 0)
-                DrawLight(i, view, unused);
+                DrawLight(i, view, camera);
         }
     }
     DAT_1101c804.Flush();

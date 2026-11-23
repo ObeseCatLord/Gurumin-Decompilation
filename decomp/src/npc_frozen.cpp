@@ -9,29 +9,7 @@ Matrix4 RotationZ(float angle);                  // 0x101b1b40
 
 #include "node.h"
 
-// Effect start parameters (model_state.cpp ModelState), only the fields set here.
-struct ModelState
-{
-    int m_0000;
-    int m_0004;
-    float m_0008;
-    char m_000c;
-    unsigned char m_000d_0 : 1;
-    unsigned char followOwner : 1;   // 0x0d bit 1: the effect follows its owner
-    unsigned char m_000d_2 : 6;
-    char m_000e;
-    char pad_000f[0x1d];
-    int m_002c;               // 0x2c: owner (character index + 100)
-    char pad_0030[0x14];
-    ModelState();             // 0x101668b0
-};
-
-struct EffectManager
-{
-    int Start(int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame,
-              const Matrix4 *matrix, const ModelState *options, int *pause);  // 0x10172350
-    int RemoveOwnedBy(int owner);                    // 0x101883b0
-};
+#include "effect_manager.h"
 
 #include "anim_model.h"
 
@@ -56,7 +34,6 @@ struct ActorSlot
 #include "char_state.h"
 
 extern "C" ActorSlot DAT_10daaaec[0x80];
-extern "C" EffectManager DAT_10daaa80;
 extern "C" short DAT_103153b0[0x80];           // non-zero = release now
 extern "C" char DAT_10255a88[0x80];
 extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
@@ -74,10 +51,10 @@ int FUN_100469d0(int index)
     {
         DAT_1020b430[index].saved = DAT_10daaaec[index].m_0140;
         DAT_1020b430[index].state = 1;
-        ModelState options;
+        EffectOptions options;
         Matrix4 matrix;
         Vec4 position;
-        options.m_002c = index + 100;
+        options.owner = index + 100;
         options.followOwner = 1;
         matrix = RotationZ((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f);
         matrix.SetTranslation(DAT_10db6ee8[index].matrix.GetTranslation());
@@ -97,7 +74,7 @@ int FUN_100469d0(int index)
     {
         Matrix4 matrix;
         Vec4 position;
-        ModelState options;
+        EffectOptions options;
         options.followOwner = 1;
         matrix = RotationZ((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f);
         matrix.SetTranslation(DAT_10db6ee8[index].matrix.GetTranslation());

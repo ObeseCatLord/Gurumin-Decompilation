@@ -64,11 +64,7 @@ struct EffectType
     char pad_0261[0x177];
 };
 
-struct EffectManager
-{
-    int DrawSpriteA(int index, const Matrix4 &view, int unused);
-    int DrawSpriteB(int index, const Matrix4 &view, int unused);
-};
+#include "effect_manager.h"
 
 extern "C" EffectSprite DAT_11134cc8[];          // table A: sprites placed in the world
 extern "C" EffectSprite DAT_118a8888[];          // table B: sprites placed on the screen
@@ -80,7 +76,7 @@ extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render s
 // 0x101890f0 (EffectManager::DrawSpriteA). Queues sprite `index` of table A: its world position is projected with
 // `view` to the 640x480 screen and the square drawn around it with the sprite's blend mode, its alpha fading with
 // the remaining lifetime. Returns 0 (nothing is drawn unless the definition is a sprite).
-int EffectManager::DrawSpriteA(int index, const Matrix4 &view, int unused)
+int EffectManager::DrawSpriteA(int index, const Matrix4 &view, const Matrix4 *camera)
 {
     int type = DAT_11134cc8[index].type;
     FUN_1013f070(0, 0, 0);
@@ -140,7 +136,7 @@ int EffectManager::DrawSpriteA(int index, const Matrix4 &view, int unused)
 
 // 0x10189340 (EffectManager::DrawSpriteB). The same for sprite `index` of table B, whose position is already in
 // screen coordinates. Returns 0.
-int EffectManager::DrawSpriteB(int index, const Matrix4 &view, int unused)
+int EffectManager::DrawSpriteB(int index, const Matrix4 &view, const Matrix4 *camera)
 {
     int type = DAT_118a8888[index].type;
     FUN_1013f070(0, 0, 0);

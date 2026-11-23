@@ -103,7 +103,10 @@ struct CharState
                     {
                         int alarmFlashes;         // char_move.cpp: alarm flashes so far (Npc_RideAlarm)
                         int swing;                // enemy_pendulum.cpp: angle change per frame
-                        int reversed;             // route_carrier.cpp: 1 while walking the route backwards
+                        int reversed;             // route_carrier.cpp, route_follow.cpp: 1 while walking the route
+                                                  // backwards
+                        int messageDelay;         // tutorial_page_next.cpp (slot 0): frames before the "last page"
+                                                  // message may show again
                         int reviveHealth;         // companion_update.cpp (companion slot): health it revives
                                                   // with (0 = its maximum + 2000)
                         int scriptValue;          // char_script.cpp: value carried between steps (opacity in

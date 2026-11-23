@@ -3,11 +3,8 @@
 // them. The search loops are unrolled by 8 by the compiler (the plain `for` below gives exactly that).
 
 #include "script_vars.h"
+#include "game_vars.h"
 
-extern "C" int DAT_104463f8[0x60];
-extern "C" int DAT_10468230[0x60];
-extern "C" int DAT_10447fd8[0x60];
-extern "C" char DAT_1021f640[0x60];
 
 // Adds an event `id` lasting |value| frames with `flag` to the first free slot (nothing happens when all
 // 0x60 slots are in use). Returns 0.

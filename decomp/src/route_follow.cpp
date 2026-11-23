@@ -6,7 +6,6 @@
 #include "route_point.h"
 
 extern "C" RoutePoint DAT_10210fc0[][16];        // the routes of the map
-extern "C" int DAT_1020b444[][16];               // per walker: [0] = 1 while it walks its route backwards
 
 // 0x1002f320 (Route_Follow). Reads point `point` of route `route` for walker `walker`: stores its action (low two
 // bits), value and group in *outAction, *outValue and *outGroup. When `position` lies within `radius` of the point
@@ -38,24 +37,24 @@ extern "C" int FUN_1002f320(int walker, int route, int point, int *outPoint, flo
         switch (*outAction)
         {
         case 0:
-            if (DAT_1020b444[walker][0] != 0)
+            if (DAT_1020b430[walker].reversed != 0)
                 next = point - 1;
             else
                 next = point + 1;
             break;
         case 1:
             result = 1;
-            DAT_1020b444[walker][0] = 0;
+            DAT_1020b430[walker].reversed = 0;
             next = point + 1;
             break;
         case 2:
             result = 2;
-            DAT_1020b444[walker][0] = 0;
+            DAT_1020b430[walker].reversed = 0;
             next = 1;
             break;
         case 3:
             result = 3;
-            DAT_1020b444[walker][0] = 1;
+            DAT_1020b430[walker].reversed = 1;
             next = point - 1;
             break;
         }

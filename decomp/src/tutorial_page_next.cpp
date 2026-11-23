@@ -4,6 +4,8 @@
 
 #include <string.h>
 #include "texture_load.h"
+#include "char_state.h"
+#include "anim_model.h"
 
 // "最後のページです。" ("This is the last page."), Shift-JIS.
 #define LAST_PAGE_TEXT "\x8d\xc5\x8c\xe3\x82\xcc\x83\x79\x81\x5b\x83\x57\x82\xc5\x82\xb7\x81\x42"
@@ -19,7 +21,6 @@
 #include "game_vars.h"
 #include "ui_vars.h"
 
-extern "C" int DAT_1020b444;                         // frames before the "last page" message may show again
 
 extern "C" int FUN_1001e1a0(const char *name, const char *alphaName);  // Texture_Load
 extern "C" int FUN_1000ed70(const char *text, int style, int frames);  // shows a message
@@ -39,9 +40,9 @@ extern "C" int FUN_1004f4f0(void)
     {
 
         DAT_104c03e4 = 0;
-        if (DAT_1020b444 == 0)
+        if (DAT_1020b430[PLAYER_SLOT].messageDelay == 0)
         {
-            DAT_1020b444 = 0x3c;
+            DAT_1020b430[PLAYER_SLOT].messageDelay = 0x3c;
             FUN_1000ed70(LAST_PAGE_TEXT, 0, 0x28);
         }
         return 0;
@@ -168,9 +169,9 @@ extern "C" int FUN_1004f860(void)
     if (atFirstPage)
     {
         DAT_104c03e4 = 0;
-        if (DAT_1020b444 == 0)
+        if (DAT_1020b430[PLAYER_SLOT].messageDelay == 0)
         {
-            DAT_1020b444 = 0x3c;
+            DAT_1020b430[PLAYER_SLOT].messageDelay = 0x3c;
             FUN_1000ed70(FIRST_PAGE_TEXT, 0, 0x28);
         }
         return 0;

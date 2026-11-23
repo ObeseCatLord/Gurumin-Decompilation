@@ -4,9 +4,6 @@
 
 #include "tracker.h"
 #include "game_vars.h"
-extern "C" int DAT_104bfb08[0x7c];   // state of each message box
-extern "C" int DAT_10467c20[0x7c];   // frames the box has been held
-extern "C" int DAT_104481d8[0x7c];   // fade value, 0 (gone) .. 14 (fully shown)
 #include "script_vars.h"
 #include "ui_vars.h"
 

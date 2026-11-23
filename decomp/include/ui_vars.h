@@ -26,6 +26,7 @@ extern "C" int DAT_1020b228;
 extern "C" int DAT_1020c2c0;                              // the chosen camera point; current map table entry
 extern "C" int DAT_1020c2d0;                              // the movie playing
 extern "C" int DAT_1020c330;                              // panel state, 0 = hidden; the text shows in states 8..22
+extern "C" char DAT_1020da50[8][0x50];                    // the status panel's text lines
 extern "C" char DAT_1020daa0[];
 extern "C" char DAT_1020db40[];
 extern "C" char DAT_1020db90[];

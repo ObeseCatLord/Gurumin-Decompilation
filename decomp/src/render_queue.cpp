@@ -5,14 +5,11 @@
 
 #include "matrix4.h"
 
-#include "block80.h"
 
 struct Node;
 
 #include "render_vars.h"
 
-extern "C" char DAT_11b00030[0x40];
-extern "C" Block80 DAT_11b04d18[0x30];
 #include "engine_memory.h"
 
 // RenderQueue_Push: appends `node` with its parameters. The extra data and matrix are copied into their pools
@@ -32,7 +29,7 @@ extern "C" int FUN_10199880(Node *node, const void *extra, const Matrix4 *matrix
     DAT_11b00170[DAT_11b044d0] = DAT_10f655c4;
     if (extra != 0)
     {
-        DAT_11b07530(&DAT_11b04d18[DAT_11b044dc], extra, 0x80);
+        DAT_11b07530(DAT_11b04d18[DAT_11b044dc], extra, sizeof(DAT_11b04d18[0]));
         DAT_11afffa8[DAT_11b044d0] = (char)DAT_11b044dc;
         if (DAT_11b044dc < 0x2f)
             DAT_11b044dc++;

@@ -13,8 +13,6 @@
 
 #include "render_vars.h"
 
-extern "C" unsigned char DAT_11b00030[0x40];  // pass of each queued node
-extern "C" char DAT_11b04d18[][0x80];         // light sets
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
 // 0x101999a0 (DrawList_DrawPass). Draws every queued node of pass `pass` with the view `view`: uploads its bones when

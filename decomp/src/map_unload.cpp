@@ -10,6 +10,7 @@
 #include "matrix4.h"
 
 #include "node.h"
+#include "ui_vars.h"
 
 // A map object record, 0x44 bytes: three blocks of its own.
 struct MapObject
@@ -29,7 +30,6 @@ extern "C" MapObject *DAT_104c03c0;
 
 #include "char_vars.h"
 
-extern "C" char DAT_1020da50[8][0x50];
 extern "C" int FUN_10174c70(int slot, int force);    // Texture_Release
 
 // 0x10023d30 (Map_Unload). Frees the map object records, the held models and their data, resets the per-map

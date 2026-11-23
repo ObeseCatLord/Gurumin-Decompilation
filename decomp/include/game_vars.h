@@ -62,6 +62,7 @@ extern "C" int DAT_1021b548[0x20];
 extern "C" int DAT_1021b5c8[0x18];
 extern "C" int DAT_1021bbf0;
 extern "C" int DAT_1021bbf4;
+extern "C" char DAT_1021f640[0x80];                      // event slots: in-use flags
 extern "C" int DAT_1021fb40;
 extern "C" int DAT_1021fb44;
 extern "C" char DAT_10223a50;
@@ -105,18 +106,23 @@ extern "C" int DAT_1042d9e4;
 extern "C" int DAT_1042da68;                              // frames left
 extern "C" int DAT_1042e3f0[0x6000];
 extern "C" int DAT_104463f0;
+extern "C" int DAT_104463f8[0x80];                       // event slots: state
 extern "C" int DAT_10446ea8;
 extern "C" int DAT_104472b0[0x18];
 extern "C" short DAT_10447338[0x44c];                     // handle of each looping effect while it plays, -11 = not playing
 extern "C" char DAT_10447dd0;
+extern "C" int DAT_10447fd8[0x80];                       // event slots: third value
+extern "C" int DAT_104481d8[0x80];                       // fade of each message box, 0 (gone) .. 14 (fully shown)
 extern "C" int DAT_10450808[0x800];
 extern "C" int DAT_10467488[0x20];
 extern "C" int DAT_10467710;
+extern "C" int DAT_10467c20[0x80];                       // frames each message box has been held
 extern "C" int DAT_10467e20[0x20];
 extern "C" char DAT_10467ea0[];                          // message subtext line (empty = none)
 extern "C" int DAT_10467f20;
 extern "C" int DAT_10468128;
 extern "C" int DAT_1046812c;
+extern "C" int DAT_10468230[0x80];                       // event slots: second value
 extern "C" int DAT_10468430[0x18];
 extern "C" int DAT_104684b0[115];
 extern "C" int DAT_104687b0;
@@ -153,6 +159,7 @@ extern "C" float DAT_104bf8f0;                            // screen/volume fade 
 extern "C" int DAT_104bfaf8;
 extern "C" char DAT_104bfafc;
 extern "C" int DAT_104bfb00;
+extern "C" int DAT_104bfb08[0x80];                       // state of each message box
 extern "C" int DAT_104bfd0c;
 extern "C" int DAT_104bfd14;
 extern "C" int DAT_104bfd18;

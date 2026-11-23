@@ -182,6 +182,7 @@ extern "C" char DAT_1101de64;                             // next entry of that 
 extern "C" Matrix4 DAT_118e69a8;
 extern "C" char DAT_11af3f68[0x40];                       // light matrix set of each node (drawing mode 2)
 extern "C" char DAT_11afffa8[0x40];                       // light set of each node (drawing mode 2)
+extern "C" unsigned char DAT_11b00030[0x40];             // render pass of each queued node
 extern "C" Node *DAT_11b00070[0x40];                      // the queued nodes
 extern "C" int DAT_11b00170[0x40];                        // the value DAT_10f655c4 takes while the node draws
 extern "C" char DAT_11b00270[0x40];                       // the value DAT_10f65520 takes for drawing mode 2
@@ -203,6 +204,7 @@ extern "C" int DAT_11b04510;                              // non-zero = also tes
 extern "C" char DAT_11b04514;                             // non-zero = only the enabled collision regions are drawn
 extern "C" Vec4 DAT_11b04518[0x40];
 extern "C" Vec4 DAT_11b04918[0x40];
+extern "C" char DAT_11b04d18[0x30][0x80];                // light sets (0x80 bytes each)
 extern "C" Matrix4 DAT_11b06518[0x30];                    // light matrix sets
 extern "C" char DAT_11b07118[];                           // default target object of saved-matrix state 0x400000
 extern "C" Vec4 DAT_11b07128[0x40];                       // colour of each queued node

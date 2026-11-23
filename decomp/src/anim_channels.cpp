@@ -3,16 +3,7 @@
 
 #include "vec4.h"
 
-// One animated channel: `count` key frames with frame numbers, values and per-key flags (containers.cpp).
-struct KeyTrack
-{
-    int m_0000;
-    int *frames;
-    Vec4 *values;
-    char *flags;
-    int count;
-    KeyTrack();
-};
+#include "key_track.h"
 
 // Eight base values plus twelve key tracks (position, rotation, scale, colour, ... per node).
 struct AnimChannels

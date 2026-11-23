@@ -3,16 +3,7 @@
 
 #include "vec3.h"
 
-// Saved-state block of a node (scene_node.cpp NodeSaved, 0xdc bytes).
-struct NodeSaved
-{
-    char pad_0000[0x20];
-    int state;                // 0x20: 2 = let the tracked rotation return to rest
-    char pad_0024[0x54];
-    Vec3 limitMin;            // 0x78: lowest rotation per axis (radians)
-    int pad_0084;
-    Vec3 limitMax;            // 0x88: highest rotation per axis
-};
+#include "node_data.h"
 
 #include "node.h"
 
@@ -40,7 +31,7 @@ extern "C" int FUN_100165e0(int mode)
         {
             if (DAT_10db91dc->parent->saved != 0)
             {
-                DAT_10db91dc->parent->saved->state = 2;
+                DAT_10db91dc->parent->saved->state = SAVED_RETURNING;
                 return 0;
             }
         }

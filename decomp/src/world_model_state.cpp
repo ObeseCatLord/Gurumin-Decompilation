@@ -2,20 +2,7 @@
 
 #include "vec4.h"
 
-// A node's saved block (scene_node.cpp NodeSaved): the state flag and a box used by the target state.
-struct NodeSaved
-{
-    char pad_0000[0x20];
-    int state;                // 0x20: 2 = ending
-    char pad_0024[0x54];
-    float boxMinX;            // 0x78
-    float boxMinY;            // 0x7c
-    float boxMinZ;            // 0x80
-    int pad_0084;
-    float boxMaxX;            // 0x88
-    float boxMaxY;            // 0x8c
-    float boxMaxZ;            // 0x90
-};
+#include "node_data.h"
 
 #include "node.h"
 
@@ -51,12 +38,12 @@ int WorldRenderer::SetModelState(int index, int mode)
             {
                 active[index] = 1;
                 models[index].node->parent->AllocSaved();
-                models[index].node->parent->saved->boxMinX = -1.22f;
-                models[index].node->parent->saved->boxMinY = -0.27f;
-                models[index].node->parent->saved->boxMinZ = -0.17f;
-                models[index].node->parent->saved->boxMaxX = 1.22f;
-                models[index].node->parent->saved->boxMaxY = 0.27f;
-                models[index].node->parent->saved->boxMaxZ = 0.17f;
+                models[index].node->parent->saved->limitMin.x = -1.22f;
+                models[index].node->parent->saved->limitMin.y = -0.27f;
+                models[index].node->parent->saved->limitMin.z = -0.17f;
+                models[index].node->parent->saved->limitMax.x = 1.22f;
+                models[index].node->parent->saved->limitMax.y = 0.27f;
+                models[index].node->parent->saved->limitMax.z = 0.17f;
                 models[index].node->parent->EnterTargetState(&targets[index]);
                 return 0;
             }
@@ -65,7 +52,7 @@ int WorldRenderer::SetModelState(int index, int mode)
         {
             if (node->parent->saved != 0)
             {
-                node->parent->saved->state = 2;
+                node->parent->saved->state = SAVED_RETURNING;
                 return 0;
             }
         }

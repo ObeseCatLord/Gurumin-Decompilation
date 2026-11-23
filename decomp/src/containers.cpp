@@ -11,64 +11,9 @@
 
 #include "vec4.h"
 
-struct VertexPack
-{
-    int m_0000;
-    int m_0004;
-    int m_0008;
-    int m_000c;
-    int m_0010;
-    int m_0014;
-    int m_0018;
-    int vertexCount;
-    Vec4 boundsMin;
-    Vec4 boundsMax;
-    int m_0040;
-    int m_0044;
-    char pad_0048[0x28];
-    void *vertices;
-    void Init();
-    int SetVertexCount(int count);
-    int CopyFrom(const VertexPack *source);
-    int FreeVertices();
-};
+#include "mesh.h"
 
-struct IndexList
-{
-    int count;
-    int *indices;
-    void Init();
-    int Resize(int newCount);
-    int CopyFrom(const IndexList *source);
-    int Free();
-};
-
-// List of 16-byte index spans (tagged "m_indexSP" in the allocator).
-struct IndexSpanList
-{
-    int count;
-    void *spans;
-    int Resize(int newCount);
-};
-
-struct KeyTrack
-{
-    int m_0000;
-    int *frames;
-    Vec4 *values;
-    char *flags;
-    int count;
-    void Free();
-    void Reserve(int capacity);
-    void Init();
-    int MarkAll();
-    int LastFrame();
-    int HasFrame(int frame);
-    int AddKey(int frame, float x, float y, float z, float w);
-    int Insert(int frame, float x, float y, float z, float w);
-    int Set(int frame, float x, float y, float z, float w);
-    int CopyFrom(const KeyTrack *source);
-};
+#include "key_track.h"
 
 struct KeyBank
 {
@@ -95,7 +40,7 @@ int VertexPack::SetVertexCount(int count)
     vertices = 0;
     void *buffer = DAT_11b0b938(count * 0x70, "");
     vertexCount = count;
-    vertices = buffer;
+    vertices = (Vertex *)buffer;
     return 1;
 }
 
@@ -155,7 +100,7 @@ void KeyBank::Clear()
 // Frees the three key arrays (only when they were allocated) and empties the track.
 void KeyTrack::Free()
 {
-    if (m_0000 != 0)
+    if (capacity != 0)
     {
         free(frames);
         frames = 0;
@@ -164,14 +109,14 @@ void KeyTrack::Free()
         free(flags);
         flags = 0;
     }
-    m_0000 = 0;
+    capacity = 0;
     count = 0;
 }
 
 // Allocates room for 16 keys and empties the track, with a zero default key at frame 0.
 void KeyTrack::Init()
 {
-    m_0000 = 0;
+    capacity = 0;
     Reserve(16);
     count = 0;
     frames[0] = 0;
@@ -445,14 +390,14 @@ int VertexPack::CopyFrom(const VertexPack *source)
     SetVertexCount(source->vertexCount);
     boundsMin.Copy(source->boundsMin);
     boundsMax.Copy(source->boundsMax);
-    m_0000 = source->m_0000;
-    m_0004 = source->m_0004;
-    m_0008 = source->m_0008;
-    m_000c = source->m_000c;
+    center[0] = source->center[0];
+    center[1] = source->center[1];
+    center[2] = source->center[2];
+    radius = source->radius;
     vertexCount = source->vertexCount;
     m_0010 = source->m_0010;
     m_0018 = source->m_0018;
-    m_0014 = source->m_0014;
+    material = source->material;
     m_0040 = source->m_0040;
     m_0044 = source->m_0044;
     DAT_11b07530(vertices, source->vertices, vertexCount * 0x70);
@@ -476,7 +421,7 @@ int KeyTrack::Insert(int frame, float x, float y, float z, float w)
         values[j + 1].Copy(values[j]);
         flags[j + 1] = flags[j];
     }
-    if (count + 16 > m_0000)
+    if (count + 16 > capacity)
         Reserve(16);
     frames[i] = frame;
     values[i].x = x;
@@ -485,7 +430,7 @@ int KeyTrack::Insert(int frame, float x, float y, float z, float w)
     values[i].w = w;
     flags[i] = 0;
     count++;
-    if (count + 16 > m_0000)
+    if (count + 16 > capacity)
         Reserve(16);
     return i;
 }
@@ -514,7 +459,7 @@ int KeyTrack::Set(int frame, float x, float y, float z, float w)
         values[j + 1].Copy(values[j]);
         flags[j + 1] = flags[j];
     }
-    if (count + 16 > m_0000)
+    if (count + 16 > capacity)
         Reserve(16);
     frames[i] = frame;
     values[i].x = x;
@@ -523,23 +468,23 @@ int KeyTrack::Set(int frame, float x, float y, float z, float w)
     values[i].w = w;
     flags[i] = 0;
     count++;
-    if (count + 16 > m_0000)
+    if (count + 16 > capacity)
         Reserve(16);
     return i;
 }
 
 // Reallocates the span buffer for `newCount` 16-byte spans (contents are not kept). The allocation is tagged
 // "m_indexSP(count)" for the engine's memory report. Returns 1.
-int IndexSpanList::Resize(int newCount)
+int IndexList::ResizeSpans(int newCount)
 {
     char tag[64];
-    if (spans != 0)
-        DAT_11b1ba40(spans);
-    spans = 0;
+    if (spheres != 0)
+        DAT_11b1ba40(spheres);
+    spheres = 0;
     sprintf(tag, "m_indexSP(%d)", newCount);
     void *buffer = DAT_11b0b938(newCount * 16, tag);
     count = newCount;
-    spans = buffer;
+    spheres = (Vec4 *)buffer;
     return 1;
 }
 
@@ -563,10 +508,10 @@ float __stdcall Spline(float t, float a, float b, float c, float d)
 void VertexPack::Init()
 {
     vertices = 0;
-    m_0000 = 0;
-    m_0004 = 0;
-    m_0008 = 0;
-    m_000c = 0;
+    center[0] = 0;
+    center[1] = 0;
+    center[2] = 0;
+    radius = 0;
     vertexCount = 0;
     m_0040 = 0;
     m_0044 = 0;

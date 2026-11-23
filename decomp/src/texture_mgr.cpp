@@ -101,11 +101,7 @@ struct Animator
     int M_10184160();
 };
 
-struct PackHeader
-{
-    char data[0x74];
-    void M_101acfc0();
-};
+#include "mesh.h"
 
 extern "C" char DAT_10ffe5f8[1600][0x40];
 extern "C" char DAT_10f8dbb8[1600][0x40];
@@ -225,13 +221,13 @@ extern "C" int FUN_10188fb0(void)
 }
 
 // Frees the vertex data of `count` pack headers (VertexPack::FreeVertices on each).
-extern "C" void __stdcall FUN_101911b0(PackHeader *packs, int count)
+extern "C" void __stdcall FUN_101911b0(VertexPack *packs, int count)
 {
     if (packs != 0)
     {
         for (; count > 0; count--)
         {
-            packs->M_101acfc0();
+            packs->FreeVertices();
             packs++;
         }
     }

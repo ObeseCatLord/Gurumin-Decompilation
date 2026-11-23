@@ -9,13 +9,7 @@ inline int LoadIti(const char *name)
     return FUN_10174ce0(FUN_1013f8a0(name, 0), 0, 0);
 }
 
-// The material table of a node's mesh (engine_10143.cpp SlotTable), only the two lists used here.
-struct MeshData
-{
-    char pad_0000[0x14];
-    int *materials;                                  // 0x14: current material of each entry
-    int *secondary;                                  // 0x18: the entries' second texture
-};
+#include "mesh.h"
 
 #include "node.h"
 
@@ -77,19 +71,19 @@ extern "C" int FUN_10034920(int index, int variant)
         if (node != 0)
         {
             node->ReplaceMaterial(node->mesh->materials[0], body);
-            *node->mesh->secondary = body2;
+            *node->mesh->secondaryTextures = body2;
         }
         node = DAT_10db6ed8[index].root->Find("BS_003w.lwo", 0);
         if (node != 0)
         {
             node->ReplaceMaterial(node->mesh->materials[0], wing);
-            *node->mesh->secondary = wing2;
+            *node->mesh->secondaryTextures = wing2;
         }
         node = DAT_10db6ed8[index].root->Find("BS_003b.lwo", 0);
         if (node != 0)
         {
             node->ReplaceMaterial(node->mesh->materials[0], wing);
-            *node->mesh->secondary = wing2;
+            *node->mesh->secondaryTextures = wing2;
         }
         node = DAT_10db6ed8[index].root->Find("BS_003c.lwo", 0);
         if (node != 0)

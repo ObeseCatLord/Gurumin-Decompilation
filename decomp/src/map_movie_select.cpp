@@ -5,10 +5,7 @@
 
 #include "matrix4.h"
 
-struct NodeExtra
-{
-    Matrix4 AnimatedMatrix(int frame);               // 0x101693f0
-};
+#include "node_data.h"
 
 #include "node.h"
 

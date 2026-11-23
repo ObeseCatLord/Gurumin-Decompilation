@@ -16,27 +16,7 @@ struct BoneRows
 
 extern "C" IDirect3DDevice9 *DAT_10f1fcf0;      // the Direct3D device
 
-struct MeshData
-{
-    int textureSlot;          // 0x00: texture slot of the mesh, -1 = none
-    int pad_0004[2];
-    void *m_000c;             // 0x0c..0x38: buffers allocated by M_10150bb0 (vertices, indices, ...)
-    void *m_0010;
-    void *m_0014;
-    void *m_0018;
-    void *m_001c;
-    void *m_0020;
-    void *m_0024;
-    void *m_0028;
-    void *m_002c;
-    void *m_0030;
-    void *m_0034;
-    void *m_0038;
-    int pad_003c[2];
-    int m_0044;
-    void Release();
-    void UploadBones(Matrix4 *bones, int count, Matrix4 *world, int unused);
-};
+#include "mesh.h"
 
 extern "C" void FUN_101477c0(int slot);          // Texture_ReleaseSlot
 extern "C" void (*DAT_11b1ba40)(void *block);    // the engine's free
@@ -49,12 +29,12 @@ void MeshData::Release()
     textureSlot = -1;
     if (m_000c != 0)
         DAT_11b1ba40(m_000c);
-    if (m_0014 != 0)
-        DAT_11b1ba40(m_0014);
+    if (materials != 0)
+        DAT_11b1ba40(materials);
     if (m_0010 != 0)
         DAT_11b1ba40(m_0010);
-    if (m_0018 != 0)
-        DAT_11b1ba40(m_0018);
+    if (secondaryTextures != 0)
+        DAT_11b1ba40(secondaryTextures);
     if (m_001c != 0)
         DAT_11b1ba40(m_001c);
     if (m_0020 != 0)
@@ -72,9 +52,9 @@ void MeshData::Release()
     if (m_0038 != 0)
         DAT_11b1ba40(m_0038);
     m_0044 = 0;
-    m_0018 = 0;
+    secondaryTextures = 0;
     m_000c = 0;
-    m_0014 = 0;
+    materials = 0;
     m_0010 = 0;
     m_001c = 0;
     m_0020 = 0;

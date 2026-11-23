@@ -174,53 +174,31 @@ extern "C" int FUN_10169970(const MeshRef *mesh)
     return ++DAT_10feb3e0[index];
 }
 
-// Key-frame track (containers.cpp).
-struct KeyTrack
-{
-    int m_0000;
-    int *frames;
-    float *values;
-    char *flags;
-    int count;
-    void Init();                                                 // 0x101adb40
-    int Insert(int frame, float x, float y, float z, float w);   // 0x101adbb0
-};
+#include "key_track.h"
 
-// The 0x80-byte extra block of a scene node (Node::M_101949d0 allocates it): five key tracks and their state.
-struct NodeExtra
-{
-    KeyTrack tracks[5];
-    int m_0064;
-    int m_0068;
-    int m_006c;
-    int m_0070;
-    int m_0074;
-    int m_0078;
-    int m_007c;
-    void Init();
-};
+#include "node_data.h"
 
 // Empties the five tracks and gives each its default key at frame 0: track 0 = (0, 0, 0, 0), track 1 =
 // (0, 0, 0, 1), track 2 = (1, 1, 1, 0), track 3 = (1, 1, 1, 1), track 4 = (0, 0, 0, 0).
 void NodeExtra::Init()
 {
-    m_0070 = 0;
-    m_0074 = 0;
-    m_0078 = 0;
-    m_007c = 0;
-    tracks[0].Init();
-    tracks[1].Init();
-    tracks[2].Init();
-    tracks[3].Init();
-    tracks[4].Init();
-    m_0064 = 0;
-    m_0068 = 0;
-    m_006c = 0;
-    tracks[0].Insert(0, 0, 0, 0, 0);
-    tracks[1].Insert(0, 0, 0, 0, 1.0f);
-    tracks[2].Insert(0, 1.0f, 1.0f, 1.0f, 0);
-    tracks[3].Insert(0, 1.0f, 1.0f, 1.0f, 1.0f);
-    tracks[4].Insert(0, 0, 0, 0, 0);
+    m_0070[0] = 0;
+    m_0070[1] = 0;
+    m_0070[2] = 0;
+    m_0070[3] = 0;
+    tracks[NODE_TRACK_TRANSLATION].Init();
+    tracks[NODE_TRACK_ROTATION].Init();
+    tracks[NODE_TRACK_SCALE].Init();
+    tracks[NODE_TRACK_COLOUR].Init();
+    tracks[NODE_TRACK_EXTRA].Init();
+    translationOverride = 0;
+    rotationOverride = 0;
+    scaleOverride = 0;
+    tracks[NODE_TRACK_TRANSLATION].Insert(0, 0, 0, 0, 0);
+    tracks[NODE_TRACK_ROTATION].Insert(0, 0, 0, 0, 1.0f);
+    tracks[NODE_TRACK_SCALE].Insert(0, 1.0f, 1.0f, 1.0f, 0);
+    tracks[NODE_TRACK_COLOUR].Insert(0, 1.0f, 1.0f, 1.0f, 1.0f);
+    tracks[NODE_TRACK_EXTRA].Insert(0, 0, 0, 0, 0);
 }
 
 // Sorts `count` keys into ascending order (bubble sort) and applies every swap to the parallel arrays `a` and `b`

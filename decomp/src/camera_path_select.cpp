@@ -9,19 +9,7 @@
 
 #include "matrix4.h"
 
-// A key track (vec4.cpp KeyTrack), 0x14 bytes: its frames are sorted, so the last one is the length.
-struct KeyTrack
-{
-    int capacity;
-    int *frames;
-    Vec4 *values;
-    char *flags;
-    int count;
-    // 0x101afe00: the value at `frame` (with `rotation` set, a quaternion interpolated as a rotation).
-    int Sample(int frame, float *x, float *y, float *z, float *w, int rotation);
-    void Copy(const KeyTrack *source);           // 0x101ade10
-    int MarkAll();                               // 0x101adb80
-};
+#include "key_track.h"
 
 // The model the camera follows (AnimModel), only its world matrix.
 struct CameraTarget
@@ -95,11 +83,7 @@ extern "C" int FUN_1016b050(int id)
     return 0;
 }
 
-// The extra data of a scene node (scene_node.cpp Extra): its first key track.
-struct NodeExtra
-{
-    KeyTrack track;
-};
+#include "node_data.h"
 
 #include "node.h"
 
@@ -137,8 +121,8 @@ extern "C" int FUN_1016ac90(Node *root, Node *node, int *count)
         Node *target2 = root->Find(name, 0);
         if (target != 0 && node->extra != 0 && target->extra != 0)
         {
-            DAT_11af3928[*count].Copy(&node->extra->track);
-            DAT_118e69f8[*count].Copy(&target->extra->track);
+            DAT_11af3928[*count].CopyFrom(&node->extra->tracks[NODE_TRACK_TRANSLATION]);
+            DAT_118e69f8[*count].CopyFrom(&target->extra->tracks[NODE_TRACK_TRANSLATION]);
             DAT_10f8d938[*count] = atol(&node->name[strlen(node->name) - 1]);
             DAT_11018740[*count] = 1;
             DAT_11018628[*count] = 0;
@@ -146,12 +130,12 @@ extern "C" int FUN_1016ac90(Node *root, Node *node, int *count)
             DAT_10ff17e0[*count].m_000c = 0;
             if (target2 != 0)
             {
-                DAT_11af3ba8[*count].Copy(&target2->extra->track);
+                DAT_11af3ba8[*count].CopyFrom(&target2->extra->tracks[NODE_TRACK_TRANSLATION]);
                 DAT_11018628[*count] = 1;
             }
             if (second != 0)
             {
-                DAT_118e96f8[*count].Copy(&second->extra->track);
+                DAT_118e96f8[*count].CopyFrom(&second->extra->tracks[NODE_TRACK_TRANSLATION]);
                 DAT_10fdeb10[*count] = 1;
             }
             DAT_118e69f8[*count].MarkAll();

@@ -9,16 +9,17 @@
 
 #include "matrix4.h"
 
-// Types the node only points to (their layouts are still declared in the files that use them).
-struct PackHeader;   // a vertex pack of the mesh (node_sort_packs.cpp, node_colours.cpp)
-struct KeyPair;      // an index list of a pack
-struct Material;     // a mesh material (colour, texture)
-struct MeshData;     // the Direct3D buffers built from the packs
+// Types the node only points to. The mesh types are declared in mesh.h, the extra/skin/saved blocks in node_data.h;
+// include those headers to use them.
+struct VertexPack;   // a vertex pack of the mesh (mesh.h)
+struct IndexList;    // an index list of a pack, or a sphere list (mesh.h)
+struct Material;     // a mesh material: colour, textures (mesh.h)
+struct MeshData;     // the Direct3D buffers built from the packs (mesh.h)
 struct Channel;      // an animation plug's channel
 struct TextureRef;   // a shared texture reference
-struct NodeExtra;    // the node's animation tracks
-struct NodeSkin;     // skinning data (weights per bone)
-struct NodeSaved;    // saved-state block (scene_node.cpp, head_look.cpp)
+struct NodeExtra;    // the node's animation tracks (node_data.h)
+struct NodeSkin;     // skinning data: bones and skin matrices (node_data.h)
+struct NodeSaved;    // saved-state block (node_data.h)
 struct GameFile;     // an open data file (model_prescan.cpp)
 struct VisData;      // visibility cells and their boxes (visibility.cpp)
 
@@ -56,14 +57,14 @@ struct Node
     char m_0050[0x10];           // 0x050: second inherited name
     int m_0060;                  // 0x060
     int packCount;               // 0x064: entries in `packs`
-    PackHeader *packs;           // 0x068: the mesh's vertex packs
-    KeyPair *indexLists;         // 0x06c: one index list per pack
-    KeyPair *m_0070;             // 0x070
+    VertexPack *packs;           // 0x068: the mesh's vertex packs
+    IndexList *indexLists;       // 0x06c: one index list per pack
+    IndexList *m_0070;           // 0x070: one sphere list per pack (bounding sphere per triangle)
     int m_0074;                  // 0x074
     NodeDrawCallback drawCallback;  // 0x078: draws the node instead of the mesh code when set
     int m_007c;                  // 0x07c: number of entries in m_0080 and m_0084
-    PackHeader *m_0080;          // 0x080
-    KeyPair *m_0084;             // 0x084
+    VertexPack *m_0080;          // 0x080
+    IndexList *m_0084;           // 0x084
     char m_0088;                 // 0x088
     char isStatic;               // 0x089: 1 once the node was collected as static scenery (or is the collector)
     short staticCount;           // 0x08a: on the collector: number of entries in `staticNodes`
@@ -160,8 +161,8 @@ struct Node
     int ComputeBounds();                                  // 0x1019d8e0
     int BuildCollisionSpheres();                          // 0x1019e120
     int M_101ab980();                                     // 0x101ab980: frees the extra index lists
-    void M_101911b0(PackHeader *packs, int count);        // 0x101911b0: frees the packs' vertex data
-    void M_101911e0(KeyPair *lists, int count);           // 0x101911e0: frees the index lists' data
+    void M_101911b0(VertexPack *packs, int count);        // 0x101911b0: frees the packs' vertex data
+    void M_101911e0(IndexList *lists, int count);         // 0x101911e0: frees the index lists' data
     int SortPacks();                                      // 0x1019c690 (node_sort_packs.cpp)
     int WeldVertices();                                   // 0x1019e610 (node_sort_packs.cpp)
     int ApplyMaterialColours();                           // 0x1019c560 (node_colours.cpp)

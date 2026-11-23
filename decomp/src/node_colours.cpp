@@ -1,43 +1,7 @@
 // Material colours of a node's mesh parts. A node (scene_node.cpp Node) has `packCount` packs; each pack has
 // `partCount` parts of 0x70 bytes, and each part names its material by number.
 
-struct Colour
-{
-    float r;
-    float g;
-    float b;
-    float a;
-};
-
-// One mesh part, 0x70 bytes.
-struct MeshPart
-{
-    char pad_0000[0x20];
-    Colour colour;            // 0x20: diffuse colour taken from the material
-    char pad_0030[0xc];
-    float material;           // 0x3c: material number (stored as a float)
-    Colour emissive;          // 0x40: reset to (0, 0, 0, 1)
-    char pad_0050[0x20];
-};
-
-// One pack of parts, 0x74 bytes (scene_node.cpp PackHeader).
-struct PackHeader
-{
-    char pad_0000[0x1c];
-    int partCount;            // 0x1c
-    char pad_0020[0x50];
-    MeshPart *parts;          // 0x70
-};
-
-// Material, 0x180 bytes (scene_node.cpp Material).
-struct Material
-{
-    char pad_0000[0x140];
-    float colour[3];          // 0x140: r, g, b
-    char pad_014c[0x2c];
-    float alpha;              // 0x178: used when positive
-    char pad_017c[4];
-};
+#include "mesh.h"
 
 #include "node.h"
 
@@ -47,20 +11,20 @@ int Node::ApplyMaterialColours()
 {
     for (int i = 0; i < packCount; i++)
     {
-        for (int j = 0; j < packs[i].partCount; j++)
+        for (int j = 0; j < packs[i].vertexCount; j++)
         {
-            float r = materials[(int)packs[i].parts[j].material].colour[0];
-            float g = materials[(int)packs[i].parts[j].material].colour[1];
-            float b = materials[(int)packs[i].parts[j].material].colour[2];
-            float a = 0.0f < materials[(int)packs[i].parts[j].material].alpha ? materials[(int)packs[i].parts[j].material].alpha : 0;
-            packs[i].parts[j].colour.r = r;
-            packs[i].parts[j].colour.g = g;
-            packs[i].parts[j].colour.b = b;
-            packs[i].parts[j].colour.a = a;
-            packs[i].parts[j].emissive.r = 0;
-            packs[i].parts[j].emissive.g = 0;
-            packs[i].parts[j].emissive.b = 0;
-            packs[i].parts[j].emissive.a = 1.0f;
+            float r = materials[(int)packs[i].vertices[j].material].colour[0];
+            float g = materials[(int)packs[i].vertices[j].material].colour[1];
+            float b = materials[(int)packs[i].vertices[j].material].colour[2];
+            float a = 0.0f < materials[(int)packs[i].vertices[j].material].alpha ? materials[(int)packs[i].vertices[j].material].alpha : 0;
+            packs[i].vertices[j].colour[0] = r;
+            packs[i].vertices[j].colour[1] = g;
+            packs[i].vertices[j].colour[2] = b;
+            packs[i].vertices[j].colour[3] = a;
+            packs[i].vertices[j].emissive[0] = 0;
+            packs[i].vertices[j].emissive[1] = 0;
+            packs[i].vertices[j].emissive[2] = 0;
+            packs[i].vertices[j].emissive[3] = 1.0f;
         }
     }
     return 0;

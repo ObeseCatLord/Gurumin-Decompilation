@@ -1,75 +1,70 @@
 // Vertex record (28 floats = 112 bytes): position (x, y, z, 1), normal (+1 pad), colour RGBA, texture
 // coordinates and the remaining blend/texture fields.
 
-struct Vertex
-{
-    float v[28];
-    void SetPosition(float x, float y, float z);
-    void Set(float x, float y, float z, float nx, float ny, float nz, float u, float t, float r, float g, float b, float a);
-};
+#include "mesh.h"
 
 // Sets the position and resets everything else: normal (0, 0, 1), white colour, zero UVs.
 void Vertex::SetPosition(float x, float y, float z)
 {
-    v[0] = x;
-    v[1] = y;
-    v[2] = z;
-    v[3] = 1.0f;
-    v[4] = 0;
-    v[5] = 0;
-    v[6] = 1.0f;
-    v[7] = 1.0f;
-    v[8] = 1.0f;
-    v[9] = 1.0f;
-    v[10] = 1.0f;
-    v[11] = 1.0f;
-    v[12] = 0;
-    v[13] = 0;
-    v[14] = 0;
-    v[15] = 0;
-    v[16] = 0;
-    v[17] = 0;
-    v[18] = 0;
-    v[19] = 0;
-    v[20] = 0;
-    v[21] = 0;
-    v[22] = 0;
-    v[23] = 0;
-    v[24] = 1.0f;
-    v[25] = 0;
-    v[26] = 0;
-    v[27] = 0;
+    position[0] = x;
+    position[1] = y;
+    position[2] = z;
+    position[3] = 1.0f;
+    normal[0] = 0;
+    normal[1] = 0;
+    normal[2] = 1.0f;
+    normal[3] = 1.0f;
+    colour[0] = 1.0f;
+    colour[1] = 1.0f;
+    colour[2] = 1.0f;
+    colour[3] = 1.0f;
+    uv[0] = 0;
+    uv[1] = 0;
+    m_0038 = 0;
+    material = 0;
+    emissive[0] = 0;
+    emissive[1] = 0;
+    emissive[2] = 0;
+    emissive[3] = 0;
+    m_0050[0] = 0;
+    m_0050[1] = 0;
+    m_0050[2] = 0;
+    m_0050[3] = 0;
+    m_0060 = 1.0f;
+    m_0064[0] = 0;
+    m_0064[1] = 0;
+    m_0064[2] = 0;
 }
 
 // Sets position, normal, colour and the first texture coordinates in one call.
 void Vertex::Set(float x, float y, float z, float nx, float ny, float nz, float u, float t, float r, float g, float b, float a)
 {
-    v[0] = x;
-    v[1] = y;
-    v[2] = z;
-    v[3] = 1.0f;
-    v[4] = nx;
-    v[5] = ny;
-    v[6] = nz;
-    v[7] = 1.0f;
-    v[8] = r;
-    v[9] = g;
-    v[10] = b;
-    v[11] = a;
-    v[12] = u;
-    v[13] = t;
-    v[14] = 0;
-    v[15] = 0;
-    v[16] = 0;
-    v[17] = 0;
-    v[18] = 0;
-    v[19] = 0;
-    v[20] = 0;
-    v[21] = 0;
-    v[22] = 0;
-    v[23] = 0;
-    v[24] = 1.0f;
-    v[25] = 0;
-    v[26] = 0;
-    v[27] = 0;
+    position[0] = x;
+    position[1] = y;
+    position[2] = z;
+    position[3] = 1.0f;
+    normal[0] = nx;
+    normal[1] = ny;
+    normal[2] = nz;
+    normal[3] = 1.0f;
+    colour[0] = r;
+    colour[1] = g;
+    colour[2] = b;
+    colour[3] = a;
+    uv[0] = u;
+    uv[1] = t;
+    m_0038 = 0;
+    material = 0;
+    emissive[0] = 0;
+    emissive[1] = 0;
+    emissive[2] = 0;
+    emissive[3] = 0;
+    m_0050[0] = 0;
+    m_0050[1] = 0;
+    m_0050[2] = 0;
+    m_0050[3] = 0;
+    m_0060 = 1.0f;
+    m_0064[0] = 0;
+    m_0064[1] = 0;
+    m_0064[2] = 0;
 }

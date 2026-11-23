@@ -15,31 +15,9 @@
 
 struct Node;
 
-struct NodeSaved
-{
-    char pad_0000[0x20];
-    int m_0020;
-    Matrix4 matrix;
-    char pad_0064[0x34];
-    Node *linkedNodes[8];        // 0x98: nodes of the same group linked to this one (M_10191990)
-    int m_00b8;
-    char pad_00bc[0x20];
-    void M_10166870();
-};
+#include "node_data.h"
 
-struct KeyPair
-{
-    int count;
-    union
-    {
-        int *indices;            // index list: the vertex indices (three per triangle)
-        struct Vec4 *spheres;    // sphere list: centre and radius (w) of each triangle
-    };
-    void M_101ad0e0();
-    void Init();                                 // 0x101ad1b0
-    void Copy(const KeyPair *source);            // 0x101ad160
-    int Resize(int count);                       // 0x101ad1c0 (IndexSpanList::Resize)
-};
+#include "mesh.h"
 
 // A reference-counted cache entry (mesh_cache.cpp): the motion of a node points to one holding its cache slot.
 struct TextureRef
@@ -51,40 +29,6 @@ extern "C" int FUN_10169be0(TextureRef *texture);  // adds a reference
 
 struct Node;
 
-struct NodeSkin
-{
-    char pad_0000[0x84];
-    char parentName[0x40];      // 0x84: name of the node this one is bound to
-    Matrix4 m_00c4;
-    int pad_0104;
-    char linkNames[0x40][0x40]; // 0x108: names of the linked nodes
-    Node *links[0x40];          // 0x1108: nodes this skinned node depends on (m_5618 of them)
-    Node *bones[0x44];
-    char boneNames[0x44][0x40]; // 0x1318: names of the bones
-    Matrix4 bindPose[0x44];
-    Matrix4 m_3518[0x44];
-    char pad_4618[0x1000];
-    int m_5618;
-    void Clear();               // 0x10166810: empties the skin data
-};
-
-// A vertex of a pack, 0x70 bytes (position first).
-struct PackVertex
-{
-    float position[3];
-    char pad_000c[0x64];
-};
-
-struct MeshData
-{
-    char pad_0000[0x4c];
-    int bufferSlot;              // 0x4c: entry of the mesh buffer tables (DAT_10feb3e0 ...), -1 = none
-    int M_10150bb0(struct PackHeader *packs, KeyPair *indexLists, int packCount, struct Material *materials, int flags);
-    void Release();  // 0x10150a90 (mesh_release.cpp)
-    void M_101476e0(int pack, int value);
-    void M_10147690(int a, int b);
-    void Init();                                 // 0x10145a10
-};
 extern "C" int FUN_10169990(MeshData *mesh);
 extern "C" int FUN_10169970(MeshData *mesh);     // MeshCache_AddRef
 
@@ -100,59 +44,9 @@ struct Channel
     Keys keys;
 };
 
-// A key track (vec4.cpp KeyTrack), 0x14 bytes.
-struct KeyTrack
-{
-    char data[0x14];
-    void Copy(const KeyTrack *source);           // 0x101ade10
-};
+#include "key_track.h"
 
-struct NodeExtra
-{
-    KeyTrack tracks[5];          // 0x00
-    char pad_0064[0xc];
-    int m_0070[4];               // 0x70
-    Matrix4 AnimatedMatrix(int frame);            // 0x101693f0 (node_extra.cpp)
-    void M_10169660();
-    void M_10169620();           // 0x10169620 (SlotLists::Clear): frees the extra data's lists
-};
-
-// Mesh material (0x180 bytes).
-struct Material
-{
-    char name[0x40];
-    char textures[4][0x40];      // 0x40: texture file names (empty = none)
-    float colour[3];             // 0x140: r, g, b (1 = white)
-    char pad_014c[0x24];
-    int m_0170;
-    float alpha;                 // 0x174: 0..255
-    int m_0178;
-    unsigned char m_017c[4];
-};
-
-struct PackHeader
-{
-    float center[3];             // 0x00: centre of the pack's vertices
-    float radius;                // 0x0c: bounding radius (0 = not needed)
-    int m_0010;
-    int material;
-    int pad_0018;
-    int vertexCount;             // 0x1c
-    float boxMin[4];             // 0x20: (w = 1)
-    float boxMax[4];             // 0x30
-    char pad_0040[0x30];
-    PackVertex *vertices;        // 0x70: the vertices
-    void M_101acfa0();
-    void Copy(const PackHeader *source);         // 0x101ad040
-};
-
-struct IndexList
-{
-    int data[2];
-    void M_101ad1b0();
-};
-
-struct KeyPair;
+struct IndexList;
 
 Matrix4 InverseMatrix(const Matrix4 &matrix);      // 0x101b0d40 (node_bones.cpp)
 
@@ -162,9 +56,9 @@ Matrix4 InverseMatrix(const Matrix4 &matrix);      // 0x101b0d40 (node_bones.cpp
 // steps; inline in the original).
 inline void Node::RestoreSavedMatrix()
 {
-    if (saved->m_0020 != 0)
+    if (saved->state != 0)
         matrix = saved->matrix;
-    saved->m_0020 = 0;
+    saved->state = SAVED_EMPTY;
 }
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
@@ -192,13 +86,13 @@ extern "C" int DAT_11b044d0;
 extern "C" int DAT_11b002d0[0x80];
 
 // Frees the index buffers of `count` index lists.
-extern "C" void __stdcall FUN_101911e0(KeyPair *pairs, int count)
+extern "C" void __stdcall FUN_101911e0(IndexList *pairs, int count)
 {
     if (pairs != 0)
     {
         for (; count > 0; count--)
         {
-            pairs->M_101ad0e0();
+            pairs->Free();
             pairs++;
         }
     }
@@ -301,7 +195,7 @@ int Node::ReleaseSavedStates()
         if (flags & 0x1000)
             RestoreSavedMatrix();
         if (flags & 0x4000)
-            saved->m_0020 = 0;
+            saved->state = SAVED_EMPTY;
         if (flags & 0x2000)
             RestoreSavedMatrix();
         if (flags & 0x400000)
@@ -376,13 +270,13 @@ int Node::AllocMaterials(int count)
             materials[i].colour[0] = 1.0f;
             materials[i].colour[1] = 1.0f;
             materials[i].colour[2] = 1.0f;
-            materials[i].m_0178 = 0;
+            materials[i].alpha = 0;
             materials[i].m_017c[0] = 0;
             materials[i].m_017c[1] = 0;
             materials[i].m_017c[2] = 0;
             materials[i].m_017c[3] = 0;
             materials[i].m_0170 = 0;
-            materials[i].alpha = 255.0f;
+            materials[i].m_0174 = 255.0f;
         }
         materialCount = count;
     }
@@ -466,7 +360,7 @@ int Node::M_101949d0()
     if (extra == 0)
     {
         extra = (NodeExtra *)DAT_11b0b938(0x80, "");
-        extra->M_10169660();
+        extra->Init();
     }
     return 1;
 }
@@ -557,12 +451,12 @@ extern "C" void FUN_1019bdb0(void)
 }
 
 // Allocates and initialises `count` pack headers.
-extern "C" PackHeader *__stdcall FUN_1019c320(int count)
+extern "C" VertexPack *__stdcall FUN_1019c320(int count)
 {
-    PackHeader *packs = (PackHeader *)DAT_11b0b938(count * sizeof(PackHeader), "");
+    VertexPack *packs = (VertexPack *)DAT_11b0b938(count * sizeof(VertexPack), "");
     for (int i = 0; i < count; i++)
     {
-        packs[i].M_101acfa0();
+        packs[i].Init();
         packs[i].radius = 0;
     }
     return packs;
@@ -573,7 +467,7 @@ extern "C" IndexList *__stdcall FUN_1019c360(int count)
 {
     IndexList *lists = (IndexList *)DAT_11b0b938(count * sizeof(IndexList), "");
     for (int i = 0; i < count; i++)
-        lists[i].M_101ad1b0();
+        lists[i].Init();
     return lists;
 }
 // Clears the special pass marker (0x8000) on this node and all its ancestors.
@@ -594,9 +488,9 @@ int Node::ClearSpecialPassOnLinks()
         flags &= ~0x8000;
     if (flags & 0x1000)
         flags &= ~0x8000;
-    if (skin != 0 && skin->m_5618 != 0)
+    if (skin != 0 && skin->boneCount != 0)
     {
-        for (int i = 0; i < skin->m_5618; i++)
+        for (int i = 0; i < skin->boneCount; i++)
             skin->links[i]->M_1019d680();
     }
     for (int i = 0; i < childCount; i++)
@@ -730,7 +624,7 @@ void Node::Release()
     m_0084 = 0;
     if (extra != 0)
     {
-        extra->M_10169620();
+        extra->Clear();
         DAT_11b1ba40(extra);
     }
     extra = 0;
@@ -893,9 +787,9 @@ int Node::EnterTargetState(void *target)
             m_0098 = DAT_11b07118;
         if ((flags & 0x400000) != 0)
         {
-            if (saved->m_0020 == 2)
+            if (saved->state == SAVED_RETURNING)
             {
-                saved->m_0020 = 1;
+                saved->state = SAVED_HOLDING;
                 return 1;
             }
         }
@@ -952,7 +846,7 @@ extern "C" void FUN_101997f0(void)
 // Sets the render mode of the subtree (mode 8 is ignored for nodes with an active glyph cache).
 int Node::M_1019b050(int value)
 {
-    if (value == 8 && skin != 0 && skin->m_5618 != 0)
+    if (value == 8 && skin != 0 && skin->boneCount != 0)
         drawMode = 0;
     else
         drawMode = value;
@@ -1033,15 +927,15 @@ int Node::M_10191870(Node **list, int *count)
 // Copies bind poses from a skinned node's glyph/bone cache into its "bip" bones.
 int Node::M_10191770()
 {
-    if (skin != 0 && skin->m_5618 != 0)
+    if (skin != 0 && skin->boneCount != 0)
     {
         for (int i = 0; i < 0x44; i++)
         {
             Node *bone = skin->bones[i];
             if (bone != 0 && bone->skinned != 0 && _strnicmp(bone->name, "bip", 3) == 0)
             {
-                skin->bones[i]->skin->m_00c4 = skin->bindPose[i];
-                skin->bones[i]->skin->m_3518[0] = skin->m_3518[i];
+                skin->bones[i]->skin->inverseBone = skin->inverseBones[i];
+                skin->bones[i]->skin->bindPoses[0] = skin->bindPoses[i];
             }
         }
     }
@@ -1430,8 +1324,8 @@ int Node::Rename(const char *newName, const char *oldName)
     }
     if (skin != 0)
     {
-        if (_stricmp(skin->parentName, oldName) == 0)
-            strcpy(skin->parentName, newName);
+        if (_stricmp(skin->boneName, oldName) == 0)
+            strcpy(skin->boneName, newName);
         int i;
         for (i = 0; i < 0x40; i++)
         {
@@ -1553,7 +1447,7 @@ int Node::M_1019eeb0(Node *root, Node **list, int *count)
             skin->Clear();
         }
     }
-    if (skin != 0 && skin->m_5618 != 0)
+    if (skin != 0 && skin->boneCount != 0)
     {
         int i;
         for (i = 0; i < 0x40; i++)
@@ -1567,8 +1461,8 @@ int Node::M_1019eeb0(Node *root, Node **list, int *count)
                     skin->links[i]->skin = (NodeSkin *)DAT_11b0b938(0x561c, "bone");
                     skin->links[i]->skin->Clear();
                 }
-                skin->links[i]->skin->pad_0104 = 1;
-                strcpy(skin->links[i]->skin->parentName, skin->parentName);
+                skin->links[i]->skin->isLink = 1;
+                strcpy(skin->links[i]->skin->boneName, skin->boneName);
             }
         }
         int chain = 1;
@@ -1592,7 +1486,7 @@ int Node::M_1019eeb0(Node *root, Node **list, int *count)
                             skin->bones[i]->skin = (NodeSkin *)DAT_11b0b938(0x561c, "bone");
                             skin->bones[i]->skin->Clear();
                         }
-                        strcpy(skin->bones[i]->skin->parentName, skin->parentName);
+                        strcpy(skin->bones[i]->skin->boneName, skin->boneName);
                     }
                 }
             }
@@ -1641,8 +1535,8 @@ int Node::CopyMesh(Node *source, int slot)
             if (found >= 0)
             {
                 mesh = DAT_10fa7478[found];
-                packs = (PackHeader *)DAT_10ff2ff8[found];
-                indexLists = (KeyPair *)DAT_10fe01d8[found];
+                packs = (VertexPack *)DAT_10ff2ff8[found];
+                indexLists = (IndexList *)DAT_10fe01d8[found];
                 packCount = DAT_10fee5e0[found];
                 FUN_10169970(mesh);
                 goto copyMaterials;
@@ -1663,15 +1557,15 @@ int Node::CopyMesh(Node *source, int slot)
             DAT_11b1ba40(indexLists);
         if (materials != 0)
             DAT_11b1ba40(materials);
-        packs = (PackHeader *)DAT_11b0b938(source->packCount * sizeof(PackHeader), "m_vpack");
-        indexLists = (KeyPair *)DAT_11b0b938(source->packCount * sizeof(KeyPair), "m_vpackindex");
+        packs = (VertexPack *)DAT_11b0b938(source->packCount * sizeof(VertexPack), "m_vpack");
+        indexLists = (IndexList *)DAT_11b0b938(source->packCount * sizeof(IndexList), "m_vpackindex");
         packCount = source->packCount;
         for (int i = 0; i < packCount; i++)
         {
-            packs[i].M_101acfa0();
-            packs[i].Copy(&source->packs[i]);
+            packs[i].Init();
+            packs[i].CopyFrom(&source->packs[i]);
             indexLists[i].Init();
-            indexLists[i].Copy(&source->indexLists[i]);
+            indexLists[i].CopyFrom(&source->indexLists[i]);
         }
         if (mesh != 0)
             fread(0, 1, 1, 0);           // a node that still has a mesh here is a bug: crash on purpose
@@ -1820,11 +1714,11 @@ int Node::CopyAnimation(Node *source, int slot)
     if (source->extra != 0)
     {
         M_101949d0();
-        extra->tracks[0].Copy(&source->extra->tracks[1]);
-        extra->tracks[1].Copy(&source->extra->tracks[1]);
-        extra->tracks[2].Copy(&source->extra->tracks[1]);
-        extra->tracks[3].Copy(&source->extra->tracks[3]);
-        extra->tracks[4].Copy(&source->extra->tracks[4]);
+        extra->tracks[0].CopyFrom(&source->extra->tracks[1]);
+        extra->tracks[1].CopyFrom(&source->extra->tracks[1]);
+        extra->tracks[2].CopyFrom(&source->extra->tracks[1]);
+        extra->tracks[3].CopyFrom(&source->extra->tracks[3]);
+        extra->tracks[4].CopyFrom(&source->extra->tracks[4]);
         extra->m_0070[0] = source->extra->m_0070[0];
         extra->m_0070[1] = source->extra->m_0070[1];
         extra->m_0070[2] = source->extra->m_0070[2];
@@ -1922,19 +1816,19 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     CopyAnimation(source, motionSlot);
     CopyMesh(source, meshSlot);
     ComputeBounds();
-    if (source->skin != 0 && source->skin->m_5618 != 0)
+    if (source->skin != 0 && source->skin->boneCount != 0)
     {
         skin = (NodeSkin *)DAT_11b0b938(0x561c, "bone");
         skin->Clear();
-        strcpy(skin->parentName, source->skin->parentName);
-        skin->m_5618 = source->skin->m_5618;
-        for (i = 0; i < source->skin->m_5618; i++)
+        strcpy(skin->boneName, source->skin->boneName);
+        skin->boneCount = source->skin->boneCount;
+        for (i = 0; i < source->skin->boneCount; i++)
             strcpy(skin->linkNames[i], source->skin->linkNames[i]);
         for (i = 0; i < 0x44; i++)
         {
             strcpy(skin->boneNames[i], source->skin->boneNames[i]);
-            skin->bindPose[i] = source->skin->bindPose[i];
-            skin->m_3518[i] = source->skin->m_3518[i];
+            skin->inverseBones[i] = source->skin->inverseBones[i];
+            skin->bindPoses[i] = source->skin->bindPoses[i];
         }
     }
     strcpy(m_070c, source->m_070c);
@@ -1977,7 +1871,7 @@ int Node::ComputeBounds()
             float packMinX = 999999.0f;
             float packMinY = 999999.0f;
             float packMinZ = 999999.0f;
-            const PackVertex *vertex = packs[i].vertices;
+            const Vertex *vertex = packs[i].vertices;
             for (int j = 0; j < packs[i].vertexCount; j++)
             {
                 if (vertex->position[0] < packMinX)
@@ -2006,14 +1900,14 @@ int Node::ComputeBounds()
                 minZ = packMinZ;
             if (packMaxZ > maxZ)
                 maxZ = packMaxZ;
-            packs[i].boxMin[0] = packMinX;
-            packs[i].boxMin[1] = packMinY;
-            packs[i].boxMin[2] = packMinZ;
-            packs[i].boxMin[3] = 1.0f;
-            packs[i].boxMax[0] = packMaxX;
-            packs[i].boxMax[1] = packMaxY;
-            packs[i].boxMax[2] = packMaxZ;
-            packs[i].boxMax[3] = 1.0f;
+            packs[i].boundsMin.x = packMinX;
+            packs[i].boundsMin.y = packMinY;
+            packs[i].boundsMin.z = packMinZ;
+            packs[i].boundsMin.w = 1.0f;
+            packs[i].boundsMax.x = packMaxX;
+            packs[i].boundsMax.y = packMaxY;
+            packs[i].boundsMax.z = packMaxZ;
+            packs[i].boundsMax.w = 1.0f;
             packs[i].center[0] = (packMinX + packMaxX) / 2.0f;
             packs[i].center[1] = (packMinY + packMaxY) / 2.0f;
             packs[i].center[2] = (packMinZ + packMaxZ) / 2.0f;
@@ -2072,11 +1966,11 @@ int Node::BuildCollisionSpheres()
         M_101911e0(m_0070, packCount);
         if (m_0070 != 0)
             DAT_11b1ba40(m_0070);
-        m_0070 = (KeyPair *)DAT_11b0b938(packCount * sizeof(KeyPair), "m_vpackindexsp");
+        m_0070 = (IndexList *)DAT_11b0b938(packCount * sizeof(IndexList), "m_vpackindexsp");
         for (int p = 0; p < packCount; p++)
         {
             m_0070[p].Init();
-            m_0070[p].Resize(indexLists[p].count / 3);
+            m_0070[p].ResizeSpans(indexLists[p].count / 3);
             for (int i = 0; i < indexLists[p].count; i += 3)
             {
                 int first = indexLists[p].indices[i];

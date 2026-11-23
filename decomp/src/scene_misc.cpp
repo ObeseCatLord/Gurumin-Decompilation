@@ -35,21 +35,7 @@ struct SceneOwner
     int M_1017b160();
 };
 
-struct GlyphCache
-{
-    char pad_0000[0x80];
-    int m_0080;
-    char m_0084;
-    char pad_0085[0x7f];
-    int m_0104;
-    int m_0108[0x400];
-    int m_1108[0x40];
-    int m_1208[0x44];
-    int m_1318[0x440];
-    char pad_2418[0x3200];
-    int m_5618;
-    void Clear();
-};
+#include "node_data.h"
 
 struct ColorTables
 {
@@ -87,17 +73,17 @@ extern "C" Node DAT_111be9c8[];
 extern "C" int DAT_10ff1df8[];
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
-// Empties the glyph cache used by the Windows-font text path (counters and four tables).
-void GlyphCache::Clear()
+// 0x10166810. Empties a node's skin data: no bone, no bone name, not a link, no links or bones, all names cleared.
+void NodeSkin::Clear()
 {
-    m_5618 = 0;
-    m_0084 = 0;
-    m_0104 = 0;
-    m_0080 = 0;
-    memset(m_0108, 0, sizeof(m_0108));
-    memset(m_1318, 0, sizeof(m_1318));
-    memset(m_1108, 0, sizeof(m_1108));
-    memset(m_1208, 0, sizeof(m_1208));
+    boneCount = 0;
+    boneName[0] = 0;
+    isLink = 0;
+    bone = 0;
+    memset(linkNames, 0, sizeof(linkNames));
+    memset(boneNames, 0, sizeof(boneNames));
+    memset(links, 0, sizeof(links));
+    memset(bones, 0, sizeof(bones));
 }
 
 // Constructor: the member constructors do the work.

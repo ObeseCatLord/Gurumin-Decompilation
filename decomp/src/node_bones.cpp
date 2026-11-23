@@ -5,24 +5,9 @@
 
 Matrix4 IdentityMatrix();  // 0x101b0ba0
 
-// Extra data of a node (scene_node.cpp Extra).
-struct NodeExtra
-{
-    Matrix4 AnimatedMatrix(int frame);   // 0x101693f0 (node_extra.cpp)
-};
+#include "node_data.h"
 
 struct Node;
-
-// Skinning data of a node: the bone it hangs on (looked up by name) and the matrices used to skin it.
-struct NodeSkin
-{
-    char pad_0000[0x80];
-    Node *bone;               // 0x80: the bone node, 0 when it is the node itself or missing
-    char boneName[0x40];      // 0x84
-    Matrix4 inverseBone;      // 0xc4: inverse of the bone's world matrix
-    char pad_0104[0x3414];
-    Matrix4 bindPose;         // 0x3518: the node's matrix when skinned
-};
 
 #include "node.h"
 
@@ -91,11 +76,11 @@ int Node::SetupSkins(Node *root)
     if (skinned != 0)
     {
         if ((flags & 0x100000) && extra != 0)
-            skin->bindPose = extra->AnimatedMatrix(0);
+            skin->bindPoses[0] = extra->AnimatedMatrix(0);
         else if (frameMatrixCount != 0)
-            skin->bindPose = *frameMatrices;
+            skin->bindPoses[0] = *frameMatrices;
         else
-            skin->bindPose = matrix;
+            skin->bindPoses[0] = matrix;
         skin->bone = root->Find(skin->boneName, 0);
         if (skin->bone == this)
             skin->bone = 0;

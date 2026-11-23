@@ -5,21 +5,9 @@
 
 #include "vec4.h"
 
-struct MeshData
-{
-    int SetRange(int first, int last);           // 0x10146d90 (SlotTable::M_10146d90)
-    void UploadBones(Matrix4 *bones, int count, Matrix4 *world, int view);   // 0x10145a50
-    // 0x10151ba0: draws the mesh with the world matrix and the given lighting parameters.
-    int DrawLit(Matrix4 *world, const Matrix4 *view, int mode, const void *lights, Vec4 *a, Vec4 *b);
-};
+#include "mesh.h"
 
-// Skinning data of a node (node_draw.cpp NodeSkin).
-struct NodeSkin
-{
-    char pad_0000[0x4618];
-    Matrix4 bones[0x40];      // 0x4618
-    int boneCount;            // 0x5618
-};
+#include "node_data.h"
 
 #include "node.h"
 
@@ -54,7 +42,7 @@ extern "C" int FUN_101999a0(int unused, const Matrix4 *view, int lights, unsigne
             continue;
         NodeSkin *skin = DAT_11b00070[i]->skin;
         if (skin != 0 && skin->boneCount != 0)
-            DAT_11b00070[i]->mesh->UploadBones(skin->bones, skin->boneCount, &DAT_11b00070[i]->worldMatrix, (int)view);
+            DAT_11b00070[i]->mesh->UploadBones(skin->skinMatrices, skin->boneCount, &DAT_11b00070[i]->worldMatrix, (int)view);
         Node *node = DAT_11b00070[i];
         if (node->animated != 0)
         {

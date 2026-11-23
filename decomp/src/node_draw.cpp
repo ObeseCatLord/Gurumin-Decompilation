@@ -6,22 +6,9 @@
 
 #include "vec4.h"
 
-struct MeshData
-{
-    int SetRange(int first, int last);           // 0x10146d90 (SlotTable::M_10146d90)
-    void UploadBones(Matrix4 *bones, int count, Matrix4 *worldMatrix, int view);   // 0x10145a50
-    // 0x10151150: draws the mesh with the world matrix and the pass-through arguments.
-    int Draw(Matrix4 *worldMatrix, const Matrix4 *view, int a4, int a0a0, int a5, int a6, int a7, int a8, int a9,
-             int a10, int a11, int a12, int a14);
-};
+#include "mesh.h"
 
-// Skinning data of a node: the bone matrices and their count.
-struct NodeSkin
-{
-    char pad_0000[0x4618];
-    Matrix4 bones[0x40];      // 0x4618
-    int boneCount;            // 0x5618
-};
+#include "node_data.h"
 
 #include "node.h"
 
@@ -51,7 +38,7 @@ int Node::Draw(const Matrix4 *parent, const Matrix4 *view, int a3, int a4, int a
         {
             mesh->SetRange(0, 0x400);
             if (skin != 0 && skin->boneCount != 0)
-                mesh->UploadBones(skin->bones, skin->boneCount, (Matrix4 *)&worldMatrix, (int)view);
+                mesh->UploadBones(skin->skinMatrices, skin->boneCount, (Matrix4 *)&worldMatrix, (int)view);
             mesh->Draw(&worldMatrix, view, a4, drawMode, a5, a6, a7, a8, a9, a10, a11, a12, a14);
         }
     }

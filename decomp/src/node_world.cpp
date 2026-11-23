@@ -4,11 +4,7 @@
 
 #include "matrix4.h"
 
-// A node's animation data (node_extra.cpp NodeExtra).
-struct NodeExtra
-{
-    Matrix4 AnimatedMatrix(int frame);           // 0x101693f0
-};
+#include "node_data.h"
 
 struct Keys
 {

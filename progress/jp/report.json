@@ -4495,7 +4495,7 @@
      }
     },
     {
-     "name": "?Resize@IndexSpanList@@QAEHH@Z",
+     "name": "?ResizeSpans@IndexList@@QAEHH@Z",
      "size": "115",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -11937,7 +11937,7 @@
    ],
    "functions": [
     {
-     "name": "?Clear@GlyphCache@@QAEXXZ",
+     "name": "?Clear@NodeSkin@@QAEXXZ",
      "size": "83",
      "fuzzy_match_percent": 100.0,
      "metadata": {

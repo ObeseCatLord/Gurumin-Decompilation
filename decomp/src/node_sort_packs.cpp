@@ -3,51 +3,8 @@
 
 #include <string.h>
 
-// Mesh material (scene_node.cpp Material, 0x180 bytes), only the value tested here.
-struct Material
-{
-    char pad_0000[0x178];
-    float m_0178;                // 0x178: 1 = the pack goes first
-    char pad_017c[4];
-};
+#include "mesh.h"
 
-// A vertex pack (scene_node.cpp PackHeader, 0x74 bytes).
-struct PackHeader
-{
-    char pad_0000[0x14];
-    int material;                // 0x14: index into the node's materials
-    char pad_0018[4];
-    int vertexCount;             // 0x1c
-    char pad_0020[0x50];
-    struct Vertex *vertices;     // 0x70: 0x70-byte vertices
-    void Init();                                 // 0x101acfa0
-    void Copy(const PackHeader *source);         // 0x101ad040
-    int SetVertexCount(int count);               // 0x101acff0: reallocates the vertex array
-};
-
-// One vertex of a pack (position, normal, colour, texture coordinates...), compared and copied whole.
-struct Vertex
-{
-    int data[0x1c];
-};
-
-// The index list of a vertex pack (8 bytes).
-struct KeyPair
-{
-    int count;
-    int *indices;
-    void Init();                                 // 0x101ad1b0
-    void Copy(const KeyPair *source);          // 0x101ad160
-};
-
-// The mesh buffers built from the packs (scene_node.cpp MeshData).
-struct MeshData
-{
-    char pad_0000[0x4c];
-    int bufferSlot;              // 0x4c: entry of the mesh buffer tables, -1 = none
-    void Init();                                 // 0x10145a10
-    void Release();                              // 0x10150a90
-};
 extern "C" int FUN_10169990(MeshData *mesh);     // MeshCache_Release: drops one reference, returns those left
 
 #include "node.h"
@@ -70,8 +27,8 @@ int Node::SortPacks()
         DAT_11b1ba40(mesh);
         mesh = 0;
     }
-    PackHeader *newPacks = (PackHeader *)DAT_11b0b938(packCount * sizeof(PackHeader), "vp");
-    KeyPair *newLists = (KeyPair *)DAT_11b0b938(packCount * sizeof(KeyPair), "vpi");
+    VertexPack *newPacks = (VertexPack *)DAT_11b0b938(packCount * sizeof(VertexPack), "vp");
+    IndexList *newLists = (IndexList *)DAT_11b0b938(packCount * sizeof(IndexList), "vpi");
     for (i = 0; i < packCount; i++)
     {
         newPacks[i].Init();
@@ -80,19 +37,19 @@ int Node::SortPacks()
     int count = 0;
     for (i = 0; i < packCount; i++)
     {
-        if (materials[packs[i].material].m_0178 == 1.0f)
+        if (materials[packs[i].material].alpha == 1.0f)
         {
-            newPacks[count].Copy(&packs[i]);
-            newLists[count].Copy(&indexLists[i]);
+            newPacks[count].CopyFrom(&packs[i]);
+            newLists[count].CopyFrom(&indexLists[i]);
             count++;
         }
     }
     for (i = 0; i < packCount; i++)
     {
-        if (materials[packs[i].material].m_0178 != 1.0f)
+        if (materials[packs[i].material].alpha != 1.0f)
         {
-            newPacks[count].Copy(&packs[i]);
-            newLists[count].Copy(&indexLists[i]);
+            newPacks[count].CopyFrom(&packs[i]);
+            newLists[count].CopyFrom(&indexLists[i]);
             count++;
         }
     }

@@ -385,17 +385,7 @@ KeyBank::KeyBank()
     Clear();
 }
 
-// Growable key-frame track (containers.cpp). Reserve lives here because its `new Vec4[]` loop keeps the element
-// pointer in edx across the Vec4() calls.
-struct KeyTrack
-{
-    int capacity;
-    int *frames;
-    Vec4 *values;
-    char *flags;
-    int count;
-    void Reserve(int extra);
-};
+#include "key_track.h"
 
 // Grows the three key arrays by `extra` entries, keeping their contents. Returns nothing; the capacity grows.
 void KeyTrack::Reserve(int extra)

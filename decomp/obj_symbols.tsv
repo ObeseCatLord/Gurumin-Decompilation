@@ -55,7 +55,7 @@
 ??1MmvPlayer@@QAE@XZ	101608c0
 ?Close@MmvPlayer@@QAEXXZ	101609b0
 ??0ModelState@@QAE@XZ	101668b0
-?Clear@GlyphCache@@QAEXXZ	10166810
+?Clear@NodeSkin@@QAEXXZ	10166810
 ??0ColorTables@@QAE@XZ	10172780
 ??1Widget@@QAE@XZ	10172990
 ??1NodeBody@@QAE@XZ	10191480
@@ -451,3 +451,4 @@ _FUN_101426d0@8	101426d0
 ?ClearFlags@Node@@QAEHI@Z	1019b1b0
 ?ReplaceMaterial@Node@@QAEHHH@Z	1019e830
 ?EnterTargetState@Node@@QAEHPAX@Z	101948f0
+?ResizeSpans@IndexList@@QAEHH@Z	101ad1c0

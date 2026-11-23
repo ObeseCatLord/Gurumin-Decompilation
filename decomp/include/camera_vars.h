@@ -10,6 +10,7 @@
 #include "vec4.h"
 
 
+extern "C" char DAT_101e8d50[];                            // node name the camera rays are limited to
 extern "C" int DAT_10203440;
 extern "C" int DAT_10203444;                              // ground height cache, -100 = unknown
 extern "C" float DAT_10203448;
@@ -88,7 +89,7 @@ extern "C" int DAT_1101ddd0;
 extern "C" int DAT_1101ddd4;
 extern "C" int DAT_1101ddd8;
 extern "C" int DAT_1101dddc;
-extern "C" int DAT_1101dde4;
+extern "C" float DAT_1101dde4;                            // how far the camera target is lifted (0 or up to 120)
 extern "C" int DAT_1101dde8;
 extern "C" int DAT_1101ddec;
 extern "C" int DAT_1101ddf0;

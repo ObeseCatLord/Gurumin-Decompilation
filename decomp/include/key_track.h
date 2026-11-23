@@ -13,7 +13,14 @@
 // Per-key flag of a KeyBank: hold the previous key's value up to this key (KeyBank::Sample).
 #define KEY_FLAG_HOLD 0x10
 
-struct KeyTrack
+// Base of KeyTrack and KeyBank: holds no data, only the cubic interpolation both Sample functions call.
+struct KeyInterpolator
+{
+    // 0x101ad920: cubic Hermite interpolation between `b` (t = 0) and `c` (t = 1) with neighbours `a` and `d`.
+    float Spline(float t, float a, float b, float c, float d);
+};
+
+struct KeyTrack : KeyInterpolator
 {
     int capacity;     // 0x00: allocated length of the three arrays
     int *frames;      // 0x04: frame number of each key, ascending
@@ -42,7 +49,7 @@ struct KeyTrack
 // A fixed key-frame bank (0xa84 bytes): up to 0x80 keys kept sorted by frame, used while loading and inside motion
 // channels (anim_model.h), effect models and the world's tables. Constructor and Insert/Set in vec4.cpp, the rest in
 // containers.cpp; Sample at 0x101af4c0.
-struct KeyBank
+struct KeyBank : KeyInterpolator
 {
     int frames[KEY_BANK_SIZE];     // 0x000: frame number of each key, ascending
     Vec4 values[KEY_BANK_SIZE];    // 0x200: value of each key

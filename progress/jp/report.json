@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 18.1936,
+  "fuzzy_match_percent": 18.2846,
   "total_code": "1720206",
-  "matched_code": "236230",
-  "matched_code_percent": 13.7327,
+  "matched_code": "237369",
+  "matched_code_percent": 13.7989,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 817,
-  "matched_functions_percent": 67.4092,
+  "matched_functions": 818,
+  "matched_functions_percent": 67.4917,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 273,
-  "complete_units": 156,
-  "matched_rules_code": "235603",
-  "matched_rules_code_percent": 13.6962,
-  "matched_rules_functions": 816,
-  "matched_rules_functions_percent": 67.3267
+  "total_units": 275,
+  "complete_units": 157,
+  "matched_rules_code": "236742",
+  "matched_rules_code_percent": 13.7624,
+  "matched_rules_functions": 817,
+  "matched_rules_functions_percent": 67.4092
  },
  "units": [
   {
@@ -66,6 +66,52 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/ability_text.cpp"
+   }
+  },
+  {
+   "name": "app/action_select",
+   "measures": {
+    "fuzzy_match_percent": 36.2331,
+    "total_code": "1188",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1188",
+     "fuzzy_match_percent": 36.2331
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10011520",
+     "size": "1188",
+     "fuzzy_match_percent": 36.2331,
+     "metadata": {
+      "virtual_address": "268506400"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/action_select.cpp"
    }
   },
   {
@@ -2696,6 +2742,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/camera_follow.cpp"
+   }
+  },
+  {
+   "name": "app/camera_lift",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "1139",
+    "matched_code": "1139",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "1139",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1,
+    "matched_rules_code": "1139",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1139",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1016be80",
+     "size": "1139",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269926016"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/camera_lift.cpp"
    }
   },
   {
@@ -16999,7 +17091,7 @@
   {
    "name": "app/vec4",
    "measures": {
-    "fuzzy_match_percent": 69.2254,
+    "fuzzy_match_percent": 69.181,
     "total_code": "9293",
     "matched_code": "4331",
     "matched_code_percent": 46.605,
@@ -17024,7 +17116,7 @@
     {
      "name": ".text",
      "size": "9293",
-     "fuzzy_match_percent": 69.2254
+     "fuzzy_match_percent": 69.181
     }
    ],
    "functions": [
@@ -17277,7 +17369,7 @@
      }
     },
     {
-     "name": "?Spline@@YGMMMMMM@Z",
+     "name": "?Spline@KeyInterpolator@@QAEMMMMMM@Z",
      "size": "179",
      "fuzzy_match_percent": 56.25,
      "metadata": {
@@ -17287,7 +17379,7 @@
     {
      "name": "?Sample@KeyBank@@QAEHHPAM000H@Z",
      "size": "1182",
-     "fuzzy_match_percent": 41.1815,
+     "fuzzy_match_percent": 39.527,
      "metadata": {
       "virtual_address": "270202048"
      }
@@ -17295,7 +17387,7 @@
     {
      "name": "?Sample@KeyTrack@@QAEHHPAM000H@Z",
      "size": "1079",
-     "fuzzy_match_percent": 23.5795,
+     "fuzzy_match_percent": 24.3566,
      "metadata": {
       "virtual_address": "270204416"
      }
@@ -17303,7 +17395,7 @@
     {
      "name": "?Sample@KeyBank@@QAEHMPAM000H@Z",
      "size": "1176",
-     "fuzzy_match_percent": 7.8767,
+     "fuzzy_match_percent": 8.476,
      "metadata": {
       "virtual_address": "270203232"
      }
@@ -18330,13 +18422,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1356152",
+    "total_code": "1353825",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 216,
+    "total_functions": 214,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -18353,7 +18445,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1356152",
+     "size": "1353825",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -18412,14 +18504,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268488609"
-     }
-    },
-    {
-     "name": "FUN_10011520",
-     "size": "1188",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268506400"
      }
     },
     {
@@ -19852,14 +19936,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269924032"
-     }
-    },
-    {
-     "name": "FUN_1016be80",
-     "size": "1139",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269926016"
      }
     },
     {

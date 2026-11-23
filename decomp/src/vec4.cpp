@@ -543,11 +543,9 @@ void Vec4::Mirror(const Vec4 &normal)
 // Cubic Hermite interpolation between `b` (t = 0) and `c` (t = 1) with neighbours `a` and `d`. The tangents are
 // (b - a) / 2 + (c - b) at b and (c - b) / 2 + (d - c) at c (not the usual Catmull-Rom halves of both differences).
 // Not byte-identical yet: cl 13.00 rewrites t3 * -2 as -(t3 + t3) and shares it with the b term (see open.tsv).
-// The original is probably a member (this unused): every caller (the four Sample functions 0x101af4c0..0x101b0240)
-// loads ecx with its own key container first. Declaring it in KeyBank changes cl 13.00's output for the unrelated
-// FUN_100b4f00 (char_move.cpp), so it stays a free function until that is understood. It sits in this file so the
-// callers here know it leaves edx alone.
-float __stdcall Spline(float t, float a, float b, float c, float d)
+// A member of the data-less base KeyInterpolator of KeyTrack and KeyBank (include/key_track.h): every caller loads
+// ecx with its own key container first (`mov ecx, edx`), and Spline itself never reads `this`.
+float KeyInterpolator::Spline(float t, float a, float b, float c, float d)
 {
     float bc = c - b;
     float tangentB = (b - a) * 0.5f + bc;
@@ -643,14 +641,14 @@ int KeyBank::Sample(int frame, float *x, float *y, float *z, float *w, int rotat
     // each call (cl 13.00 evaluates it once, after the key indices); a separate `t` statement makes it convert
     // `offset` before the linear/spline branch instead.
 #define SPLINE_T ((float)offset / (float)span)
-    *x = Spline(SPLINE_T,
-                values[AT_LEAST_FIRST(i - 2)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
+    *x = this->Spline(SPLINE_T,
+                values[AT_LEAST_FIRST(i - 1 - 1)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
                 values[AT_MOST_LAST(i + 1, count - 1)].x);
-    *y = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
+    *y = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 1 - 1)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
                 values[AT_MOST_LAST(i + 1, count - 1)].y);
-    *z = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
+    *z = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 1 - 1)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
                 values[AT_MOST_LAST(i + 1, count - 1)].z);
-    *w = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
+    *w = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 1 - 1)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
                 values[AT_MOST_LAST(i + 1, count - 1)].w);
 #undef SPLINE_T
     return 1;
@@ -732,14 +730,14 @@ int KeyTrack::Sample(int frame, float *x, float *y, float *z, float *w, int rota
     // each call (cl 13.00 evaluates it once, after the key indices); a separate `t` statement makes it convert
     // `offset` before the linear/spline branch instead.
 #define SPLINE_T ((float)offset / (float)span)
-    *x = Spline(SPLINE_T,
+    *x = this->Spline(SPLINE_T,
                 values[AT_LEAST_FIRST(i - 2)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
                 values[AT_MOST_LAST(i + 1, count - 1)].x);
-    *y = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
+    *y = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
                 values[AT_MOST_LAST(i + 1, count - 1)].y);
-    *z = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
+    *z = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
                 values[AT_MOST_LAST(i + 1, count - 1)].z);
-    *w = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
+    *w = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
                 values[AT_MOST_LAST(i + 1, count - 1)].w);
 #undef SPLINE_T
     return 1;
@@ -819,14 +817,14 @@ int KeyBank::Sample(float frame, float *x, float *y, float *z, float *w, int rot
     // each call (cl 13.00 evaluates it once, after the key indices); a separate `t` statement makes it convert
     // `offset` before the linear/spline branch instead.
 #define SPLINE_T (offset / span)
-    *x = Spline(SPLINE_T,
+    *x = this->Spline(SPLINE_T,
                 values[AT_LEAST_FIRST(i - 2)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
                 values[AT_MOST_LAST(i + 1, count - 1)].x);
-    *y = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
+    *y = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
                 values[AT_MOST_LAST(i + 1, count - 1)].y);
-    *z = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
+    *z = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
                 values[AT_MOST_LAST(i + 1, count - 1)].z);
-    *w = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
+    *w = this->Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
                 values[AT_MOST_LAST(i + 1, count - 1)].w);
 #undef SPLINE_T
     return 1;

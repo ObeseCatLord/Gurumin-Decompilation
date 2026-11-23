@@ -7,6 +7,7 @@ address	name	evidence
 1000c720	Characters_Draw	draws every character slot under view*projection (character_draw.cpp)
 1000e340	Debris_Draw	draws the used debris pieces (debris.cpp)
 1000eed0	Message_DrawPanel	fading message box with optional subtext (message_panel.cpp)
+10011520	Player_SelectActionMotion	next motion of the player action chain (action_select.cpp, draft)
 10026730	Watcher_Update	hovering watcher: faces the player, keeps its home height, eases its turn (behaviour from 0x100f9670)
 100279b0	Enemy_BackAwayFromPlayer	enemy walks away from the player veering 5 degrees (enemy_flee.cpp)
 10049b00	Map_RoutePosition	point at fraction t of a map record route (map_route.cpp)
@@ -32,6 +33,7 @@ address	name	evidence
 100144c0	Ability_GetDescription	copies the effect text of the highest-priority ability bit and returns the bit (matched, decomp/src/ability_text.cpp)
 1013dfb0	GuruMain	DLL export called by game.exe
 1016a480	Playback_Advance	steps a motion playback one frame (playback_advance.cpp, draft)
+1016be80	Camera_LiftOverGround	lifts the camera target above the ground (camera_lift.cpp)
 101af960	KeyBank_SampleFloat	key lookup with a float frame (vec4.cpp, draft)
 101afe00	KeyTrack_Sample	key lookup over a KeyTrack (vec4.cpp, draft)
 101b2a28	sprintf	CRT

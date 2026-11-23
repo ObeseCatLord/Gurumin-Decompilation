@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (182)
+## 1. Walls to retry (183)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -28,6 +28,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100106e0` 1567 — Save_Write: frame, calls and layout identical; the unrolled bit-set loop swaps ebx/edi for two of its counters and the start-position loads use other registers; locals for the position tried
 - [ ] `10010d10` 1323 — Save_ReadSlotInfo: statements and flow match; the stack layout differs like Save_ReadThumbnail 0x10011240 (original frame 0x3f0, ours 0x400; the unused Vec4 sits near the path buffer); Vec4 placements tried
 - [ ] `10011240` 605 — Save_ReadThumbnail: code identical; stack layout differs (the original puts the unused Vec4 at 0x378 above the path buffer and the scalars below the file object); declaration orders and buffer sizes tried
+- [ ] `10011520` 1188 — Player_SelectActionMotion (action_select.cpp, rule-clean draft, 1184 vs 1188 bytes): the original keeps the 4-byte key count in the dead p2 stack slot ([esp+0x48]) and reuses ecx = 3 for the compare and the DAT_104c01ec store; ours keeps the count in edx; count types/orders, union for DAT_104c0158 and loop forms tried
 - [ ] `10011dd0` 419 — Npc_StandOnGround: logic identical; register residue (state address in eax and its store before the DAT_102022b8 load in the original, edi and after in ours; the hit result in eax vs our temporaries); state local and store order tried
 - [ ] `10012130` 172 — Inventory_Add: original loads *count into edi before the add (mov edi,[eax]; add esi,edi); VS2003 folds the memory operand. Rest identical
 - [ ] `10012220` 418 — Model_ApplyCommands: logic identical; index/model registers swapped (ebp/ebx) and argument loads scheduled differently; two parameter orders tried
@@ -190,9 +191,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ae950` 249 — QuatFromAxisAngle: 16 bytes; the original keeps cos(half) in the angle slot and spills axis.z into the axis slot, ours the other way round (declaration order tried)
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
-- [ ] `101af4c0` 1182 — KeyBank::Sample (vec4.cpp, after Spline so edx survives the calls): the spline blend factor written inside each Spline call removes the (float)offset hoist; left: the original keeps (keyFlags >> 2) & 1 in eax before the hold test (cl 13.00 here folds it into test al,4; ten spellings tried: ?:, !=0, bool, unsigned, separate reads, switch, ==1), i - 2 spelled (i - 1) - 1, and the Spline call loads ecx (thiscall member; declaring it breaks FUN_100b4f00)
-- [ ] `101af960` 1176 — KeyBank::Sample(float) (vec4.cpp, 1168 vs 1176 bytes): same wall as KeyBank::Sample 0x101af4c0; the original keeps the i == count copy and the hold copy as two blocks; maybe Spline is a thiscall member (mov ecx,edx before the call)
-- [ ] `101afe00` 1079 — KeyTrack::Sample (vec4.cpp, 1056 vs 1079 bytes): count/frames registers swapped (ebp/ebx) and the i == count hold copy placed after the cmp in the original (cl 13.00 emits je far); flat, nested, goto forms tried; same Spline thiscall suspicion
+- [ ] `101af4c0` 1182 — KeyBank::Sample (vec4.cpp): Spline is now KeyInterpolator::Spline (thiscall member of the empty base of KeyBank/KeyTrack) and the four call blocks match; left: (keyFlags >> 2) & 1 kept live in eax across the hold test (cl 13.00 folds it into test al,4) and i - 2 as (i - 1) - 1 (a local changes the allocation); 1184 vs 1176 bytes
+- [ ] `101af960` 1176 — KeyBank::Sample(float) (vec4.cpp, 1168 vs 1176 bytes): Spline member in place; the original holds count in edi and saves esi/edi; same wall as 101af4c0
+- [ ] `101afe00` 1079 — KeyTrack::Sample (vec4.cpp, 1088 vs 1079 bytes): Spline member in place; count/frames registers (ebp/ebx) swapped and the i == count hold copy placed after the cmp in the original
 
 ## 2. Small functions (30-250 bytes) (2)
 
@@ -203,12 +204,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (100)
+## 4. Large functions (801-3000 bytes) (98)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `1016be80` 1139 bytes (float, loops 2, calls 14)
 - [ ] `100ed510` 1160 bytes (float, loops 10, calls 15)
-- [ ] `10011520` 1188 bytes (float, loops 4, calls 8)
 - [ ] `1004d4b0` 1188 bytes (float, loops 3, calls 2)
 - [ ] `10038070` 1195 bytes (float, loops 2, calls 37)
 - [ ] `1005f750` 1200 bytes (float, loops 4, calls 28)

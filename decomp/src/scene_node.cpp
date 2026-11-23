@@ -1271,10 +1271,10 @@ int Node::ReplaceMaterial(int a, int b)
 // 0x101992f0. The top node of the tree this node belongs to (following the parent links).
 Node *Node::Root()
 {
-    Node *node = this;
-    while (node->parent != 0)
-        node = node->parent;
-    return node;
+    // written recursively; the compiler turns the tail call into the parent loop
+    if (parent == 0)
+        return this;
+    return parent->Root();
 }
 
 // 0x101a52d0. Names this node `name`, or "name(0)", "name(1)", ... (the first that no node of the tree uses yet)

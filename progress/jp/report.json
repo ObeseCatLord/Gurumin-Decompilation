@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 17.5506,
+  "fuzzy_match_percent": 17.5508,
   "total_code": "1720206",
-  "matched_code": "226128",
-  "matched_code_percent": 13.1454,
+  "matched_code": "226157",
+  "matched_code_percent": 13.1471,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 806,
-  "matched_functions_percent": 66.5017,
+  "matched_functions": 807,
+  "matched_functions_percent": 66.5842,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
   "total_units": 267,
   "complete_units": 151,
-  "matched_rules_code": "225501",
-  "matched_rules_code_percent": 13.109,
-  "matched_rules_functions": 805,
-  "matched_rules_functions_percent": 66.4191
+  "matched_rules_code": "225530",
+  "matched_rules_code_percent": 13.1106,
+  "matched_rules_functions": 806,
+  "matched_rules_functions_percent": 66.5017
  },
  "units": [
   {
@@ -13593,32 +13593,32 @@
   {
    "name": "app/scene_node",
    "measures": {
-    "fuzzy_match_percent": 93.6857,
+    "fuzzy_match_percent": 93.7124,
     "total_code": "17013",
-    "matched_code": "12908",
-    "matched_code_percent": 75.8714,
+    "matched_code": "12937",
+    "matched_code_percent": 76.0419,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
     "total_functions": 82,
-    "matched_functions": 77,
-    "matched_functions_percent": 93.9024,
+    "matched_functions": 78,
+    "matched_functions_percent": 95.122,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 0,
-    "matched_rules_code": "12908",
-    "matched_rules_code_percent": 75.8714,
-    "matched_rules_functions": 77,
-    "matched_rules_functions_percent": 93.9024
+    "matched_rules_code": "12937",
+    "matched_rules_code_percent": 76.0419,
+    "matched_rules_functions": 78,
+    "matched_rules_functions_percent": 95.122
    },
    "sections": [
     {
      "name": ".text",
      "size": "17013",
-     "fuzzy_match_percent": 93.6857
+     "fuzzy_match_percent": 93.7124
     }
    ],
    "functions": [
@@ -14073,7 +14073,7 @@
     {
      "name": "?Root@Node@@QAEPAU1@XZ",
      "size": "29",
-     "fuzzy_match_percent": 84.375,
+     "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270111472"
      }

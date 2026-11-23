@@ -3,7 +3,6 @@ address	status	reason
 10169720	open	memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 1016b010	open	original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 1016c300	open	control-flow layout of a three-way flag test differs (two source shapes tried)
-101992f0	open	walk to the root: original keeps the next pointer in edx, VS2003 in ecx (two loop shapes tried)
 100e2080	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 100e2110	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 100e2440	open	enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
@@ -57,7 +56,6 @@ address	status	reason
 101ad5c0	open	MotionList::InsertByName: the original inlines Insert (cl 13.00 here calls it even when declared inline); with __forceinline only the loop index register differs (ecx vs ebp)
 101ae950	open	QuatFromAxisAngle: 16 bytes; the original keeps cos(half) in the angle slot and spills axis.z into the axis slot, ours the other way round (declaration order tried)
 101aeee0	open	Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
-101992f0	open	Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)
 101883b0	open	EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 100fb6d0	open	ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
 10037470	open	ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried

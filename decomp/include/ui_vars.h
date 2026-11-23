@@ -22,7 +22,11 @@ extern "C" char DAT_10202a48[];                           // "dpartsbf.bmp": a l
 extern "C" int DAT_10202b20;                              // 1 = draw text outlines
 extern "C" int DAT_10203408;                              // dead zone around the axis centre (in 1/256 units)
 extern "C" int DAT_10203428;                              // 1 = text input allowed
-extern "C" int DAT_1020b228;
+extern "C" int DAT_1020b228;                              // texture slot of the map icon, negative = none
+extern "C" int DAT_10c6359c;                              // where the map movie is shown: 0 centre, 1 below centre, 2 at (DAT_10c635a0, DAT_10c635a4), 3 the same but shifted by a quarter of the movie size
+extern "C" int DAT_10c635a0;                              // movie position x for placements 2 and 3
+extern "C" int DAT_10c635a4;                              // movie position y for placements 2 and 3
+extern "C" int DAT_10c66d08;                              // non-zero = the map movie is hidden
 extern "C" int DAT_1020c2c0;                              // the chosen camera point; current map table entry
 extern "C" int DAT_1020c2d0;                              // the movie playing
 extern "C" int DAT_1020c330;                              // panel state, 0 = hidden; the text shows in states 8..22
@@ -62,6 +66,9 @@ extern "C" Node *DAT_104c03d4;                            // the left half
 extern "C" Node *DAT_104c03d8;                            // the book cover
 extern "C" int DAT_104c03e0;
 extern "C" int DAT_104c03e4;                              // 1 while the pages turn
+extern "C" int DAT_1020b444;                              // cleared when a book opens
+extern "C" int DAT_10c6504c;                              // the left page last shown in the first book
+extern "C" int DAT_10c65050;                              // the left page last shown in the second book
 extern "C" int DAT_104c03e8;                              // non-zero in the second book
 extern "C" char DAT_1065cb30;                             // a key of the current input frame (DemoRecording::buttons_now[4])
 extern "C" Matrix4 DAT_1086df38;                          // the player's world matrix; viewer matrix

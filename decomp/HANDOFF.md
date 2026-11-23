@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 14.08% of code, 822 of 1212 functions |
-| Matched under the rules | 14.04% of code, 821 of the 822 matched functions |
-| Fuzzy match | 18.87% |
+| Matched | 14.15% of code, 823 of 1212 functions |
+| Matched under the rules | 14.11% of code, 822 of the 823 matched functions |
+| Fuzzy match | 19.01% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -51,6 +51,8 @@ function) and node_world.cpp (0) still break rule 2.
 - Batch 317: Ground_BuildHeights 0x100169c0 (ground_height.cpp; DAT_1049f200/DAT_1042e3f0 are float[0x60][16][16])
   and Collide_RayThroughRegions 0x10020090 (collide_regions.cpp) matched; ListBank::CompileStatement 0x100ed9b0
   drafted (tail layout, open.tsv).
+- Batch 318: TextureObject::DrawColoured 0x1014c960 (texture_bind.cpp) matched; Map_DrawMovie 0x1001ed80
+  (map_movie_draw.cpp) and TutorialBook_Open 0x1004ed60 (tutorial_open.cpp) drafted (register allocation).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

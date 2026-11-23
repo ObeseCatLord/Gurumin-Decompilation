@@ -525,3 +525,4 @@ _Enemy_IsBusy	100e1c40
 ?DrawItemPreview@@YAHXZ	10038070
 ?CompileStatement@ListBank@@QAEHPAD@Z	100ed9b0
 ?DeclareFunction@ListBank@@QAEHPAD@Z	100366c0
+?DrawColoured@TextureObject@@QAEHHHHHMMMMMMMMMM@Z	1014c960

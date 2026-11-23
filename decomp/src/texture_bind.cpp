@@ -962,6 +962,96 @@ int TextureObject::DrawTinted(int left, int top, int right, int bottom, float u0
     return 1;
 }
 
+// 0x1014c960 (TextureObject::DrawColoured). Like DrawCell, but the rectangle is given in 640x480 screen coordinates
+// (scaled to the back buffer) and the diffuse colour is `alpha`, `red`, `green`, `blue` (each 0..1); no specular.
+// Returns 1.
+int TextureObject::DrawColoured(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1,
+                                float z, float alpha, float angle, float red, float green, float blue)
+{
+    PanelVertex vertices[4];
+    BindStage0();
+    float scaleX = (float)DAT_10202b34 / 640.0f;
+    float scaleY = (float)DAT_10202b38 / 480.0f;
+    if (angle != 0.0f)
+    {
+        Vec4 topLeft;
+        Vec4 bottomRight;
+        Vec4 topRight;
+        Vec4 bottomLeft;
+        Vec4 centre;
+        centre.x = (float)(left + right) * 0.5f;
+        centre.y = (float)(top + bottom) * 0.5f;
+        topLeft.x = (float)left - centre.x;
+        topLeft.y = (float)top - centre.y;
+        bottomRight.x = (float)right - centre.x;
+        bottomRight.y = (float)bottom - centre.y;
+        topRight.x = (float)right - centre.x;
+        topRight.y = (float)top - centre.y;
+        bottomLeft.x = (float)left - centre.x;
+        bottomLeft.y = (float)bottom - centre.y;
+        topLeft.RotateZ(angle);
+        bottomRight.RotateZ(angle);
+        topRight.RotateZ(angle);
+        bottomLeft.RotateZ(angle);
+        topLeft.x += centre.x;
+        topLeft.y += centre.y;
+        bottomRight.x += centre.x;
+        bottomRight.y += centre.y;
+        topRight.x += centre.x;
+        topRight.y += centre.y;
+        bottomLeft.x += centre.x;
+        bottomLeft.y += centre.y;
+        vertices[0].x = topLeft.x * scaleX;
+        vertices[0].y = topLeft.y * scaleY;
+        vertices[1].x = topRight.x * scaleX;
+        vertices[1].y = topRight.y * scaleY;
+        vertices[2].x = bottomLeft.x * scaleX;
+        vertices[2].y = bottomLeft.y * scaleY;
+        vertices[3].x = bottomRight.x * scaleX;
+        vertices[3].y = bottomRight.y * scaleY;
+    }
+    else
+    {
+        vertices[0].x = (float)left * scaleX;
+        vertices[0].y = (float)top * scaleY;
+        vertices[1].x = (float)right * scaleX;
+        vertices[1].y = (float)top * scaleY;
+        vertices[2].x = (float)left * scaleX;
+        vertices[2].y = (float)bottom * scaleY;
+        vertices[3].x = (float)right * scaleX;
+        vertices[3].y = (float)bottom * scaleY;
+    }
+    vertices[0].u = u0;
+    vertices[0].v = v0;
+    vertices[1].u = u1;
+    vertices[1].v = v0;
+    vertices[2].u = u0;
+    vertices[2].v = v1;
+    vertices[3].u = u1;
+    vertices[3].v = v1;
+    int a = (int)(alpha * 255.0f);
+    if (a > 255)
+        a = 255;
+    else if (a < 0)
+        a = 0;
+    unsigned int colour = (((unsigned int)(int)(red * 255.0f) | a << 8) << 8 | (int)(green * 255.0f)) << 8 |
+                          (int)(blue * 255.0f);
+    vertices[0].colour = vertices[1].colour = vertices[2].colour = vertices[3].colour = colour;
+    vertices[0].specular = vertices[1].specular = vertices[2].specular = vertices[3].specular = 0xff000000;
+    vertices[0].z = vertices[1].z = vertices[2].z = vertices[3].z = z;
+    vertices[0].rhw = vertices[1].rhw = vertices[2].rhw = vertices[3].rhw = 1.0f;
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x1c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    FUN_1013ef90(0, 4, 4);                  // alpha: modulate
+    FUN_1013ef90(0, 5, 2);                  //   texture
+    FUN_1013ef90(0, 6, 0);                  //   diffuse
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 2, vertices, 0x20);
+    return 1;
+}
+
 // 0x1014d4e0 (TextureObject::DrawFrame). Draws the speech-balloon panel: one triangle fan (21 points) from the
 // centre of the rectangle left..right, top..bottom pulled 8 - `border` pixels inwards, with the corners cut off in
 // steps of 2, 4 and 8 pixels and a tail 20 + `border` pixels long below the middle of the bottom edge. The points are

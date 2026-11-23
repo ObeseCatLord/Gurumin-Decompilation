@@ -17,8 +17,6 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060 (vec4.cpp
 // 0x101ae4d0 (View_ContainsPoint, vec4.cpp): 1 when `point` transformed by `matrix` lies inside the view volume, widened by `margin`.
 extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin);
 
-
-
 // Empties the bank: clears the light list, the 0x80-entry table, every model record's id and the counters.
 int ModelBank::Reset()
 {
@@ -156,15 +154,8 @@ int ModelBank::AddLitModel(AnimModel *model)
 
 #include <stdio.h>
 
-// The texture slots (texture_mgr.cpp TextureObject), only the image update.
-struct TextureSlot
-{
-    char pad_0000[0x38];
-    int UpdateImage(int flags);                      // 0x10169f70
-    int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);  // 0x1014b750
-};
+#include "texture_object.h"
 
-extern "C" TextureSlot DAT_118d0ba8[1600];
 extern "C" int DAT_10203434;                         // 1 when shadows are drawn
 extern "C" int DAT_1101d864;
 extern "C" int DAT_1101d878;                         // set while loading the shared textures

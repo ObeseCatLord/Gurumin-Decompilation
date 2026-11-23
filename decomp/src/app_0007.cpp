@@ -7,14 +7,10 @@ struct Renderer
     void M_10172a40(void *item);
 };
 
-struct RenderItem
-{
-    char data[0x38];
-};
+#include "texture_object.h"
 
 extern "C" void FUN_1013f070(int, int, int);
 extern "C" Renderer DAT_1021cffc;
-extern "C" RenderItem DAT_118d0ba8[];
 extern "C" int DAT_104c0140;
 extern "C" int DAT_104bf8d4;
 extern "C" int DAT_104bf8d8;

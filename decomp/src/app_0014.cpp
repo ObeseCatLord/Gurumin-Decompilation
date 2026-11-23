@@ -2,10 +2,7 @@
 
 #include <windows.h>
 
-struct TextureObject
-{
-    char data[0x38];
-};
+#include "texture_object.h"
 
 struct MoviePlayer
 {
@@ -19,7 +16,6 @@ struct MoviePlayer
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 extern "C" MoviePlayer DAT_10f08ab0;
 extern "C" int DAT_10202478;
-extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" int DAT_104bfe74;
 extern "C" int DAT_104bfe70;
 extern "C" int DAT_10c62edc[0x1000];

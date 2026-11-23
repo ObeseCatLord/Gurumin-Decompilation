@@ -6,50 +6,7 @@
 #include <string.h>
 #include "d3d9_min.h"
 
-struct TextureObject
-{
-    IDirect3DTexture9Like *texture;     // 0x00: Direct3D texture
-    IDirect3DSurface9Like *surface;     // 0x04: surface of a render-target texture (or a second part), may be 0
-    int width;               // 0x08: texture width in pixels
-    int height;              // 0x0c: texture height in pixels
-    int target;              // 0x10: 1 = R5G6B5 render target, 2 = A8R8G8B8 render target, else 0
-    int poolIndex;           // 0x14: buffer pool index of the frames
-    int pad_0018;
-    int poolSlot;            // 0x1c: non-zero when the frames live in the buffer pool (1 = R5G6B5, 2 = A4R4G4B4)
-    char pad_0020[0x18];
-    int BindStage0();
-    int BindStage1();
-    int Write16(int x, int y, int rowPixels, int rows, int pitch, const void *bits);
-    int Release();
-    int CaptureRgb24(unsigned char *out);
-    int CaptureRgbRows(unsigned char *out);
-    int CaptureRgbFirst(unsigned char *out);
-    int BeginRenderTo(int width, int height, int offset);
-    int HalveRgb24(unsigned char *pixels, int width, int height);
-    int Upload(int width, int height, unsigned char *pixels, const unsigned char *alpha);
-    int DrawTriangles(const void *vertices, int triangles);
-    int DrawStrip(struct ScreenVertex *vertices, int count);
-    int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);
-    int DrawQuad(const struct Vec4 *positions, const struct Vec4 *uvs, const struct Vec4 *colours,
-                 const struct Vec4 *speculars, float alpha, int skip);
-    int DrawThroughShader(TextureObject *second, TextureObject *third);
-    int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
-                 float alpha, float angle);
-    int DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
-                   float alpha, float angle, float grey);
-    int DrawFrame(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
-    int DrawFillAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
-    int DrawFrameAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
-    int DrawFrameAltStretched(int left, int top, int right, int bottom, float z, float alpha, int textured,
-                              int border);
-    int DrawFrameAltTinted(int left, int top, int right, int bottom, float z, float alpha, int textured, int border,
-                           unsigned int rgb);
-    int DrawFrameAltPlain(int left, int top, int right, int bottom, float z, float alpha, int vertexAlpha,
-                          int border, unsigned int rgb);
-    int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);
-    int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
-                      const unsigned short *palette);
-};
+#include "texture_object.h"
 
 extern "C" IDirect3DDevice9 *DAT_10f1fcf0;      // the Direct3D device
 extern "C" TextureObject *DAT_10f6550c;         // texture bound to stage 0 (1 = none/unknown)
@@ -1075,7 +1032,6 @@ int TextureObject::DrawTinted(int left, int top, int right, int bottom, float u0
     DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 2, vertices, 0x20);
     return 1;
 }
-
 
 // 0x1014d4e0 (TextureObject::DrawFrame). Draws the speech-balloon panel: one triangle fan (21 points) from the
 // centre of the rectangle left..right, top..bottom pulled 8 - `border` pixels inwards, with the corners cut off in

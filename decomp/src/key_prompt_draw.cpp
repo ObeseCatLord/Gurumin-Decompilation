@@ -13,19 +13,12 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..
 #include "anim_model.h"
 #include "char_state.h"
 
-struct TextureObject
-{
-    char pad_0000[0x38];
-    // 0x1014c430. The 9th and 10th arguments are the vertices' depth and 1/w.
-    void DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
-                    float rhw, float alpha, int b);
-};
+#include "texture_object.h"
 
 extern "C" int DAT_104bf8f8[0x7c];                   // 1 while a key prompt is shown over the character
 extern "C" int DAT_1021d138[0x7c];                   // the prompt: cell (0..15) + 1000 or 2000 for the other sheets
 extern "C" int DAT_104b721c[0x19];                   // Game texture slots from texBalloon5 (DAT_104b7200 + 0x1c)
 extern "C" int DAT_104bf88c;                         // the prompt's size in pixels
-extern "C" TextureObject DAT_118d0ba8[];
 
 // 0x1000d6b0 (KeyPrompt_DrawAll). For every character with a prompt (and in use, not removed below x -100000) the
 // point 40 units above its head bone (or its origin without one, 20 units) is projected with `view` and the prompt

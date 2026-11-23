@@ -7,10 +7,7 @@
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 
-struct TextureObject
-{
-    char data[0x38];
-};
+#include "texture_object.h"
 
 // The effect sprite batch (texture_mgr.cpp Selection).
 struct SpriteBatch
@@ -69,7 +66,6 @@ struct EffectType
 extern "C" EffectSprite DAT_11134cc8[];          // table A: sprites placed in the world
 extern "C" EffectSprite DAT_118a8888[];          // table B: sprites placed on the screen
 extern "C" EffectType DAT_1101dfdc[0x47e];
-extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" SpriteBatch DAT_1101c804;
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 

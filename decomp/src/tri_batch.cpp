@@ -1,11 +1,6 @@
 // Triangle batches: lists of vertices (three per triangle) collected during a frame and drawn with one texture.
 
-// Texture slot in the table at 0x118d0ba8 (1600 entries of 0x38 bytes, see texture_mgr.cpp).
-struct TextureObject
-{
-    char pad_0000[0x38];
-    int M_1014bb70(void *vertices, int triangles);  // draws `triangles` triangles from `vertices` with this texture
-};
+#include "texture_object.h"
 
 struct TriangleBatch
 {
@@ -29,7 +24,7 @@ int TriangleBatch::M_10172a40(TextureObject *texture)
     if (count < 3)
         return 0;
     if (texture != 0)
-        return texture->M_1014bb70(vertices, count / 3);
+        return texture->DrawTriangles(vertices, count / 3);
     return 0;
 }
 
@@ -43,7 +38,7 @@ int TriangleBatch::Flush()
         {
             DAT_10ff1dec--;
             FUN_1013f070(0, blendMode, 0);
-            texture->M_1014bb70(vertices, count / 3);
+            texture->DrawTriangles(vertices, count / 3);
             FUN_1013f070(0, 0, 0);
         }
         count = 0;

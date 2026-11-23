@@ -1,13 +1,6 @@
 // Texture manager, triangle batches (Selection = TriangleBatch in tri_batch.cpp), model owners and helpers.
 
-struct TextureObject
-{
-    char pad_0000[0x34];
-    void *texture;
-    void M_10169df0();
-    void M_10169e10();
-    void M_10169e40();
-};
+#include "texture_object.h"
 
 struct TextureManager
 {
@@ -73,7 +66,6 @@ struct Animator
 extern "C" char DAT_10ffe5f8[1600][0x40];
 extern "C" char DAT_10f8dbb8[1600][0x40];
 extern "C" char DAT_10fa6db8[1600];
-extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" int FUN_10174c70(int slot, int force);
 
@@ -120,7 +112,7 @@ int TextureManager::M_10173480()
     {
         if (DAT_10ffe5f8[i][0] != 0)
         {
-            DAT_118d0ba8[i].M_10169e40();
+            DAT_118d0ba8[i].Unload();
             DAT_10ffe5f8[i][0] = 0;
             DAT_10f8dbb8[i][0] = 0;
         }
@@ -134,7 +126,7 @@ int TextureManager::M_101734d0()
     for (int i = 0; i < 1600; i++)
     {
         if (DAT_10ffe5f8[i][0] != 0)
-            DAT_118d0ba8[i].M_10169df0();
+            DAT_118d0ba8[i].Recreate();
     }
     return 1;
 }
@@ -145,7 +137,7 @@ int TextureManager::M_10173510()
     for (int i = 0; i < 1600; i++)
     {
         if (DAT_10ffe5f8[i][0] != 0)
-            DAT_118d0ba8[i].M_10169e10();
+            DAT_118d0ba8[i].Restore();
     }
     return 1;
 }
@@ -181,7 +173,7 @@ extern "C" int FUN_10188fb0(void)
 {
     for (int i = 0; i < 1600; i++)
     {
-        if (DAT_10ffe5f8[i][0] != 0 && DAT_10fa6db8[i] == 0 && DAT_118d0ba8[i].texture == 0)
+        if (DAT_10ffe5f8[i][0] != 0 && DAT_10fa6db8[i] == 0 && DAT_118d0ba8[i].loaded == 0)
             FUN_10174c70(i, 1);
     }
     return 0;
@@ -238,7 +230,7 @@ extern "C" int FUN_10174c70(int slot, int force)
     if (force != 0 || refs == 0)
     {
         DAT_10fdeb90[slot] = 0;
-        DAT_118d0ba8[slot].M_10169e40();
+        DAT_118d0ba8[slot].Unload();
         DAT_10ffe5f8[slot][0] = 0;
     }
     return DAT_10fdeb90[slot];

@@ -4,20 +4,12 @@
 
 #include <math.h>
 
-struct TextureObject
-{
-    char pad_0000[0x38];
-    // 0x1014c430: draws texture coordinates (u0, v0)-(u1, v1) into the rectangle. Its tenth argument is passed
-    // as a float here (1.0f); other files pass an int colour there.
-    void DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int frame,
-                    float colour, float alpha, int b);
-};
+#include "texture_object.h"
 
 extern "C" int DAT_104bf8ec;                     // fade kind (see above)
 extern "C" float DAT_104bf8f0;                   // fade amount, 0-100
 extern "C" int DAT_104c02e0;                     // colour of fade kind 3
 extern "C" int DAT_104b7224;                     // texture slot of the iris wipe
-extern "C" TextureObject DAT_118d0ba8[1600];       // the texture slots
 extern "C" void FUN_10143e00(int left, int top, int right, int bottom, int colour, int mode, float alpha);  // fills a rectangle
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 

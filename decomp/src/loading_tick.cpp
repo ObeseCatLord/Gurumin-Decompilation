@@ -5,13 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct TextureObject
-{
-    char pad_0000[0x38];
-    // 0x1014bc60: draws the cell (u0, v0)-(u1, v1) into the rectangle, turned by `angle`.
-    void DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, int frame,
-                    float alpha, float angle);
-};
+#include "texture_object.h"
 
 struct Game
 {
@@ -27,7 +21,6 @@ struct Engine
     int PumpAndRecover();              // 0x1015c850 (render_shutdown.cpp)
 };
 
-extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" Game DAT_104b7200;
 extern "C" Engine DAT_10836c70;
 extern "C" int DAT_10f6552c;          // 1 once WM_QUIT was received

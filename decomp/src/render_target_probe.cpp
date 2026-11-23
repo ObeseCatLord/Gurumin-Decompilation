@@ -4,15 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct TextureObject
-{
-    char pad_0000[0x38];
-    int UpdateImage(int value);                  // 0x10169f70: makes the texture the render target (0 = failed)
-    int CaptureRgbRows(unsigned char *out);      // 0x10145120: reads back the first four rows as RGB
-    int CaptureRgbFirst(unsigned char *out);     // 0x10145210: reads back the first 32 pixels as RGB
-};
+#include "texture_object.h"
 
-extern "C" TextureObject DAT_118d0ba8[1600];       // the texture slots
 extern "C" int DAT_10f654cc;                     // 1 while a texture is the render target
 extern "C" int DAT_10f654d0;                     // 1 = rendering to textures works
 extern "C" int DAT_10f654d4;                     // 1 = the first read-back saw the blue square

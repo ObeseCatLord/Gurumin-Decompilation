@@ -20,10 +20,7 @@ struct ActorSlot
     char pad_0008[0x180];
 };
 
-struct TextureObject
-{
-    char data[0x38];
-};
+#include "texture_object.h"
 
 struct MoviePlayer
 {
@@ -44,7 +41,6 @@ struct Game
 
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" MoviePlayer DAT_10f08ab0;
-extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" int DAT_10202478;                  // texture slot the movies are decoded into
 extern "C" Game DAT_10874848;
 extern "C" int DAT_104bfe78;                  // 1 once the game over has started

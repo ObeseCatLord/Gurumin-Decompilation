@@ -18,10 +18,7 @@ struct CameraPoint
     char pad_000c[0xf4];
 };
 
-struct TextureObject
-{
-    char pad_0000[0x38];
-};
+#include "texture_object.h"
 
 struct MmvPlayer
 {
@@ -40,7 +37,6 @@ extern "C" char DAT_10875e48[0x40][0x20];            // movie names
 extern "C" int DAT_1020b228;
 extern "C" int DAT_10c64a5c;
 extern "C" int DAT_10202478;                         // the movie texture slot
-extern "C" TextureObject DAT_118d0ba8[];
 extern "C" MmvPlayer DAT_10f08ab0;
 extern "C" int FUN_10016580(const char *name);       // Movie_PlayToTexture
 extern "C" int FUN_1001e240(void);                   // Map_IconTexture

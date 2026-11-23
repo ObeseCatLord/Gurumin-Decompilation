@@ -162,12 +162,7 @@ void MmvPlayer::ReadFrame()
     }
 }
 
-struct TextureSlot
-{
-    char data[0x38];
-    void M_1014b670();
-    void M_1014b6e0();
-};
+#include "texture_object.h"
 
 extern "C" void __stdcall FUN_1014f120(int, int, int width, int height, int pitch, void *pixels, void *palette);
 extern "C" void FUN_10143b50(void);
@@ -175,7 +170,6 @@ extern "C" void FUN_10143b80(void);
 extern "C" char DAT_10ffe5f8[1600][0x40];
 extern "C" char DAT_10f8dbb8[1600][0x40];
 extern "C" char DAT_10fa6db8[1600];
-extern "C" TextureSlot DAT_118d0ba8[1600];
 
 // Constructor: nothing open yet.
 MmvPlayer::MmvPlayer()
@@ -250,7 +244,7 @@ extern "C" int FUN_10161070(int index)
         return -1;
     }
     if (DAT_10ffe5f8[index][0] != 0)
-        DAT_118d0ba8[index].M_1014b670();
+        DAT_118d0ba8[index].BindStage0();
     return index;
 }
 
@@ -263,7 +257,7 @@ extern "C" int FUN_101610b0(int index)
         return -1;
     }
     if (DAT_10ffe5f8[index][0] != 0)
-        DAT_118d0ba8[index].M_1014b6e0();
+        DAT_118d0ba8[index].BindStage1();
     return index;
 }
 

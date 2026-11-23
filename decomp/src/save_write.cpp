@@ -19,13 +19,8 @@ struct GameFile
     int Write(const void *buffer, int size, int count);   // 0x101b2420
 };
 
-struct TextureObject
-{
-    char pad_0000[0x38];
-    int CaptureRgb24(unsigned char *out);            // 0x10145060: reads the render target back as RGB
-};
+#include "texture_object.h"
 
-extern "C" TextureObject DAT_118d0ba8[1600];         // the texture slots
 extern "C" int DAT_108360f8;                         // texture slot of the save thumbnail
 extern "C" char DAT_10256110[];                      // name of system.sav
 extern "C" char DAT_1042de28[0x60];                  // 1 for each item ever obtained (inventory.cpp)

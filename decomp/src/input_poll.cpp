@@ -9,7 +9,6 @@
 #include "win_vars.h"
 #include "ui_vars.h"
 
-extern "C" InputEffect *DAT_10f65578;  // the force-feedback effect
 extern "C" long __stdcall DirectInput8Create(HINSTANCE instance, unsigned long version, const GUID &iid, void **out,
                                              IUnknown *outer);
 

@@ -12,7 +12,6 @@
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" char DAT_1020d4c0[];       // per-character state written here (4 or 6)
 #include "anim_model.h"
 
 // 0x1001a840 (Char_ClampStatus). Clamps the counter (15) and level (5), clears the flag and keeps the larger value. A character whose

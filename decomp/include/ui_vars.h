@@ -8,6 +8,7 @@
 #include "matrix4.h"
 #include "menu_text.h"
 
+struct InputEffect;   // dinput_min.h
 struct Node;   // node.h
 
 extern "C" char DAT_101d65b0[][0x10];                     // icon file names
@@ -72,6 +73,7 @@ extern "C" int DAT_10f65568;                              // the joystick has fo
 extern "C" unsigned char DAT_10f6556c;                    // axes present: 1 = z, 2 = rz, 4 = rx, 8 = ry
 extern "C" int DAT_10f65570;                              // joystick enabled
 extern "C" int DAT_10f65574;                              // joystick disabled by the settings
+extern "C" InputEffect *DAT_10f65578;                     // the force-feedback effect (0 = none)
 extern "C" int DAT_10f66998;
 extern "C" int DAT_10f6699c;
 extern "C" int DAT_10f669a0;

@@ -7,12 +7,10 @@
 
 #include "anim_model.h"
 
-#include "char_move_lock.h"
 #include "last_position.h"
 
 #include "char_state.h"
 
-extern "C" CharMoveLock DAT_10db9380[0x80];
 #include "char_tables.h"
 #include "char_vars.h"
 
@@ -36,7 +34,7 @@ extern "C" int FUN_1002a110(int slot, int run)
     int value;
     int action;
     target.Copy(DAT_10db6ee8[slot].matrix.GetTranslation());
-    DAT_10db9380[slot].locked = 0;
+    DAT_10db6ee8[slot].mode = 0;
     DAT_10db6ee8[slot].walkingRoute = 1;
     DAT_10db6ee8[slot].motionFrame = 0x1e;
     DAT_10db6ee8[slot].M_10161be0(0, 0);

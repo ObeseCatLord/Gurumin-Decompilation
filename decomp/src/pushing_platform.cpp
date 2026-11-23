@@ -13,7 +13,6 @@
 
 #include "node.h"
 
-#include "char_move_lock.h"
 
 #include "char_state.h"
 #include "char_slot.h"
@@ -21,7 +20,6 @@
 // The character slot whose health falling below half drops the waiting blocks.
 #define BLOCK_TRIGGER_SLOT 59
 
-extern "C" CharMoveLock DAT_10db9380[0x80];
 #include "char_vars.h"
 
 extern "C" Vec3 *DAT_1032d5b8[];                 // positions of the characters moved by routes
@@ -70,9 +68,9 @@ extern "C" int FUN_1002a490(int index)
             away.Normalized3();
         else
             away.x = 1.0f;
-        if (DAT_10db9380[0].locked == 2 &&
+        if (DAT_10db6ee8[0].mode == 2 &&
             DAT_10db6ee8[index].IsClearAny(&(DAT_10db6ee8[0].move * -1.0f)) == 0 &&
-            DAT_10db9380[0].locked == 2 && DAT_10db6ee8[0].matrix._43 > -140.0f)
+            DAT_10db6ee8[0].mode == 2 && DAT_10db6ee8[0].matrix._43 > -140.0f)
         {
             // standing on the block: lifted onto it and moved outwards
             DAT_10db6ee8[0].matrix._43 = block.z + 12.0f;

@@ -9,7 +9,6 @@
 
 #include "char_state.h"
 
-extern "C" int DAT_104bf8a4;                         // frames of a digit motion
 #include "game_vars.h"
 
 // 0x1001d2d0 (DigitCounter_Update). One frame of the counter of character slot `index`. Idle: when flag 0x9c2 is

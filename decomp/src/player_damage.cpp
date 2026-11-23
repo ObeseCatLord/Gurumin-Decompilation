@@ -5,6 +5,7 @@
 #include "vec4.h"
 
 #include "matrix4.h"
+#include "char_tables.h"
 
 struct Matrix4;
 #include "effect_manager.h"
@@ -25,7 +26,6 @@ struct Matrix4;
 #include "ui_vars.h"
 
 extern "C" char DAT_104686b0;
-extern "C" char DAT_1020d4c0;
 extern "C" int FUN_1003ad20(int sound, const Vec4 &position, float volume);  // Sound_PlayEffect
 extern "C" int FUN_1013f880(void);                                          // the game's random number
 extern "C" int FUN_100119d0(int index, int damage, int a);                  // EventSlots_Add: shows the damage
@@ -120,7 +120,7 @@ extern "C" int FUN_1005dbf0(int damage)
         }
     }
     DAT_104686b0 = 60;
-    DAT_1020d4c0 = 4;
+    DAT_1020d4c0[PLAYER_SLOT] = 4;
     Vec4 position = DAT_10db6ee8[0].matrix.GetTranslation();
     position.z += 50.0f;
     DAT_10daaa80.Start(0xc, position, -1, 0, 0, 0, 0, 0, 0, 0);

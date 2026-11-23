@@ -262,7 +262,8 @@ struct AnimModel
     int nextSlotId;           // 0x248c: id of the next slot's character (read as DAT_10db6ee8[i - 1].nextSlotId)
     int pad_2490;
     int m_2494;               // 0x2494: cleared by LoadModel
-    int mode;                 // 0x2498: 1 = normal (set by the scene start for the player), 2 = over the pit area
+    int mode;                 // 0x2498: 0 = the game may move the character, 1 = normal (set by the scene start for
+                              //         the player), 2 = over the pit area
 
     AnimModel();                                                   // 0x101629f0 (anim_ctor.cpp)
     ~AnimModel();                                                  // 0x10007e10 (the shared empty destructor)

@@ -33,7 +33,6 @@ extern "C" int FUN_10092af0(int code, int value);     // scene callback
 #include "render_vars.h"
 #include "sound_vars.h"
 
-extern "C" int DAT_10db9380;
 
 // Starts the scene with player character file `characterFile`; `value` is kept in DAT_104bfeb4.
 extern "C" void FUN_100cc1d0(const char *characterFile, int value)
@@ -54,7 +53,7 @@ extern "C" void FUN_100cc1d0(const char *characterFile, int value)
     DAT_10c68000.Seek(0);
     DAT_104c00e0 = 0;
     DAT_104c0108 = 0;
-    DAT_10db9380 = 1;
+    DAT_10db6ee8[PLAYER_SLOT].mode = 1;
 }
 
 extern "C" void FUN_100123d0(void);              // Chars_ReloadModels
@@ -81,7 +80,7 @@ extern "C" void FUN_1003a6c0(void)
             if (FUN_10001b40() != 0)
                 FUN_10001b40();
         }
-        DAT_10db9380 = 1;
+        DAT_10db6ee8[PLAYER_SLOT].mode = 1;
         DAT_104c0228 = 0;
         DAT_104c022c = 0;
         DAT_104c022d = 0;

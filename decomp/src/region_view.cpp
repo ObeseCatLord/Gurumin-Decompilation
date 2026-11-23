@@ -9,11 +9,11 @@
 
 #include "region_view.h"
 #include "render_vars.h"
+#include "game_vars.h"
 
 
 
 extern "C" MapRegion *DAT_104c03c0;
-extern "C" unsigned int DAT_104bf8a4;   // frame counter
 extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin);  // View_ContainsPoint
 
 // 0x10021070 (Region_IsVisible). 1 when one of the four corners of region `index` (at half its height) lies in the

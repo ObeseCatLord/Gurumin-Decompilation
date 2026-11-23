@@ -7,8 +7,8 @@
 #include "game_file.h"
 
 #include "node.h"
+#include "render_vars.h"
 
-extern "C" void (*DAT_10f65538)(const char *path, int a);   // load notification of the host (may be 0)
 extern "C" int FUN_10161120(char *name, const char *path);  // Path_GetBaseName
 
 extern "C" int FUN_1013edb0(const char *format, ...);  // error report (empty in the release build)

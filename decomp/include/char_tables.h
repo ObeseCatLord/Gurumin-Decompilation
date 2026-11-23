@@ -25,6 +25,7 @@ extern "C" KindCounter DAT_1020b46c[CHAR_SLOT_COUNT];     // cooldown of kind 0x
 extern "C" KindCounter DAT_1020b498[CHAR_SLOT_COUNT];     // cooldown of kind 0x64
 extern "C" KindCounter DAT_1020b49c[CHAR_SLOT_COUNT];     // cooldown of kind 0x46
 extern "C" KindCounter DAT_1020b4b4[CHAR_SLOT_COUNT];     // cooldown of kind 0x2d
+extern "C" unsigned char DAT_1020d4c0[CHAR_SLOT_COUNT];    // per-character display state (4 or 6)
 extern "C" char DAT_1020d540[CHAR_SLOT_COUNT];            // 1 = the character is in play (char_retire.cpp clears it); per zone character: also hurt enemies that are away
 extern "C" int DAT_1020e138[CHAR_SLOT_COUNT];
 extern "C" int DAT_10210b30[CHAR_SLOT_COUNT];             // non-zero = told to react

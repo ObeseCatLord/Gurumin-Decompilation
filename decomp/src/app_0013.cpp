@@ -1,5 +1,6 @@
 // Message window, sound effects, inventory removal, animation playback.
 
+#include "anim_model.h"
 #include <string.h>
 
 #include "node.h"
@@ -10,7 +11,6 @@
 extern "C" char *FUN_1013f910(const char *name);
 extern "C" void FUN_10001980(const char *, int, int, int, int, int, int);
 extern "C" void FUN_100016c0(const char *, int, int, int, int, int, int);
-extern "C" int DAT_10db9380;
 extern "C" void FUN_1000ec70(int, float, float, float, float);
 extern "C" signed char DAT_103150c0[];
 extern "C" void FUN_1000e810(void);
@@ -50,7 +50,7 @@ extern "C" int FUN_100114a0(void)
     DAT_104c016c = 0;
     if (DAT_104c00e0 != 0)
     {
-        DAT_10db9380 = 1;
+        DAT_10db6ee8[PLAYER_SLOT].mode = 1;
         DAT_10db9254 = 0;
         DAT_10db9264 = 1.0f;
         DAT_10db7c34 = 1.0f;

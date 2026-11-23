@@ -138,6 +138,7 @@ extern "C" int DAT_10f65514;
 extern "C" int DAT_10f65520;                              // 1 while the overhead pass draws
 extern "C" int DAT_10f6552c;                              // set when Windows asked the game to quit (WM_QUIT); 1 once WM_QUIT was received
 extern "C" int DAT_10f65530;                              // 1 while the game window is active
+extern "C" void (*DAT_10f65538)(const char *path, int a);  // load notification of the host (may be 0)
 extern "C" int DAT_10f6553c;
 extern "C" int DAT_10f65540;                              // with 32-bit colour: non-zero = R8G8B8, else X8R8G8B8
 extern "C" int DAT_10f6559c;

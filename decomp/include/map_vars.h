@@ -81,7 +81,7 @@ extern "C" char DAT_10f19860[16][0x100];
 extern "C" int DAT_10f1fd24;
 extern "C" float DAT_10f65594;                            // height of the view
 extern "C" int DAT_10f655bc;                              // 1 while the map nodes are queued for it
-extern "C" Vec4 DAT_10f668b8;                             // the visible area: maximum corner
+extern "C" Box2 DAT_10f668a8;                            // the visible area
 extern "C" Vec4 DAT_10f66918;                             // the overhead pass's area: minimum corner
 extern "C" Vec4 DAT_10f66928;                             // maximum corner
 extern "C" int DAT_10faae88[0x400];                       // reference count of each texture name

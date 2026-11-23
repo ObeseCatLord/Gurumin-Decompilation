@@ -25,7 +25,6 @@ extern "C" float DAT_104bfe24;    // the pit's floor height
 #include "map_vars.h"
 #include "render_vars.h"
 
-extern "C" Vec4 DAT_10f668a8;     // the visible area: minimum corner
 
 // 0x1000f5a0 (Map_BuildTopView). Takes the map's model (its single child when it has 0x20 children, or the map's
 // root node without one): `out` becomes an overhead projection (z mirrored, moved up twice the view height) times
@@ -54,10 +53,10 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
     *out = projection * matrix;
     DAT_104d29e8.Copy(map->boundsMin);
     DAT_104d29f8.Copy(map->boundsMax);
-    DAT_10f668a8.Copy(DAT_104d29e8);
-    DAT_10f668b8.Copy(DAT_104d29f8);
-    DAT_10f668a8.z = DAT_10f65594;
-    DAT_10f668b8.z = DAT_10f65594;
+    DAT_10f668a8.min.Copy(DAT_104d29e8);
+    DAT_10f668a8.max.Copy(DAT_104d29f8);
+    DAT_10f668a8.min.z = DAT_10f65594;
+    DAT_10f668a8.max.z = DAT_10f65594;
     DAT_10f65688.Copy(Project(DAT_10f65688, projection));
     DAT_10f668e8.Copy(Project(DAT_10f668e8, projection));
     return map;
@@ -92,8 +91,8 @@ void FUN_1000f7f0(void)
                 unsigned flags = DAT_104c007c->flags;
                 DAT_104c007c->flags = flags | 0x20;
                 DAT_10f655bc = 1;
-                DAT_10f66918.Copy(DAT_10f668a8);
-                DAT_10f66928.Copy(DAT_10f668b8);
+                DAT_10f66918.Copy(DAT_10f668a8.min);
+                DAT_10f66928.Copy(DAT_10f668a8.max);
                 DAT_10f66918.z -= 1200.0f;
                 DAT_10f66918.x -= 1100.0f;
                 DAT_10f66918.y -= 1100.0f;

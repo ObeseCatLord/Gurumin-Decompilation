@@ -71,6 +71,7 @@ extern "C" int DAT_10254088;
 extern "C" int DAT_10254310[0x20];
 extern "C" int DAT_10254590;
 extern "C" short DAT_102548b8;
+extern "C" unsigned char DAT_10254c40[0x400];             // drop / position ring: 0 = unused, 1 = in use (falling), 2..30 = fading out
 extern "C" int DAT_10255040[0x20];                        // effect kind of each slot (0 = free)
 extern "C" int DAT_102559f0;
 extern "C" int DAT_102559f4;
@@ -129,6 +130,7 @@ extern "C" int DAT_104bf894;
 extern "C" int DAT_104bf898;
 extern "C" int DAT_104bf89c;
 extern "C" int DAT_104bf8a0;
+extern "C" unsigned int DAT_104bf8a4;                     // frame counter (restarts the colour plug animations)
 extern "C" int DAT_104bf8a8;
 extern "C" int DAT_104bf8ac;
 extern "C" int DAT_104bf8b0;

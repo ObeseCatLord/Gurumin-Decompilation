@@ -13,6 +13,7 @@
 #include "char_tables.h"
 #include "char_vars.h"
 #include "render_vars.h"
+#include "map_vars.h"
 
 // Starts effect `effect` at `position` for character slot `index` and records its handle in that slot.
 extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame, const Matrix4 *matrix, const EffectOptions *options)
@@ -275,7 +276,6 @@ int EffectManager::Init()
     return 0;
 }
 
-extern "C" struct Box2 DAT_10f668a8;                 // the visible area
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
 // Effect records whose slot is free must not be in a list: crash on purpose (fread on a null file).

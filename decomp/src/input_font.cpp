@@ -6,7 +6,6 @@
 
 #include "font_set.h"
 
-extern "C" DirectInput *DAT_10f65578;     // the force-feedback effect (an InputEffect while it exists)
 #include "ui_vars.h"
 #include "engine_memory.h"
 
@@ -19,8 +18,8 @@ int Input::Rumble(float divisor, int milliseconds)
         float clamped = 1.0f < divisor ? divisor : 1.0f;
         periodic.magnitude = (long)(10000.0f / clamped);
         effect.duration = milliseconds * 1000;
-        ((InputEffect *)DAT_10f65578)->SetParameters(&effect, 0x101);  // DIEP_DURATION | DIEP_TYPESPECIFICPARAMS
-        ((InputEffect *)DAT_10f65578)->Start(1, 0);
+        DAT_10f65578->SetParameters(&effect, 0x101);  // DIEP_DURATION | DIEP_TYPESPECIFICPARAMS
+        DAT_10f65578->Start(1, 0);
     }
     return 1;
 }

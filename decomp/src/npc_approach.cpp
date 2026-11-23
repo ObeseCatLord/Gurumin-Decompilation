@@ -9,7 +9,6 @@
 
 #include "anim_model.h"
 
-#include "char_move_lock.h"
 
 #include "char_state.h"
 
@@ -19,7 +18,6 @@ inline float Atan2(float y, float x)
     return (float)atan2(y, x);
 }
 
-extern "C" CharMoveLock DAT_10db9380[0x80];
 extern "C" void FUN_10043cc0(int slot);         // Char_ResetState
 
 // 0x10045ed0 (Npc_ApproachPlayer). Runs one frame of the approach of character `slot`: the first frame unlocks it,
@@ -35,7 +33,7 @@ extern "C" int FUN_10045ed0(int slot)
     if (DAT_1020b430[slot].approachStarted == 0)
     {
         DAT_1020b430[slot].approachStarted = 1;
-        DAT_10db9380[slot].locked = 0;
+        DAT_10db6ee8[slot].mode = 0;
         DAT_1020b430[slot].stopDistance = DAT_1020b430[slot].approachCode % 100 * 10;
         DAT_10db6ee8[slot].PlayMotion(2, 0, 5, 1.0f);
         return 0;

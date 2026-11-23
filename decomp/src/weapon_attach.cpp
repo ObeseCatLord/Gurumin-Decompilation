@@ -12,8 +12,8 @@
 
 #include "char_vars.h"
 #include "map_vars.h"
+#include "game_vars.h"
 
-extern "C" int DAT_104bf8a4;
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);  // builds the data path of `name`
 
 // 0x1001a990 (Char_AttachWeapon). Gives character `index` weapon `weapon` (0x32..0x3d; 0 keeps the current ones):

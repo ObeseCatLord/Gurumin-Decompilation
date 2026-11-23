@@ -6,12 +6,12 @@ struct Matrix4;
 #include "tri_batch.h"
 #include "vec4.h"
 #include "render_vars.h"
+#include "game_vars.h"
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060 (vec4.cpp)
 
-#define DROP_COUNT 0x400
+#define DROP_COUNT 0x400   // entries of DAT_10254c40
 
-extern "C" unsigned char DAT_10254c40[DROP_COUNT]; // 0 = unused, 1 = falling, 2..30 = fading out
 #include "char_vars.h"
 
 // 0x1000c390 (Drops_Update). Moves every drop (x and y by 0.02, down by 3.5), draws it when its depth is between 0.9

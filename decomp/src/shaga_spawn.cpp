@@ -8,6 +8,7 @@
 #include "vec4.h"
 
 #include "matrix4.h"
+#include "game_vars.h"
 
 Matrix4 RotationX(float angle);                  // 0x101b1ad0
 Matrix4 RotationZ(float angle);                  // 0x101b1b40
@@ -22,7 +23,6 @@ Matrix4 Scaling(float x, float y, float z);      // 0x101b13c0
 #include "map_vars.h"
 
 extern "C" void FUN_1000e750(void);           // AntiTamper_Store
-extern "C" int DAT_104bf8a4;
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
 extern "C" int FUN_1013f880(void);            // the game's random number
 extern "C" int FUN_1001af10(int index);       // Shaga_PushOut

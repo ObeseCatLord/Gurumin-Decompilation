@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (159)
+## 1. Walls to retry (160)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -150,6 +150,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
 - [ ] `10190e30` 884 — EffectManager::Draw: flow, calls and the record checks in place; scheduling residue (the 0x244 table constant, the pushes shared by the crash and draw blocks hoisted above the test) and the sprite loops keep first/end in ebp/edi in the original
+- [ ] `10192c90` 975 — CylinderSphere_Overlap (box_overlap.cpp, rule-clean): 25 bytes off; the original adds sphere->y + sphereOffset->y in that order (fld [ebx+4]) at all three point.y assignments, cl 13.00 here picks offset first whatever the source order (x and z come out right); also two stack slots (radius, sphereRadius) differ
 - [ ] `10194a10` 580 — Circle_Intersect (__stdcall): logic identical; the stack slots of d2 and disc are swapped and the original multiplies by d2 after storing (rb2 + ra2); k split, 2.0 factor and early returns tried
 - [ ] `10194c60` 629 — Node::UpdateWorld: code identical except the EH state of the AnimatedMatrix temporary (ours 1, original 5; the original unwind map has four empty states 1-4); branch order, named result locals and a conditional expression tried
 - [ ] `101992f0` 29 — Node::Root: the original walks the parents in edx, cl 13.00 here in ecx (parent-local form tried)
@@ -169,20 +170,19 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ae950` 249 — QuatFromAxisAngle: 16 bytes; the original keeps cos(half) in the angle slot and spills axis.z into the axis slot, ours the other way round (declaration order tried)
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
-- [ ] `101af4c0` 1182 — KeyBank::Sample (vec4.cpp, after KeyBank::Spline so edx survives the calls): flow, frame and the clamped spline indices line up; the original keeps (keyFlags >> 2) & 1 in eax before the hold test and converts offset/span separately in the linear and spline branches, cl 13.00 here folds the flag into test al,4 and hoists (float)offset above the branch (spline block placed first); switch, mode-variable and hold-variable forms tried
+- [ ] `101af4c0` 1182 — KeyBank::Sample (vec4.cpp, after Spline so edx survives the calls): the spline blend factor written inside each Spline call removes the (float)offset hoist; left: the original keeps (keyFlags >> 2) & 1 in eax before the hold test (cl 13.00 here folds it into test al,4; ten spellings tried: ?:, !=0, bool, unsigned, separate reads, switch, ==1), i - 2 spelled (i - 1) - 1, and the Spline call loads ecx (thiscall member; declaring it breaks FUN_100b4f00)
 
 ## 2. Small functions (30-250 bytes) (2)
 
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (3)
+## 3. Medium functions (251-800 bytes) (2)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
-- [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (142)
+## 4. Large functions (801-3000 bytes) (141)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `100d2110` 894 bytes (float, loops 4, calls 12)
@@ -191,7 +191,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100360f0` 939 bytes (loops 4, calls 1)
 - [ ] `10026730` 950 bytes (float, loops 6, calls 13)
 - [ ] `10049b00` 954 bytes (float, loops 6, calls 10)
-- [ ] `10192c90` 975 bytes (float, loops 1, calls 16)
 - [ ] `10051190` 988 bytes (float, calls 5)
 - [ ] `100279b0` 998 bytes (float, calls 36)
 - [ ] `10029cf0` 999 bytes (float, loops 2, calls 3)

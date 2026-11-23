@@ -36,6 +36,7 @@ address	name	evidence
 1014f900	FontRenderer_DrawStringToPixels	text into a 16-bit pixel buffer (font_metrics.cpp, draft)
 1014fdd0	FontRenderer_DrawTextClipped	cached text texture drawn clipped (font_metrics.cpp)
 10150bb0	MeshData_BuildBuffers	builds the mesh pack tables and buffers (mesh_build.cpp, draft)
+1015f4e0	TextInput_Update	per-frame name-entry text input update (text_input.cpp, draft)
 101615d0	ItmDescramble	key "GURUguruMinmIN_", sum/xor check (docs/ITM_FORMAT.md)
 10161120	Path_GetBaseName	copies the file name without directory and extension
 1013f910	MakeDataPath	sprintf("%s\\%s", base dir, name) into 4 rotating buffers

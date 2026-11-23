@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.6553,
+  "fuzzy_match_percent": 14.6653,
   "total_code": "1720206",
   "matched_code": "199043",
   "matched_code_percent": 11.5709,
@@ -7671,7 +7671,7 @@
   {
    "name": "app/listbank_vars",
    "measures": {
-    "fuzzy_match_percent": 26.2499,
+    "fuzzy_match_percent": 35.0452,
     "total_code": "1963",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -7692,14 +7692,14 @@
     {
      "name": ".text",
      "size": "1963",
-     "fuzzy_match_percent": 26.2499
+     "fuzzy_match_percent": 35.0452
     }
    ],
    "functions": [
     {
      "name": "?FindVariable@ListBank@@QAEHPBDPAH11@Z",
      "size": "976",
-     "fuzzy_match_percent": 26.2097,
+     "fuzzy_match_percent": 52.5219,
      "metadata": {
       "virtual_address": "268660880"
      }
@@ -7707,7 +7707,7 @@
     {
      "name": "?RegisterBuiltin@ListBank@@QAEHPBDFP6AHPAU1@H@Z@Z",
      "size": "987",
-     "fuzzy_match_percent": 26.2897,
+     "fuzzy_match_percent": 17.7632,
      "metadata": {
       "virtual_address": "268659872"
      }
@@ -11595,7 +11595,7 @@
    ],
    "functions": [
     {
-     "name": "?FreeAll@ResourceBanks@@QAEHXZ",
+     "name": "?FreeAll@ListBank@@QAEHXZ",
      "size": "159",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -11603,7 +11603,7 @@
      }
     },
     {
-     "name": "?FreeBank@ResourceBanks@@QAEHH@Z",
+     "name": "?FreeBank@ListBank@@QAEHH@Z",
      "size": "104",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -14761,7 +14761,7 @@
    ],
    "functions": [
     {
-     "name": "?M_100364a0@TokenReader@@QAEDH@Z",
+     "name": "?ReadType@ListBank@@QAEDPAPAD@Z",
      "size": "183",
      "fuzzy_match_percent": 100.0,
      "metadata": {

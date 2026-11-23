@@ -4,22 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct TokenReader
-{
-    int ReportError(const char *message);  // 0x100359c0 (ListBank::ReportError; same object as ListBank)
-    int M_10035d20(int source, char *word);
-    char M_100364a0(int source);
-};
-
+#include "listbank.h"
 extern "C" const char DAT_101d7f08[];
 extern "C" const char DAT_101d7ee4[];
 
 // Reads a type name token: returns 0 for "int", 1 for "float", 2 for "string"; reports an error (and returns 0)
 // when the token is missing or unknown.
-char TokenReader::M_100364a0(int source)
+char ListBank::ReadType(char **text)
 {
     char word[256];
-    if (M_10035d20(source, word) == 0)
+    if (ReadArgument(text, word) == 0)
     {
         ReportError(DAT_101d7f08);
         return 0;

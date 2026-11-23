@@ -4,13 +4,7 @@
 
 #include <string.h>
 
-struct ScriptCompiler
-{
-    int Load(const char *text, int length);         // 0x100fb6d0
-    int CompileStatement(const char *statement);    // 0x100ed9b0: Script_CompileStatement
-};
-
-extern "C" ScriptCompiler DAT_104687b8;
+#include "listbank.h"
 extern "C" int DAT_104bfe84;          // ring read index
 extern "C" int DAT_104bfe88;          // ring write index
 extern "C" int DAT_1020247c[8];       // queued script numbers
@@ -30,7 +24,7 @@ extern "C" int FUN_100fc3e0(void)
         if (script != 0)
         {
             DAT_1049eae4 = 0;
-            DAT_104687b8.Load(script, strlen(script));
+            DAT_104687b8.LoadText(script, strlen(script));
             DAT_1049eae4 = 0;
             DAT_10492d88 = 1;
             DAT_1049eadc = 0;

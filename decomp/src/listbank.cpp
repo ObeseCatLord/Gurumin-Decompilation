@@ -6,90 +6,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Callback the host installs to receive parser messages: (1, message text) for errors, (5000, text offset) for
-// the position of the error in the script text.
-typedef void (*ParserCallback)(int code, int value);
-
-// A top-level `{ ... }` block of a script (its start in the text).
-struct ScriptBlock
-{
-    char *start;              // first character after the opening brace
-    char *end;                // first character after the closing brace
-};
-
-struct ListBank
-{
-    int *result;              // 0x00: where the last evaluated expression left its value
-    char resultType;          // 0x04: type of *result: 0 = int, 1 = float, 2 = quoted text
-    char pad_0005[3];
-    ParserCallback callback;  // 0x08: message callback (may be 0)
-    char m_000c[8][0x80][0x10];
-    char m_400c[8][0x80];
-    int m_440c[8][0x100];
-    char pad_640c[0x8400];
-    char m_e80c[8][0x80];
-    char names[0xdce][0x20];  // 0xec0c: names of the declared script variables
-    int pad_2a5cc;
-    int compiling;            // 0x2a5d0: 1 while CompileText runs
-    int nameCount;            // 0x2a5d4: number of entries in `names`
-    int globalNameCount;      // 0x2a5d8: names declared outside any script (kept between compiles)
-    int m_2a5dc[8];
-    ScriptBlock blocks[0x800];// 0x2a5fc: top-level `{ }` blocks of the text
-    int blockCount;           // 0x2e5fc
-    char text[0x7d00];        // 0x2e600: script text being parsed
-    int textLength;           // 0x36300
-    char *cursor[8];          // 0x36304: read position in `text`, one per nesting level
-    int depth;                // 0x36324: current nesting level
-    int pad_36328;
-    int m_3632c;
-    ListBank *self;           // 0x36330: set to this object by LoadText
-    char m_36334[0x20][0x20]; // 0x36334: registered keywords (16 are searched; the init clears 32)
-    int *m_36734[0x20];       // 0x36734: the variable arrays of the keywords ("ch" = the script flags)
-    char m_367b4[0x20];       // 0x367b4: element type of each keyword array (0 = int, otherwise float)
-
-    int M_10004680(int group);
-    int M_100046d0(const char *text, int group, int value, char flag);
-    int M_100048f0(const char *name, int *index);
-    int M_10004950(char *buffer, void *value, char type);
-    int M_100049e0(const char *text);
-    int M_10004a30(const char *text, int *value);
-    int M_10004aa0(const char *text, float *value);
-    int ReportError(const char *message);
-    int FindAll(const char *name, int *out);
-    int FreeAll();
-    int FreeBank(int group);                                   // 0x10007ce0 (resource_banks.cpp)
-    int ReadStatement(char **text, char *statement);           // 0x10035b10
-    int SkipBlock(char **text, int *level, int block);         // 0x10035a30
-    int ReadArgument(char **text, char *word);
-    int ReadWord(char **text, char *word);
-    int FindCase(const char *value, char *text, char **found);
-    int FindLabel(const char *name, char *text, char **found);
-    int SkipStatement(char **text);
-    int FindVariable(const char *name, int *index, int *group, int *element);  // 0x10037090
-    int AssignValue(const char *name, const struct ScriptValue *value, char type);
-    int ReadTerm(char **text, char *word);
-    int CompileStatement(const char *statement);               // 0x100ed9b0
-    int CompileText();
-    int LoadText(const char *source, int length);
-    int GetIndexPart(const char *name, char *part, int n);    // 0x10036560: the n-th [ ] part of `name`
-    int Evaluate(const char *expression, char type);
-    int CompileCall(const char *text, int flags);              // 0x10089a10 (Script_CompileCall)
-    int FirstIndexValue(const char *name, int *value);
-    int DeclareVariable(const char *name, int group, char type);
-    int RegisterBuiltin(const char *signature, int id, int (*handler)(ListBank *bank, int id));  // 0x10036ca0
-    int InitLibrary();
-};
-
+#include "listbank.h"
 // Clears group `group`: entries that are not in use lose their values. Returns 1.
 int ListBank::M_10004680(int group)
 {
-    m_2a5dc[group] = 0;
+    variableCounts[group] = 0;
     for (int i = 0; i < 0x80; i++)
     {
-        if (m_e80c[group][i] == 0)
+        if (borrowed[group][i] == 0)
         {
-            m_440c[group][i] = 0;
-            m_e80c[group][i] = 0;
+            values[group][i].storage = 0;
+            borrowed[group][i] = 0;
         }
     }
     return 1;
@@ -98,11 +25,11 @@ int ListBank::M_10004680(int group)
 // Appends entry (`text`, `value`, `flag`) to group `group` and marks it in use. Returns 1.
 int ListBank::M_100046d0(const char *text, int group, int value, char flag)
 {
-    m_e80c[group][m_2a5dc[group]] = 1;
-    strcpy(m_000c[group][m_2a5dc[group]], text);
-    m_440c[group][m_2a5dc[group]] = value;
-    m_400c[group][m_2a5dc[group]] = flag;
-    m_2a5dc[group]++;
+    borrowed[group][variableCounts[group]] = 1;
+    strcpy(variableNames[group][variableCounts[group]], text);
+    values[group][variableCounts[group]].value = value;
+    variableTypes[group][variableCounts[group]] = flag;
+    variableCounts[group]++;
     return 1;
 }
 
@@ -139,7 +66,7 @@ int ListBank::M_100049e0(const char *text)
     int length = strlen(text);
     for (int i = 0; i < length; i++)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (text[i] == '(' || text[i] == ')')
             return 1;
@@ -153,7 +80,7 @@ int ListBank::M_10004a30(const char *text, int *value)
     int length = strlen(text);
     for (int i = 0; i < length; i++)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (text[i] != '+' && text[i] != '-' && (text[i] < '0' || text[i] > '9'))
             return 0;
@@ -168,7 +95,7 @@ int ListBank::M_10004aa0(const char *text, float *value)
     int length = strlen(text);
     for (int i = 0; i < length; i++)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (text[i] != '+' && text[i] != '-' && text[i] != '.' && (text[i] < '0' || text[i] > '9'))
             return 0;
@@ -182,7 +109,7 @@ int ListBank::M_10004aa0(const char *text, float *value)
 // script buffers (ScriptBuffers_FreeAll 0x10007d50). Returns 0.
 int ListBank::ReportError(const char *message)
 {
-    m_3632c = 1;
+    failed = 1;
     printf("%s\n", message);
     if (callback != 0)
         callback(1, (int)message);
@@ -197,11 +124,11 @@ int ListBank::ReportError(const char *message)
 int ListBank::FindAll(const char *name, int *out)
 {
     int found = 0;
-    for (int i = 0; i < nameCount; i++)
+    for (int i = 0; i < builtinCount; i++)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
-        if (strcmp(name, names[i]) == 0)
+        if (strcmp(name, builtinNames[i]) == 0)
             out[found++] = i;
     }
     return found;
@@ -217,14 +144,14 @@ int ListBank::CompileText()
     char statement[256];
     FreeBank(0);
     int savedDepth = depth;
-    nameCount = globalNameCount;
+    builtinCount = globalBuiltinCount;
     compiling = 1;
     blockCount = 0;
     p = text;
     depth = 0;
     while (p < text + textLength)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         ReadStatement(&p, statement);
         cursor[0] = p;
@@ -256,7 +183,7 @@ int ListBank::SkipBlock(char **text, int *level, int block)
     int inQuotes = 0;
     while (p < this->text + textLength)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (*p == '"')
         {
@@ -321,7 +248,7 @@ int ListBank::ReadStatement(char **text, char *statement)
     int length = 0;
     do
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (inQuotes == 0)
         {
@@ -410,7 +337,7 @@ int ListBank::ReadArgument(char **text, char *word)
         p++;
     do
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (*p == '"')
         {
@@ -470,7 +397,7 @@ int ListBank::ReadWord(char **text, char *word)
         p++;
     do
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (*p == '"')
         {
@@ -520,7 +447,7 @@ int ListBank::ReadTerm(char **text, char *word)
         p++;
     do
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (*p == '"')
         {
@@ -582,7 +509,7 @@ int ListBank::GetIndexPart(const char *name, char *part, int n)
         name++;
     do
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (*name == 0)
             return 0;
@@ -725,20 +652,20 @@ int ListBank::FirstIndexValue(const char *name, int *value)
 // in use (m_e80c = 0) and keeps a pointer to the storage in m_440c. Returns 1.
 int ListBank::DeclareVariable(const char *name, int group, char type)
 {
-    m_e80c[group][m_2a5dc[group]] = 0;
-    strcpy(m_000c[group][m_2a5dc[group]], name);
+    borrowed[group][variableCounts[group]] = 0;
+    strcpy(variableNames[group][variableCounts[group]], name);
     if (type == 0 || type == 1)
     {
-        m_440c[group][m_2a5dc[group]] = (int)new int;
-        *(int *)m_440c[group][m_2a5dc[group]] = 0;
+        values[group][variableCounts[group]].ints = new int;
+        *values[group][variableCounts[group]].ints = 0;
     }
     else if (type == 2)
     {
-        m_440c[group][m_2a5dc[group]] = (int)new char[0x100];
-        strcpy((char *)m_440c[group][m_2a5dc[group]], "NULL");
+        values[group][variableCounts[group]].texts = new char[1][LISTBANK_TEXT_SIZE];
+        strcpy(values[group][variableCounts[group]].texts[0], "NULL");
     }
-    m_400c[group][m_2a5dc[group]] = type;
-    m_2a5dc[group]++;
+    variableTypes[group][variableCounts[group]] = type;
+    variableCounts[group]++;
     return 1;
 }
 
@@ -793,7 +720,7 @@ extern "C" int FUN_10005a70(ListBank *bank, int id);   // Script_LibraryBuiltin:
 // 0x278c). The names declared so far count as global ones. Returns 0.
 int ListBank::InitLibrary()
 {
-    result = (int *)((char *)this + 0x2240c);
+    result = resultBuffer;
     self = this;
     callback = 0;
     pad_36328 = 0;
@@ -801,15 +728,15 @@ int ListBank::InitLibrary()
     compiling = 0;
     textLength = 0;
     depth = 0;
-    m_3632c = 0;
-    nameCount = 0;
+    failed = 0;
+    builtinCount = 0;
     for (int i = 0; i < 0x20; i++)
         m_36334[i][0] = 0;
     for (int group = 0; group < 8; group++)
     {
-        m_2a5dc[group] = 0;
+        variableCounts[group] = 0;
         for (int k = 0; k < 0x80; k++)
-            m_440c[group][k] = 0;
+            values[group][k].storage = 0;
     }
     RegisterBuiltin("float sin(float)", 0x2774, FUN_10005a70);
     RegisterBuiltin("float cos(float)", 0x2775, FUN_10005a70);
@@ -836,11 +763,10 @@ int ListBank::InitLibrary()
     RegisterBuiltin("float _max(float,float)", 0x278a, FUN_10005a70);
     RegisterBuiltin("float _min(float,float)", 0x278b, FUN_10005a70);
     RegisterBuiltin("int strcmp(string,string)", 0x278c, FUN_10005a70);
-    globalNameCount = nameCount;
+    globalBuiltinCount = builtinCount;
     return 0;
 }
 
-extern "C" ListBank DAT_104687b8;                       // the game's script parser
 extern "C" int DAT_10c62edc[0x1000];                    // script flags
 extern "C" int DAT_1032d69c;                            // 1 once the game built-ins are registered
 extern "C" char DAT_101dc1fc[];                         // "ch" (copied as an array, not a literal)
@@ -856,7 +782,7 @@ extern "C" void FUN_1013ad90(void)
     DAT_104687b8.m_36734[0] = DAT_10c62edc;
     DAT_104687b8.m_367b4[0] = 0;
     strcpy(DAT_104687b8.m_36334[0], DAT_101dc1fc);
-    DAT_104687b8.m_3632c = 0;
+    DAT_104687b8.failed = 0;
     DAT_104687b8.callback = FUN_10017f20;
     DAT_104687b8.RegisterBuiltin("int Message(int,string,string,string,string)", 11000, FUN_10138280);
     DAT_104687b8.RegisterBuiltin("int ShopStart()", 0x2b5c, FUN_10138280);
@@ -951,7 +877,7 @@ extern "C" void FUN_1013ad90(void)
     DAT_104687b8.RegisterBuiltin("int PlayMovie2(string,int)", 0x3340, FUN_10138280);
     DAT_104687b8.RegisterBuiltin("string Type(int)", 0x3341, FUN_10138280);
     DAT_104687b8.RegisterBuiltin("int GetCf(int)", 0x2fbe, FUN_10138280);
-    DAT_104687b8.globalNameCount = DAT_104687b8.nameCount;
+    DAT_104687b8.globalBuiltinCount = DAT_104687b8.builtinCount;
     DAT_1032d69c = 1;
 }
 
@@ -970,7 +896,7 @@ int ListBank::FindCase(const char *value, char *text, char **found)
     int count = 0;
     for (; text < &this->text[textLength]; text++)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (quoted == 0 && parens == 0 && braces == 1 && count >= 3 && text[-3] == 'c' && text[-2] == 'a' &&
             text[-1] == 's' && text[0] == 'e')
@@ -1034,7 +960,7 @@ int ListBank::FindLabel(const char *name, char *text, char **found)
     int length = strlen(name);
     for (; text < &this->text[textLength]; text++)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (quoted == 0 && parens == 0 && braces == 1 && count >= length - 1 && text[length + 1] == ':')
         {
@@ -1100,7 +1026,7 @@ int ListBank::SkipStatement(char **text)
     char *end = &this->text[textLength];
     for (; p < end; p++, count++)
     {
-        if (m_3632c != 0)
+        if (failed != 0)
             return 0;
         if (quoted == 0 && parens == 0 && braces == 0)
         {
@@ -1187,7 +1113,7 @@ struct ScriptValue
 // once the variable was found, 0 otherwise or after an error.
 int ListBank::AssignValue(const char *name, const ScriptValue *value, char type)
 {
-    if (m_3632c != 0)
+    if (failed != 0)
         return 0;
     ScriptValue v = *value;
     {
@@ -1228,56 +1154,56 @@ int ListBank::AssignValue(const char *name, const ScriptValue *value, char type)
         int element;
         if (FindVariable(name, &index, &group, &element) != 0)
         {
-            if (m_400c[group][index] == 0)
+            if (variableTypes[group][index] == 0)
             {
                 if (type == 0)
                 {
-                    ((int *)m_440c[group][index])[element] = v.i();
+                    values[group][index].ints[element] = v.i();
                     return 1;
                 }
                 if (type == 1)
                 {
-                    ((int *)m_440c[group][index])[element] = (int)v.f();
+                    values[group][index].ints[element] = (int)v.f();
                     return 1;
                 }
                 if (type == 2)
                 {
-                    ((int *)m_440c[group][index])[element] = atol(&v.text[1]);
+                    values[group][index].ints[element] = atol(&v.text[1]);
                     return 1;
                 }
             }
-            else if (m_400c[group][index] == 1)
+            else if (variableTypes[group][index] == 1)
             {
                 if (type == 0)
                 {
-                    ((float *)m_440c[group][index])[element] = (float)v.i();
+                    values[group][index].floats[element] = (float)v.i();
                     return 1;
                 }
                 if (type == 1)
                 {
-                    ((float *)m_440c[group][index])[element] = v.f();
+                    values[group][index].floats[element] = v.f();
                     return 1;
                 }
                 if (type == 2)
                 {
-                    ((float *)m_440c[group][index])[element] = (float)atof(&v.text[1]);
+                    values[group][index].floats[element] = (float)atof(&v.text[1]);
                     return 1;
                 }
             }
-            else if (m_400c[group][index] == 2)
+            else if (variableTypes[group][index] == 2)
             {
                 if (type == 0)
                 {
-                    sprintf((char *)m_440c[group][index] + element * 0x100, "\"%d\"", v.i());
+                    sprintf(values[group][index].texts[element], "\"%d\"", v.i());
                     return 1;
                 }
                 if (type == 1)
                 {
-                    sprintf((char *)m_440c[group][index] + element * 0x100, "\"%f\"", v.f());
+                    sprintf(values[group][index].texts[element], "\"%f\"", v.f());
                     return 1;
                 }
                 if (type == 2)
-                    strcpy((char *)m_440c[group][index] + element * 0x100, v.text);
+                    strcpy(values[group][index].texts[element], v.text);
             }
             return 1;
         }

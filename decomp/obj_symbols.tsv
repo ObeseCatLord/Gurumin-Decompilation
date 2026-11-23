@@ -73,7 +73,6 @@
 ??1Matrix4@@QAE@XZ	1013eda0
 ?Query@CollisionWorld@@QAEHPAUMatrix4@@PAUVec4@@H1PAHHH@Z	101a1640
 ?Collision_ProbePoint@@YAHMMMH@Z	1000ff80
-?FreeAll@ResourceBanks@@QAEHXZ	10007d50
 ?AdvanceFrame@WorldRenderer@@QAEHXZ	10189080
 ?M_1017cc90@WorldRenderer@@QAEHH@Z	1017cc90
 ?Rebuild@Node@@QAEHXZ	101ac1a0
@@ -135,7 +134,7 @@ _Vec3_LengthSquared	101ac220
 ?Translate@Matrix4@@QAEXMMM@Z	101adec0
 ?SetRotationZ@Matrix4@@QAEXM@Z	101ae710
 _Vec3_Length	101ae890
-?FreeBank@ResourceBanks@@QAEHH@Z	10007ce0
+?FreeBank@ListBank@@QAEHH@Z	10007ce0
 ??0RenderWindow@@QAE@XZ	1013e470
 ?ReportError@ListBank@@QAEHPBD@Z	100359c0
 ?FreeAll@ListBank@@QAEHXZ	10007d50
@@ -472,3 +471,4 @@ _FUN_101426d0@8	101426d0
 ?M_101629b0@AnimModel@@QAEHMM@Z	101629b0
 ?DrawSpriteA@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	101890f0
 ?DrawSpriteB@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	10189340
+?ReadType@ListBank@@QAEDPAPAD@Z	100364a0

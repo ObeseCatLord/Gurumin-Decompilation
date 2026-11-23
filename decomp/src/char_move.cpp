@@ -254,8 +254,6 @@ extern "C" int FUN_100b1520(int index)
     return 0;
 }
 
-struct EffectOptions;
-
 #include "effect_manager.h"
 
 struct CollisionWorld

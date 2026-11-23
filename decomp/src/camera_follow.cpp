@@ -9,8 +9,6 @@
 #include "node.h"
 #include "char_state.h"
 
-struct EffectOptions;
-
 #include "effect_manager.h"
 
 extern "C" Vec4 DAT_118e6cb8;     // camera target

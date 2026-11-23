@@ -7,8 +7,6 @@
 
 #include "matrix4.h"
 
-struct EffectOptions;
-
 #include "effect_manager.h"
 
 #include "anim_model.h"

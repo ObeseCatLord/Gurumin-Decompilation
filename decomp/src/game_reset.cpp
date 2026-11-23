@@ -53,11 +53,7 @@ struct GameObject
     void M_10007f20();                           // 0x10007f20 (Game::M_10007f20)
 };
 
-struct ResourceBanks
-{
-    void M_10007d50();                           // 0x10007d50
-};
-
+#include "listbank.h"
 struct MmvPlayer
 {
     void Close();                                // 0x101609b0
@@ -602,7 +598,6 @@ extern "C" Vec4 DAT_10edbd38;
 extern "C" Vec4 DAT_10edbdd8;
 extern "C" Vec4 DAT_10edbde8;
 extern "C" MmvPlayer DAT_10f08ab0;
-extern "C" ResourceBanks DAT_104687b8;
 extern "C" Vec4 DAT_10f08d1c;
 extern "C" int DAT_10f654b4;
 extern "C" int DAT_10f654b8;
@@ -774,7 +769,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104bfd10 = 0;
   DAT_104c016c = 0;
   DAT_1049eae4 = 1;
-  DAT_104687b8.M_10007d50();
+  DAT_104687b8.FreeAll();
   DAT_1065cb28.M_1013edb0();
   memset(DAT_10c62250, 0, sizeof(DAT_10c62250));
   memset(DAT_10c62650, 0, sizeof(DAT_10c62650));

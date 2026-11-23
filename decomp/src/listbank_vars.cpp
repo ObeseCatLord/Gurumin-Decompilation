@@ -5,66 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef void (*ParserCallback)(int code, int value);
-typedef int (*BuiltinHandler)(struct ListBank *bank, int id);
-
-// The script parser (listbank.cpp ListBank), with the array dimension tables of the declared variables.
-struct ListBank
-{
-    int *result;              // 0x00: where the last evaluated expression left its value
-    char resultType;          // 0x04
-    char pad_0005[3];
-    ParserCallback callback;  // 0x08: message callback (may be 0)
-    char names[8][0x80][0x10];// 0x0c: declared variable names per nesting level
-    char m_400c[8][0x80];     // 0x400c: variable types (0 = int, 1 = float, 2 = text)
-    int m_440c[8][0x100];
-    int sizes[8][0x80][8];    // 0x640c: size of each array dimension
-    char dimensions[8][0x80]; // 0xe40c: number of array dimensions (0 = not an array)
-    char m_e80c[8][0x80];
-    char builtinNames[0x100][0x20];       // 0xec0c: names of the registered builtin functions
-    char builtinReturnTypes[0x100];       // 0x10c0c: 0 = int, 1 = float, 2 = string
-    char builtinParamTypes[0x100][0x10];  // 0x10d0c: parameter types (+10 = by reference, 0xff = end)
-    short builtinIds[0x100];              // 0x11d0c
-    BuiltinHandler builtinHandlers[0x100];// 0x11f0c
-    char pad_1230c[0x10000];
-    char builtinParamCounts[0x100];       // 0x2230c
-    char pad_2240c[0x81c0];
-    int pad_2a5cc;
-    int compiling;            // 0x2a5d0
-    int builtinCount;         // 0x2a5d4: registered builtin functions
-    int pad_2a5d8;
-    int counts[8];            // 0x2a5dc: variables declared per nesting level
-    char pad_2a5fc[0x4004];
-    char text[0x7d00];        // 0x2e600: script text being parsed
-    int textLength;           // 0x36300
-    char *cursor[8];          // 0x36304: read position in `text`, one per nesting level
-    int depth;                // 0x36324: current nesting level
-    int pad_36328;
-    int m_3632c;              // 0x3632c: set once an error was reported
-    ListBank *self;           // 0x36330
-
-    int GetIndexPart(const char *name, char *part, int n);    // 0x10036560
-    int ReadWord(char **text, char *word);                    // 0x10035e80
-    int ReadTerm(char **text, char *word);                    // 0x10035fa0
-    char ReadType(char **text);                               // 0x100364a0 (type_parse.cpp)
-    int Evaluate(const char *expression, char type);         // 0x100caf90
-    int FreeAll();                                            // 0x10007d50
-    // 0x100359c0 (listbank.cpp): reports a parse error and frees the script buffers. Returns 0.
-    int ReportError(const char *message)
-    {
-        m_3632c = 1;
-        printf("%s\n", message);
-        if (callback != 0)
-            callback(1, (int)message);
-        if (callback != 0)
-            callback(5000, cursor[depth] - text);
-        FreeAll();
-        return 0;
-    }
-    int FindVariable(const char *name, int *index, int *group, int *element);
-    int RegisterBuiltin(const char *signature, short id, BuiltinHandler handler);
-};
-
+#include "listbank.h"
 // "添え字の範囲を超えています。" ("The index is out of range."), Shift-JIS.
 #define INDEX_RANGE_TEXT "\x93\x59\x82\xa6\x8e\x9a\x82\xcc\x94\xcd\x88\xcd\x82\xf0\x92\xb4\x82\xa6\x82\xc4\x82\xa2\x82\xdc\x82\xb7\x81\x42"
 // "添え字の次元が違います。" ("The number of indexes is wrong."), Shift-JIS.
@@ -107,11 +48,11 @@ int ListBank::FindVariable(const char *name, int *index, int *group, int *elemen
         base[i] = 0;
         for (g = depth; g >= 0; g--)
         {
-            for (k = 0; k < counts[g]; k++)
+            for (k = 0; k < variableCounts[g]; k++)
             {
-                if (m_3632c != 0)
+                if (failed != 0)
                     return 0;
-                if (strcmp(base, names[g][k]) == 0)
+                if (strcmp(base, variableNames[g][k]) == 0)
                 {
                     *index = k;
                     *group = g;
@@ -135,11 +76,11 @@ int ListBank::FindVariable(const char *name, int *index, int *group, int *elemen
     }
     for (g = depth; g >= 0; g--)
     {
-        for (k = 0; k < counts[g]; k++)
+        for (k = 0; k < variableCounts[g]; k++)
         {
-            if (m_3632c != 0)
+            if (failed != 0)
                 return 0;
-            if (strcmp(name, names[g][k]) == 0)
+            if (strcmp(name, variableNames[g][k]) == 0)
             {
                 if (dimensions[g][k] == 0)
                 {
@@ -192,7 +133,7 @@ int ListBank::RegisterBuiltin(const char *signature, short id, BuiltinHandler ha
             builtinParamTypes[builtinCount][0] = (char)0xff;
             do
             {
-                if (m_3632c != 0)
+                if (failed != 0)
                     return 0;
                 ReadTerm(&cursor, word);
                 builtinParamTypes[builtinCount][i] = 0;

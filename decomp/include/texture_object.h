@@ -61,6 +61,7 @@ struct TextureObject : TextureHandle
     int DrawQuad(const struct Vec4 *positions, const struct Vec4 *uvs, const struct Vec4 *colours,
                  const struct Vec4 *speculars, float alpha, int skip);
     int DrawThroughShader(TextureObject *second, TextureObject *third);
+    int DrawBlurred();                               // 0x101446f0
     int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
                  float alpha, float angle);
     int DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,

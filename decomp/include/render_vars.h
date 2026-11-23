@@ -9,8 +9,6 @@
 #include "model_def.h"
 #include "vec4.h"
 
-struct FadeNode;   // node_fade.h
-struct FadeOwner;   // node_fade.h
 struct IUnknownLike;   // com_min.h
 struct MeshData;   // mesh.h
 struct Node;   // node.h
@@ -38,8 +36,8 @@ extern "C" int DAT_1020343c;                              // lens flares switche
 extern "C" int DAT_10203474;
 extern "C" int DAT_10203478;
 extern "C" int DAT_1020347c;
-extern "C" FadeNode *DAT_1021a1e0[];                      // the nodes
-extern "C" FadeOwner *DAT_10254ac0[];                     // owner of each node (0 = none)
+extern "C" Node *DAT_1021a1e0[];                          // the nodes
+extern "C" Node *DAT_10254ac0[];                          // owner of each node: the map region it lies in (0 = none)
 extern "C" int DAT_104b7224;                              // texture slot of the iris wipe
 extern "C" int DAT_104bfe68;
 extern "C" int DAT_104bfeb0;
@@ -94,6 +92,7 @@ extern "C" float DAT_10f1fcf8;                            // step per update; st
 extern "C" IUnknownLike *DAT_10f1fcfc[2];                 // the two swap targets, created with the device (Render_CreateDevice)
 extern "C" IUnknownLike *DAT_10f1fd00;
 extern "C" IUnknownLike *DAT_10f1fd04[8];                 // render-target surfaces
+extern "C" void *DAT_10f1fd08;                            // the four-tap blur pixel shader (overlaps the last render-target surfaces above)
 extern "C" void *DAT_10f1fd0c;                            // the crossfade pixel shader
 extern "C" IUnknownLike *DAT_10f1fd28[2];                // textures of the two swap targets
 extern "C" IUnknownLike *DAT_10f1fd2c;                   // = DAT_10f1fd28[1], released on its own by Render_OnLostDevice

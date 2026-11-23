@@ -420,6 +420,7 @@ _sqrtf	10002010
 ?DrawScreenCopy@TextureObject@@QAEHHHHHMM@Z	1014b750
 ?DrawQuad@TextureObject@@QAEHPBUVec4@@000MH@Z	1014c080
 ?DrawThroughShader@TextureObject@@QAEHPAU1@0@Z	10144320
+?DrawBlurred@TextureObject@@QAEHXZ	101446f0
 ?Update@Input@@QAEHXZ	10142790
 _FUN_10142670@8	10142670
 _FUN_10142690@8	10142690
@@ -526,3 +527,4 @@ _Enemy_IsBusy	100e1c40
 ?CompileStatement@ListBank@@QAEHPAD@Z	100ed9b0
 ?DeclareFunction@ListBank@@QAEHPAD@Z	100366c0
 ?DrawColoured@TextureObject@@QAEHHHHHMMMMMMMMMM@Z	1014c960
+?ClearMarkers_Create@@YAHXZ	1004cf20

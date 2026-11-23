@@ -20,6 +20,10 @@ extern "C" float DAT_10203454;
 extern "C" float DAT_10203458;
 extern "C" float DAT_1020345c;
 extern "C" float DAT_10203460;
+extern "C" Node *DAT_1021c620;                            // the "Bip01" node the scene looks at
+extern "C" Node *DAT_1021c628;                            // "@kumo2"
+extern "C" Node *DAT_1021c62c;                            // "@kumo3"
+extern "C" Node *DAT_1021c630;                            // "scop-pt"
 extern "C" Node *DAT_1021c624;                            // a node the target goal drifts towards (0 = none)
 extern "C" int DAT_104c0358;                              // 1 once the camera vectors were set up
 extern "C" int DAT_104c035c;                              // frames left in the camera shift (0 = none)

@@ -634,6 +634,99 @@ int TextureObject::DrawThroughShader(TextureObject *second, TextureObject *third
     return 0;
 }
 
+#define BLUR_TAP_OFFSET 0.0009765625f       // 1/1024: distance of each of the four taps from the pixel centre
+
+// 0x101446f0 (TextureObject::DrawBlurred). Binds this texture to all four stages and draws the whole back buffer as
+// one quad whose four texture coordinate pairs are each shifted by 1/1024 in a different diagonal direction (stage 0
+// up-left, 1 down-right, 2 up-right, 3 down-left), so the fixed-function blend of the stages
+// samples four neighbouring texels. Coordinates cover the part of the square targets the size of the screen (half a
+// texel in from each edge). Returns 0.
+int TextureObject::DrawBlurred()
+{
+    ShaderVertex vertices[4];
+    DAT_10f1fcf0->SetTexture(0, texture);
+    DAT_10f1fcf0->SetTexture(1, texture);
+    DAT_10f1fcf0->SetTexture(2, texture);
+    DAT_10f1fcf0->SetTexture(3, texture);
+    float width = (float)DAT_10202b34;
+    float height = (float)DAT_10202b38;
+    vertices[0].x = 0.0f;
+    vertices[0].y = 0.0f;
+    vertices[1].x = width;
+    vertices[1].y = 0.0f;
+    vertices[2].x = 0.0f;
+    vertices[2].y = height;
+    vertices[3].x = width;
+    vertices[3].y = height;
+    vertices[0].u3 = vertices[0].u2 = vertices[0].u1 = vertices[0].u0 =
+        0.5f / DAT_10202b18;
+    vertices[0].v3 = vertices[0].v2 = vertices[0].v1 = vertices[0].v0 =
+        0.5f / DAT_10202b18;
+    vertices[1].u3 = vertices[1].u2 = vertices[1].u1 = vertices[1].u0 =
+        (width - 0.5f) / DAT_10202b18;
+    vertices[1].v3 = vertices[1].v2 = vertices[1].v1 = vertices[1].v0 =
+        0.5f / DAT_10202b18;
+    vertices[2].u3 = vertices[2].u2 = vertices[2].u1 = vertices[2].u0 =
+        0.5f / DAT_10202b18;
+    vertices[2].v3 = vertices[2].v2 = vertices[2].v1 = vertices[2].v0 =
+        (height - 0.5f) / DAT_10202b18;
+    vertices[3].u3 = vertices[3].u2 = vertices[3].u1 = vertices[3].u0 =
+        (width - 0.5f) / DAT_10202b18;
+    vertices[3].v3 = vertices[3].v2 = vertices[3].v1 = vertices[3].v0 =
+        (height - 0.5f) / DAT_10202b18;
+    vertices[0].u0 -= BLUR_TAP_OFFSET;
+    vertices[0].v0 -= BLUR_TAP_OFFSET;
+    vertices[1].u0 -= BLUR_TAP_OFFSET;
+    vertices[1].v0 -= BLUR_TAP_OFFSET;
+    vertices[2].u0 -= BLUR_TAP_OFFSET;
+    vertices[2].v0 -= BLUR_TAP_OFFSET;
+    vertices[3].u0 -= BLUR_TAP_OFFSET;
+    vertices[3].v0 -= BLUR_TAP_OFFSET;
+    vertices[0].u1 += BLUR_TAP_OFFSET;
+    vertices[0].v1 += BLUR_TAP_OFFSET;
+    vertices[1].u1 += BLUR_TAP_OFFSET;
+    vertices[1].v1 += BLUR_TAP_OFFSET;
+    vertices[2].u1 += BLUR_TAP_OFFSET;
+    vertices[2].v1 += BLUR_TAP_OFFSET;
+    vertices[3].u1 += BLUR_TAP_OFFSET;
+    vertices[3].v1 += BLUR_TAP_OFFSET;
+    vertices[0].u2 += BLUR_TAP_OFFSET;
+    vertices[0].v2 -= BLUR_TAP_OFFSET;
+    vertices[1].u2 += BLUR_TAP_OFFSET;
+    vertices[1].v2 -= BLUR_TAP_OFFSET;
+    vertices[2].u2 += BLUR_TAP_OFFSET;
+    vertices[2].v2 -= BLUR_TAP_OFFSET;
+    vertices[3].u2 += BLUR_TAP_OFFSET;
+    vertices[3].v2 -= BLUR_TAP_OFFSET;
+    vertices[0].u3 -= BLUR_TAP_OFFSET;
+    vertices[0].v3 += BLUR_TAP_OFFSET;
+    vertices[1].u3 -= BLUR_TAP_OFFSET;
+    vertices[1].v3 += BLUR_TAP_OFFSET;
+    vertices[2].u3 -= BLUR_TAP_OFFSET;
+    vertices[2].v3 += BLUR_TAP_OFFSET;
+    vertices[3].u3 -= BLUR_TAP_OFFSET;
+    vertices[3].v3 += BLUR_TAP_OFFSET;
+    vertices[0].colour = vertices[1].colour = vertices[2].colour = vertices[3].colour = 0xffffffff;
+    vertices[0].specular = vertices[1].specular = vertices[2].specular = vertices[3].specular = 0xff000000;
+    vertices[0].z = vertices[1].z = vertices[2].z = vertices[3].z = 0.0f;
+    vertices[0].rhw = vertices[1].rhw = vertices[2].rhw = vertices[3].rhw = 1.0f;
+    FUN_1013ef30(0x8d, 1);                  // D3DRS_COLORVERTEX
+    DAT_10f1fcf0->SetFVF(0x4c4);
+    DAT_10f1fcf0->SetVertexShader(0);
+    FUN_1013ef30(0x91, 1);                  // D3DRS_DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1
+    FUN_1013ef90(0, 4, 4);                  // alpha: modulate
+    FUN_1013ef90(0, 5, 2);                  //   texture
+    FUN_1013ef90(0, 6, 0);                  //   diffuse
+    FUN_1013ef90(0, 1, 4);                  // colour: modulate
+    FUN_1013ef90(0, 2, 2);                  //   texture
+    FUN_1013ef90(0, 3, 0);                  //   diffuse
+    DAT_10f1fcf0->SetPixelShader(DAT_10f1fd08);
+    DAT_10f0d5c8++;
+    DAT_10f1fcf0->DrawPrimitiveUP(5 /* D3DPT_TRIANGLESTRIP */, 2, vertices, 0x38);
+    DAT_10f1fcf0->SetPixelShader(0);
+    return 0;
+}
+
 // 0x10149100 (SwapTarget_DrawPreview). Draws the swap target in use as a 256x256 quad at the top left of the screen
 // (the part of the square target the size of the back buffer), stages 1 to 3 off. Returns 1.
 extern "C" int FUN_10149100(void)

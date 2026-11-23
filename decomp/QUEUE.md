@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (191)
+## 1. Walls to retry (193)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -46,6 +46,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
 - [ ] `1001bb20` 925 — Char_DrawLinks (char_links.cpp, rule-clean, new CharLink table in char_links.h): 16 bytes of scheduling: the original stores the angle (fstp) after pushing the operator- arguments of the dropped Length2D and pushes the second -1 of the first Start after loading the offset; tried a split angle, a top-of-function angle, a named Length2D result and other option store orders.
 - [ ] `1001d2d0` 1154 — DigitCounter_Update: blocks and cases in place; the original keeps the state offset (index * 0x40) in edi and the divisor 10 in ebx, ours swaps them (and pushes ebx/edi around the first test)
+- [ ] `1001dc20` 1397 — Char_InitSlot (char_init.cpp, rule-clean draft, 1376 vs 1397 bytes): the original keeps the 0x22-count loop of invariant stores to DAT_1021c620..630 (13.00 hoists them and deletes the loop in every spelling), and the fallen branch stores the slot state twice around DAT_10453008 = -10000 while the else branch shares the epilogue
 - [ ] `1001ed80` 1257 — Map_DrawMovie (map_movie_draw.cpp, rule-clean draft, 1216 vs 1257 bytes): register allocation and stack layout (original: x in edi and y in ebp with their own stack homes, width/height in bx/si, movieFade separate from the alpha product; frame 0x28 vs ours 0x20); local/field/declaration-order forms tried
 - [ ] `1001f270` 588 — Map_SelectMovie: same code apart from register roles (the original keeps the nearest index in ebx, the counter in esi and the camera-point pointer in edi, pushed inside the loop); declaration orders, pointer loop and named matrix tried
 - [ ] `100211a0` 466 — Region_WaveVertex: logic identical; ebx/ebp swapped for the flip counter and the point address, and the original rounds each sine result to float twice (helper and caller locals tried)
@@ -76,6 +77,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10047440` 1473 — Npc_PushCart (npc_wheel.cpp): flow and calls line up; the original keeps the pointer to DAT_10210b30[index] in a stack slot (it reuses ebx for the slot kind after Char_ResetState) and pushes -1 before reading fs:[0]; cl 13.00 here folds the pointer back into [index*4], so the frame is 4 bytes smaller
 - [ ] `10047a10` 1598 — Npc_RideBehindMarker (npc_ride.cpp): 4 bytes; the marker heading copy lives in the slot of the cached distance pointer in the original, cl 13.00 here puts it in the turn variable's slot
 - [ ] `10049650` 822 — Wave_Update (enemy_spawn.cpp): code identical apart from stack slots; the original puts the position vector right after the counters (group, earliest and slot above it), cl 13.00 here puts the loop scalars first; declaration orders and scopes tried
+- [ ] `1004cf20` 1416 — ClearMarkers_Create (clear_markers.cpp, 1424 vs 1416 bytes): the original caches DAT_104c0394 in ebp across the record loop and re-reads the global after the EH -1 clobber (no stack slot); ours spills it or reloads it per key; local/const/static forms tried
 - [ ] `1004d4b0` 1188 — Regions_Update (region_view.cpp, rule-clean draft, 1184 vs 1188 bytes): the original keeps zero in edi (also the vertex-offset induction variable, cleared per region; push edi/xor edi,edi prologue) and tail-duplicates the push/push/call 100211a0 on the not-morphing and age<0 paths; ours keeps zero in ebp with the point counter; loop forms, counters and flag types tried
 - [ ] `1004ed60` 1262 — TutorialBook_Open (tutorial_open.cpp, rule-clean draft, 1264 vs 1262 bytes): register allocation only (original keeps found in ebx and left in edi and spills cover/right; ours keeps cover in ebx); ~15 declaration orders and types tried
 - [ ] `1004f250` 655 — TutorialBook_Close draft: flow and calls match (LoadTexture inline for the cover); the page loop registers differ (original: first page in edi, second in ebp, name pointer in ebx), like the other TutorialBook functions; declaration orders tried
@@ -212,12 +214,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (85)
+## 4. Large functions (801-3000 bytes) (82)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `101446f0` 1273 bytes (float, calls 17)
-- [ ] `1001dc20` 1397 bytes (float, loops 5, calls 18)
-- [ ] `1004cf20` 1416 bytes (float, loops 4, calls 41)
 - [ ] `10150bb0` 1421 bytes (float, loops 3, calls 37)
 - [ ] `10043fc0` 1423 bytes (float, loops 1, calls 27)
 - [ ] `1015f4e0` 1429 bytes (loops 12, calls 31)

@@ -4,9 +4,14 @@ usage: python tools/build_all.py [--report progress/jp/report.json] [--version j
 
 --report writes an objdiff-format progress report (function names, addresses, sizes and match percentages only)
 for ByteMatch / decomp.dev, plus progress.svg (README meter) next to it. Functions not yet decompiled are listed in the unit "app/unmatched" at 0 %.
+"Matched under the rules" counts the matched functions whose file declares no struct/class/union and no extern
+global of its own (AGENTS.md rule 2; tools/rule_check.py decides): printed as RULES and added to the measures.
 Percentages: MATCH = 100, EQUIV (cl 13.00 encoding quirks only) = 99, DIFF = share of identical bytes, capped at 98.
 """
 import csv, glob, json, os, re, subprocess, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from rule_check import file_violations
 
 here = os.path.dirname(os.path.abspath(__file__))
 root = os.path.join(here, "..")
@@ -39,6 +44,9 @@ def measures(functions):
     matched_code = sum(f["size"] for f in matched)
     fuzzy = sum(f["size"] * f["percent"] for f in functions) / total_code if total_code else 0.0
     complete = bool(functions) and len(matched) == len(functions)
+    # matched under the rules: byte-identical and defined in a file without per-file types or globals
+    ruled = [f for f in matched if f.get("rules_clean")]
+    ruled_code = sum(f["size"] for f in ruled)
     return {
         "fuzzy_match_percent": round(fuzzy, 4),
         "total_code": str(total_code),
@@ -56,6 +64,10 @@ def measures(functions):
         "complete_data_percent": 0.0,
         "total_units": 1,
         "complete_units": 1 if complete else 0,
+        "matched_rules_code": str(ruled_code),
+        "matched_rules_code_percent": round(100.0 * ruled_code / total_code, 4) if total_code else 0.0,
+        "matched_rules_functions": len(ruled),
+        "matched_rules_functions_percent": round(100.0 * len(ruled) / len(functions), 4) if functions else 0.0,
     }
 
 
@@ -79,14 +91,17 @@ def main():
     symbols = load_symbol_addresses()
     total_m = total_d = total_e = 0
     matched_bytes = 0
+    ruled_matched = ruled_bytes = 0  # the matched functions whose file passes rule_check
     unique_matched = 0  # game functions matched, each address counted once (some files repeat a callee)
     units = []
+    all_functions = []  # every compared function with its rules_clean flag, for the report's total measures
     seen = set()
     sources = [(p, os.path.basename(p), []) for p in sorted(glob.glob(os.path.join(root, "src", "*.cpp")))]
     sources += [(p, os.path.join("..", "src_od", os.path.basename(p)), ["/Od", "/Oi"])
                 for p in sorted(glob.glob(os.path.join(root, "src_od", "*.cpp")))]
     for path, build_name, flags in sources:
         name = os.path.basename(path)
+        rules_clean = not file_violations(path)
         out = subprocess.run(["cmd", "/c", os.path.join(root, "build.bat"), build_name] + flags,
                              capture_output=True, text=True).stdout
         functions = []
@@ -112,24 +127,30 @@ def main():
             if percent >= 100.0:
                 unique_matched += 1
                 matched_bytes += game[addr]
-            functions.append({"name": sym, "size": game[addr], "percent": percent, "address": addr})
+                if rules_clean:
+                    ruled_matched += 1
+                    ruled_bytes += game[addr]
+            functions.append({"name": sym, "size": game[addr], "percent": percent, "address": addr,
+                              "rules_clean": rules_clean})
         m = re.search(r"matched (\d+), differing (\d+), equivalent (\d+)", out)
         if m:
             total_m += int(m.group(1)); total_d += int(m.group(2)); total_e += int(m.group(3))
         else:
             print(name, "BUILD FAILED"); print(out[-2000:])
+        all_functions += functions
         if functions:
             units.append(unit_entry("app/" + os.path.splitext(name)[0], os.path.relpath(path, os.path.join(root, "..")).replace(os.sep, "/"), functions))
     print("TOTAL matched %d, equivalent (13.00 encoding only) %d, differing %d" % (total_m, total_e, total_d))
     code = sum(game.values())
     print("PROGRESS %d of %d game functions matched (%.1f%%), %d of %d code bytes (%.2f%%)" % (
         unique_matched, len(game), 100.0 * unique_matched / len(game), matched_bytes, code, 100.0 * matched_bytes / code))
+    print("RULES %d of %d matched functions are matched under the rules (no per-file types or globals), %d code bytes (%.2f%%)" % (
+        ruled_matched, unique_matched, ruled_bytes, 100.0 * ruled_bytes / code))
     if report_path:
         rest = [{"name": "FUN_" + a, "size": s, "percent": 0.0, "address": a} for a, s in sorted(game.items()) if a not in seen]
         units.append(unit_entry("app/unmatched", "", rest))
-        everything = []
-        for u in units:
-            everything += [{"size": int(f["size"]), "percent": f["fuzzy_match_percent"]} for f in u["functions"]]
+        everything = [{"size": f["size"], "percent": round(f["percent"], 4), "rules_clean": f.get("rules_clean")}
+                      for f in all_functions + rest]
         total = measures(everything)
         total["total_units"] = len(units)
         total["complete_units"] = sum(1 for u in units if u["metadata"]["complete"])
@@ -139,9 +160,9 @@ def main():
             json.dump(report, f, indent=1)
         subprocess.run([sys.executable, os.path.join(here, "progress_svg.py"), report_path,
                         os.path.join(os.path.dirname(os.path.abspath(report_path)), "progress.svg")], check=True)
-        print("report (%s): %d of %d functions, %.2f%% of code matched, fuzzy %.2f%%" % (
+        print("report (%s): %d of %d functions, %.2f%% of code matched (%d functions, %.2f%% under the rules), fuzzy %.2f%%" % (
             version, total["matched_functions"], total["total_functions"], total["matched_code_percent"],
-            total["fuzzy_match_percent"]))
+            total["matched_rules_functions"], total["matched_rules_code_percent"], total["fuzzy_match_percent"]))
 
 
 if __name__ == "__main__":

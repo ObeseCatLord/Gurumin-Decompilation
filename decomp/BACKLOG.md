@@ -35,6 +35,9 @@ retype those members first.
    122 held per file (type/size conflicts, file-local types; `globals_driver.py plan` lists them), see HANDOFF.
 4. Teach `build_all.py` to report "matched under the rules" (no per-file type or global declarations in the
    function's file) next to the byte count.
+   Status 2026-11-22: done (`tools/rule_check.py`; build_all prints `RULES`, report.json measures
+   `matched_rules_*`): 182 of 789 matched functions pass. `python tools/rule_check.py` lists the files that hold
+   the rest, most matched functions first.
 
 ## Phase A: finish the medium functions (251-800 bytes)
 

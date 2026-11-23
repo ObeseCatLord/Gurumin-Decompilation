@@ -18,7 +18,7 @@ typedef char check_walker[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "route_point.h"
 
-extern "C" RoutePoint DAT_10210fc0[][16];     // the routes of the map
+#include "map_records.h"
 #include "char_tables.h"
 #include "world.h"
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
@@ -65,8 +65,8 @@ extern "C" int FUN_100451c0(int index)
         DAT_1020b430[index].state = 2;
         DAT_1020b430[index].wait = 0;
         DAT_1020b430[index].rider = DAT_1020b430[index].talk / 100 + index;
-        DAT_1020b430[index].speed = DAT_10210fc0[DAT_1020b430[index].talk % 100][0].x;
-        DAT_1020b430[index].fadeActions = DAT_10210fc0[DAT_1020b430[index].talk % 100][0].code;
+        DAT_1020b430[index].speed = DAT_10210fc0[DAT_1020b430[index].talk % 100].points[0].x;
+        DAT_1020b430[index].fadeActions = DAT_10210fc0[DAT_1020b430[index].talk % 100].points[0].code;
         if (value > 1)
         {
             DAT_1020b430[index].pointPause = value;

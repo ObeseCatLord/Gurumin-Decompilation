@@ -7,16 +7,7 @@
 // windows.h-style max: evaluates the larger argument twice.
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-// Entry of the map table, 0x100 bytes.
-struct MapEntry
-{
-    int id;                   // map id; several entries can share one
-    int pad_0004;
-    int icon;                 // 0x08: index into the icon name table
-    char pad_000c[0xf4];
-};
-
-extern "C" MapEntry DAT_10210fc0[];
+#include "map_records.h"
 #include "ui_vars.h"
 
 extern "C" int FUN_10161920(const char *name);                    // Texture_FindByName (mmv_texreg.cpp)
@@ -31,17 +22,17 @@ extern "C" int FUN_1001e240(void)
     int i;
     for (i = 0; i < DAT_10216dc4; i++)
     {
-        if (DAT_10210fc0[DAT_1020c2c0].id == DAT_10210fc0[i].id)
+        if (DAT_10210fc0[DAT_1020c2c0].entry.id == DAT_10210fc0[i].entry.id)
             break;
     }
     if (i == DAT_10216dc4)
         return 0;
-    strcpy(name, DAT_101d65b0[DAT_10210fc0[i].icon]);
+    strcpy(name, DAT_101d65b0[DAT_10210fc0[i].entry.icon]);
     name[MAX(strlen(name) - 4, 0)] = 0;
     int texture = FUN_10161920(name);
     if (texture < 0)
     {
-        texture = FUN_1001e1a0(DAT_101d65b0[DAT_10210fc0[i].icon], "maruf00a.bmp");
+        texture = FUN_1001e1a0(DAT_101d65b0[DAT_10210fc0[i].entry.icon], "maruf00a.bmp");
         DAT_10836c70.ResetFrameTimer();
     }
     return texture;

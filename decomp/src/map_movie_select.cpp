@@ -17,7 +17,7 @@
 #include "texture_object.h"
 #include "map_vars.h"
 
-extern "C" CameraPoint DAT_10210fc4[];
+#include "map_records.h"
 extern "C" int FUN_10016580(const char *name);       // Movie_PlayToTexture
 extern "C" int FUN_1001e240(void);                   // Map_IconTexture
 
@@ -33,7 +33,7 @@ int Map_SelectMovie()
     player.Copy(DAT_1086df38.GetTranslation());
     for (int i = 0; i < DAT_10216dc4; i++)
     {
-        point.Copy(DAT_104c03ac->extra->AnimatedMatrix(DAT_10210fc4[i].frame).GetTranslation());
+        point.Copy(DAT_104c03ac->extra->AnimatedMatrix(DAT_10210fc0[i].camera.frame).GetTranslation());
         float distance = (player - point).LengthSquared3();
         if (distance < best)
         {
@@ -44,14 +44,14 @@ int Map_SelectMovie()
     if (nearest == -1 || best > 10000.0f)
         nearest = 0x5c;
     DAT_1020c2c0 = nearest;
-    int movie = DAT_10210fc4[nearest].movie;
+    int movie = DAT_10210fc0[nearest].camera.movie;
     if (movie != DAT_1020c2d0)
     {
         if (DAT_104bfe70 != 0 && DAT_104bfe70 < 0x30)
         {
             for (int frame = DAT_104bfe70; frame < 0x2f; frame += 2)
                 DAT_10f08ab0.M_10161050();
-            movie = DAT_10210fc4[DAT_1020c2c0].movie;
+            movie = DAT_10210fc0[DAT_1020c2c0].camera.movie;
             DAT_104bfe70 = 0x30;
             DAT_1020c2d0 = movie;
         }

@@ -16,7 +16,7 @@ inline float AbsFloat(float value)
     return (float)fabs(value);
 }
 
-extern "C" int DAT_10210fc4[][4];                    // per script node and state: the voice of the character
+#include "map_records.h"
 #include "char_vars.h"
 #include "map_vars.h"
 
@@ -64,7 +64,7 @@ extern "C" int FUN_100ba040(void)
         if (DAT_104c0364 != i)
         {
             DAT_104c0364 = i;
-            int voice = DAT_10210fc4[DAT_10db6ee8[i].switchNode * 0x10 + DAT_1020b430[i].values[1]][0] % 10000;
+            int voice = DAT_10210fc0[DAT_10db6ee8[i].switchNode].points[DAT_1020b430[i].values[1]].y % 10000;
             if (voice > 5000)
                 voice -= 10000;
             DAT_104c0368 = voice;

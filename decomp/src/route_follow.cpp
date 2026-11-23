@@ -5,7 +5,7 @@
 
 #include "route_point.h"
 
-extern "C" RoutePoint DAT_10210fc0[][16];        // the routes of the map
+#include "map_records.h"
 
 // 0x1002f320 (Route_Follow). Reads point `point` of route `route` for walker `walker`: stores its action (low two
 // bits), value and group in *outAction, *outValue and *outGroup. When `position` lies within `radius` of the point
@@ -15,15 +15,15 @@ extern "C" RoutePoint DAT_10210fc0[][16];        // the routes of the map
 extern "C" int FUN_1002f320(int walker, int route, int point, int *outPoint, float *position, int *outAction,
                             int *outValue, int *outGroup, int radius)
 {
-    float x = (float)DAT_10210fc0[route][point].x;
-    float y = (float)DAT_10210fc0[route][point].y;
-    float z = (float)DAT_10210fc0[route][point].z;
-    int action = DAT_10210fc0[route][point].code / 10000;
+    float x = (float)DAT_10210fc0[route].points[point].x;
+    float y = (float)DAT_10210fc0[route].points[point].y;
+    float z = (float)DAT_10210fc0[route].points[point].z;
+    int action = DAT_10210fc0[route].points[point].code / 10000;
     int result = 0;
     if (action > 5000)
         action -= 10000;
     *outAction = action;
-    int value = DAT_10210fc0[route][point].code % 10000;
+    int value = DAT_10210fc0[route].points[point].code % 10000;
     if (value > 5000)
         value -= 10000;
     *outValue = value;
@@ -58,9 +58,9 @@ extern "C" int FUN_1002f320(int walker, int route, int point, int *outPoint, flo
             next = point - 1;
             break;
         }
-        x = (float)DAT_10210fc0[route][next].x;
-        y = (float)DAT_10210fc0[route][next].y;
-        z = (float)DAT_10210fc0[route][next].z;
+        x = (float)DAT_10210fc0[route].points[next].x;
+        y = (float)DAT_10210fc0[route].points[next].y;
+        z = (float)DAT_10210fc0[route].points[next].z;
     }
     *outPoint = next;
     position[0] = x;
@@ -82,25 +82,25 @@ extern "C" int FUN_100286b0(int value);          // Angle_Wrap: -4999..5000
 extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, float *position, int *outType,
                             int *outParam, int *outValue)
 {
-    int x = DAT_10210fc0[route][point].x / 10000;
+    int x = DAT_10210fc0[route].points[point].x / 10000;
     int result = 0;
     if (x > 5000)
         x -= 10000;
     float fx = (float)x;
-    int y = DAT_10210fc0[route][point].x % 10000;
+    int y = DAT_10210fc0[route].points[point].x % 10000;
     if (y > 5000)
         y -= 10000;
     float fy = (float)y;
-    int z = DAT_10210fc0[route][point].y / 10000;
+    int z = DAT_10210fc0[route].points[point].y / 10000;
     if (z > 5000)
         z -= 10000;
     float fz = (float)z;
-    int value = DAT_10210fc0[route][point].y % 10000;
+    int value = DAT_10210fc0[route].points[point].y % 10000;
     if (value > 5000)
         value -= 10000;
     *outValue = value;
-    *outType = DAT_10210fc0[route][point].z;
-    int parameter = DAT_10210fc0[route][point].code;
+    *outType = DAT_10210fc0[route].points[point].z;
+    int parameter = DAT_10210fc0[route].points[point].code;
     *outParam = parameter;
     if (fx - 20.0f < position[0] && fx + 20.0f > position[0] && fy - 20.0f < position[1] &&
         fy + 20.0f > position[1] && fz - 20.0f < position[2] && fz + 20.0f > position[2])
@@ -149,9 +149,9 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
             point++;
             break;
         }
-        fx = (float)FUN_100286b0(DAT_10210fc0[route][point].x / 10000);
-        fy = (float)FUN_100286b0(DAT_10210fc0[route][point].x % 10000);
-        fz = (float)FUN_100286b0(DAT_10210fc0[route][point].y / 10000);
+        fx = (float)FUN_100286b0(DAT_10210fc0[route].points[point].x / 10000);
+        fy = (float)FUN_100286b0(DAT_10210fc0[route].points[point].x % 10000);
+        fz = (float)FUN_100286b0(DAT_10210fc0[route].points[point].y / 10000);
     }
     *outPoint = point;
     position[0] = fx;

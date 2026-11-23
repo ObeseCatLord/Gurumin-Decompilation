@@ -4,15 +4,6 @@
 
 #include "route_point.h"
 
-// Entry of the map table, 0x100 bytes.
-struct MapEntry
-{
-    int id;
-    int pad_0004;
-    int icon;                 // 0x08: index into the icon name table
-    int pad_000c;
-    RoutePoint route[15];     // 0x10
-};
 
 // A signed four-digit field: values above 5000 count down from 10000.
 inline int SignedField(int value)
@@ -22,7 +13,7 @@ inline int SignedField(int value)
     return value;
 }
 
-extern "C" MapEntry DAT_10210fc0[];
+#include "map_records.h"
 
 // 0x10049990 (Map_RouteLength). Returns the length of the route of map table entry `map`, walked until a point ends
 // it and back again, plus each point's extra cost times `costScale`. Point i is stored at entries i and 2 * i of one
@@ -35,15 +26,15 @@ extern "C" float FUN_10049990(int map, int costScale)
     int count = 0;
     for (int i = 1; i < 16; i++)
     {
-        points[i].x = points[2 * i].x = (float)DAT_10210fc0[map].route[i - 1].x;
-        points[i].y = points[2 * i].y = (float)DAT_10210fc0[map].route[i - 1].y;
-        points[i].z = points[2 * i].z = (float)DAT_10210fc0[map].route[i - 1].z;
+        points[i].x = points[2 * i].x = (float)DAT_10210fc0[map].entry.route[i - 1].x;
+        points[i].y = points[2 * i].y = (float)DAT_10210fc0[map].entry.route[i - 1].y;
+        points[i].z = points[2 * i].z = (float)DAT_10210fc0[map].entry.route[i - 1].z;
         if (i > 1)
             total += (points[2 * i] - points[2 * (i - 1)]).Length();
-        if (SignedField(DAT_10210fc0[map].route[i - 1].code % 10000) != 0)
-            total += (float)(SignedField(DAT_10210fc0[map].route[i - 1].code % 10000) * costScale);
+        if (SignedField(DAT_10210fc0[map].entry.route[i - 1].code % 10000) != 0)
+            total += (float)(SignedField(DAT_10210fc0[map].entry.route[i - 1].code % 10000) * costScale);
         count++;
-        if (SignedField(DAT_10210fc0[map].route[i - 1].code / 10000) % 4 > 1)
+        if (SignedField(DAT_10210fc0[map].entry.route[i - 1].code / 10000) % 4 > 1)
             break;
     }
     total += (points[2 * count] - points[2]).Length();

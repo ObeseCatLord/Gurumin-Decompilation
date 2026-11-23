@@ -15,7 +15,7 @@
 
 #include "char_state.h"
 
-extern "C" DamageZone DAT_10210fc0[];
+#include "map_records.h"
 #include "char_tables.h"
 #include "world.h"
 extern "C" int FUN_100119d0(int index, int damage, int a);   // shows the damage on character `index`
@@ -27,10 +27,10 @@ extern "C" int FUN_100119d0(int index, int damage, int a);   // shows the damage
 extern "C" int FUN_1002ebf0(int index)
 {
     int zone = DAT_10db6ee8[index].zone;
-    if (DAT_10210fc0[zone].onFlag != 0)
+    if (DAT_10210fc0[zone].zone.onFlag != 0)
     {
-        int offFlag = DAT_10210fc0[zone].offFlag;
-        int on = DAT_10874848.TestScriptFlag(DAT_10210fc0[zone].onFlag);
+        int offFlag = DAT_10210fc0[zone].zone.offFlag;
+        int on = DAT_10874848.TestScriptFlag(DAT_10210fc0[zone].zone.onFlag);
         if (offFlag == 0)
         {
             if (on == 0)
@@ -44,23 +44,23 @@ extern "C" int FUN_1002ebf0(int index)
                 return 0;
         }
     }
-    int step = DAT_10210fc0[zone].step;
+    int step = DAT_10210fc0[zone].zone.step;
     if (++DAT_1020b430[index].turn > step)
         DAT_1020b430[index].turn = 0;
     for (int slot = DAT_1020b430[index].turn + 0x3a; slot < 0x5c; slot += __max(1, step))
     {
-        if ((DAT_10db6ee8[slot].matrix.translation.x > DAT_10210fc0[zone].left &&
-             DAT_10db6ee8[slot].matrix.translation.x < DAT_10210fc0[zone].right &&
-             DAT_10db6ee8[slot].matrix.translation.y > DAT_10210fc0[zone].front &&
-             DAT_10db6ee8[slot].matrix.translation.y < DAT_10210fc0[zone].back &&
-             DAT_10db6ee8[slot].matrix.translation.z > DAT_10210fc0[zone].bottom &&
-             DAT_10db6ee8[slot].matrix.translation.z < DAT_10210fc0[zone].top) ||
+        if ((DAT_10db6ee8[slot].matrix.translation.x > DAT_10210fc0[zone].zone.left &&
+             DAT_10db6ee8[slot].matrix.translation.x < DAT_10210fc0[zone].zone.right &&
+             DAT_10db6ee8[slot].matrix.translation.y > DAT_10210fc0[zone].zone.front &&
+             DAT_10db6ee8[slot].matrix.translation.y < DAT_10210fc0[zone].zone.back &&
+             DAT_10db6ee8[slot].matrix.translation.z > DAT_10210fc0[zone].zone.bottom &&
+             DAT_10db6ee8[slot].matrix.translation.z < DAT_10210fc0[zone].zone.top) ||
             (DAT_10210d30[slot] == 0 && DAT_1020d540[index] != 0 && DAT_10db6ee8[slot].matrix.translation.x < -20000.0f &&
-             DAT_10867e18[slot].x > DAT_10210fc0[zone].left && DAT_10867e18[slot].x < DAT_10210fc0[zone].right &&
-             DAT_10867e18[slot].y > DAT_10210fc0[zone].front && DAT_10867e18[slot].y < DAT_10210fc0[zone].back &&
-             DAT_10867e18[slot].z > DAT_10210fc0[zone].bottom && DAT_10867e18[slot].z < DAT_10210fc0[zone].top))
+             DAT_10867e18[slot].x > DAT_10210fc0[zone].zone.left && DAT_10867e18[slot].x < DAT_10210fc0[zone].zone.right &&
+             DAT_10867e18[slot].y > DAT_10210fc0[zone].zone.front && DAT_10867e18[slot].y < DAT_10210fc0[zone].zone.back &&
+             DAT_10867e18[slot].z > DAT_10210fc0[zone].zone.bottom && DAT_10867e18[slot].z < DAT_10210fc0[zone].zone.top))
         {
-            int damage = DAT_10210fc0[zone].damage;
+            int damage = DAT_10210fc0[zone].zone.damage;
             FUN_100119d0(slot, damage, 0);
             DAT_10daaae8[slot].stats[STAT_HEALTH] -= damage;
         }

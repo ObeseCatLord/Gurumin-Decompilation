@@ -23,11 +23,12 @@ extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, Node *other, Matrix4 *oth
                                       int c, int flags);
 
 
-// Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
-int AnimModel::M_101627d0(float x, float y, int mode)
+// Sets the model's movement for this frame: x, y scaled by the model scale, z (the vertical step) as it is.
+// Flying enemies call it (Enemy_FlyAndStrafe).
+int AnimModel::SetMoveStep(float x, float y, float z)
 {
     m_23d8.x = x * speedScale;
-    *(int *)&m_23d8.z = mode;  // the int mode is stored in the float slot as it is
+    m_23d8.z = z;
     m_23d8.y = y * speedScale;
     return 0;
 }

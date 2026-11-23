@@ -413,7 +413,7 @@ address	name	evidence
 101687c0	ModelObject::TickTimer	role from the decompiled source (decomp/src/model_misc.cpp)
 10169620	SlotLists::Clear	role from the decompiled source (decomp/src/model_misc.cpp)
 10169760	ModelNames_FindFree	role from the decompiled source (decomp/src/model_misc.cpp)
-101627d0	AnimModel::SetMoveOffset	role from the decompiled source (decomp/src/model_params.cpp)
+101627d0	AnimModel::SetMoveStep	sets the per-frame move step x, y (scaled) and z (matched, decomp/src/model_params.cpp)
 101629b0	AnimModel::FaceDirection	role from the decompiled source (decomp/src/model_params.cpp)
 10167400	WorldRenderer::TickFade	advances the screen fade one frame (decomp/src/world_ctor.cpp)
 101619a0	ModelTable_ClearFlags	role from the decompiled source (decomp/src/model_state.cpp)
@@ -997,3 +997,5 @@ address	name	evidence
 101a82d0	Node::BuildMesh	matched decompiled source (decomp/obj_symbols.tsv)
 10167440	WorldRenderer::DrawPictures	matched decompiled source (decomp/obj_symbols.tsv)
 1009d490	Enemy_ChaseAndSlash	kind 0x4f (FUN_1009e2d0); "@Bip01 R Fin"/"@Bip01 R Fore" trail effect 0x4c, sound 0x152; enemy_slash.cpp
+1009b120	Enemy_HopAndStrafe	kind 0x50 (FUN_1009e2d0): strafing enemy that hops back to its last ground positions; effect 0x57, sound 0x153 (matched, decomp/src/enemy_strafe.cpp)
+1009c070	Enemy_FlyAndStrafe	kind 0x51 (FUN_1009e2d0): flying strafing enemy, height steps clamped to 5 towards player z + 40 / + 200, effect 7, sound 0x158 (draft, decomp/src/enemy_strafe.cpp)

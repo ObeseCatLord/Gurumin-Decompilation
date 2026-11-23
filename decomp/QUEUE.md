@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (170)
+## 1. Walls to retry (171)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -84,6 +84,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
 - [ ] `10099b30` 2897 — Enemy_StrafeAndBurst (enemy_strafe.cpp, rule-clean): the same ebx/edi swap as 1009a690, and the idle block (motion 2, then `if (rand % 100 > 2) return 0;` before the motion-speed check) is merged into two copies (chase/left/right and back) where the original has one, placed before the end check. The defeated branch matches only as an if/else with two full FUN_1003a7d0 calls (cl hoists the common arguments); a ternary path is evaluated first.
 - [ ] `1009a690` 2703 — Enemy_StrafeAndShoot (enemy_strafe.cpp, rule-clean; twin 10099040 matched from the same source shape): 1 byte longer. ebx and edi are swapped all through (ours: index in edi, the model offset index*0x249c in ebx; the original and 10099040: index in ebx), and in the chase step the far/mid tails are merged the other way round (the original keeps the walk branch's copy of the heading/stuck tail and the run branch's `action = 0` block). Tried: early return vs nested if in the attack step (the attack step's own m_238c check + return is needed: 2688 -> 2704 bytes, 1756 -> 426 diffs), switch (worse), the end check in every step (worse), stuck-check spellings (`>=` / separate increment: much worse), a local copy of the index.
+- [ ] `1009c070` 4229 — Enemy_FlyAndStrafe (enemy_strafe.cpp): everything after the two height clamps matches up to frame offsets. Each clamp in the original keeps a copy of the unclamped value in ecx, compares a temporary copy against -5 and writes the value back at the second test of 5; the clamp is a double-evaluated max(min(x, 5), -5) with 5 > x as the first test. Our spellings (macros either way round, explicit ternaries, a new local, inline functions, double or int literals) never make that temporary, so the code is 24 bytes short and self / the matrix pointer sit 4 / 8 bytes lower in the frame
 - [ ] `1009d490` 2368 — Enemy_ChaseAndSlash (enemy_slash.cpp, rule-clean): frame, zero register (ebx) and the effect block match; 64 bytes short. Left: the cross-jumping of the side-step states 6-8. The original keeps state 6 whole, merges 8 into 7 from the heading fadd and 7 into 6 from the `< 200` check; ours merges 6 and 7 from RotateZ and keeps 8 whole. Store order of the stuck reset makes no difference (the compiler canonicalises it); the || form vs two ready blocks changes which pairs merge (two ready blocks in state 6 stop all merging, 2576 bytes). Key finds: the two stores before the Vec4 declarations, and the effect block reaching the model through a local `AnimModel *model` (with `&DAT_10db6ee8[index].matrix` the matrix address is CSEd with the top and takes ebx from the zero register).
 - [ ] `100b0250` 1583 — Companion0_Update: all but the idle branch identical; there the original takes eax/ecx for the first block's temporaries and edx/eax for the second (cl 13.00 here edx/eax and ecx/edx); its twins 0x100b0880 and 0x100b0f00 match with the same branch; slot-variable, local and early-return forms tried
 - [ ] `100b4300` 1583 — Npc_RaiseAlarm (char_move.cpp): all but the alarm block identical; the original pushes an immediate 0 for Sound_PlayEffect and re-zeroes edi after the red flash, cl 13.00 here re-zeroes edi before the sound. The `||` spelling of the line-of-sight test makes cl 13.00 inline atan2f (a larger frame); the `visible` local keeps it a call
@@ -318,7 +319,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10016ec0` 2970 bytes (float, loops 6, calls 56)
 - [ ] `10165240` 2986 bytes (float, loops 15, calls 68)
 
-## 5. Very large functions (over 3000 bytes) (111)
+## 5. Very large functions (over 3000 bytes) (109)
 
 - [ ] `100094e0` 3023 bytes (float, loops 2, calls 27)
 - [ ] `100fb7b0` 3089 bytes (float, loops 16, calls 57)
@@ -344,12 +345,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1017a010` 3719 bytes (float, loops 10, calls 70)
 - [ ] `10079470` 3839 bytes (float, loops 3, calls 70)
 - [ ] `10004b10` 3854 bytes (float, loops 14, calls 9)
-- [ ] `1009b120` 3918 bytes (float, loops 4, calls 138)
 - [ ] `1000a0b0` 3983 bytes (float, loops 8, calls 16)
 - [ ] `10083eb0` 4012 bytes (float, loops 17, calls 109)
 - [ ] `10056b30` 4169 bytes (float, loops 12, calls 59)
 - [ ] `1007c050` 4174 bytes (float, calls 93)
-- [ ] `1009c070` 4229 bytes (float, loops 5, calls 124)
 - [ ] `100311b0` 4234 bytes (float, calls 73)
 - [ ] `100af1b0` 4254 bytes (float, loops 3, calls 94)
 - [ ] `100615f0` 4264 bytes (float, calls 75)

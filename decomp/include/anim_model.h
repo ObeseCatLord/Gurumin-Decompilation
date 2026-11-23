@@ -89,7 +89,7 @@ struct AnimModel
 {
     Vec4 m_0000;
     char pad_0010[2];
-    char m_0012;
+    char m_0012;              // 0x12: set to 2 every frame by many characters (Enemy_FlyAndStrafe)
     char m_0013;
     char pad_0014[4];
     Matrix4 m_0018;
@@ -245,7 +245,7 @@ struct AnimModel
     Vec4 move;                // 0x23a8: movement impulse applied by the next update (Character_SetMove)
     Vec4 velocity;            // 0x23b8: current movement
     Vec4 m_23c8;
-    Vec4 m_23d8;              // 0x23d8: x, y = target of MoveTowards / M_101627d0; z holds their int `mode`
+    Vec4 m_23d8;              // 0x23d8: x, y = target of MoveTowards / step of SetMoveStep; z = MoveTowards' int `mode` or SetMoveStep's vertical step
     Vec4 m_23e8;
     Vec4 m_23f8;
     Vec4 m_2408;
@@ -287,7 +287,7 @@ struct AnimModel
     int UpdateCollision();                                         // 0x10162390 (texture_mgr.cpp)
     int Teleport(float x, float y, float z);                       // 0x10162420 (model_place.cpp)
     int SetPosition(float x, float y, float z);                    // 0x10162610 (model_place.cpp)
-    int M_101627d0(float x, float y, int mode);
+    int SetMoveStep(float x, float y, float z);  // 0x101627d0 (model_params.cpp)
     int MoveTowards(float x, float y, int mode);                   // 0x10162800
     // 0x101628b0: queues a push (x, y, z) with `flag` unless the model is locked.
     int SetPendingPush(float x, float y, float z, char flag);

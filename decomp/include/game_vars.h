@@ -69,7 +69,7 @@ extern "C" char DAT_10223a50;
 extern "C" char DAT_10223a58[0x400];
 extern "C" int DAT_10253f18[0x18];
 extern "C" int DAT_10254088;
-extern "C" int DAT_10254310[0x20];
+extern "C" unsigned char DAT_10254310[0x80];               // per character slot: Enemy_HopAndStrafe sets its own to 1
 extern "C" int DAT_10254590;
 extern "C" short DAT_102548b8;
 extern "C" unsigned char DAT_10254c40[0x400];             // drop / position ring: 0 = unused, 1 = in use (falling), 2..30 = fading out

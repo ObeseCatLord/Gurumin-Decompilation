@@ -128,17 +128,39 @@ struct CharState
                         int scriptResult;         // char_script.cpp: result of the last step (5 = run the next
                                                   // step at once, 2 = waiting)
                     };
-                    int pointPause;               // 0x20: route_carrier.cpp: frames to wait at a route point
-                    int m_0024;
+                    union                         // 0x20
+                    {
+                        int pointPause;           // route_carrier.cpp: frames to wait at a route point
+                        int hopRequests;          // enemy_strafe.cpp (Enemy_HopAndStrafe): frames counted
+                                                  // towards the next hop
+                    };
+                    union                         // 0x24
+                    {
+                        int m_0024;
+                        int restFrames;           // enemy_strafe.cpp (Enemy_HopAndStrafe): frames standing still
+                                                  // in the idle motion
+                    };
                     union                         // 0x28
                     {
                         int fadeActions;          // route_carrier.cpp: bit n set = fade out at a point with
                                                   // action n
                         int skipGroundProbe;      // non-zero = skip the ground probe of a shot (0x1001a590)
+                        int hopBack;              // enemy_strafe.cpp (Enemy_HopAndStrafe): 1 = the next hop
+                                                  // ends the strafe
                     };
-                    int m_002c;
+                    union                         // 0x2c
+                    {
+                        int m_002c;
+                        int hopFrame;             // enemy_strafe.cpp (Enemy_HopAndStrafe): frame of the hop
+                                                  // under way (0 = not hopping)
+                    };
                     int m_0030;
-                    int m_0034;
+                    union                         // 0x34
+                    {
+                        int m_0034;
+                        int hopHistory;           // enemy_strafe.cpp (Enemy_HopAndStrafe): HopHistory state of
+                                                  // the position history in LastPosition
+                    };
                 };
                 int values[13];                   // the same variables by index (enemy_ai.cpp, enemy_moves.cpp,
                                                   // ai_pick.cpp and friends use values[0..5])

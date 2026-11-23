@@ -99,6 +99,7 @@ extern "C" int DAT_10c65648;
 extern "C" int DAT_10c6564c;
 extern "C" int DAT_10c6566c;                              // 1 = drill 5
 extern "C" int DAT_10c66710;                              // non-zero: wake-up radius forced to 300
+extern "C" int DAT_10c66cb0;                              // cleared when costume 6 is revoked (its unlock bits are incomplete)
 extern "C" int DAT_10c66cc0;                              // non-zero = message words are replaced; non-zero = voices are not limited
 extern "C" int DAT_10c66d00;
 extern "C" Vec4 DAT_10c66ef0[0x100];                      // velocity

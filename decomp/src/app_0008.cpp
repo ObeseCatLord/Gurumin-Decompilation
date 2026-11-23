@@ -11,20 +11,6 @@
 #include "char_tables.h"
 
 
-// Releases and frees the owned mesh node and clears the two counters. Returns 1.
-int MeshOwner::M_1000be10()
-{
-    m_0030 = 0;
-    m_0034 = 0;
-    if (mesh != 0)
-    {
-        mesh->M_1019e9a0();
-        DAT_11b1ba40(mesh);
-    }
-    mesh = 0;
-    return 1;
-}
-
 // Animates the message window: opening (state 1) counts 0 -> 15, closing (state 2) counts back to 0, after
 // which the window is hidden (state 0).
 extern "C" int FUN_1000cbe0(void)

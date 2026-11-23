@@ -55,6 +55,21 @@ int EffectModel::M_1000b9f0(const char *path, int value, int start, int end)
     return 1;
 }
 
+// 0x1000be10 (EffectModel::Free). Stops the effect: forgets the frame counter, releases and frees the model node and
+// makes the slot free again. Returns 1.
+int EffectModel::Free()
+{
+    visible = 0;
+    frame = 0;
+    if (node != 0)
+    {
+        node->Release();
+        DAT_11b1ba40(node);
+    }
+    node = 0;
+    return 1;
+}
+
 // Returns the first free effect model slot, or -1.
 inline int FindFreeEffectModel()
 {

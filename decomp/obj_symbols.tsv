@@ -429,7 +429,7 @@ _FUN_101426d0@8	101426d0
 ?DrawScreenCopy@TextureSlot@@QAEHHHHHMM@Z	1014b750
 ?DrawShadows@ModelBank@@QAEHPAUNode@@PBUMatrix4@@1H@Z	10165e00
 ?DrawShadowsInto@ModelBank@@QAEHPAUNode@@PBUMatrix4@@1H@Z	10166100
-?StartProximityPass@Node@@QAEHPAMPAUMatrix4@@1MH@Z	101a2370
+?StartProximityPass@Node@@QAEHPAMPAUMatrix4@@1HH@Z	101a2370
 ?TagRegion@Node@@QAEHPBUBox2@@PAY0EA@$$CBDPAUMatrix4@@@Z	10199cd0
 ?Draw@EffectModel@@QAEHABUMatrix4@@@Z	1000baf0
 ?SetTranslation@Matrix4@@QAEXUVec4@@@Z	101adef0
@@ -520,3 +520,6 @@ _Enemy_IsBusy	100e1c40
 ?DrawTextClipped@FontRenderer@@QAEHHHPBDHHHHHMMM@Z	1014fdd0
 ?DeclareFromText@ListBank@@QAEHPADH@Z	100ed510
 ?Lava_Update@@YAHXZ	1005f750
+?DrawKeyed@EffectModel@@QAEHAAUMatrix4@@0@Z	10037b40
+?Free@EffectModel@@QAEHXZ	1000be10
+?DrawItemPreview@@YAHXZ	10038070

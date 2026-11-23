@@ -112,7 +112,7 @@ struct AnimModel
     char m_0074;
     char m_0075;
     char m_0076;
-    char m_0077;
+    unsigned char m_0077;     // 0x77: model variant loaded (Costume_LoadPlayerModel 0x1003b6e0)
     int m_0078;
     int m_007c;
     int m_0080;

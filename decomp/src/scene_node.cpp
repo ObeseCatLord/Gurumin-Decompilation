@@ -107,14 +107,14 @@ int Node::M_101944d0()
     return 1;
 }
 
-// Starts a proximity pass over the subtree: clears m_00a8 everywhere, remembers `radius` and runs the recursive
+// Starts a proximity pass over the subtree: clears m_00a8 everywhere, remembers the motion `frame` and runs the recursive
 // pass M_10194f40 from depth 0. Returns 1. (It sits here, after M_101944d0, because the compiler keeps `this` in
 // edx across that call only when it can see M_101944d0's body.)
-int Node::StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, float radius, int b)
+int Node::StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b)
 {
     M_101944d0();
-    DAT_11b044f8 = radius;
-    M_10194f40(position, matrix, reference, radius, b, 0);
+    DAT_11b044f8 = frame;
+    M_10194f40(position, matrix, reference, frame, b, 0);
     return 1;
 }
 

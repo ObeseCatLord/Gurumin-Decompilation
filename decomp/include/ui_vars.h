@@ -48,7 +48,7 @@ extern "C" int DAT_104bf8c0;
 extern "C" int DAT_104bfd10;
 extern "C" int DAT_104bff00;
 extern "C" int DAT_104bff0c;
-extern "C" unsigned char DAT_104c0230;
+extern "C" unsigned int DAT_104c0230;                       // costume unlock bits (bit n-1 = costume n for 1-5, 0x20 = 10, 0x40 = 8, 0x80 = 9, 0x100 = 11, 0x200 = 12)
 extern "C" unsigned char DAT_104c02c4;                    // selects which of the two outline textures DAT_10836100 holds (odd/even)
 extern "C" unsigned char DAT_104c02c5;                    // character slot to draw an outline around (0 = none)
 extern "C" unsigned char DAT_104c02c6;                    // 0 = outline added to the scene, otherwise darkened into it

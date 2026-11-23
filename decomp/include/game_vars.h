@@ -395,7 +395,7 @@ extern "C" char DAT_104c02e7;
 extern "C" char DAT_104c02ec;
 extern "C" char DAT_104c02ee;
 extern "C" char DAT_104c02f4;
-extern "C" int DAT_104c02f8;
+extern "C" float DAT_104c02f8;
 extern "C" int DAT_104c02fc;
 extern "C" char DAT_104c0300;
 extern "C" char DAT_104c0301;

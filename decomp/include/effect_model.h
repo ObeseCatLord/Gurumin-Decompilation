@@ -1,7 +1,7 @@
 // EffectModel: one slot of the model table at DAT_10edbe08 (EFFECT_MODEL_SLOTS slots, 0xb08 bytes each): models
 // placed by scripts (hit sparks, magic effects) and attached models such as held items. A slot is free while
 // node == 0. Set up by EffectModel::M_1000b9f0 (effect_model.cpp), drawn by EffectModel::Draw (mesh_slots.cpp) or,
-// with its key frames, by EffectModel::M_10037b40 (called from ai_pick.cpp).
+// with its key frames, by EffectModel::DrawKeyed (called from ai_pick.cpp).
 #ifndef GURUMIN_EFFECT_MODEL_H
 #define GURUMIN_EFFECT_MODEL_H
 
@@ -28,7 +28,8 @@ struct EffectModel
     EffectModel();
     int M_1000b9f0(const char *path, int value, int start, int end);
     int Draw(const Matrix4 &view);                                // 0x1000baf0
-    int M_10037b40(const Matrix4 &view, const Matrix4 &camera);  // 0x10037b40: draws with the key frames applied
+    int Free();                                                   // 0x1000be10: releases the model, the slot is free again
+    int DrawKeyed(Matrix4 &view, Matrix4 &camera);                // 0x10037b40: draws with the key frames applied
 
     // Adds a position key and marks the effect as changed.
     void AddKey(int frame, float x, float y, float z)

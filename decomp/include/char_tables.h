@@ -71,6 +71,7 @@ extern "C" int DAT_103084a8[CHAR_SLOT_COUNT];             // number of words in 
 extern "C" int DAT_103086b0[CHAR_SLOT_COUNT];
 extern "C" int DAT_1030b668[CHAR_SLOT_COUNT];             // base kind of each character (-1 or 0 = none)
 extern "C" int DAT_1030b8f8[CHAR_SLOT_COUNT];
+extern "C" char DAT_1030c480[CHAR_SLOT_COUNT];            // cleared when an enemy is spawned (char_spawn.cpp)
 extern "C" int DAT_1030c278[CHAR_SLOT_COUNT];             // frames until the next face change (0 = none)
 extern "C" char DAT_1030ce38[CHAR_SLOT_COUNT];
 extern "C" unsigned char DAT_1030ceb8[CHAR_SLOT_COUNT][0x100];  // replacement chosen for each word (0xff = not yet)
@@ -87,6 +88,7 @@ extern "C" int DAT_104485e8[CHAR_SLOT_COUNT];
 extern "C" char DAT_104487e8[CHAR_SLOT_COUNT][0x100];     // length of each word
 extern "C" int DAT_10453008[CHAR_SLOT_COUNT];
 extern "C" int DAT_10467288[CHAR_SLOT_COUNT];             // each character's debris colour
+extern "C" int DAT_10467510[CHAR_SLOT_COUNT];             // cleared when an enemy is spawned (char_spawn.cpp)
 extern "C" char DAT_10467920[CHAR_SLOT_COUNT];            // 1 = no ground found below the slot
 extern "C" int DAT_104679a0[CHAR_SLOT_COUNT];
 extern "C" char DAT_10467ba0[CHAR_SLOT_COUNT];            // DEFEATED_MARK once a strafing enemy was defeated (enemy_strafe.cpp)

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (184)
+## 1. Walls to retry (188)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -65,7 +65,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10037090` 976 — ListBank::FindVariable: calls and the inline ReportError expansion match (listbank_vars.cpp sees ReportError as an inline member); the search loops keep the level in edi and spill this (cl 13.00 here keeps this in edi) and the original hoists the error flag into a local per level
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
 - [ ] `10037560` 743 — ListBank::AssignValue: statements and calls match; frame 8 bytes larger (the original puts the (float)(int) conversion temporary in the keyword index slot and the atof result in the value buffer) and the int-variable type-0 store is placed after the type tests; block scopes, an int local and kind forms tried
+- [ ] `10037b40` 1232 — EffectModel::DrawKeyed (mesh_slots.cpp, 1248 vs 1232 bytes): structure and EH states match; the original loads [ebp+0x34] for frame - start after the second pointer push of the KeyBank::Sample call, ours first, and registers differ downstream; a fully hoisted playFrame gives 1232 bytes but moves zero from ebx to edi
+- [ ] `10038070` 1195 — DrawItemPreview (item_preview.cpp, 1200 vs 1195 bytes): calls and EH states match; load order of ItemInfo.previewScale (+0x54, first, tested) vs previewHeight (+0x50, stored before the 0x64 default) and the item-index loads before name[0] = 0 differ; 7 statement orders tried
 - [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
+- [ ] `1003b6e0` 1208 — Costume_LoadPlayerModel (costume_load.cpp, 1200 vs 1208 bytes): logic matches; the original holds index*0x249c in ebx and reads variant from the stack (ours keeps variant in ebx); costume 11/12 sprintf pushes per-branch format constants after hoisted pushes; speedScale copy via eax vs ecx
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `100451c0` 1644 — Npc_WalkRoute (route_carrier.cpp): flow and calls line up; the original frame is 8 bytes smaller: the float temporaries (speed, 0.1/0.9 factors, heading) reuse the slots of the Route_Follow results (reached, action), which cl 13.00 here keeps apart
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
@@ -76,6 +79,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f250` 655 — TutorialBook_Close draft: flow and calls match (LoadTexture inline for the cover); the page loop registers differ (original: first page in edi, second in ebp, name pointer in ebx), like the other TutorialBook functions; declaration orders tried
 - [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
 - [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
+- [ ] `10050510` 1219 — Char_SpawnEnemy (char_spawn.cpp, 1232 vs 1219 bytes): the kind/route match in the slot search shares one je-break in the original (ours duplicates the compare), and packed % 100 == 0 gives test edx,edx instead of cmp edx,ebx; ~16 spellings tried
 - [ ] `10051190` 988 — MapCursor_Step (map_cursor.cpp, rule-clean draft, 1024 vs 988 bytes): register allocation from the start (original: index in edi, slot offset in ebx, rider flag in ecx and two stack slots; ours index in ebp, flag in esi) and the early-test order; held/hold-pointer/reference forms tried; next: the shared rider block written with a goto, then a permuter run
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054770` 506 — Game::MarkKilled: same statements; like RaiseGameOverEvents the original walks the events with two pointers (&flags[1] and &ids[0]) and keeps this in ebp, cl 13.00 here one event pointer and this in ebx (pointer and indexed forms tried)
@@ -205,15 +209,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (95)
+## 4. Large functions (801-3000 bytes) (91)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `10038070` 1195 bytes (float, loops 2, calls 37)
-- [ ] `1003b6e0` 1208 bytes Costume_LoadPlayerModel (calls 33)
-- [ ] `10050510` 1219 bytes (float, loops 2, calls 18)
 - [ ] `100169c0` 1220 bytes (float, loops 9, calls 33)
 - [ ] `10020090` 1224 bytes (float, loops 1, calls 27)
-- [ ] `10037b40` 1232 bytes (float, calls 42)
 - [ ] `1014c960` 1234 bytes (float, calls 22)
 - [ ] `1001ed80` 1257 bytes (float, calls 11)
 - [ ] `100ed9b0` 1258 bytes Script_CompileStatement (loops 11, calls 22)

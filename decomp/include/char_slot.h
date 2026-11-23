@@ -82,7 +82,7 @@ struct CharSlot
     int m_00e0;
     int m_00e4;
     int m_00e8;
-    int m_00ec;
+    float speedScale;         // 0xec: motion speed scale given to the model (AnimModel::speedScale) when it is loaded
     int params[16];           // 0xf0: by CharParam index (params[PARAM_MODEL] = model definition)
     ParamVector position;     // 0x130
     char switchesHeld;        // 0x140: number of switches the character is holding

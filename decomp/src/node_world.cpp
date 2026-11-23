@@ -8,7 +8,7 @@
 
 struct Keys
 {
-    int M_101ad350(float value, int a, int b);   // 0x101ad350 (containers.cpp MotionList::FrameAt)
+    int M_101ad350(int value, int a, int b);   // 0x101ad350 (containers.cpp MotionList::FrameAt)
 };
 
 // A plug of a node (scene_node.cpp Channel).

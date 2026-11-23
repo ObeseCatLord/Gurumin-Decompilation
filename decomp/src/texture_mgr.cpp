@@ -232,6 +232,6 @@ int AnimModel::UpdateCollision()
     if (root != 0)
         root->ReleaseSavedStates();
     m_2384 = 0;
-    root->StartProximityPass(matrix.m, &work, 0, radius, 0);
+    root->StartProximityPass(matrix.m, &work, 0, motionFrame, 0);
     return 0;
 }

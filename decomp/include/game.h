@@ -199,6 +199,7 @@ struct Game : Object
     int DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade);  // fade: passed to DrawTinted, unused there
     int DrawCursor(int x, int y, float fade, int frame);
     int DrawWindowMarks(int frame);
+    int DrawWindows(int size);  // 0x100094e0
     int DrawDebugText(const char *text, int x, int y);
     int FindConstant(const char *name);
     int CloseWindow(int id);

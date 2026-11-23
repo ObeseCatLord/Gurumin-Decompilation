@@ -150,7 +150,7 @@ int UpdateMeshSlots()
     for (int i = 0; i < EFFECT_MODEL_SLOTS; i++)
     {
         if (DAT_10edbe08[i].node != 0)
-            DAT_10edbe08[i].M_10037b40(DAT_108392d8, DAT_10836330);
+            DAT_10edbe08[i].DrawKeyed(DAT_108392d8, DAT_10836330);
     }
     Matrix4 identity;
     identity.SetIdentity();

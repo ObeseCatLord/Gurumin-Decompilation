@@ -322,8 +322,8 @@ struct Node
     int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);  // 0x1019f210
     int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
                            Vec4 *closest);                // 0x10191ec0
-    int M_10194f40(float *position, Matrix4 *matrix, Matrix4 *reference, float radius, int b, int depth);  // 0x10194f40
-    int StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, float radius, int b);     // 0x101a2370
+    int M_10194f40(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b, int depth);  // 0x10194f40
+    int StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b);     // 0x101a2370
     // 0x1019f340: tests a moving model (probe points) against this collision node (model_params.cpp).
     int M_1019f340(int mask, Matrix4 *world, int a, float reach, int *out5, Vec4 *probe, int probeCount, int *hitCount,
                    Vec4 *hitPoint, Vec4 *hitNormal, int limit, int *out12, int c, int d, int e);

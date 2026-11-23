@@ -23,6 +23,7 @@ struct Tracker
     int M_10001440();
     int M_10001450();
     int M_100014a0();
+    int M_100014b0();   // 0x100014b0 (Obj::ReportCursor in app_0001.cpp)
 };
 
 extern "C" Tracker DAT_1020d9e0;                          // the game's mouse and key tracker

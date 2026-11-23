@@ -200,7 +200,7 @@ extern "C" int DAT_11b044e4;
 extern "C" int DAT_11b044e8;
 extern "C" int DAT_11b044ec;                              // non-zero = the plugs do not give the frame
 extern "C" int DAT_11b044f4;
-extern "C" float DAT_11b044f8;                            // radius of the current proximity pass (used by M_10194f40); the value the frame-giving plugs are sampled at
+extern "C" int DAT_11b044f8;                              // motion frame of the current pass (set by StartProximityPass, used by M_10194f40); the value the frame-giving plugs are sampled at
 extern "C" int DAT_11b04500;
 extern "C" int DAT_11b04504;
 extern "C" char DAT_11b04508;                             // set while an important model changes motion (read by the playback code)

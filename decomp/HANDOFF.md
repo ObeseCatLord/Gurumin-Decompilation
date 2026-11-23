@@ -17,53 +17,64 @@ reading it, then `AGENTS.md`.
 ## Progress (2026-11-23, `progress/jp/report.json`)
 | measure | value |
 |---|---|
-| Fully linked | 0.00% of code (147 of 252 units complete) |
-| Matched | 12.07% of code (207655 of 1720206 bytes), 796 of 1212 functions |
-| Matched under the rules | 11.16% of code (191918 bytes), 764 of the 796 matched functions |
-| Fuzzy match | 15.44% |
+| Fully linked | 0.00% of code (148 of 255 units complete) |
+| Matched | 12.17% of code (209406 of 1720206 bytes), 797 of 1212 functions |
+| Matched under the rules | 11.37% of code (195512 bytes), 770 of the 797 matched functions |
+| Fuzzy match | 15.57% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). `python tools/rule_check.py`
-lists the files still breaking rule 2 (32 matched functions left), most matches first.
+lists the files still breaking rule 2 (27 matched functions left), most matches first.
 
 ## State
-- Last session (cf657b4): AnimModel::CloneModel 0x1017b210 and AnimModel::LoadFile 0x1017b9b0 (was M_1017b9b0)
-  matched in the new anim_clone.cpp, rule-clean (the 1017b210/1017b9b0 family is done). AnimModel fields named on
-  the way (m_0013, m_0088, spineNode, leftToeNode, rightToeNode, colliderReach (float), m_2320, bipNode);
-  DAT_10ff19e8 is `Matrix4 *[0x100]` (each model table entry's world matrix); Node::M_1019f340 takes a float reach.
-- Enemy_SeekShaga 0x100d2110 drafted in shaga_seek.cpp (+ include/shaga.h: ShagaCandidate, SHAGA_SLOT_COUNT),
-  rule-clean, body identical: ebx/edi are pushed before the FUN_100aa820 call (original: after the step test) and
-  the pair branch's `count++` cross-jumps into the single branch. Early-return/nested-if/local placement/candidate
-  spellings tried (open.tsv). A permuter run or a new idea about push sinking is the next lever.
-- Deferred / open (the 32 pending matches, from `rule_check.py`):
+- This session (37b7412, d9c2a00): Node::SegmentHitsMesh 0x101a8780 matched in the new node_mesh_hits.cpp
+  (rule-clean). Node::m_0070 is now `triangleSpheres`; Node::IntersectTriangle 0x1019dca0 (ray-triangle test,
+  writes the hit point into its third argument) is declared in node.h. Node::Collide 0x101a8e60 is drafted in the
+  same file with the new signature `Collide(const char *tag, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit)`
+  (FUN_1001fff0 passes tag/mask through).
+- **The region prologue wall** (open.tsv 0x101a8e60): Collide's body after the prologue is SegmentHitsMesh's
+  matched code, but the prologue that picks the tag offset (node kind < 0x40 = visibility cell, "CDLnn" = collision
+  region, kind 0xfd / "OvF" = offset 7) does not cross-jump like the original. The original shares the tails of the
+  four branches (cell list DAT_11b002c0 vs DAT_11afffe8/DAT_11affdd8): `mov bl,[cell]; test bl,bl; mov ecx,6; je
+  children; cmp al,0xfd; jne; mov ecx,7`. cl here keeps the cell-list branch as `cmp byte [..],0` and does not merge
+  identical tails (checked with a toy file: shared char local, assignment after the test, ternary on the list,
+  `&&`-chained gotos, an inline helper). RayCast 0x101a9670, CastSegment 0x101aaa20 and CastSegment2 0x101aa080 have
+  the same prologue (with kind 0xff for name nodes and `(flags & mask) == mask`), so one idea that fixes it gives four
+  functions (~9500 bytes).
+- Rule merges this session: ScreenBatch was a view of TriangleBatch (0x10172ac0 = TriangleBatch::AppendVertices,
+  `vertices` is `ScreenVertex *`); DAT_10202464 (int[4]), DAT_108029b8 (Vec4, player start), DAT_1042de28
+  (char[0x80], items obtained) in game_vars.h; DAT_1020d860 in ground_height.h; names_od globals in name_paths.h.
+  save_slot, screen_vertices and names_od are rule-clean now.
+- Deferred / open (the 27 pending matches, from `rule_check.py`):
   - **Node family**: Node/NodeBody/SceneNode/WorldNode/GameNodeBody views (ctor 0x1019ebc0, dtor 0x10191480) are
     still separate; risky because Game and WorldRenderer embed them.
-  - **WorldRenderer** (world_ctor, world_frame, scene_start; Bind takes ModelRecord = AnimModel).
+  - **WorldRenderer** (world_ctor, world_frame, scene_start, world_model_state; Bind takes ModelRecord = AnimModel).
   - **window_create.cpp**: RenderWindow/GameWindow views + DAT_10f1a860.
   - **DAT_10210fc0 map table** (0x100-byte entries read as MapEntry/DamageZone/CameraPoint/RoutePoint[16]): needs a
     union type (map_icons, map_route, route_follow).
-  - DAT_108029b8 (Vec4 read as raw ints in save_write/save_slot), DAT_104c03c0 (MapObject vs MapRegion),
-    switches.cpp / switch_effects.cpp (MapObject + DAT_1030bbf8/10255b08/10219fc0/1042e0a8), game_reset.cpp
-    (13 globals), names_od, npc_greet (skipped: Character/CharMatrix views), screen_vertices ScreenBatch.
-  - GameFile 0x28 vs MovieFile 0x24; DAT_10874848/DAT_104b7200 both Game; ParamVector may be Vec4.
-- Open match walls: Enemy_SeekShaga 0x100d2110 (above), BoxSphere_Overlap 0x10192520 and CylinderSphere_Overlap
-  0x10192c90 (y-sum operand order), KeyBank::Sample 0x101af4c0 (flag fold; KeyTrack twins 0x101afe00/0x101af960/
-  0x101b0240 wait for it), ProjectPlanarUVs 0x1019bdd0 (x87 scheduling). Details in open.tsv and NOTES.
-- Section 4 candidates already looked at and left: 0x10164c10, 0x1001bb20, 0x10049b00, 0x10026730, 0x100360f0,
-  0x1004f8b7, the 0x101a24e0/0x101a8780/0x101aa080 families. 0x10199e20 (Node::QueueDraw) has an EH frame and
-  string tests; 0x10167440/0x10167d90 belong to an unnamed 0x14xxxx-byte object (no type yet).
-- Look-alike families left in sections 4-5 (same instruction sequence, >85%): 101aa080/101aaa20/101a9670,
-  101713f0/10170580/10187520, 10167440/10167d90, 10199e20/1019a6b0, 101a8780/101a8e60, 1009a690/10099b30,
-  100fda40/100fc4a0. One match in a family usually gives the others (1017b210 gave 1017b9b0 at first build).
+  - **Switch hold slots** (switches.cpp, switch_effects.cpp, game_reset.cpp): DAT_1030bbf8/10255b08/10219fc0/
+    1042e0a8/10219c40 are 0x80-slot tables, but game_reset memsets only 0x100 bytes (0x40 slots, a leftover of a
+    smaller table): declare them [0x80] and write game_reset's memset size explicitly; DAT_1030bbf8 is
+    `SwitchObject *` vs `int`; MapObject has views in switches/map_special/map_unload.
+  - game_reset.cpp also: DAT_10453208 (int[0x4000] memset vs MessageText[0x7c] in message_open: sizes disagree),
+    DAT_104b7200 (GameObject vs Game). DAT_104c03c0 (MapObject vs MapRegion, region_view/map_unload), npc_greet
+    (Character/CharMatrix views), node_world (Keys/Channel).
+- Open match walls: the region prologue (above), Enemy_SeekShaga 0x100d2110 (push placement), BoxSphere_Overlap
+  0x10192520 and CylinderSphere_Overlap 0x10192c90 (y-sum operand order), KeyBank::Sample 0x101af4c0 (flag fold;
+  KeyTrack twins 0x101afe00/0x101af960/0x101b0240 wait for it), ProjectPlanarUVs 0x1019bdd0 (x87 scheduling).
+- Look-alike families left in sections 4-5: 101aa080/101aaa20/101a9670 (+101a8e60, region prologue),
+  101713f0/10170580/10187520, 10167440/10167d90, 10199e20/1019a6b0, 1009a690/10099b30, 100fda40/100fc4a0.
+  Playback::Update 0x1016a480 (1045 bytes, model_state.cpp neighbour) was looked at: many cross-jumped tails.
 
 ## Next steps
-1. Another look-alike family: 101a8780/101a8e60 (Node::Collide, 1751 bytes; Node is a shared type) or
-   10199e20/1019a6b0 (Node::QueueDraw; needs the EH frame), decoding the frame from `asm.py`.
-2. Section 4 functions next to matched rule-clean code (anim_clone.cpp / texture_mgr.cpp / scene_node.cpp
-   neighbours in QUEUE.md); fix scheduling with variants.
-3. The remaining 32 pending matches: the DAT_10210fc0 map-table union (3 files), WorldRenderer (3 files),
-   window_create, switches + switch_effects globals; then the Node family merge.
-4. The open walls above (Enemy_SeekShaga push placement first), if a new idea comes up.
+1. The region prologue (one fix = Collide, RayCast, CastSegment, CastSegment2): try a source shape where the
+   four branches share code by construction, e.g. compute the cell entry into one variable in the branches and test
+   it once after them, or test the tag offset in a separate statement; build a toy file in `src/` (delete it after)
+   to compare shapes quickly, as this session did.
+2. Another look-alike family: 101713f0/10170580/10187520 or 1009a690/10099b30 (decode the frame from `asm.py`).
+3. Rule merges: the switch hold-slot globals (above), then the DAT_10210fc0 map-table union, WorldRenderer,
+   window_create; then the Node family merge.
+4. Section 4 functions next to rule-clean code; the open walls above if a new idea comes up.
 
 ## How the merges were run (reuse)
 - Types: `python tools/type_move_driver.py apply <files>` then `python tools/prune_header_includes.py <new headers>`;
@@ -78,12 +89,13 @@ lists the files still breaking rule 2 (32 matched functions left), most matches 
 
 ## Continuation prompt
 "Continue the Gurumin decompilation. Read `decomp/HANDOFF.md` (including its Standing instructions) and `AGENTS.md`.
-Work through HANDOFF 'Next steps': one look-alike family from the list in 'State' (101a8780/101a8e60 first), then
-`decomp/QUEUE.md` section 4 functions next to already-matched rule-clean code (decode the frame from `asm.py`, write,
-fix scheduling with variants); put every new type and global in a shared header so new matches count under the
-rules, and merge a file's remaining struct views (HANDOFF 'Deferred / open') when you touch it. After each batch run
-`python tools/build_all.py --report ../progress/jp/report.json` and `python tools/check_matches.py` from `decomp/`;
-commit and push only with no real loss. Keep everything human-readable (named constants, liberal comments,
-informative names). Work autonomously. Rewrite HANDOFF.md at the end with the Fully linked / Matched / Matched under
-the rules / Fuzzy numbers, keeping its Standing instructions section and a continuation prompt for the next task,
-then end your turn."
+Work through HANDOFF 'Next steps': first the region prologue shared by Node::Collide 0x101a8e60 and the
+RayCast/CastSegment/CastSegment2 family (try new source shapes in a toy file), then another look-alike family from
+'State', then the rule merges listed under 'Deferred / open' (switch hold-slot globals first) and `decomp/QUEUE.md`
+section 4 functions next to already-matched rule-clean code (decode the frame from `asm.py`, write, fix scheduling
+with variants). Put every new type and global in a shared header so new matches count under the rules. After each
+batch run `python tools/build_all.py --report ../progress/jp/report.json` and `python tools/check_matches.py` from
+`decomp/`; commit and push only with no real loss. Keep everything human-readable (named constants, liberal
+comments, informative names). Work autonomously. Rewrite HANDOFF.md at the end with the Fully linked / Matched /
+Matched under the rules / Fuzzy numbers, keeping its Standing instructions section and a continuation prompt for
+the next task, then end your turn."

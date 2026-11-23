@@ -1,13 +1,14 @@
-// Scene node constructor.
+// Scene node constructor (node.h).
 
 #include "matrix4.h"
 
 #include "vec4.h"
 
-#include "scene_node.h"
+#include "node.h"
 
-// Member constructors run first (matrices and vectors), then Init (0x10191500) fills in the defaults.
-SceneNode::SceneNode()
+// 0x1019ebc0. Member constructors run first (matrices and vectors), then Init (0x10191500) fills in the defaults.
+// Used for the scene nodes embedded in WorldRenderer and allocated by the model loaders.
+Node::Node()
 {
-    M_10191500();
+    Init();
 }

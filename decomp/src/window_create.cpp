@@ -5,39 +5,7 @@
 #include <string.h>
 #include <imm.h>
 
-typedef void (*WindowCallback)();
-
-struct RenderWindow
-{
-    virtual LRESULT __stdcall WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
-    HWND window;
-    int active;
-    HINSTANCE instance;
-    int compositionResult;
-    int compositionEnded;
-    WindowCallback onCompositionString;
-    WindowCallback onCompositionResult;
-    WindowCallback onCursorPos;
-    WindowCallback onAttributes;
-    char pad_0028[0x30];
-    char title[0x64];
-    char className[0x64];
-    int wheelDelta;
-    int middleCapture;
-    HICON icon;
-    RenderWindow();
-    void RegisterWindowClass(HINSTANCE instance);
-    void Create(HINSTANCE instance);
-};
-
-// The game's window (the instance at 0x10f65698): a RenderWindow whose WindowProc handles the game's messages.
-struct GameWindow : RenderWindow
-{
-    LRESULT __stdcall WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
-    GameWindow();
-};
-
-extern "C" RenderWindow *DAT_10f1a860;
+#include "render_window.h"
 #include "render_vars.h"
 
 // Constructor: no window yet, no icon, and the window title and class name both set to "Kernel Class"

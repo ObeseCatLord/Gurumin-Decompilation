@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "ime.h"
+#include "render_window.h"
 
 // Stores `value` in slot `index` of the first state array.
 int StateArrays::M_1015caa0(int value, int index)

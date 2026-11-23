@@ -1,6 +1,7 @@
 #pragma once
 
 #include "object.h"
+#include "node.h"
 
 struct FontRenderer;   // font_renderer.h
 
@@ -35,13 +36,6 @@ struct GameNamedEntry
     char title[0x50];           // 0x54
     int value;                  // 0xa4
     char pad_00a8[0x40];
-};
-
-// One scene node body (0x18a0 bytes, destructor 0x10191480, see src/node_dtor.cpp). Game owns 32 of them.
-struct GameNodeBody
-{
-    char data[0x18a0];
-    ~GameNodeBody();
 };
 
 // The game object: global instance DAT_104b7200. Holds menu textures, HUD state, the script variable tables and
@@ -128,7 +122,7 @@ struct Game : Object
     FontRenderer *textRenderer;   // 0x7664: draws the window marks (set by LoadMenuTextures)
     float m_7668[3];            // 0x7668: per-window fade
     char pad_7674[0x11f4];
-    GameNodeBody m_8868[0x20];  // 0x8868: menu model nodes, destroyed in ~Game
+    Node m_8868[0x20];          // 0x8868: menu model nodes, destroyed in ~Game
     char pad_39c68[0x5c1ac];
     GameNamedEntry m_95e14[0x100];
     int m_a4614;

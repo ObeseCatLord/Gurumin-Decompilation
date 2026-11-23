@@ -1,10 +1,9 @@
-// StateArrays, ImeContext, ImeWindowHooks: declared here once (first used by src/ime.cpp).
+// StateArrays, ImeContext: declared here once (first used by src/ime.cpp).
 #ifndef GURUMIN_IME_H
 #define GURUMIN_IME_H
 
 #include <windows.h>
 
-typedef void (*ImeCallback)();   // an IME event callback of ImeWindowHooks
 
 struct StateArrays
 {
@@ -40,23 +39,7 @@ struct ImeContext
     DWORD LoadCandidates();
     int GetModeText(char *out);
 };
-// IME hooks inside the game window object DAT_10f65698 (RenderWindow, window_create.cpp): WindowProc calls these
-// callbacks on WM_IME_COMPOSITION and sets the two flags.
-struct ImeWindowHooks
-{
-    void *vtable;
-    HWND window;                       // 0x04
-    int active;
-    HINSTANCE instance;
-    int compositionResult;             // 0x10: a result string arrived
-    int compositionEnded;              // 0x14: the composition string changed
-    ImeCallback onCompositionString;   // 0x18
-    ImeCallback onCompositionResult;   // 0x1c
-    ImeCallback onCursorPos;           // 0x20
-    ImeCallback onAttributes;          // 0x24
-};
 
 extern "C" ImeContext DAT_10f68124;                       // the game's IME context (ime.cpp)
-extern "C" ImeWindowHooks DAT_10f65698;                   // the IME hooks part of the game window object (RenderWindow)
 
 #endif

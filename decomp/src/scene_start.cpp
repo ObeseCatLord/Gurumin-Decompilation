@@ -10,19 +10,7 @@
 
 #include "effect_manager.h"
 
-typedef int (*SceneCallback)(int code, int value);
-
-// The world object (world_frame.cpp: WorldRenderer); only the members used here.
-struct WorldRenderer
-{
-    char pad_0000[0x974];
-    char m_0974;              // 0x974: set for costume 6
-    int Bind(void *playerModel, void *mapRoot, int *state, SceneCallback callback, void *data);  // 0x1017c9c0
-    int LoadCharacter(const char *path);                                                         // 0x10166950
-    int Seek(int target);                                                                         // 0x10189000
-};
-
-extern "C" WorldRenderer DAT_10c68000;
+#include "world_renderer.h"
 extern "C" void FUN_100114a0(void);                   // Scene_ResetBattleState
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);
 extern "C" int FUN_10092af0(int code, int value);     // scene callback
@@ -49,7 +37,7 @@ extern "C" void FUN_100cc1d0(const char *characterFile, int value)
     DAT_10203420 = 1.0f;
     DAT_10c68000.LoadCharacter(FUN_1013f8a0(characterFile, 0));
     if (DAT_10c655f0 == 6)
-        DAT_10c68000.m_0974 = 1;
+        DAT_10c68000.m_00974 = 1;
     DAT_10c68000.Seek(0);
     DAT_104c00e0 = 0;
     DAT_104c0108 = 0;

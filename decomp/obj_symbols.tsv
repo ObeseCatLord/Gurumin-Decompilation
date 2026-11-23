@@ -58,7 +58,7 @@
 ?Clear@NodeSkin@@QAEXXZ	10166810
 ??0ColorTables@@QAE@XZ	10172780
 ??1Widget@@QAE@XZ	10172990
-??1NodeBody@@QAE@XZ	10191480
+??1Node@@QAE@XZ	10191480
 ?ReleaseMesh@Node@@QAEXXZ	101913f0
 ?SetPosition@Vertex@@QAEXMMM@Z	101acea0
 ?Set@Vertex@@QAEXMMMMMMMMMMMM@Z	101acf10
@@ -81,7 +81,7 @@
 ?RemoveChild@Node@@QAEHPAU1@H@Z	101a2f30
 ?CopyPlugData@Node@@QAEHXZ	1019bd10
 ?SetMaterialValue@Node@@QAEHPBDH@Z	1019e8c0
-??0SceneNode@@QAE@XZ	1019ebc0
+??0Node@@QAE@XZ	1019ebc0
 ?UpdateVisibleCells@VisNode@@QAEHXZ	10199be0
 ?Copy@Vec4@@QAEXABU1@@Z	101acc20
 ?InBox@Vec4@@QAEHPBUBox2@@@Z	101ac6e0
@@ -361,7 +361,7 @@ _sqrtf	10002010
 ?Init@VertexPack@@QAEXXZ	101acfa0
 ?Init@IndexList@@QAEXXZ	101ad1b0
 ??0WorldRenderer@@QAE@XZ	101670e0
-?Bind@WorldRenderer@@QAEHPAUModelRecord@@PAXPAHP6AXHH@Z1@Z	1017c9c0
+?Bind@WorldRenderer@@QAEHPAUAnimModel@@PAXPAHP6AHHH@Z1@Z	1017c9c0
 ?LoadCharacter@WorldRenderer@@QAEHPBD@Z	10166950
 ?StartFade@WorldRenderer@@QAEHHHH@Z	10167390
 ?TickFade@WorldRenderer@@QAEXXZ	10167400

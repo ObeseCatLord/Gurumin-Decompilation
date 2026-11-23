@@ -6,30 +6,15 @@
 
 #include "node.h"
 
-// A model record (0x249c bytes, the layout of a Character's model part).
-struct ModelRecord
-{
-    char pad_0000[0x22f4];
-    Node *node;               // 0x22f4
-    char pad_22f8[0x1a4];
-};
-
-struct WorldRenderer
-{
-    char pad_00000[0x8860];
-    ModelRecord *models;      // 0x8860
-    char pad_08864[0x136cf4];
-    Vec4 targets[0x80];       // 0x13f558: target of each model's state
-    char active[0x80];        // 0x13fd58: 1 while the model's state runs
-    int SetModelState(int index, int mode);
-};
+#include "anim_model.h"
+#include "world_renderer.h"
 
 // 0x10166f20 (WorldRenderer::SetModelState). For model `index`: mode 1 starts the state of its linked node (unless it
 // has one already) with the box (-1.22, -0.27, -0.17)..(1.22, 0.27, 0.17) and its target; mode 0 ends a running
 // state; mode -5 drops it. Returns 0.
 int WorldRenderer::SetModelState(int index, int mode)
 {
-    Node *node = models[index].node;
+    Node *node = models[index].headNode;
     if (node != 0)
     {
         if (mode == 1)
@@ -37,14 +22,14 @@ int WorldRenderer::SetModelState(int index, int mode)
             if (node->parent->saved == 0)
             {
                 active[index] = 1;
-                models[index].node->parent->AllocSaved();
-                models[index].node->parent->saved->limitMin.x = -1.22f;
-                models[index].node->parent->saved->limitMin.y = -0.27f;
-                models[index].node->parent->saved->limitMin.z = -0.17f;
-                models[index].node->parent->saved->limitMax.x = 1.22f;
-                models[index].node->parent->saved->limitMax.y = 0.27f;
-                models[index].node->parent->saved->limitMax.z = 0.17f;
-                models[index].node->parent->EnterTargetState(&targets[index]);
+                models[index].headNode->parent->AllocSaved();
+                models[index].headNode->parent->saved->limitMin.x = -1.22f;
+                models[index].headNode->parent->saved->limitMin.y = -0.27f;
+                models[index].headNode->parent->saved->limitMin.z = -0.17f;
+                models[index].headNode->parent->saved->limitMax.x = 1.22f;
+                models[index].headNode->parent->saved->limitMax.y = 0.27f;
+                models[index].headNode->parent->saved->limitMax.z = 0.17f;
+                models[index].headNode->parent->EnterTargetState(&targets[index]);
                 return 0;
             }
         }
@@ -59,8 +44,8 @@ int WorldRenderer::SetModelState(int index, int mode)
         else if (mode == -5)
         {
             active[index] = 0;
-            if (models[index].node->parent->saved != 0)
-                models[index].node->parent->FreeSaved();
+            if (models[index].headNode->parent->saved != 0)
+                models[index].headNode->parent->FreeSaved();
         }
     }
     return 0;

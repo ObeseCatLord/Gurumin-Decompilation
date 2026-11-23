@@ -7,6 +7,7 @@
 #ifndef GURUMIN_NODE_H
 #define GURUMIN_NODE_H
 
+#include "vec4.h"
 #include "matrix4.h"
 
 // Types the node only points to. The mesh types are declared in mesh.h, the extra/skin/saved blocks in node_data.h;
@@ -48,6 +49,13 @@ enum NodeFlags
     NODE_FLAG_SKIP_SUBTREE = 0x8000,      // the subtree is not updated or drawn
     NODE_FLAG_ANIMATED_BY_EXTRA = 0x100000,  // animated through its extra data (NodeExtra)
     NODE_FLAG_NO_STATE_9 = 0x800000       // drawn with render state 9 turned off
+};
+
+// Corners of Node::box (an array: the constructor builds it with one loop).
+enum NodeBoxCorner
+{
+    NODE_BOX_MIN = 0,
+    NODE_BOX_MAX = 1
 };
 
 struct Node
@@ -97,13 +105,12 @@ struct Node
     Vec4 m_0298;                 // 0x298
     NodeExtra *extra;            // 0x2a8: the node's animation tracks
     Vec4 tint;                   // 0x2ac: colour multiplier, w = alpha (1 = fully visible, node_fade.cpp); all 1 after Init
-    char pad_02bc[0x10];         // 0x2bc: not seen yet
+    Vec4 m_02bc;                 // 0x2bc: not seen yet (constructed with the node)
     int frame;                   // 0x2cc: current animation frame (-1, -2, ...: a stored pose)
     unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
     Matrix4 poses[NODE_POSE_COUNT];  // 0x2d4: the current pose ([0]) and the stored poses (frames -1 to -16)
     Vec4 bounds;                 // 0x6d4: bounding sphere (centre relative to the node, radius in w)
-    Vec4 boundsMin;              // 0x6e4: lower corner of the mesh's box
-    Vec4 boundsMax;              // 0x6f4: upper corner of the mesh's box
+    Vec4 box[2];                 // 0x6e4: the mesh's box: [NODE_BOX_MIN] lower, [NODE_BOX_MAX] upper corner
     char skinned;                // 0x704: 1 = the node has skinning data (also skipped by the sphere tests unless
                                  //        DAT_11b04510 is set)
     NodeSkin *skin;              // 0x708: skinning data
@@ -138,6 +145,8 @@ struct Node
     char m_189c;                 // 0x189c: colour value (M_10194630)
 
     // Life cycle and loading
+    Node();                                               // 0x1019ebc0: constructs the members, then Init (node_ctor.cpp)
+    ~Node();                                              // 0x10191480: destroys the matrix members (node_dtor.cpp)
     void Init();                                          // 0x10191500: every field to its default (node_init.cpp)
     void Release();                                       // 0x1019e9a0: frees the node's meshes and children
     void ReleaseMesh();                                   // 0x101913f0

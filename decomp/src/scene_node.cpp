@@ -1062,8 +1062,8 @@ int Node::SetMaterialValue(const char *material, int value)
 int Node::CreateChildCopies()
 {
     Node *created[0x20];
-    boundsMin.z = packs->vertices[0].position[2];
-    boundsMax.z = packs->vertices[0].position[2];
+    box[NODE_BOX_MIN].z = packs->vertices[0].position[2];
+    box[NODE_BOX_MAX].z = packs->vertices[0].position[2];
     m_1858 = 1;
     for (int i = 0; i < 0x20; i++)
     {
@@ -1638,8 +1638,8 @@ copyMaterials:
     }
     drawMode = source->drawMode;
     bounds.Copy(source->bounds);
-    boundsMin.Copy(source->boundsMin);
-    boundsMax.Copy(source->boundsMax);
+    box[NODE_BOX_MIN].Copy(source->box[NODE_BOX_MIN]);
+    box[NODE_BOX_MAX].Copy(source->box[NODE_BOX_MAX]);
     return 1;
 }
 
@@ -1969,14 +1969,14 @@ int Node::ComputeBounds()
         bounds.y = (minY + maxY) / 2.0f;
         bounds.z = (minZ + maxZ) / 2.0f;
         float radius = size.Length() / 2.0f;
-        boundsMin.x = minX;
-        boundsMin.y = minY;
-        boundsMin.z = minZ;
-        boundsMax.x = maxX;
-        boundsMin.w = 1.0f;
-        boundsMax.y = maxY;
-        boundsMax.z = maxZ;
-        boundsMax.w = 1.0f;
+        box[NODE_BOX_MIN].x = minX;
+        box[NODE_BOX_MIN].y = minY;
+        box[NODE_BOX_MIN].z = minZ;
+        box[NODE_BOX_MAX].x = maxX;
+        box[NODE_BOX_MIN].w = 1.0f;
+        box[NODE_BOX_MAX].y = maxY;
+        box[NODE_BOX_MAX].z = maxZ;
+        box[NODE_BOX_MAX].w = 1.0f;
         bounds.w = radius;
     }
     return 1;

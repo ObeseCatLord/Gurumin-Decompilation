@@ -29,10 +29,10 @@ extern "C" Node *FUN_10018100(const Vec4 *point)
         if (strstr(region->name, "eggobj") == 0 && strstr(region->name, "croud") == 0 &&
             strstr(region->name, "fire") == 0)
         {
-            low.x = MIN(region->boundsMin.x, region->boundsMax.x);
-            low.y = MIN(region->boundsMin.y, region->boundsMax.y);
-            high.x = MAX(region->boundsMin.x, region->boundsMax.x);
-            high.y = MAX(region->boundsMin.y, region->boundsMax.y);
+            low.x = MIN(region->box[NODE_BOX_MIN].x, region->box[NODE_BOX_MAX].x);
+            low.y = MIN(region->box[NODE_BOX_MIN].y, region->box[NODE_BOX_MAX].y);
+            high.x = MAX(region->box[NODE_BOX_MIN].x, region->box[NODE_BOX_MAX].x);
+            high.y = MAX(region->box[NODE_BOX_MIN].y, region->box[NODE_BOX_MAX].y);
             if (low.x + 50.0f < point->x && high.x - 50.0f > point->x && low.y + 50.0f < point->y &&
                 high.y - 50.0f > point->y)
                 return region;

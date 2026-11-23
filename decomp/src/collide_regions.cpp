@@ -12,8 +12,8 @@ extern "C" int FUN_1001fff0(Node *root, const char *tag, unsigned int mask, Vec4
     int i = 0;
     for (Node *node = root->FindByFlags(4, 0, 0); node != 0; node = root->FindByFlags(4, ++i, 0))
     {
-        if (node->boundsMin.x < position->x && node->boundsMax.x > position->x && node->boundsMin.y < position->y &&
-            node->boundsMax.y > position->y && node->Collide(tag, mask, position, velocity, hit) != 0)
+        if (node->box[NODE_BOX_MIN].x < position->x && node->box[NODE_BOX_MAX].x > position->x && node->box[NODE_BOX_MIN].y < position->y &&
+            node->box[NODE_BOX_MAX].y > position->y && node->Collide(tag, mask, position, velocity, hit) != 0)
             return 1;
     }
     return 0;

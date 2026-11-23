@@ -2,11 +2,13 @@
 
 #include "matrix4.h"
 
-#include "node_dtor.h"
+#include "vec4.h"
+
+#include "node.h"
 
 
 // 0x10191480. Empty body: the compiler destroys the matrix members and the array of sixteen matrices.
-NodeBody::~NodeBody()
+Node::~Node()
 {
 }
 

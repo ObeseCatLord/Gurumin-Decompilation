@@ -8,11 +8,7 @@
 
 Matrix4 Transpose(const Matrix4 &matrix);       // 0x101b1090
 
-// The first three rows of a transposed bone matrix: one vertex-shader constant each.
-struct BoneRows
-{
-    Vec4 row[3];
-};
+#include "bone_rows.h"
 
 #include "render_vars.h"
 

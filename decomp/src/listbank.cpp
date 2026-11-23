@@ -1095,14 +1095,7 @@ int ListBank::SkipStatement(char **text)
     return 0;
 }
 
-// A value produced by the expression evaluator: an int (type 0), a float (type 1) or quoted text (type 2, the text
-// still starts with its opening quote).
-struct ScriptValue
-{
-    char text[0x100];
-    int &i() { return *(int *)text; }
-    float &f() { return *(float *)text; }
-};
+#include "script_value.h"
 
 // "定義されてない識別子です。" ("This identifier is not defined."), Shift-JIS.
 #define UNDEFINED_NAME_TEXT "è`³êÄÈ¢¯ÊqÅ·B"

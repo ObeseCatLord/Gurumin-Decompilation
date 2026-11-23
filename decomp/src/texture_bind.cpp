@@ -302,14 +302,7 @@ int TextureObject::DrawStrip(ScreenVertex *vertices, int count)
     return 1;
 }
 
-// A RECT (left, top, right, bottom).
-struct Rect
-{
-    long left;
-    long top;
-    long right;
-    long bottom;
-};
+#include "texture_bind.h"
 
 extern "C" IDirect3DSurface9Like *DAT_10f141dc;  // the back buffer surface
 
@@ -528,19 +521,6 @@ int TextureObject::HalveRgb24(unsigned char *pixels, int width, int height)
     return 1;
 }
 
-// A pre-transformed vertex with every field (FVF 0x1c4), 0x20 bytes.
-struct PanelVertex
-{
-    float x;
-    float y;
-    float z;
-    float rhw;
-    unsigned int colour;
-    unsigned int specular;
-    float u;
-    float v;
-};
-
 extern "C" void FUN_10143b50(void);                                   // Render_UnbindTexture0
 
 
@@ -605,21 +585,6 @@ int TextureObject::DrawScreenCopy(int left, int top, int right, int bottom, floa
 }
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
-
-// A pre-transformed vertex with four texture coordinate pairs (FVF 0x4c4), 0x38 bytes.
-struct ShaderVertex
-{
-    float x;
-    float y;
-    float z;
-    float rhw;
-    unsigned int colour;
-    unsigned int specular;
-    float u0, v0;
-    float u1, v1;
-    float u2, v2;
-    float u3, v3;
-};
 
 
 // 0x10144320 (TextureObject::DrawThroughShader). Binds this texture to stage 0, `second` to stage 1 and `third` to

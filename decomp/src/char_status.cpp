@@ -7,12 +7,7 @@
 #include "matrix4.h"
 #include "char_slot.h"
 
-// Character record viewed from its world matrix (0x10db6ee8 + 0x2328), 0x249c bytes.
-struct CharMatrixView
-{
-    Matrix4 matrix;
-    char pad_0040[0x249c - 0x40];
-};
+#include "char_matrix_view.h"
 
 
 #include "char_tables.h"

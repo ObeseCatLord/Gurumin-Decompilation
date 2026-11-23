@@ -7,21 +7,10 @@
 
 #include "anim_model.h"
 
-// Field 0x24a8 of each character record (npc_approach.cpp CharMoveLock).
-struct CharMoveLock
-{
-    int locked;
-    char pad_0004[0x2498];
-};
+#include "char_move_lock.h"
+#include "step_record.h"
 
 #include "char_state.h"
-
-// A 0x40-byte record per character slot (DAT_10802c08): the last step taken.
-struct StepRecord
-{
-    Vec4 step;
-    char pad_0010[0x30];
-};
 
 extern "C" CharMoveLock DAT_10db9380[0x80];
 extern "C" StepRecord DAT_10802c08[0x80];

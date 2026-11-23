@@ -1,9 +1,6 @@
 // IME candidate list layout.
 
-struct MenuText
-{
-    char text[0x80];
-};
+#include "menu_text.h"
 
 struct TextRenderer
 {

@@ -14,10 +14,7 @@
 
 #include "game.h"
 
-struct FrameTimer
-{
-    int ResetNext();                                 // 0x1013eee0 (FrameTimer_ResetNext)
-};
+#include "frame_timer.h"
 
 extern "C" FrameTimer DAT_10836c70;
 #include "game_vars.h"

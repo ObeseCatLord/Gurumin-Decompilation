@@ -66,10 +66,7 @@ int Game::SetWindowLastItem(int id, int count)
     return 0;
 }
 
-struct Callee
-{
-    void Method();
-};
+#include "app_0004.h"
 
 typedef void (Callee::*CalleeMethod)();
 
@@ -83,15 +80,6 @@ extern "C" void __stdcall FUN_10004650(char *object, int stride, int count, Call
         object += stride;
     }
 }
-
-struct Latch
-{
-    int m_0000;
-    int m_0004;
-    int pad_0008[3];
-    int m_0014;
-    int M_1000b9c0();
-};
 
 // Toggles a 30-frame latch when in state 10: 0 -> 30, 30 -> 0.
 int Latch::M_1000b9c0()

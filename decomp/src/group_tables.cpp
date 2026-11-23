@@ -4,12 +4,7 @@
 // Three groups of twelve values; slot 9 of each group is the group leader (-1 = none).
 #include "map_vars.h"
 
-// Six 24-byte formation records; only the first field (the active flag) is reset here.
-struct Formation
-{
-    int active;
-    char pad_0004[0x14];
-};
+#include "formation.h"
 
 extern "C" Formation DAT_1049efdc[6];
 extern "C" int DAT_102199b8[0x5c];  // per-character group timers

@@ -3,29 +3,9 @@
 #include <windows.h>
 #include <stdlib.h>
 
-struct Mesh
-{
-    void M_1019e9a0();
-};
+#include "app_0008.h"
 
-struct MeshHolder
-{
-    Mesh *mesh;
-    char pad_0004[0x28];
-    int m_002c;
-    int m_0030;
-    char pad_0034[0xad4];
-};
 
-struct MeshOwner
-{
-    int pad_0000;
-    Mesh *mesh;
-    char pad_0008[0x28];
-    int m_0030;
-    int m_0034;
-    int M_1000be10();
-};
 
 extern "C" void (*DAT_11b1ba40)(void *);
 #include "game_vars.h"

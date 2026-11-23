@@ -2,21 +2,7 @@
 // frame by frame. The recorder is the global object at 0x1065cb28.
 #include <stdio.h>
 
-struct DemoRecording
-{
-    int pad_0000;
-    char buttons_now[0x1c];         // 0x04: the 28 button bytes of the frame being played back
-    int values_now[5];              // 0x20: its five values
-    char pad_0034[0x40];
-    int playFrame;                  // 0x74: next frame to play back
-    int frameCount;                 // 0x78: number of recorded frames (at most 36000 = 20 minutes at 30 Hz)
-    int pad_007c;
-    int values[5][36000];           // 0x80: five 32-bit values per frame (analogue input and the like)
-    char buttons[0x1c][36000];      // 0xafd00: 28 button bytes per frame
-    int Load(const char *path);
-    int PlayFrame();
-    int RecordFrame();
-};
+#include "demo_recording.h"
 
 // 0x1015cc90. Loads a recording from `path`: the frame count, then per frame the five values and the 28 button
 // bytes. A missing file leaves the recording as it is. Returns 0. Called by Game_Startup.

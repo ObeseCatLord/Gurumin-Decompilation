@@ -5,10 +5,7 @@
 
 #include "matrix4.h"
 
-struct Block80
-{
-    char data[0x80];
-};
+#include "block80.h"
 
 struct Node;
 

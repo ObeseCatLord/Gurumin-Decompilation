@@ -195,11 +195,7 @@ int Game::MoveCursor()
     return 1;
 }
 
-// The menu text renderer (Game::m_7664, see menu_list.cpp).
-struct MenuTextRenderer
-{
-    int M_101501f0(int x, int y, const char *text, int colour, int a, float scaleX, float scaleY);  // draws text
-};
+#include "menu_text_renderer.h"
 
 // Scroll marks, Shift-JIS: filled while `frame` is at most 5, outlined after that (they blink).
 #define MARK_UP "\x81\xa3"              // ▲

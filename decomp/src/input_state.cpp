@@ -1,14 +1,7 @@
 // The button state of the input object (the recorder at 0x1065cb28, demo_record.cpp): the raw button bits and,
 // for 14 buttons, one byte that is 1 on the frame the button goes down and one byte that is 1 while it is held.
 
-// Button bytes in `pressed` and `held`: bits 10-13 of the raw state come first, then bits 0, 3, 2, 1, 9, 8 and 4-7.
-struct InputState
-{
-    unsigned int buttons;        // raw button bits of the current frame
-    char pressed[14];            // 0x04: 1 = went down this frame
-    char held[14];               // 0x12: 1 = down
-    int SetButtons(unsigned int newButtons);
-};
+#include "input_state.h"
 
 // 0x1015cae0 (InputState::SetButtons). Takes `newButtons` as the button bits of the new frame: a button is pressed
 // when its bit is set now and was clear before, held while its bit is set (the first eight buttons are read from the

@@ -6,18 +6,8 @@
 #include "matrix4.h"
 #include "char_state.h"
 
-// Pose object of a character (pointer table DAT_1021bdf8, 0x24 bytes per character); matrix at 0x1cc.
-struct Pose
-{
-    char pad_0000[0x1cc];
-    Matrix4 matrix;
-};
+#include "pulse_scale.h"
 
-struct PoseRef
-{
-    Pose *pose;
-    int pad_0004[8];
-};
 
 extern "C" PoseRef DAT_1021bdf8[0x80];
 extern "C" Matrix4 FUN_101b13c0(float x, float y, float z);

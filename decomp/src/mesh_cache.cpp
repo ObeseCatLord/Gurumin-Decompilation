@@ -3,11 +3,7 @@
 
 #include "texture_object.h"
 
-struct MeshRef
-{
-    char pad_0000[0x4c];
-    int index;
-};
+#include "mesh_ref.h"
 
 struct TextureRef
 {

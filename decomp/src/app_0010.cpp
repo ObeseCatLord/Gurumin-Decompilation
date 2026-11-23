@@ -8,10 +8,7 @@
 #include "char_state.h"
 #include "char_slot.h"
 
-struct NamedPath
-{
-    char path[0x4b34];
-};
+#include "named_path.h"
 
 #include "char_tables.h"
 #include "char_vars.h"

@@ -5,46 +5,13 @@
 #include <windows.h>
 #include <math.h>
 
-struct Point
-{
-    int x;
-    int y;
-};
+#include "app_0001.h"
 
 // Stub that always returns 1 (an unused input hook).
 extern "C" int __stdcall FUN_10001000(int, int, int)
 {
     return 1;
 }
-
-struct Obj
-{
-    char m_0000;
-    char m_0001;
-    char m_0002;
-    char m_0003;
-    int m_0004;
-    int m_0008;
-    int clickX;               // 0x0c: where the left button was last pressed
-    int clickY;               // 0x10
-    int m_0014;
-    int changed;
-    int m_001c;
-    int lastX;
-    int lastY;
-    int leftHeld;             // 0x28: 1 while the left button stays down
-    int rightHeld;            // 0x2c
-    int middleHeld;           // 0x30
-    DWORD clickTime;          // 0x34: tick count of the last left press (0 after a double click)
-    int m_0038;
-    int m_003c;
-    int m_0040;
-    int M_10001010(int p, int q, int r);
-    int GetState(Point *pos, char *a, char *b, char *c, int *d, char *e);
-    int UpdateChanged();
-    int ReportCursor();
-    int Update(Point *pos, char *left, char *middle, char *right, int *wheel, char *doubleClick);
-};
 
 // Init: binds the object to window `p` with cursor callback `q` and user value `r`; clears the position.
 // Returns 0 when the window or callback is missing.

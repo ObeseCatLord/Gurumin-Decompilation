@@ -5,11 +5,7 @@
 
 #include "vec4.h"
 
-struct Box
-{
-    Vec4 min;
-    Vec4 max;
-};
+#include "box.h"
 
 // 0x10191fd0 (Box_Overlap). Moves box `first` by `firstOffset` and box `second` by `secondOffset` and returns 1 when
 // they overlap on all three axes (touching faces do not count), else 0. On overlap `centreDelta`, when given,

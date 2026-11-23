@@ -12,12 +12,7 @@
 
 #include "node.h"
 
-// Field 0x24a8 of each character record (npc_approach.cpp CharMoveLock).
-struct CharMoveLock
-{
-    int locked;                   // 2 = the player is standing on something
-    char pad_0004[0x2498];
-};
+#include "char_move_lock.h"
 
 #include "char_state.h"
 #include "char_slot.h"

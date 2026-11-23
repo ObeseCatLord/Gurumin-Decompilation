@@ -17,15 +17,7 @@ extern "C" int FUN_10010420(const char *path, int unused1, int unused2, int loop
 extern "C" int FUN_100016c0(const char *file, const int *x, const int *y, const int *z, int pan, int channel,
                             float volume);
 
-// Sound effect table: one 0x40-byte record per effect id.
-struct SoundDef
-{
-    char name[0x20];          // file name without folder and extension
-    int loop;                 // 0x20: loop mode, 0 = play once
-    int volume;               // 0x24: volume in percent, 0 = 100
-    int notPositional;        // 0x28: play without position even when one is given
-    char pad_002c[0x14];
-};
+#include "sound_def.h"
 
 extern "C" SoundDef DAT_108dc158[];
 

@@ -102,12 +102,7 @@ extern "C" int FUN_100248e0(Vec4 position, Vec4 *ground, float height)
     return 1;
 }
 
-// Per-slot direction record, 0x40 bytes (the first vector of DAT_10802bf8; see char_shots.cpp).
-struct SlotVector
-{
-    Vec4 vector;
-    char pad_0010[0x30];
-};
+#include "slot_vector.h"
 
 extern "C" SlotVector DAT_10802bf8[0x80];
 #include "char_tables.h"

@@ -4,10 +4,7 @@
 
 #include "vec4.h"
 
-struct Fader
-{
-    void M_101acc20(const Vec4 &value);
-};
+#include "fader.h"
 
 #include "node.h"
 

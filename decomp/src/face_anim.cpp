@@ -14,13 +14,7 @@ inline int LoadIti(const char *name)
     return FUN_10174ce0(FUN_1013f8a0(name, 0), 0, 0);
 }
 
-struct FaceSet
-{
-    int delay[0x40];          // frames to show each face before switching
-    int next[0x40];           // following face (the same face = stay)
-    char pad_0200[0x100];
-    char names[0x40][0x10];   // 0x300: face texture names (indexed by character, see below)
-};
+#include "face_set.h"
 
 #include "char_slot.h"
 

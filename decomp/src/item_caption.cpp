@@ -16,27 +16,11 @@
 
 // The start of each item record (the item table, ItemInfo in other files, is viewed from 0x40 bytes further on).
 
-struct ItemName
-
-{
-
-    char name[0x40];
-
-    char pad_0040[0x80];
-
-};
+#include "item_caption.h"
 
 
 
 // A 0x240-byte record per item holding its fallback name.
-
-struct ItemText
-
-{
-
-    char name[0x240];
-
-};
 
 
 

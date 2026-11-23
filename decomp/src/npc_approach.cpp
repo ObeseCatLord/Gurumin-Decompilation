@@ -9,13 +9,7 @@
 
 #include "anim_model.h"
 
-// Field 0x24a8 of each character record (it lies past the 0x249c bytes world.h gives a record, so it is declared
-// on its own with the record stride).
-struct CharMoveLock
-{
-    int locked;                   // 0 = the character may be moved by the game
-    char pad_0004[0x2498];
-};
+#include "char_move_lock.h"
 
 #include "char_state.h"
 

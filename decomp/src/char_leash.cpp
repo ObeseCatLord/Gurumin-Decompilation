@@ -6,22 +6,9 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-// Per-slot position record, 0x40 bytes (char_shots.cpp); here the start position of each character.
-struct SlotPosition
-{
-    Vec4 position;
-    char pad_0010[0x30];
-};
+#include "slot_position.h"
+#include "move_limit.h"
 
-// Per-character movement limits, 0x100 bytes per slot (set up by the spawn code at 0x1002ae70).
-struct MoveLimit
-{
-    int rangeX;               // allowed distance from the start position along x (0 = unlimited)
-    int rangeY;               // the same along y
-    int limitX;               // 1 = the x range applies
-    int limitY;               // 1 = the y range applies
-    char pad_0010[0xf0];
-};
 
 // Absolute value of a float (an inline helper: its argument is rounded to float first).
 inline float AbsFloat(float value)

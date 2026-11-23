@@ -12,21 +12,9 @@ struct CollisionWorld
     int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
 };
 
-// Per-slot position, 0x40 bytes per slot.
-struct SlotPosition
-{
-    Vec4 position;
-    char pad_0010[0x30];
-};
+#include "slot_position.h"
+#include "slot_motion.h"
 
-// Per-slot flight direction and speed.
-struct SlotMotion
-{
-    float angle;              // rotation about the vertical axis, copied from the owner (see FUN_1001a590)
-    float heading;            // radians
-    float speed;
-    int pad_000c;
-};
 
 extern "C" SlotPosition DAT_10802bf8[0x80];
 extern "C" SlotMotion DAT_10255160[0x80];

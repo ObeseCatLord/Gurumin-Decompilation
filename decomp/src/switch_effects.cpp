@@ -8,14 +8,7 @@
 
 #include "matrix4.h"
 
-// A map object that can be held as a switch.
-struct SwitchObject
-{
-    char pad_0000[0xac];
-    unsigned char flags;          // 0xac: 0x20 = no effect, the holder is released instead
-    char pad_00ad[0x19f];
-    Matrix4 matrix;               // 0x24c: world matrix
-};
+#include "switch_object.h"
 
 extern "C" SwitchObject *DAT_1030bbf8[0x80];     // object of each used hold slot (0 = unused)
 extern "C" int DAT_10255b08[0x80];               // holder of each slot

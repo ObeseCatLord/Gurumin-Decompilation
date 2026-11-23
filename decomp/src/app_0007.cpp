@@ -2,10 +2,7 @@
 
 #include <string.h>
 
-struct Renderer
-{
-    void M_10172a40(void *item);
-};
+#include "renderer.h"
 
 #include "texture_object.h"
 

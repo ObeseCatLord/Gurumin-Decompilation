@@ -6,17 +6,8 @@
 
 #include "vec4.h"
 
-struct VisCell
-{
-    unsigned char count;
-    unsigned char neighbours[0x3f];
-};
+#include "visibility.h"
 
-struct VisData
-{
-    VisCell cells[0x40];
-    Box2 boxes[0x40];
-};
 
 #include "node.h"
 #include "anim_model.h"

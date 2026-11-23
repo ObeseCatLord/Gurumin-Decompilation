@@ -3,13 +3,7 @@
 // (code / 10000) and a value (code % 10000), each wrapped to -4999..5000; the action's low two bits say what happens
 // when the walker reaches the point and the rest is a group number.
 
-struct RoutePoint
-{
-    int x;
-    int y;
-    int z;
-    int code;
-};
+#include "route_point.h"
 
 extern "C" RoutePoint DAT_10210fc0[][16];        // the routes of the map
 extern "C" int DAT_1020b444[][16];               // per walker: [0] = 1 while it walks its route backwards

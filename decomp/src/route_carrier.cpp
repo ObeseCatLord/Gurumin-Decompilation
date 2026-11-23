@@ -23,13 +23,7 @@ struct LastPosition
 
 #include "char_slot.h"
 
-struct RoutePoint
-{
-    int x;
-    int y;
-    int z;
-    int code;
-};
+#include "route_point.h"
 
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" RoutePoint DAT_10210fc0[][16];     // the routes of the map

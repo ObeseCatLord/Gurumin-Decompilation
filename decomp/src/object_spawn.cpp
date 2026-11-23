@@ -17,14 +17,7 @@ extern "C" const char *FUN_1013f8a0(const char *name, int folder);
 // Message window state (see Message_Show, app_0013.cpp).
 extern "C" char DAT_10467ea0[];
 
-// Character fields used only by objects.
-struct ObjectView
-{
-    char pad_0000[0x22c];
-    Vec4 colour;              // 0x22c: model colour (r, g, b, a)
-    char pad_023c[0x3a];
-    char m_0276;              // 0x276: set to 1 for objects
-};
+#include "object_view.h"
 
 // Loads model file `name` into the next free object slot and places it at (x, y, z). The model's colour values
 // are set to (slot, 0xff, 0x4f) on every node and its colour to opaque white. Returns the slot, or 0 after

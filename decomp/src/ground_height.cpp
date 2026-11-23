@@ -6,21 +6,8 @@
 
 #include "matrix4.h"
 
-// A ground object with a height map (only the fields used here).
-struct GroundObject
-{
-    char pad_0000[0x1cc];
-    Matrix4 matrix;                                  // 0x1cc: world matrix
-};
+#include "ground_height.h"
 
-// The same object seen from its height map origin.
-struct GroundOrigin
-{
-    char pad_0000[0x1fc];
-    float x;                                         // 0x1fc: corner of the height map
-    float y;                                         // 0x200
-    float base;                                      // 0x204: height added to the samples
-};
 
 extern "C" Matrix4 DAT_10db9210;                     // the player's world matrix
 extern "C" GroundOrigin *DAT_1020d860[0x60];         // the ground objects (0 = free)

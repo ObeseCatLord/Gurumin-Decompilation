@@ -4,15 +4,7 @@
 
 #include "dinput_min.h"
 
-struct FontSet
-{
-    HFONT fonts[3];
-    void *glyphs[0x20];
-    char pad_008c[0x2300];
-    void *buffer;
-    void *buffer2;
-    int Release();
-};
+#include "font_set.h"
 
 extern "C" DirectInput *DAT_10f65578;     // the force-feedback effect (an InputEffect while it exists)
 #include "ui_vars.h"

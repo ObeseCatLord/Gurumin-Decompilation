@@ -4,13 +4,7 @@
 #include <string.h>
 #include "d3d9_min.h"
 
-struct Bounds
-{
-    float x;
-    float y;
-    float z;
-    float w;
-};
+#include "bounds.h"
 
 #include "render_vars.h"
 

@@ -18,11 +18,7 @@ extern "C" int FUN_10016500(int index, const char *path, int start, int end, int
     return 0;
 }
 
-// Model path table at 0x10b314c8: one 0x4b34-byte record per model id, starting with the file name.
-struct ModelPath
-{
-    char path[0x4b34];
-};
+#include "model_path.h"
 
 extern "C" ModelPath DAT_10b314c8[];
 extern "C" int FUN_10012220(int index, int value);

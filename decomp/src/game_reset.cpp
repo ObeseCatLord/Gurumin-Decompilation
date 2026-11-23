@@ -20,38 +20,14 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-// A 0xfc-byte record of which four fields are cleared here.
-struct SmallRecord
-{
-    int m_0000;
-    int m_0004;
-    char pad_0008[0xec];
-    int m_00f4;
-    int m_00f8;
-};
+#include "game_reset.h"
 
 #include "node.h"
-
-struct EffectTable
-{
-    void M_10172a80(char *table, int count);     // 0x10172a80
-};
 
 #include "model_bank.h"
 
 #include "effect_manager.h"
 
-struct EmptyObject
-{
-    void M_1013edb0();                           // 0x1013edb0 (an empty method)
-    void M_1013ef00();                           // 0x1013ef00
-};
-
-struct GameObject
-{
-    void M_100082e0();                           // 0x100082e0
-    void M_10007f20();                           // 0x10007f20 (Game::M_10007f20)
-};
 
 #include "listbank.h"
 struct MmvPlayer

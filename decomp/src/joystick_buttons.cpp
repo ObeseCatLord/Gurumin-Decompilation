@@ -1,19 +1,7 @@
 // Reading the game's buttons from a DirectInput joystick state: each game button is mapped (DAT_10f1bef0) to an
 // axis direction or a joystick button, with a default layout for map 0.
 
-// The DirectInput joystick state (DIJOYSTATE): axes from 0 to 65535, centre 32768.
-struct JoyState
-{
-    int x;                        // lX
-    int y;                        // lY
-    int z;                        // lZ
-    int rx;                       // lRx
-    int ry;                       // lRy
-    int rz;                       // lRz
-    int sliders[2];
-    unsigned int pov[4];
-    unsigned char buttons[32];    // 0x30
-};
+#include "joy_state.h"
 
 #include "ui_vars.h"
 

@@ -9,16 +9,7 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..
 
 #include "texture_object.h"
 
-// The effect sprite batch (texture_mgr.cpp Selection).
-struct SpriteBatch
-{
-    int SetBlend(int mode, int unused);          // 0x10173450
-    // 0x10188f10: queues a square from (left, top) to (right, bottom) with texture coordinates (u0, v0)-(u1, v1),
-    // depth `z`, the alpha and two colours.
-    int AddSprite(TextureObject *texture, float left, float top, float right, float bottom, float u0, float v0,
-                  float u1, float v1, float z, float alpha, float r, float g, float b, float r2, float g2, float b2,
-                  float m_0078);
-};
+#include "sprite_batch.h"
 
 #include "effect_manager.h"
 

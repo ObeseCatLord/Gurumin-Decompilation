@@ -3,22 +3,8 @@
 
 #include "ddraw_min.h"
 
-struct Texture
-{
-    int Write16(int x, int y, int width, int height, int pitch, void *bits);  // 0x1014f060: copies 16-bit pixels
-    int M_1014ef20(int x, int y, int width, int height, int pitch, void *bits);  // copies 32-bit pixels
-};
+#include "surface_copy.h"
 
-// Owner of an off-screen DirectDraw surface (the video frame).
-struct VideoSurface
-{
-    char pad_0000[0x10];
-    IDirectDrawSurfaceLike *surface;
-    char pad_0014[0xc];
-    int width;
-    int height;
-    void CopyTo(Texture *texture);
-};
 
 // Locks the surface (DDLOCK_WAIT | DDLOCK_NOSYSLOCK) and copies its pixels into `texture`; the pixel size
 // (pitch / width) picks the 16-bit or 32-bit writer. Other sizes are not copied.

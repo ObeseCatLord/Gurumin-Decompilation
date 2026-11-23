@@ -20,11 +20,7 @@ struct StartVectors
     char pad_0020[0x20];
 };
 
-// Per-character pose table entry, 0x24 bytes (pulse_scale.cpp).
-struct PoseEntry
-{
-    int words[9];
-};
+#include "pose_entry.h"
 
 extern "C" StartVectors DAT_10802bf8[0x80];
 extern "C" PoseEntry DAT_1021bdf8[0x80];

@@ -95,13 +95,7 @@ extern "C" int FUN_10052480(void)
     return 0;
 }
 
-// One int every 0x40 bytes (laid over the CharState table at 0x1020b430, see world.h); used for the per-kind
-// cooldown counters below.
-struct KindCounter
-{
-    int value;
-    char pad_0004[0x3c];
-};
+#include "kind_counter.h"
 
 extern "C" KindCounter DAT_1020b498[0x80];  // cooldown of kind 0x64
 extern "C" KindCounter DAT_1020b49c[0x80];  // cooldown of kind 0x46

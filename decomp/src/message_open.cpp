@@ -3,12 +3,7 @@
 
 #include <string.h>
 
-// The text of a message box (0x280 bytes).
-struct MessageText
-{
-    char lines[4][0x80];
-    char speaker[0x80];           // 0x200
-};
+#include "message_text.h"
 
 #include "char_slot.h"
 

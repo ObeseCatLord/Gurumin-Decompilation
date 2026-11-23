@@ -4,12 +4,7 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-// 16-byte per-character marker records at 0x10867e18 (only the y value is used here).
-struct Marker
-{
-    float y;
-    char pad_0004[0xc];
-};
+#include "marker.h"
 
 #include "char_tables.h"
 #include "char_vars.h"

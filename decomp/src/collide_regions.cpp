@@ -19,20 +19,8 @@ extern "C" int FUN_1001fff0(Node *root, int a, int b, Vec4 *position, Vec4 *velo
     return 0;
 }
 
-// A set of marker points of a model (reached through the model at DAT_104c03ac, field 0x2a8).
-struct MarkerSet
-{
-    char pad_0000[8];
-    Vec4 *points;             // 0x08
-    char *flags;              // 0x0c: one byte per point
-    int count;                // 0x10
-};
+#include "collide_regions.h"
 
-struct MarkerOwner
-{
-    char pad_0000[0x2a8];
-    MarkerSet *markers;       // 0x2a8
-};
 
 extern "C" Node *DAT_10255f08;          // the world's root node
 extern "C" MarkerOwner *DAT_104c03ac;

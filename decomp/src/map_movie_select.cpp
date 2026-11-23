@@ -11,14 +11,7 @@
 #include "game_vars.h"
 #include "ui_vars.h"
 
-// A camera point of the map (0x100 bytes): the frame of the camera path at which it lies and its movie.
-struct CameraPoint
-{
-    int frame;
-    int m_0004;
-    int movie;                                       // 0x08: movie number (index into DAT_10875e48), -1 = none
-    char pad_000c[0xf4];
-};
+#include "camera_point.h"
 
 #include "texture_object.h"
 

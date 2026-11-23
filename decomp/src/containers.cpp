@@ -16,9 +16,7 @@
 #include "key_track.h"
 
 #include "matrix4.h"
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
-extern "C" void (*DAT_11b1ba40)(void *);
+#include "engine_memory.h"
 
 // Reallocates the vertex buffer for `count` vertices (0x70 bytes each, see vertex.cpp). Returns 1.
 int VertexPack::SetVertexCount(int count)
@@ -347,7 +345,6 @@ int MotionList::AddEntry(int id, int value, const char *name, int extra)
     entryCount++;
     return 1;
 }
-extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);
 
 // Makes this pack a copy of `source` (header fields and vertices).
 int VertexPack::CopyFrom(const VertexPack *source)

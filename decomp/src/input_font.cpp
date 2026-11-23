@@ -8,8 +8,7 @@
 
 extern "C" DirectInput *DAT_10f65578;     // the force-feedback effect (an InputEffect while it exists)
 #include "ui_vars.h"
-
-extern "C" void (*DAT_11b1ba40)(void *);
+#include "engine_memory.h"
 
 // Starts the force-feedback effect once for `milliseconds` ms with magnitude 10000 / divisor (divisors below 1
 // count as 1, so full strength is the most). Does nothing without a force-feedback joystick. Returns 1.

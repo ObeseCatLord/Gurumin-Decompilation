@@ -13,7 +13,7 @@ struct Node;
 
 extern "C" char DAT_11b00030[0x40];
 extern "C" Block80 DAT_11b04d18[0x30];
-extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);
+#include "engine_memory.h"
 
 // RenderQueue_Push: appends `node` with its parameters. The extra data and matrix are copied into their pools
 // and the entry stores their index (0xff = none). Full queues keep overwriting the last entry.

@@ -6,8 +6,7 @@
 #include "node.h"
 
 #include "char_tables.h"
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // the engine's allocator
+#include "engine_memory.h"
 extern "C" int FUN_1013f880(void);            // the game's random number
 
 // 0x101ac010 (Node::Load). Releases this node and gives it model `path`: from the cache when that file is cached

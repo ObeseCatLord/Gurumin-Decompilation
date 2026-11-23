@@ -45,8 +45,7 @@ struct Placement
     char name[0x40];
     char pad_027b[0x15d];
 };
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
+#include "engine_memory.h"
 extern "C" Placement DAT_1101dde0[];
 #include "camera_vars.h"
 #include "render_vars.h"

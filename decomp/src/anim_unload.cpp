@@ -11,8 +11,7 @@ Matrix4 IdentityMatrix();  // 0x101b0ba0
 #include "anim_model.h"
 
 #include "render_vars.h"
-
-extern "C" void (*DAT_11b1ba40)(void *block);  // the engine's free
+#include "engine_memory.h"
 
 // 0x10162c50. Unloads the model: removes it from the model table, frees its node tree and its buffer, and resets
 // the position (identity world matrix), speed, collision and motion state. Returns 1.

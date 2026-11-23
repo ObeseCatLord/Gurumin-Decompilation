@@ -15,7 +15,7 @@ Matrix4 Transpose(const Matrix4 &matrix);       // 0x101b1090
 #include "mesh.h"
 
 extern "C" void FUN_101477c0(int slot);          // Texture_ReleaseSlot
-extern "C" void (*DAT_11b1ba40)(void *block);    // the engine's free
+#include "engine_memory.h"
 
 // 0x10150a90. Releases the mesh: its texture slot and every buffer, then clears the fields.
 void MeshData::Release()

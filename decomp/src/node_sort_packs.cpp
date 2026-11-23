@@ -8,10 +8,7 @@
 extern "C" int FUN_10169990(MeshData *mesh);     // MeshCache_Release: drops one reference, returns those left
 
 #include "node.h"
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // the engine's allocator
-extern "C" void (*DAT_11b1ba40)(void *);                      // the engine's free
-extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);   // the engine's memcpy
+#include "engine_memory.h"
 
 // 0x1019c690 (Node::SortPacks). Drops this node's mesh when it was its last user, copies the packs and their index
 // lists into new arrays (first those whose material has m_0178 == 1, then the others), frees the old ones and gives

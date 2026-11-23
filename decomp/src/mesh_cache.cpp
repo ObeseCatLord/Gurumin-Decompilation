@@ -65,10 +65,7 @@ extern "C" int FUN_10169c00(const TextureRef *texture)
     }
     return DAT_10faae88[index];
 }
-
-extern "C" void (*DAT_11b1ba40)(void *);          // engine free
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);              // engine allocator
-extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);   // engine memcpy
+#include "engine_memory.h"
 extern "C" int FUN_1013f880(void);                // the game's random number
 
 // 0x10169c60. Creates the texture from `width` x `height` RGB `pixels` (at most TEXTURE_MAX_SIDE on each side).

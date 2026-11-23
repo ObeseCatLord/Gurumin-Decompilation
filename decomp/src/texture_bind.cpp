@@ -15,7 +15,7 @@ extern "C" TextureObject *DAT_10f65510;         // texture bound to stage 1 (1 =
 extern "C" void *FUN_10148590(int poolIndex, IUnknownLike *texture, int width, int height, int slot);
 extern "C" int FUN_10148520(int poolIndex, int width, int height);
 extern "C" int FUN_101484b0(int poolIndex, int width, int height);  // drops the pooled copy (buffer_pool.cpp)
-extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);  // engine memcpy
+#include "engine_memory.h"
 
 // Binds this texture to stage 0 unless it is bound there already. Returns 1.
 int TextureObject::BindStage0()
@@ -489,9 +489,6 @@ int TextureObject::BeginRenderTo(int width, int height, int offset)
     }
     return DAT_10f1fcf0->SetViewport(&DAT_10f1fd48) == 0;
 }
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);  // the engine's allocator
-extern "C" void (*DAT_11b1ba40)(void *block);                 // the engine's free
 
 // 0x10144ee0. Halves a 24-bit image in place: every 2x2 block of `pixels` (width x height) becomes the average of
 // its four pixels, per channel. The result (width/2 x height/2) is built in a temporary buffer and copied back.

@@ -15,8 +15,7 @@
 #include "char_vars.h"
 #include "game_vars.h"
 #include "map_vars.h"
-
-extern "C" void (*DAT_11b1ba40)(void *block);        // the engine's free
+#include "engine_memory.h"
 extern "C" char DAT_103150c0[0x80];
 
 extern "C" int FUN_1013fb10(int active, int target, int frames);

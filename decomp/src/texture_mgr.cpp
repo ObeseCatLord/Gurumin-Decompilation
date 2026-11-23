@@ -64,8 +64,7 @@ struct Animator
 #include "mesh.h"
 
 #include "render_vars.h"
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
+#include "engine_memory.h"
 extern "C" int FUN_10174c70(int slot, int force);
 
 // Constructor: the member constructors do the work.

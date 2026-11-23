@@ -6,9 +6,7 @@
 
 extern "C" int FUN_10161920(const char *name);   // Texture_FindByName: slot holding `name`, or -1
 #include "render_vars.h"
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // the engine's allocator
-extern "C" void (*DAT_11b1ba40)(void *);                      // the engine's free
+#include "engine_memory.h"
 
 // 0x10175c90 (Texture_CreateFromPixels). Returns the slot of the texture named `name`: the existing one when that
 // name is loaded, else a free slot that gets a new texture from `pixels` (all white when `pixels` is 0) with one

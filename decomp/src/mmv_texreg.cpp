@@ -41,8 +41,7 @@ struct MmvPlayer
     void DecodeFrameRle(int count);
     void Open(const char *path);
 };
-
-extern "C" void (*DAT_11b1ba40)(void *);
+#include "engine_memory.h"
 #include "render_vars.h"
 
 // Not byte-identical yet: the original keeps 0 in ebx for its compares and stores (see open.tsv).
@@ -349,8 +348,6 @@ struct GameFile
     int Seek(int offset, int origin);              // 0x101b2380
     int Read(void *buffer, int size, int count);   // 0x101b23a0
 };
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // engine allocator
 extern "C" int FUN_10161120(char *out, const char *path);       // Path_GetBaseName
 
 // 0x10160a90 (MmvPlayer::Open). Loads movie `path` (looked for as .in\<base name>.MMV first) whole into memory:

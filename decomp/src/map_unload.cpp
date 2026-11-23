@@ -26,8 +26,7 @@ struct LastPosition
     Vec4 step;
     char pad_0020[0x20];
 };
-
-extern "C" void (*DAT_11b1ba40)(void *block);        // the engine's free
+#include "engine_memory.h"
 extern "C" MapObject *DAT_104c03c0;
 #include "camera_vars.h"
 #include "char_tables.h"

@@ -13,8 +13,7 @@
 extern "C" EffectModel DAT_10edbe08[64];  // effect models placed by scripts (slot free while node == 0)
 
 extern "C" Matrix4 DAT_10db9210;
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
-extern "C" void (*DAT_11b1ba40)(void *);
+#include "engine_memory.h"
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
 // Constructor: only the members with constructors do anything (Vec4/Matrix4/KeyBank); the rest is set by Setup.

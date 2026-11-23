@@ -4,10 +4,7 @@
 #include <stdlib.h>
 
 #include "app_0008.h"
-
-
-
-extern "C" void (*DAT_11b1ba40)(void *);
+#include "engine_memory.h"
 #include "game_vars.h"
 
 #include "char_tables.h"

@@ -130,7 +130,7 @@ extern "C" float DAT_104bf8f0;        // fade value
 extern "C" float DAT_1032d4b0;        // fade step per frame
 extern "C" float DAT_104bf8e8;        // fade target (set exactly on the last frame)
 extern "C" OverlayModel *DAT_104c03c8; // its model
-extern "C" void (*DAT_11b1ba40)(void *block);       // the engine's free
+#include "engine_memory.h"
 extern "C" int FUN_1000cb30(const char *text);
 extern "C" int FUN_1000cb90(const char *text);      // Caption_Set
 extern "C" int FUN_10174c70(int slot, int force);   // releases a texture slot

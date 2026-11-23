@@ -3,8 +3,7 @@
 #include "node.h"
 
 #include "char_tables.h"
-
-extern "C" void (*DAT_11b1ba40)(void *);
+#include "engine_memory.h"
 
 // Releases and frees every node in the 0x80-entry node pool DAT_11b002d0.
 extern "C" int FUN_101a5860(void)

@@ -60,9 +60,7 @@ inline void Node::RestoreSavedMatrix()
         matrix = saved->matrix;
     saved->state = SAVED_EMPTY;
 }
-
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
-extern "C" void (*DAT_11b1ba40)(void *);
+#include "engine_memory.h"
 #include "char_vars.h"
 #include "render_vars.h"
 
@@ -952,7 +950,6 @@ int Node::RemoveChild(Node *child, int keep)
     children[j] = 0;
     return 0;
 }
-extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 
 // Makes private copies of every animation plug's data in the subtree.
 int Node::CopyPlugData()
@@ -1488,8 +1485,6 @@ int Node::M_1019eeb0(Node *root, Node **list, int *count)
         children[child]->M_1019eeb0(root, list, count);
     return 1;
 }
-
-extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);   // the engine's memcpy
 extern "C" int FUN_10169840(const char *folder, const char *name, int *freeSlot);  // ModelNames_Find: slot of folder+name, -1 = none (a free slot in *freeSlot)
 extern "C" int FUN_10169760(void);                   // ModelNames_FindFree
 extern "C" int FUN_10169780(int slot, const char *folder, const char *name);   // ModelNames_SetJoined

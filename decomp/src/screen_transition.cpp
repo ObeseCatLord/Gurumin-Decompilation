@@ -4,8 +4,7 @@
 #include <mmsystem.h>
 
 #include "render_vars.h"
-
-extern "C" DWORD DAT_10f654d8;
+#include "win_vars.h"
 extern "C" int FUN_1013ed20(void);
 extern "C" int FUN_1013ed60(void);
 extern "C" int FUN_101439e0(void);

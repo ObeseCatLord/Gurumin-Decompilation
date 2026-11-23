@@ -16,6 +16,8 @@ def main():
                          + rb')\b[^;]*;[^\n]*\n?', re.M)
     files = sorted(glob.glob(os.path.join(ROOT, "src", "*.cpp")) + glob.glob(os.path.join(ROOT, "src_od", "*.cpp")))
     for path in files:
+        if os.path.basename(path) == "npc_greet.cpp":
+            continue                     # open.tsv 100b8220: any shared header tips its register allocation
         data = open(path, "rb").read()
         matches = list(pattern.finditer(data))
         if not matches:

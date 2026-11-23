@@ -79,7 +79,7 @@ extern "C" int DAT_104bf8f0;
 extern "C" int DAT_104bfb08[0x80];
 extern "C" int DAT_104bfd5c;
 extern "C" int DAT_104bfe24;
-extern "C" int DAT_104c00e4;
+#include "win_vars.h"
 extern "C" char DAT_104c022c;
 extern "C" char DAT_104c022d;
 extern "C" EmptyObject DAT_1065cb28;

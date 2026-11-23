@@ -19,8 +19,7 @@ struct Engine
 extern "C" Engine DAT_10836c70;
 #include "game_vars.h"
 #include "render_vars.h"
-
-extern "C" DWORD DAT_104c032c;        // tick count of the last update
+#include "win_vars.h"
 extern "C" int FUN_101439e0(void);    // Render_ResetTarget
 extern "C" void FUN_1014b390(void);   // render_reset.cpp
 

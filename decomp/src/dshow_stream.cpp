@@ -7,14 +7,7 @@
 #include "ddraw_min.h"
 
 #include "dshow_stream.h"
-
-
-
-
-extern "C" const GUID DAT_101fccdc;              // CLSID_AMMultiMediaStream
-extern "C" const GUID DAT_101fccec;              // IID_IAMMultiMediaStream
-extern "C" const GUID DAT_101fccfc;              // MSPID_PrimaryVideo
-extern "C" const GUID DAT_101fcccc;              // IID_IDirectDrawMediaStream
+#include "win_vars.h"
 
 // 0x101488b0 (DShowStream::Close). Releases the five interfaces, last to first.
 void DShowStream::Close()

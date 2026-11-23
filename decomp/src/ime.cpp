@@ -148,7 +148,6 @@ extern "C" int FUN_1015d500(int value)
     DAT_10f66bbc = value;
     return 1;
 }
-extern "C" ImeContext DAT_10f68124;
 
 // 1 when the game's IME is switched on.
 extern "C" int FUN_1015d510(void)
@@ -201,8 +200,7 @@ DWORD ImeContext::LoadCandidates()
     ImmGetCandidateListA(context, 0, buffer, size);
     return buffer->dwCount;
 }
-extern "C" DWORD DAT_10f66dd8;   // saved conversion mode
-extern "C" DWORD DAT_10f66bb8;   // saved sentence mode
+#include "win_vars.h"
 
 extern "C" char DAT_10f67008[32][0x80];  // candidate strings
 
@@ -253,9 +251,6 @@ extern "C" int FUN_1015fd30(void)
         strcpy(DAT_10f66ef8, DAT_10f66df8);
     return 0;
 }
-
-
-extern "C" ImeWindowHooks DAT_10f65698;
 extern "C" void FUN_1015f3e0();        // reads the composition string
 extern "C" void FUN_1015f400();        // reads the result string
 extern "C" void FUN_1015f490();        // reads the cursor position

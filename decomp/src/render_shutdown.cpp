@@ -22,9 +22,7 @@ extern "C" int DAT_10f6550c;                  // texture bound to stage 0 (0 = f
 extern "C" int FUN_101734d0(void);            // Texture_OnLostDevice: releases every registered texture
 extern "C" int FUN_10173510(void);            // Texture_OnResetDevice: recreates them
 extern "C" int FUN_1013ed20(void);            // Render_BeginScene
-
-extern "C" HWND DAT_10f6569c;                 // the game window
-extern "C" HINSTANCE DAT_10f140c8;            // the module instance
+#include "win_vars.h"
 extern "C" IUnknownLike *DAT_10f141dc;
 extern "C" int FUN_101483a0(void);            // BufferPool_ReleaseAll (texcache.cpp)
 extern "C" int FUN_10148280(void);            // releases the four buffer pools

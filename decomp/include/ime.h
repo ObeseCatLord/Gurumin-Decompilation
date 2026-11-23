@@ -56,4 +56,7 @@ struct ImeWindowHooks
     ImeCallback onAttributes;          // 0x24
 };
 
+extern "C" ImeContext DAT_10f68124;                       // the game's IME context (ime.cpp)
+extern "C" ImeWindowHooks DAT_10f65698;                   // the IME hooks part of the game window object (RenderWindow)
+
 #endif

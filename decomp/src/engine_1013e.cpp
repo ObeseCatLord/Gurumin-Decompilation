@@ -9,8 +9,7 @@
 #include "map_vars.h"
 #include "render_vars.h"
 #include "sound_vars.h"
-
-extern "C" DWORD DAT_10f654d8;
+#include "win_vars.h"
 extern "C" int DAT_10f65508;
 // Frame blend (after-image) strength: rises by the step every other frame up to the limit (see FUN_1013fb10).
 
@@ -32,8 +31,6 @@ extern "C" int FUN_1013ed60(void)
     DAT_10f6547c = 0;
     return 0;
 }
-
-extern "C" HWND DAT_10f6569c;  // the game window
 
 // 0x1013edc0 (Render_Present). Ends the scene and presents the back-buffer rectangle `source` (in the game's 640x480
 // coordinates), scaled to the same place in the window's client area. Returns 1.

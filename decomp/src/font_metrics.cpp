@@ -120,7 +120,7 @@ struct GameFile
 
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
 #include "engine_memory.h"
-extern "C" HWND DAT_10f6569c;                        // the game window
+#include "win_vars.h"
 #include "render_vars.h"
 #include "ui_vars.h"
 

@@ -6,15 +6,10 @@
 #include <string.h>
 
 #include "dinput_min.h"
-
-extern "C" HINSTANCE DAT_10f140c8;   // the module instance
-extern "C" HWND DAT_10f6569c;        // the game window
+#include "win_vars.h"
 #include "ui_vars.h"
 
 extern "C" InputEffect *DAT_10f65578;  // the force-feedback effect
-extern "C" const GUID DAT_101fccbc;  // IID_IDirectInput8A
-extern "C" const GUID DAT_101fcc0c;  // GUID_SysKeyboard
-extern "C" const GUID DAT_101fcc1c;  // GUID_SysMouse
 extern "C" long __stdcall DirectInput8Create(HINSTANCE instance, unsigned long version, const GUID &iid, void **out,
                                              IUnknown *outer);
 

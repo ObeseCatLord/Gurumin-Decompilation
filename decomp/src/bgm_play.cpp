@@ -24,8 +24,7 @@ struct GameFile
 #include "sound_vars.h"
 
 #include "game_vars.h"
-
-extern "C" DWORD DAT_104c00e4;                   // tick count when the track was started
+#include "win_vars.h"
 extern "C" void FUN_10010480(const char *name, int a, int b, int c, int d, int fade);   // Bgm_StartStream
 extern "C" int FUN_10161120(char *out, const char *path);                              // Path_GetBaseName
 extern "C" int Bgm_CheckHeader(char *name, int sum, unsigned int check);               // 0x10001cb0

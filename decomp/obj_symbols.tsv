@@ -518,3 +518,5 @@ _Enemy_IsBusy	100e1c40
 ?Draw@AnimModel@@QAEHPBUMatrix4@@PBUVec4@@H@Z	10163150
 ?FUN_1000c720@@YAHPAUMatrix4@@ABU1@PAUVec4@@@Z	1000c720
 ?DrawTextClipped@FontRenderer@@QAEHHHPBDHHHHHMMM@Z	1014fdd0
+?DeclareFromText@ListBank@@QAEHPADH@Z	100ed510
+?Lava_Update@@YAHXZ	1005f750

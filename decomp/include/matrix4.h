@@ -58,6 +58,9 @@ struct Matrix4
     Matrix4 operator*(const Matrix4 &other);           // 0x101b0670: matrix product
 };
 
+Matrix4 RotationZ(float angle);   // 0x101b1b40: turn of `angle` about z
+Matrix4 RotationX(float angle);   // 0x101b1ad0: turn of `angle` about x
+
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 
 #endif

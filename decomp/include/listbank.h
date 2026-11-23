@@ -110,6 +110,7 @@ struct ListBank
     int ReadTerm(char **text, char *word);
     int ReadToken(char **text, char *token);                  // 0x100360f0: next token of an expression
     int CompileStatement(const char *statement);               // 0x100ed9b0
+    int DeclareFromText(char *declaration, int group);        // 0x100ed510
     int CompileText();
     int LoadText(const char *source, int length);
     int GetIndexPart(const char *name, char *part, int n);    // 0x10036560: the n-th [ ] part of `name`

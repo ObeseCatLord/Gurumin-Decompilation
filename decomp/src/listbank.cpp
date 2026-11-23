@@ -1474,3 +1474,97 @@ int ListBank::AssignValue(const char *name, const ScriptValue *value, char type)
     ReportError(UNDEFINED_NAME_TEXT);
     return 0;
 }
+
+#define DUPLICATE_NAME_TEXT "\x95\xcf\x90\x94\x96\xbc\x82\xaa\x8f" "d\x95\xa1\x82\xb5\x82\xc4\x82\xdc\x82\xb7\x81" "B"
+
+// 0x100ed510 (ListBank::DeclareFromText). Declares the variables listed in `declaration` in group `group`: each
+// word is a variable name with optional "[size]" parts (every size is compiled; their product is the element
+// count). The type comes from ReadType. A name that is already declared in the group is an error. Each variable gets
+// storage for all its elements (zeroed numbers, or text elements preset to ""), and its sizes, dimension count and
+// type are recorded. Returns 1 when the list is used up, 0 after an error.
+int ListBank::DeclareFromText(char *declaration, int group)
+{
+    char *source = declaration;
+    char type = ReadType(&source);
+    int elements = 1;
+    char word[LISTBANK_TEXT_SIZE];
+    while (failed == 0)
+    {
+        char part[LISTBANK_TEXT_SIZE];
+        ReadWord(&source, word);
+        if (word[0] == 0)
+            return 1;
+        borrowed[group][variableCounts[group]] = 0;
+        if (GetIndexPart(word, part, 0) != 0)
+        {
+            int dimension = 0;
+            while (GetIndexPart(word, part, dimension) != 0)
+            {
+                CompileCall(part, 0);
+                if (resultType == 0)
+                {
+                    // already an int
+                }
+                else if (resultType == 1)
+                    *result = (int)*(float *)result;
+                else if (resultType == 2)
+                    *result = atol((char *)result + 1);
+                else
+                    *result = 0;
+                sizes[group][variableCounts[group]][dimension] = *result;
+                elements = sizes[group][variableCounts[group]][dimension] * elements;
+                dimension++;
+                sizes[group][variableCounts[group]][dimension] = 0;
+            }
+            dimensions[group][variableCounts[group]] = dimension;
+            int length = 0;
+            while (word[length] != '[')
+                length++;
+            word[length] = 0;
+            strcpy(variableNames[group][variableCounts[group]], word);
+        }
+        else
+        {
+            strcpy(variableNames[group][variableCounts[group]], word);
+            sizes[group][variableCounts[group]][0] = 0;
+            dimensions[group][variableCounts[group]] = 0;
+        }
+        for (int i = 0; i < variableCounts[group]; i++)
+        {
+            if (strcmp(variableNames[group][i], word) == 0)
+            {
+                failed = 1;
+                printf("%s\n", DUPLICATE_NAME_TEXT);
+                if (callback != 0)
+                    callback(1, (int)DUPLICATE_NAME_TEXT);
+                if (callback != 0)
+                    callback(5000, cursor[depth] - text);
+                FreeAll();
+                return 0;
+            }
+        }
+        if (type == 0)
+        {
+            values[group][variableCounts[group]].ints = new int[elements];
+            values[group][variableCounts[group]].ints[0] = 0;
+            for (int i = 0; i < elements; i++)
+                values[group][variableCounts[group]].ints[i] = 0;
+        }
+        else if (type == 1)
+        {
+            values[group][variableCounts[group]].floats = new float[elements];
+            values[group][variableCounts[group]].ints[0] = 0;
+            for (int i = 0; i < elements; i++)
+                values[group][variableCounts[group]].ints[i] = 0;
+        }
+        else if (type == 2)
+        {
+            values[group][variableCounts[group]].texts = new char[elements][LISTBANK_TEXT_SIZE];
+            for (int i = 0; i < elements; i++)
+                strcpy(values[group][variableCounts[group]].texts[i], "\"\"");
+        }
+        variableTypes[group][variableCounts[group]] = type;
+        variableCounts[group]++;
+    }
+    return 0;
+}

@@ -51,7 +51,7 @@ extern "C" char DAT_1021f9c0[CHAR_SLOT_COUNT];
 extern "C" char DAT_102239d0[CHAR_SLOT_COUNT];
 extern "C" int DAT_10253a58[CHAR_SLOT_COUNT];
 extern "C" int DAT_10253c58[CHAR_SLOT_COUNT];
-extern "C" char DAT_10253e98[CHAR_SLOT_COUNT];
+extern "C" unsigned char DAT_10253e98[CHAR_SLOT_COUNT];   // frames of protection left after a lava or trap hit (lava_hazard.cpp)
 extern "C" char DAT_10254090[CHAR_SLOT_COUNT];
 extern "C" int DAT_10254110[CHAR_SLOT_COUNT];
 extern "C" int DAT_10254390[CHAR_SLOT_COUNT];             // greeting countdown per character (10000 = greet now)

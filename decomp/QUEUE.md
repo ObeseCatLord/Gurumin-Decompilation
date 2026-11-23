@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (183)
+## 1. Walls to retry (184)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -72,6 +72,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10047440` 1473 — Npc_PushCart (npc_wheel.cpp): flow and calls line up; the original keeps the pointer to DAT_10210b30[index] in a stack slot (it reuses ebx for the slot kind after Char_ResetState) and pushes -1 before reading fs:[0]; cl 13.00 here folds the pointer back into [index*4], so the frame is 4 bytes smaller
 - [ ] `10047a10` 1598 — Npc_RideBehindMarker (npc_ride.cpp): 4 bytes; the marker heading copy lives in the slot of the cached distance pointer in the original, cl 13.00 here puts it in the turn variable's slot
 - [ ] `10049650` 822 — Wave_Update (enemy_spawn.cpp): code identical apart from stack slots; the original puts the position vector right after the counters (group, earliest and slot above it), cl 13.00 here puts the loop scalars first; declaration orders and scopes tried
+- [ ] `1004d4b0` 1188 — Regions_Update (region_view.cpp, rule-clean draft, 1184 vs 1188 bytes): the original keeps zero in edi (also the vertex-offset induction variable, cleared per region; push edi/xor edi,edi prologue) and tail-duplicates the push/push/call 100211a0 on the not-morphing and age<0 paths; ours keeps zero in ebp with the point counter; loop forms, counters and flag types tried
 - [ ] `1004f250` 655 — TutorialBook_Close draft: flow and calls match (LoadTexture inline for the cover); the page loop registers differ (original: first page in edi, second in ebp, name pointer in ebx), like the other TutorialBook functions; declaration orders tried
 - [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
 - [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
@@ -204,13 +205,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (98)
+## 4. Large functions (801-3000 bytes) (95)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `100ed510` 1160 bytes (float, loops 10, calls 15)
-- [ ] `1004d4b0` 1188 bytes (float, loops 3, calls 2)
 - [ ] `10038070` 1195 bytes (float, loops 2, calls 37)
-- [ ] `1005f750` 1200 bytes (float, loops 4, calls 28)
 - [ ] `1003b6e0` 1208 bytes Costume_LoadPlayerModel (calls 33)
 - [ ] `10050510` 1219 bytes (float, loops 2, calls 18)
 - [ ] `100169c0` 1220 bytes (float, loops 9, calls 33)

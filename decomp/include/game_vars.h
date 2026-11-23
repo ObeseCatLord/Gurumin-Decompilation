@@ -5,6 +5,7 @@
 #define GURUMIN_GAME_VARS_H
 
 #include "app_0008.h"
+#include "effect_holds.h"
 #include "game_reset.h"
 #include "matrix4.h"
 #include "vec4.h"
@@ -51,7 +52,7 @@ extern "C" char DAT_1020d438[0x80];                       // per character slot:
 extern "C" int DAT_1020d4b8;
 extern "C" int DAT_1020d5c8[0x20];
 extern "C" int DAT_1020d648;
-extern "C" int DAT_1020dcf8[0x100];
+extern "C" EffectHold DAT_1020dcf8[EFFECT_HOLD_COUNT];
 extern "C" char DAT_1020e0f8[];                           // second banner text (empty = none)
 extern "C" int DAT_10210b28;
 extern "C" int DAT_10210b2c;

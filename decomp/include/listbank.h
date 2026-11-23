@@ -93,7 +93,7 @@ struct ListBank
     int textLength;           // 0x36300
     char *cursor[8];          // 0x36304: read position in `text`, one per nesting level
     int depth;                // 0x36324: current nesting level
-    int pad_36328;
+    int flow;                 // 0x36328: how the statements run last ended (FLOW_ codes, script_statements.h)
     int failed;               // 0x3632c: set once an error was reported; every reader then fails
     ListBank *self;           // 0x36330: set to this object by LoadText
     char m_36334[0x20][0x20]; // 0x36334: registered keywords (16 are searched; the init clears 32)
@@ -132,6 +132,7 @@ struct ListBank
     int LoadText(const char *source, int length);
     int GetIndexPart(const char *name, char *part, int n);    // 0x10036560: the n-th [ ] part of `name`
     int Evaluate(const char *expression, char type);
+    int RunStatements(char wantType, int openBraces);          // 0x10089210 (script_run.cpp)
     int CompileCall(const char *text, int flags);              // 0x10089a10 (Script_CompileCall)
     int FirstIndexValue(const char *name, int *value);
     int DeclareVariable(const char *name, int group, char type);

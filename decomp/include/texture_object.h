@@ -91,6 +91,9 @@ struct TextureObject : TextureHandle
     // 0x1014ce40 (named from game_panels.cpp, not yet defined in a source file): fills the panel background; the
     // parameters follow DrawFrame's.
     int DrawFill(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);
+    // 0x1014ddf0 (texture_mesh.cpp): draws an indexed mesh through the vertex shader of `shader`.
+    int DrawMesh(struct Matrix4 *world, struct Matrix4 *viewProjection, void *vertices, int vertexCount,
+                 void *indices, int indexCount, int shader, const struct Vec4 *colour, const struct Vec4 *extra);
 };
 
 // Every texture slot.

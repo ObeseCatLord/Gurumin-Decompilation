@@ -17,6 +17,10 @@ extern "C" int FUN_10029cf0(int index, int *doneStep, int step, int *nextStep, V
 // 0x10028fa0 (Spirit_StepRoute, spirit_route.cpp): moves the spirit `index` one step along its route (see there).
 extern "C" int FUN_10028fa0(int index, int *lastPoint, int point, int *nextPoint, Vec4 *target, int *kind, int *value,
                             int *extra);
+// 0x100286d0 (Char_StepRouteTarget, route_target.cpp): the route target of character `slot` heading for `point`; writes the next
+// point, the target position, the point's kind, code and extra. Returns 1 at a hold, turn or wait point.
+extern "C" int FUN_100286d0(int slot, int *lastPoint, int point, int *nextPoint, Vec4 *target, int *kind, int *value,
+                            int *extra);
 // 0x100286b0 (app_0012.cpp): wraps a packed route part into -4999..5000.
 extern "C" int FUN_100286b0(int angle);
 // 0x1001dbd0 (app_0012.cpp): sets parameter 5 of every NPC with `id` to `value` and restarts its behaviour.

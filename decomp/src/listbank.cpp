@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "listbank.h"
+#include "script_statements.h"
 // Clears group `group`: entries that are not in use lose their values. Returns 1.
 int ListBank::M_10004680(int group)
 {
@@ -993,7 +994,7 @@ int ListBank::InitLibrary()
     result = resultBuffer;
     self = this;
     callback = 0;
-    pad_36328 = 0;
+    flow = 0;
     blockCount = 0;
     compiling = 0;
     textLength = 0;
@@ -1575,16 +1576,6 @@ int ListBank::DeclareFromText(char *declaration, int group)
 #define NO_FUNCTION_DEFINITION_TEXT "\x83" "C\x83\x93\x83^\x83v\x83\x8a\x83^\x82\xc5\x82\xcd\x8a\xd6\x90\x94\x92\xe8\x8b`\x82\xc5\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81" "B"
 #define NO_LOCAL_FUNCTION_TEXT "\x83\x8d\x81[\x83J\x83\x8b\x8a\xd6\x90\x94\x82\xcd\x92\xe8\x8b`\x82\xc5\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81" "B"
 #define BAD_FOR_TEXT "for\x82\xcc;\x82\xaa\x82\xa8\x82\xa9\x82\xb5\x82\xa2\x81" "B"
-
-// Statement kinds CompileStatement returns (besides 0 = error and 1 = nothing to execute: a label, a declaration or
-// a call that was compiled).
-#define STATEMENT_IF 10
-#define STATEMENT_FOR 11
-#define STATEMENT_WHILE 12
-#define STATEMENT_SWITCH 13
-#define STATEMENT_BREAK 14
-#define STATEMENT_CONTINUE 15
-#define STATEMENT_RETURN 16
 
 // 0x100ed9b0 (ListBank::CompileStatement). Classifies one statement by its first word. A label (ends in ':') and
 // `case` give 1; return, break, continue, if, for, while and switch give their STATEMENT_ code, with the

@@ -10,7 +10,6 @@
 #include "char_vars.h"
 #include "map_vars.h"
 
-extern "C" void FUN_100308e0(void);
 extern "C" void FUN_1002f520(void);
 extern "C" void FUN_100311b0(void);
 extern "C" int FUN_1013f880(void);

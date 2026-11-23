@@ -33,6 +33,7 @@ struct CharState
                 int counterValue;                 // digit_counter.cpp: the value shown (0..1000)
                 int approachStarted;              // npc_approach.cpp: 1 once the approach has begun
                 int walkingBack;                  // route_follow.cpp: 1 while walking the route backwards
+                int gatePoint;                    // npc_gate_carrier.cpp: route point it comes from (the point it is at)
             };
             union                                 // 0x04..0x37: behaviour variables
             {
@@ -41,8 +42,10 @@ struct CharState
                     union                         // 0x04
                     {
                         int wait;                 // frames in the current step (or until the next voice line)
+                        int gatePrevious;         // npc_gate_carrier.cpp: the route point before gatePoint
                         int scriptRunning;        // char_script.cpp: 1 while the character's script runs
                         int cooldown;             // kind4a_turret.cpp: frames before the next random attack
+                        int talkMotionStarted;    // npc_greet.cpp: 1 once the talk motion was started
                         int routeStopped;         // route_walk.cpp: non-zero = the character stays where it is
                         int layerCount;           // flame_layers.cpp: flame layers found (their timers are values[1..])
                         int counterPhase;         // digit_counter.cpp: 0 = idle, 1..10 = turning to count + 1
@@ -69,6 +72,7 @@ struct CharState
                         int wanderState;          // enemy_wander.cpp: 0 = walking, 1 or 2 = looking for a heading
                         int spiritStep;           // char_spirit.cpp: motion step of the character's motion table row
                         int lookoutMode;          // npc_lookout.cpp: what the lookout watches for (1..5)
+                        int hitFrames;            // map_cursor_walk.cpp: frames since it was hit (state 1), 0..0xaa
                     };
                     union                         // 0x0c
                     {
@@ -94,9 +98,12 @@ struct CharState
                                                   // at most 2000 + this
                         int weaponMarkB;          // weapon_attach.cpp: -2 after an unknown weapon (no model)
                         int fleeSide;             // enemy_flee.cpp: 1 = veers left, 2 = veers right (picked at random)
+                        int hikariSpeed;          // char_hikari.cpp: speed counter, 0..90 (10 while it waits)
                         int spiritReady;          // char_spirit.cpp: 1 once the spirit was set up
                         int promptFrames;         // npc_lookout.cpp: frames the key prompt stays (counted down)
+                        int watchPhase;           // npc_group_watch.cpp: 0 = idle, 1 = turning to a groupmate, 2 = showing an emote
                         int neighbour;            // npc_gesture.cpp: slot of the character it reacts to (own slot - talk / 100)
+                        int gazeTimer;            // npc_greet.cpp: frames left in the current gaze step (counted down)
                     };
                     union                         // 0x10
                     {
@@ -107,9 +114,15 @@ struct CharState
                         int swingingBack;         // enemy_pendulum.cpp: 1 while swinging back
                         int nextPoint;            // route_carrier.cpp: the route point headed for
                         int downMode;             // companion_update.cpp (companion slot): 0 = active,
+                        int passenger;            // npc_gate_carrier.cpp: slot of the enemy it carries (0 = none)
                                                   // 1 = reviving, 2 = recovering, 10 and above = going down
                         int spiritSize;           // char_spirit.cpp: 100 (with an "@O_047b" node) or 200; sets the swarm
+                        int hikariPoint;          // char_hikari.cpp: the route point it last reached (route step output)
                         int eyeOpen;              // npc_lookout.cpp: 1 = the lamp's eye is lit
+                        int groupSize;            // npc_group_watch.cpp: groupmates counted (same group digit, behaviour 3)
+                        int pitPhase;             // map_cursor_walk.cpp: 0 = outside the pit area, 1 = entering, 2 = inside,
+                                                  // 3 = leaving
+                        int greeted;              // npc_greet.cpp: 0 = has not greeted yet
                     };
                     union                         // 0x14
                     {
@@ -124,8 +137,13 @@ struct CharState
                         int scriptValue;          // char_script.cpp: value carried between steps (opacity in
                                                   // tenths)
                         int chaseFrames;          // char_spirit.cpp: frames spent chasing (swarm every 4th)
+                        int hikariReady;          // char_hikari.cpp: 2 once the light was set up on its route
                         int reactDelay;           // npc_lookout.cpp: frames until the event is raised (0 = idle)
+                        int watchTarget;          // npc_group_watch.cpp: slot of the groupmate it turns to
                         int cheerPending;         // npc_gesture.cpp: 1 = a cheer starts this frame
+                        int pickupBlocked;        // npc_gate_carrier.cpp: 1 = the player is outside the pick-up height band
+                        int pitFrames;            // map_cursor_walk.cpp: frames in the current pit phase
+                        int greetPending;         // npc_greet.cpp: 1 = greeted, the event is raised once greetings are off
                     };
                     union                         // 0x18
                     {
@@ -136,8 +154,11 @@ struct CharState
                         int shotSound;            // enemy_strafe.cpp: SHOT_SOUND_PENDING = play the shot sound with
                                                   // the next shot
                         int spiritTimer;          // char_spirit.cpp: frames left of the spirit's visit (counts down)
+                        int hikariHold;           // char_hikari.cpp: 15 after the route ended
                         int watchedCode;          // npc_lookout.cpp: item stock digits seen (-1 = none yet)
+                        int groupDigit;           // npc_group_watch.cpp: talk % 10, the group it belongs to
                         int cheerReady;           // npc_gesture.cpp: 0 = the cheer is queued instead of played at once
+                        int pickupHeight;         // npc_gate_carrier.cpp: lowest player height (below the carrier) for a pick-up
                     };
                     union                         // 0x1c
                     {
@@ -147,7 +168,9 @@ struct CharState
                         int forceStep;            // route_step.cpp: non-zero = take the point at once, whether
                                                   // or not the character is near it (cleared by the step)
                         int spiritHaunting;       // char_spirit.cpp: 1 while the visit counts down (150+ frames left)
+                        int hikariStopped;        // char_hikari.cpp: 1 = stopped by an obstacle, waits for the way to clear
                         int bestValue;            // npc_lookout.cpp: the largest value seen
+                        int sightScale;           // npc_group_watch.cpp: talk / 10, its sight range in units of 20
                         int cheerMotion;          // npc_gesture.cpp: motion of the cheer (0x5a + random 0..3)
                     };
                     union                         // 0x20
@@ -158,10 +181,12 @@ struct CharState
                         int bestAmount;           // npc_lookout.cpp: the amount that came with it
                         int routeMode;            // spirit_route.cpp: 1..3 = put the spirit on a fixed route point
                         int gesturing;            // npc_gesture.cpp: 1 while the gesture shows (neighbours react to it)
+                        int hikariSound;          // char_hikari.cpp: 1 while its "anime" sound plays
                     };
                     union                         // 0x24
                     {
                         int m_0024;
+                        int sinkLimit;            // map_cursor_walk.cpp: set to -40 while the character is not sinking
                         int restFrames;           // enemy_strafe.cpp (Enemy_HopAndStrafe): frames standing still
                                                   // in the idle motion
                     };
@@ -178,10 +203,12 @@ struct CharState
                                                   // ground when it matches the slot (mod 30)
                         int headingFrom;          // route_step.cpp: heading (degrees) at the route's first point
                         int markerSlot;           // marker_rider.cpp: slot of the marker character ridden
+                        int lastHealth;           // map_cursor_walk.cpp: the health of the slot, copied every frame
                     };
                     union                         // 0x2c
                     {
                         int m_002c;
+                        int cursorNode;           // map_cursor_walk.cpp: the route node the character heads for
                         int headingTo;            // route_step.cpp: heading (degrees) at the route's last point
                         int vanishFrames;         // marker_rider.cpp: frames left of the vanishing once the marker fell
                         int hopFrame;             // enemy_strafe.cpp (Enemy_HopAndStrafe): frame of the hop
@@ -192,13 +219,17 @@ struct CharState
                         int m_0030;
                         int markerPhase;          // marker_rider.cpp: 0 = new, 1 = riding (flags set), 2 = vanishing
                         int arrivalHold;          // map_cursor.cpp: frames left in which the cursor counts as
+                        int hikariScanned;        // char_hikari.cpp: 1 once the character to carry along was looked up
                                                   // having been carried by a rider (15 after one lands on it)
                     };
                     union                         // 0x34
                     {
                         int m_0034;
+                        int cursorKind;           // map_cursor_walk.cpp: kind of the node last reached (MapCursor_Step)
                         int arrivalAction;        // npc_patrol.cpp: action of the last route point reached
                         int hopHistory;           // enemy_strafe.cpp (Enemy_HopAndStrafe): HopHistory state of
+                        int hikariFollower;       // char_hikari.cpp: slot of the character carried along with the light (0 = none)
+                        int gateStarted;          // npc_gate_carrier.cpp: 2 once the carrier was set up on its route
                                                   // the position history in LastPosition
                     };
                 };
@@ -208,6 +239,7 @@ struct CharState
             union                                 // 0x38
             {
                 int sawPlayer;                    // 1 once the character saw the player (or was told to react)
+                int cursorPrevious;               // map_cursor_walk.cpp: the node reached before (MapCursor_Step)
                 int releasable;                   // npc_approach.cpp: non-zero = the release flag ends the approach
             };
             int behaviour;                        // 0x3c: behaviour number (0 = not unpacked from the script

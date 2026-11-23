@@ -112,10 +112,10 @@ struct IDirect3DDevice9
     virtual long __stdcall DrawPrimitive() = 0;
     virtual long __stdcall DrawIndexedPrimitive() = 0;
     virtual long __stdcall DrawPrimitiveUP(int type, unsigned int count, const void *data, unsigned int stride) = 0;
-    virtual long __stdcall DrawIndexedPrimitiveUP() = 0;
+    virtual long __stdcall DrawIndexedPrimitiveUP(int type, unsigned int minIndex, unsigned int vertexCount, unsigned int primitiveCount, const void *indices, int indexFormat, const void *vertices, unsigned int stride) = 0;
     virtual long __stdcall ProcessVertices() = 0;
     virtual long __stdcall CreateVertexDeclaration() = 0;
-    virtual long __stdcall SetVertexDeclaration() = 0;
+    virtual long __stdcall SetVertexDeclaration(void *declaration) = 0;
     virtual long __stdcall GetVertexDeclaration() = 0;
     virtual long __stdcall SetFVF(unsigned long fvf) = 0;
     virtual long __stdcall GetFVF() = 0;

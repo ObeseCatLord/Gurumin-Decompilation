@@ -30,6 +30,7 @@ extern "C" int DAT_10202b38;                              // back-buffer height
 extern "C" int DAT_10203344;
 extern "C" int DAT_10203418;                              // 0 = the darker vertex colours of the wave copies (Node::ShadeWaveCopy)
 extern "C" int DAT_1020340c;                              // texture memory budget of the pool
+extern "C" int DAT_10203410;                              // video memory budget for the mesh buffers (GetMeshBuffers)
 extern "C" float DAT_10203420;
 extern "C" int DAT_10203424;                              // counts requests whose x is 530 or more (never read here)
 extern "C" int DAT_10203434;                              // 1 when shadows are drawn

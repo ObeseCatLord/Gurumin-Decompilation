@@ -57,7 +57,7 @@ extern "C" int FUN_100b6290(int index);                    // Npc_RunToMarker
 extern "C" int FUN_100b6740(int index);
 extern "C" int FUN_10049240(int index);                    // Enemy_DropInWhenNear
 extern "C" int FUN_1001b880(int index);                    // Npc_TalkFacingSimple
-extern "C" int FUN_100b7360(int index);
+int FUN_100b7360(int index);                               // Npc_GreetWhenFaced
 extern "C" int FUN_100b7b10(int index);
 extern "C" int FUN_10045ed0(int index);                    // Npc_ApproachPlayer
 int FUN_100b5f80(int index);                               // Npc_AlertWhenSeen

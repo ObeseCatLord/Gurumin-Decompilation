@@ -563,3 +563,15 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Matrix product temporaries of `projection = projection * (if/else ScaleMatrix(...))` share one slot when written
   as an if/else with the product in each arm (two EH states, one tail); a ternary is not needed.
 - **Three-term float sums inside call arguments** (WorldRenderer::DrawPictures 0x10167440): with the half size CSE'd, `x - half + offset` and `y + half + offset` came out in the original order, but the right edge (original `fld offset; fadd x; fadd half`) needed the grouping `offset + (x + half)`; the same spelling in another branch may still schedule differently, so try groupings per call. A `Vertex *first = &v[i]` pointer local gives `add esi, edx` where the original keeps the index product and uses `lea` twice: index the array again instead (Node::BuildMesh 0x101a82d0).
+
+## Stack-slot order of same-size locals (2026-11-23)
+cl 13.00 does not place same-size locals (two Vec4s, two ints) in declaration order: the variable referenced more
+often gets the lower address; declaration order only changes the constructor call order. Two locals with swapped
+slots therefore usually mean a reference count is off, often a statement that uses the wrong variable
+(Sound_UpdateDopplerLoops 0x1004fbe0 matched once step.Fill(0) became lead.Fill(0), which is also what the code
+means). A self-assignment does not count. Char_HikariRide 0x1002cc70 (ints) does not follow the rule yet.
+Ints follow the same rule counted after optimisation: memory references that survive (address-takes included,
+CSE-merged source repeats not), cold blocks not discounted, ties to the second-declared variable; the fild spill of
+an int-to-float conversion counts as a reference of its variable. Block-scoped one-use variables may share a slot
+with a later block temporary. Char_HikariRide: eight real &next references would flip next/group; the source the
+original had there is not found yet.

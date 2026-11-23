@@ -273,6 +273,9 @@ struct Node
     // match `passMask`, in `colour` plus `addColour` (node_queue.cpp; map_view.cpp, mesh_slots.cpp, shadows).
     int QueueDraw(const Matrix4 *parent, const Matrix4 *view, const void *lights, unsigned int passMask,
                   const Vec4 *colour, const Vec4 *addColour);
+    // 0x1019a6b0: QueueDraw with fading collision regions (node_queue_fading.cpp; the map drawing pass).
+    int QueueDrawFading(const Matrix4 *parent, const Matrix4 *view, const void *lights, unsigned int passMask,
+                        const Vec4 *colour, const Vec4 *addColour);
     // 0x101a29e0: draws the subtree as the shadow of a caster at `casterPosition` lit from `lightPosition`, with
     // its world matrix as the shadow's place on the ground (shadow_texture.cpp, called by ModelBank).
     int DrawShadow(const Matrix4 *parent, const Matrix4 *view, int a3, const Vec4 *casterPosition,

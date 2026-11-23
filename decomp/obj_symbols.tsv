@@ -548,3 +548,9 @@ _Enemy_IsBusy	100e1c40
 ?AppendQuad@TriangleBatch@@QAEHMMMMMMMMMMMMMMMMM@Z	10172cb0
 ?LoadDefinitions@EffectManager@@QAEHPBD@Z	101886d0
 ?FUN_100b9150@@YAHH@Z	100b9150
+?RunStatements@ListBank@@QAEHDH@Z	10089210
+?Kind43_UpdateShots@@YAHXZ	1003fc40
+?MapCursor_Walk@@YAHH@Z	10051570
+?QueueDrawFading@Node@@QAEHPBUMatrix4@@0PBXIPBUVec4@@2@Z	1019a6b0
+?FUN_100b7360@@YAHH@Z	100b7360
+?DrawMesh@TextureObject@@QAEHPAUMatrix4@@0PAXH1HHPBUVec4@@2@Z	1014ddf0

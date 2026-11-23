@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 14.22% of code, 824 of 1212 functions |
-| Matched under the rules | 14.19% of code, 823 of the 824 matched functions |
-| Fuzzy match | 19.16% |
+| Matched | 14.31% of code, 825 of 1212 functions |
+| Matched under the rules | 14.27% of code, 824 of the 825 matched functions |
+| Fuzzy match | 19.31% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -57,6 +57,8 @@ function) and node_world.cpp (0) still break rule 2.
   ClearMarkers_Create 0x1004cf20 (clear_markers.cpp; DAT_1021a1e0/DAT_10254ac0 are Node *[]) drafted. To clean up:
   DAT_10f1fd08 (render_vars.h) lies inside DAT_10f1fd04[8]; AnimModel 0x16c is an int inside Vec4 m_00b4[12]
   (splitting the array loses the AnimModel constructor).
+- Batch 320: Npc_RideMarker 0x10043fc0 (marker_rider.cpp, behaviour 0x10) matched; Route_StepPatrol 0x10029730
+  (route_step.cpp) and MeshData::M_10150bb0 (mesh_build.cpp, shrink-wrapped prologue) drafted.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

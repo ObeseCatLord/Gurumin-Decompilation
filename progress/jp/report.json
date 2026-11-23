@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 19.1572,
+  "fuzzy_match_percent": 19.3107,
   "total_code": "1720206",
-  "matched_code": "244680",
-  "matched_code_percent": 14.2239,
+  "matched_code": "246103",
+  "matched_code_percent": 14.3066,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 824,
-  "matched_functions_percent": 67.9868,
+  "matched_functions": 825,
+  "matched_functions_percent": 68.0693,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 283,
-  "complete_units": 157,
-  "matched_rules_code": "244053",
-  "matched_rules_code_percent": 14.1874,
-  "matched_rules_functions": 823,
-  "matched_rules_functions_percent": 67.9043
+  "total_units": 286,
+  "complete_units": 158,
+  "matched_rules_code": "245476",
+  "matched_rules_code_percent": 14.2702,
+  "matched_rules_functions": 824,
+  "matched_rules_functions_percent": 67.9868
  },
  "units": [
   {
@@ -9363,7 +9363,7 @@
   {
    "name": "app/map_enter_reset",
    "measures": {
-    "fuzzy_match_percent": 95.4291,
+    "fuzzy_match_percent": 95.8022,
     "total_code": "1069",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -9388,14 +9388,14 @@
     {
      "name": ".text",
      "size": "1069",
-     "fuzzy_match_percent": 95.4291
+     "fuzzy_match_percent": 95.8022
     }
    ],
    "functions": [
     {
      "name": "_FUN_10023900",
      "size": "1069",
-     "fuzzy_match_percent": 95.4291,
+     "fuzzy_match_percent": 95.8022,
      "metadata": {
       "virtual_address": "268581120"
      }
@@ -9883,6 +9883,52 @@
    }
   },
   {
+   "name": "app/marker_rider",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "1423",
+    "matched_code": "1423",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "1423",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1,
+    "matched_rules_code": "1423",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1423",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "?FUN_10043fc0@@YAHH@Z",
+     "size": "1423",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268713920"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/marker_rider.cpp"
+   }
+  },
+  {
    "name": "app/math_float",
    "measures": {
     "fuzzy_match_percent": 100.0,
@@ -10128,6 +10174,52 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/menu_textures.cpp"
+   }
+  },
+  {
+   "name": "app/mesh_build",
+   "measures": {
+    "fuzzy_match_percent": 64.9306,
+    "total_code": "1421",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1421",
+     "fuzzy_match_percent": 64.9306
+    }
+   ],
+   "functions": [
+    {
+     "name": "?M_10150bb0@MeshData@@QAEHPAUVertexPack@@PAUIndexList@@HPAUMaterial@@H@Z",
+     "size": "1421",
+     "fuzzy_match_percent": 64.9306,
+     "metadata": {
+      "virtual_address": "269814704"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/mesh_build.cpp"
    }
   },
   {
@@ -14094,6 +14186,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/route_follow.cpp"
+   }
+  },
+  {
+   "name": "app/route_step",
+   "measures": {
+    "fuzzy_match_percent": 20.2285,
+    "total_code": "1440",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1440",
+     "fuzzy_match_percent": 20.2285
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10029730",
+     "size": "1440",
+     "fuzzy_match_percent": 20.2285,
+     "metadata": {
+      "virtual_address": "268605232"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/route_step.cpp"
    }
   },
   {
@@ -18854,13 +18992,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1333882",
+    "total_code": "1329598",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 198,
+    "total_functions": 195,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -18877,7 +19015,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1333882",
+     "size": "1329598",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -19075,14 +19213,6 @@
      }
     },
     {
-     "name": "FUN_10029730",
-     "size": "1440",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268605232"
-     }
-    },
-    {
      "name": "FUN_1002a740",
      "size": "1833",
      "fuzzy_match_percent": 0.0,
@@ -19224,14 +19354,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268708400"
-     }
-    },
-    {
-     "name": "FUN_10043fc0",
-     "size": "1423",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268713920"
      }
     },
     {
@@ -20128,14 +20250,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269812208"
-     }
-    },
-    {
-     "name": "FUN_10150bb0",
-     "size": "1421",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269814704"
      }
     },
     {

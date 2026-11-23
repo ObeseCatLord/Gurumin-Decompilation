@@ -33,7 +33,7 @@ extern "C" int FUN_100b4930(int index);                    // Npc_RideAlarm
 extern "C" int FUN_1007b870(int index);
 extern "C" int FUN_100b1ff0(int index);                    // Npc_FaceAndTalk
 extern "C" int FUN_100b23b0(int index);                    // Npc_ChildFollow
-extern "C" int FUN_10043fc0(int index);
+int FUN_10043fc0(int index);                               // Npc_RideMarker
 extern "C" int FUN_10045830(int index);                    // Npc_SleepUntilWoken
 extern "C" int FUN_10045b80(int index);                    // Char_IdleWatchPlayer
 int FUN_100b4f00(int index);                               // Npc_PopUp

@@ -128,6 +128,8 @@ struct CharState
                         int rider;                // route_carrier.cpp: character carried (0 = none)
                         int scriptResult;         // char_script.cpp: result of the last step (5 = run the next
                                                   // step at once, 2 = waiting)
+                        int forceStep;            // route_step.cpp: non-zero = take the point at once, whether
+                                                  // or not the character is near it (cleared by the step)
                     };
                     union                         // 0x20
                     {
@@ -152,16 +154,21 @@ struct CharState
                                                   // leaves the queue (QUEUE_FADE_FRAMES = gone)
                         int groundTimer;          // hover_watcher.cpp: frames counted; the shadow is put on the
                                                   // ground when it matches the slot (mod 30)
+                        int headingFrom;          // route_step.cpp: heading (degrees) at the route's first point
+                        int markerSlot;           // marker_rider.cpp: slot of the marker character ridden
                     };
                     union                         // 0x2c
                     {
                         int m_002c;
+                        int headingTo;            // route_step.cpp: heading (degrees) at the route's last point
+                        int vanishFrames;         // marker_rider.cpp: frames left of the vanishing once the marker fell
                         int hopFrame;             // enemy_strafe.cpp (Enemy_HopAndStrafe): frame of the hop
                                                   // under way (0 = not hopping)
                     };
                     union                         // 0x30
                     {
                         int m_0030;
+                        int markerPhase;          // marker_rider.cpp: 0 = new, 1 = riding (flags set), 2 = vanishing
                         int arrivalHold;          // map_cursor.cpp: frames left in which the cursor counts as
                                                   // having been carried by a rider (15 after one lands on it)
                     };

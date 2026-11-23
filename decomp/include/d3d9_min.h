@@ -143,6 +143,21 @@ struct IDirect3DDevice9
     virtual long __stdcall CreateQuery() = 0;
 };
 
+// IDirect3DVertexBuffer9 and IDirect3DIndexBuffer9 up to Unlock (the two share their method slots).
+struct IDirect3DBuffer9Like : IUnknownLike
+{
+    virtual long __stdcall GetDevice() = 0;
+    virtual long __stdcall SetPrivateData() = 0;
+    virtual long __stdcall GetPrivateData() = 0;
+    virtual long __stdcall FreePrivateData() = 0;
+    virtual unsigned long __stdcall SetPriority() = 0;
+    virtual unsigned long __stdcall GetPriority() = 0;
+    virtual void __stdcall PreLoad() = 0;
+    virtual int __stdcall GetType() = 0;
+    virtual long __stdcall Lock(unsigned int offset, unsigned int size, void **data, unsigned long flags) = 0;  // slot 11
+    virtual long __stdcall Unlock() = 0;                                                                        // slot 12
+};
+
 // D3DLOCKED_RECT: what LockRect returns.
 struct LockedRect
 {

@@ -82,30 +82,32 @@ struct Material
     float m_0174;                                                    // 0x174: 255 for a blank material
     float alpha;             // 0x178: vertex alpha, copied by ApplyMaterialColours when positive; packs whose material
                              //        has alpha 1 are drawn first (node_sort_packs.cpp); 0 for a blank material
-    unsigned char m_017c[4];
+    char m_017c[4];             // 0x17c: edge flags, signed bytes
 };
 
 // The Direct3D side of a node's mesh: texture slot, buffers built from the packs (M_10150bb0) and the entry of the
 // renderer's mesh tables.
 struct MeshData
 {
-    int textureSlot;         // 0x00: texture slot of the mesh, -1 = none
-    int pad_0004[2];
-    void *m_000c;            // 0x0c..0x38: buffers allocated by M_10150bb0 (vertices, indices, ...), freed by Release
-    void *m_0010;
-    int *materials;          // 0x14: current material of each entry
-    int *secondaryTextures;  // 0x18: each entry's second texture
-    void *m_001c;
-    void *m_0020;
-    void *m_0024;
-    void *m_0028;
-    void *m_002c;
-    void *m_0030;
-    void *m_0034;
-    void *m_0038;
-    int pad_003c[2];
-    int m_0044;
-    int pad_0048;
+    int textureSlot;         // 0x00: slot FUN_10147880 made for the buffers (M_10150bb0), -1 = none
+    int vertexCount;         // 0x04: vertices of all packs
+    int indexCount;          // 0x08: indices of all index lists
+    int *materialIds;        // 0x0c: material number of each pack (m_materialid)
+    int *textureCopies;      // 0x10: first texture of each pack, a second copy of `materials`
+    int *materials;          // 0x14: first texture slot of each pack, -1 = none
+    int *secondaryTextures;  // 0x18: each pack's second texture slot, -1 = none
+    int *doubleSide;         // 0x1c: the material's four signed edge bytes packed into one word
+    int *vertexStarts;       // 0x20: first vertex of each pack
+    int *vertexEnds;         // 0x24: end of each pack's vertices
+    int *indexStarts;        // 0x28: first index of each pack
+    int *indexEnds;          // 0x2c: end of each pack's indices
+    char *pointFlags;        // 0x30: each pack's bounding-sphere flag (rounded radius)
+    Vec4 *points;            // 0x34: each pack's bounding sphere (centre, radius in w; -1 for a double-sided material)
+    Vec4 *boxes;             // 0x38: each pack's bounding box (smallest, largest)
+    int m_003c;
+    int packCount;           // 0x40
+    int m_0044;              // 0x44: pack count again
+    int built;               // 0x48: 1 once the buffers are filled
     int bufferSlot;          // 0x4c: entry of the mesh buffer tables (DAT_10feb3e0 ...), -1 = none
 
     void Init();                                                                   // 0x10145a10

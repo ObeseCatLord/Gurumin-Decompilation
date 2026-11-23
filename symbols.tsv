@@ -14,8 +14,10 @@ address	name	evidence
 10020090	Collide_RayThroughRegions	probe ray against the visible region nodes (collide_regions.cpp)
 10026730	Watcher_Update	hovering watcher: faces the player, keeps its home height, eases its turn (behaviour from 0x100f9670)
 100279b0	Enemy_BackAwayFromPlayer	enemy walks away from the player veering 5 degrees (enemy_flee.cpp)
+10029730	Route_StepPatrol	steps a patrolling character along its map record route (route_step.cpp, draft)
 10037b40	EffectModel_DrawKeyed	draws an effect model posed by key tracks (mesh_slots.cpp, draft)
 10038070	DrawItemPreview	item preview model and name (item_preview.cpp, draft)
+10043fc0	Npc_RideMarker	behaviour 0x10: rides a taken marker, vanishes when it falls (marker_rider.cpp)
 10049b00	Map_RoutePosition	point at fraction t of a map record route (map_route.cpp)
 1004cf20	ClearMarkers_Create	builds the ClearORoot marker models (clear_markers.cpp, draft)
 1004d4b0	Regions_Update	per-frame map region visibility and point morphs (region_view.cpp, draft)
@@ -29,6 +31,7 @@ address	name	evidence
 1014c960	TextureObject_DrawColoured	quad with an ARGB diffuse colour (texture_bind.cpp)
 1014f900	FontRenderer_DrawStringToPixels	text into a 16-bit pixel buffer (font_metrics.cpp, draft)
 1014fdd0	FontRenderer_DrawTextClipped	cached text texture drawn clipped (font_metrics.cpp)
+10150bb0	MeshData_BuildBuffers	builds the mesh pack tables and buffers (mesh_build.cpp, draft)
 101615d0	ItmDescramble	key "GURUguruMinmIN_", sum/xor check (docs/ITM_FORMAT.md)
 10161120	Path_GetBaseName	copies the file name without directory and extension
 1013f910	MakeDataPath	sprintf("%s\\%s", base dir, name) into 4 rotating buffers

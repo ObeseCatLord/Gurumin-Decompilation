@@ -100,6 +100,7 @@ extern "C" D3DVIEWPORT9_ DAT_10f1fd30;                    // the full-screen vie
 extern "C" D3DVIEWPORT9_ DAT_10f1fd48;                    // the off-screen viewport
 extern "C" int DAT_10f1fd90[0x200];
 extern "C" char DAT_10f60690[0x5a0];
+extern "C" int DAT_10f655c0;                              // nonzero: new mesh buffers are marked in DAT_10f60690
 extern "C" void *DAT_10f60d30;                            // saved render target
 extern "C" IUnknownLike *DAT_10f60d38[0x5a0];
 extern "C" unsigned long DAT_10f623d0[0x100];

@@ -528,3 +528,5 @@ _Enemy_IsBusy	100e1c40
 ?DeclareFunction@ListBank@@QAEHPAD@Z	100366c0
 ?DrawColoured@TextureObject@@QAEHHHHHMMMMMMMMMM@Z	1014c960
 ?ClearMarkers_Create@@YAHXZ	1004cf20
+?M_10150bb0@MeshData@@QAEHPAUVertexPack@@PAUIndexList@@HPAUMaterial@@H@Z	10150bb0
+?FUN_10043fc0@@YAHH@Z	10043fc0

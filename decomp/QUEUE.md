@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (193)
+## 1. Walls to retry (195)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -56,6 +56,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100244b0` 502 — Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
 - [ ] `10024d00` 377 — Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
 - [ ] `10027630` 882 — Enemy_ChasePlayer (enemy_chase.cpp): all but the step setup identical; the original loads the heading and m_0010 (into eax) before storing -2/-8 into step.y and computes the speed pointer with lea; if/else, ternary and local forms tried
+- [ ] `10029730` 1440 — Route_StepPatrol (route_step.cpp, rule-clean draft, 1488 vs 1440 bytes): switch, decode and heading code match; register allocation (point/record registers swapped, slot*0x249c and bankIndex kept in stack temporaries in the original) and the duplicated forceStep ret tail; next: one int per decoded part (the Char_RunScriptStep idiom)
 - [ ] `1002a110` 559 — Char_WalkRoute: code identical; the original keeps the next route point in the slot parameter's stack home (frame 4 bytes smaller), ours gives it a local; declaration positions tried
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
 - [ ] `1002a490` 685 — Block_Update: statements and layout identical; the original computes the block model address once into esi on the standing path and reuses it for the second IsClearAny, ours recomputes it (combined, nested and goto forms and a model pointer local tried)
@@ -140,6 +141,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014d850` 1429 — TextureObject::DrawFillAlt (texture_bind.cpp): loop and calls line up; the original keeps 1 and 0 in esi/ecx while filling the shade table (and later for the render states), spills i & 1 and indexes the arrays with a byte offset, cl 13.00 here schedules the array setup differently and the frame is 0xc smaller; array declaration orders and colour forms tried
 - [ ] `1014f1f0` 806 — TextureObject::Upload (texture_bind.cpp): calls and branches line up; the original frame is 8 bytes larger (separate slots for the two lock rectangles and a row counter in memory) and its pixel loops step three separately reduced source pointers; index spellings and declaration placements tried
 - [ ] `1014f900` 1070 — FontRenderer::DrawStringToPixels (font_metrics.cpp, rule-clean, 1072 vs 1070 bytes): the proportional "s" pad loop keeps its column counter in the colour parameter slot (0x44, incremented through a register) and the final four-pixel fill keeps its pointer in edx; loop forms, function-scope column/row and tail pointer forms tried
+- [ ] `10150bb0` 1421 — MeshData::M_10150bb0 / BuildBuffers (mesh_build.cpp, 1440 bytes, 505 diff bytes): the original pushes only ebx/ebp up front and esi/edi after the FUN_101477c0 call, with a two-pop early return (shrink-wrapping), keeps zero in ebx and spills totalIndices*2 into the dead materials parameter slot; early-out and declaration forms tried
 - [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
@@ -214,13 +216,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (82)
+## 4. Large functions (801-3000 bytes) (79)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `10150bb0` 1421 bytes (float, loops 3, calls 37)
-- [ ] `10043fc0` 1423 bytes (float, loops 1, calls 27)
 - [ ] `1015f4e0` 1429 bytes (loops 12, calls 31)
-- [ ] `10029730` 1440 bytes (float, calls 9)
 - [ ] `10034210` 1460 bytes (float, loops 5, calls 42)
 - [ ] `10027da0` 1461 bytes (float, calls 37)
 - [ ] `100366c0` 1495 bytes (loops 8, calls 21)

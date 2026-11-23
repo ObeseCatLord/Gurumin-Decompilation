@@ -23,43 +23,43 @@ void MeshData::Release()
     if (textureSlot >= 0)
         FUN_101477c0(textureSlot);
     textureSlot = -1;
-    if (m_000c != 0)
-        DAT_11b1ba40(m_000c);
+    if (materialIds != 0)
+        DAT_11b1ba40(materialIds);
     if (materials != 0)
         DAT_11b1ba40(materials);
-    if (m_0010 != 0)
-        DAT_11b1ba40(m_0010);
+    if (textureCopies != 0)
+        DAT_11b1ba40(textureCopies);
     if (secondaryTextures != 0)
         DAT_11b1ba40(secondaryTextures);
-    if (m_001c != 0)
-        DAT_11b1ba40(m_001c);
-    if (m_0020 != 0)
-        DAT_11b1ba40(m_0020);
-    if (m_0024 != 0)
-        DAT_11b1ba40(m_0024);
-    if (m_0028 != 0)
-        DAT_11b1ba40(m_0028);
-    if (m_002c != 0)
-        DAT_11b1ba40(m_002c);
-    if (m_0030 != 0)
-        DAT_11b1ba40(m_0030);
-    if (m_0034 != 0)
-        DAT_11b1ba40(m_0034);
-    if (m_0038 != 0)
-        DAT_11b1ba40(m_0038);
+    if (doubleSide != 0)
+        DAT_11b1ba40(doubleSide);
+    if (vertexStarts != 0)
+        DAT_11b1ba40(vertexStarts);
+    if (vertexEnds != 0)
+        DAT_11b1ba40(vertexEnds);
+    if (indexStarts != 0)
+        DAT_11b1ba40(indexStarts);
+    if (indexEnds != 0)
+        DAT_11b1ba40(indexEnds);
+    if (pointFlags != 0)
+        DAT_11b1ba40(pointFlags);
+    if (points != 0)
+        DAT_11b1ba40(points);
+    if (boxes != 0)
+        DAT_11b1ba40(boxes);
     m_0044 = 0;
     secondaryTextures = 0;
-    m_000c = 0;
+    materialIds = 0;
     materials = 0;
-    m_0010 = 0;
-    m_001c = 0;
-    m_0020 = 0;
-    m_0024 = 0;
-    m_0028 = 0;
-    m_002c = 0;
-    m_0030 = 0;
-    m_0034 = 0;
-    m_0038 = 0;
+    textureCopies = 0;
+    doubleSide = 0;
+    vertexStarts = 0;
+    vertexEnds = 0;
+    indexStarts = 0;
+    indexEnds = 0;
+    pointFlags = 0;
+    points = 0;
+    boxes = 0;
 }
 
 // 0x10145a50. Uploads the skinning matrices of the mesh: each of the `count` bone matrices (at most 24) is

@@ -74,9 +74,8 @@ extern "C" ItemInfo DAT_1088e6b0[];
 
 extern "C" TextRenderer DAT_1020e538;
 
-extern "C" unsigned char DAT_104c02cc;           // caption scroll timer
+#include "ui_vars.h"
 
-extern "C" unsigned char DAT_104c02cd;           // how far the ability list can scroll
 
 extern "C" int FUN_10014d30(int item);           // Helmet_FaceSettings: the item's ability bits
 

@@ -7,7 +7,8 @@
 
 #include "char_slot.h"
 
-extern "C" char DAT_1021f3c0[0x80];
+#include "char_tables.h"
+#include "char_vars.h"
 
 // Clears the `m_0000` counter of every live, active enemy that is still in the world and has no pending
 // action (m_009c == 0). Returns 1.
@@ -105,7 +106,6 @@ extern "C" int FUN_1001bec0(const Vec4 *position, Vec4 *velocity)
     return 0;
 }
 
-extern "C" const char DAT_101d67f0[5];  // character slots checked by FUN_10034e80: 0, 13, 15, 58, 20
 
 // 0x10034e80. 1 when any of the five characters in DAT_101d67f0, other than `index` itself, stands within `range`
 // (x/y) of character `index`'s position, moved by `offset` when that is given. Returns 0 otherwise.

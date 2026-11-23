@@ -6,7 +6,8 @@
 #include "node.h"
 
 extern "C" Node *DAT_11b002d0[0x80];          // the cached models
-extern "C" char DAT_11b004d0[0x80][0x80];     // their file names
+#include "char_tables.h"
+
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // the engine's allocator
 extern "C" int FUN_1013f880(void);            // the game's random number
 

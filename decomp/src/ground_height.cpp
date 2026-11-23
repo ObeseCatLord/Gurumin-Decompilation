@@ -24,8 +24,7 @@ struct GroundOrigin
 
 extern "C" Matrix4 DAT_10db9210;                     // the player's world matrix
 extern "C" GroundOrigin *DAT_1020d860[0x60];         // the ground objects (0 = free)
-extern "C" int DAT_104bfdb4;                         // the ground object nearest to the player
-extern "C" float DAT_1049f3dc[][16][16];             // height samples per object, 25 units apart (-200 = none)
+#include "map_vars.h"
 
 // 0x10016700 (Ground_HeightAt). Picks the ground object nearest to the player and averages its height samples
 // around (x, y): the samples within 72 units of the point on the 25-unit grid whose weight (60 minus a fifth of the

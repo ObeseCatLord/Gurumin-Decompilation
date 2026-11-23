@@ -16,12 +16,11 @@ struct TextureRef
 
 #include "anim_model.h"
 
-extern "C" int DAT_10feb3e0[0xc80];
-extern "C" char DAT_10fada90[0xc80][0x20];
-extern "C" int DAT_10faae88[0x400];
-extern "C" char DAT_10ff65f8[0x400][0x20];
+#include "camera_vars.h"
+#include "map_vars.h"
+#include "render_vars.h"
+
 extern "C" int DAT_1101d884;
-extern "C" int DAT_1101d88c;
 extern "C" int __stdcall FUN_10143870(int, int, int);
 
 // Releases one reference to a shared model file; the name entry is freed when the count reaches 0.
@@ -71,9 +70,7 @@ extern "C" int FUN_10169c00(const TextureRef *texture)
     return DAT_10faae88[index];
 }
 
-extern "C" int DAT_1101d874;                     // texture memory in use (bytes)
 extern "C" void (*DAT_11b1ba40)(void *);          // engine free
-extern "C" int DAT_1101d878;                     // non-zero = images without generated alpha are not kept
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);              // engine allocator
 extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);   // engine memcpy
 extern "C" int FUN_1013f880(void);                // the game's random number

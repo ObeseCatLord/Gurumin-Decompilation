@@ -2,10 +2,8 @@
 
 #include "vec4.h"
 
-extern "C" int DAT_10f08d30[2];   // frames left for each of the two colour blends (0 = idle)
-extern "C" Vec4 DAT_10f66978[2];  // current colours
-extern "C" Vec4 DAT_10f657c4[2];  // per-frame colour steps
-extern "C" Vec4 DAT_10f65828[2];  // target colours (set exactly on the last frame to avoid rounding drift)
+#include "camera_vars.h"
+#include "render_vars.h"
 
 // Advances the two colour blends (light/ambient colours) by one frame each.
 extern "C" void FUN_1013f9a0(void)
@@ -22,7 +20,6 @@ extern "C" void FUN_1013f9a0(void)
     }
 }
 
-extern "C" int DAT_10203424;   // counts requests whose x is 530 or more (never read here)
 
 // 0x1013fa10. Starts colour blend `index` towards (x, y, z, w) over `frames` frames; with 1 frame or fewer the
 // colour is set at once. Note the argument order: z, y, x, w. Callers: the device setup and the scene code.
@@ -42,10 +39,6 @@ extern "C" void FUN_1013fa10(int index, int frames, float z, float y, float x, f
     DAT_10f08d30[index] = frames;
 }
 
-extern "C" int DAT_10ff1df0;   // 1 = the effect is on
-extern "C" int DAT_11018730;   // effect mode
-extern "C" int DAT_11018624;   // effect timer
-extern "C" Vec4 DAT_11af3f48;  // effect colour (0..255 per channel, stored as floats)
 
 // Turns the colour effect on with `mode` and colour (r, g, b), or off when mode is negative. Returns 1.
 extern "C" int FUN_1016afa0(int mode, int r, int g, int b)

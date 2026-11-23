@@ -54,15 +54,8 @@ struct Record2c
     Record2c();
 };
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;
-extern "C" IUnknownLike *DAT_10f1bff0[0x200];
-extern "C" int DAT_10f0cd40[0x200];
-extern "C" int DAT_10f1fd90[0x200];
-extern "C" int DAT_10f1de70[0x200];
-extern "C" int DAT_10f140c0;
-extern "C" int DAT_10f0ff80;
-extern "C" int DAT_10f6552c;
-extern "C" int DAT_10f65484;
+#include "render_vars.h"
+
 extern "C" void FUN_101493f0(void);
 extern "C" int FUN_1013ed60(void);
 extern "C" void FUN_101439e0(void);

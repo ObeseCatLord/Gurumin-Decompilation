@@ -1,9 +1,8 @@
 // Background music playback through soundarc.dll (see docs/MODDING_MAP.md "Sound architecture").
 // Two streams (0 and 1) are used alternately so a new track can start while the old one fades out.
 
-extern "C" int DAT_102027d8;
-extern "C" char DAT_104bfd54;
-extern "C" int DAT_104bfd58;
+#include "sound_vars.h"
+
 extern "C" int FUN_10001b70(int);
 extern "C" int FUN_10001ba0(int stream);
 extern "C" int FUN_10001bf0(int stream, int fadeTime);

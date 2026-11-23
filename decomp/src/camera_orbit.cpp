@@ -5,9 +5,7 @@
 
 #include "vec4.h"
 
-extern "C" Vec4 DAT_11af3e28;  // camera position
-extern "C" Vec4 DAT_118e6c78;  // camera target
-extern "C" Vec4 DAT_11af3f58;  // the camera-space push of the player (x, y; z is 0)
+#include "camera_vars.h"
 
 // Places the camera at heading `angle` around the target, keeping its ground distance and its height above the
 // target. Returns 0.
@@ -46,9 +44,6 @@ extern "C" int FUN_1016b340(float *outX, float *outY, float x, float y)
     return 0;
 }
 
-extern "C" int DAT_1101d88c;   // frames left of a camera cut blend (0 = none)
-extern "C" Vec4 DAT_11af3f08;  // camera position before the cut
-extern "C" Vec4 DAT_11af3f18;  // camera target before the cut
 
 // 0x1016b400 (Camera_TurnInput). Like FUN_1016b340, but while a camera cut is blending (DAT_1101d88c frames of
 // 60 left) the direction is a mix of the turn by the old camera heading (weight 1 - frames / 60) and by the new

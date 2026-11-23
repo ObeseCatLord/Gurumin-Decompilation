@@ -6,8 +6,9 @@
 #include "char_state.h"
 #include "char_slot.h"
 
-extern "C" int DAT_104c0370;
-extern "C" int DAT_10c62ed0;
+#include "char_vars.h"
+#include "map_vars.h"
+
 extern "C" void FUN_100308e0(void);
 extern "C" void FUN_100301a0(void);
 extern "C" void FUN_1002f520(void);

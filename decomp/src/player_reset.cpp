@@ -2,18 +2,8 @@
 
 #include "vec4.h"
 
-extern "C" Vec4 DAT_118e69e8;   // player position
-extern "C" Vec4 DAT_118e6cb8;   // player velocity
-extern "C" Vec4 DAT_11af3e28;   // camera position (camera_orbit.cpp)
-extern "C" Vec4 DAT_118e6c78;   // camera target
-extern "C" int DAT_1101d888;
-extern "C" int DAT_1101d898;
-extern "C" int DAT_1101de18;
-extern "C" int DAT_1101dde4;
-extern "C" int DAT_1101de1c;
-extern "C" char DAT_10fabe8c;
-extern "C" char DAT_10faaa80;
-extern "C" int DAT_10203444;    // ground height cache, -100 = unknown
+#include "camera_vars.h"
+#include "char_vars.h"
 
 // Zeroes the player position and velocity, the camera position and target, and the related per-frame state.
 // Returns 0.

@@ -5,15 +5,11 @@
 #include <string.h>
 
 #include "listbank.h"
-extern "C" int DAT_104bfe84;          // ring read index
-extern "C" int DAT_104bfe88;          // ring write index
+#include "char_vars.h"
+#include "game_vars.h"
+#include "script_vars.h"
+
 extern "C" int DAT_1020247c[8];       // queued script numbers
-extern "C" char *DAT_10c5e1c4[];      // script texts by number
-extern "C" int DAT_1049eae4;
-extern "C" int DAT_10492d88;          // 1 while a queued script runs
-extern "C" int DAT_1049eadc;
-extern "C" int DAT_1032d69c;          // 0 while a queued script runs
-extern "C" char DAT_104c0338;
 
 // Runs every queued script in order and empties the queue. Returns 0.
 extern "C" int FUN_100fc3e0(void)

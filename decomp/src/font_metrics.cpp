@@ -142,8 +142,9 @@ struct GameFile
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);       // the engine's allocator
 extern "C" HWND DAT_10f6569c;                        // the game window
-extern "C" int DAT_10f654a4;                         // 1 = 32-bit textures
-extern "C" int DAT_1101d878;                         // set while creating shared textures
+#include "render_vars.h"
+#include "ui_vars.h"
+
 extern "C" int FUN_10175c90(const char *name, int width, int height, const unsigned char *pixels, int alpha,
                             int flags);              // Texture_CreateFromPixels
 

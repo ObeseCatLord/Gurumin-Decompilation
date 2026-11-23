@@ -10,11 +10,8 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-extern "C" char DAT_1021f3c0[0x80];                  // kind of each character slot
-extern "C" int DAT_104bfdd8;                         // the carried object's slot (below 0x5c: nothing carried)
-extern "C" int DAT_104c0384;                         // the object it rests on (0 = none yet)
-extern "C" int DAT_104c0388;                         // the carried slot DAT_104c0384 was found for
-extern "C" Vec4 DAT_10867df8;                        // top of the object below; z becomes the height above it
+#include "char_tables.h"
+#include "char_vars.h"
 
 // 0x1001d920 (Carry_StackOnObject). Finds the object of kind 5 or 0x5f (slots 0x5c..0x7f) whose top lies 135..165
 // units above the carried object (285..315 for a tall one, which has the node "@O_019b") within 25 units in x and

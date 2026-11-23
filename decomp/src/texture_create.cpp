@@ -5,8 +5,8 @@
 #include "texture_object.h"
 
 extern "C" int FUN_10161920(const char *name);   // Texture_FindByName: slot holding `name`, or -1
-extern "C" char DAT_10ffe5f8[1600][0x40];          // their names (empty = free)
-extern "C" char DAT_10fdeb90[1600];                // reference count per slot
+#include "render_vars.h"
+
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // the engine's allocator
 extern "C" void (*DAT_11b1ba40)(void *);                      // the engine's free
 

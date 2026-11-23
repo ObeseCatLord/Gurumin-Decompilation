@@ -2,9 +2,7 @@
 
 #include <stdio.h>
 
-extern "C" int DAT_10f1fd24;
-extern "C" char DAT_10f19860[16][0x100];
-extern "C" char DAT_10202b40[][0x100];
+#include "map_vars.h"
 
 // Returns "<folder>\\<name>" for data folder number `folder` (folder names in DAT_10202b40). The result is one
 // of 16 rotating 256-byte buffers, so it stays valid for the next 15 calls. Used for nearly every file load.

@@ -5,8 +5,7 @@
 #include <string.h>
 
 #include "listbank.h"
-extern "C" const char DAT_101d7f08[];
-extern "C" const char DAT_101d7ee4[];
+#include "script_vars.h"
 
 // Reads a type name token: returns 0 for "int", 1 for "float", 2 for "string"; reports an error (and returns 0)
 // when the token is missing or unknown.
@@ -39,8 +38,6 @@ struct GameFile
     void Close();
 };
 
-extern "C" unsigned short DAT_10f65558;          // position in the random table
-extern "C" int DAT_10f20590[0x10000];
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
 // Loads the 256 KB table fontr.dat into DAT_10f20590, or fills it with rand() when the file is missing.

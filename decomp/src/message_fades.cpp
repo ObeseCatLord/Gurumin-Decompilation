@@ -13,11 +13,8 @@ extern "C" int DAT_104bfb08[0x7c];   // state of each message box
 extern "C" int DAT_10467c20[0x7c];   // frames the box has been held
 extern "C" int DAT_104481d8[0x7c];   // fade value, 0 (gone) .. 14 (fully shown)
 extern "C" unsigned int DAT_104bfd5c;  // frames spent waiting for a key
-extern "C" int DAT_104bfd10;
-extern "C" char DAT_1065cb30;        // a key of the current input frame (DemoRecording::buttons_now[4])
-extern "C" char DAT_104c0339;
-extern "C" char DAT_104c0338;
-extern "C" unsigned char DAT_104c0230;
+#include "script_vars.h"
+#include "ui_vars.h"
 
 // 0x1000cdf0 (Messages_Update). Advances every message box by one frame (see above). A pending DAT_104c0339
 // request with bit 0 or 1 of DAT_104c0230 set is answered (DAT_104c0338 = 1) on a key or button press. Returns 0.

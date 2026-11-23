@@ -16,10 +16,10 @@ struct Engine
 };
 
 extern "C" Engine DAT_10836c70;
-extern "C" char DAT_10894698[][0x124];   // model paths
-extern "C" char DAT_1021f3c0[0x80];      // slot kind
-extern "C" int DAT_10c62edc[0x1000];     // script flags
-extern "C" int DAT_10c62ed0;             // current map
+#include "char_tables.h"
+#include "char_vars.h"
+#include "game_vars.h"
+
 extern "C" int FUN_1003ad20(int sound, const Vec4 &position, float volume);   // Sound_PlayEffect
 extern "C" int FUN_100119d0(int id, int value, char flag);                    // EventSlots_Add
 // EffectModel_PlaceColoured (effect_model.cpp): places the model `path` at (x, y, z) turned by (ox, oy, oz) degrees.

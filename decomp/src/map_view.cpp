@@ -22,11 +22,11 @@ Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);         // 0x101b10
 extern "C" Node *DAT_104c007c;    // the map's model
 extern "C" Node *DAT_10255f08;    // the map's root node
 extern "C" float DAT_104bfe24;    // the pit's floor height
-extern "C" Vec4 DAT_104d29e8;     // the pit area: minimum corner
-extern "C" Vec4 DAT_104d29f8;     // the pit area: maximum corner
+#include "char_vars.h"
+#include "map_vars.h"
+#include "render_vars.h"
+
 extern "C" Vec4 DAT_10f668a8;     // the visible area: minimum corner
-extern "C" Vec4 DAT_10f668b8;     // the visible area: maximum corner
-extern "C" float DAT_10f65594;    // height of the view
 extern "C" Vec4 DAT_10f65688;     // camera position (projected here)
 extern "C" Vec4 DAT_10f668e8;     // camera target (projected here)
 
@@ -66,23 +66,8 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
     return map;
 }
 
-extern "C" Matrix4 DAT_10836ec8;           // parent matrix of the overhead pass (identity, set in game_reset.cpp)
 extern "C" Matrix4 DAT_108392d8;           // the current view-projection matrix
 extern "C" Matrix4 DAT_10836330;           // the camera matrix
-extern "C" Matrix4 DAT_10866da8;           // the projection of the main view
-extern "C" Matrix4 DAT_104c03f8;           // a second projection
-extern "C" Matrix4 DAT_10836cd8;           // the camera under that projection
-extern "C" Vec4 DAT_118e69e8;              // camera position
-extern "C" Vec4 DAT_118e6cb8;              // camera target
-extern "C" Vec4 DAT_10da90d0;              // current colour
-extern "C" Vec4 DAT_10f66918;              // the overhead pass's area: minimum corner
-extern "C" Vec4 DAT_10f66928;              // maximum corner
-extern "C" int DAT_102022c4;               // non-zero = draw the overhead pass
-extern "C" int DAT_10f654cc;               // non-zero when off-screen render targets are supported
-extern "C" int DAT_10f65520;               // 1 while the overhead pass draws
-extern "C" int DAT_10f655bc;               // 1 while the map nodes are queued for it
-extern "C" int DAT_10daaad0;               // 1 while the effects draw into it
-extern "C" char DAT_11affdd8[100];         // per collision region "CDLnn": 1 = enabled
 extern "C" void FUN_1013f070(int mode, int a, int b);              // sets a 2D/3D render state
 extern "C" void FUN_10199860(void);                                // RenderQueue_Clear
 // 0x101999a0 (draw_list.cpp DrawList_DrawPass): draws the queued nodes of pass `pass` (the first argument is unused).

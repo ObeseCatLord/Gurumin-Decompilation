@@ -28,13 +28,12 @@ struct MeshOwner
 };
 
 extern "C" void (*DAT_11b1ba40)(void *);
-extern "C" int DAT_104bf8d4;
-extern "C" int DAT_104bf8d8;
+#include "game_vars.h"
+
 extern "C" int DAT_104bf8f8[0x7c];
 extern "C" int DAT_1021d138[0x7c];
 extern "C" int DAT_1021f740[0x7c];
 extern "C" MeshHolder DAT_10edbe0c[0x40];
-extern "C" int DAT_104bfe88;
 extern "C" int DAT_1020247c[8];
 extern "C" int DAT_104c0270[0x10];
 

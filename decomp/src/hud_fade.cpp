@@ -4,11 +4,9 @@
 
 #include "texture_object.h"
 
-extern "C" int DAT_104bfd78;
-extern "C" int DAT_104bf8c0;
-extern "C" int DAT_104bff00;
-extern "C" int DAT_104bff0c;
-extern "C" int DAT_102024a0;
+#include "game_vars.h"
+#include "ui_vars.h"
+
 extern "C" void FUN_1013f070(int, int, int);
 
 // Draws the dark panel (and the texture DAT_102024a0 when one is set) with an alpha of DAT_104bff0c / 15

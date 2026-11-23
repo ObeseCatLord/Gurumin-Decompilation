@@ -14,7 +14,7 @@ struct BoneRows
     Vec4 row[3];
 };
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;      // the Direct3D device
+#include "render_vars.h"
 
 #include "mesh.h"
 

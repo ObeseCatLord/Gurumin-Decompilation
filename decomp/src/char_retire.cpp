@@ -11,9 +11,9 @@ struct Marker
     char pad_0004[0xc];
 };
 
-extern "C" char DAT_1020d540[0x80];
-extern "C" int DAT_10c635a8;
-extern "C" char DAT_1049efb0[10][10];
+#include "char_tables.h"
+#include "char_vars.h"
+
 extern "C" Marker DAT_10867e18[0x80];
 
 // Retires character `index` once: moves it out of the world (matrix._41 = -100000 - matrix._41), records its two-digit

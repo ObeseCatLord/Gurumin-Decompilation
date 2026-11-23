@@ -6,13 +6,9 @@
 
 #include "texture_object.h"
 
-extern "C" int DAT_10f654cc;                     // 1 while a texture is the render target
-extern "C" int DAT_10f654d0;                     // 1 = rendering to textures works
-extern "C" int DAT_10f654d4;                     // 1 = the first read-back saw the blue square
-extern "C" int DAT_10f65484;                     // non-zero = render to the back buffer (no swap target)
-extern "C" int DAT_10203434;
-extern "C" int DAT_10203438;
-extern "C" int DAT_102022b8;                     // non-zero = always place characters on the ground
+#include "char_vars.h"
+#include "render_vars.h"
+
 extern "C" int FUN_10175c90(const char *name, int width, int height, const unsigned char *pixels, int alpha,
                             int flags);          // Texture_CreateFromPixels
 extern "C" int FUN_10174c70(int slot, int force);  // Texture_Release

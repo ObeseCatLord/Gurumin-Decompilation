@@ -21,13 +21,9 @@ struct CollisionWorld
 #include "char_state.h"
 
 extern "C" CollisionWorld *DAT_10255f08;
-extern "C" Vec4 DAT_118e69e8;            // player position
-extern "C" Vec4 DAT_118e6cb8;            // player velocity
-extern "C" int DAT_102022b8;             // non-zero = always place characters on the ground
+#include "char_vars.h"
+
 extern "C" unsigned short DAT_104c0380;  // frame counter
-extern "C" char DAT_104c0094;            // non-zero = only a few behaviours run (an event is playing)
-extern "C" int DAT_10c62ed0;             // current map
-extern "C" int DAT_10c655e0;
 
 extern "C" int FUN_1001b5b0(int index);                    // Char_UnpackParameter
 extern "C" int FUN_10043cc0(int index);                    // Char_ResetState

@@ -17,8 +17,7 @@ struct ScreenBatch
     int Add(const ScreenVertex *source, int sourceCount);
 };
 
-extern "C" int DAT_10202b34;     // back buffer width
-extern "C" int DAT_10202b38;     // back buffer height
+#include "render_vars.h"
 
 // 0x10172ac0 (ScreenBatch::Add). Appends `sourceCount` vertices given for a 640x480 screen, scaling their positions
 // to the back buffer. Returns 1.

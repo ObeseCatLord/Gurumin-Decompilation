@@ -2,7 +2,7 @@
 #include <string.h>
 
 // Three groups of twelve values; slot 9 of each group is the group leader (-1 = none).
-extern "C" int DAT_10255960[3][12];
+#include "map_vars.h"
 
 // Six 24-byte formation records; only the first field (the active flag) is reset here.
 struct Formation
@@ -12,13 +12,10 @@ struct Formation
 };
 
 extern "C" Formation DAT_1049efdc[6];
-extern "C" int DAT_1042dea8[0x5c];  // per-character group numbers (characters 0..0x5b)
 extern "C" int DAT_102199b8[0x5c];  // per-character group timers
 
 #include "matrix4.h"
 
-extern "C" int DAT_102108d0[6];       // owner of each attached matrix (0 = free)
-extern "C" Matrix4 DAT_10f08880[6];   // attached matrices
 
 // Stores a copy of `matrix` moved by (x, y, z) in the first free attachment slot and records `owner` for it.
 // Returns the slot, or 0 when all six are in use.
@@ -59,7 +56,6 @@ extern "C" void FUN_10034fe0(void)
 }
 
 // Per-character attachment matrices (6 per character slot) for kind-0x58 characters.
-extern "C" Matrix4 DAT_108687f8[0x80 * 6];
 
 #include "char_slot.h"
 

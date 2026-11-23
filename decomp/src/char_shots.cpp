@@ -32,7 +32,7 @@ extern "C" SlotPosition DAT_10802bf8[0x80];
 extern "C" SlotMotion DAT_10255160[0x80];
 extern "C" int FUN_1013f880(void);  // the game's random number
 extern "C" CollisionWorld *DAT_10255f08;
-extern "C" int DAT_11b002c0;        // collision filter of the current test (a character's nearCells)
+#include "char_vars.h"
 
 // 0x1001a680 (Char_FireShot). Starts a shot of character `owner` from `position` in the first free helper slot:
 // state 1, 300 frames to live, `spread` stored in the slot, the owner's pitch and target heading, speed 5. With

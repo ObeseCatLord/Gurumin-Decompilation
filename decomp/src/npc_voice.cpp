@@ -17,10 +17,9 @@ inline float AbsFloat(float value)
 }
 
 extern "C" int DAT_10210fc4[][4];                    // per script node and state: the voice of the character
-extern "C" int DAT_104c0364;                         // the character whose voice played (0 = none)
-extern "C" int DAT_104c0368;                         // that voice (-5000..5000, 0x240 = first voice sound)
-extern "C" int DAT_104c0370;
-extern "C" int DAT_104c0378;                         // frames before the voice is cleared after walking away
+#include "char_vars.h"
+#include "map_vars.h"
+
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 
 // 0x100ba040 (Npc_PlayGreeting). While the player stands on the ground (m_239c == 1): if the character greeted

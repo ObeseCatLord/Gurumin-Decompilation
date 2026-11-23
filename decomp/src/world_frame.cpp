@@ -46,10 +46,7 @@ struct WorldRenderer
 
 extern "C" void FUN_10143e00(int left, int top, int right, int bottom, int colour, int mode, float alpha);  // fills a rectangle
 
-extern "C" int DAT_1101de08;
-extern "C" int DAT_1101de0c;
-extern "C" int DAT_1101de10;
-extern "C" int DAT_1101de14;
+#include "camera_vars.h"
 
 // Once per frame while enabled: rebuilds the world draw lists (M_1017cc90) when the frame changed since the last
 // call, publishes the frame number to four globals read by the renderers and increments it.

@@ -14,7 +14,8 @@ struct CollisionWorld
 };
 
 extern "C" Node *DAT_10446e00[];   // the shaga models (shaga_spawn.cpp)
-extern "C" float DAT_1030cd98[];        // their radius
+#include "char_vars.h"
+
 extern "C" CollisionWorld *DAT_10255f08;
 
 // 0x1001af10 (Shaga_PushOut). Moves shaga model `index` out of the world collision: its centre (the placement raised

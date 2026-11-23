@@ -13,10 +13,9 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
+#include "char_tables.h"
+
 extern "C" float DAT_10255160[0x80][4];       // [0]: distance kept behind the marker
-extern "C" char DAT_1021f3c0[0x80];           // slot kind of each character (',' = free marker)
-extern "C" char DAT_10219e40[0x80];
 extern "C" int DAT_10255f10[0x80];
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 

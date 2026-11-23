@@ -15,10 +15,8 @@ struct MoviePlayer
 
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 extern "C" MoviePlayer DAT_10f08ab0;
-extern "C" int DAT_10202478;
-extern "C" int DAT_104bfe74;
-extern "C" int DAT_104bfe70;
-extern "C" int DAT_10c62edc[0x1000];
+#include "game_vars.h"
+#include "ui_vars.h"
 
 // Movie_PlayToTexture: opens movie `name` (folder 0) in the movie player DAT_10f08ab0, decodes the first frame
 // into the texture slot DAT_10202478 and records the movie's frame count. Returns 1.

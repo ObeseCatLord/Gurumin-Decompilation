@@ -15,9 +15,7 @@ struct JoyState
     unsigned char buttons[32];    // 0x30
 };
 
-extern "C" int DAT_10f1bef0[];                   // per game button: what it is mapped to (0 = default)
-extern "C" int DAT_10203408;                     // dead zone around the axis centre (in 1/256 units)
-extern "C" unsigned char DAT_10f6556c;           // axes present: 1 = z, 2 = rz, 4 = rx, 8 = ry
+#include "ui_vars.h"
 
 // An axis counts as pushed towards its low or high end past the dead zone around the centre (128 in 1/256 units).
 // 0x10142b20 (Joystick_IsButtonDown). Whether game button `button` is down in `state`: maps 1-4 are the y and x
@@ -122,7 +120,6 @@ extern "C" int __stdcall FUN_10142b20(int button, const JoyState *state)
     return 0;
 }
 
-extern "C" int DAT_10f60c30[];                   // per game button: the key it is mapped to (0 = default)
 
 // 0x10142dd0 (Keyboard_IsButtonDown). Whether game button `button` is down in the DirectInput key array `keys`
 // (non-zero = down, bit 7 of the key). Map 0 uses the default layout of each game button; maps 1-0x21 are fixed

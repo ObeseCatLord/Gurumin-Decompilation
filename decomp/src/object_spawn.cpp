@@ -8,19 +8,14 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-extern "C" int DAT_1021f338;
-extern "C" char DAT_1021f3c0[0x80];
+#include "char_tables.h"
+#include "char_vars.h"
+#include "game_vars.h"
+
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);
 
 // Message window state (see Message_Show, app_0013.cpp).
-extern "C" int DAT_104bfd4c;
-extern "C" char DAT_104c01fc;
-extern "C" int DAT_104bf8c8;
-extern "C" int DAT_104bf8cc;
-extern "C" int DAT_104bf8d0;
 extern "C" char DAT_10467ea0[];
-extern "C" char DAT_10219bc0[];
-extern "C" const char DAT_101d76d0[];  // "オブジェ数オーバーだぞよ"
 
 // Character fields used only by objects.
 struct ObjectView

@@ -3,7 +3,8 @@
 
 #include <windows.h>
 
-extern "C" int DAT_1020aee4;
+#include "sound_vars.h"
+
 extern "C" void __stdcall FUN_10001170(int, int, int, int, int, int);
 extern "C" HWND FUN_10001570(void);
 

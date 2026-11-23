@@ -191,8 +191,8 @@ WorldRenderer::WorldRenderer()
     }
 }
 
-extern "C" int DAT_1101de34;
-extern "C" float DAT_10203420;
+#include "render_vars.h"
+
 extern "C" int FUN_10161120(char *out, const char *path);   // Path_GetBaseName
 extern "C" int FUN_101615d0(char *data, int size, const char *name, int sum, unsigned int check);  // ItmDescramble
 

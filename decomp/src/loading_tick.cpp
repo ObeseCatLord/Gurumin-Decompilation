@@ -17,11 +17,10 @@ struct Engine
 };
 
 extern "C" Engine DAT_10836c70;
-extern "C" int DAT_10f6552c;          // 1 once WM_QUIT was received
+#include "game_vars.h"
+#include "render_vars.h"
+
 extern "C" DWORD DAT_104c032c;        // tick count of the last update
-extern "C" int DAT_10f65478;          // 1 while the indicator draws (render target reset in progress)
-extern "C" float DAT_104c031c;        // spinner angle
-extern "C" float DAT_104c0320;        // loading progress in percent
 extern "C" int FUN_101439e0(void);    // Render_ResetTarget
 extern "C" void FUN_1014b390(void);   // render_reset.cpp
 

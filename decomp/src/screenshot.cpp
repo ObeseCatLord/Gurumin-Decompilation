@@ -2,11 +2,8 @@
 
 #include "d3d9_min.h"
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;   // the Direct3D device
-extern "C" int DAT_10202b24;                 // back-buffer width
-extern "C" int DAT_10202b28;                 // back-buffer height
-extern "C" int DAT_10f654a4;                 // non-zero = 32-bit colour mode (else R5G6B5)
-extern "C" int DAT_10f65540;                 // with 32-bit colour: non-zero = R8G8B8, else X8R8G8B8
+#include "render_vars.h"
+#include "ui_vars.h"
 
 // 0x1013e9d0 (Screenshot_ReadBackBuffer). Copies the back buffer into a new 24-bit BGR picture (width * height * 3
 // bytes, allocated with new) and stores its size in *width and *height. The back buffer goes through a system-memory

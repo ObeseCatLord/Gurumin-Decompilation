@@ -5,7 +5,7 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-extern "C" int DAT_104c00d0;  // when non-zero, the player (character 0) cannot be pushed
+#include "char_vars.h"
 
 // 0x1001bfb0 (Char_LimitTurn). Limits how far character `index` turns this step: the difference between its target
 // heading and its heading, wrapped into -pi..pi (pi = 3.1415, a full turn = 6.283 here), is clamped to

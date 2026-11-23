@@ -4,11 +4,7 @@
 #include "char_state.h"
 #include "char_slot.h"
 
-extern "C" char DAT_1030ce38[0x80];
-extern "C" int DAT_1030b668[0x80];
-extern "C" int DAT_104679a0[0x80];
-extern "C" int DAT_10314ec0[0x80];
-extern "C" int DAT_1021f440[0x80];
+#include "char_tables.h"
 
 // Splits the packed value: digits from 100000 up go to the formation number (CharState m_0004[1]), the
 // middle four digits (value / 10 % 10000) to CharState m_003c. When those middle digits are not zero the

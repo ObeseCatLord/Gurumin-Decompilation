@@ -156,19 +156,8 @@ int ModelBank::AddLitModel(AnimModel *model)
 
 #include "texture_object.h"
 
-extern "C" int DAT_10203434;                         // 1 when shadows are drawn
-extern "C" int DAT_1101d864;
-extern "C" int DAT_1101d878;                         // set while loading the shared textures
-extern "C" int DAT_10f8d9b8[10];                     // copy of the shadow targets
-extern "C" int DAT_10f655ac;                         // cel.bmp (cel shading ramp)
-extern "C" int DAT_10f655b0;                         // cel2.bmp
-extern "C" int DAT_10f654cc;                         // render-to-texture available (RenderTarget_Probe)
-extern "C" int DAT_10f654d0;
-extern "C" int DAT_10f654e4;                         // 1 = screen-size crossfade targets
-extern "C" float DAT_10202b18;                       // size of the crossfade targets
-extern "C" int DAT_10f6559c;
-extern "C" int DAT_10f655a0;
-extern "C" int DAT_10f65484;
+#include "render_vars.h"
+
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
 extern "C" int FUN_10173550(const char *path, const char *alphaPath, int flags);  // Texture_LoadBmp
 extern "C" int FUN_10175c90(const char *name, int width, int height, const unsigned char *pixels, int alpha,
@@ -255,7 +244,6 @@ int ModelBank::CreateTextures()
     return 1;
 }
 
-extern "C" int DAT_1020343c;                         // lens flares switched on
 extern "C" int FUN_1013f880(void);                   // the game's random number
 
 // 0x10166520 (ModelBank::DrawLensFlares). For every flare point collected this frame draws eight discs from the lens
@@ -310,8 +298,6 @@ struct ShadowScene
                    AnimModel *model, float modelScale);  // 0x101a29e0
 };
 
-extern "C" int DAT_10203438;                         // shadows switched on
-extern "C" int DAT_10f654d4;
 
 // 0x10166100 (ModelBank::DrawShadowsInto). Like DrawShadows, drawing each shadow with the caster's shadow matrix
 // raised 6.1 units, set as `scene`'s matrix, and with render state 9 off around it. A caster reset here also takes

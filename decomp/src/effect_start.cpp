@@ -7,11 +7,9 @@
 
 #include "effect_manager.h"
 
-extern "C" int DAT_110186a8[32];                     // recently started script ids
-extern "C" int DAT_10fa73f8[32];                     // their definitions
+#include "render_vars.h"
+
 extern "C" unsigned char DAT_1101de64;               // next entry of that cache
-extern "C" int DAT_1101de60;                         // effects started so far
-extern "C" int DAT_10ff1df8[0x47e];                  // 1 once a definition's resources are loaded
 extern "C" int FUN_10161920(const char *name);       // Texture_FindByName
 
 // 0x10172350 (EffectManager::Start). Starts the effect with script id `effect` at `position`: finds its definition

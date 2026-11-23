@@ -9,8 +9,8 @@
 #include "char_slot.h"
 
 extern "C" int FUN_10043cc0(int index);
-extern "C" char DAT_1021f3c0[0x80];   // slot kind (3 = enemy)
-extern "C" int DAT_10c66710;          // non-zero: wake-up radius forced to 300
+#include "char_tables.h"
+#include "char_vars.h"
 
 // For an idle character (state 0): plays its motion 2 and, when the player is within 10 * m_0004[1] units,
 // triggers FUN_10043cc0 (the character notices the player). Returns 0.

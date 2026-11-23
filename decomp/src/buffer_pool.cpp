@@ -12,19 +12,7 @@ struct Bounds
     float w;
 };
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;
-extern "C" IUnknownLike *DAT_10f0d5e0[0x5a0];
-extern "C" IUnknownLike *DAT_10f1c7f0[0x5a0];
-extern "C" IUnknownLike *DAT_10f60d38[0x5a0];
-extern "C" IUnknownLike *DAT_10f1a870[0x5a0];
-extern "C" int DAT_10f1e670[0x5a0];
-extern "C" int DAT_10f628e8[0x5a0];
-extern "C" int DAT_10f1a86c;
-extern "C" IUnknownLike *DAT_10f1bff0[0x200];
-extern "C" int DAT_10f1fd90[0x200];
-extern "C" int DAT_10f0cd40[0x200];
-extern "C" int DAT_10f1de70[0x200];
-extern "C" int DAT_10f0ff80;
+#include "render_vars.h"
 
 // Resets four bounding boxes to the 'empty' value (-30000 in each axis, w = 1) and their counts to 0.
 extern "C" int FUN_10147620(void *, Bounds *bounds, int *counts)
@@ -149,7 +137,6 @@ extern "C" int FUN_10148520(int index)
     return 0;
 }
 
-extern "C" char DAT_10f60690[0x5a0];
 
 // 0x10147880. Creates a mesh buffer pair in the first free slot: a vertex buffer and a 16-bit index buffer in system
 // memory, each rounded up to the next multiple of 256 bytes. Their sizes are recorded and the buffers returned in
@@ -182,7 +169,6 @@ extern "C" int FUN_10147880(IUnknownLike **vertexBuffer, int vertexBytes, IUnkno
     return slot;
 }
 
-extern "C" int DAT_1020340c;                         // texture memory budget of the pool
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
 // 0x10148590. Returns the video-memory copy of pooled buffer `index`, creating it from `source` (width x height,

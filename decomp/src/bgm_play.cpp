@@ -32,11 +32,8 @@ struct GameFile
 };
 
 extern "C" BgmTrack DAT_108db358[0x41];
-extern "C" int DAT_10202358;                     // track playing
-extern "C" char DAT_104c033c;                    // non-zero = always track 0
-extern "C" int DAT_104c01b0;                     // non-zero = no sound process
-extern "C" char DAT_10f627d0[];                  // the game's data folder
-extern "C" char DAT_102564a8[];                  // receives the rest of the .de2 header
+#include "sound_vars.h"
+
 extern "C" int DAT_104c0270[16];                 // anti-tamper noise table
 extern "C" DWORD DAT_104c00e4;                   // tick count when the track was started
 extern "C" void FUN_10010480(const char *name, int a, int b, int c, int d, int fade);   // Bgm_StartStream

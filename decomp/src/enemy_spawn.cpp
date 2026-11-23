@@ -15,16 +15,11 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-extern "C" char DAT_1049efb0[10][10];         // the wave groups: character of each slot (0 = empty)
-extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated
+#include "char_tables.h"
+#include "char_vars.h"
+#include "world.h"
 extern "C" Vec4 DAT_10867e18[0x80];           // where a character in play was placed
-extern "C" Vec4 DAT_104c4438[0x80];           // where a wave enemy came in
-extern "C" int DAT_10453008[0x80];
 extern "C" int DAT_102199b8[0x80];            // per-character group timer (char_reset.cpp)
-extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
-extern "C" char DAT_1020d540[0x80];           // 1 = the character is in play
-extern "C" char DAT_1021b4c8[0x80];
-extern "C" int DAT_10c635a8;                  // wave enemies still alive
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 
 // atan2 on floats (an inline helper: both arguments are rounded to float first, the second one first).

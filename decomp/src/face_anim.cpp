@@ -25,10 +25,8 @@ struct FaceSet
 #include "char_slot.h"
 
 extern "C" FaceSet DAT_1087664c[0x80];
-extern "C" short DAT_10b314c0;           // last face frame set
-extern "C" int DAT_10c655f0;             // current costume
-extern "C" int DAT_1030c278[0x80];       // frames until the next face change (0 = none)
-extern "C" int DAT_10447dd8[0x80];       // face to show next
+#include "char_tables.h"
+#include "char_vars.h"
 
 // Not byte-identical yet: register roles of index/frame and the face-table index form differ (see open.tsv).
 // Shows face `frame` on character `index` and schedules the next face of its set. The player in costume 6 uses the

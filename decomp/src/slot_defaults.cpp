@@ -2,8 +2,7 @@
 
 #include <string.h>
 
-extern "C" int DAT_1030c908[0x22];
-extern "C" int DAT_1030b870[0x22];
+#include "ui_vars.h"
 
 // Resets the two 0x22-entry slot tables. Mode 0 (new game) enables slots 1..0x11; any other mode sets the
 // special layout (slots 0x17, 0x18, 0x1f disabled, 0x19..0x1e set to the ids 0x6f4..0x6fa).

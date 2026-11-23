@@ -11,10 +11,8 @@ struct Renderer
 
 extern "C" void FUN_1013f070(int, int, int);
 extern "C" Renderer DAT_1021cffc;
-extern "C" int DAT_104c0140;
-extern "C" int DAT_104bf8d4;
-extern "C" int DAT_104bf8d8;
-extern "C" char DAT_10210ae8[];
+#include "game_vars.h"
+#include "ui_vars.h"
 
 // Draws the full-screen overlay quad (texture slot DAT_104c0140) with additive blending.
 extern "C" int FUN_1000c340(void)

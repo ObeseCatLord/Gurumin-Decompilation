@@ -13,24 +13,18 @@ struct NamedPath
     char path[0x4b34];
 };
 
-extern "C" int DAT_104c01b0;
-extern "C" short DAT_10447338[0x44c];
+#include "char_tables.h"
+#include "char_vars.h"
+#include "game_vars.h"
+#include "render_vars.h"
+#include "sound_vars.h"
+#include "ui_vars.h"
+
 extern "C" int FUN_10001b40(void);
-extern "C" char DAT_1020e0f8[];
 extern "C" NamedPath DAT_10b314c8[];
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
-extern "C" int DAT_104c0198;
-extern "C" int DAT_104c00d0;
-extern "C" int DAT_1049f0f0;
 extern "C" Vec3 *DAT_1032d5b8[];
 extern "C" char DAT_1021bbc0[];
-extern "C" int DAT_10c66590;
-extern "C" int DAT_10c62edc[0x1000];
-extern "C" int DAT_10c66594;
-extern "C" char DAT_104c0131;
-extern "C" char DAT_104c0130;
-extern "C" short DAT_10219ec0[0x80];
-extern "C" char DAT_1021f3c0[0x80];
 
 // Marks all 0x44c looping-sound slots free (-11) and stops the sound process' loops (command 0x221, sent
 // twice when the first call succeeds) unless sound is muted.
@@ -135,23 +129,14 @@ struct OverlayModel
     void Release();  // 0x1019e9a0
 };
 
-extern "C" int DAT_104bf8e4;          // frames left of the fade
 extern "C" float DAT_104bf8f0;        // fade value
 extern "C" float DAT_1032d4b0;        // fade step per frame
 extern "C" float DAT_104bf8e8;        // fade target (set exactly on the last frame)
-extern "C" int DAT_104bfe1c;          // 1 while the overlay mode is open
-extern "C" int DAT_104bfd78;
-extern "C" int DAT_104bf8d4;
-extern "C" int DAT_1030c500[0x100];   // the overlay mode's state (entry 0x13 is cleared first)
 extern "C" OverlayModel *DAT_104c03c8; // its model
 extern "C" int DAT_104c03cc;
 extern "C" int DAT_104c03d0;
 extern "C" int DAT_104c03d4;
 extern "C" int DAT_104c03d8;
-extern "C" int DAT_104c03dc;
-extern "C" int DAT_104c03e0;
-extern "C" int DAT_104c03e4;
-extern "C" int DAT_1030b870[0x22];    // its texture slots (-1 = none)
 extern "C" void (*DAT_11b1ba40)(void *block);       // the engine's free
 extern "C" int FUN_1000cb30(const char *text);
 extern "C" int FUN_1000cb90(const char *text);      // Caption_Set

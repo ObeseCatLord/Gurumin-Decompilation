@@ -6,23 +6,13 @@
 #include <string.h>
 #include "d3d9_min.h"
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;
-extern "C" int DAT_10f6547c;
+#include "map_vars.h"
+#include "render_vars.h"
+#include "sound_vars.h"
+
 extern "C" DWORD DAT_10f654d8;
 extern "C" int DAT_10f65508;
-extern "C" int DAT_10f65504;
 // Frame blend (after-image) strength: rises by the step every other frame up to the limit (see FUN_1013fb10).
-extern "C" float DAT_10f6549c;  // current strength
-extern "C" float DAT_10f1fcf8;  // step per update
-extern "C" float DAT_10f628d0;  // limit
-extern "C" int DAT_10f65498;    // 1 while the frame blend is active
-extern "C" int DAT_10f654f4;    // frame blending allowed by the settings
-extern "C" int DAT_10202b0c;    // number of frame buffers
-extern "C" int DAT_10f6553c;
-extern "C" char DAT_10202b40[][0x100];
-extern "C" int DAT_10f0edf8;
-extern "C" char DAT_10f64368[4][0x100];
-extern "C" char DAT_10f627d0[];
 
 // Starts a new Direct3D scene (ending the open one first).
 extern "C" int FUN_1013ed20(void)
@@ -118,7 +108,6 @@ extern "C" int FUN_1013faf0(void)
     return 0;
 }
 
-extern "C" int DAT_10f6552c;  // set when Windows asked the game to quit (WM_QUIT)
 
 // Pumps the Windows message queue: handles at most 30 pending messages per call so a flood of input cannot stall
 // the frame. Returns 0 (and sets the quit flag) when WM_QUIT arrives, else 1.

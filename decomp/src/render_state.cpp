@@ -4,10 +4,7 @@
 
 #include "d3d9_min.h"
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;
-extern "C" unsigned long DAT_10f623d0[0x100];
-extern "C" unsigned long DAT_10f08d40[8][0x100];
-extern "C" unsigned long DAT_10f141e0[8][0x100];
+#include "render_vars.h"
 
 // Render_SetRenderState: returns 1 when the cached value changed.
 extern "C" int FUN_1013ef30(unsigned long state, unsigned long value)

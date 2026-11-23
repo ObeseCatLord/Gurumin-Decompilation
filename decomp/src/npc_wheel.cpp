@@ -20,9 +20,9 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 #include "char_slot.h"
 
 extern "C" Node *DAT_1021bdf8[0x80][9];       // [0]: the cart's wheel node
-extern "C" Matrix4 DAT_10868838[0x80][6];     // saved node matrices of each character
+#include "char_tables.h"
+
 extern "C" float DAT_10255160[0x80][4];       // [0]: the wheel's angle
-extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
 extern "C" int DAT_104bf8f8[0x7c];            // key prompt shown (app_0008.cpp)
 extern "C" int DAT_1021d138[0x7c];            // key prompt id
 extern "C" int DAT_1021f740[0x7c];            // key prompt frames left

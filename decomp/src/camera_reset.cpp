@@ -3,77 +3,12 @@
 
 #include "vec4.h"
 
-extern "C" int DAT_10203440;
-extern "C" int DAT_10203444;
-extern "C" float DAT_10203448;
-extern "C" float DAT_1020344c;
-extern "C" float DAT_10203450;
-extern "C" float DAT_10203454;
-extern "C" float DAT_10203458;
-extern "C" float DAT_1020345c;
-extern "C" float DAT_10203460;
-extern "C" char DAT_10faa678;
-extern "C" char DAT_10faaa80;
-extern "C" int DAT_10fabe88;
-extern "C" char DAT_10fabe8c;
-extern "C" int DAT_10fe01d0;
-extern "C" int DAT_10feb3d8;
-extern "C" int DAT_10ff19e0;
-extern "C" int DAT_10ff1df0;
-extern "C" int DAT_10ff2ff0;
-extern "C" int DAT_10ff2ff4;
-extern "C" int DAT_11018624;
-extern "C" int DAT_11018728;
-extern "C" int DAT_1101872c;
-extern "C" int DAT_11018730;
-extern "C" int DAT_11018734;
-extern "C" int DAT_11018738;
+#include "camera_vars.h"
+#include "char_vars.h"
+
 extern "C" int DAT_1101c800;  // camera heading target
-extern "C" int DAT_1101d888;
-extern "C" int DAT_1101d88c;  // frames left of a camera cut blend
-extern "C" int DAT_1101d890;
-extern "C" int DAT_1101d894;
-extern "C" int DAT_1101d898;
-extern "C" int DAT_1101d89c;
-extern "C" int DAT_1101d8a0;
-extern "C" int DAT_1101d8a4;
-extern "C" int DAT_1101d8a8;
-extern "C" int DAT_1101d8ac;
-extern "C" int DAT_1101d8b0;
-extern "C" int DAT_1101d8b4;
 extern "C" char DAT_1101d8b8;
-extern "C" int DAT_1101d9b8;
-extern "C" int DAT_1101ddd0;
-extern "C" int DAT_1101ddd4;
-extern "C" int DAT_1101ddd8;
-extern "C" int DAT_1101dddc;
 extern "C" int DAT_1101dde0;
-extern "C" int DAT_1101dde4;
-extern "C" int DAT_1101dde8;
-extern "C" int DAT_1101ddec;
-extern "C" int DAT_1101ddf0;
-extern "C" int DAT_1101de08;
-extern "C" int DAT_1101de0c;
-extern "C" int DAT_1101de10;
-extern "C" int DAT_1101de14;
-extern "C" int DAT_1101de18;
-extern "C" int DAT_1101de20;
-extern "C" int DAT_1101de28;
-extern "C" int DAT_1101de2c;
-extern "C" char DAT_1101de38;
-extern "C" Vec4 DAT_118e69e8;  // camera position
-extern "C" Vec4 DAT_118e6c78;  // goal of the camera target
-extern "C" Vec4 DAT_118e6c88;
-extern "C" Vec4 DAT_118e6c98;
-extern "C" Vec4 DAT_118e6ca8;
-extern "C" Vec4 DAT_118e6cb8;  // camera target
-extern "C" Vec4 DAT_118e6cd8;
-extern "C" Vec4 DAT_11af3e28;  // goal of the camera position
-extern "C" Vec4 DAT_11af3e38;
-extern "C" Vec4 DAT_11af3e48;
-extern "C" Vec4 DAT_11af3e58;
-extern "C" Vec4 DAT_11af3f48;
-extern "C" Vec4 DAT_11af3f58;  // the camera-space push of the player
 
 // 0x1016a980 (Camera_Reset). Clears the camera globals: the camera position and target vectors and their goals,
 // the blend and cut counters (DAT_10203444 = -100, DAT_10203440 = 1), and sets the scale factors to 1 and

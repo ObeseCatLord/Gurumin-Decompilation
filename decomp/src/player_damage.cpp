@@ -29,24 +29,12 @@ struct MoviePlayer
 #include "game.h"
 
 extern "C" MoviePlayer DAT_10f08ab0;
-extern "C" int DAT_10202478;                  // texture slot the movies are decoded into
-extern "C" int DAT_104bfe78;                  // 1 once the game over has started
-extern "C" int DAT_104bfe1c;
-extern "C" int DAT_104bfd78;
-extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
-extern "C" int DAT_104bfe6c;
-extern "C" int DAT_104c00c8;
-extern "C" char DAT_104c00cc;                 // 2 = the extra life was used up this hit
-extern "C" int DAT_104c00d0;
-extern "C" char DAT_104c0135;
-extern "C" int DAT_104c00b8;                  // non-zero = invulnerable
-extern "C" int DAT_10c655f0;                  // current costume
+#include "char_vars.h"
+#include "game_vars.h"
+#include "map_vars.h"
+#include "ui_vars.h"
+
 extern "C" unsigned char DAT_104c033a;                 // face variant (char_attach.cpp)
-extern "C" char DAT_104c0332;                 // non-zero = voices off
-extern "C" char DAT_104c0093;                 // non-zero = damage reduced to two thirds
-extern "C" int DAT_10c66d00;
-extern "C" int DAT_10c64ad4;
-extern "C" int DAT_10c64ad8;
 extern "C" char DAT_104686b0;
 extern "C" char DAT_1020d4c0;
 extern "C" int FUN_1003ad20(int sound, const Vec4 &position, float volume);  // Sound_PlayEffect

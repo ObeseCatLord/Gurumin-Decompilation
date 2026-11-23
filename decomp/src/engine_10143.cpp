@@ -30,10 +30,10 @@ struct SlotTable
     int M_101476e0(int index, int value);
 };
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;
+#include "render_vars.h"
+
 extern "C" int DAT_10f6550c;
 extern "C" int DAT_10f65510;
-extern "C" int DAT_10f181e0[0x5a0];
 
 // Unbinds texture stage 0 (only when something is bound).
 extern "C" void FUN_10143b50(void)
@@ -146,9 +146,6 @@ extern "C" void FUN_1013ef30(int state, int value);              // Render_SetRe
 extern "C" void FUN_1013ef90(int stage, int type, int value);    // Render_SetTextureStageState (cached)
 extern "C" void FUN_1013f070(int mode, int a, int b);            // sets the 2D blend mode
 
-extern "C" int DAT_10202b34;     // back buffer width
-extern "C" int DAT_10202b38;     // back buffer height
-extern "C" int DAT_10f0d5c8;     // number of draw calls this frame
 
 // 0x10143bc0 (Render_DrawGradientQuad). Draws an untextured rectangle from (left, top) to (right, bottom) given on
 // the 640x480 screen, with colour `top` along its top edge and `bottom` along its bottom edge, opacity `alpha`

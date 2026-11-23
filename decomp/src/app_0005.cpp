@@ -2,9 +2,7 @@
 
 #include <windows.h>
 
-extern "C" char DAT_1020e0f8[];
-extern "C" int DAT_104bf8d4;
-extern "C" int DAT_104bf8d8;
+#include "game_vars.h"
 
 struct Tracker
 {

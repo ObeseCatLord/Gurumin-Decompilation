@@ -13,8 +13,9 @@
 
 extern "C" Vec3 *DAT_1032d5b8[];      // positions the camera keeps in view
 extern "C" char DAT_1021bbc0[];       // a flag per camera position
-extern "C" int DAT_1049f0f0;          // number of camera positions
-extern "C" int DAT_104c036c;          // 1 once a scripted character was registered
+#include "char_vars.h"
+#include "map_vars.h"
+
 // 0x10029cf0: runs one script step of character `index`.
 extern "C" int FUN_10029cf0(int index, int *a, int step, int *nextStep, Vec4 *position, int *result, int *value,
                             int *b);

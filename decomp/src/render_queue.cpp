@@ -12,23 +12,10 @@ struct Block80
 
 struct Node;
 
-extern "C" int DAT_11b044d0;
-extern "C" int DAT_11b044dc;
-extern "C" int DAT_11b002b8;
-extern "C" Node *DAT_11b00070[0x40];
-extern "C" char DAT_11b00270[0x40];
+#include "render_vars.h"
+
 extern "C" char DAT_11b00030[0x40];
-extern "C" char DAT_11af3f68[0x40];
-extern "C" char DAT_11afffa8[0x40];
-extern "C" int DAT_11b00170[0x40];
-extern "C" Vec4 DAT_11b04518[0x40];
-extern "C" Vec4 DAT_11b04918[0x40];
-extern "C" Vec4 DAT_11b07128[0x40];
 extern "C" Block80 DAT_11b04d18[0x30];
-extern "C" Matrix4 DAT_11b06518[0x30];
-extern "C" int DAT_10f65520;
-extern "C" int DAT_10f655c4;
-extern "C" Vec4 DAT_10f66948;
 extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);
 
 // RenderQueue_Push: appends `node` with its parameters. The extra data and matrix are copied into their pools

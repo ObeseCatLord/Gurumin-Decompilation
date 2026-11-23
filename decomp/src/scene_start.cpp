@@ -23,23 +23,15 @@ extern "C" WorldRenderer DAT_10c68000;
 extern "C" void FUN_100114a0(void);                   // Scene_ResetBattleState
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);
 extern "C" int FUN_10092af0(int code, int value);     // scene callback
-extern "C" Vec4 DAT_118e69e8;                         // player position
-extern "C" Vec4 DAT_118e6cb8;                         // player velocity
-extern "C" Vec4 DAT_10da9150;                         // saved player position
-extern "C" Vec4 DAT_10868818;                         // saved player velocity
-extern "C" char DAT_10db6ee8[];                       // player model (character 0's CharModel)
+#include "anim_model.h"
+#include "camera_vars.h"
+#include "char_vars.h"
+#include "game_vars.h"
+#include "render_vars.h"
+#include "sound_vars.h"
+
 extern "C" void *DAT_10255f08;                        // map root node
-extern "C" int DAT_104bfe68;
 extern "C" int DAT_1020e538;
-extern "C" int DAT_104bfe70;
-extern "C" int DAT_104bfeb4;
-extern "C" int DAT_104bfe6c;
-extern "C" int DAT_104bfeb0;
-extern "C" char DAT_104c0309;
-extern "C" float DAT_10203420;
-extern "C" int DAT_10c655f0;                          // current costume
-extern "C" int DAT_104c00e0;
-extern "C" int DAT_104c0108;
 extern "C" int DAT_10db9380;
 
 // Starts the scene with player character file `characterFile`; `value` is kept in DAT_104bfeb4.
@@ -67,15 +59,10 @@ extern "C" void FUN_100cc1d0(const char *characterFile, int value)
 extern "C" void FUN_100123d0(void);              // Chars_ReloadModels
 extern "C" int FUN_1015c9e0(int mode);           // Screen_StartTransition (0 = end the transition)
 extern "C" int FUN_10001b40(void);               // SoundArc_Message221
-extern "C" int DAT_104c01b0;
-extern "C" short DAT_10447338[0x44c];
-extern "C" int DAT_104c0228;
 extern "C" unsigned char DAT_104c022c;           // write index of the position history
 extern "C" unsigned char DAT_104c022d;
 extern "C" Vec4 DAT_10802ad8[16];                // recent player positions (ring of 16)
 extern "C" Matrix4 DAT_10db9210;                 // the player's world matrix (character 0)
-extern "C" Vec4 DAT_11af3e28;                    // camera position
-extern "C" Vec4 DAT_118e6c78;                    // camera target
 
 // Finishes a pending scene start (DAT_104bfeb0) unless a cut-scene runs: reloads the character models, ends the
 // screen transition, clears the effects, resets the per-object sound table (when DAT_104c01b0 is clear), fills the

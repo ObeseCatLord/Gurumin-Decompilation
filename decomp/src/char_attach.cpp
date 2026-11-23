@@ -19,13 +19,9 @@ struct ItemInfo
 };
 
 extern "C" ItemInfo DAT_1088e6b0[];
-extern "C" char DAT_108f678c[][0x240];   // item model paths
-extern "C" int DAT_104c02c8;             // face settings of the worn helmet
+#include "char_vars.h"
+
 extern "C" char DAT_104c033a;            // face variant: from the costume and the helmet worn with it
-extern "C" char DAT_104c0319;            // set to 1 when a helmet is attached
-extern "C" int DAT_10c655f0;             // current costume (6 = the one with three pointer nodes)
-extern "C" int DAT_10c6566c;             // 1 = drill 5
-extern "C" int DAT_10c64ad4;             // drill level 0..3
 extern "C" Node *DAT_104c00f8;           // the player's "scop-pt" node (0 = none)
 extern "C" Node *DAT_104c00fc;           // the player's "charbase0" node
 extern "C" Node *DAT_104c0100;           // "scop-2pt" (costume 6 only)

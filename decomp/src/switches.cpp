@@ -17,7 +17,9 @@ struct MapObject
 extern "C" MapObject DAT_10874848;
 extern "C" int DAT_1030bbf8[0x80];       // the held object of each slot (non-zero while used, switch_effects.cpp)
 extern "C" int DAT_10255b08[0x80];       // holder of each slot
-extern "C" short DAT_10254838[0x80];     // per-object switch state; 1000 is added while it is held
+#include "char_tables.h"
+#include "char_vars.h"
+#include "game_vars.h"
 
 // Releases the hold slot of `holder`: a character's hold count drops by one and its switch node is turned off; an
 // object loses its "held" bonus of 1000. Returns 1, or 0 when `holder` holds nothing.
@@ -42,12 +44,6 @@ extern "C" int FUN_10057b90(int holder)
     return 0;
 }
 
-extern "C" char DAT_1021f3c0[0x80];       // slot kind (0x13 / 0x14 = the two switch kinds)
-extern "C" short DAT_1032d4b8[0x80];      // script flag set by the switch (0 = none)
-extern "C" short DAT_1020b128[0x80];      // switch animation frame
-extern "C" short DAT_10219ec0[0x80];      // gimmick id controlled by the switch
-extern "C" int DAT_10c62edc[0x1000];      // script flags
-extern "C" int DAT_104bfe6c;              // 1 while sounds are muted (cut-scenes)
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);
 
 // Turns the switch in slot `slot` on: kind 0x13 shows frame 1 and plays sound 0x38a, kind 0x14 shows frame 0x1f and

@@ -11,26 +11,16 @@
 
 #include "effect_manager.h"
 
-extern "C" Vec4 DAT_118e6cb8;     // camera target
-extern "C" Vec4 DAT_118e69e8;     // camera position
-extern "C" Vec4 DAT_10edbd48;     // goal of the target (the followed node's position when there is one)
-extern "C" Vec4 DAT_10866d98;     // goal of the position
-extern "C" Vec4 DAT_10f08aa0;     // the target of the previous frame
-extern "C" Vec4 DAT_104d29d8;     // the position of the previous frame
-extern "C" Vec4 DAT_118e6c78;     // copies of the target
+#include "camera_vars.h"
+#include "char_tables.h"
+#include "char_vars.h"
+
 extern "C" Vec4 DAT_10f668e8;
-extern "C" Vec4 DAT_11af3e28;     // copies of the position
 extern "C" Vec4 DAT_10f65688;
-extern "C" int DAT_104c0358;      // 1 once the camera vectors were set up
-extern "C" Node *DAT_104c039c;    // the node the camera follows (0 = none)
 extern "C" void FUN_1016a8d0(void);
 
 extern "C" Node *DAT_10255f08;     // the map's root node
 extern "C" Node *DAT_1021bdf8[0x80][9];       // character 0: [0] = the stand's parent node
-extern "C" Matrix4 DAT_10868838[0x80][6];  // character 0: [0] = the matrix the sparkle follows
-extern "C" int DAT_10c6356c;      // the shot's point as integers (z + 115)
-extern "C" int DAT_10c63570;
-extern "C" int DAT_10c63574;
 
 // 0x100184e0 (Camera_ItemStand). The shot of the item stand ("kagudai") rising: on the first call it finds the
 // stand in the map (setting flag 0x20 on its parent and clearing it on its "itemkagu" item) and keeps its parent node. Every 65
@@ -133,12 +123,6 @@ extern "C" int FUN_10018fb0(void)
     return 0;
 }
 
-extern "C" Vec4 DAT_108393d8;     // the point the camera orbits (w: its heading)
-extern "C" Vec4 DAT_10da93f0;     // the orbit centre (the player's position)
-extern "C" Node *DAT_1021c624;    // a node the target goal drifts towards (0 = none)
-extern "C" Vec4 DAT_10802be8;     // the position goal of a camera shift
-extern "C" Vec4 DAT_10c67ff0;     // the target goal of a camera shift
-extern "C" int DAT_104c035c;      // frames left in the camera shift (0 = none)
 
 // 0x10019310 (Camera_Shift). Like Camera_Ease, with the goals offset: while a shift runs (DAT_104c035c counts down)
 // the offsets move 15 % towards the shift goals relative to the current camera, divided by 1 + the frames left / 2;
@@ -187,9 +171,6 @@ extern "C" int FUN_10019310(void)
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-extern "C" float DAT_10da93e0;    // the character the camera stands at (rounded to an index)
-extern "C" float DAT_10da93e4;    // the character it looks at (rounded; below 0 = in front of the first)
-extern "C" float DAT_10da93e8;    // how much the target rises with the distance (per cent)
 
 // 0x10019d80 (Camera_Between). A two-character shot: the position goal is the head of character DAT_10da93e0
 // (35 units above its head node, or 75 above it without one), the target goal the head of character DAT_10da93e4

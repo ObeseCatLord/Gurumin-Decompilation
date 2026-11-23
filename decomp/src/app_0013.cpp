@@ -4,36 +4,18 @@
 
 #include "node.h"
 
-extern "C" int DAT_104bfd4c;
-extern "C" char DAT_104c01fc;
-extern "C" int DAT_104bf8c8;
-extern "C" int DAT_104bf8cc;
-extern "C" int DAT_104bf8d0;
-extern "C" char DAT_10219bc0[];
+#include "char_vars.h"
+#include "game_vars.h"
+
 extern "C" char DAT_10467ea0[];
 extern "C" char *FUN_1013f910(const char *name);
 extern "C" void FUN_10001980(const char *, int, int, int, int, int, int);
 extern "C" void FUN_100016c0(const char *, int, int, int, int, int, int);
-extern "C" int DAT_10468128;
-extern "C" char DAT_104c023e;
-extern "C" int DAT_104c0194;
-extern "C" int DAT_104c0168;
-extern "C" int DAT_104c016c;
-extern "C" int DAT_104c00e0;
 extern "C" int DAT_10db9380;
-extern "C" int DAT_10db9254;
-extern "C" float DAT_10db9264;
-extern "C" float DAT_10db7c34;
-extern "C" int DAT_104c01a4;
-extern "C" int DAT_104c0108;
-extern "C" char DAT_104c0190;
 extern "C" void FUN_1000ec70(int, float, float, float, float);
 extern "C" signed char DAT_103150c0[];
 extern "C" void FUN_1000e810(void);
 extern "C" Node *DAT_104c01dc;
-extern "C" int DAT_104c01e4;
-extern "C" int DAT_104c01e0;
-extern "C" char DAT_10db6f5e;
 
 // Opens the message window with `text` (and an optional second line) for `frames` frames.
 extern "C" int FUN_1000ed70(const char *text, const char *subtext, int frames)

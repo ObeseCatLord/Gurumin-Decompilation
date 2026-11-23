@@ -6,29 +6,14 @@
 
 extern "C" void FUN_1000f360(int, int);
 extern "C" void FUN_10001c50(int);
-extern "C" int DAT_104bfd28;
-extern "C" int DAT_104bfd2c;
-extern "C" int DAT_104bfd30;
+#include "char_tables.h"
+#include "game_vars.h"
+#include "map_vars.h"
+#include "sound_vars.h"
+
 extern "C" int DAT_104bfd5c;
-extern "C" int DAT_1030c568;
 // Screen colour fade: the colour moves from DAT_10da90d0 towards DAT_10c67f60 by DAT_10daa800 per frame.
-extern "C" int DAT_1042da68;   // frames left
-extern "C" Vec4 DAT_10da90d0;  // current colour
-extern "C" Vec4 DAT_10daa800;  // step per frame
-extern "C" Vec4 DAT_10c67f60;  // target colour
-extern "C" int DAT_104bfd4c;
-extern "C" char DAT_104c01fc;
-extern "C" int DAT_104bf8c8;
-extern "C" int DAT_104bf8cc;
-extern "C" int DAT_104bf8d0;
-extern "C" char DAT_10219bc0[];
 extern "C" char DAT_10467ea0[];
-extern "C" int DAT_10255040[0x20];
-extern "C" int DAT_1020d5c8[0x20];
-extern "C" int DAT_1030c278[0x80];
-extern "C" int DAT_10447dd8[0x80];
-extern "C" int DAT_104c01b0;
-extern "C" short DAT_10447338[];
 
 // Starts the screen fade-in (state 1).
 extern "C" int FUN_1000ebf0(void)

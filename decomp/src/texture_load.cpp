@@ -3,8 +3,9 @@
 
 #include "texture_load.h"
 
-extern "C" int DAT_10c636c4;
-extern "C" int DAT_102028c8;   // texture of the count-down digits
+#include "map_vars.h"
+#include "render_vars.h"
+
 extern "C" void FUN_10023d30(void);
 
 // Out-of-line copy of LoadTexture for callers that pass a variable name (same body; a plain forwarder would not

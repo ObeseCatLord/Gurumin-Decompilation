@@ -3,19 +3,10 @@
 #include <string.h>
 #include "d3d9_min.h"
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;
-extern "C" int DAT_10f6548c;
+#include "render_vars.h"
+
 extern "C" int DAT_10f6550c;
 extern "C" int DAT_10f65510;
-extern "C" int DAT_10f654cc;
-extern "C" void *DAT_10f60d30;
-extern "C" void *DAT_10f0d540;
-extern "C" D3DVIEWPORT9_ DAT_10f1fd30;
-extern "C" D3DVIEWPORT9_ DAT_10f0ece0;
-extern "C" int DAT_10f65470;
-extern "C" int DAT_10f65474;
-extern "C" int DAT_10202b34;
-extern "C" int DAT_10202b38;
 extern "C" void FUN_10143b50(void);
 
 // Render_ResetState: unbinds the textures of stages 0..3, resets the cached stage states, and when an off-screen
@@ -44,15 +35,8 @@ extern "C" void FUN_1014b390(void)
 }
 
 // Default-pool Direct3D resources that do not survive a device reset (Render_OnResetDevice recreates them).
-extern "C" IUnknownLike *DAT_10f0ee00[16][0x46];  // vertex/index buffers of the 16 draw lists (FUN_1014ddf0)
-extern "C" IUnknownLike *DAT_10f1fd04[8];         // render-target surfaces
-extern "C" IUnknownLike *DAT_10f654ac;            // dynamic vertex buffer of the 2D drawing code
 extern "C" IUnknownLike *DAT_10f141dc;
-extern "C" IUnknownLike *DAT_10f1a864;
-extern "C" IUnknownLike *DAT_10f1fcfc[2];         // the two swap targets, created with the device (Render_CreateDevice)
-extern "C" IUnknownLike *DAT_10f1fd00;
 extern "C" IUnknownLike *DAT_10f1fd28;            // created with the device
-extern "C" IUnknownLike *DAT_10f1fd2c;
 extern "C" IUnknownLike *DAT_10f08d38;
 extern "C" void FUN_10147760(void);  // BufferPool_ReleaseDynamic
 extern "C" int FUN_10148350(void);   // TexCache_ReleaseAll
@@ -101,10 +85,6 @@ extern "C" int FUN_1014b2a0(void)
     return 1;
 }
 
-extern "C" int DAT_10202b24;   // back-buffer width set at device creation
-extern "C" int DAT_10202b28;   // back-buffer height
-extern "C" int DAT_10f65480;   // split screen: 0 = whole screen, 1 = left half, 2 = right half
-extern "C" int DAT_10f65478;   // non-zero while an off-screen target is set up (then the saved state is kept)
 
 // 0x101439e0 (Render_ResetTarget). Unbinds the textures of stages 0..3, makes the back buffer and depth buffer the
 // render targets again and sets the viewport to the whole back buffer or one half of it (split screen). Unless an
@@ -160,8 +140,6 @@ extern "C" void FUN_101439e0(void)
 // windows.h-style min (vec4.cpp): each argument is evaluated twice.
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
-extern "C" float DAT_10202b18;  // largest viewport size (both width and height)
-extern "C" int DAT_10f65490;    // swap target in use (0 or 1)
 
 // 0x1014b480 (Render_ResetSwapTarget). Like Render_ResetTarget, but the render target is the swap target in use and
 // the depth buffer the second one (DAT_10f08d38), and the viewport is at most DAT_10202b18 wide and high.

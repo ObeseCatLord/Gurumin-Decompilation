@@ -17,10 +17,8 @@ struct CollisionWorld
 };
 
 extern "C" CollisionWorld *DAT_10255f08;
-extern "C" Vec4 DAT_118e69e8;            // player position
-extern "C" Vec4 DAT_118e6cb8;            // player velocity
-extern "C" int DAT_102022b8;             // non-zero = always place characters on the ground
-extern "C" char DAT_10255a88[0x80];
+#include "char_tables.h"
+#include "char_vars.h"
 
 #include "char_state.h"
 

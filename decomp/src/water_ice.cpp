@@ -4,11 +4,9 @@
 #include "node.h"
 
 extern "C" Node *DAT_104c007c;   // the water surface node
-extern "C" Node *DAT_104c0084;   // "ICERIPA": the ice surface added below the water node
-extern "C" Node *DAT_104c0080;   // second water node (found next to the surface)
-extern "C" char DAT_104c02dc;    // 1 while the water is frozen
+#include "map_vars.h"
+
 extern "C" float DAT_104bfe24;   // height of the ice surface
-extern "C" float DAT_10db9248;   // the player's height (character 0, position z)
 
 // 0x10011fb0 (Water_SetFrozen). Freezes (`frozen` != 0) or thaws the water of the current map, when the map has
 // all three water nodes. Freezing lifts the player onto the ice when below it and switches the node flags so the

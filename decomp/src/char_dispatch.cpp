@@ -6,7 +6,9 @@
 #include "char_state.h"
 #include "char_slot.h"
 
-extern "C" int DAT_104bfe78;  // non-zero while character updates are suspended
+#include "char_tables.h"
+#include "char_vars.h"
+
 extern "C" int FUN_1010c650(int index);
 extern "C" int FUN_10011f80(int index);
 extern "C" int FUN_10104640(int index);
@@ -79,7 +81,6 @@ extern "C" int FUN_1009e2d0(int index)
 }
 
 // Enemy behaviour updaters selected by DAT_1020b230 (one value per character slot).
-extern "C" int DAT_1020b230[0x80];
 extern "C" int FUN_100a9240(int index, int variant);
 extern "C" int FUN_100aa820(int index, int variant);
 extern "C" int FUN_100af1b0(int index);

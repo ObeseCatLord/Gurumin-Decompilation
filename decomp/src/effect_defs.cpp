@@ -4,7 +4,8 @@
 #include <string.h>
 
 #include "effect_manager.h"
-extern "C" int DAT_110186a8[32];
+#include "render_vars.h"
+
 extern "C" char DAT_1101de64;
 
 // Takes the first free effect definition, names it "未設定" ("not set"), gives it its defaults and clears the

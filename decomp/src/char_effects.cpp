@@ -9,7 +9,9 @@
 
 #include "effect_manager.h"
 
-extern "C" int DAT_10219770[0x80];  // effect handle of each character slot
+#include "char_tables.h"
+#include "char_vars.h"
+#include "render_vars.h"
 
 // Starts effect `effect` at `position` for character slot `index` and records its handle in that slot.
 extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame, const Matrix4 *matrix, const EffectOptions *options)
@@ -27,7 +29,6 @@ struct TriangleBatch
 };
 
 extern "C" TriangleBatch DAT_1101c804;
-extern "C" char DAT_10fc6a90[];
 // Stops every effect: rebinds the effect batch to its buffer, clears all effect tables and marks their slots free
 // (-1), and resets the six group offsets. The offset table has only five values in the original; the sixth group
 // gets whatever was on the stack (kept as is).
@@ -225,8 +226,6 @@ int EffectManager::ClearTables()
     return 0;
 }
 
-extern "C" char DAT_1101de68[0x114450];   // effect definitions with the data before them (cleared by Init)
-extern "C" int DAT_110186a8[32];
 extern "C" char DAT_1101de64;
 extern "C" int FUN_1016f900(void);        // adds the default effect definition (effect_defs.cpp)
 
@@ -286,7 +285,6 @@ int EffectManager::Init()
 }
 
 extern "C" struct Box2 DAT_10f668a8;                 // the visible area
-extern "C" float DAT_10f668c0;                       // its depth limit
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
 // Effect records whose slot is free must not be in a list: crash on purpose (fread on a null file).

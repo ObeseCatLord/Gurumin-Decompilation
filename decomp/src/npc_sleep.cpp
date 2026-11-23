@@ -22,12 +22,12 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
-extern "C" char DAT_10255a88[0x80];
+#include "char_tables.h"
+#include "char_vars.h"
+
 extern "C" float DAT_10255160[0x80][4];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" unsigned char DAT_102550e0[0x80];  // non-zero = wake at once (the character's level elsewhere)
-extern "C" int DAT_104c00e0;
 extern "C" int DAT_104bf8f8[0x7c];            // key prompt shown (app_0008.cpp)
 extern "C" int DAT_1021d138[0x7c];            // key prompt id
 extern "C" int DAT_1021f740[0x7c];            // key prompt frames left

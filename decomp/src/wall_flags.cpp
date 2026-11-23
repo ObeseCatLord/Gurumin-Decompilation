@@ -7,10 +7,8 @@
 #include "node.h"
 
 extern "C" Node *DAT_10255f08;
-extern "C" Vec4 DAT_118e69e8;
-extern "C" Vec4 DAT_118e6cb8;
-extern "C" int DAT_10c62ed0;
-extern "C" int DAT_10c63370;
+#include "char_vars.h"
+#include "map_vars.h"
 
 // Makes `wallName` solid while the player (position DAT_118e69e8, velocity DAT_118e6cb8) touches the probe
 // node `probeName`, and passable otherwise.

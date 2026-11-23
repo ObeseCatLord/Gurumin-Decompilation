@@ -1,7 +1,7 @@
 // Script flags 0x400, 0x418, 0x43c, 0x453 and 0x454 hold the settings of the map being entered; this table sets
 // them for each map number.
 
-extern "C" int DAT_10c62edc[0x1000];      // script flags
+#include "game_vars.h"
 
 // 0x10021380 (Map_SetEntryFlags). Sets script flags 0x400, 0x418, 0x43c, 0x453 and 0x454 for map `map`.
 // Returns 1, or 0 for a map without entry flags (only flag 0x454 is cleared then).

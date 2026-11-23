@@ -22,9 +22,8 @@ struct Engine
 };
 
 extern "C" MapEntry DAT_10210fc0[];
-extern "C" int DAT_10216dc4;            // number of map table entries
-extern "C" int DAT_1020c2c0;            // current map table entry
-extern "C" char DAT_101d65b0[][0x10];   // icon file names
+#include "ui_vars.h"
+
 extern "C" Engine DAT_10836c70;
 extern "C" int FUN_10161920(const char *name);                    // Texture_FindByName (mmv_texreg.cpp)
 extern "C" int FUN_1001e1a0(const char *name, const char *fallback);  // loads a texture, `fallback` if missing

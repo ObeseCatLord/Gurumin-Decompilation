@@ -12,7 +12,7 @@ Matrix4 IdentityMatrix();                           // 0x101b0ba0
 
 #include "anim_model.h"
 
-extern "C" Matrix4 DAT_118e69a8;
+#include "render_vars.h"
 
 // 0x10162420 (AnimModel_Teleport). Like SetPosition, but the root node drops its saved states and the second
 // matrix moves to (x, y, z) as well. Returns 0.

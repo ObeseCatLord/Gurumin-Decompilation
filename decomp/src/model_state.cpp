@@ -145,7 +145,7 @@ int Playback::BindModel(AnimModel *owner)
     return 1;
 }
 
-extern "C" int DAT_110175f8;  // number of motion blends started
+#include "render_vars.h"
 
 // 0x1016a2e0 (Playback::Play). Starts layer `layer` at `speed`. Nothing happens (returns 0) for an inactive or
 // out-of-range layer, or, unless `restart` is set, when the layer is already playing, being blended into or is the

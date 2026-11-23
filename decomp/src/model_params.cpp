@@ -14,15 +14,14 @@
 // 0x101ae060: transforms `point` by `matrix` and divides by w (projection to -1..1 screen space).
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);
 
-extern "C" int DAT_10ff19e8[0x100];   // per model: its collision data
+#include "char_vars.h"
+#include "render_vars.h"
 
 // Collision test of a model (world matrix) against another model: 0x10193140 (stdcall, recursive over nodes).
 extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, Node *other, int otherData, Vec4 *probe, int count,
                                       int *hitCount, int *hitIds, Vec4 *hits, int *hitOther, int mode, int a, int b,
                                       int c, int flags);
 
-extern "C" int DAT_11b002c0;    // collision filter of the current test (the model's collisionFilter)
-extern "C" char DAT_11b002c8;   // 1 while a model-against-world test runs
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
 int AnimModel::M_101627d0(float x, float y, int mode)

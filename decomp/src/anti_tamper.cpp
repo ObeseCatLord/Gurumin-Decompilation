@@ -9,12 +9,8 @@
 
 #include "char_slot.h"
 
-extern "C" int DAT_10c635f8;
-extern "C" int DAT_10c64ad4;
-extern "C" int DAT_10c64ad8;
-extern "C" int DAT_10c655f0;
-extern "C" int DAT_10c6670c;
-extern "C" int DAT_104684b0[115];
+#include "char_vars.h"
+#include "game_vars.h"
 
 // Disguised copy of `value` stored in guard slot `index`.
 #define GUARD_VALUE(index, value) (~(value) + (index) * 0x41)
@@ -36,7 +32,6 @@ extern "C" int FUN_1000e750(void)
 }
 
 extern "C" char DAT_103150c0[0x50];
-extern "C" int DAT_10c66144[15];
 
 // AntiTamper_StoreArrays: refreshes the copies of the 0x50 inventory counts (slots 10..89) and of 15 more
 // values (slots 100..114). Called after every inventory change.
@@ -51,10 +46,6 @@ extern "C" int FUN_1000e810(void)
 }
 
 extern "C" int DAT_104c0270[16];
-extern "C" int DAT_104c0344;
-extern "C" short DAT_104c034c;
-extern "C" int DAT_11b044f0;
-extern "C" unsigned int DAT_104bf890;
 
 // Penalty: writes a random value into a random entry of the 16-entry noise table.
 inline void TAMPER()

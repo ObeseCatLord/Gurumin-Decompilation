@@ -33,12 +33,8 @@ struct RoutePoint
 
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" RoutePoint DAT_10210fc0[][16];     // the routes of the map
-extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
-extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated
-extern "C" int DAT_10254598[0x80];
-extern "C" char DAT_1020d540[0x80];           // 1 = the character is in play
-extern "C" char DAT_1021b4c8[0x80];
-extern "C" char DAT_10256420[0x80];
+#include "char_tables.h"
+#include "world.h"
 extern "C" Vec4 DAT_10867e18[0x80];
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 extern "C" int FUN_1002f320(int walker, int route, int point, int *outPoint, float *position, int *outAction,

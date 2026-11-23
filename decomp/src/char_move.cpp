@@ -39,8 +39,9 @@ extern "C" int FUN_100241e0(int index, float x, float y, float z)
 
 #include "char_state.h"
 
-extern "C" int DAT_10210b30[0x80];
-extern "C" char DAT_10255a88[0x80];
+#include "char_tables.h"
+#include "char_vars.h"
+#include "world.h"
 extern "C" int FUN_1013f880(void);                                          // the game's random number
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 extern "C" int FUN_1000d620(int index, int key, int frames);                // KeyPrompt_Show
@@ -379,7 +380,6 @@ int FUN_100b5f80(int index)
     return 0;
 }
 
-extern "C" Vec4 DAT_118e6cb8;                 // camera target
 extern "C" int DAT_104bf8f8[0x7c];            // key prompt shown (app_0008.cpp)
 extern "C" int DAT_1021d138[0x7c];            // key prompt id
 extern "C" int DAT_1021f740[0x7c];            // key prompt frames left
@@ -620,7 +620,6 @@ extern "C" int FUN_100b1ff0(int index)
     return 0;
 }
 
-extern "C" char DAT_1021f3c0[0x80];           // slot kind of each character (',' = free marker, 'Q' = taken marker)
 
 // 0x100b6290 (Npc_RunToMarker). A messenger: on its first frame it claims the nearest free marker among characters
 // 0x5c..0x7b (kind ',' becomes 'Q'; with none it restarts with m_003c 1). It idles (motion 2) until it sees the
@@ -723,7 +722,6 @@ extern "C" int FUN_100b6290(int index)
     return 0;
 }
 
-extern "C" int DAT_11b002c0;                  // collision filter of the current test (a character's collisionFilter)
 
 // 0x100b23b0 (Npc_ChildFollow). A child that idles (motion 2) until it sees the player (within its talk id's line
 // * 10 units, 18 degrees either side or 150 units, walls ignored) or is told to react: it shows prompt 15, plays
@@ -969,9 +967,6 @@ int FUN_100b4f00(int index)
 
 #include "game.h"
 
-extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated
-extern "C" char DAT_10468730[0x80];
-extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
 extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a);   // ColourFade_Start
 
 // 0x100b4300 (Npc_RaiseAlarm). A lookout that idles (motion 2) until it sees the player (within the talk id's
@@ -1186,7 +1181,6 @@ extern "C" int FUN_100b4930(int index)
     return 0;
 }
 
-extern "C" Playback *DAT_1101d880;            // motion playback of the character being moved
 
 // 0x10098be0 (Enemy_ShoveAndBlast). An enemy that idles (motion 2) and now and then (3 in 100, at most every 100
 // frames) either attacks or starts walking (talk 2): walking it follows the player (motion 0, 5 units a frame)
@@ -1423,7 +1417,6 @@ extern "C" int FUN_1009d100(int index)
     return 0;
 }
 
-extern "C" Matrix4 DAT_10868838[0x80][6];     // saved node matrices of each character
 Matrix4 RotationY(float angle);               // 0x101b1bb0
 
 // 0x10048b70 (Char_SwingDoor). A door on a character slot: its model's root matrix is saved on the first frame and
@@ -1479,8 +1472,6 @@ int FUN_10048b70(int index)
     return 0;
 }
 
-extern "C" char DAT_1021f9c0[0x80];
-extern "C" short DAT_103153b0[0x80];
 extern "C" unsigned char DAT_102550e0[0x80];  // non-zero = wake at once (the character's level elsewhere)
 
 // 0x10048e90 (Enemy_DropIn). An enemy that drops in from above: on its first frame it is refilled if defeated and

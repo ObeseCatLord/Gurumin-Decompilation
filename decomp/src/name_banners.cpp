@@ -11,9 +11,8 @@ struct TextRenderer
 };
 
 extern "C" TextRenderer DAT_1020e538;   // the game's text renderer
-extern "C" char DAT_10210ae8[];         // first banner text (empty = none)
-extern "C" char DAT_1020e0f8[];         // second banner text (empty = none)
-extern "C" int DAT_104bf8d8;            // fade-in counter, 15 = fully visible
+#include "game_vars.h"
+#include "ui_vars.h"
 
 // 0x1000cc30 (Hud_DrawNameBanners). With a first text, it is drawn at the upper left (panel at (32, 10)) and a second
 // text next to it (panel at (310, 10)); with only the second text, that one is centred at the top (panel centred on

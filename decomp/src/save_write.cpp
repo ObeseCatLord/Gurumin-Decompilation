@@ -22,17 +22,13 @@ struct GameFile
 #include "texture_object.h"
 #include "char_slot.h"
 
-extern "C" int DAT_108360f8;                         // texture slot of the save thumbnail
-extern "C" char DAT_10256110[];                      // name of system.sav
+#include "char_vars.h"
+#include "game_vars.h"
+
 extern "C" char DAT_1042de28[0x60];                  // 1 for each item ever obtained (inventory.cpp)
-extern "C" int DAT_10c62ed0;                         // current map
 extern "C" int DAT_108029b8[4];                      // where the player starts (x, y, z, w)
-extern "C" int DAT_104bfd18;
-extern "C" int DAT_1049f200[0x6000];
-extern "C" int DAT_10c62edc[0x1000];                 // script flags
 extern "C" int DAT_103150c0[0x20];
 extern "C" int DAT_10202464[4];
-extern "C" int DAT_104c00dc;                         // play time
 extern "C" int FUN_101603c0(const char *name, int record, unsigned int *value);   // SystemSav_ReadRecord
 extern "C" int FUN_1015fea0(const char *name, int record, unsigned int value);    // SystemSav_WriteRecord
 extern "C" int FUN_10161120(char *out, const char *path);                         // Path_GetBaseName

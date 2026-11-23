@@ -17,8 +17,7 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..
 
 extern "C" int DAT_104bf8f8[0x7c];                   // 1 while a key prompt is shown over the character
 extern "C" int DAT_1021d138[0x7c];                   // the prompt: cell (0..15) + 1000 or 2000 for the other sheets
-extern "C" int DAT_104b721c[0x19];                   // Game texture slots from texBalloon5 (DAT_104b7200 + 0x1c)
-extern "C" int DAT_104bf88c;                         // the prompt's size in pixels
+#include "ui_vars.h"
 
 // 0x1000d6b0 (KeyPrompt_DrawAll). For every character with a prompt (and in use, not removed below x -100000) the
 // point 40 units above its head bone (or its origin without one, 20 units) is projected with `view` and the prompt

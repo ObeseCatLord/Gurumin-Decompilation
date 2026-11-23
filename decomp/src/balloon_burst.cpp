@@ -19,7 +19,8 @@ inline float Atan2(float y, float x)
     return (float)atan2(y, x);
 }
 
-extern "C" char DAT_1021f3c0[0x80];              // kind of each character slot ('B' = balloon)
+#include "char_tables.h"
+
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);  // Sound_PlayEffect
 
 // 0x100543a0 (Balloon_Blast). Lets every balloon that has not burst react to a blast at `blast`: it gets the

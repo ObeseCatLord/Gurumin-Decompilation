@@ -767,9 +767,10 @@ int ListBank::InitLibrary()
     return 0;
 }
 
-extern "C" int DAT_10c62edc[0x1000];                    // script flags
-extern "C" int DAT_1032d69c;                            // 1 once the game built-ins are registered
-extern "C" char DAT_101dc1fc[];                         // "ch" (copied as an array, not a literal)
+#include "char_vars.h"
+#include "game_vars.h"
+#include "script_vars.h"
+
 extern "C" void FUN_10017f20(int code, int value);      // the game's parser message callback
 extern "C" int FUN_10138280(ListBank *bank, int id);    // Script_GameBuiltin: runs the game built-ins
 

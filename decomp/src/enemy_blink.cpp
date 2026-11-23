@@ -33,7 +33,8 @@ struct CollisionWorld
 };
 
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" char DAT_1020d540[0x80];           // 1 = the character is in play
+#include "char_tables.h"
+
 extern "C" CollisionWorld *DAT_10255f08;
 extern "C" int FUN_1013f880(void);            // the game's random number
 extern "C" int FUN_10015860(Vec4 pos);        // Vis_IsVisible

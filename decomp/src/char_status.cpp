@@ -15,17 +15,12 @@ struct CharMatrixView
 };
 
 
-extern "C" short DAT_103153b4[];      // a per-character counter, at most 15
-extern "C" int DAT_10219778[];        // a per-character level, at most 5
-extern "C" unsigned char DAT_10315352[];   // a per-character flag, cleared every frame
-extern "C" unsigned char DAT_102550e2[];   // a per-character value; the larger of it and DAT_102550e0 is kept
+#include "char_tables.h"
+#include "char_vars.h"
+
 extern "C" unsigned char DAT_102550e0[];
-extern "C" char DAT_104686b2[];       // per-character mode (7 = the mode handled here)
-extern "C" unsigned char DAT_1020d4c2[];   // per-character count compared with 4
 extern "C" char DAT_1020d4c0[];       // per-character state written here (4 or 6)
 extern "C" CharMatrixView DAT_10db9210[];
-extern "C" Vec4 DAT_10836c74;         // reference position (in the engine object at 0x10836c70)
-extern "C" Vec4 DAT_10f08080[];       // each character's offset from the reference position
 extern "C" int DAT_104c00f8;          // non-zero = keep the offsets up to date
 
 // 0x1001a840 (Char_ClampStatus). Clamps the counter (15) and level (5), clears the flag and keeps the larger value. A character whose

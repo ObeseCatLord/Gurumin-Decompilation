@@ -29,61 +29,20 @@ struct LastPosition
 
 extern "C" void (*DAT_11b1ba40)(void *block);        // the engine's free
 extern "C" MapObject *DAT_104c03c0;
-extern "C" int DAT_102564a0;                         // number of map object records
+#include "camera_vars.h"
+#include "char_tables.h"
+#include "map_vars.h"
+#include "sound_vars.h"
+
 extern "C" void *DAT_104c0394;
-extern "C" Node *DAT_104c0390;                       // the model of the map's held object
-extern "C" Node *DAT_104c039c;
-extern "C" void *DAT_104c03a0;
-extern "C" int DAT_104c03a4;
-extern "C" Node *DAT_104c03a8;
 extern "C" int DAT_104c03ac;
-extern "C" int DAT_103086b0[0x80];
-extern "C" int DAT_1030b8f8[0x80];
-extern "C" int DAT_104483e8[0x80];
-extern "C" int DAT_10254598[0x80];
-extern "C" int DAT_104c0350;
 extern "C" int DAT_10255160[0x200];
-extern "C" Matrix4 DAT_10868838[0x80][6];
-extern "C" Vec4 DAT_104c4438[0x80];
-extern "C" int DAT_10453008[0x80];
 extern "C" int DAT_1021bdf8[0x80][9];
-extern "C" Vec4 DAT_10edbd58[8];
-extern "C" int DAT_104c0354;
-extern "C" Vec4 DAT_10866d98;
-extern "C" Vec4 DAT_10edbd48;
-extern "C" Vec4 DAT_104d29d8;
-extern "C" Vec4 DAT_10f08aa0;
-extern "C" int DAT_1049efd8[0x3c];
-extern "C" int DAT_10255960[3][12];
-extern "C" int DAT_103088d0[0xb64];
 extern "C" char DAT_1020da50[8][0x50];
-extern "C" int DAT_102028d4;
-extern "C" int DAT_104c038c;
-extern "C" Matrix4 DAT_10f08880[6];
-extern "C" int DAT_102108d0[6];
-extern "C" int DAT_10447310[10];
-extern "C" int DAT_1021a398[10];
 extern "C" Vec4 DAT_10867e18[0x80];
-extern "C" int DAT_1020e138[0x80];
-extern "C" int DAT_10253a58[0x80];
-extern "C" int DAT_1042dba8[0x80];
-extern "C" char DAT_1020d540[0x80];
-extern "C" char DAT_1021b4c8[0x80];
-extern "C" char DAT_10256420[0x80];
-extern "C" int DAT_10254390[0x80];
-extern "C" char DAT_1021f940[0x80];
-extern "C" int DAT_1021bbf8[0x5c];
-extern "C" int DAT_1042dea8[0x5c];
-extern "C" int DAT_1021b728[0x5c];
 extern "C" int DAT_10255f10[0x5c];
-extern "C" int DAT_102028dc;
-extern "C" int DAT_104c03b8;
-extern "C" int DAT_104c03bc;
 extern "C" int DAT_102199b8[0x5c];
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" int DAT_102028c8;                         // texture slots held by the map (-1 = none)
-extern "C" int DAT_102028cc;
-extern "C" int DAT_1021d018[0x28];
 extern "C" int DAT_10446e00[0x28];
 extern "C" int FUN_10174c70(int slot, int force);    // Texture_Release
 

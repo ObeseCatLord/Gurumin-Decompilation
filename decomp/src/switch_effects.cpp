@@ -21,8 +21,8 @@ extern "C" SwitchObject *DAT_1030bbf8[0x80];     // object of each used hold slo
 extern "C" int DAT_10255b08[0x80];               // holder of each slot
 extern "C" int DAT_10219fc0[0x80];               // effect kind of each slot (0, 1 or 2)
 extern "C" int DAT_1042e0a8[0x80];               // 1 once the slot's effect was started
-extern "C" unsigned int DAT_104bf890;            // frame counter
-extern "C" Vec4 DAT_118e6cb8;                    // camera target
+#include "char_vars.h"
+
 extern "C" int FUN_10015860(Vec4 position);      // Vis_IsVisible
 extern "C" int FUN_10057b90(int holder);         // Switch_Release
 

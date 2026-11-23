@@ -12,8 +12,9 @@
 
 #include "node.h"
 
-extern "C" char DAT_11b04514;            // non-zero = only the enabled collision regions are drawn
-extern "C" char DAT_11affdd8[100];       // per collision region "CDLnn": 1 = enabled
+#include "map_vars.h"
+#include "render_vars.h"
+
 extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin);   // View_ContainsPoint
 
 // 0x101995a0 (Node::Draw). Draws this node unless its subtree is skipped (flag 0x8000) or it is a collision region

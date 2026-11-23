@@ -5,8 +5,8 @@
 #include <windows.h>
 #include <stdio.h>
 
-extern "C" int DAT_1020aee4;
-extern "C" char DAT_1020ade0[];
+#include "sound_vars.h"
+
 extern "C" HWND FUN_10001570(void);
 
 // Command 0x230 with two arguments.

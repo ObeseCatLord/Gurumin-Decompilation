@@ -12,28 +12,12 @@
 
 #include "node.h"
 
-extern "C" int DAT_10c62edc[0x1000];                 // script flags
-extern "C" int DAT_10c62ed0;                         // current map
-extern "C" char DAT_1021f3fa[0x42];
-extern "C" int DAT_102549a8[0x42];
-extern "C" int DAT_104c0354;
-extern "C" Node *DAT_104c0390;                       // the model of the map's held object
+#include "char_vars.h"
+#include "game_vars.h"
+#include "map_vars.h"
+
 extern "C" void (*DAT_11b1ba40)(void *block);        // the engine's free
-extern "C" int DAT_1021a370[10];
-extern "C" int DAT_1020dcd0[10];
-extern "C" int DAT_104c03b4;
-extern "C" int DAT_104c0364;
-extern "C" int DAT_104c0368;
-extern "C" int DAT_104c036c;
-extern "C" int DAT_104c0370;
-extern "C" int DAT_102028c8;
-extern "C" int DAT_102028d0;
-extern "C" int DAT_10c62250[0x100];
-extern "C" int DAT_10c62650[0x200];
-extern "C" short DAT_104c0398;
-extern "C" int DAT_104c00b8;
 extern "C" char DAT_103150c0[0x80];
-extern "C" int DAT_1021d018[0x28];
 extern "C" int DAT_10446e00[0x28];
 
 extern "C" int FUN_1013fb10(int active, int target, int frames);

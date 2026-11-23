@@ -1,11 +1,7 @@
 // Drawing of the Japanese IME composition string (name entry and text input).
 
-extern "C" int DAT_10f67000;
-extern "C" int DAT_10f66bc4;
-extern "C" int DAT_10f6699c;
-extern "C" char DAT_10f66cd0[];
-extern "C" char DAT_10f68008[];
-extern "C" char DAT_10f66ab8[];
+#include "ui_vars.h"
+
 extern "C" int __stdcall FUN_1014fdd0(int x, int y, const char *text, int a, int b, int c, int d, int colour, int flags, float scaleX, float scaleY);
 
 // Ime_DrawComposition: draws the text before the cursor, the clause being converted (selected or composing

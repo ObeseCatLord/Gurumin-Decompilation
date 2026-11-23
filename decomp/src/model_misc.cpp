@@ -76,8 +76,7 @@ struct MeshRef
     int index;
 };
 
-extern "C" int DAT_10feb3e0[0xc80];
-extern "C" char DAT_10fada90[0xc80][0x20];
+#include "render_vars.h"
 
 // Sets the model's blend value; any non-zero value selects blend mode 0x17, zero turns blending off.
 int ModelObject::M_10162f20(int value)

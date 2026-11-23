@@ -11,7 +11,7 @@
 
 #include "char_state.h"
 
-extern "C" int DAT_10c6351c;             // the character being talked to
+#include "char_vars.h"
 
 // atan2 on floats (an inline helper: both arguments are rounded to float first, the second one first).
 inline float Atan2(float y, float x)

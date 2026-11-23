@@ -21,7 +21,7 @@ extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, 
 #include "anim_model.h"
 #include "char_state.h"
 
-extern "C" char DAT_1021f6c0[0x80];
+#include "char_tables.h"
 
 extern "C" int FUN_1013f880(void);  // the game's random number
 

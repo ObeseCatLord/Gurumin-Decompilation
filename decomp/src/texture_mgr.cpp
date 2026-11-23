@@ -63,9 +63,8 @@ struct Animator
 
 #include "mesh.h"
 
-extern "C" char DAT_10ffe5f8[1600][0x40];
-extern "C" char DAT_10f8dbb8[1600][0x40];
-extern "C" char DAT_10fa6db8[1600];
+#include "render_vars.h"
+
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" int FUN_10174c70(int slot, int force);
 
@@ -192,7 +191,6 @@ extern "C" void __stdcall FUN_101911b0(VertexPack *packs, int count)
     }
 }
 
-extern "C" int DAT_10ff1dec;
 
 // Queues `count` vertices for texture `id`, flushing first when the texture changes or the buffer is full.
 int Selection::M_10188eb0(int id, int a, int count)
@@ -218,7 +216,6 @@ int Selection::AddQuad(int id, float x0, float y0, float z0, float u0, float v0,
     M_10172cb0(x0, y0, z0, u0, v0, x1, y1, z1, u1, v1, x2, y2, u2, v2, colour, a, b);
     return 0;
 }
-extern "C" char DAT_10fdeb90[1600];  // reference count per texture slot
 
 // Releases one reference to texture slot `slot`. The texture is unloaded (and its name cleared, freeing the slot)
 // when the count reaches zero or when `force` is set. Returns the remaining count, or -1 for an unused slot.
@@ -236,7 +233,6 @@ extern "C" int FUN_10174c70(int slot, int force)
     return DAT_10fdeb90[slot];
 }
 
-extern "C" char DAT_11b04508;  // set while an important model changes motion (read by the playback code)
 
 // Starts motion `motion` on this model (0x1017b0e0, CharModel::M_1017b0e0 in other files): creates the playback
 // object on first use, then hands the request to it. `a`/`b` are the playback options (loop mode, blend frames).

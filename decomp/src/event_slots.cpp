@@ -2,7 +2,8 @@
 // DAT_10447fd8 = event id, DAT_1021f640 = a flag byte). The scripts add events; a per-frame update elsewhere runs
 // them. The search loops are unrolled by 8 by the compiler (the plain `for` below gives exactly that).
 
-extern "C" int DAT_1020d660[0x60];
+#include "script_vars.h"
+
 extern "C" int DAT_104463f8[0x60];
 extern "C" int DAT_10468230[0x60];
 extern "C" int DAT_10447fd8[0x60];

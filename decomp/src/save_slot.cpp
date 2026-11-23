@@ -23,7 +23,9 @@ struct GameFile
 
 #include "vec4.h"
 
-extern "C" char DAT_10f60590[];  // save directory prefix, e.g. "SaveData\\"
+#include "char_vars.h"
+#include "game_vars.h"
+
 int FUN_1003b2c0(const char *path, int mode);
 
 // Save_LoadSlot: loads save file `name` from the save folder through Save_Load (0x1003b2c0).
@@ -113,18 +115,9 @@ int FUN_10011240(const char *name, void *thumbnail)
 #include "anim_model.h"
 #include "char_slot.h"
 
-extern "C" int DAT_10c62edc[0x1000];             // script flags
 extern "C" int DAT_103150c0[0x20];
 extern "C" int DAT_10202464[4];
-extern "C" int DAT_1049f200[0x6000];
-extern "C" int DAT_104bfd18;
-extern "C" int DAT_104c00dc;                     // play time
-extern "C" int DAT_1030b660;                     // map to enter
-extern "C" int DAT_10c62ed0;                     // current map
 extern "C" float DAT_108029b8;                   // where the player starts (x, y, z)
-extern "C" float DAT_108029bc;
-extern "C" float DAT_108029c0;
-extern "C" int DAT_104bfd50;
 extern "C" int FUN_1013e6f0(int a, const char *text, const char *name);
 extern "C" int FUN_100154c0(int value);
 extern "C" void FUN_10015910(void);

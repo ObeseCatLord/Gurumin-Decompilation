@@ -11,12 +11,8 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-extern "C" int DAT_10c62ed0;                  // current map
-extern "C" int DAT_10c6351c;                  // the character being talked to
-extern "C" int DAT_10de6e80;                  // character 20's frame counter (CharState of character 0x5d)
-extern "C" Vec4 DAT_10803118;                 // character 20's resting place
-extern "C" int DAT_10c6564c;
-extern "C" int DAT_10c65648;
+#include "char_vars.h"
+
 extern "C" int FUN_100e1c40(int index);                // Enemy_IsBusy
 extern "C" int FUN_10028360(int index, int a);         // Enemy_TurnToPlayer
 extern "C" int FUN_10027560(int index);                // Enemy_IdleMotion

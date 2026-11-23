@@ -23,19 +23,14 @@ struct Engine
 #include "anim_model.h"
 
 extern "C" Engine DAT_10836c70;
-extern "C" int DAT_1030b668[0x80];            // base kind of each character
-extern "C" int DAT_10c64ad8;                  // the player's stamina gauge
+#include "char_tables.h"
+#include "char_vars.h"
+#include "map_vars.h"
+
 extern "C" void FUN_1000e750(void);           // AntiTamper_Store
 extern "C" Node *DAT_10446e00[];
-extern "C" int DAT_1042db08[];
-extern "C" int DAT_1021d018[];
-extern "C" int DAT_10254798[];
 extern "C" int DAT_104bf8a4;
 extern "C" Node *DAT_10255f08;               // the map's root node
-extern "C" char DAT_1020da24[];
-extern "C" float DAT_1030cd98[];              // their radius
-extern "C" Vec4 DAT_10da9160[];               // their velocity
-extern "C" char DAT_102194c8[];
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
 extern "C" int FUN_1013f880(void);            // the game's random number
 extern "C" int FUN_1001af10(int index);       // Shaga_PushOut

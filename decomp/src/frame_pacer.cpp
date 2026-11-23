@@ -4,20 +4,12 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-extern "C" int DAT_10f654f0;      // 1 = wait with Sleep and run one step per frame (smooth mode)
-extern "C" int DAT_10202b08;      // debug keys enabled
+#include "render_vars.h"
+
 extern "C" int DAT_10f654d8;      // next deadline (timeGetTime milliseconds)
 extern "C" unsigned int DAT_10f65508;  // 60 Hz steps so far; every second one is an engine tick
-extern "C" int DAT_10f65504;      // engine ticks so far
-extern "C" int DAT_10f654c0;      // counts down by one per tick
 // Frame blend (after-image) strength (engine_1013e.cpp).
-extern "C" float DAT_10f6549c;    // current strength
-extern "C" float DAT_10f1fcf8;    // step per tick
-extern "C" float DAT_10f628d0;    // limit
-extern "C" int DAT_10f65498;      // 1 while the frame blend is active
-extern "C" int DAT_10f654dc;      // frames since the rate was last measured
 extern "C" DWORD DAT_10f654e0;    // time of the last measurement
-extern "C" float DAT_10f654e8;    // measured frames per second
 extern "C" void *DAT_10f6550c;    // texture bound to stage 0 (texture_bind.cpp)
 extern "C" void FUN_1013f9a0(void);   // ColourFades_Step
 extern "C" void FUN_10147a00(void);   // TextureSlots_Age

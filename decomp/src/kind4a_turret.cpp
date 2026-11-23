@@ -13,7 +13,8 @@
 
 #include "char_slot.h"
 
-extern "C" char DAT_10255a88[0x80];
+#include "char_tables.h"
+
 extern "C" char DAT_102550e0[0x80];              // 1 = the character was hit (attack at once)
 extern "C" int FUN_1013f880(void);               // the game's random number
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound

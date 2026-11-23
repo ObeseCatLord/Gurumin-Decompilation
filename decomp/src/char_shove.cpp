@@ -12,7 +12,8 @@
 
 #include "char_state.h"
 
-extern "C" Vec4 DAT_10802ac8;     // where the player's head looks
+#include "char_vars.h"
+
 extern "C" int FUN_100165e0(int mode);   // starts (1) or ends head tracking
 
 // 0x1002ee70 (Char_UpdateShoves). Runs the four shoves of slot `slot`: a look target points the player's head 75

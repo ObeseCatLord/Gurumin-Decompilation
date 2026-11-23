@@ -7,7 +7,7 @@
 
 #include "node.h"
 
-extern "C" Node *DAT_10db91dc;  // the player's head node (character 0, field 0x2304)
+#include "char_vars.h"
 
 // mode 1: starts head tracking, limited to +-1.22 rad around x, +-0.27 around y and +-0.17 around z;
 // mode 0: lets the head return to rest; mode -5: removes the tracking block. Returns 0.
@@ -46,10 +46,7 @@ extern "C" int FUN_100165e0(int mode)
 
 #include "matrix4.h"
 
-extern "C" Vec4 DAT_10802ac8;          // where the player's head looks
-extern "C" int DAT_10c6358c;           // look-around step: 0..9 = one side, -1..-9 = the other side
 extern "C" Matrix4 DAT_10db9210;    // the player's world matrix (character 0)
-extern "C" float DAT_10db9364;         // the player's heading (character 0)
 
 // 0x10019210 (Player_LookAround). Moves the head-look target to a point 1000 units to one side of the player and
 // 500 units up, switching sides every ten calls, and (re)starts head tracking. Returns 0.

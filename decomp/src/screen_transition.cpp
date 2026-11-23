@@ -3,15 +3,9 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-extern "C" int DAT_10203344;
-extern "C" int DAT_10f65498;
-extern "C" int DAT_10f65490;
-extern "C" int DAT_10f65494;
-extern "C" int DAT_10f654c0;
-extern "C" int DAT_10f654c4;
-extern "C" char DAT_10f65500;
+#include "render_vars.h"
+
 extern "C" DWORD DAT_10f654d8;
-extern "C" int DAT_10f65484;
 extern "C" int FUN_1013ed20(void);
 extern "C" int FUN_1013ed60(void);
 extern "C" int FUN_101439e0(void);

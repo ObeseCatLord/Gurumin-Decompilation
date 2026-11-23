@@ -8,6 +8,8 @@
 #include "node_data.h"
 
 #include "node.h"
+#include "game_vars.h"
+#include "ui_vars.h"
 
 // A camera point of the map (0x100 bytes): the frame of the camera path at which it lies and its movie.
 struct CameraPoint
@@ -26,17 +28,8 @@ struct MmvPlayer
     int M_10160960(TextureObject *texture);          // renders the current frame into `texture`
 };
 
-extern "C" Matrix4 DAT_1086df38;                     // the player's world matrix
 extern "C" Node *DAT_104c03ac;                       // the camera path node
 extern "C" CameraPoint DAT_10210fc4[];
-extern "C" int DAT_10216dc4;                         // number of camera points
-extern "C" int DAT_1020c2c0;                         // the chosen camera point
-extern "C" int DAT_1020c2d0;                         // the movie playing
-extern "C" int DAT_104bfe70;                         // frames of the movie decoded so far (0x30 = all)
-extern "C" char DAT_10875e48[0x40][0x20];            // movie names
-extern "C" int DAT_1020b228;
-extern "C" int DAT_10c64a5c;
-extern "C" int DAT_10202478;                         // the movie texture slot
 extern "C" MmvPlayer DAT_10f08ab0;
 extern "C" int FUN_10016580(const char *name);       // Movie_PlayToTexture
 extern "C" int FUN_1001e240(void);                   // Map_IconTexture

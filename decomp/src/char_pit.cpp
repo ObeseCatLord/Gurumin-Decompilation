@@ -9,12 +9,12 @@
 #include "char_state.h"
 #include "char_slot.h"
 
-extern "C" char DAT_1021f9c0[0x80];
+#include "char_tables.h"
+#include "char_vars.h"
+#include "map_vars.h"
+
 extern "C" Vec4 DAT_10867e18[0x80];
-extern "C" int DAT_104bfe28;                         // non-zero when the map has a pit
 extern "C" float DAT_104bfe24;                       // the pit's floor height
-extern "C" Vec4 DAT_104d29e8;                        // the pit area: minimum corner
-extern "C" Vec4 DAT_104d29f8;                        // maximum corner
 extern "C" int FUN_100241e0(int index, float x, float y, float z);   // Character_SetMove
 #include <math.h>
 

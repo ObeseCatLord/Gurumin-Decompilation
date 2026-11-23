@@ -22,7 +22,7 @@ extern "C" TriangleBatch DAT_1021cffc;
 extern "C" Vec4 DAT_104c0438[DROP_COUNT];          // drop positions
 extern "C" unsigned char DAT_10254c40[DROP_COUNT]; // 0 = unused, 1 = falling, 2..30 = fading out
 extern "C" Matrix4 DAT_108392d8;                   // the current view-projection matrix
-extern "C" float DAT_118e6cc0;                     // the height the drops land at
+#include "char_vars.h"
 
 // 0x1000c390 (Drops_Update). Moves every drop (x and y by 0.02, down by 3.5), draws it when its depth is between 0.9
 // and 1.0 (larger when nearer, fading with its state) and advances its state: a falling drop starts fading once it is

@@ -16,12 +16,10 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-extern "C" int DAT_102548c0[0x80];                   // script code of each character (pairs of decimal digits)
-extern "C" int DAT_1030b668[0x80];                   // base kind of each character (-1 or 0 = none)
-extern "C" int DAT_1020b230[0x80];                   // kind variant (the kind's ten-thousands)
+#include "char_tables.h"
+
 extern "C" int DAT_10255160[0x80][4];
 extern "C" int DAT_1021bdf8[0x80][9];
-extern "C" char DAT_10255a88[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 
 // 0x1001b0a0 (Char_SelectKind). Sets the kind of character `index` from its script code: the millions pair picks a

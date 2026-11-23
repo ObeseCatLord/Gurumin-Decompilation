@@ -31,8 +31,9 @@ struct FadeOwner
     unsigned char brightness; // 0x1899
 };
 
-extern "C" Matrix4 DAT_1086df38;        // viewer matrix
-extern "C" int DAT_104c03b0;            // number of fading nodes
+#include "render_vars.h"
+#include "ui_vars.h"
+
 extern "C" FadeNode *DAT_1021a1e0[];    // the nodes
 extern "C" FadeOwner *DAT_10254ac0[];   // owner of each node (0 = none)
 

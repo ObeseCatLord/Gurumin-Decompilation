@@ -10,7 +10,7 @@
 
 Matrix4 IdentityMatrix();                           // 0x101b0ba0
 
-extern "C" char DAT_11b07118[];                     // default target object of saved-matrix state 0x400000
+#include "render_vars.h"
 
 #include "node.h"
 

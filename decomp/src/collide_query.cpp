@@ -111,9 +111,8 @@ struct SlotVector
 
 extern "C" unsigned short DAT_104c0380;  // frame counter
 extern "C" SlotVector DAT_10802bf8[0x80];
-extern "C" Vec4 DAT_10864cf8[0x80];      // ground point found below each slot
-extern "C" char DAT_10467920[0x80];      // 1 = no ground found below the slot
-extern "C" int DAT_11b002c0;             // collision filter of the current test (a character's nearCells)
+#include "char_tables.h"
+#include "char_vars.h"
 
 // 0x1001a450 (Slot_HasNoGround). Every tenth frame (spread over the slots by slot number) casts a ray at the point
 // 15 units along slot `slot`'s vector from `point`, from 300 below to 50 above it, against the world collision

@@ -6,10 +6,10 @@
 
 #include "texture_object.h"
 
-extern "C" int DAT_104bf8ec;                     // fade kind (see above)
+#include "render_vars.h"
+#include "sound_vars.h"
+
 extern "C" float DAT_104bf8f0;                   // fade amount, 0-100
-extern "C" int DAT_104c02e0;                     // colour of fade kind 3
-extern "C" int DAT_104b7224;                     // texture slot of the iris wipe
 extern "C" void FUN_10143e00(int left, int top, int right, int bottom, int colour, int mode, float alpha);  // fills a rectangle
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 

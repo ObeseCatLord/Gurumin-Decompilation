@@ -8,10 +8,10 @@
 
 #include "texture_object.h"
 
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;      // the Direct3D device
+#include "render_vars.h"
+
 extern "C" TextureObject *DAT_10f6550c;         // texture bound to stage 0 (1 = none/unknown)
 extern "C" TextureObject *DAT_10f65510;         // texture bound to stage 1 (1 = none/unknown)
-extern "C" int DAT_10f141d4;                    // number of texture switches this frame (statistics)
 extern "C" void *FUN_10148590(int poolIndex, IUnknownLike *texture, int width, int height, int slot);
 extern "C" int FUN_10148520(int poolIndex, int width, int height);
 extern "C" int FUN_101484b0(int poolIndex, int width, int height);  // drops the pooled copy (buffer_pool.cpp)
@@ -231,7 +231,6 @@ int TextureObject::CaptureRgbRows(unsigned char *out)
 extern "C" void FUN_1013ef30(int state, int value);                   // Render_SetRenderState (cached)
 extern "C" void FUN_1013ef90(int stage, int type, int value);         // Render_SetTextureStageState (cached)
 extern "C" void FUN_10143b80(void);                                   // Render_UnbindTexture1
-extern "C" int DAT_10f0d5c8;                                          // draw calls this frame (statistics)
 
 // 0x1014bb70. Draws `triangles` triangles from `vertices` (FVF 0x1c4: position, diffuse colour, one texture
 // coordinate; 0x20 bytes per vertex) with this texture on stage 0: texture times vertex colour for both colour and
@@ -260,8 +259,6 @@ int TextureObject::DrawTriangles(const void *vertices, int triangles)
     return 1;
 }
 
-extern "C" int DAT_10202b34;  // back-buffer width
-extern "C" int DAT_10202b38;  // back-buffer height
 
 // Pre-transformed vertex (FVF 0x1c4), 0x20 bytes.
 struct ScreenVertex
@@ -355,9 +352,6 @@ int TextureObject::CaptureRgbFirst(unsigned char *out)
     return 1;
 }
 
-extern "C" int DAT_10f6548c;
-extern "C" int DAT_10f654cc;              // non-zero when off-screen render targets are supported
-extern "C" int DAT_10f65478;              // non-zero while an off-screen target is set up
 extern "C" int FUN_10148410(void);   // BufferPool_Alloc
 
 // 0x1014f1f0 (TextureObject::Upload). (Re)creates this texture at width x height and forgets it as a bound texture.
@@ -459,16 +453,7 @@ int TextureObject::Upload(int width, int height, unsigned char *pixels, const un
     return 1;
 }
 
-extern "C" int DAT_10202b24;              // back-buffer width
-extern "C" int DAT_10202b28;              // back-buffer height
 extern "C" void *DAT_10f08d38;            // depth buffer for off-screen targets
-extern "C" void *DAT_10f60d30;            // saved render target
-extern "C" void *DAT_10f0d540;            // saved depth buffer
-extern "C" D3DVIEWPORT9_ DAT_10f1fd30;    // the full-screen viewport
-extern "C" D3DVIEWPORT9_ DAT_10f1fd48;    // the off-screen viewport
-extern "C" D3DVIEWPORT9_ DAT_10f0ece0;    // saved viewport
-extern "C" int DAT_10f65470;              // saved width
-extern "C" int DAT_10f65474;              // saved height
 
 // 0x10143870. Makes this texture's surface the render target (with the off-screen depth buffer) for drawing into
 // it: the textures of stages 0..3 are unbound and the viewport covers offset..width, offset..height (clamped to the
@@ -559,8 +544,6 @@ struct PanelVertex
 
 extern "C" void FUN_10143b50(void);                                   // Render_UnbindTexture0
 
-extern "C" int DAT_10202b24;  // back-buffer width set at device creation
-extern "C" int DAT_10202b28;  // back-buffer height
 
 // 0x1014b750 (TextureObject::DrawScreenCopy). Draws this whole texture into the rectangle left..right, top..bottom
 // (640x480 screen coordinates, scaled to the back buffer) as a two-triangle strip, with counter-clockwise culling.
@@ -639,8 +622,6 @@ struct ShaderVertex
     float u3, v3;
 };
 
-extern "C" float DAT_10202b18;  // size of the square crossfade targets
-extern "C" void *DAT_10f1fd0c;  // the crossfade pixel shader
 
 // 0x10144320 (TextureObject::DrawThroughShader). Binds this texture to stage 0, `second` to stage 1 and `third` to
 // stage 2 and draws the whole back buffer as one quad through the crossfade pixel shader. The four texture
@@ -703,7 +684,6 @@ int TextureObject::DrawThroughShader(TextureObject *second, TextureObject *third
 }
 
 extern "C" void *DAT_10f1fd28[2];      // textures of the two swap targets
-extern "C" int DAT_10f65490;           // swap target in use (0 or 1)
 
 // 0x10149100 (SwapTarget_DrawPreview). Draws the swap target in use as a 256x256 quad at the top left of the screen
 // (the part of the square target the size of the back buffer), stages 1 to 3 off. Returns 1.

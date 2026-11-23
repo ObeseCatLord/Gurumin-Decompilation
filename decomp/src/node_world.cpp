@@ -20,8 +20,7 @@ struct Channel
 
 #include "node.h"
 
-extern "C" int DAT_11b044ec;     // non-zero = the plugs do not give the frame
-extern "C" float DAT_11b044f8;   // the value the frame-giving plugs are sampled at
+#include "render_vars.h"
 
 // 0x10194c60 (Node::UpdateWorld). Sets this node's world matrix to its matrix for `frame` times `parent`, then does
 // the same for every child with the new world matrix. The frame comes from `frameSource` when there is one, or from

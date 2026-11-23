@@ -63,26 +63,9 @@ inline void Node::RestoreSavedMatrix()
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" void (*DAT_11b1ba40)(void *);
-extern "C" char DAT_11b07118[];
-extern "C" int DAT_11b002c0;
-extern "C" int DAT_11b044e0;
-extern "C" int DAT_11b044e4;
-extern "C" int DAT_11b044e8;
-extern "C" int DAT_11b044ec;
-extern "C" int DAT_11b044f4;
-extern "C" int DAT_10203474;
-extern "C" float DAT_11b044f8;  // radius of the current proximity pass (used by M_10194f40)
-extern "C" int DAT_11b04500;
-extern "C" int DAT_10203478;
-extern "C" int DAT_11b04504;
-extern "C" int DAT_1020347c;
-extern "C" char DAT_11b04508;
-extern "C" int DAT_11b0450c;
-extern "C" int DAT_11b04510;
-extern "C" char DAT_11b04514;
-extern "C" int DAT_11b002b8;
-extern "C" int DAT_11b044dc;
-extern "C" int DAT_11b044d0;
+#include "char_vars.h"
+#include "render_vars.h"
+
 extern "C" int DAT_11b002d0[0x80];
 
 // Frees the index buffers of `count` index lists.
@@ -1343,10 +1326,6 @@ int Node::Rename(const char *newName, const char *oldName)
     return 1;
 }
 
-extern "C" int DAT_10feb3e0[];   // per mesh buffer slot: 1 = owned by a single node
-extern "C" int DAT_10fee5e0[];
-extern "C" int DAT_10ff2ff8[];
-extern "C" int DAT_10fe01d8[];
 
 // 0x10191280. Frees the pack and index data of every node in this subtree whose mesh buffer is not shared (its slot
 // in DAT_10feb3e0 is 1), and resets the slot. Nodes are skipped when their name (after a "CDL..." or "OvF..." prefix
@@ -1510,7 +1489,6 @@ int Node::M_1019eeb0(Node *root, Node **list, int *count)
     return 1;
 }
 
-extern "C" MeshData *DAT_10fa7478[];                 // per mesh buffer slot: the mesh
 extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);   // the engine's memcpy
 extern "C" int FUN_10169840(const char *folder, const char *name, int *freeSlot);  // ModelNames_Find: slot of folder+name, -1 = none (a free slot in *freeSlot)
 extern "C" int FUN_10169760(void);                   // ModelNames_FindFree
@@ -1651,8 +1629,6 @@ int Node::BlendFrames(int from, int to, float t)
 }
 
 extern "C" TextureRef *DAT_10fdf1d0[];                // per motion cache slot: the reference
-extern "C" Matrix4 *DAT_1101c820[];                    //   the frame matrices
-extern "C" int DAT_11017600[];                        //   the number of frames
 extern "C" int FUN_10169ab0(const char *folder, const char *name, int *freeSlot);  // motion name slot, -1 = none
 extern "C" int FUN_101699d0(void);                   // a free motion name slot
 extern "C" int FUN_101699f0(int slot, const char *folder, const char *name);       // names a motion slot

@@ -16,21 +16,16 @@ struct TextureManager
 #define D3DERR_DEVICELOST ((long)0x88760868)
 #define D3DERR_DEVICENOTRESET ((long)0x88760869)
 
-extern "C" int DAT_10f6552c;                  // 1 once WM_QUIT was received
-extern "C" int DAT_10f65530;                  // 1 while the game window is active
-extern "C" int DAT_10f656a0;                  // 1 = keep running while inactive
+#include "render_vars.h"
+
 extern "C" int DAT_10f6550c;                  // texture bound to stage 0 (0 = forget the binding)
-extern "C" char DAT_10f0ff84[];               // the D3DPRESENT_PARAMETERS used for Reset
 extern "C" int FUN_101734d0(void);            // Texture_OnLostDevice: releases every registered texture
 extern "C" int FUN_10173510(void);            // Texture_OnResetDevice: recreates them
 extern "C" int FUN_1013ed20(void);            // Render_BeginScene
 
 extern "C" HWND DAT_10f6569c;                 // the game window
-extern "C" char DAT_10f65754[];               // its window class name
 extern "C" HINSTANCE DAT_10f140c8;            // the module instance
-extern "C" IDirect3DDevice9 *DAT_10f1fcf0;    // the Direct3D device
 extern "C" IUnknownLike *DAT_10f141dc;
-extern "C" IUnknownLike *DAT_10f141d8;        // the IDirect3D9 object
 extern "C" int FUN_101483a0(void);            // BufferPool_ReleaseAll (texcache.cpp)
 extern "C" int FUN_10148280(void);            // releases the four buffer pools
 extern "C" void FUN_101b22b0(void);

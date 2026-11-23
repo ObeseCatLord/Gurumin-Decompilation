@@ -9,13 +9,9 @@ struct TextRenderer
 };
 
 extern "C" TextRenderer DAT_1020e538;   // the game's text renderer
-extern "C" int DAT_1020c330;            // panel state, 0 = hidden; the text shows in states 8..22
-extern "C" char DAT_1020dc80;           // when 4 or more, the last line is yellow
+#include "ui_vars.h"
+
 extern "C" char DAT_1020da50[];         // the five text lines
-extern "C" char DAT_1020daa0[];
-extern "C" char DAT_1020db40[];
-extern "C" char DAT_1020db90[];
-extern "C" char DAT_1020dbe0[];
 extern "C" void FUN_1013f070(int mode, int a, int b);  // sets the 2D blend mode
 
 // 0x1001e340. Draws the panel at (460, 295), 184x140, at 85 % of `alpha`, and in states 8..22 (once `alpha` is at

@@ -7,7 +7,7 @@
 
 #include "node.h"
 
-extern "C" int DAT_11b04510;  // non-zero = also test the nodes marked in m_0704
+#include "render_vars.h"
 
 // 0x10193060. 1 when the bounding spheres `boundsA` and `boundsB` (centre x/y/z, radius w), each moved by its offset,
 // are closer than 0.578 times the sum of their radii (about 1/sqrt(3), so the spheres must overlap well). The

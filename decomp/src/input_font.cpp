@@ -15,7 +15,8 @@ struct FontSet
 };
 
 extern "C" DirectInput *DAT_10f65578;     // the force-feedback effect (an InputEffect while it exists)
-extern "C" int DAT_10f65564;            // non-zero when force feedback is enabled
+#include "ui_vars.h"
+
 extern "C" void (*DAT_11b1ba40)(void *);
 
 // Starts the force-feedback effect once for `milliseconds` ms with magnitude 10000 / divisor (divisors below 1

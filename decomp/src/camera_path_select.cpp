@@ -18,14 +18,9 @@ struct CameraTarget
     Matrix4 world;                                   // 0x2328
 };
 
-extern "C" int DAT_1101d89c;                         // number of camera paths
-extern "C" int DAT_10f8d938[];                       // id of each path
-extern "C" KeyTrack DAT_118e69f8[];                  // the position track of each path
-extern "C" int DAT_1101d8a4;                         // the current path
-extern "C" int DAT_1101d890;                         // 1 while a path camera runs
-extern "C" int DAT_1101d8a0;
+#include "camera_vars.h"
+
 extern "C" float DAT_1101c800;                       // frame of the path
-extern "C" char DAT_10faa678;
 extern "C" CameraTarget *DAT_1101d884;               // the model the camera follows
 
 extern "C" int FUN_1015c9e0(int mode);               // Screen_StartTransition
@@ -96,12 +91,6 @@ struct PathSettings
     int m_000c;
 };
 
-extern "C" KeyTrack DAT_11af3928[];                  // per path: the camera position track
-extern "C" KeyTrack DAT_11af3ba8[];                  //   the second target track
-extern "C" KeyTrack DAT_118e96f8[];                  //   the "...b" node's track
-extern "C" int DAT_11018740[];                       //   1 = active
-extern "C" int DAT_11018628[];                       //   1 = has a second target
-extern "C" int DAT_10fdeb10[];                       //   1 = has a "...b" node
 extern "C" PathSettings DAT_10ff17e0[];
 
 // 0x1016ac90 (Camera_CollectPaths). Adds every camera path below `node` (kind 2, name not ending in 'b') to the

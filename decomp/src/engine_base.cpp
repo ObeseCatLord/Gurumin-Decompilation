@@ -12,11 +12,11 @@ struct Object
 
 extern "C" void FUN_101b21c0(void);
 extern "C" void FUN_1003ad20(int, int, float);
-extern "C" int DAT_104c01b0;
-extern "C" int DAT_102027d8;
+#include "char_vars.h"
+#include "render_vars.h"
+#include "sound_vars.h"
+
 extern "C" int FUN_10001b70(int);
-extern "C" int DAT_104c0198;
-extern "C" int DAT_104c00d0;
 
 // Empty base class constructor.
 Object::Object()

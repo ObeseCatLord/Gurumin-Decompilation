@@ -7,7 +7,7 @@ extern "C" int FUN_100016c0(const char *file, const float *x, const float *y, co
 extern "C" int FUN_10001980(const char *file, const float *x, const float *y, const float *z, int mode, int loop,
                             float volume);
 extern "C" char *FUN_1013f910(const char *name);  // path of `name` in the sound folder
-extern "C" int DAT_104c01b8;                     // sound output setting (non-zero = mode 1)
+#include "sound_vars.h"
 
 // Plays sound `name` at world position (x, y, z), looping on channel `loop` (0 = play once), at `volume`
 // (halved for the sound engine).

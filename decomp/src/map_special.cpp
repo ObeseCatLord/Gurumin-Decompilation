@@ -13,9 +13,9 @@ struct MapObject
     int RaiseEvent(int id);                     // 0x100020d0
 };
 
-extern "C" int DAT_10c6505c;           // map script timer: > 0 running, 0 = raise the end event, < 0 = ended
-extern "C" int DAT_10c62ed0;           // current map
-extern "C" Matrix4 DAT_10e40204;       // world matrix of the object the map 0x18 effect is placed on
+#include "char_vars.h"
+#include "map_vars.h"
+
 extern "C" MapObject DAT_10874848;
 extern "C" void FUN_1007dab0(void);
 extern "C" void FUN_10053020(void);

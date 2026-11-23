@@ -20,9 +20,7 @@ struct ModelDef
 #include "char_slot.h"
 
 extern "C" ModelDef DAT_10b314c4[];
-extern "C" int DAT_104c02f0;      // "DAT" source of the player for kind 4
-extern "C" int DAT_10c652cc;      // "DAT" source of the player for the other kinds
-extern "C" int DAT_104c0314;      // "DAT" source of the other characters
+#include "render_vars.h"
 
 // 0x10012220 (Model_ApplyCommands). Applies the commands of a model definition to a character's scene owner: with
 // `b` negative, character `a` with its own model definition; otherwise model definition `a` to character `b`. "SET"

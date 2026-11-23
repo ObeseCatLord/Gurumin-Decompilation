@@ -4,9 +4,10 @@
 
 #include "vec3.h"
 
-extern "C" int DAT_104bfe6c;     // non-zero in the mode where only positional sounds are turned down
-extern "C" int DAT_104c01b0;     // non-zero = sound effects off
-extern "C" char DAT_108db428[];  // file extension of the sound files
+#include "char_vars.h"
+#include "game_vars.h"
+#include "sound_vars.h"
+
 extern "C" char *FUN_1013f910(const char *name);  // full path of a data file
 // 0x10010310: plays `path` at (x, y, z) through the 3D sound code (`loop` = 0 plays once); returns its handle.
 extern "C" int FUN_10010310(const char *path, float x, float y, float z, int loop, float volume);
@@ -27,7 +28,6 @@ struct SoundDef
 };
 
 extern "C" SoundDef DAT_108dc158[];
-extern "C" short DAT_10447338[];  // handle of each looping effect while it plays, -11 = not playing
 
 // 0x1003ac20 (Sound_PlayWav). Plays "wav\<name>.<extension>" at `position` (0 = not positional) unless sound
 // effects are off. The volume is scaled first: by 0.8 for positional sounds when DAT_104bfe6c is set, otherwise by

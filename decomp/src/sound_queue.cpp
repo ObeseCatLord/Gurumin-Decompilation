@@ -3,10 +3,8 @@
 
 #include "vec4.h"
 
-extern "C" int DAT_10447310[10];   // frames left before the sound plays (0 = free slot)
-extern "C" int DAT_1021a398[10];   // sound id
-extern "C" int DAT_1042d870[10];   // 1 when the sound has a position
-extern "C" Vec4 DAT_10f08a00[10];  // position of the sound
+#include "sound_vars.h"
+
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);
 
 // Queues `sound` to play after `delay` frames, at `position` (0 = not positional). When all slots are in use, the

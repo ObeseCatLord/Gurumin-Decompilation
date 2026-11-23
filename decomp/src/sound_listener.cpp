@@ -3,14 +3,11 @@
 
 #include "vec4.h"
 
-extern "C" Vec4 DAT_118e69e8;     // camera position
-extern "C" Vec4 DAT_118e6cb8;     // camera target
-extern "C" Vec4 DAT_11af3e28;     // goal of the position
-extern "C" Vec4 DAT_118e6c78;     // goal of the target
-extern "C" Vec4 DAT_10c67f40;     // listener position (scaled)
-extern "C" Vec4 DAT_10c67fe0;     // listener direction
-extern "C" int DAT_104c0354;      // non-zero = the camera is not smoothed here
-extern "C" int DAT_104c01b0;      // non-zero = no listener update is sent
+#include "camera_vars.h"
+#include "char_vars.h"
+#include "map_vars.h"
+#include "sound_vars.h"
+
 // Sound command 0x235 (app_0002.cpp, declared there with int parameters): the listener's volume, position,
 // direction and up vector.
 extern "C" int FUN_100017c0(float volume, float x, float y, float z, float dx, float dy, float dz, float ux, float uy,

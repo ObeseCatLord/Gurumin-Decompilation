@@ -9,18 +9,12 @@
 
 extern "C" HINSTANCE DAT_10f140c8;   // the module instance
 extern "C" HWND DAT_10f6569c;        // the game window
-extern "C" int DAT_10f65570;         // joystick enabled
-extern "C" int DAT_10f65574;         // joystick disabled by the settings
-extern "C" int DAT_10f65564;         // force feedback enabled
-extern "C" int DAT_10f65568;         // the joystick has force feedback
-extern "C" int DAT_10f6555c;         // mouse wheel movement accumulated
+#include "ui_vars.h"
+
 extern "C" InputEffect *DAT_10f65578;  // the force-feedback effect
 extern "C" const GUID DAT_101fccbc;  // IID_IDirectInput8A
 extern "C" const GUID DAT_101fcc0c;  // GUID_SysKeyboard
 extern "C" const GUID DAT_101fcc1c;  // GUID_SysMouse
-extern "C" const char DAT_101fcbf4[];  // c_dfDIJoystick
-extern "C" const char DAT_101fc9ec[];  // c_dfDIKeyboard
-extern "C" const char DAT_101fc7e4[];  // c_dfDIMouse
 extern "C" long __stdcall DirectInput8Create(HINSTANCE instance, unsigned long version, const GUID &iid, void **out,
                                              IUnknown *outer);
 

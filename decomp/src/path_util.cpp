@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
-extern "C" char DAT_10ff65f8[][0x20];  // texture names (see mesh_cache.cpp)
-extern "C" char DAT_10fada90[][0x20];
+#include "map_vars.h"
+#include "render_vars.h"
 
 // Creates every directory along `path` (like mkdir -p): cuts the path at each backslash in turn and calls
 // CreateDirectoryA on the prefix, then on the whole path. Returns 0.
@@ -50,8 +50,6 @@ extern "C" int FUN_101699f0(int index, const char *folder, const char *name)
     return 0;
 }
 
-extern "C" int DAT_10feb3e0[0xc80];   // reference count of each model name
-extern "C" int DAT_10faae88[0x400];   // reference count of each texture name
 
 // Looks up folder + name (cut to 31 characters) in the model name table. Returns its index when it is there.
 // Otherwise the name is stored in the first free entry (its reference count reset), that index goes to *freeSlot

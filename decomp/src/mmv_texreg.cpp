@@ -61,7 +61,7 @@ struct MmvPlayer
 };
 
 extern "C" void (*DAT_11b1ba40)(void *);
-extern "C" unsigned char DAT_10f68138[0x25800];  // buffer for one streamed frame record
+#include "render_vars.h"
 
 // Not byte-identical yet: the original keeps 0 in ebx for its compares and stores (see open.tsv).
 // Like ReadFrame for a movie that plays once: after the last frame the in-memory copy is freed or the file closed,
@@ -167,9 +167,6 @@ void MmvPlayer::ReadFrame()
 extern "C" void __stdcall FUN_1014f120(int, int, int width, int height, int pitch, void *pixels, void *palette);
 extern "C" void FUN_10143b50(void);
 extern "C" void FUN_10143b80(void);
-extern "C" char DAT_10ffe5f8[1600][0x40];
-extern "C" char DAT_10f8dbb8[1600][0x40];
-extern "C" char DAT_10fa6db8[1600];
 
 // Constructor: nothing open yet.
 MmvPlayer::MmvPlayer()

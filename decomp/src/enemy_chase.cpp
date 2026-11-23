@@ -14,7 +14,8 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 #include "char_state.h"
 
 extern "C" float DAT_10255160[0x80][4];       // [0]: the enemy's current speed
-extern "C" int DAT_104bfd08;                  // non-zero = enemies do not move
+#include "char_vars.h"
+
 extern "C" int FUN_1013f880(void);            // the game's random number
 extern "C" int FUN_10024e80(int index, Vec4 move);           // Char_OutsideLimit
 extern "C" int FUN_100241e0(int index, float x, float y, float z);   // Character_SetMove

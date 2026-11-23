@@ -9,7 +9,8 @@
 // The cooldown counters of the different enemy kinds live in the behaviour state words of the enemy's own slot
 // or of the slot before or after it (char_state.h).
 
-extern "C" int DAT_10c66cc0;                         // non-zero = voices are not limited
+#include "char_vars.h"
+
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 
 // 0x100b9bb0 (Enemy_PlayVoice). Plays voice `sound` of enemy `index` unless its cooldown is running (`limited`

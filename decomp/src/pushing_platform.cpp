@@ -34,7 +34,8 @@ struct LastPosition
 
 extern "C" CharMoveLock DAT_10db9380[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" int DAT_1049f0f0;                     // number of entries in the two lists below
+#include "char_vars.h"
+
 extern "C" Vec3 *DAT_1032d5b8[];                 // positions of the characters moved by routes
 extern "C" char DAT_1021bbc0[];
 

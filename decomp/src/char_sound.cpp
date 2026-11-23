@@ -5,8 +5,8 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-extern "C" Vec4 DAT_118e6cb8;  // the player's position here (player_reset.cpp calls it the player velocity)
-extern "C" char DAT_104c0332;  // when set, sounds requested with `optional` are skipped
+#include "char_vars.h"
+
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);  // Sound_PlayEffect
 
 // 0x10065b10 (Character_PlaySound). Plays `sound` at character `index`'s position at full volume. Characters 0x3a

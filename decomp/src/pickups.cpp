@@ -3,15 +3,9 @@
 
 #include "char_slot.h"
 
-extern "C" int DAT_10210fb8;          // next slot of the pickup effect ring
-extern "C" int DAT_10255040[0x20];    // effect kind of each slot (0 = free)
-extern "C" int DAT_102196f0[0x20];
-extern "C" int DAT_1020d5c8[0x20];
-extern "C" int DAT_10c64ad8;          // banked hundreds
-extern "C" int DAT_10c64ad0;          // non-zero = the bank holds 400
-extern "C" int DAT_10c655f0;          // current costume
-extern "C" int DAT_104c02c8;          // face settings of the worn helmet (Helmet_FaceSettings)
-extern "C" char DAT_104c0119;         // HUD counter display timer
+#include "char_vars.h"
+#include "game_vars.h"
+
 extern "C" int FUN_10011aa0(int id, int value);   // EventSlots_AddWaiting
 extern "C" void FUN_1000e750(void);               // AntiTamper_Store
 

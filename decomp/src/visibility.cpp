@@ -22,10 +22,11 @@ struct VisData
 #include "anim_model.h"
 #include "char_state.h"
 
-extern "C" int DAT_10f65520;
-extern "C" Vec4 DAT_10f66908;
+#include "camera_vars.h"
+#include "char_tables.h"
+#include "render_vars.h"
+
 extern "C" Vec4 DAT_10f668e8;
-extern "C" char DAT_11afffe8[0x40];
 
 // Finds the cell boxes that contain the eye position and marks them and all cells listed as visible from them.
 // Not byte-identical yet (see open.tsv).
@@ -72,7 +73,6 @@ extern "C" int FUN_10015860(Vec4 pos)
 }
 
 // Characters (world.h): matrix and nearCells are used here.
-extern "C" char DAT_1021d338[0x80][0x40];  // per character: 1 for each cell box within 75 units
 
 // 1 when character `index` stands in a currently visible cell (or the map has no visibility data), else 0.
 extern "C" int FUN_10015710(int index)

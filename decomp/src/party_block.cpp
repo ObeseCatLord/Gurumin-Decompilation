@@ -15,7 +15,7 @@ inline float AbsFloat(float value)
     return (float)fabs(value);
 }
 
-extern "C" const char DAT_101d67f0[5];   // the party's character slots: 0, 13, 15, 58 and 20
+#include "char_vars.h"
 
 // 0x10034cc0 (Party_BlocksMove). Returns 1 when one of the five party characters other than `self` would be within
 // `range` of character `self` after it moves by `step` (on the ground plane) and either the move brings `self`

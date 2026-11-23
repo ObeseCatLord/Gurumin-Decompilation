@@ -13,7 +13,7 @@ struct ItemInfo
 };
 
 extern "C" ItemInfo DAT_1088e6b0[];
-extern "C" int DAT_1042e2a8[];
+#include "ui_vars.h"
 
 // Draws the icon of the item in inventory slot `slot` as a 16x16 sprite at (x, y), insetting the UVs by 0.002
 // to avoid bleeding from the neighbouring icons.

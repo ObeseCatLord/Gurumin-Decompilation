@@ -2,13 +2,7 @@
 
 #include "d3d9_min.h"
 
-extern "C" IUnknownLike *DAT_10f1a870[0x5a0];
-extern "C" IUnknownLike *DAT_10f60d38[0x5a0];
-extern "C" IUnknownLike *DAT_10f0d5e0[0x5a0];
-extern "C" IUnknownLike *DAT_10f1c7f0[0x5a0];
-extern "C" int DAT_10f1e670[0x5a0];
-extern "C" int DAT_10f628e8[0x5a0];
-extern "C" int DAT_10f1a86c;
+#include "render_vars.h"
 
 // Releases every Direct3D surface held by texture slot `slot` and subtracts the slot's two sizes from the
 // VRAM total DAT_10f1a86c. Returns 0 for an invalid slot, 1 otherwise.

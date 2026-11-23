@@ -20,31 +20,15 @@ struct FrameTimer
 };
 
 extern "C" FrameTimer DAT_10836c70;
-extern "C" int DAT_104c03e8;                         // non-zero in the second book
-extern "C" int DAT_102194c0;                         // the left page shown
-extern "C" int DAT_102194c4;                         // the right page shown
-extern "C" int DAT_104c03e0;
-extern "C" int DAT_104c03e4;                         // 1 while the pages turn
+#include "game_vars.h"
+#include "ui_vars.h"
+
 extern "C" int DAT_1020b444;                         // frames before the "last page" message may show again
-extern "C" char DAT_102028e8[0x22][0x10];            // the page textures
-extern "C" char DAT_10202a48[];                      // "dpartsbf.bmp": a locked page
-extern "C" int DAT_1030b870[0x22];                   // texture slots of the pages
-extern "C" int DAT_1030c908[0x22];                   // script flag of each page (0 = no page)
-extern "C" int DAT_104483dc;                         // page of the left texture
-extern "C" int DAT_104483e0;                         // page of the right texture
-extern "C" int DAT_10c62edc[0x1000];                 // script flags
 extern "C" Node *DAT_104c03cc;                       // the turning sheet
 extern "C" Node *DAT_104c03d0;                       // the right half
 extern "C" Node *DAT_104c03d4;                       // the left half
 extern "C" Node *DAT_104c03d8;                       // the book cover
-extern "C" int DAT_102239c8;                         // frames per animation step
-extern "C" int DAT_104bfd4c;
-extern "C" char DAT_104c01fc;
-extern "C" int DAT_104bf8c8;
-extern "C" int DAT_104bf8cc;
-extern "C" int DAT_104bf8d0;
 extern "C" char DAT_10467ea0;
-extern "C" char DAT_10219bc0[];                      // the message shown
 
 extern "C" int FUN_1001e1a0(const char *name, const char *alphaName);  // Texture_Load
 extern "C" int FUN_1000ed70(const char *text, int style, int frames);  // shows a message

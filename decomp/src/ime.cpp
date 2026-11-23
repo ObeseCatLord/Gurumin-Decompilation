@@ -174,7 +174,7 @@ DWORD ImeContext::GetPageSize()
     return buffer->dwPageSize;
 }
 
-extern "C" int DAT_10f66bbc;
+#include "ui_vars.h"
 
 // Stores the IME option value DAT_10f66bbc. Returns 1.
 extern "C" int FUN_1015d500(int value)
@@ -235,29 +235,9 @@ DWORD ImeContext::LoadCandidates()
     ImmGetCandidateListA(context, 0, buffer, size);
     return buffer->dwCount;
 }
-extern "C" int DAT_10f67000;     // 1 while text input (IME composition) is active
-extern "C" int DAT_10f66df0;     // 1 once input has finished
-extern "C" int DAT_10f66bc8;     // 1 when the IME conversion mode was changed and must be restored
 extern "C" DWORD DAT_10f66dd8;   // saved conversion mode
 extern "C" DWORD DAT_10f66bb8;   // saved sentence mode
-extern "C" char *DAT_10f66ef8;   // caller's buffer that receives the entered text (may be 0)
-extern "C" char DAT_10f66df8[];  // the text entered so far
 
-extern "C" char DAT_10f66bd0[];  // composition string
-extern "C" char DAT_10f66cd0[];  // result string
-extern "C" char DAT_10f68008[];
-extern "C" char DAT_10f66ab8[];
-extern "C" int DAT_10f68108;
-extern "C" int DAT_10f669a0;
-extern "C" int DAT_10f66de0;
-extern "C" int DAT_10f66aa8;
-extern "C" int DAT_10f6811c;
-extern "C" int DAT_10f6810c;
-extern "C" int DAT_10f66bc0;
-extern "C" int DAT_10f66ddc;
-extern "C" int DAT_10f66de4;
-extern "C" int DAT_10f66bc4;
-extern "C" int DAT_10f66dd4;
 extern "C" char DAT_10f67008[32][0x80];  // candidate strings
 
 // Prepares text input with `text` as the starting text: maximum length 0x80 (DAT_10f66bbc), the text is copied into
@@ -327,10 +307,6 @@ struct ImeWindowHooks
 };
 
 extern "C" ImeWindowHooks DAT_10f65698;
-extern "C" int DAT_10203428;           // 1 = text input allowed
-extern "C" int DAT_10f68110;
-extern "C" int DAT_10f66998;
-extern "C" char *DAT_10f68118;         // buffer that receives the text (see FUN_1015fd30)
 extern "C" void FUN_1015f3e0();        // reads the composition string
 extern "C" void FUN_1015f400();        // reads the result string
 extern "C" void FUN_1015f490();        // reads the cursor position

@@ -11,13 +11,9 @@ struct TextRenderer
     int M_101501f0(int x, int y, const MenuText *line, int colour, int a, float scaleX, float scaleY);  // draws text
 };
 
-extern "C" int DAT_10f66aac;
-extern "C" int DAT_10f66ab0;
-extern "C" int DAT_10f66de8;
-extern "C" int DAT_10f66dd0;
+#include "ui_vars.h"
+
 extern "C" MenuText DAT_10f67008[];
-extern "C" int DAT_10f67000;   // 1 while text input is active
-extern "C" int DAT_10f68114;   // index of the selected candidate
 
 // Number of candidates shown on the current page (at most 9).
 inline int VisibleLines()

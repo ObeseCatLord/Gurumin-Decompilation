@@ -11,21 +11,10 @@
 
 #include "node.h"
 
-extern "C" int DAT_11b044d0;                  // number of queued nodes
+#include "render_vars.h"
+
 extern "C" unsigned char DAT_11b00030[0x40];  // pass of each queued node
-extern "C" Node *DAT_11b00070[0x40];          // the queued nodes
-extern "C" int DAT_11b00170[0x40];            // the value DAT_10f655c4 takes while the node draws
-extern "C" char DAT_11b00270[0x40];           // the value DAT_10f65520 takes for drawing mode 2
-extern "C" char DAT_11af3f68[0x40];           // light matrix set of each node (drawing mode 2)
-extern "C" char DAT_11afffa8[0x40];           // light set of each node (drawing mode 2)
-extern "C" Vec4 DAT_11b07128[0x40];           // colour of each queued node
-extern "C" Vec4 DAT_11b04518[0x40];
-extern "C" Vec4 DAT_11b04918[0x40];
-extern "C" Matrix4 DAT_11b06518[];            // light matrix sets
 extern "C" char DAT_11b04d18[][0x80];         // light sets
-extern "C" Vec4 DAT_10f66948;                 // the current draw colour
-extern "C" int DAT_10f655c4;
-extern "C" int DAT_10f65520;
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
 // 0x101999a0 (DrawList_DrawPass). Draws every queued node of pass `pass` with the view `view`: uploads its bones when

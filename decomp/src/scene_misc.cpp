@@ -48,8 +48,9 @@ struct Placement
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" Placement DAT_1101dde0[];
-extern "C" Node DAT_111be9c8[];
-extern "C" int DAT_10ff1df8[];
+#include "camera_vars.h"
+#include "render_vars.h"
+
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
 // 0x10166810. Empties a node's skin data: no bone, no bone name, not a link, no links or bones, all names cleared.

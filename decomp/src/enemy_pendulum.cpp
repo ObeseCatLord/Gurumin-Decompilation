@@ -31,11 +31,11 @@ struct CollisionWorld
 };
 
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
-extern "C" char DAT_10255a88[0x80];
+#include "char_tables.h"
+#include "char_vars.h"
+
 extern "C" CollisionWorld *DAT_10255f08;
 extern "C" unsigned short DAT_104c0380;       // frame counter
-extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
 extern "C" int FUN_100241e0(int index, float x, float y, float z);   // Character_SetMove
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 

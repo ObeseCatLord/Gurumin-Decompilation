@@ -11,31 +11,14 @@ struct Fader
 
 #include "node.h"
 
-extern "C" int DAT_1101de1c;
+#include "camera_vars.h"
+#include "render_vars.h"
+
 extern "C" void FUN_10194360(const Vec4 *, const Vec4 *, int, int, int);
 extern "C" Fader DAT_10f65688;
 extern "C" Fader DAT_10f668e8;
 extern "C" void FUN_1016ac90(int, int, int *);
-extern "C" int DAT_10fabe88;
-extern "C" int DAT_1101d8a0;
-extern "C" int DAT_11018738;
-extern "C" int DAT_1101d89c;
-extern "C" int DAT_1101d8a8;
-extern "C" int DAT_1101de24;
-extern "C" int DAT_10ff1df0;
-extern "C" float DAT_10203448;
-extern "C" float DAT_1020344c;
-extern "C" int DAT_1101d894;
-extern "C" int DAT_1101ddec;
-extern "C" char DAT_1101d9c0[4][0x100];
-extern "C" int DAT_1101ddc0[4];
 extern "C" char DAT_1101d8b8[0x100];
-extern "C" int DAT_1101d9b8;
-extern "C" int DAT_1101ddf4;
-extern "C" int DAT_1101ddf0;
-extern "C" int DAT_1101d890;
-extern "C" int DAT_10ff1df8[0x47e];
-extern "C" Node DAT_111be9c8[0x47e];
 
 // Sets the camera control mode DAT_1101de1c to 1.
 extern "C" int FUN_1016a8c0(void)

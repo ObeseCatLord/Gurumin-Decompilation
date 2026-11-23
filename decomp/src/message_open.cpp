@@ -17,7 +17,8 @@ extern "C" int DAT_104bfb08[0x7c];               // state of each message box
 extern "C" int DAT_104481d8[0x7c];               // fade value
 extern "C" int DAT_10467c20[0x7c];               // frames the box has been held
 extern "C" unsigned int DAT_104bfd5c;            // frames spent waiting for a key
-extern "C" int DAT_10c655f0;                     // 6 = the player has no name yet
+#include "char_vars.h"
+
 extern "C" int FUN_1003ad20(int sound, const void *position, float volume);
 extern "C" int FUN_1013e790(char *out, const char *text);     // Names_Expand
 extern "C" int FUN_1000c020(char *out, const char *text);     // Text_Substitute

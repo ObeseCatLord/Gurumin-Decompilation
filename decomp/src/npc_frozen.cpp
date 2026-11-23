@@ -19,9 +19,9 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-extern "C" short DAT_103153b0[0x80];           // non-zero = release now
-extern "C" char DAT_10255a88[0x80];
-extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
+#include "char_tables.h"
+#include "char_vars.h"
+
 extern "C" int FUN_1013f880(void);            // the game's random number
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 

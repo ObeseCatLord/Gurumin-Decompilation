@@ -24,22 +24,14 @@ struct LastPosition
 
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" Node *DAT_1021bdf8[0x80][9];              // [1], [2]: the companion's attached effect nodes
-extern "C" short DAT_103153b0[0x80];
-extern "C" int DAT_10219770[0x80];
+#include "char_tables.h"
+#include "char_vars.h"
+
 extern "C" unsigned char DAT_10315350[0x80];
 extern "C" unsigned char DAT_102550e0[0x80];         // level of each character
 extern "C" unsigned char DAT_104686b0[0x80];         // display state (2 = down, 7 = idle, 0x1e = revived)
 extern "C" unsigned char DAT_1020d4c0[0x80];
-extern "C" char DAT_1042d9e8[0x80];                  // set when the character was hit this frame
-extern "C" char DAT_1021f3c0[0x80];                  // kind of each character slot
-extern "C" Vec4 DAT_10f08080[0x80];
-extern "C" Vec4 DAT_10836c74;
-extern "C" int DAT_104c00e0;
-extern "C" int DAT_104c00e8;                         // map area
 extern "C" int DAT_104c00f8;
-extern "C" int DAT_10c655f0;                         // current costume
-extern "C" int DAT_10c635f8;
-extern "C" int DAT_10c64ad8;
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 extern "C" int FUN_1000e750(void);
 extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner,

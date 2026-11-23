@@ -15,7 +15,7 @@ struct TriangleBatch
 };
 
 extern "C" void FUN_1013f070(int state, int value, int extra);  // render-state switch (0 = blend mode)
-extern "C" int DAT_10ff1dec;                                     // batches still pending this frame
+#include "render_vars.h"
 
 // Draws the queued triangles with `texture` (instead of the batch's own); nothing happens with fewer than
 // three vertices or without a texture. Returns the draw call's result, or 0.

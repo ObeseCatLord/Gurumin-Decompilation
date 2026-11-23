@@ -10,7 +10,8 @@ Matrix4 IdentityMatrix();  // 0x101b0ba0
 
 #include "anim_model.h"
 
-extern "C" int DAT_10ff19e8[0x100];    // collision data of each model table entry
+#include "render_vars.h"
+
 extern "C" void (*DAT_11b1ba40)(void *block);  // the engine's free
 
 // 0x10162c50. Unloads the model: removes it from the model table, frees its node tree and its buffer, and resets

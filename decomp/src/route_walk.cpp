@@ -25,7 +25,8 @@ struct StepRecord
 
 extern "C" CharMoveLock DAT_10db9380[0x80];
 extern "C" StepRecord DAT_10802c08[0x80];
-extern "C" int DAT_1049f0f0;                     // number of entries in the two lists below
+#include "char_vars.h"
+
 extern "C" Vec4 *DAT_1032d5b8[];                 // positions of the characters moved by routes
 extern "C" char DAT_1021bbc0[];
 // 0x100286d0: the route target of character `slot` heading for `point` (writes the next point, the target and the

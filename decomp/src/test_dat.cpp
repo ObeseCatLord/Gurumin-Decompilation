@@ -6,13 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern "C" int DAT_104c02b0;                    // number of groups read
-extern "C" int DAT_103084a8[0x80];              // number of words in each group
+#include "char_tables.h"
+#include "char_vars.h"
+#include "game_vars.h"
+
 // Word tables, per group and word.
-extern "C" char DAT_1032d870[0x80][0x100][0x20];    // the words
-extern "C" char DAT_104487e8[0x80][0x100];          // length of each word
-extern "C" unsigned char DAT_1030ceb8[0x80][0x100]; // replacement chosen for each word (0xff = not yet)
-extern "C" int DAT_10c66cc0;                    // non-zero = message words are replaced
 extern "C" int FUN_1013f880(void);               // the game's random number
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // Path_Data
 

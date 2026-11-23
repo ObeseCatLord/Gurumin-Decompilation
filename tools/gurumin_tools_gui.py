@@ -26,7 +26,10 @@ import threading
 import asset_groups
 import dialogue_tab
 
-TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
+FROZEN = getattr(sys, "frozen", False)     # True in the standalone exe (tools/build_exe.py)
+TOOLS_DIR = os.path.join(sys._MEIPASS, "tools") if FROZEN else os.path.dirname(os.path.abspath(__file__))
+if FROZEN:
+    sys.path.insert(0, TOOLS_DIR)
 REPO_DIR = os.path.dirname(TOOLS_DIR)
 SETTINGS_PATH = os.path.join(os.path.expanduser("~"), ".gurumin_tools_gui.json")
 MOD_STATE_NAME = "gurumin_mod.json"      # per-mod file: modification times recorded at export, to spot edited files
@@ -417,6 +420,13 @@ class JobRunner:
                     os.makedirs(parent, exist_ok=True)
             if job.before:
                 job.before()
+            if FROZEN and job.command[0] == sys.executable:
+                ok = self._run_in_process(job.command[1:])
+                if not ok:
+                    self.post("error", "  failed: %s\n" % subprocess.list2cmdline(job.command[1:]))
+                if job.after:
+                    job.after(ok)
+                return ok
             env = dict(os.environ, PYTHONIOENCODING="utf-8")
             flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
             proc = subprocess.Popen(job.command, cwd=TOOLS_DIR, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -431,6 +441,44 @@ class JobRunner:
             self.post("error", "  failed: %s\n" % subprocess.list2cmdline(job.command))
         if job.after:
             job.after(ok)
+        return ok
+
+
+    def _run_in_process(self, argv):
+        """The exe has no Python to start, so it runs the tool's script in this thread with its output captured."""
+        import runpy, traceback
+
+        class LogWriter:
+            def __init__(self, post):
+                self.post, self.pending = post, ""
+
+            def write(self, text):
+                self.pending += text
+                *lines, self.pending = self.pending.split("\n")
+                for line in lines:
+                    self.post("log", "  " + line + "\n")
+                return len(text)
+
+            def flush(self):
+                pass
+
+        writer = LogWriter(self.post)
+        saved = sys.argv, sys.stdout, sys.stderr
+        sys.argv, sys.stdout, sys.stderr = list(argv), writer, writer
+        try:
+            runpy.run_path(argv[0], run_name="__main__")
+            ok = True
+        except SystemExit as exc:
+            ok = exc.code in (None, 0)
+            if isinstance(exc.code, str):
+                writer.write(exc.code + "\n")
+        except Exception:
+            traceback.print_exc(file=writer)
+            ok = False
+        finally:
+            if writer.pending:
+                writer.write("\n")
+            sys.argv, sys.stdout, sys.stderr = saved
         return ok
 
 
@@ -1397,7 +1445,29 @@ def print_commands():
         print("  %-18s -> %s" % (name, "%s (%s)" % (hit[1], hit[0].key) if hit else "not part of the mod"))
 
 
+def run_tool_from_command_line(argv):
+    """GuruminModTools.exe --run-tool itm_tool.py decode a.itm a.txt: runs one bundled tool without the window."""
+    if sys.stdout is None:          # the exe has no console of its own; borrow the one it was started from
+        try:
+            import ctypes
+            ctypes.windll.kernel32.AttachConsole(-1)
+            sys.stdout = sys.stderr = open("CONOUT$", "w", encoding="utf-8", errors="replace")
+        except OSError:
+            sys.stdout = sys.stderr = open(os.devnull, "w")
+    out = sys.stdout
+
+    def post(kind, text):
+        if kind in ("log", "error"):
+            out.write(text[2:] if text.startswith("  ") else text)
+            out.flush()
+
+    script = os.path.join(TOOLS_DIR, os.path.basename(argv[0]))
+    return 0 if JobRunner(post)._run_in_process([script] + argv[1:]) else 1
+
+
 def main():
+    if "--run-tool" in sys.argv[1:2]:
+        sys.exit(run_tool_from_command_line(sys.argv[2:]))
     if "--print-commands" in sys.argv:
         print_commands()
         return

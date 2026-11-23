@@ -12,6 +12,18 @@ like the tools themselves. Then either double-click `tools\gurumin_tools_gui.py`
 python tools\gurumin_tools_gui.py
 ```
 
+### As one program (`GuruminModTools.exe`)
+`python tools\build_exe.py` (needs `pip install pyinstaller pillow`) builds `dist\GuruminModTools.exe`: the same
+window with Python, Tkinter, Pillow, every tool, `tools\native\iti_unpack.exe` and the mod DLL inside, so it runs
+on a PC without Python. Build the mod DLL first (`mod/build.sh`) so *Install into the game* can add it. The exe
+holds no game files. It runs each tool inside itself instead of starting Python, and the same tools work from a
+command prompt without the window:
+
+```
+GuruminModTools.exe --run-tool itm_tool.py decode map.itm map.txt
+GuruminModTools.exe --run-tool dialogue_tool.py export "C:\Games\Gurumin" text.tsv
+```
+
 `python tools\gurumin_tools_gui.py --print-commands` prints the command line behind every button, with placeholder
 paths, without opening the window.
 

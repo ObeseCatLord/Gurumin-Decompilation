@@ -49,6 +49,10 @@ game's `mod\` folder for the mod DLL. The **Dialogue** tab lists all 4,937 lines
 speaker, messages, menu choices, names, cutscene subtitles), lets you search and edit them and previews each line in
 the game's own font. The game folder is only read. Walkthrough: [`docs/GUI.md`](docs/GUI.md).
 
+No Python? `GuruminModTools.exe` is the same window as one program (Python, Pillow, the tools and the mod DLL
+inside; no game files). Build it with `python tools/build_exe.py` (needs `pip install pyinstaller pillow`); it lands
+in `dist\`.
+
 <p align="center"><img src="docs/media/gui_mod.png" alt="Mod tab: exported files sorted by character, their status, install into the game" width="760"></p>
 <p align="center"><img src="docs/media/gui_dialogue.png" alt="Dialogue tab: Hyperbolic's lines, one translated, with the preview in the game's font" width="760"></p>
 

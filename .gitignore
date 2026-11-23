@@ -13,3 +13,5 @@ Save Files/
 re/export_new/
 tools/native/*.exe
 tools/native/*.obj
+dist/
+build/pyinstaller/

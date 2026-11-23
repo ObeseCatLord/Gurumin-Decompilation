@@ -88,6 +88,5 @@ extern "C" Vec4 DAT_10f66918;                             // the overhead pass's
 extern "C" Vec4 DAT_10f66928;                             // maximum corner
 extern "C" int DAT_10faae88[0x400];                       // reference count of each texture name
 extern "C" char DAT_10ff65f8[0x400][0x20];                // texture names (see mesh_cache.cpp)
-extern "C" char DAT_11affdd8[100];                        // per collision region "CDLnn": 1 = enabled
 
 #endif

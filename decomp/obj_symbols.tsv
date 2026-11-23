@@ -489,3 +489,4 @@ _FUN_101426d0@8	101426d0
 ?CloneModel@AnimModel@@QAEHPAU1@H@Z	1017b210
 ?LoadFile@AnimModel@@QAEHPBD@Z	1017b9b0
 ?SegmentHitsMesh@Node@@QAEHPAUVec4@@0@Z	101a8780
+?IntersectTriangle@Node@@QAEHPBUVec4@@0PAU2@10PAM22000@Z	1019dca0

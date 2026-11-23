@@ -409,6 +409,12 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   Repeated loads at the end of switch cases are cross-jumped into one call, so write each case in full.
 - Locals that live only in one block should be declared in that block: cl reuses their stack slot for later
   spills (SystemSav_ReadRecord 0x101603c0 matched its frame once `zero`/`word` moved into their loops).
+- A triangle test whose later Vec4 locals share stack slots with earlier call temporaries (and whose shared
+  `return 0` sits at the end) nests the rest inside `if (!(u < 0.0f) && !(u > det)) { ... }` (C0/C3 tests, NaN
+  passes); each successive interpolated value got a fresh local (`edgeU`, then `hitU`): reassigning `uB` gives
+  the same instructions with the float slots permuted (Node::IntersectTriangle 0x1019dca0).
+- `DAT_11affdd8[name[3] * 10 + name[4]]` was `DAT_11afffe8[(name[3] - '0') * 10 + (name[4] - '0')]`: cl folds the
+  '0' digits into the displacement (0x11afffe8 - 0x210), so a fake global appears 0x210 below the real table.
 - Three FILETIMEs in ascending address order with an 8-byte gap after the last-write time are an array
   `FILETIME times[4]` used as times[0..2] (SystemSav_WriteRecord 0x1015fea0); separate variables are ordered differently.
 - Copying a byte buffer once per loop iteration into an `int c` local gives the original's movsx/xor/add sequence

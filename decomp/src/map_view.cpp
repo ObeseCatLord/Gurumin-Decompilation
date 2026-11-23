@@ -81,7 +81,7 @@ void FUN_1000f7f0(void)
         {
             DAT_10f65520 = 1;
             if (DAT_10255f08->visibilityCells == 0 || map->name[0] != 'C' || map->name[1] != 'D' || map->name[2] != 'L' ||
-                DAT_11affdd8[map->name[3] * 10 + map->name[4]] != 0)
+                DAT_11afffe8[(map->name[3] - '0') * 10 + (map->name[4] - '0')] != 0)
             {
                 FUN_1013f070(0, 0, 0);
                 FUN_1013f070(10, 0, 0);

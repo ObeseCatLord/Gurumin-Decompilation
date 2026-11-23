@@ -13,6 +13,7 @@
 #include "node.h"
 
 #include "map_vars.h"
+#include "camera_vars.h"
 #include "render_vars.h"
 
 extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin);   // View_ContainsPoint
@@ -31,7 +32,7 @@ int Node::Draw(const Matrix4 *parent, const Matrix4 *view, int a3, int a4, int a
     if (flags & 0x8000)
         return 0;
     if (DAT_11b04514 != 0 && name[0] == 'C' && name[1] == 'D' && name[2] == 'L' &&
-        DAT_11affdd8[name[3] * 10 + name[4]] == 0)
+        DAT_11afffe8[(name[3] - '0') * 10 + (name[4] - '0')] == 0)
         return 0;
     if (mesh != 0 && (flags & 0x10) && !(flags & 0x20) && !(flags & 0xe00) && hasCollision != 0)
     {

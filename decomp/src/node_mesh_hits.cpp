@@ -36,7 +36,7 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060: point ti
 
 // 0x101a8780. Tests the segment `from`-`to` against this node's own triangles (children are not visited); called by
 // FUN_1011d810. Returns 0 at once when the node is a collision region that is switched off (in the current test's
-// cell list when DAT_11b002c0 is set, else in DAT_11affdd8). A pack is tested only when its material is opaque and
+// cell list when DAT_11b002c0 is set, else in the visible-cell table DAT_11afffe8). A pack is tested only when its material is opaque and
 // its bounding sphere is within the segment's length of `from` and of the segment's line; a triangle only when its
 // own bounding sphere (sphere lists, when the node has them) touches the line. Returns 1 when a triangle is hit, from
 // either side, at a point closer than the segment's length to both ends. A node with visibility cells updates them
@@ -72,7 +72,7 @@ int Node::SegmentHitsMesh(Vec4 *from, Vec4 *to)
             goto switchedOff;
     }
     else if (DAT_11b04514 != 0 && name[0] == 'C' && name[1] == 'D' && name[2] == 'L' &&
-             DAT_11affdd8[name[3] * REGION_DIGIT_TENS + name[4]] == 0)
+             DAT_11afffe8[(name[3] - '0') * REGION_DIGIT_TENS + (name[4] - '0')] == 0)
         goto switchedOff;
 
     float range = from->Distance(*to);
@@ -230,7 +230,7 @@ int Node::Collide(const char *tag, unsigned int mask, Vec4 *from, Vec4 *to, Vec4
         if (name[0] == 'C' && name[1] == 'D' && name[2] == 'L')
         {
             tagOffset = TAG_OFFSET_REGION;
-            if (DAT_11affdd8[name[3] * REGION_DIGIT_TENS + name[4]] == 0)
+            if (DAT_11afffe8[(name[3] - '0') * REGION_DIGIT_TENS + (name[4] - '0')] == 0)
                 goto testChildren;
         }
         if (name[0] == 'O' && name[1] == 'v' && name[2] == 'F')

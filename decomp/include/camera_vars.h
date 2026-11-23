@@ -124,6 +124,8 @@ extern "C" Vec4 DAT_11af3f08;                             // camera position bef
 extern "C" Vec4 DAT_11af3f18;                             // camera target before the cut
 extern "C" Vec4 DAT_11af3f48;                             // effect colour (0..255 per channel, stored as floats)
 extern "C" Vec4 DAT_11af3f58;                             // the camera-space push of the player (x, y; z is 0)
+// Visibility cells seen this frame (visibility.cpp): 1 = cell i is visible. Collision regions "CDLnn" and node kinds
+// below 0x40 are indexed by their cell number, so the same table switches them on and off.
 extern "C" char DAT_11afffe8[0x40];
 
 #endif

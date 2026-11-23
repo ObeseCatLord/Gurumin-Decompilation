@@ -259,7 +259,7 @@ struct Node
     // 0x1019dca0: ray-triangle test (ray from `origin` along `direction`, triangle a-b-c). On a hit, writes the hit
     // point into `a`, the distance along the ray into `hitT` and the texture coordinates interpolated from the
     // corners' (uvA..uvC, x and y) into `texU`/`texV`, and returns 1; 0 when the ray misses or is parallel.
-    int IntersectTriangle(const Vec4 *origin, const Vec4 *direction, Vec4 *a, const Vec4 *b, const Vec4 *c,
+    int IntersectTriangle(const Vec4 *origin, const Vec4 *direction, Vec4 *a, Vec4 *b, const Vec4 *c,
                           float *hitT, float *texU, float *texV, const Vec4 *uvA, const Vec4 *uvB, const Vec4 *uvC);
     // 0x101a9670: casts the segment against the nodes called `name` (0 = all) whose kind and mask match; writes
     // the nearest hit point and, when `t` is given, its position along the segment. Returns 1 on a hit.

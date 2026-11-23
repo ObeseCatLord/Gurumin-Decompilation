@@ -82,22 +82,22 @@ int AnimModel::SetPlayback(int a, int b, int c, int d, int e, int f)
     {
         motion = (Playback *)DAT_11b0b938(0x7c84, "");
         motion->Init();
-        motion->M_1016a020(this);
+        motion->BindModel(this);
     }
     motion->SetLayer(a, b, c, d, e, f);
     return 1;
 }
 
-// Sets the (x, y) offset of slot `slot` in layer `layer` (LayerTable::M_1016a260).
+// Sets the (x, y) offset of slot `slot` in layer `layer` (Playback::SetSlotOffset).
 int AnimModel::SetLayerOffset(int layer, int slot, int x, int y)
 {
     if (motion == 0)
     {
         motion = (Playback *)DAT_11b0b938(0x7c84, "");
         motion->Init();
-        motion->M_1016a020(this);
+        motion->BindModel(this);
     }
-    motion->M_1016a260(layer, slot, x, y);
+    motion->SetSlotOffset(layer, slot, x, y);
     return 1;
 }
 
@@ -115,29 +115,29 @@ extern "C" int __stdcall FUN_1016fa40(int index)
     return 0;
 }
 
-// Sets slot `slot`'s layer source and value (LayerTable::M_1016a220).
+// Sets slot `slot`'s layer source and value (Playback::SetSlotSource).
 int AnimModel::SetLayerSource(void *source, int slot, int value)
 {
     if (motion == 0)
     {
         motion = (Playback *)DAT_11b0b938(0x7c84, "");
         motion->Init();
-        motion->M_1016a020(this);
+        motion->BindModel(this);
     }
-    motion->M_1016a220(source, slot, value);
+    motion->SetSlotSource(source, slot, value);
     return 1;
 }
 
-// Sets parameter `slot` of layer `layer` (LayerTable::M_1016a2a0).
+// Sets parameter `slot` of layer `layer` (Playback::SetLayerParam).
 int AnimModel::SetLayerParameter(int layer, int slot, int value)
 {
     if (motion == 0)
     {
         motion = (Playback *)DAT_11b0b938(0x7c84, "");
         motion->Init();
-        motion->M_1016a020(this);
+        motion->BindModel(this);
     }
-    motion->M_1016a2a0(layer, slot, value);
+    motion->SetLayerParam(layer, slot, value);
     return 1;
 }
 
@@ -148,7 +148,7 @@ int AnimModel::M_1017b160()
     {
         motion = (Playback *)DAT_11b0b938(0x7c84, "");
         motion->Init();
-        motion->M_1016a020(this);
+        motion->BindModel(this);
     }
     return motion->m_0bec == 1;
 }

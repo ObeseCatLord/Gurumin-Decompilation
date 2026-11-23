@@ -10,7 +10,6 @@ Matrix4 IdentityMatrix();  // 0x101b0ba0
 
 #include "anim_model.h"
 
-extern "C" Node *DAT_10faaa88[0x100];  // the model table
 extern "C" int DAT_10ff19e8[0x100];    // collision data of each model table entry
 extern "C" void (*DAT_11b1ba40)(void *block);  // the engine's free
 

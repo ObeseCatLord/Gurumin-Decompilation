@@ -41,20 +41,7 @@ struct TextureRef
     int index;
 };
 
-struct LayerTable
-{
-    char pad_0000[0x2c];
-    int m_002c[16];
-    int m_006c[16];
-    char pad_00ac[0xfc4];
-    int m_1070[0x90][16];
-    int m_3470[0x90][16];
-    int m_5870[0x90][16];
-
-    int M_1016a220(int a, int slot, int value);
-    int M_1016a260(int layer, int slot, int x, int y);
-    int M_1016a2a0(int layer, int slot, int value);
-};
+#include "anim_model.h"
 
 extern "C" int DAT_10feb3e0[0xc80];
 extern "C" char DAT_10fada90[0xc80][0x20];
@@ -238,40 +225,40 @@ int MeshInstance::M_10169f70(int value)
     return FUN_10143870(m_002c, m_0030, value);
 }
 
-// Sets layer source `a` and value for slot `slot` (at most 16 slots, values up to 0x8f).
-int LayerTable::M_1016a220(int a, int slot, int value)
-{
-    if (value > 0x8f)
-        return 0;
-    if (slot > 15)
-        return 0;
-    if (a == 0)
-        return 0;
-    m_006c[slot] = value;
-    m_002c[slot] = a;
-    return 1;
-}
-
-// Sets the (x, y) offset of slot `slot` in layer `layer`.
-int LayerTable::M_1016a260(int layer, int slot, int x, int y)
+// 0x1016a220. Sets the source and layer of motion slot `slot` (16 slots, layers up to 0x8f; a source is required).
+int Playback::SetSlotSource(void *source, int slot, int layer)
 {
     if (layer > 0x8f)
         return 0;
     if (slot > 15)
         return 0;
-    m_1070[layer][slot] = x;
-    m_3470[layer][slot] = y;
+    if (source == 0)
+        return 0;
+    slotLayer[slot] = layer;
+    slotSource[slot] = source;
     return 1;
 }
 
-// Sets parameter `slot` (0..7) of layer `layer`.
-int LayerTable::M_1016a2a0(int layer, int slot, int value)
+// 0x1016a260. Sets the (x, y) offset of slot `slot` in layer `layer`.
+int Playback::SetSlotOffset(int layer, int slot, int x, int y)
+{
+    if (layer > 0x8f)
+        return 0;
+    if (slot > 15)
+        return 0;
+    slotOffsetX[layer][slot] = x;
+    slotOffsetY[layer][slot] = y;
+    return 1;
+}
+
+// 0x1016a2a0. Sets parameter `slot` (0..7) of layer `layer`.
+int Playback::SetLayerParam(int layer, int slot, int value)
 {
     if (layer > 0x8f)
         return 0;
     if (slot > 7)
         return 0;
-    m_5870[layer][slot] = value;
+    layerParams[layer][slot] = value;
     return 1;
 }
 

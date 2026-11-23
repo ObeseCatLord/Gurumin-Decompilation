@@ -11,7 +11,6 @@
 
 #include "node.h"
 
-extern "C" int DAT_10faaa88[0x100];
 
 // Clears the model table DAT_10faaa88 (all 0x100 entries unused).
 extern "C" void FUN_10161980(void)

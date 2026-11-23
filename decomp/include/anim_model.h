@@ -20,8 +20,8 @@ struct Node;
 #define PLAYBACK_BLENDING_LAYER 0x90
 
 // The motion playback state of a model (0x7c84 bytes, `AnimModel::motion`): which layer (motion) plays, the frame,
-// and per-layer frame ranges and values. Init, SetLayer, Play and friends are in model_state.cpp; the layer-slot
-// setters at 0x1016a220-0x1016a2a0 in mesh_cache.cpp (LayerTable).
+// and per-layer frame ranges and values. Init, SetLayer, BindNode, BindModel and Play are in model_state.cpp; the
+// motion-slot setters (SetSlotSource, SetSlotOffset, SetLayerParam) in mesh_cache.cpp.
 struct Playback
 {
     int m_0000;
@@ -36,8 +36,8 @@ struct Playback
     int frame;                                     // 0x20: current frame
     int m_0024;
     int m_0028;
-    int m_002c[16];
-    int m_006c[16];                                // -1 = unused
+    void *slotSource[16];                          // 0x2c: source of each motion slot (SetSlotSource)
+    int slotLayer[16];                             // 0x6c: layer of each motion slot (-1 = unused)
     int m_00ac[PLAYBACK_LAYER_COUNT];              // 0xac: 1 while the layer is active
     int m_02ec[PLAYBACK_LAYER_COUNT];              // 0x2ec: first frame
     int m_052c[PLAYBACK_LAYER_COUNT];              // 0x52c: last frame
@@ -46,22 +46,27 @@ struct Playback
     int m_0bec;
     int m_0bf0[PLAYBACK_LAYER_COUNT];              // 0xbf0: playback direction (+1 forwards, -1 backwards)
     int m_0e30[PLAYBACK_LAYER_COUNT];
-    int m_1070[PLAYBACK_LAYER_COUNT][16];          // 0x1070: per-layer values, cleared when the layer starts
-    int m_3470[PLAYBACK_LAYER_COUNT][16];
-    int m_5870[PLAYBACK_LAYER_COUNT][16];          // 0x5870: per-layer values, -2 (unused) when the layer starts
-    int m_7c70;
+    int slotOffsetX[PLAYBACK_LAYER_COUNT][16];     // 0x1070: per layer and slot: x offset (cleared when the layer
+                                                   // starts; SetSlotOffset)
+    int slotOffsetY[PLAYBACK_LAYER_COUNT][16];     // 0x3470: y offset
+    int layerParams[PLAYBACK_LAYER_COUNT][16];     // 0x5870: per-layer parameters, 8 used (-2 = unused, set when
+                                                   // the layer starts; SetLayerParam)
+    int frameCount;                                // 0x7c70: frames of the bound node's animation (0 when 8 or
+                                                   // fewer)
     int blending;                                  // 0x7c74: non-zero while blending into nextLayer
     int m_7c78;
     int nextLayer;                                 // 0x7c7c: layer being blended into
     Node *m_7c80;
 
     void Init();                                                       // 0x10169f90
-    void M_1016a020(void *owner);                                      // binds the playback to its model
+    int BindModel(struct AnimModel *owner);                            // 0x1016a020: BindNode on owner's root
+    int BindNode(Node *node);                                          // 0x1016a090: binds to `node`, resets
     int SetLayer(int layer, int a, int first, int last, int b, int c); // 0x1016a100
     int Play(int layer, int restart, int blendFrames, float speed);    // 0x1016a2e0
-    int M_1016a220(void *source, int slot, int value);                 // layer-slot setters (mesh_cache.cpp)
-    int M_1016a260(int layer, int slot, int x, int y);
-    int M_1016a2a0(int layer, int slot, int value);
+    // Motion-slot setters (mesh_cache.cpp); each returns 0 for an out-of-range layer or slot, else 1.
+    int SetSlotSource(void *source, int slot, int layer);              // 0x1016a220: slot's source and layer
+    int SetSlotOffset(int layer, int slot, int x, int y);              // 0x1016a260
+    int SetLayerParam(int layer, int slot, int value);                 // 0x1016a2a0: slot 0..7
 };
 
 // One key-framed motion channel of a model (0xa98 bytes): a key bank and its playback range.
@@ -312,5 +317,8 @@ struct AnimModel
 
 // The character models (one per character slot; slot 0 is the player).
 extern "C" AnimModel DAT_10db6ee8[0x80];
+
+// The model table: root node of each loaded model file (0 = free entry).
+extern "C" Node *DAT_10faaa88[0x100];
 
 #endif

@@ -472,3 +472,8 @@ _FUN_101426d0@8	101426d0
 ?DrawSpriteA@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	101890f0
 ?DrawSpriteB@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	10189340
 ?ReadType@ListBank@@QAEDPAPAD@Z	100364a0
+?SetSlotSource@Playback@@QAEHPAXHH@Z	1016a220
+?SetSlotOffset@Playback@@QAEHHHHH@Z	1016a260
+?SetLayerParam@Playback@@QAEHHHH@Z	1016a2a0
+?BindNode@Playback@@QAEHPAUNode@@@Z	1016a090
+?BindModel@Playback@@QAEHPAUAnimModel@@@Z	1016a020

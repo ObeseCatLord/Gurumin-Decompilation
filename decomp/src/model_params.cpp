@@ -14,7 +14,6 @@
 // 0x101ae060: transforms `point` by `matrix` and divides by w (projection to -1..1 screen space).
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);
 
-extern "C" Node *DAT_10faaa88[0x100];
 extern "C" int DAT_10ff19e8[0x100];   // per model: its collision data
 
 // Collision test of a model (world matrix) against another model: 0x10193140 (stdcall, recursive over nodes).

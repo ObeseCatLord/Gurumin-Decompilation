@@ -972,3 +972,5 @@ address	name	evidence
 10165e00	ModelBank::DrawShadows	draws the shadows of the first ten shadow casters (own targets or kage.bmp) (matched, decomp/src/model_bank.cpp)
 
 10166100	ModelBank::DrawShadowsInto	DrawShadows through the scene matrix (caster shadow matrix raised 6.1) (matched, decomp/src/model_bank.cpp)
+1016a090	Playback::BindNode	matched decompiled source (decomp/obj_symbols.tsv)
+1016a020	Playback::BindModel	matched decompiled source (decomp/obj_symbols.tsv)

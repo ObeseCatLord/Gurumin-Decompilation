@@ -156,7 +156,7 @@ int AnimModel::M_1017b1c0()
     {
         motion = (Playback *)DAT_11b0b938(0x7c84, "");
         motion->Init();
-        motion->M_1016a020(this);
+        motion->BindModel(this);
     }
     return motion->layer;
 }
@@ -246,7 +246,7 @@ void AnimModel::PlayMotion(int layer, int a, int b, float speed)
     {
         motion = (Playback *)DAT_11b0b938(0x7c84, "");
         motion->Init();
-        motion->M_1016a020(this);
+        motion->BindModel(this);
     }
     if (important != 0)
         DAT_11b04508 = 1;
@@ -269,7 +269,7 @@ int AnimModel::LoadModel(const char *path)
     ZeroVec unused2;
     m_2494 = 0;
     if (motion != 0)
-        motion->M_1016a020(this);
+        motion->BindModel(this);
     return 1;
 }
 

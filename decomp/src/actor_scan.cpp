@@ -47,12 +47,7 @@ extern "C" int FUN_10011cd0(void)
     return -1;
 }
 
-// Root node of a character model (scene_node.cpp Node).
-struct RootNode
-{
-    void M_101946b0(int value, int mask);
-    void M_10194730(int value, int mask);
-};
+#include "node.h"
 
 extern "C" char DAT_10315350[0x80];
 

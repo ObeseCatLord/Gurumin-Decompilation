@@ -28,12 +28,7 @@ extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, LoadedModel *other, int o
                                       int *hitCount, int *hitIds, Vec4 *hits, int *hitOther, int mode, int a, int b,
                                       int c, int flags);
 
-// Collision node of a model (scene_node.cpp Node); 0x1019f340 tests a moving model against it.
-struct CollisionNode
-{
-    int M_1019f340(int mask, Matrix4 *world, int a, int b, int *out5, Vec4 *probe, int probeCount, int *hitCount,
-                   Vec4 *hitPoint, Vec4 *hitNormal, int limit, int *out12, int c, int d, int e);
-};
+#include "node.h"
 
 extern "C" int DAT_11b002c0;    // collision filter of the current test (the model's m_0070)
 extern "C" char DAT_11b002c8;   // 1 while a model-against-world test runs
@@ -55,7 +50,7 @@ struct AnimModel
     char pad_22a0[0x4c];
     LoadedModel *root;           // 0x22ec: this model's own entry in the model table
     char pad_22f0[0x18];
-    CollisionNode *collider;     // 0x2308: the map collision this model moves against
+    Node *collider;     // 0x2308: the map collision this model moves against
     char pad_230c[0xc];
     int m_2318;
     int m_231c;

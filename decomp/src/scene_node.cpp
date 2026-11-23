@@ -849,7 +849,7 @@ int Node::M_10194630(char value, unsigned int mask)
 }
 
 // Sets colour value m_189a the same way.
-int Node::M_101946b0(char value, unsigned int mask)
+int Node::M_101946b0(unsigned char value, unsigned int mask)
 {
     if ((flags & mask) != 0)
     {
@@ -1893,7 +1893,7 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     m_1888 = source->m_1888;
     m_188c = source->m_188c;
     m_1890 = source->m_1890;
-    m_1879 = source->m_1879;
+    pathKind = source->pathKind;
     m_187a = source->m_187a;
     m_187b = source->m_187b;
     m_187c = source->m_187c;

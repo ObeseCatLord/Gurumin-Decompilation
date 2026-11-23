@@ -2,7 +2,7 @@
 
 #include "vec3.h"
 
-#include "matrix4.h"
+#include "node.h"
 
 struct CharModel
 {
@@ -45,9 +45,9 @@ struct Character
     char pad_02ac[0xab0];
     float m_0d5c;             // 0xd5c: 1.0 when spawned (model alpha or scale)
     char pad_0d60[0x159c];
-    struct RootNode *m_22fc;  // 0x22fc: root node of the model (0x22ec inside CharModel)
+    Node *m_22fc;             // 0x22fc: root node of the model (0x22ec inside CharModel)
     int m_2300;               // 0x2300: non-zero while the character is in use (key prompts are drawn)
-    struct HeadNode *headNode;  // 0x2304: the model's head bone node (head_look.cpp, the player's at 0x10db91dc)
+    Node *headNode;           // 0x2304: the model's head bone node (head_look.cpp, the player's at 0x10db91dc)
     char pad_2308[0x30];
     Matrix4 matrix;           // 0x2338: world matrix; matrix._41/_42/_43 (0x2368) is the character's position
     char pad_2378[0x24];

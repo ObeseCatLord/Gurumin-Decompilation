@@ -77,7 +77,7 @@ struct SceneOwner
     char pad_029c[7];
     unsigned char loadCount;  // 0x2a3: number of models loaded so far (stops counting at 3)
     char pad_02a4[0x2048];
-    struct ModelNode *root;   // 0x22ec: root node of the loaded model
+    struct Node *root;   // 0x22ec: root node of the loaded model
     char pad_22f0[0x38];
     float position[4];        // 0x2328: model position used for collision
     char pad_2338[0x30];
@@ -92,13 +92,7 @@ struct SceneOwner
     int UpdateCollision();
 };
 
-struct ModelNode
-{
-    int ReleaseSavedStates();  // 0x10194510
-    int StartProximityPass(float *position, Matrix4 *matrix, int a, float radius, int b);
-    void Load(const char *path, int flags);            // 0x101abd60
-    ModelNode *Find(const char *name, int index);       // 0x1019ece0
-};
+#include "node.h"
 
 struct Animator
 {
@@ -312,7 +306,7 @@ int SceneOwner::LoadModel(const char *path)
 {
     if (root == 0)
         return 0;
-    root->Load(path, 0);
+    root->PreScanFile(path, 0);
     if (loadCount < 3)
         loadCount++;
     root->Find("Bip01", 0);

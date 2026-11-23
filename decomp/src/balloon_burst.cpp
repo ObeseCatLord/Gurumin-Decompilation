@@ -11,12 +11,6 @@ Matrix4 TranslationMatrix(float x, float y, float z);   // 0x101b1360
 
 #include "node.h"
 
-struct RootNode
-{
-    char pad_0000[0x1754];
-    Node *children[0x40];         // 0x1754
-};
-
 // A character record (world.h Character) as a balloon uses it.
 struct Character
 {
@@ -25,7 +19,7 @@ struct Character
     int angle;                    // 0x288: direction of the blast (in 1/1000 radians)
     int push;                     // 0x28c: strength of the push (a multiple of 13, plus 3)
     char pad_0290[0x206c];
-    RootNode *root;               // 0x22fc: root node of the model
+    Node *root;               // 0x22fc: root node of the model
     char pad_2300[0x38];
     Matrix4 matrix;               // 0x2338: world matrix
     char pad_2378[0x124];

@@ -6,14 +6,6 @@
 #include "world.h"
 #include "vec4.h"
 
-// Root node of a character model (scene_node.cpp Node).
-struct RootNode
-{
-    void M_10191280();
-    void M_10194630(int value, int mask);
-    void M_101946b0(int value, int mask);
-    void M_10194730(int value, int mask);
-};
 
 extern "C" int DAT_1021f338;
 extern "C" char DAT_1021f3c0[0x80];
@@ -56,7 +48,7 @@ extern "C" int FUN_10017c00(const char *name, int x, int y, int z)
     }
     int slot = DAT_1021f338++;
     DAT_10db6ed8[slot].model.M_1017b9b0(FUN_1013f8a0(name, 0));
-    DAT_10db6ed8[slot].m_22fc->M_10191280();
+    DAT_10db6ed8[slot].m_22fc->ReleaseUniqueMeshData();
     DAT_10db6ed8[slot].model.M_10162420((float)x, (float)y, (float)z);
     DAT_1021f3c0[slot] = 6;
     ((ObjectView *)&DAT_10db6ed8[slot])->m_0276 = 1;

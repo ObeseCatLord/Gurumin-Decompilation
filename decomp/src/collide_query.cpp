@@ -144,18 +144,7 @@ extern "C" int FUN_1001a450(int slot, const Vec4 *point)
     return DAT_10467920[slot] != 0;
 }
 
-// Head bone node of a character model (scene_node.cpp Node), only its world matrix.
-struct HeadNode
-{
-    char pad_0000[0x24c];
-    Matrix4 worldMatrix;   // 0x24c
-};
 
-// Root node of a character model (scene_node.cpp Node).
-struct RootNode
-{
-    HeadNode *Find(const char *name, int index);  // 0x1019ece0: the index-th node called `name` in the subtree, or 0
-};
 
 // 0x100242c0 (Char_ProbeAhead). Casts a ray from character `index` (from its "Bip01 Head" node when `fromHead` is
 // set, or its position when it has none; from its position otherwise), moved by `offset` when given, to the point
@@ -172,7 +161,7 @@ extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, 
     hit.x = -200000.0f;
     if (fromHead != 0)
     {
-        HeadNode *head = DAT_10db6ed8[index].m_22fc->Find("Bip01 Head", 0);
+        Node *head = DAT_10db6ed8[index].m_22fc->Find("Bip01 Head", 0);
         if (head != 0)
             from.Copy(head->worldMatrix.GetTranslation());
         else
@@ -219,7 +208,7 @@ extern "C" int FUN_100244b0(int index, float angle, Vec4 *ground, float depth, i
     hit.x = -200000.0f;
     if (fromHead != 0)
     {
-        HeadNode *head = DAT_10db6ed8[index].m_22fc->Find("Bip01 Head", 0);
+        Node *head = DAT_10db6ed8[index].m_22fc->Find("Bip01 Head", 0);
         if (head != 0)
             from.Copy(head->worldMatrix.GetTranslation());
         else

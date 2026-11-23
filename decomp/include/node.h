@@ -20,6 +20,7 @@ struct NodeExtra;    // the node's animation tracks
 struct NodeSkin;     // skinning data (weights per bone)
 struct NodeSaved;    // saved-state block (scene_node.cpp, head_look.cpp)
 struct GameFile;     // an open data file (model_prescan.cpp)
+struct VisData;      // visibility cells and their boxes (visibility.cpp)
 
 // Called instead of the normal mesh drawing when set (node_draw.cpp passes the node's world matrix, the view matrix and
 // Draw's own arguments).
@@ -94,7 +95,7 @@ struct Node
     int frameMatrixCount;        // 0x294: entries in `frameMatrices`
     Vec4 m_0298;                 // 0x298
     NodeExtra *extra;            // 0x2a8: the node's animation tracks
-    Vec4 m_02ac;                 // 0x2ac: a scale, 1 on every axis after Init
+    Vec4 tint;                   // 0x2ac: colour multiplier, w = alpha (1 = fully visible, node_fade.cpp); all 1 after Init
     char pad_02bc[0x10];         // 0x2bc: not seen yet
     int frame;                   // 0x2cc: current animation frame (-1, -2, ...: a stored pose)
     unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
@@ -114,14 +115,14 @@ struct Node
     unsigned char m_1858;        // 0x1858: cycling child index (1..childCount), advanced by M_10194ee0
     int m_185c;                  // 0x185c
     int m_1860;                  // 0x1860: saved flags (M_10191d50)
-    void *visibilityCells;       // 0x1864: visibility cells (0 = none)
+    VisData *visibilityCells;    // 0x1864: visibility cells (0 = none)
     Vec4 m_1868;                 // 0x1868: a second scale, 1 on every axis after Init
     unsigned char m_1878;        // 0x1878: 0xe0 after Init
-    char m_1879;                 // 0x1879
+    char pathKind;               // 0x1879: 2 = camera path (camera_path_select.cpp)
     char m_187a;                 // 0x187a
     unsigned char m_187b;        // 0x187b: 45 after Init
-    char m_187c;                 // 0x187c
-    char m_187d;                 // 0x187d
+    unsigned char m_187c;        // 0x187c: copied into the camera path list
+    unsigned char m_187d;        // 0x187d: copied into the camera path list
     unsigned char m_187e;        // 0x187e: 0xff after Init
     float m_1880;                // 0x1880: 1.0 after Init
     int m_1884;                  // 0x1884
@@ -201,7 +202,7 @@ struct Node
     int M_10193cb0(int from, int to);                     // 0x10193cb0: render mode `from` -> `to` in the subtree
     void M_10193d10(int index);                           // 0x10193d10
     int M_10194630(char value, unsigned int mask);        // 0x10194630: m_189c on matching kinds
-    int M_101946b0(char value, unsigned int mask);        // 0x101946b0: m_189a on matching kinds
+    int M_101946b0(unsigned char value, unsigned int mask); // 0x101946b0: m_189a on matching kinds
     int M_10194730(char value, unsigned int mask);        // 0x10194730: m_189b on matching kinds
     int M_10191e50();                                     // 0x10191e50: element from the node names
     void M_10191d50();                                    // 0x10191d50: saves the subtree's flags
@@ -254,6 +255,10 @@ struct Node
                            Vec4 *closest);                // 0x10191ec0
     int M_10194f40(float *position, Matrix4 *matrix, int a, float radius, int b, int depth);  // 0x10194f40
     int StartProximityPass(float *position, Matrix4 *matrix, int a, float radius, int b);     // 0x101a2370
+    // 0x1019f340: tests a moving model (probe points) against this collision node (model_params.cpp).
+    int M_1019f340(int mask, Matrix4 *world, int a, int b, int *out5, Vec4 *probe, int probeCount, int *hitCount,
+                   Vec4 *hitPoint, Vec4 *hitNormal, int limit, int *out12, int c, int d, int e);
+    int UpdateVisibleCells();                             // 0x10199be0 (visibility.cpp)
     int TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matrix4 *matrix);  // 0x10199cd0
 };
 

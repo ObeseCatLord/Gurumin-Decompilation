@@ -17,13 +17,7 @@ extern "C" StartVectors DAT_10802bf8[0x80];
 // Char_ProbeAhead (collide_query.cpp): casts a ray `depth` ahead of character `index`.
 extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, int testOnly, const Vec4 *offset);
 
-// Root node of a character model (scene_node.cpp Node): node-flag setters applied to the whole tree.
-struct RootNode
-{
-    int M_10194630(char value, unsigned int mask);
-    int M_101946b0(unsigned char value, unsigned int mask);
-    int M_10194730(char value, unsigned int mask);
-};
+#include "node.h"
 
 extern "C" char DAT_1021f6c0[0x80];
 

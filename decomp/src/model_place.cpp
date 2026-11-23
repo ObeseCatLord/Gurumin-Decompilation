@@ -8,13 +8,7 @@
 
 Matrix4 IdentityMatrix();                           // 0x101b0ba0
 
-// A node the model hangs in (its root or the collision it moves against); only the flag cleared here.
-struct PlacedNode
-{
-    char pad_0000[0xa8];
-    int m_00a8;
-    int ReleaseSavedStates();                       // 0x10194510 (Node::ReleaseSavedStates)
-};
+#include "node.h"
 
 struct PathMover
 {
@@ -34,9 +28,9 @@ struct PathMover
     Vec4 m_228c;
     int m_229c;
     char pad_22a0[0x4c];
-    PlacedNode *root;         // 0x22ec: the model's node tree
+    Node *root;         // 0x22ec: the model's node tree
     char pad_22f0[0x18];
-    PlacedNode *collider;     // 0x2308: the map collision this model moves against
+    Node *collider;     // 0x2308: the map collision this model moves against
     char pad_230c[0x1c];
     Matrix4 world;            // 0x2328: world matrix
     char pad_2368[4];
@@ -103,9 +97,9 @@ int PathMover::Teleport(float x, float y, float z)
     m_237c = 1.0f;
     m_2374 = 0;
     if (collider != 0)
-        collider->m_00a8 = 0;
+        collider->hasCollision = 0;
     if (root != 0)
-        root->m_00a8 = 0;
+        root->hasCollision = 0;
     m_2384 = 0;
     m_2379 = 0;
     m_2378 = 0;
@@ -146,9 +140,9 @@ int PathMover::SetPosition(float x, float y, float z)
     m_23e8.Set(0, 0, 0, 0);
     m_2374 = 0;
     if (collider != 0)
-        collider->m_00a8 = 0;
+        collider->hasCollision = 0;
     if (root != 0)
-        root->m_00a8 = 0;
+        root->hasCollision = 0;
     m_2384 = 0;
     m_2379 = 0;
     m_2378 = 0;

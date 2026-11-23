@@ -9,11 +9,7 @@
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 
-struct HeadNode
-{
-    char pad_0000[0x24c];
-    Matrix4 worldMatrix;                          // 0x24c
-};
+#include "node.h"
 
 struct TextureObject
 {

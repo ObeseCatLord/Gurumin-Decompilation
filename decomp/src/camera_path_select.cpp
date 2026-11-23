@@ -101,25 +101,7 @@ struct NodeExtra
     KeyTrack track;
 };
 
-// A scene node (scene_node.cpp Node), only the fields used here.
-struct PathNode
-{
-    char name[0x40];
-    char pad_0040[0x6c];
-    unsigned int flags;          // 0xac: 0x10 = ..., 0x20 = ..., 0x40 = path not active at the start
-    char pad_00b0[0x1f8];
-    NodeExtra *extra;            // 0x2a8: the node's animation tracks
-    char pad_02ac[0x4a4];
-    int childCount;              // 0x750
-    char pad_0754[0x1000];
-    PathNode *children[0x40];    // 0x1754
-    char pad_1854[0x25];
-    char kind;                   // 0x1879: 2 = camera path
-    char pad_187a[2];
-    unsigned char m_187c;
-    unsigned char m_187d;
-    PathNode *Find(const char *name, int index);    // 0x1019ece0
-};
+#include "node.h"
 
 // Per camera path: two values from the path node, a flag and the target's flag 0x10.
 struct PathSettings
@@ -142,17 +124,17 @@ extern "C" PathSettings DAT_10ff17e0[];
 // path tables at *count: the path id is the last character of its name (atol), the camera track comes from the
 // node, the target track from "<name>.Target", and optional tracks from "<name>.Target2" and "<name>b" (all looked up
 // under `root`). Returns 0.
-extern "C" int FUN_1016ac90(PathNode *root, PathNode *node, int *count)
+extern "C" int FUN_1016ac90(Node *root, Node *node, int *count)
 {
-    if (node->kind == 2 && node->name[strlen(node->name) - 1] != 'b')
+    if (node->pathKind == 2 && node->name[strlen(node->name) - 1] != 'b')
     {
         char name[0x100];
         sprintf(name, "%sb", node->name);
-        PathNode *second = root->Find(name, 0);
+        Node *second = root->Find(name, 0);
         sprintf(name, "%s.Target", node->name);
-        PathNode *target = root->Find(name, 0);
+        Node *target = root->Find(name, 0);
         sprintf(name, "%s.Target2", node->name);
-        PathNode *target2 = root->Find(name, 0);
+        Node *target2 = root->Find(name, 0);
         if (target != 0 && node->extra != 0 && target->extra != 0)
         {
             DAT_11af3928[*count].Copy(&node->extra->track);

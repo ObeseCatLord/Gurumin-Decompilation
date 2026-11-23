@@ -5,11 +5,7 @@
 
 #include "matrix4.h"
 
-struct ShagaNode
-{
-    char pad_0000[0x1cc];
-    Matrix4 matrix;                             // 0x1cc: the model's placement
-};
+#include "node.h"
 
 // The world collision (scene root node); see collide_normals.cpp.
 struct CollisionWorld
@@ -17,7 +13,7 @@ struct CollisionWorld
     int Query(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, int *hitId, int a, int b);  // 0x101a1640
 };
 
-extern "C" ShagaNode *DAT_10446e00[];   // the shaga models (shaga_spawn.cpp)
+extern "C" Node *DAT_10446e00[];   // the shaga models (shaga_spawn.cpp)
 extern "C" float DAT_1030cd98[];        // their radius
 extern "C" CollisionWorld *DAT_10255f08;
 

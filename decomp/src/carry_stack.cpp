@@ -6,10 +6,7 @@
 
 #include "vec4.h"
 
-struct RootNode
-{
-    void *Find(const char *name, int index);         // 0x1019ece0 (Node::Find)
-};
+#include "node.h"
 
 extern "C" Character DAT_10db6ed8[0x80];
 extern "C" char DAT_1021f3c0[0x80];                  // kind of each character slot

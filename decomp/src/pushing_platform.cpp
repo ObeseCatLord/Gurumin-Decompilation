@@ -14,10 +14,7 @@ struct AnimModel
     int IsClearAny(const Vec4 *move);            // 0x101640b0: 0 when the move collides
 };
 
-struct RootNode
-{
-    void M_10194730(int value, int mask);        // sets a node state bit in the whole tree
-};
+#include "node.h"
 
 // A character record (world.h Character), only the fields used here.
 struct Character
@@ -25,7 +22,7 @@ struct Character
     char pad_0000[0x10];
     AnimModel model;              // 0x10
     char pad_0011[0x22eb];
-    RootNode *root;               // 0x22fc
+    Node *root;               // 0x22fc
     char pad_2300[0x38];
     Matrix4 matrix;               // 0x2338: world matrix; matrix._41/_42/_43 (0x2368) is the position
     char pad_2378[0x40];

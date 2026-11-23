@@ -2,12 +2,7 @@
 
 #include <string.h>
 
-struct AnimNode
-{
-    char pad_0000[0x294];
-    int m_0294;
-    void M_1019b130(int flags);
-};
+#include "node.h"
 
 extern "C" int DAT_104bfd4c;
 extern "C" char DAT_104c01fc;
@@ -35,7 +30,7 @@ extern "C" char DAT_104c0190;
 extern "C" void FUN_1000ec70(int, float, float, float, float);
 extern "C" signed char DAT_103150c0[];
 extern "C" void FUN_1000e810(void);
-extern "C" AnimNode *DAT_104c01dc;
+extern "C" Node *DAT_104c01dc;
 extern "C" int DAT_104c01e4;
 extern "C" int DAT_104c01e0;
 extern "C" char DAT_10db6f5e;
@@ -110,12 +105,12 @@ extern "C" int FUN_100120a0(const int *index, int *amount)
 }
 
 // Plays `node`'s animation forwards or backwards (reverse) and remembers it as the current UI animation.
-extern "C" int FUN_100158b0(AnimNode *node, int reverse)
+extern "C" int FUN_100158b0(Node *node, int reverse)
 {
     DAT_104c01dc = node;
     if (reverse != 0)
     {
-        DAT_104c01e4 = node->m_0294 - 1;
+        DAT_104c01e4 = node->frameMatrixCount - 1;
         DAT_104c01e0 = -1;
     }
     else
@@ -123,7 +118,7 @@ extern "C" int FUN_100158b0(AnimNode *node, int reverse)
         DAT_104c01e4 = 0;
         DAT_104c01e0 = 1;
     }
-    node->M_1019b130(0x20);
+    node->SetFlags(0x20);
     DAT_10db6f5e = 1;
     return 0;
 }

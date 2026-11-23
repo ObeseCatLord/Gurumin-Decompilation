@@ -15,7 +15,7 @@ extern "C" char DAT_11b07118[];                     // default target object of 
 #include "node.h"
 
 // 0x10191500 (Node::Init). Resets every field of a new node: called "root", no mesh, children or skin, identity world
-// and local matrices, cull margin 3.84, unit scale (m_02ac and m_1868..m_1874), and the remaining defaults.
+// and local matrices, cull margin 3.84, unit scale (tint and m_1868..m_1874), and the remaining defaults.
 void Node::Init()
 {
     m_1860 = 0;
@@ -30,7 +30,7 @@ void Node::Init()
     drawCallback = 0;
     m_187a = 0;
     m_187b = 45;
-    m_1879 = 0;
+    pathKind = 0;
     m_187c = 0;
     m_187d = 0;
     m_187e = 0xff;
@@ -45,7 +45,7 @@ void Node::Init()
     m_189b = 0xff;
     element = 0;
     m_1880 = 1.0f;
-    m_02ac.Fill(1.0f);
+    tint.Fill(1.0f);
     m_1878 = 0xe0;
     m_0080 = 0;
     m_0084 = 0;

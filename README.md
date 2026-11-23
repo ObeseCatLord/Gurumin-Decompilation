@@ -36,6 +36,13 @@ the byte share lags the function share. `python decomp/tools/build_all.py` print
 | `save_tool.py decode/encode/info/thumb` | `SaveData\gdataNN.sav` ↔ raw state; thumbnail extract. |
 | `script_api.py`, `gen_script_api_md.py` | script built-in list → `docs/SCRIPT_API.md`. |
 | `config_keys.py`, `save_layout.py` | gurumin.def key map, save body map (from the decompiler output). |
+| `gurumin_tools_gui.py` | one window for all of the above (Tkinter, no extra install): see below. |
+
+### Modding GUI
+`python tools/gurumin_tools_gui.py` opens one window over all the tools: pick the game folder once, then export
+files to editable PNG/text/WAV/OBJ/GIF, import them back, or batch-convert whole folders. The **Mod** tab exports
+game files into a mod folder (`edit\`), shows which ones you changed, and repackages them into `out\` with the
+game's folder layout. The game folder is only read. Walkthrough: [`docs/GUI.md`](docs/GUI.md).
 
 ### Documentation (`docs/`)
 `MODDING_MAP.md` (start here: costumes, anti-cheat guards, render states, sound, menu images), `ITM_FORMAT.md`,

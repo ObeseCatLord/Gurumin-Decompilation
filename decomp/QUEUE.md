@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (230)
+## 1. Walls to retry (237)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -48,6 +48,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001bb20` 925 — Char_DrawLinks (char_links.cpp, rule-clean, new CharLink table in char_links.h): 16 bytes of scheduling: the original stores the angle (fstp) after pushing the operator- arguments of the dropped Length2D and pushes the second -1 of the first Start after loading the offset; tried a split angle, a top-of-function angle, a named Length2D result and other option store orders.
 - [ ] `1001d2d0` 1154 — DigitCounter_Update: blocks and cases in place; the original keeps the state offset (index * 0x40) in edi and the divisor 10 in ebx, ours swaps them (and pushes ebx/edi around the first test)
 - [ ] `1001dc20` 1397 — Char_InitSlot (char_init.cpp, rule-clean draft, 1376 vs 1397 bytes): the original keeps the 0x22-count loop of invariant stores to DAT_1021c620..630 (13.00 hoists them and deletes the loop in every spelling), and the fallen branch stores the slot state twice around DAT_10453008 = -10000 while the else branch shares the epilogue
+- [ ] `1001e4b0` 2161 — StatusPanel_UpdateText (status_panel_text.cpp, 21 bytes off): the original shifts timeSlashWidth >> 1 (sar esi,1) before the TextWidth(grade) call, ours after the _ftol; in-place >>=, a local before/after the switch, in-expression and a float temp tried. Review before counting a match: the draft uses #pragma inline_depth(0) because the original calls Game::TestScriptFlag out of line all eight times (in its unit the definition was probably not visible); find an honest equivalent
 - [ ] `1001ed80` 1257 — Map_DrawMovie (map_movie_draw.cpp, rule-clean draft, 1216 vs 1257 bytes): register allocation and stack layout (original: x in edi and y in ebp with their own stack homes, width/height in bx/si, movieFade separate from the alpha product; frame 0x28 vs ours 0x20); local/field/declaration-order forms tried
 - [ ] `1001f270` 588 — Map_SelectMovie: same code apart from register roles (the original keeps the nearest index in ebx, the counter in esi and the camera-point pointer in edi, pushed inside the loop); declaration orders, pointer loop and named matrix tried
 - [ ] `100211a0` 466 — Region_WaveVertex: logic identical; ebx/ebp swapped for the flip counter and the point address, and the original rounds each sine result to float twice (helper and caller locals tried)
@@ -87,6 +88,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10044b10` 1711 — Npc_PatrolRoute (npc_patrol.cpp, 1712 = 1712 bytes): the original shares the float temporaries with the address-taken Route_Follow outputs (action 0x20, point 0x10, keep 0x1c), stores state/keep = 1 after the talk divide, stores the state-1 angle to memory before targetHeading and branches for PlayMotion(group != 0); about 12 spellings and all 120 declaration orders tried
 - [ ] `100451c0` 1644 — Npc_WalkRoute (route_carrier.cpp): flow and calls line up; the original frame is 8 bytes smaller: the float temporaries (speed, 0.1/0.9 factors, heading) reuse the slots of the Route_Follow results (reached, action), which cl 13.00 here keeps apart
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
+- [ ] `100460d0` 2285 — Npc_ShockByLink (npc_link_shock.cpp, behaviour 0x17, C++ linkage): the body from the link search to the reset matches; after the link-gone check the original stores mode = 1, held = al (0) and wait = 1, then tests the same link value again before talk % 10 (ours hoists the talk load and reorders the stores), and keeps index in ebp, i in edi with index*0x249c spilled to [esp+0x24] (ours in ebx); nested if/else, goto, a link local with an explicit second test and a (char) store tried
 - [ ] `10047440` 1473 — Npc_PushCart (npc_wheel.cpp): flow and calls line up; the original keeps the pointer to DAT_10210b30[index] in a stack slot (it reuses ebx for the slot kind after Char_ResetState) and pushes -1 before reading fs:[0]; cl 13.00 here folds the pointer back into [index*4], so the frame is 4 bytes smaller
 - [ ] `10047a10` 1598 — Npc_RideBehindMarker (npc_ride.cpp): 4 bytes; the marker heading copy lives in the slot of the cached distance pointer in the original, cl 13.00 here puts it in the turn variable's slot
 - [ ] `10049650` 822 — Wave_Update (enemy_spawn.cpp): code identical apart from stack slots; the original puts the position vector right after the counters (group, earliest and slot above it), cl 13.00 here puts the loop scalars first; declaration orders and scopes tried
@@ -111,6 +113,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
 - [ ] `1005c680` 1846 — Bgm_Update (bgm_update.cpp, 1648 vs 1846 bytes): the BGM start, position and ftol half and every bar easing body match; the original unrolls the two 32-bar loops with 8 separate byte-pointer induction variables (4 spilled) and the float pointer as the loop test, ours folds them into one pointer plus displacements; frame struct, byte array, macro index, float-pointer loop variable and 8 explicit lane pointers tried
 - [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
+- [ ] `1005ecb0` 2161 — Gimmick_Use (gimmick_use.cpp, 2016 vs 2161 bytes): the original keeps idx*0xfc in esi through the function (reloaded after each call, reused at the merge points) with ebx = 0, edi = 0xf, ebp = 1; ours recomputes the index at each merge; a slot-access macro, a slot pointer and an index local tried. Cleanup before matching: gimmick_slot.h declares DAT_10860cec[0x41] (GimmickSlot : Latch, 0xfc) while world.h declares the same table as EffectSlot DAT_10860df0 (8 bytes into each record): merge them into one type
 - [ ] `1007b870` 2009 — Npc_GatedRouteCarrier (npc_gate_carrier.cpp, behaviour 0xd, 2016 bytes): frame 0x6c vs 0x64; the original shares the 0x14 slot (route output param / the index*16 temporary) and 0x18 (output value / distance / z) and keeps route in the 0x10 temporary slot; block-scoped outputs give the 0x64 frame but lose the top-of-function zero stores (+16 bytes); 24 declaration orders, a float output, hoisted route tried
 - [ ] `10089210` 2033 — ListBank::RunStatements (script_run.cpp, 2048 vs 2033 bytes): structure, stack slots and calls match; from the switch default sprintf onward the scratch registers shift by one (original eax/edx, ours edx/ecx) and the loop-entry compare is cmp edx,ecx / jbe instead of cmp ecx,edx / jae; || form, a hit variable, goto into the else, while/do/for(;;) and reversed operands tried
 - [ ] `10099b30` 2897 — Enemy_StrafeAndBurst (enemy_strafe.cpp, rule-clean): the same ebx/edi swap as 1009a690, and the idle block (motion 2, then `if (rand % 100 > 2) return 0;` before the motion-speed check) is merged into two copies (chase/left/right and back) where the original has one, placed before the end check. The defeated branch matches only as an if/else with two full FUN_1003a7d0 calls (cl hoists the common arguments); a ternary path is evaluated first.
@@ -141,6 +144,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 - [ ] `100ed9b0` 1258 — ListBank::CompileStatement (listbank.cpp, 1264 vs 1258 bytes): all but the int/float/string tail matches; the original puts the string-test jne to the call block, then the shared error block, the float declare and the call block last, without cross-jumping the int/float DeclareFromText tails; every spelling gives call-first (1264) or merged declares (1248)
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
+- [ ] `10115cd0` 2163 — ItemDictionary_Update (item_dictionary.cpp, 2176 bytes, 119 off): only the prologue register choice differs (original loads the DAT_104bf8bc flag into eax after push eax with the constant 1 in ecx and later in ebp; ours loads the flag into ecx before push -1 with 1 in eax, so mov [x],eax is 1 byte shorter and a nop shifts the first loop); obtained[4] (frame 0x3c0), function-scope locals, x==0/!x/local flag, store orders and the fade ladder all tried. FUN_101603c0 is int* here but unsigned* in save_write.cpp (original sar)
 - [ ] `10137b10` 1889 — Game_FrameStep (frame_step.cpp, 1904 vs 1889 bytes; was named Screenshot_Capture): one register residue spreads through the function: the original keeps the constant 1 in ebx throughout and writes 100 as an immediate or through esi, ours puts 100 in ebx and 1 in edi; limit local vs direct stats compare, store order, reversed compare and a mode local tried
 - [ ] `1013e260` 428 — UserFolder_FindNt: identical apart from block placement (the original puts the strcpy(base) branch out of line after the fsetup.dll loop and jumps back; ours keeps it before the loop); if/else orders and the combined test tried
 - [ ] `1013e4f0` 431 — GameWindow::WindowProc (the base RenderWindow::WindowProc 0x1013e450 is DefWindowProc): an inline base WindowProc called from each case duplicates the tails like the original but cl 13.00 then propagates message constants and does not cache window/wParam in ebx/edi; has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
@@ -227,8 +231,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019d8e0` 954 — Node::ComputeBounds: control flow and stores in place; the -999999 constant and the y min/max slots use other registers/slots (ecx and swapped 0x18/0x1c in the original), declaration orders tried
 - [ ] `1019e120` 1246 — Node::BuildCollisionSpheres: 14 bytes; identical except that the original encodes the indexed loads with the offset register as base ([ecx + ebx + 4] for vertices, [edi + edx + 4] for the pack lists), ours with the pointer register first (typed vertex struct tried)
 - [ ] `1019eeb0` 844 — Node::SetupSkinning (M_1019eeb0): identical except the bone != 0 test in the parent-name condition, which cl 13.00 here drops (the original keeps test eax, eax; je); local and re-read forms tried
+- [ ] `101a0cf0` 2380 — Node::SphereHitsMesh (node_sphere_hits.cpp, 2416 vs 2380 bytes, frame 0x154 vs 0x15c): the original copies radius into the shared float slot [esp+0x14] and reloads it for radius*radius, and reloads this->triangleSpheres twice (no CSE) where ours propagates the copy and CSEs; the pack byte offset lives in ebx in the original, in ecx via a spill in ours; the two hit blocks sit after the main loop in the original. Tried: float reach=radius copy, by-value/const-ref Squared() helper, reach reuse, early index vars, swapped compares. Cleanup before a match: VertexPack::Sphere() casts this to Vec4* (mesh.h) and the (double)radius compares lack a source reason
+- [ ] `101a4a60` 2157 — Node::ScanChunks (model_scan_chunks.cpp, 30 diff lines): only the two plug allocations (PLUG, PLU2): the original loads the size, pops the Mem_Alloc arguments and pushes the Read arguments before storing plugs[g] (mov [esi],eax just before the Read call), ours stores first; the debug name "c->m_plugdata[g]" suggests an allocation macro on a local c; a data local, assignment inside the arguments, a size copy and reading plugs[g] back tried
 - [ ] `101a82d0` 1153 — Node::BuildMesh (node_mesh_build.cpp, rule-clean): everything matches (aligned frame, the unrolled table loop, the strength-reduced triangle loop) except the operand order of the VertexPack addresses: the original writes [index*0x74 + packs], ours [packs + index*0x74] (5 places) and the register of the third vertex index load (ecx, ours esi). The first vertex now matches (index kept in `vertex`, no Vertex pointer). Tried: (list + packs)->, i + packs, char-pointer offsets in either order, unsigned/short/long/const/register indices, unsigned tables, table lookups inline, a pack pointer (caches packs), an inline PackAt(packs, i) helper, a fresh material local, indices through a row pointer (loses the strength reduction). cl seems to put a reloaded member pointer as base and a parameter as index; the original treats packs like a parameter.
 - [ ] `101a8e60` 2060 — Node::Collide (node_mesh_hits.cpp, rule-clean): body after the region prologue is SegmentHitsMesh's matched code. Original: both kind arms load the cell into bl (the register caching DAT_11b04514) and share the tail test bl,bl/mov ecx,6/je; both CDL arms cmp memory; the switched-off jump shares the tag-fail restore (mov ebp then mov edi). Ours: one arm of each pair cmp memory, the other loads, so tails do not merge. Tried (2026-11-23): local cell var (gets dl, list moves to edi), local initialised from DAT_11b04514, join-test after both arms (the compiler tail-duplicates it), inline CellState helper, bool cast, ternary on the list. The 'CDL region table' DAT_11affdd8 was DAT_11afffe8 - 0x210 (folded '0' digits): fixed.
+- [ ] `101aa080` 2442 — Node::CastSegment2 (node_segment_cast.cpp, 2512 vs 2442 bytes): body, triangle loops, nearest-hit update and both child loops match; only the kind/name pre-check register allocation differs (original keeps the cell/name char in bl and tail-merges "ecx=6; je skip; cmp al,0xfd"; ours uses dl/al and loads movsx [esi+4] first); char cell local, one shared char local (worse), kind-first branch order, static loop first and the counter/found placement tried
 - [ ] `101acc60` 301 — DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
 - [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
@@ -251,18 +258,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (32)
+## 4. Large functions (801-3000 bytes) (24)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
-- [ ] `10146db0` 2152 bytes (calls 52)
-- [ ] `101a4a60` 2157 bytes It3_ScanChunks (loops 7, calls 74)
-- [ ] `1001e4b0` 2161 bytes (float, loops 10, calls 45)
-- [ ] `1005ecb0` 2161 bytes (loops 3, calls 54)
-- [ ] `10115cd0` 2163 bytes (float, loops 7, calls 53)
-- [ ] `100460d0` 2285 bytes (float, loops 1, calls 57)
-- [ ] `101a0cf0` 2380 bytes (float, loops 8, calls 58)
-- [ ] `101aa080` 2442 bytes (float, loops 4, calls 48)
 - [ ] `1007a370` 2478 bytes (float, calls 52)
 - [ ] `101aaa20` 2483 bytes (float, loops 4, calls 48)
 - [ ] `10020560` 2533 bytes (float, loops 8, calls 30)
@@ -402,7 +401,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (7 files)
+## 7. Comment pass (8 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
@@ -412,6 +411,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/camera_shift_orbit.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/doppler_loops.cpp`: 1 of 2 functions without a comment
 - [ ] `src/homing_shots.cpp`: 1 of 2 functions without a comment
+- [ ] `src/node_sphere_hits.cpp`: 1 of 2 functions without a comment
 - [ ] `src/route_carrier.cpp`: 0 of 2 functions without a comment, no header
 - [ ] `src/route_follow.cpp`: 0 of 0 functions without a comment, no header
 

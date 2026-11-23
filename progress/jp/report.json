@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 20.1364,
+  "fuzzy_match_percent": 20.3948,
   "total_code": "1720206",
-  "matched_code": "252294",
-  "matched_code_percent": 14.6665,
+  "matched_code": "254008",
+  "matched_code_percent": 14.7661,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 829,
-  "matched_functions_percent": 68.3993,
+  "matched_functions": 830,
+  "matched_functions_percent": 68.4818,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 298,
-  "complete_units": 160,
-  "matched_rules_code": "251667",
-  "matched_rules_code_percent": 14.6301,
-  "matched_rules_functions": 828,
-  "matched_rules_functions_percent": 68.3168
+  "total_units": 302,
+  "complete_units": 161,
+  "matched_rules_code": "253381",
+  "matched_rules_code_percent": 14.7297,
+  "matched_rules_functions": 829,
+  "matched_rules_functions_percent": 68.3993
  },
  "units": [
   {
@@ -2996,6 +2996,52 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/camera_setup.cpp"
+   }
+  },
+  {
+   "name": "app/camera_shift_orbit",
+   "measures": {
+    "fuzzy_match_percent": 41.9886,
+    "total_code": "1801",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1801",
+     "fuzzy_match_percent": 41.9886
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10019670",
+     "size": "1801",
+     "fuzzy_match_percent": 41.9886,
+     "metadata": {
+      "virtual_address": "268539504"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/camera_shift_orbit.cpp"
    }
   },
   {
@@ -13119,6 +13165,52 @@
    }
   },
   {
+   "name": "app/npc_patrol",
+   "measures": {
+    "fuzzy_match_percent": 71.6121,
+    "total_code": "1711",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1711",
+     "fuzzy_match_percent": 71.6121
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10044b10",
+     "size": "1711",
+     "fuzzy_match_percent": 71.6121,
+     "metadata": {
+      "virtual_address": "268716816"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/npc_patrol.cpp"
+   }
+  },
+  {
    "name": "app/npc_ride",
    "measures": {
     "fuzzy_match_percent": 98.0,
@@ -17005,6 +17097,52 @@
    }
   },
   {
+   "name": "app/text_draw",
+   "measures": {
+    "fuzzy_match_percent": 42.7928,
+    "total_code": "1755",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1755",
+     "fuzzy_match_percent": 42.7928
+    }
+   ],
+   "functions": [
+    {
+     "name": "?DrawTextA@FontRenderer@@QAEHHHPBDHHMM@Z",
+     "size": "1755",
+     "fuzzy_match_percent": 42.7928,
+     "metadata": {
+      "virtual_address": "269812208"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/text_draw.cpp"
+   }
+  },
+  {
    "name": "app/text_fields",
    "measures": {
     "fuzzy_match_percent": 100.0,
@@ -18062,6 +18200,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/tutorial_page_next.cpp"
+   }
+  },
+  {
+   "name": "app/tutorial_update",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "1714",
+    "matched_code": "1714",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "1714",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1,
+    "matched_rules_code": "1714",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1714",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "?TutorialBook_Update@@YAHXZ",
+     "size": "1714",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268850256"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/tutorial_update.cpp"
    }
   },
   {
@@ -19560,13 +19744,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1307659",
+    "total_code": "1300678",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 181,
+    "total_functions": 177,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -19583,7 +19767,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1307659",
+     "size": "1300678",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -19674,14 +19858,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268535920"
-     }
-    },
-    {
-     "name": "FUN_10019670",
-     "size": "1801",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268539504"
      }
     },
     {
@@ -19893,14 +20069,6 @@
      }
     },
     {
-     "name": "FUN_10044b10",
-     "size": "1711",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268716816"
-     }
-    },
-    {
      "name": "FUN_100460d0",
      "size": "2285",
      "fuzzy_match_percent": 0.0,
@@ -20050,14 +20218,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268846640"
-     }
-    },
-    {
-     "name": "FUN_10065450",
-     "size": "1714",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268850256"
      }
     },
     {
@@ -20722,14 +20882,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269802992"
-     }
-    },
-    {
-     "name": "FUN_101501f0",
-     "size": "1755",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269812208"
      }
     },
     {

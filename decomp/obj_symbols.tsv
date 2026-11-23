@@ -541,3 +541,5 @@ _Enemy_IsBusy	100e1c40
 ?ReadControls@Input@@QAEHH@Z	10143180
 ?IsJoystickButtonDown@Input@@QAEHHPBUJoyState@@@Z	10142b20
 ?IsKeyboardButtonDown@Input@@QAEHHPBE@Z	10142dd0
+?DrawTextA@FontRenderer@@QAEHHHPBDHHMM@Z	101501f0
+?TutorialBook_Update@@YAHXZ	10065450

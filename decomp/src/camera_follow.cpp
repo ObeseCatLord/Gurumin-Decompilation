@@ -170,9 +170,9 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 
 // 0x10019d80 (Camera_Between). A two-character shot: the position goal is the head of character DAT_10da93e0
-// (35 units above its head node, or 75 above it without one), the target goal the head of character DAT_10da93e4
+// (35 units above its head node, or 75 above it without one), the target goal the head of character DAT_10da93e0.y
 // the same way, or 600 units ahead of and 60 below the first when that is negative. The target goal rises by
-// DAT_10da93e8 per cent of the distance between them. The target and position then move 20 % towards their goals
+// DAT_10da93e0.z per cent of the distance between them. The target and position then move 20 % towards their goals
 // plus 80 % towards their previous values, and the copies are refreshed. Returns 0.
 extern "C" int FUN_10019d80(void)
 {
@@ -181,9 +181,9 @@ extern "C" int FUN_10019d80(void)
         FUN_1016a8d0();
         DAT_104c0358 = 1;
     }
-    int first = (int)(DAT_10da93e0 + 0.5f);
+    int first = (int)(DAT_10da93e0.x + 0.5f);
     first = first > 0 ? first : 0;
-    float rounded = DAT_10da93e4 < 0.0f ? DAT_10da93e4 - 0.5f : DAT_10da93e4 + 0.5f;
+    float rounded = DAT_10da93e0.y < 0.0f ? DAT_10da93e0.y - 0.5f : DAT_10da93e0.y + 0.5f;
     int second = (int)rounded;
     if (DAT_10db6ee8[first].headNode != 0)
     {
@@ -214,7 +214,7 @@ extern "C" int FUN_10019d80(void)
         DAT_10edbd48.z += 75.0f;
     }
     if (DAT_10866d98.x > -20000.0f)
-        DAT_10edbd48.z += (DAT_10866d98 - DAT_10edbd48).Length() * DAT_10da93e8 * 0.01f;
+        DAT_10edbd48.z += (DAT_10866d98 - DAT_10edbd48).Length() * DAT_10da93e0.z * 0.01f;
     DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8) * 0.2f +
                       (DAT_10f08aa0 - DAT_118e6cb8) * 0.8f);
     DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8) * 0.2f +

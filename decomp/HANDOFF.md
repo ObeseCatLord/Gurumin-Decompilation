@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 14.67% of code, 829 of 1212 functions |
-| Matched under the rules | 14.63% of code, 828 of the 829 matched functions |
-| Fuzzy match | 20.14% |
+| Matched | 14.77% of code, 830 of 1212 functions |
+| Matched under the rules | 14.73% of code, 829 of the 830 matched functions |
+| Fuzzy match | 20.39% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -75,6 +75,10 @@ function) and node_world.cpp (0) still break rule 2.
   TextureManager::CreateDevice 0x10148b00 (src_od/render_device.cpp, an /Od unit; render_device.h types the D3D
   structs; build_all now passes /Op- for src_od), TextureObject::DrawFill 0x1014ce40 (texture_fill.cpp) and
   Input::ReadControls 0x10143180 (input_controls.cpp; the joystick_buttons.cpp helpers became Input methods).
+- Batch 326: TutorialBook_Update 0x10065450 matched (tutorial_update.cpp, C++ linkage for the EH frame;
+  tutorial_book.h). Lead: the four tutorial_open/page_next drafts are extern "C" and may need C++ linkage too.
+  Drafts: FontRenderer::DrawText 0x101501f0 (text_draw.cpp), Camera_ShiftOrbit 0x10019670 (camera_shift_orbit.cpp;
+  DAT_10da93e0 is a Vec4 now), Npc_PatrolRoute 0x10044b10 (npc_patrol.cpp; CharState::arrivalAction).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

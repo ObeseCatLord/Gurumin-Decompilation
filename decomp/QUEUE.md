@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (205)
+## 1. Walls to retry (208)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -41,6 +41,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10016700` 694 — Ground_HeightAt: the spill copy of the first fabs comes from summing two casts in one expression (written so); left: cl 13.00 here evaluates the column term first (the original the row term, whatever the source order) and the weight is copied through edx before the > 1 test
 - [ ] `10017d30` 488 — RenderTarget_Probe: 2 bytes; the original compares the second UpdateImage result with the zero register (cmp eax, ebp), ours uses test eax, eax; !x and result-local forms tried
 - [ ] `10019310` 849 — Camera_Shift: same statements; block layout differs (the original keeps the shrink branch on the fallthrough of the counter tests and cross-jumps into the shift branch's final Copy) and the shift-goal subtraction loads its operands in another order; branch order swapped tried
+- [ ] `10019670` 1801 — Camera_ShiftOrbit (camera_shift_orbit.cpp, 1760 vs 1801 bytes): statements complete; block layout differs like Camera_Shift 0x10019310 (the original puts the fade block on the counter-test fallthrough before the shift block, ours after it) and the 0.15/0.85 temporaries take other stack slots; !(c != 0 && --c != 0) tried
 - [ ] `1001b0a0` 1106 — Char_SelectKind: same statements; register roles differ from the start (original: index in ebx, kind pointer in esi, the ten-thousands pair in ebp tested with a dec chain; cl 13.00 here keeps index in ebp and compiles that switch as a compare tree) and the original reloads the kind for the 0x55 test; kind-pointer local and if-chain forms tried
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
@@ -75,6 +76,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
 - [ ] `1003b6e0` 1208 — Costume_LoadPlayerModel (costume_load.cpp, 1200 vs 1208 bytes): logic matches; the original holds index*0x249c in ebx and reads variant from the stack (ours keeps variant in ebx); costume 11/12 sprintf pushes per-branch format constants after hoisted pushes; speedScale copy via eax vs ecx
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
+- [ ] `10044b10` 1711 — Npc_PatrolRoute (npc_patrol.cpp, 1712 = 1712 bytes): the original shares the float temporaries with the address-taken Route_Follow outputs (action 0x20, point 0x10, keep 0x1c), stores state/keep = 1 after the talk divide, stores the state-1 angle to memory before targetHeading and branches for PlayMotion(group != 0); about 12 spellings and all 120 declaration orders tried
 - [ ] `100451c0` 1644 — Npc_WalkRoute (route_carrier.cpp): flow and calls line up; the original frame is 8 bytes smaller: the float temporaries (speed, 0.1/0.9 factors, heading) reuse the slots of the Route_Follow results (reached, action), which cl 13.00 here keeps apart
 - [ ] `10045ed0` 497 — Npc_ApproachPlayer: logic identical; scheduling of the offset copy (the original interleaves the y store and the z doubling with the copy and stores z before the Length call); four doubling spellings tried
 - [ ] `10047440` 1473 — Npc_PushCart (npc_wheel.cpp): flow and calls line up; the original keeps the pointer to DAT_10210b30[index] in a stack slot (it reuses ebx for the slot kind after Char_ResetState) and pushes -1 before reading fs:[0]; cl 13.00 here folds the pointer back into [index*4], so the frame is 4 bytes smaller
@@ -148,6 +150,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014d850` 1429 — TextureObject::DrawFillAlt (texture_bind.cpp): loop and calls line up; the original keeps 1 and 0 in esi/ecx while filling the shade table (and later for the render states), spills i & 1 and indexes the arrays with a byte offset, cl 13.00 here schedules the array setup differently and the frame is 0xc smaller; array declaration orders and colour forms tried
 - [ ] `1014f1f0` 806 — TextureObject::Upload (texture_bind.cpp): calls and branches line up; the original frame is 8 bytes larger (separate slots for the two lock rectangles and a row counter in memory) and its pixel loops step three separately reduced source pointers; index spellings and declaration placements tried
 - [ ] `1014f900` 1070 — FontRenderer::DrawStringToPixels (font_metrics.cpp, rule-clean, 1072 vs 1070 bytes): the proportional "s" pad loop keeps its column counter in the colour parameter slot (0x44, incremented through a register) and the final four-pixel fill keeps its pointer in edx; loop forms, function-scope column/row and tail pointer forms tried
+- [ ] `101501f0` 1755 — FontRenderer::DrawText (text_draw.cpp, 1776 vs 1755 bytes): bitmap-font branch matches; in the Windows-font branch the original keeps text in ebp (slot text in eax in the strcmp loop), pushes literal zeros for TextOutA instead of a register, and holds colour16/opaque in ebp; pixel-loop counters and the DrawTinted tail pushes differ (register allocation); int/ushort opaque, pointer and do/while loops, branch swap tried
 - [ ] `10150bb0` 1421 — MeshData::M_10150bb0 / BuildBuffers (mesh_build.cpp, 1440 bytes, 505 diff bytes): the original pushes only ebx/ebp up front and esi/edi after the FUN_101477c0 call, with a two-pop early return (shrink-wrapping), keeps zero in ebx and spills totalIndices*2 into the dead materials parameter slot; early-out and declaration forms tried
 - [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
 - [ ] `1015f4e0` 1429 — TextInput_Update (text_input.cpp, 1440 vs 1429 bytes, 51 diffs): one register swap in the candidate loop (original keeps the page size DAT_10f66ab0 in esi and the line counter in edi, and pushes ebp/edi a block later); counter scope/type, compare order and pointer forms tried. Must stay out of ime.cpp (13.00 forwards the globals across the ImeContext calls in that TU)
@@ -226,15 +229,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (65)
+## 4. Large functions (801-3000 bytes) (61)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
-- [ ] `10044b10` 1711 bytes (float, loops 2, calls 44)
-- [ ] `10065450` 1714 bytes (float, loops 6, calls 42)
-- [ ] `101501f0` 1755 bytes (float, loops 10, calls 19)
 - [ ] `100b7b10` 1798 bytes (float, loops 1, calls 33)
-- [ ] `10019670` 1801 bytes (float, loops 4, calls 73)
 - [ ] `1003bc60` 1804 bytes (float, loops 8, calls 38)
 - [ ] `1002a740` 1833 bytes (float, loops 3, calls 52)
 - [ ] `1016b6c0` 1833 bytes (float, loops 6, calls 18)
@@ -410,11 +409,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (2 files)
+## 7. Comment pass (3 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
+- [ ] `src/camera_shift_orbit.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/route_carrier.cpp`: 0 of 2 functions without a comment, no header
 - [ ] `src/route_follow.cpp`: 0 of 0 functions without a comment, no header
 

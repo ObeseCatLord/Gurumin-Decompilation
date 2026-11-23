@@ -10,6 +10,7 @@
 #include "game_vars.h"
 #include "render_vars.h"
 #include "ui_vars.h"
+#include "tutorial_book.h"
 
 extern "C" int FUN_100235e0(int mode);
 extern "C" int FUN_1001e1a0(const char *name, const char *alphaName);  // Texture_Load

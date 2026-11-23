@@ -71,6 +71,12 @@ extern "C" int DAT_10c6504c;                              // the left page last 
 extern "C" int DAT_10c65050;                              // the left page last shown in the second book
 extern "C" int DAT_104c03e8;                              // non-zero in the second book
 extern "C" char DAT_1065cb30;                             // a key of the current input frame (DemoRecording::buttons_now[4])
+extern "C" char DAT_1065cb31;                             // a key of the current input frame (DemoRecording::buttons_now[5]); closes the tutorial book
+extern "C" char DAT_1065cb3e;                             // a key of the current input frame (DemoRecording::buttons_now[0x12])
+extern "C" char DAT_1065cb3f;                             // a key of the current input frame (DemoRecording::buttons_now[0x13])
+extern "C" int DAT_1065cb48;                              // first analogue value of the input frame (DemoRecording::values_now[0]): left/right
+extern "C" int DAT_1065cb4c;                              // second analogue value of the input frame (DemoRecording::values_now[1]): up/down
+extern "C" int DAT_1065cb90;                              // non-zero = the mouse is not read in the tutorial book
 extern "C" Matrix4 DAT_1086df38;                          // the player's world matrix; viewer matrix
 extern "C" char DAT_10875e48[0x40][0x20];                 // movie names
 extern "C" ItemName DAT_1088e670[];

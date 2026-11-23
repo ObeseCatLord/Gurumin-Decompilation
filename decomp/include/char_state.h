@@ -177,6 +177,7 @@ struct CharState
                     union                         // 0x34
                     {
                         int m_0034;
+                        int arrivalAction;        // npc_patrol.cpp: action of the last route point reached
                         int hopHistory;           // enemy_strafe.cpp (Enemy_HopAndStrafe): HopHistory state of
                                                   // the position history in LastPosition
                     };

@@ -36,9 +36,11 @@ extern "C" int DAT_10c6356c;                              // the shot's point as
 extern "C" int DAT_10c63570;
 extern "C" int DAT_10c63574;
 extern "C" Vec4 DAT_10c67ff0;                             // the target goal of a camera shift
-extern "C" float DAT_10da93e0;                            // the character the camera stands at (rounded to an index)
-extern "C" float DAT_10da93e4;                            // the character it looks at (rounded; below 0 = in front of the first)
-extern "C" float DAT_10da93e8;                            // how much the target rises with the distance (per cent)
+// 0x10da93e0: in Camera_Between x = the character the camera stands at (rounded to an index), y = the character it
+// looks at (rounded; below 0 = in front of the first), z = how much the target rises with the distance (per cent);
+// in Camera_ShiftOrbit the point the camera position orbits.
+extern "C" Vec4 DAT_10da93e0;
+extern "C" Vec4 DAT_10874838;                             // orbit centre of the camera target (Camera_ShiftOrbit)
 extern "C" Vec4 DAT_10da93f0;                             // the orbit centre (the player's position)
 extern "C" Vec4 DAT_10edbd48;                             // goal of the target (the followed node's position when there is one)
 extern "C" Vec4 DAT_10f08aa0;                             // the target of the previous frame

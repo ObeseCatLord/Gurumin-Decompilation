@@ -66,7 +66,7 @@ struct CharSlot
     int m_00a4;
     int m_00a8;               // 0xa8: read for the previous slot when sharing models (char_motion.cpp)
     int m_00ac;
-    int m_00b0;
+    int routeRecord;          // 0xb0: the map record (DAT_10210fc0) whose route the character walks (map_cursor.cpp)
     int m_00b4;
     int m_00b8;
     int money;                // 0xbc: the player's money (slot 0, guarded by the anti-tamper check); -1 for the

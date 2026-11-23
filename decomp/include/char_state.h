@@ -88,6 +88,7 @@ struct CharState
                         int companionHealthCap;   // companion_update.cpp (owner slot): a revived companion gets
                                                   // at most 2000 + this
                         int weaponMarkB;          // weapon_attach.cpp: -2 after an unknown weapon (no model)
+                        int fleeSide;             // enemy_flee.cpp: 1 = veers left, 2 = veers right (picked at random)
                     };
                     union                         // 0x10
                     {
@@ -158,7 +159,12 @@ struct CharState
                         int hopFrame;             // enemy_strafe.cpp (Enemy_HopAndStrafe): frame of the hop
                                                   // under way (0 = not hopping)
                     };
-                    int m_0030;
+                    union                         // 0x30
+                    {
+                        int m_0030;
+                        int arrivalHold;          // map_cursor.cpp: frames left in which the cursor counts as
+                                                  // having been carried by a rider (15 after one lands on it)
+                    };
                     union                         // 0x34
                     {
                         int m_0034;

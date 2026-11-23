@@ -9,6 +9,7 @@
 #include "char_state.h"
 
 #include "enemy_queue.h"
+#include "enemy_flee.h"
 extern "C" int FUN_10026af0(int index);
 extern "C" int FUN_10026b70(int index);
 extern "C" int FUN_10026c50(int index);
@@ -17,7 +18,6 @@ extern "C" int FUN_10026d80(int index, float range);
 extern "C" int FUN_10027400(int index);
 extern "C" int FUN_10027560(int index);
 extern "C" int FUN_10027630(int index, int flag);
-extern "C" int FUN_100279b0(int index, int a, int b);
 extern "C" int FUN_10027da0(int index, int a);
 extern "C" int FUN_10028360(int index, int a);
 

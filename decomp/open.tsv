@@ -1,5 +1,6 @@
 address	status	reason
 10015910	open	settings byte flags: cl 13.00 here threads the three mode tests (after mode == 0 it jumps past the others), the original tests each in turn; flag-array, local copy and (char)mode forms tried
+10051190	open	MapCursor_Step (map_cursor.cpp, rule-clean draft, 1024 vs 988 bytes): register allocation from the start (original: index in edi, slot offset in ebx, rider flag in ecx and two stack slots; ours index in ebp, flag in esi) and the early-test order; held/hold-pointer/reference forms tried; next: the shared rider block written with a goto, then a permuter run
 10169720	open	memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 1016b010	open	original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 1016c300	open	control-flow layout of a three-way flag test differs (two source shapes tried)

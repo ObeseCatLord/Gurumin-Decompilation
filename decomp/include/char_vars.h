@@ -85,6 +85,7 @@ extern "C" char DAT_108f678c[][0x240];                    // item model paths
 extern "C" short DAT_10b314c0;                            // last face frame set
 extern "C" ModelPath DAT_10b314c8[];                     // the model file of each model number
 extern "C" int DAT_10c62ed0;                              // current map
+extern "C" int DAT_10c63520;                              // 1 while a rider stands on the map cursor
 extern "C" int DAT_10c6351c;                              // the character being talked to
 extern "C" int DAT_10c6358c;                              // look-around step: 0..9 = one side, -1..-9 = the other side
 extern "C" int DAT_10c635a8;                              // wave enemies still alive

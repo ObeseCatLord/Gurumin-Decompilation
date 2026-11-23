@@ -15,18 +15,24 @@ reading it, then `AGENTS.md`.
 - Hard rules from `AGENTS.md` (typed members, one declaration per type, no fakematches, never commit a lost match).
 
 ## Progress (2026-11-23, `progress/jp/report.json`)
-| measure | value |
+| Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 13.15% of code (226128 of 1720206 bytes), 806 of 1212 functions |
-| Matched under the rules | 13.11% of code (225501 bytes), 805 of the 806 matched functions |
-| Fuzzy match | 17.37% |
+| Matched | 13.37% of code (230058 of 1720206 bytes), 811 of 1212 functions |
+| Matched under the rules | 13.34% of code (229431 bytes), 810 of the 811 matched functions |
+| Fuzzy match | 17.79% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
 function) and node_world.cpp (0) still break rule 2.
 
 ## State
+- **Workflow (parent session, 2026-11-23):** per-function matching goes to Sonnet subagents (2-3 in parallel on
+  disjoint files) with a self-contained brief (tools, idioms, hard rules, "report: matched or bytes off, do not
+  commit"); the Opus session picks functions, verifies with build_all + check_matches, commits, pushes, updates this.
+- Batches 310-311 matched Watcher_Update 0x10026730 (hover_watcher.cpp), Map_RoutePosition 0x10049b00
+  (map_route.cpp: points at 2i/2i+1, 1-based marks[], three locals sharing one slot) and Enemy_BackAwayFromPlayer
+  0x100279b0 (enemy_flee.cpp + enemy_flee.h). MapCursor_Step 0x10051190 is a draft (map_cursor.cpp, open.tsv).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the
@@ -52,7 +58,8 @@ function) and node_world.cpp (0) still break rule 2.
    enemy_barrage.cpp shows the shared shapes: Vec4 player/self, atan2 facing, EffectOptions + Matrix4 temporaries).
 3. Near-misses with a genuinely new idea: the stack-slot swaps of 100a7150/100a6a50 (maybe a permuter run),
    Enemy_FlyAndStrafe's clamps, 1009d490's side-step tails, the 1009a690/10099b30 swap.
-4. Other section 4-5 functions next to matched rule-clean code (`decomp/QUEUE.md`).
+4. Section 4 large functions of `decomp/QUEUE.md` in order (character behaviours run from 0x100f9670 and the
+   map-route family match well: delegate them to subagents).
 
 ## How the merges were run (reuse)
 - Types: `python tools/type_move_driver.py apply <files>` then `python tools/prune_header_includes.py <new headers>`;

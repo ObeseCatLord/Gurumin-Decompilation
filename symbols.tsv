@@ -5,6 +5,9 @@ address	name	evidence
 10001ee0	SoundArc_Init	formats ".\soundarc.dll" / "%s\soundarc.dll"
 10002440	MapData_Load	opens bin\map.itm, descrambles, parses #...Table sections
 10026730	Watcher_Update	hovering watcher: faces the player, keeps its home height, eases its turn (behaviour from 0x100f9670)
+100279b0	Enemy_BackAwayFromPlayer	enemy walks away from the player veering 5 degrees (enemy_flee.cpp)
+10049b00	Map_RoutePosition	point at fraction t of a map record route (map_route.cpp)
+10051190	MapCursor_Step	moves a cursor along a map record route (map_cursor.cpp, draft)
 101615d0	ItmDescramble	key "GURUguruMinmIN_", sum/xor check (docs/ITM_FORMAT.md)
 10161120	Path_GetBaseName	copies the file name without directory and extension
 1013f910	MakeDataPath	sprintf("%s\\%s", base dir, name) into 4 rotating buffers

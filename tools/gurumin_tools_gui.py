@@ -23,6 +23,8 @@ import subprocess
 import sys
 import threading
 
+import asset_groups
+
 TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_DIR = os.path.dirname(TOOLS_DIR)
 SETTINGS_PATH = os.path.join(os.path.expanduser("~"), ".gurumin_tools_gui.json")
@@ -332,7 +334,7 @@ class Settings(dict):
     """game_dir, mod_dir, packs_dll - saved as JSON in the user's home folder."""
     def __init__(self):
         super().__init__(game_dir="", mod_dir=os.path.join(os.path.expanduser("~"), "Documents", "Gurumin_mod"),
-                         packs_dll="")
+                         packs_dll="", sort_exports=True)
         try:
             with open(SETTINGS_PATH, encoding="utf-8") as f:
                 self.update(json.load(f))
@@ -513,24 +515,48 @@ def build_gui():
         def start_folder(self):
             return self.game_dir() or self.mod_dir() or REPO_DIR
 
+        def file_groups(self):
+            """Sorts game files into character/type folders (built once per game folder: reads map.itm and models)."""
+            if getattr(self, "_groups_for", None) != self.game_dir():
+                self._groups = asset_groups.AssetGroups(self.game_dir())
+                self._groups_for = self.game_dir()
+            return self._groups
+
+        def game_rel_for_name(self, game_name):
+            """Path of a game file inside the game folder, found by its name (names are unique in the game)."""
+            if getattr(self, "_index_for", None) != self.game_dir():
+                self._index = asset_groups.game_file_index(self.game_dir()) if self.game_dir() else {}
+                self._index_for = self.game_dir()
+            return self._index.get(game_name.lower(), "")
+
         def edit_path_for(self, game_file, kind, ext=None, sub=None):
-            """Default export target: <mod>/edit (or /reference) mirroring the game; next to the file otherwise."""
+            """Default export target: <mod>/edit (or /reference), sorted into character/type folders or mirroring
+            the game's folders; next to the file when no mod folder is set."""
             ext = ext or (kind.edit_ext if kind else ".out")
             if self.mod_dir() and is_inside(game_file, self.game_dir()):
                 rel = os.path.relpath(game_file, self.game_dir())
                 sub = sub or ("reference" if kind and kind.reference else "edit")
+                if self.settings.get("sort_exports", True):
+                    group = self.file_groups().group_for(os.path.basename(game_file))
+                    rel = os.path.join(*group.split("/"), os.path.basename(game_file))
                 return os.path.join(self.mod_dir(), sub, rel + ext)
             if is_inside(game_file, self.game_dir()):
                 return ""
             return game_file + ext
+
+        def game_rel_for_edit(self, edit_file, game_name):
+            """Game path of an edited file: by name from the game folder (sorted exports), else by its position in
+            <mod>/edit (exports that mirror the game's folders)."""
+            edit_root = os.path.join(self.mod_dir(), "edit")
+            return self.game_rel_for_name(game_name) or os.path.relpath(
+                os.path.join(os.path.dirname(edit_file), game_name), edit_root)
 
         def out_path_for(self, edit_file, kind):
             """Default import target: <mod>/out/<game path> for files in <mod>/edit; next to the file otherwise."""
             game_name = game_name_for_edit_file(os.path.basename(edit_file), kind)
             edit_root = os.path.join(self.mod_dir(), "edit")
             if self.mod_dir() and is_inside(edit_file, edit_root):
-                rel = os.path.relpath(os.path.join(os.path.dirname(edit_file), game_name), edit_root)
-                return os.path.join(self.mod_dir(), "out", rel)
+                return os.path.join(self.mod_dir(), "out", self.game_rel_for_edit(edit_file, game_name))
             return os.path.join(os.path.dirname(edit_file), game_name)
 
         def original_for_edit(self, edit_file, kind):
@@ -538,8 +564,7 @@ def build_gui():
             edit_root = os.path.join(self.mod_dir(), "edit")
             if self.game_dir() and self.mod_dir() and is_inside(edit_file, edit_root):
                 game_name = game_name_for_edit_file(os.path.basename(edit_file), kind)
-                rel = os.path.relpath(os.path.join(os.path.dirname(edit_file), game_name), edit_root)
-                return os.path.join(self.game_dir(), rel)
+                return os.path.join(self.game_dir(), self.game_rel_for_edit(edit_file, game_name))
             return ""
 
         def run(self, jobs):
@@ -798,10 +823,12 @@ def build_gui():
 
         def _build_mod_tab(self):
             tab = self.new_tab("Mod", "1. Export game files into the mod folder (edit\\ for editable files and "
-                               "movie frame folders, reference\\ for models).  2. Edit them with any editor.  3. Repackage: the "
-                               "game files are rebuilt in the mod's out\\ folder with the game's folder layout.  Copy "
-                               "out\\ over a backup of the game to play the mod. Reopening a mod folder later picks up "
-                               "where you left off.")
+                               "movie frame folders, reference\\ for models), sorted into folders by character "
+                               "(Characters\\Parin, Enemies\\Slime, ...) or type (Maps, Items, ...).  2. Edit them with "
+                               "any editor; textures may be larger than the originals (up to 2048x2048).  3. Repackage: "
+                               "the game files are rebuilt in the mod's out\\ folder with the game's folder layout.  "
+                               "4. Install into the game: the mod DLL loads them from the game's mod\\ folder, nothing "
+                               "of the game is overwritten. Reopening a mod folder later picks up where you left off.")
             top = self.section(tab, "Export from the game")
             self.mod_kind_vars = {}
             kinds_bar = ttk.Frame(top)
@@ -813,6 +840,11 @@ def build_gui():
             self.buttons(top, 1, ("Export chosen files...", self._mod_export_files),
                          ("Export a game sub-folder (ticked types)...", self._mod_export_folder),
                          ("Export the whole game (ticked types)", lambda: self._mod_export_tree(self.game_dir())))
+            self.sort_var = tk.BooleanVar(value=self.settings.get("sort_exports", True))
+            ttk.Checkbutton(top, text="Sort exports into folders by character or type (Characters\\Parin, Maps, "
+                            "Items, ...); off = the game's own folders", variable=self.sort_var,
+                            command=lambda: self.settings.__setitem__("sort_exports", self.sort_var.get())).grid(
+                row=2, column=0, columnspan=3, sticky="w", padx=4)
 
             box = self.section(tab, "Files in the mod")
             columns = ("game", "edit", "status")
@@ -833,6 +865,32 @@ def build_gui():
                          ("Open edit folder", lambda: self.open_folder(os.path.join(self.mod_dir(), "edit"))),
                          ("Open out folder", lambda: self.open_folder(os.path.join(self.mod_dir(), "out"))))
             self.mod_items = {}
+
+            play = self.section(tab, "Play the mod")
+            ttk.Label(play, wraplength=900, justify="left", text=(
+                "Install copies out\\ to the game's mod\\<mod name>\\ folder and adds the mod DLL (d3d9.dll and "
+                "gurumin_mod.ini) next to game.exe. The DLL loads every file in mod\\ in place of the game's file of "
+                "the same name; the game's own files are not touched. Remove takes this mod's folder out again "
+                "(mod\\uninstall.bat removes the DLL).")).grid(row=0, column=0, columnspan=3, sticky="w", padx=4)
+            self.buttons(play, 1, ("Install into the game", self._mod_install),
+                         ("Remove from the game", self._mod_uninstall),
+                         ("Open the game's mod folder", lambda: self.open_folder(os.path.join(self.game_dir(), "mod"))))
+
+        def _mod_name(self):
+            return os.path.basename(os.path.normpath(self.mod_dir())) or "mod"
+
+        def _mod_install(self):
+            if not self._mod_ready():
+                return
+            out_dir = os.path.join(self.mod_dir(), "out")
+            self.run([Job("install %s into %s\\mod" % (self._mod_name(), self.game_dir()),
+                          tool_command("mod_install.py", "install", out_dir, self.game_dir(), self._mod_name()))])
+
+        def _mod_uninstall(self):
+            if not self._mod_ready():
+                return
+            self.run([Job("remove %s from %s\\mod" % (self._mod_name(), self.game_dir()),
+                          tool_command("mod_install.py", "remove", self.game_dir(), self._mod_name()))])
 
         def _ticked_kinds(self):
             return [k for k in FILE_KINDS if self.mod_kind_vars[k.key].get()]
@@ -893,7 +951,7 @@ def build_gui():
             rows = []
             for edit_file in find_files(edit_root, lambda n: kind_for_edit_file(n) is not None, frame_folders=True):
                 kind, game_name = kind_for_edit_file(edit_file)
-                game_rel = os.path.relpath(os.path.join(os.path.dirname(edit_file), game_name), edit_root)
+                game_rel = self.game_rel_for_edit(edit_file, game_name)
                 out_file = os.path.join(mod, "out", game_rel)
                 mtime = edit_mtime(edit_file)
                 rec = exported.get(os.path.relpath(edit_file, mod).replace(os.sep, "/"))

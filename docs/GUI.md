@@ -27,13 +27,17 @@ game folder holds" counts the files of each type.
 
 ## Making a mod: the Mod tab
 1. **Export.** Tick the file types you want and press *Export chosen files...* (pick files in the game folder),
-   *Export a game sub-folder...* or *Export the whole game*. The editable files land in `<mod>\edit\` with the same
-   sub-folders as the game.
+   *Export a game sub-folder...* or *Export the whole game*. The editable files land in `<mod>\edit\`, sorted into
+   folders by character (`Characters\Parin\`, `Enemies\Slime\`, `Bosses\Giga\`) or type (`Maps\`, `Items\`,
+   `Interface\`, `Movies\`, ...). Untick *Sort exports* to keep the game's own sub-folders instead.
 2. **Edit** the files with any program: text editor for scripts, image editor for textures and the font, audio
    editor for music.
 3. **Repackage.** *Repackage edited files* rebuilds only what you changed; *Repackage selected* and *Repackage all*
    do what they say. The rebuilt game files go to `<mod>\out\`, again with the game's sub-folders.
-4. **Play.** Back up the game folder, then copy the contents of `<mod>\out\` over it.
+4. **Play.** *Install into the game* (section *Play the mod*) copies `<mod>\out\` to `<game>\mod\<mod name>\` and
+   adds the mod DLL; the DLL loads those files in place of the game's own, so nothing in the game is overwritten.
+   *Remove from the game* takes the mod out again. Textures may be larger than the originals, up to 2048x2048
+   ([`MODDING_FILES.md`](MODDING_FILES.md)).
 
 The list shows every file in the mod with its status: *unchanged* (exported, not edited), *edited - needs
 repackaging*, *repackaged* (the file in `out\` is newer than your edit) or *reference (view only)*. Select a row and
@@ -45,14 +49,15 @@ the file names, so you can also add files to `edit\` by hand if you follow the n
 ### Mod folder layout
 | Folder | Holds | Example |
 |---|---|---|
-| `edit\` | editable files: the game file's name plus a new extension | `edit\3ddata\stage01.itm.txt` |
-| `edit\...\*.mmv.frames\` | a movie: one PNG per frame (`frame_0000.png`, ...) | `edit\3ddata\logo.mmv.frames\` |
+| `edit\` | editable files: the game file's name plus a new extension | `edit\Scripts\stage\stage01.itm.txt` |
+| `edit\...\*.mmv.frames\` | a movie: one PNG per frame (`frame_0000.png`, ...) | `edit\Movies\logo.mmv.frames\` |
 | `out\` | rebuilt game files, ready to copy into the game | `out\3ddata\stage01.itm` |
 | `reference\` | things you can look at but not put back yet (models, save thumbnails, movie GIFs) | `reference\3ddata\pc.it3.obj` |
 | `gurumin_mod.json` | file times recorded at export, used to tell which files you edited | |
 
 Keep the game file's name in the editable file's name: several formats are scrambled with a key made from the
-file name, and the GUI uses the name to know where each file belongs.
+file name, and the GUI uses the name to know where each file belongs (no two game files share a name, so the
+sorting folders do not matter).
 
 | Game file | Editable file | Back to the game? |
 |---|---|---|

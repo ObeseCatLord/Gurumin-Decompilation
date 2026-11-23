@@ -44,8 +44,10 @@ files to editable PNG/text/WAV/OBJ/GIF, import them back, or batch-convert whole
 game files into a mod folder (`edit\`), shows which ones you changed, and repackages them into `out\` with the
 game's folder layout. The game folder is only read. Walkthrough: [`docs/GUI.md`](docs/GUI.md).
 
-### Mod DLL (`mod/`): HD movies
-A `d3d9.dll` for the Japanese PC version, loaded next to `game.exe`; it changes nothing on disk. It plays `.mmv`
+### Mod DLL (`mod/`): replacement files and HD movies
+A `d3d9.dll` for the Japanese PC version, loaded next to `game.exe`; it changes nothing on disk. It loads any
+game file from a `mod\` folder in the game folder in place of the original, by name, and turns PNG textures of any
+size up to 2048x2048 into the game's format on the fly ([`docs/MODDING_FILES.md`](docs/MODDING_FILES.md)). It plays `.mmv`
 movies made at 2x or 4x their original size at the original size on screen with the extra detail
 ([`docs/MOVIES_HD.md`](docs/MOVIES_HD.md)). `mmv_tool.py encode` and the GUI make an HD movie from larger frames
 on their own, and the GUI's repackage adds the DLL to `out\`. Install by hand with

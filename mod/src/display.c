@@ -151,10 +151,6 @@ static void read_settings(void)
     }
 }
 
-static BYTE *app_address(DWORD va)
-{
-    return app_base + (va - APP_PREFERRED_BASE);
-}
 
 static int find_app(void)
 {
@@ -465,8 +461,10 @@ void display_before_direct3d(void)
         AddVectoredExceptionHandler(1, log_exception);
     if (!find_app())
         return;
+    hooks_init(app_base, log_line);
+    files_install(log_line);
     if (settings.hd_movies)
-        movies_install(app_base, log_line);
+        movies_install(log_line);
     if (!settings.enabled)
     {
         log_line("display: off");

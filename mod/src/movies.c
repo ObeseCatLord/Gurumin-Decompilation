@@ -51,7 +51,6 @@ static upload_fn real_upload;
 static close_fn real_close;
 static void *real_dshow_upload;
 
-static BYTE *app_base;
 static void (*log_line)(const char *format, ...);
 
 // One HD movie at a time (the game has one movie texture).
@@ -70,45 +69,6 @@ static struct
 } swapped;
 
 static IDirect3DTexture9 *hd_textures[5];   // by scale (2 and 4), kept for the rest of the game
-
-static BYTE *app_address(DWORD va)
-{
-    return app_base + (va - 0x10000000u);
-}
-
-// `expect` lists the original bytes at `va` (0x100 = any byte: relocated addresses).
-static int code_matches(DWORD va, const short *expect, int length)
-{
-    const BYTE *target = app_address(va);
-    for (int i = 0; i < length; i++)
-        if (expect[i] < 0x100 && target[i] != expect[i])
-        {
-            log_line("movies: unexpected code at %08lx, HD movies off", va);
-            return 0;
-        }
-    return 1;
-}
-
-// Jumps from the first `length` bytes of `va` to `hook`; returns a trampoline that runs those bytes and goes on.
-static void *detour(DWORD va, int length, void *hook)
-{
-    BYTE *target = app_address(va);
-    BYTE *trampoline = VirtualAlloc(NULL, 32, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-    if (!trampoline)
-        return NULL;
-    memcpy(trampoline, target, length);
-    trampoline[length] = 0xe9;
-    *(INT32 *)(trampoline + length + 1) = (INT32)(target + length - (trampoline + length + 5));
-    DWORD old;
-    VirtualProtect(target, length, PAGE_EXECUTE_READWRITE, &old);
-    target[0] = 0xe9;
-    *(INT32 *)(target + 1) = (INT32)((BYTE *)hook - (target + 5));
-    for (int i = 5; i < length; i++)
-        target[i] = 0x90;
-    VirtualProtect(target, length, old, &old);
-    FlushInstructionCache(GetCurrentProcess(), target, length);
-    return trampoline;
-}
 
 // Scale of an HD movie from its palette's spare bytes, or 1.
 static int movie_scale(const BYTE *movie)
@@ -230,13 +190,12 @@ __attribute__((naked)) static void hook_dshow_upload(void)
                      : "i"(restore_videotex), "m"(real_dshow_upload));
 }
 
-void movies_install(BYTE *app, void (*log)(const char *format, ...))
+void movies_install(void (*log)(const char *format, ...))
 {
     static const short open_code[] = {0x6a, 0xff, 0x68, 0x100, 0x100, 0x100, 0x100};    // push -1; push handler
     static const short upload_code[] = {0x8b, 0xc1, 0x53, 0x8b, 0x98, 0x54, 0x02, 0x00, 0x00};
     static const short close_code[] = {0x53, 0x56, 0x8b, 0xf1, 0x8a, 0x46, 0x4b};
     static const short dshow_code[] = {0x83, 0xec, 0x6c, 0x56, 0x8b, 0xf1};
-    app_base = app;
     log_line = log;
     if (!code_matches(VA_MMV_OPEN, open_code, 7) || !code_matches(VA_MMV_UPLOAD, upload_code, 9) ||
         !code_matches(VA_MMV_CLOSE, close_code, 7) || !code_matches(VA_DSHOW_UPLOAD, dshow_code, 6))

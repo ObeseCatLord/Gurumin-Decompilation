@@ -485,3 +485,4 @@ _FUN_101426d0@8	101426d0
 ?Reset@TriangleBatch@@QAEHXZ	10172aa0
 ?SetBlend@TriangleBatch@@QAEHHH@Z	10173450
 ?AddVertices@TriangleBatch@@QAEHPAUTextureObject@@PAXH@Z	10188eb0
+?ProjectPlanarUVs@Node@@QAEHH@Z	1019bdd0

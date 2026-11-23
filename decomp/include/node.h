@@ -157,6 +157,7 @@ struct Node
     int CreateChildCopies();                              // 0x101abb70
     int BuildMesh(int recurse, int flags);                // 0x1019afa0: creates the mesh buffers
     int Rebuild();                                        // 0x101ac1a0
+    int ProjectPlanarUVs(int material);                   // 0x1019bdd0: planar texture coordinates (scene_node.cpp)
     int AllocMaterials(int count);                        // 0x1019c1e0
     int ComputeBounds();                                  // 0x1019d8e0
     int BuildCollisionSpheres();                          // 0x1019e120

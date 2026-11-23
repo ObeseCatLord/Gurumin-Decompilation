@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (195)
+## 1. Walls to retry (197)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -56,12 +56,14 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100244b0` 502 — Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
 - [ ] `10024d00` 377 — Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
 - [ ] `10027630` 882 — Enemy_ChasePlayer (enemy_chase.cpp): all but the step setup identical; the original loads the heading and m_0010 (into eax) before storing -2/-8 into step.y and computes the speed pointer with lea; if/else, ternary and local forms tried
+- [ ] `10027da0` 1461 — Enemy_KeepDistanceFromPlayer (enemy_flee.cpp, 1488 bytes, 450 diffs): esi/edi swapped (CharState vs AnimModel offsets), the original keeps int 0 in ecx around the DAT_104bfd08 test, and pushes PlayMotion's first argument in two branches (next: the call written in both branches of an if/else); references, ternary and >= forms tried
 - [ ] `10029730` 1440 — Route_StepPatrol (route_step.cpp, rule-clean draft, 1488 vs 1440 bytes): switch, decode and heading code match; register allocation (point/record registers swapped, slot*0x249c and bankIndex kept in stack temporaries in the original) and the duplicated forceStep ret tail; next: one int per decoded part (the Char_RunScriptStep idiom)
 - [ ] `1002a110` 559 — Char_WalkRoute: code identical; the original keeps the next route point in the slot parameter's stack home (frame 4 bytes smaller), ours gives it a local; declaration positions tried
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
 - [ ] `1002a490` 685 — Block_Update: statements and layout identical; the original computes the block model address once into esi on the standing path and reuses it for the second IsClearAny, ours recomputes it (combined, nested and goto forms and a model pointer local tried)
 - [ ] `1002ebf0` 628 — DamageZone_Update: same tests; register allocation differs from the start (the original leaves index in its stack slot and reloads it, ours keeps it in ebx, which changes the flag-test layout and hides the loop-invariant (float)left the original hoists); else-if, nested and conditional forms of the flag test tried
 - [ ] `1002f050` 690 — Route_FollowGates: same statements and jump table; the original keeps the route row in ebx and the point in edi (cl 13.00 here esi/ebx); a separate next-point variable tried
+- [ ] `10034210` 1460 — Move_SweepToWorld (move_sweep.cpp, 1472 vs 1460 bytes): stack slots of the scalar locals only (penetration between two float temps, arrived between contactNormal and rounded, nodeDepth below the Fill(0) temp); all 120 declaration orders and gap placements tried; next: scope/loop structure or a permuter run
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `100360f0` 939 — ListBank::ReadToken (listbank.cpp, rule-clean): logic complete; the original tests the 13 two-character operator pairs and the 10 single-operator ends as a plain linear chain (two shared return blocks, alternating), while our compiler threads the jumps (after `op == '-'` fails on *p it skips straight to the next '-' test) and is 100 bytes shorter; also inQuotes lives in ebp and `last` in memory in the original (ours the other way). Tried one || expression, separate ifs, length++ bodies and declaration orders.
 - [ ] `10036ca0` 987 — ListBank::RegisterBuiltin (Script_RegisterBuiltin): flow, calls and the inline ReportError expansion match (listbank_vars.cpp); the original frame is 4 bytes smaller and pushes ebx/esi/edi only before the parameter loop (shrink-wrapped), cl 13.00 here at the start; separate loop variables and split error returns tried
@@ -216,13 +218,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (79)
+## 4. Large functions (801-3000 bytes) (76)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1015f4e0` 1429 bytes (loops 12, calls 31)
-- [ ] `10034210` 1460 bytes (float, loops 5, calls 42)
-- [ ] `10027da0` 1461 bytes (float, calls 37)
-- [ ] `100366c0` 1495 bytes (loops 8, calls 21)
 - [ ] `101643c0` 1520 bytes (float, loops 12, calls 9)
 - [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)
 - [ ] `10057ee0` 1550 bytes (float, loops 1, calls 52)

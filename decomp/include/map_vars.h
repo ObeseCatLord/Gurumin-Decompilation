@@ -29,6 +29,10 @@ extern "C" char DAT_1021f3fa[0x42];
 extern "C" int DAT_102549a8[0x42];
 extern "C" Node *DAT_102550c0[0x8];                       // its "QQ" node
 extern "C" int DAT_10255960[3][12];
+extern "C" int DAT_10210ff0;                              // the map's x limits (minimum, maximum) and y limits (maximum, minimum), in world units
+extern "C" int DAT_10210ff4;
+extern "C" int DAT_10210ff8;
+extern "C" int DAT_10210ffc;
 extern "C" Node *DAT_10255f08;                            // the map's root node; its collision is the world collision
 extern "C" int DAT_102564a0;                              // number of map object records
 extern "C" int DAT_103088d0[0xb64];

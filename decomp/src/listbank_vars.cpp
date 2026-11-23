@@ -112,7 +112,7 @@ int ListBank::RegisterBuiltin(const char *signature, short id, BuiltinHandler ha
 {
     char params[0x100];
     char word[0x100];
-    builtinHandlers[builtinCount] = handler;
+    builtinHandlers[builtinCount].handler = handler;
     char *cursor = (char *)signature;
     builtinIds[builtinCount] = id;
     builtinReturnTypes[builtinCount] = ReadType(&cursor);

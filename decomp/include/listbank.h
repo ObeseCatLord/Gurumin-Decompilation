@@ -45,6 +45,13 @@ union ScriptVariableValue
     void *storage;                            // the storage as allocated (FreeBank frees it unless borrowed)
 };
 
+// What a registered function runs: a builtin has a handler, a function declared in the script has its body text.
+union ScriptFunction
+{
+    BuiltinHandler handler;
+    char *body;               // first character after the parameter list (builtinIds = -1)
+};
+
 struct ListBank
 {
     int *result;              // 0x00: where the last evaluated expression left its value (resultBuffer)
@@ -62,8 +69,8 @@ struct ListBank
     char builtinReturnTypes[0x100];       // 0x10c0c: 0 = int, 1 = float, 2 = string
     char builtinParamTypes[0x100][0x10];  // 0x10d0c: parameter types (+10 = by reference, 0xff = end)
     short builtinIds[0x100];              // 0x11d0c
-    BuiltinHandler builtinHandlers[0x100];// 0x11f0c
-    char pad_1230c[0x10000];
+    ScriptFunction builtinHandlers[0x100];// 0x11f0c: the handler of a builtin, the body text of a script function
+    char builtinParamNames[0x100][0x10][0x10];  // 0x1230c: parameter names of the declared script functions
     char builtinParamCounts[0x100];       // 0x2230c
     int resultBuffer[0x2070];             // 0x2240c: where Evaluate leaves its result (`result` points here)
     int pad_2a5cc;

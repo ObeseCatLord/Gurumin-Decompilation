@@ -2,6 +2,7 @@
 // named entries (text, value, flag), the script text being parsed and an error flag (m_3632c) that makes every
 // reader fail once an error was reported.
 
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1741,5 +1742,144 @@ int ListBank::CompileStatement(char *statement)
         DeclareFunction(statement);
     else
         ReportError(NO_LOCAL_FUNCTION_TEXT);
+    return 1;
+}
+
+// "関数が多すぎ" ("too many functions"), Shift-JIS.
+#define TOO_MANY_FUNCTIONS_TEXT "\x8a\xd6\x90\x94\x82\xaa\x91\xbd\x82\xb7\x82\xac"
+// "対応する括弧がありません。" ("There is no matching bracket."), Shift-JIS.
+#define NO_MATCHING_BRACKET_TEXT "\x91\xce\x89\x9e\x82\xb7\x82\xe9\x8a\x87\x8c\xca\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb9\x82\xf1\x81" "B"
+// "引数に異常な記述があります。" ("The argument has a wrong description."), Shift-JIS.
+#define BAD_ARGUMENT_TEXT "\x88\xf8\x90\x94\x82\xc9\x88\xd9\x8f\xed\x82\xc8\x8b" "L\x8f" "q\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb7\x81" "B"
+// "型が異常です。" ("The type is wrong."), Shift-JIS.
+#define BAD_PARAMETER_TYPE_TEXT "\x8c^\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81" "B"
+// "関数名が重複してます。" ("The function name is a duplicate."), Shift-JIS.
+#define DUPLICATE_FUNCTION_TEXT "\x8a\xd6\x90\x94\x96\xbc\x82\xaa\x8f" "d\x95\xa1\x82\xb5\x82\xc4\x82\xdc\x82\xb7\x81" "B"
+// Longest function table (the parser keeps 0x100 functions) and the most parameters of one function.
+#define FUNCTION_LIMIT 0xff
+#define PARAMETER_LIMIT 0x10
+// builtinIds of a function declared in the script text (builtins have their positive ids).
+#define SCRIPT_FUNCTION_ID -1
+// Placeholder name of a parameter that has none (the bytes "tmp").
+#define UNNAMED_PARAMETER "tmp"
+// builtinParamTypes: the parameter is passed by reference (added to the type).
+#define BY_REFERENCE 10
+
+// Reports an error exactly like ReportError (which the original compiler expanded here three times).
+static __forceinline int ReportErrorExpanded(ListBank *bank, const char *message)
+{
+    bank->failed = 1;
+    printf("%s\n", message);
+    if (bank->callback != 0)
+        bank->callback(1, (int)message);
+    if (bank->callback != 0)
+        bank->callback(5000, bank->cursor[bank->depth] - bank->text);
+    bank->FreeAll();
+    return 0;
+}
+
+// 0x100366c0 (ListBank::DeclareFunction). Declares a function written in the script, `statement` being its header
+// "type name(type name, &type name, ...)": the function table gets the body text (the read position of level 0),
+// the return type, the name and the parameter types and names (a "&" before a parameter name marks it as passed by
+// reference). A parameter without a name gets "tmp", a name equal to a type word reports a wrong argument, and a
+// name already declared with the same parameter types is a duplicate. Returns 1 when declared, 0 after an error
+// (the missing-bracket errors also clear the last result).
+int ListBank::DeclareFunction(char *statement)
+{
+    // The scope of the header parsing: its buffers share their stack space with the loop below.
+    {
+        char *source = statement;
+        char params[LISTBANK_TEXT_SIZE];
+        char word[LISTBANK_TEXT_SIZE];
+        if (builtinCount > FUNCTION_LIMIT)
+            MessageBoxA(0, TOO_MANY_FUNCTIONS_TEXT, "err", 0);
+        builtinHandlers[builtinCount].body = cursor[0];
+        builtinIds[builtinCount] = SCRIPT_FUNCTION_ID;
+        builtinReturnTypes[builtinCount] = ReadType(&source);
+        ReadWord(&source, builtinNames[builtinCount]);
+        for (int j = 0; j < PARAMETER_LIMIT; j++)
+            builtinParamTypes[builtinCount][j] = (char)0xff;
+        strcpy(params, source);
+        source = params;
+        if (params[0] != '(')
+        {
+            ReportErrorExpanded(this, NO_MATCHING_BRACKET_TEXT);
+            self->resultType = 0;
+            *self->result = 0;
+            return 0;
+        }
+        params[0] = ' ';
+        if (params[strlen(params) - 1] != ')')
+        {
+            ReportError(NO_MATCHING_BRACKET_TEXT);
+            self->resultType = 0;
+            *self->result = 0;
+            return 0;
+        }
+        params[strlen(params) - 1] = ' ';
+        int i = 0;
+        builtinParamTypes[builtinCount][0] = (char)0xff;
+        while (i < PARAMETER_LIMIT)
+        {
+            if (failed != 0)
+                return 0;
+            ReadTerm(&source, word);
+            builtinParamCounts[builtinCount] = (char)i;
+            if (word[0] == 0)
+                break;
+            if (strcmp(word, "int") == 0)
+                builtinParamTypes[builtinCount][i] = 0;
+            else if (strcmp(word, "float") == 0)
+                builtinParamTypes[builtinCount][i] = 1;
+            else if (strcmp(word, "string") == 0)
+                builtinParamTypes[builtinCount][i] = 2;
+            else
+            {
+                builtinParamTypes[builtinCount][i] = 0;
+                ReportError(BAD_PARAMETER_TYPE_TEXT);
+            }
+            for (;;)
+            {
+                ReadTerm(&source, builtinParamNames[builtinCount][i]);
+                if (builtinParamNames[builtinCount][i][0] == '&')
+                {
+                    builtinParamTypes[builtinCount][i] += BY_REFERENCE;
+                    ReadTerm(&source, builtinParamNames[builtinCount][i]);
+                }
+                if (builtinParamNames[builtinCount][i][0] == 0)
+                {
+                    ReportErrorExpanded(this, BAD_ARGUMENT_TEXT);
+                    strcpy(builtinParamNames[builtinCount][i], UNNAMED_PARAMETER);
+                    break;
+                }
+                if (strcmp(builtinParamNames[builtinCount][i], "int") != 0 &&
+                    strcmp(builtinParamNames[builtinCount][i], "float") != 0 &&
+                    strcmp(builtinParamNames[builtinCount][i], "string") != 0)
+                    break;
+                ReportErrorExpanded(this, BAD_ARGUMENT_TEXT);
+                i++;
+                if (strcmp(builtinParamNames[builtinCount][i], "int") == 0)
+                    builtinParamTypes[builtinCount][i] = 0;
+                else if (strcmp(builtinParamNames[builtinCount][i], "float") == 0)
+                    builtinParamTypes[builtinCount][i] = 1;
+                else if (strcmp(builtinParamNames[builtinCount][i], "string") == 0)
+                    builtinParamTypes[builtinCount][i] = 2;
+                strcpy(builtinParamNames[builtinCount][i - 1], UNNAMED_PARAMETER);
+            }
+            i++;
+            builtinParamCounts[builtinCount] = (char)i;
+            builtinParamTypes[builtinCount][i] = (char)0xff;
+        }
+    }
+    for (int k = 0; k < builtinCount; k++)
+    {
+        if (strcmp(builtinNames[k], builtinNames[builtinCount]) == 0 &&
+            memcmp(builtinParamTypes[builtinCount], builtinParamTypes[k], PARAMETER_LIMIT) == 0)
+        {
+            ReportError(DUPLICATE_FUNCTION_TEXT);
+            return 0;
+        }
+    }
+    builtinCount++;
     return 1;
 }

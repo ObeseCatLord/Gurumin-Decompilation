@@ -12,4 +12,7 @@ extern "C" int FUN_10024e80(int index, Vec4 move);
 // weapon (when its mode is 1). Returns 1 when the move ends, else 0.
 extern "C" int FUN_100279b0(int index, int stopAfter, int shootBelow);
 
+
+// 0x10027da0 (Enemy_KeepDistanceFromPlayer): the enemy holds a distance of about 200 units from the player.
+extern "C" int FUN_10027da0(int index, int chanceEnd);
 #endif

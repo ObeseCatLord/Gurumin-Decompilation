@@ -31,6 +31,9 @@ typedef void (*NodeDrawCallback)(Matrix4 *world, const Matrix4 *view, int a3, co
                                  float shadowX, float shadowY, float shadowZ, int shadowTexture,
                                  float shadowScale, int shadowSize, const Vec4 *lightDirection, float modelSize,
                                  AnimModel *model, float alpha);
+// Called by QueueDraw after the children when set, with the node's world matrix and QueueDraw's own arguments.
+typedef void (*NodeQueueCallback)(Matrix4 *world, const Matrix4 *view, const void *lights, unsigned int passMask,
+                                  const Vec4 *colour, const Vec4 *addColour);
 
 // Limits of the fixed-size arrays in a node.
 enum NodeLimits
@@ -44,14 +47,20 @@ enum NodeLimits
 // Node::flags bits whose meaning is known.
 enum NodeFlags
 {
+    NODE_FLAG_QUEUED = 0x2,               // drawn later through the render queue (FUN_10199880)
     NODE_FLAG_DRAWN = 0x10,               // drawn this frame
     NODE_FLAG_HIDDEN = 0x20,              // not drawn
     NODE_FLAG_NEVER_CULLED = 0x40,        // skips the view-volume test
     NODE_FLAG_COLLISION_PROBE = 0x400,    // a collision probe: test this node itself, not its children
-    NODE_FLAG_SPECIAL_PASSES = 0xe00,     // drawn in one of the special passes
+    NODE_FLAG_SPECIAL_PASSES = 0xe00,     // drawn in one of the special passes (a debug shape, see below)
+    NODE_FLAG_SHAPE_BOX = 0x200,          // debug pass: shown as its box
+    NODE_FLAG_SHAPE_SPHERE = 0x400,       // debug pass: shown as its bounding sphere
+    NODE_FLAG_SHAPE_SOLID_BOX = 0x800,    // debug pass: shown as its box, filled
     NODE_FLAG_SKIP_SUBTREE = 0x8000,      // the subtree is not updated or drawn
     NODE_FLAG_ANIMATED_BY_EXTRA = 0x100000,  // animated through its extra data (NodeExtra)
-    NODE_FLAG_NO_STATE_9 = 0x800000       // drawn with render state 9 turned off
+    NODE_FLAG_NO_STATE_9 = 0x800000,      // drawn with render state 9 turned off
+    NODE_FLAG_HIGHLIGHT_PASS = 0x1000000, // drawn while only the highlight pass draws (DAT_11b00028)
+    NODE_FLAG_NOT_OVERHEAD = 0x20000      // left out of the overhead pass (DAT_10f65520)
 };
 
 // Corners of Node::box (an array: the constructor builds it with one loop).
@@ -71,7 +80,7 @@ struct Node
     VertexPack *packs;           // 0x068: the mesh's vertex packs
     IndexList *indexLists;       // 0x06c: one index list per pack
     IndexList *triangleSpheres;  // 0x070: one sphere list per pack (bounding sphere per triangle, 0 = none)
-    int m_0074;                  // 0x074
+    NodeQueueCallback queueCallback;  // 0x074: run by QueueDraw after the children when set
     NodeDrawCallback drawCallback;  // 0x078: draws the node instead of the mesh code when set
     int m_007c;                  // 0x07c: number of entries in m_0080 and m_0084
     VertexPack *m_0080;          // 0x080
@@ -127,7 +136,7 @@ struct Node
     int m_185c;                  // 0x185c
     int m_1860;                  // 0x1860: saved flags (M_10191d50)
     VisData *visibilityCells;    // 0x1864: visibility cells (0 = none)
-    Vec4 m_1868;                 // 0x1868: a second scale, 1 on every axis after Init
+    Vec4 fogColour;              // 0x1868: fog colour of a "fogset" root node, 1 on every axis after Init
     unsigned char m_1878;        // 0x1878: 0xe0 after Init
     char pathKind;               // 0x1879: 2 = camera path (camera_path_select.cpp)
     char m_187a;                 // 0x187a
@@ -135,11 +144,11 @@ struct Node
     unsigned char m_187c;        // 0x187c: copied into the camera path list
     unsigned char m_187d;        // 0x187d: copied into the camera path list
     unsigned char m_187e;        // 0x187e: 0xff after Init
-    float m_1880;                // 0x1880: 1.0 after Init
+    float fogDensity;            // 0x1880: fog density of a "fogset" root node, 1.0 after Init
     int m_1884;                  // 0x1884
     float m_1888;                // 0x1888: 45.0 after Init
-    int m_188c;                  // 0x188c
-    int m_1890;                  // 0x1890
+    float fogNear;               // 0x188c: distance the fog of a "fogset" root node starts at
+    float fogFar;                // 0x1890: distance it is full at
     int m_1894;                  // 0x1894
     char element;                // 0x1898: 1 = fire, 2 = thunder (from the node name, M_10191e50)
     unsigned char m_1899;        // 0x1899: 30 after Init
@@ -260,9 +269,10 @@ struct Node
     int Draw(const Matrix4 *parent, const Matrix4 *view, int a3, const Matrix4 *shadowMatrix, float shadowX, float shadowY, float shadowZ, int shadowTexture,
              float shadowScale, int shadowSize, const Vec4 *lightDirection, float modelSize, AnimModel *model,
              float alpha);
-    // 0x10199e20: queues the subtree for drawing under `parent` with `view` (map_view.cpp, mesh_slots.cpp).
-    void QueueDraw(const Matrix4 *parent, const Matrix4 *view, const Vec4 *direction, int a, const Vec4 *colour,
-                   int b);
+    // 0x10199e20: draws the subtree with the light set `lights` under `parent` and `view`, the nodes whose flags
+    // match `passMask`, in `colour` plus `addColour` (node_queue.cpp; map_view.cpp, mesh_slots.cpp, shadows).
+    int QueueDraw(const Matrix4 *parent, const Matrix4 *view, const void *lights, unsigned int passMask,
+                  const Vec4 *colour, const Vec4 *addColour);
     // 0x101a29e0: draws the subtree as the shadow of a caster at `casterPosition` lit from `lightPosition`, with
     // its world matrix as the shadow's place on the ground (shadow_texture.cpp, called by ModelBank).
     int DrawShadow(const Matrix4 *parent, const Matrix4 *view, int a3, const Vec4 *casterPosition,
@@ -285,6 +295,9 @@ struct Node
     // corners' (uvA..uvC, x and y) into `texU`/`texV`, and returns 1; 0 when the ray misses or is parallel.
     int IntersectTriangle(const Vec4 *origin, const Vec4 *direction, Vec4 *a, Vec4 *b, const Vec4 *c,
                           float *hitT, float *texU, float *texV, const Vec4 *uvA, const Vec4 *uvB, const Vec4 *uvC);
+    // 0x101ab3e0: 1 when the segment from `from` to `to` crosses the box of a node in this tree that has a
+    // box-collision flag (node_box_hit.cpp).
+    int SegmentHitsBox(Vec4 *from, Vec4 *to);
     // 0x101a9670: casts the segment against the nodes called `name` (0 = all) whose kind and mask match; writes
     // the nearest hit point and, when `t` is given, its position along the segment. Returns 1 on a hit.
     int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,

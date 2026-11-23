@@ -39,14 +39,12 @@ extern "C" Vec4 DAT_10edbd48;                             // goal of the target 
 extern "C" Vec4 DAT_10f08aa0;                             // the target of the previous frame
 extern "C" Vec4 DAT_10f65688;                            // camera position (eye)
 extern "C" Vec4 DAT_10f668e8;                            // camera target
-extern "C" int DAT_10f668f8;
-extern "C" int DAT_10f668fc;
-extern "C" int DAT_10f66900;
+extern "C" Vec4 DAT_10f668f8;                            // fog colour (x/y/z set by FUN_10199dc0, all four by a "fogset" node)
 extern "C" Vec4 DAT_10f66908;
 extern "C" float DAT_10f66968;
 extern "C" float DAT_10f6696c;
 extern "C" int DAT_10f66970;
-extern "C" int DAT_10f66974;
+extern "C" float DAT_10f66974;                           // fog density
 extern "C" int DAT_10f8d938[];                            // id of each path
 extern "C" char DAT_10faa678;
 extern "C" char DAT_10faaa80;

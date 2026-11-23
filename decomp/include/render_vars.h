@@ -107,6 +107,7 @@ extern "C" unsigned long DAT_10f623d0[0x100];
 extern "C" float DAT_10f628d0;                            // limit
 extern "C" int DAT_10f628e8[0x5a0];
 extern "C" char DAT_10f64368[4][0x100];
+extern "C" int DAT_10f654bc;                              // debug: nodes with a shape flag are shown as shapes
 extern "C" int DAT_10f65470;                              // saved width
 extern "C" int DAT_10f65474;                              // saved height
 extern "C" int DAT_10f65478;                              // non-zero while an off-screen target is set up (then the saved state is kept); 1 while the indicator draws (render target reset in progress)
@@ -187,6 +188,8 @@ extern "C" Node *DAT_11b00070[0x40];                      // the queued nodes
 extern "C" int DAT_11b00170[0x40];                        // the value DAT_10f655c4 takes while the node draws
 extern "C" char DAT_11b00270[0x40];                       // the value DAT_10f65520 takes for drawing mode 2
 extern "C" int DAT_11b002b8;
+extern "C" int DAT_11b002c4;                              // debug: skinned nodes are shown as their skeleton
+extern "C" int DAT_11b00028;                              // only nodes with NODE_FLAG_HIGHLIGHT_PASS are drawn
 extern "C" char DAT_11b002c8;                             // 1 while a model-against-world test runs
 extern "C" int DAT_11b044d0;                              // number of queued nodes
 extern "C" int DAT_11b044dc;

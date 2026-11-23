@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (164)
+## 1. Walls to retry (165)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -159,6 +159,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10199380` 526 — Node::FindBone: logic identical; the original keeps 0 in ebx (zero compares, trylevel store, then the loop counter) and frame in edx, ours tests against 0 and keeps frame in ebx; a counter declared at the top and the clamp spellings tried
 - [ ] `10199880` 275 — RenderQueue_Push: identical except the two byte loads use al/dl the other way round (register allocation)
 - [ ] `10199be0` 224 — VisNode::UpdateVisibleCells: logic and registers line up; original pushes ebx/esi/edi before the Vec4 ctor and keeps the box pointer in ebx, VS2003 sinks the pushes (shrink-wrapping)
+- [ ] `10199e20` 2168 — Node::QueueDraw (node_queue.cpp, rule-clean draft): frame (0xb8) and block structure match; cl caches 0 in ebp and pushes ebx/ebp/edi at the top, the original keeps `view` in ebp, `addColour` in ebx, spills the skeleton loop counter and pushes the callee-saved registers after the colour defaults. The first `return 0` is merged with the CDL return in the original, with the NODE_FLAG_SKIP_SUBTREE return in ours. Twin 1019a6b0 waits for it.
 - [ ] `1019b280` 117 — Text_ReadToken: cl 13.00 leaves the whitespace-skip loop unrotated (jmp back to the top); VS2003 rotates it (three loop shapes tried)
 - [ ] `1019bdd0` 1032 — Node::ProjectPlanarUVs (scene_node.cpp, rule-clean): 42 bytes off, x87 scheduling only: in four places the original loads the next vertex index (mov ecx,[esp+..]) before the fmul by PLANAR_UV_SCALE, and stores the loop index right after add ecx,3 instead of after the cmp; operand order and outer index declarations tried
 - [ ] `1019d8e0` 954 — Node::ComputeBounds: control flow and stores in place; the -999999 constant and the y min/max slots use other registers/slots (ecx and swapped 0x18/0x1c in the original), declaration orders tried
@@ -186,7 +187,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (131)
+## 4. Large functions (801-3000 bytes) (129)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
@@ -229,7 +230,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10150bb0` 1421 bytes (float, loops 3, calls 37)
 - [ ] `10043fc0` 1423 bytes (float, loops 1, calls 27)
 - [ ] `1015f4e0` 1429 bytes (loops 12, calls 31)
-- [ ] `101ab3e0` 1437 bytes (float, loops 3, calls 37)
 - [ ] `10029730` 1440 bytes (float, calls 9)
 - [ ] `10034210` 1460 bytes (float, loops 5, calls 42)
 - [ ] `10027da0` 1461 bytes (float, calls 37)
@@ -283,7 +283,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001e4b0` 2161 bytes (float, loops 10, calls 45)
 - [ ] `1005ecb0` 2161 bytes (loops 3, calls 54)
 - [ ] `10115cd0` 2163 bytes (float, loops 7, calls 53)
-- [ ] `10199e20` 2168 bytes (float, loops 3, calls 53)
 - [ ] `1003fc40` 2194 bytes (float, loops 4, calls 51)
 - [ ] `100286d0` 2211 bytes (float, calls 16)
 - [ ] `10051570` 2211 bytes (float, calls 64)

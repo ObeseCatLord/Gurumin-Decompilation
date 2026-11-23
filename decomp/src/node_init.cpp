@@ -15,7 +15,7 @@ Matrix4 IdentityMatrix();                           // 0x101b0ba0
 #include "node.h"
 
 // 0x10191500 (Node::Init). Resets every field of a new node: called "root", no mesh, children or skin, identity world
-// and local matrices, cull margin 3.84, unit scale (tint and m_1868..m_1874), and the remaining defaults.
+// and local matrices, cull margin 3.84, unit scale (tint and fogColour), and the remaining defaults.
 void Node::Init()
 {
     m_1860 = 0;
@@ -26,7 +26,7 @@ void Node::Init()
     kind = 0xff;
     m_0298.Fill(0);
     m_1899 = 30;
-    m_0074 = 0;
+    queueCallback = 0;
     drawCallback = 0;
     m_187a = 0;
     m_187b = 45;
@@ -38,13 +38,13 @@ void Node::Init()
     m_1858 = 0;
     m_1884 = 0;
     m_1888 = 45.0f;
-    m_188c = 0;
-    m_1890 = 0;
+    fogNear = 0;
+    fogFar = 0;
     m_028c = 0;
     m_189a = 0xff;
     m_189b = 0xff;
     element = 0;
-    m_1880 = 1.0f;
+    fogDensity = 1.0f;
     tint.Fill(1.0f);
     m_1878 = 0xe0;
     m_0080 = 0;
@@ -92,8 +92,8 @@ void Node::Init()
     matrix = IdentityMatrix();
     m_070c[0] = 0;
     memset(childNames, 0, sizeof(childNames));
-    m_1868.x = 1.0f;
-    m_1868.y = 1.0f;
-    m_1868.z = 1.0f;
-    m_1868.w = 1.0f;
+    fogColour.x = 1.0f;
+    fogColour.y = 1.0f;
+    fogColour.z = 1.0f;
+    fogColour.w = 1.0f;
 }

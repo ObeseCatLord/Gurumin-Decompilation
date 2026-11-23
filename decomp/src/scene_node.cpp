@@ -1820,13 +1820,13 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     flags = source->flags;
     cullMargin = source->cullMargin;
     group = source->group;
-    m_1868.Copy(source->m_1868);
+    fogColour.Copy(source->fogColour);
     m_1878 = source->m_1878;
-    m_1880 = source->m_1880;
+    fogDensity = source->fogDensity;
     m_1884 = source->m_1884;
     m_1888 = source->m_1888;
-    m_188c = source->m_188c;
-    m_1890 = source->m_1890;
+    fogNear = source->fogNear;
+    fogFar = source->fogFar;
     pathKind = source->pathKind;
     m_187a = source->m_187a;
     m_187b = source->m_187b;

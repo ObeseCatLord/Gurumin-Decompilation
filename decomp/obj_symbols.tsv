@@ -347,7 +347,7 @@ _TestDat_Load	1000beb0
 ?Overlay_DrawModel@@YAHXZ	100236c0
 ?Close@DShowStream@@QAEXXZ	101488b0
 ?Open@DShowStream@@QAEJPBD@Z	1015c450
-?Bgm_Play@@YAHH@Z	1003aef0
+?Bgm_Play@@YAHHH@Z	1003aef0
 ?Update@Obj@@QAEHPAUPoint@@PAD11PAH1@Z	10001170
 ?Open@MmvPlayer@@QAEXPBD@Z	10160a90
 ?FUN_100106e0@@YAHPBD@Z	100106e0
@@ -545,3 +545,4 @@ _Enemy_IsBusy	100e1c40
 ?TutorialBook_Update@@YAHXZ	10065450
 ?Char_SpiritUpdate@@YAHH@Z	1002a740
 ?Sample@KeyTrack@@QAEHMPAM000H@Z	101b0240
+?AppendQuad@TriangleBatch@@QAEHMMMMMMMMMMMMMMMMM@Z	10172cb0

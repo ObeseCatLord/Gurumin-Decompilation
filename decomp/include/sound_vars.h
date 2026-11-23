@@ -13,7 +13,6 @@ extern "C" int DAT_102027d8;
 extern "C" char DAT_1020ade0[];
 extern "C" int DAT_1020aee4;
 extern "C" int DAT_1021a398[10];                          // sound id
-extern "C" char DAT_102564a8[];                           // receives the rest of the .de2 header
 extern "C" int DAT_1042d870[10];                          // 1 when the sound has a position
 extern "C" int DAT_10447310[10];                          // frames left before the sound plays (0 = free slot)
 extern "C" int DAT_104bf8ec;                              // fade kind (see above)

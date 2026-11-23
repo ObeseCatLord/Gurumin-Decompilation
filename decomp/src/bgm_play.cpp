@@ -13,6 +13,7 @@
 #include "game_file.h"
 
 #include "sound_vars.h"
+#include "bgm_spectrum.h"
 
 #include "game_vars.h"
 #include "win_vars.h"
@@ -25,13 +26,13 @@ extern "C" int Bgm_CheckHeader(char *name, int sum, unsigned int check);        
 // fading the old track out unless this is track 0), then opens the file from the data folder and checks its
 // header against the name key, reading the rest of the header into DAT_102564a8. When the file is missing or the
 // check fails, a random value is written to a random entry of DAT_104c0270. Returns 1, or 0 when nothing started.
-int Bgm_Play(int index)
+int Bgm_Play(int index, int unused)
 {
     char path[0x100];
     char name[0x20];
     int sum;
     int check;
-    int unused;
+    int unusedHeaderWord;
     int size;
     if (DAT_104c033c != 0)
         index = 0;
@@ -59,7 +60,7 @@ int Bgm_Play(int index)
             FUN_10161120(name, path);
             file.Read(&sum, 1, 4);
             file.Read(&check, 1, 4);
-            file.Read(&unused, 1, 4);
+            file.Read(&unusedHeaderWord, 1, 4);
             file.Read(&size, 1, 4);
             if (Bgm_CheckHeader(name, sum, check))
             {

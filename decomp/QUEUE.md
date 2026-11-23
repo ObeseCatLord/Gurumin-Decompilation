@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (213)
+## 1. Walls to retry (216)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -66,6 +66,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1002a740` 1833 — Char_SpiritUpdate (char_spirit.cpp, behaviour 0x25, C++ linkage for the EH frame): instructions, registers and frame size match; only stack slots differ (start at 0x64 vs 0x68, move at 0x24 vs 0x1c, world 0x1c vs 0x18, spare Vec4 order; the original puts the three FUN_10028fa0 output ints at 0x5c-0x64 just below start); block/function scope of the outputs, an int[3] and used[] placement tried
 - [ ] `1002ebf0` 628 — DamageZone_Update: same tests; register allocation differs from the start (the original leaves index in its stack slot and reloads it, ours keeps it in ebx, which changes the flag-test layout and hides the loop-invariant (float)left the original hoists); else-if, nested and conditional forms of the flag test tried
 - [ ] `1002f050` 690 — Route_FollowGates: same statements and jump table; the original keeps the route row in ebx and the point in edi (cl 13.00 here esi/ebx); a separate next-point variable tried
+- [ ] `100301a0` 1850 — MapMinigame_DrawHud (minigame_hud.cpp): the banner half matches; in the score pop-up branch the original evaluates ftol((width + 0.5) / 2) first (kept in ebx) before TextWidth(scoreText, pop / 37.5 + 1.8), ours sinks it after the call; separate statements, one expression and x as the accumulator tried
 - [ ] `10034210` 1460 — Move_SweepToWorld (move_sweep.cpp, 1472 vs 1460 bytes): stack slots of the scalar locals only (penetration between two float temps, arrived between contactNormal and rounded, nodeDepth below the Fill(0) temp); all 120 declaration orders and gap placements tried; next: scope/loop structure or a permuter run
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
 - [ ] `100360f0` 939 — ListBank::ReadToken (listbank.cpp, rule-clean): logic complete; the original tests the 13 two-character operator pairs and the 10 single-operator ends as a plain linear chain (two shared return blocks, alternating), while our compiler threads the jumps (after `op == '-'` fails on *p it skips straight to the next '-' test) and is 100 bytes shorter; also inQuotes lives in ebp and `last` in memory in the original (ours the other way). Tried one || expression, separate ifs, length++ bodies and declaration orders.
@@ -103,6 +104,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `100564d0` 1611 — Debris_Update (debris_update.cpp, 1648 vs 1611 bytes): the state dispatch is laid out with the fly/pickup block inline and physics out of line in the original (cmp al,1; jbe; cmp al,6; jb FADE; cmp al,0x14; jne PHYS), 13.00 inlines physics and threads the 0x14 test; if/else orders, condition forms and continue forms tried; frame 0x124 vs 0x120
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
+- [ ] `1005c680` 1846 — Bgm_Update (bgm_update.cpp, 1648 vs 1846 bytes): the BGM start, position and ftol half and every bar easing body match; the original unrolls the two 32-bar loops with 8 separate byte-pointer induction variables (4 spilled) and the float pointer as the loop test, ours folds them into one pointer plus displacements; frame struct, byte array, macro index, float-pointer loop variable and 8 explicit lane pointers tried
 - [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
 - [ ] `10099b30` 2897 — Enemy_StrafeAndBurst (enemy_strafe.cpp, rule-clean): the same ebx/edi swap as 1009a690, and the idle block (motion 2, then `if (rand % 100 > 2) return 0;` before the motion-speed check) is merged into two copies (chase/left/right and back) where the original has one, placed before the end check. The defeated branch matches only as an if/else with two full FUN_1003a7d0 calls (cl hoists the common arguments); a ternary path is evaluated first.
 - [ ] `1009a690` 2703 — Enemy_StrafeAndShoot (enemy_strafe.cpp, rule-clean; twin 10099040 matched from the same source shape): 1 byte longer. ebx and edi are swapped all through (ours: index in edi, the model offset index*0x249c in ebx; the original and 10099040: index in ebx), and in the chase step the far/mid tails are merged the other way round (the original keeps the walk branch's copy of the heading/stuck tail and the run branch's `action = 0` block). Tried: early return vs nested if in the attack step (the attack step's own m_238c check + return is needed: 2688 -> 2704 bytes, 1756 -> 426 diffs), switch (worse), the end check in every step (worse), stuck-check spellings (`>=` / separate increment: much worse), a local copy of the index.
@@ -190,6 +192,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016b6c0` 1833 — Camera_TrackPathFrame (camera_path_track.cpp, 1824 vs 1833 bytes): logic complete, the state-0 scan loop matches; the original frame is 4 bytes larger (state spilled at [0x1c], previousPath at [0x30], constant 1 kept in ebx), the later loops use other registers and Sample loads the frame before the track address; hoisted path = 0, a KeyTrack pointer, hoisted distance and state/startPath orders tried
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
 - [ ] `10172350` 1068 — EffectManager::Start: all but one cluster identical; the original loads the matrix owner before the value but stores the value first and computes the start frame early (cl 13.00 here pairs them the other way); the 24 orders of value/owner/serial/frame and a start local tried
+- [ ] `10172cb0` 1855 — TriangleBatch::AppendQuad (tri_batch_quad.cpp, 1872 vs 1855 bytes): the rotated corner block, colour packing and RotateZ order match; in the rotated path the vertex pointer is loaded after the fmul (original before the next fld) and inc edi moves; the unrotated path goes through [esp+0x90]/[esp+0xa4] temporaries and tail-merges the sixth vertex in the original; helper vs macro, first++ vs first+k, chained stores, corner temporaries and branch swap tried; next idea: scale the parameters in place (left = scaleX * left)
 - [ ] `10175c90` 476 — Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
 - [ ] `1017c5f0` 750 — ModelBank::LightForRoot (model_bank.cpp, rule-clean): the 16-model search loop (unrolled by 8) and the light code match; the default-light block of both functions constructs two one-element Vec4 arrays through the vector constructor iterator 0x10004650 (count 1), while 13.00 calls the constructor directly for `Vec4 a[1]` (also tried a[1][1] and an array member of a local struct) -- the original array must be declared some other way; an inline helper for the block is not inlined under /Ob1.
 - [ ] `10187520` 3712 — EffectManager::DrawLight (effect_light.cpp, rule-clean, EffectLight points/widths/colours typed, ScreenVertex fields named): full logic drafted; frame 0x1614 vs 0x160c and ebp pushed in the prologue (the original pushes it after the first dispatch), light base in ebp instead of ebx, kinds 7/9 share one call, vertex pointer stepping differs.
@@ -234,14 +237,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (55)
+## 4. Large functions (801-3000 bytes) (51)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
-- [ ] `1005c680` 1846 bytes (float, loops 2, calls 8)
-- [ ] `10018870` 1850 bytes (float, calls 94)
-- [ ] `100301a0` 1850 bytes (float, calls 41)
-- [ ] `10172cb0` 1855 bytes (float, calls 16)
 - [ ] `10035050` 1858 bytes (float, loops 2, calls 62)
 - [ ] `10137b10` 1889 bytes Screenshot_Capture (loops 6, calls 49)
 - [ ] `100a8ac0` 1912 bytes (float, calls 58)
@@ -408,11 +407,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (3 files)
+## 7. Comment pass (4 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
+- [ ] `src/bgm_update.cpp`: 2 of 3 functions without a comment
 - [ ] `src/camera_shift_orbit.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/route_carrier.cpp`: 0 of 2 functions without a comment, no header
 - [ ] `src/route_follow.cpp`: 0 of 0 functions without a comment, no header

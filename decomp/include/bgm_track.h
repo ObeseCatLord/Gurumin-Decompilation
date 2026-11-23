@@ -14,4 +14,7 @@ struct BgmTrack
     char pad_002c[4];
 };
 
+// 0x1003aef0 (Bgm_Play), bgm_play.cpp; C++ linkage. The callers pass a second argument that it does not read.
+int Bgm_Play(int index, int unused);
+
 #endif

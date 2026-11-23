@@ -87,6 +87,7 @@ struct CharState
                         int placed;               // route_walk.cpp: 1 once the character was put on its route
                         int cameraFrames;         // camera_follow.cpp (slot 0): frames since the closing camera
                                                   // started (effect every 65, sinks after 90)
+                        int pullVariant;          // camera_item_stand_pull.cpp (slot 0): random bits picked when the pull shot starts
                         int downTimer;            // companion_update.cpp (companion slot): frames counted in
                                                   // the down / revive cycle
                         int companionHealthCap;   // companion_update.cpp (owner slot): a revived companion gets

@@ -24,10 +24,10 @@ struct TriangleBatch
     // 0x10172ac0 (screen_vertices.cpp): copies `count` vertices given for a 640x480 screen to the end of the
     // buffer, scaling their positions to the back buffer; returns 1.
     int AppendVertices(const ScreenVertex *source, int count);
-    // 0x10172cb0: appends a quad (two triangles) from (left, top) to (right, bottom) at depth z with texture
-    // coordinates (u0, v0)-(u1, v1), the alpha and two colours.
-    void AppendQuad(float left, float top, float right, float bottom, float u0, float v0, float u1, float v1, float z,
-                    float alpha, float r, float g, float b, float r2, float g2, float b2, float m_0078);
+    // 0x10172cb0 (tri_batch_quad.cpp): appends a quad (two triangles) from (left, top) to (right, bottom) at depth z with texture
+    // coordinates (u0, v0)-(u1, v1), the alpha and two colours; the corners are turned by `rotation` when not 0.
+    int AppendQuad(float left, float top, float right, float bottom, float u0, float v0, float u1, float v1, float z,
+                    float alpha, float r, float g, float b, float r2, float g2, float b2, float rotation);
     int Flush();                                    // 0x101733f0
     int SetBlend(int mode, int unused);             // 0x10173450
     int AddVertices(TextureObject *texture, void *source, int count);   // 0x10188eb0

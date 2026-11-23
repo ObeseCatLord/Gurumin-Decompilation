@@ -199,14 +199,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (114)
+## 4. Large functions (801-3000 bytes) (113)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10026730` 950 bytes (float, loops 6, calls 13)
 - [ ] `10049b00` 954 bytes (float, loops 6, calls 10)
 - [ ] `10051190` 988 bytes (float, calls 5)
 - [ ] `100279b0` 998 bytes (float, calls 36)
-- [ ] `10029cf0` 999 bytes (float, loops 2, calls 3)
 - [ ] `1000c720` 1032 bytes (float, loops 2, calls 22)
 - [ ] `1000e340` 1035 bytes (float, loops 1, calls 23)
 - [ ] `100509e0` 1035 bytes (float, calls 36)
@@ -427,10 +426,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (0)
+## 6. Naming: matched functions without a readable name (1)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
+- [ ] `10029cf0` 999 bytes (src/char_script.cpp)
 
 ## 7. Comment pass (2 files)
 

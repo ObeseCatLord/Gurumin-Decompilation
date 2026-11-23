@@ -17,48 +17,47 @@ reading it, then `AGENTS.md`.
 ## Progress (2026-11-23, `progress/jp/report.json`)
 | measure | value |
 |---|---|
-| Fully linked | 0.00% of code (151 of 260 units complete) |
-| Matched | 12.48% of code (214610 of 1720206 bytes), 801 of 1212 functions |
-| Matched under the rules | 12.44% of code (213983 bytes), 800 of the 801 matched functions |
-| Fuzzy match | 16.11% |
+| Fully linked | 0.00% of code (151 of 262 units complete) |
+| Matched | 12.64% of code (217410 of 1720206 bytes), 802 of 1212 functions |
+| Matched under the rules | 12.60% of code (216783 bytes), 801 of the 802 matched functions |
+| Fuzzy match | 16.54% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
 function) and node_world.cpp (0) still break rule 2.
 
 ## State
-- This session (5cb2834 .. HEAD): no new match; fuzzy 15.96% -> 16.11%.
-  - **WorldRenderer::DrawPictures 0x10167440** drafted in new world_pictures.cpp (rule-clean, open.tsv): 21 bytes
-    left, all in the in-world PICTURE_SCREEN_EXACT branch (the original starts the bottom-edge sum before pushing
-    the two constant texture coordinates). The 0x20 script pictures are typed in world_renderer.h (pictureAlpha,
-    pictureUVs, pictureAngle, pictureGrey, picturePositions, pictureSizes, pictureInWorld, pictureBlend,
-    pictureKind, screenTexture/Width/Height; PICTURE_COUNT, PictureKind, PictureBlend). render_state.h gained
-    RENDER_DEPTH_WRITE (9), RENDER_DEPTH_TEST (12), BLEND_ADD (1), BLEND_DARKEN (10).
-  - **Node::BuildMesh 0x101a82d0**: the first vertex of each triangle now matches (index kept in `vertex`, no
-    Vertex pointer). Left: `[index*0x74 + packs]` operand order (5 places) and the register of the third vertex
-    index load. The add's spelling does not steer it (packs[i], i + packs, char* offsets in either order, an inline
-    PackAt(packs, i), index types all compile identically); open.tsv lists what was tried.
-  - **Node::QueueDraw 0x10199e20**: not changed. Diagnosis: ours keeps 0 in ebp (`cmp [mem], ebp`), the original
-    has no zero register because ebp holds `view` and ebx `addColour` (in the queued branch the original calls
-    `operator+` with `mov ecx, ebx`); the callee-saved pushes follow from that. Twin 1019a6b0 (with the CDL fade
-    counter m_1899) waits for it.
-  - 10167d90 is not DrawPictures' twin (EH frame, copies a matrix into the world, different loop).
+- This session (dcd0ede .. HEAD): **Enemy_StrafeAndLunge 0x10099040 matched** (2800 bytes) in the new rule-clean
+  enemy_strafe.cpp (kinds 0x4c-0x4e, dispatched by char_dispatch.cpp); constants and enums in strafe_enemy.h;
+  CharState::shotSound (0x18) and DAT_10467ba0 (char_tables.h) typed. Fuzzy 16.11% -> 16.54%.
+  - **Enemy_StrafeAndShoot 0x1009a690** (kind 0x4c): 1 byte long, 426 diffs. Left: ebx/edi swapped all through
+    (ours: index in edi, model offset in ebx) and the chase step's far/mid tails merged the other way round. Key
+    finds that got it this far: `(float)atan2((double)x, (double)y)` (aligned frame + rounding, NOTES), the
+    quarter turn is `3.1415f / 2`, and the attack step has its own `if (m_238c) AddMotionSpeed; return 0;`.
+  - **Enemy_StrafeAndBurst 0x10099b30** (kind 0x4d): 47 bytes long, 559 diffs: the same register swap, and its
+    idle block (`if (rand % 100 > 2) return 0;` before the motion-speed check) is merged into two copies instead
+    of one. The defeated branch matches as an if/else with two full calls.
+  - The swap appears only in the two functions with a common end check (`if (m_238c) AddMotionSpeed`); the
+    matched twin returns from every path. open.tsv lists what was tried.
+- **WorldRenderer::DrawPictures 0x10167440**, **Node::QueueDraw 0x10199e20** (twin 1019a6b0), **Node::BuildMesh
+  0x101a82d0**: not changed this session (all three are scheduling/register walls; see open.tsv).
 - **npc_greet.cpp** / **node_world.cpp** / **the region prologue wall** (0x101a8e60, RayCast 0x101a9670,
   CastSegment 0x101aaa20, CastSegment2 0x101aa080): unchanged (see open.tsv).
 - Open match walls: Enemy_SeekShaga 0x100d2110, BoxSphere_Overlap 0x10192520, CylinderSphere_Overlap 0x10192c90,
   KeyBank::Sample 0x101af4c0, ProjectPlanarUVs 0x1019bdd0, plus the drafts above.
 - Every function left in QUEUE.md is 750 bytes or more. Look-alike families left in sections 4-5:
-  101713f0/10170580/10187520 (3.7 KB each), 1009a690/10099b30 (2.7-2.9 KB), 100fda40/100fc4a0 (5 KB),
-  10167d90 (2.6 KB, WorldRenderer, its own shape).
+  101713f0/10170580/10187520 (3.7 KB each), 100fda40/100fc4a0 (5 KB), 10167d90 (2.6 KB, WorldRenderer, its own
+  shape). Kinds 0x47-0x51 (char_dispatch.cpp FUN_1009e2d0): 1009d490 (0x4f), 1009b120 (0x50), 1009c070 (0x51) are
+  still in the queue and are probably more members of the enemy-behaviour family (check them against
+  enemy_strafe.cpp and char_move.cpp's Enemy_*AndBlast first).
 
 ## Next steps
-1. A new family in a new rule-clean file: 1009a690/10099b30 or 101713f0/10170580/10187520 (one source shape per
-   family: match one, then the others are mostly field offsets). Decode with `asm.py`, write, iterate with sbs.
-2. DrawPictures: one more idea for the in-world PICTURE_SCREEN_EXACT branch (e.g. branch order, or the v1 bug
-   written another way); it is otherwise byte-identical.
-3. QueueDraw: look for a source shape that gives `addColour` its own register in the queued branch (a separate
-   variable per branch, or the colour defaults written inside the branches) before trying permutations.
-4. BuildMesh, the region prologue and npc_greet only with a genuinely new idea.
+1. Kinds 0x4f-0x51 (1009d490, 1009b120, 1009c070): compare with enemy_strafe.cpp / char_move.cpp; a new member
+   of an existing shape can match at the first build (10099040 did).
+2. A new family in a new rule-clean file: 101713f0/10170580/10187520 (decode with `asm.py`, write, iterate).
+3. The 1009a690/10099b30 register swap: look for a source shape of the common end check (or of the attack step's
+   model pointer) that leaves the index in ebx; try the idle block of 10099b30 written another way.
+4. DrawPictures / QueueDraw / BuildMesh, the region prologue and npc_greet only with a genuinely new idea.
 
 ## How the merges were run (reuse)
 - Types: `python tools/type_move_driver.py apply <files>` then `python tools/prune_header_includes.py <new headers>`;
@@ -73,11 +72,11 @@ function) and node_world.cpp (0) still break rule 2.
 
 ## Continuation prompt
 "Continue the Gurumin decompilation. Read `decomp/HANDOFF.md` (including its Standing instructions) and `AGENTS.md`.
-Work through HANDOFF 'Next steps': first a new section 4-5 look-alike family (1009a690/10099b30 or
-101713f0/10170580/10187520) in a new rule-clean file (decode the frame from `asm.py`, write, fix the stack layout
-with scopes and fresh locals as NOTES describes), then the last 21 bytes of WorldRenderer::DrawPictures 0x10167440
-(world_pictures.cpp), then Node::QueueDraw 0x10199e20's register allocation (addColour/view registers) and its twin
-1019a6b0. Put every new type and global in a shared header so new matches count under the rules. After each batch
+Work through HANDOFF 'Next steps': first the enemy kinds 0x4f-0x51 (1009d490, 1009b120, 1009c070) against the
+shapes in enemy_strafe.cpp and char_move.cpp, then a new section 4-5 look-alike family (101713f0/10170580/10187520)
+in a new rule-clean file (decode the frame from `asm.py`, write, fix the stack layout with scopes and fresh locals as
+NOTES describes), then the ebx/edi register swap of Enemy_StrafeAndShoot 0x1009a690 / Enemy_StrafeAndBurst
+0x10099b30. Put every new type and global in a shared header so new matches count under the rules. After each batch
 run `python tools/build_all.py --report ../progress/jp/report.json` and `python tools/check_matches.py` from
 `decomp/`; commit and push only with no real loss (a rename shows as LOST + new at the same address: update
 `obj_symbols.tsv`). Keep everything human-readable (named constants, liberal comments, informative names). Work

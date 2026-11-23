@@ -33,23 +33,9 @@ struct EffectManager
     int RemoveOwnedBy(int owner);                    // 0x101883b0
 };
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    char pad_0000[0x267];
-    char m_0267;              // 0x267: 1 while held (idle)
-    char pad_0268[0x2c];
-    int m_0294;               // 0x294: 1 while held in its pose
-    char pad_0298[0x2054];
-    Node *root;               // 0x22ec: root node of the model
-    char pad_22f0[0x38];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x130];
-    int m_2498;               // 0x2498: set to 1 by the scene start for the player
-};
+#include "anim_model.h"
 
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // Per-slot state table at 0x10daaaec (actor_scan.cpp ActorSlot).
 struct ActorSlot
@@ -77,7 +63,6 @@ struct NpcState
     char pad_0010[0x30];
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" EffectManager DAT_10daaa80;
@@ -110,7 +95,7 @@ int FUN_100469d0(int index)
                                0, 0, &matrix, &options, 0);
         else
             DAT_10daaa80.Start(0x36c6, position, -1, -1, &DAT_10db6ee8[index].matrix, 0, 0, &matrix, &options, 0);
-        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_10db6ee8[index].mode = 0;
         DAT_10db6ee8[index].m_0267 = 1;
         DAT_10db6ee8[index].m_0294 = 1;
         DAT_10daaaec[index].m_013e = 1;
@@ -129,7 +114,7 @@ int FUN_100469d0(int index)
     }
     if (DAT_1032d69c != 0)
     {
-        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_10db6ee8[index].mode = 0;
         DAT_10db6ee8[index].m_0267 = 1;
         DAT_10db6ee8[index].m_0294 = 1;
         DAT_10daaaec[index].m_013e = 1;
@@ -145,7 +130,7 @@ int FUN_100469d0(int index)
             DAT_10daaa80.Start(0x2265, position, -1, -1, 0, 0, 0, 0, 0, 0);
         }
         DAT_10daaaec[index].m_0140 = (char)DAT_1020b430[index].saved;
-        DAT_10db6ee8[index].m_2498 = 1;
+        DAT_10db6ee8[index].mode = 1;
         DAT_10db6ee8[index].m_0267 = 0;
         DAT_10daaaec[index].m_013e = 0;
         DAT_10daaaec[index].m_0094 = 0;

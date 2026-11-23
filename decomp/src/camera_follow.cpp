@@ -190,21 +190,10 @@ extern "C" int FUN_10019310(void)
     return 0;
 }
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    char pad_0000[0x22f4];
-    Node *head;               // 0x22f4: the model's head node (0 = none)
-    char pad_22f8[0x30];
-    Matrix4 matrix;        // 0x2328: world matrix
-    char pad_2368[0x114];
-    float heading;            // 0x247c: facing angle in radians
-    char pad_2480[0x1c];
-};
+#include "anim_model.h"
 
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" float DAT_10da93e0;    // the character the camera stands at (rounded to an index)
 extern "C" float DAT_10da93e4;    // the character it looks at (rounded; below 0 = in front of the first)
 extern "C" float DAT_10da93e8;    // how much the target rises with the distance (per cent)
@@ -225,9 +214,9 @@ extern "C" int FUN_10019d80(void)
     first = first > 0 ? first : 0;
     float rounded = DAT_10da93e4 < 0.0f ? DAT_10da93e4 - 0.5f : DAT_10da93e4 + 0.5f;
     int second = (int)rounded;
-    if (DAT_10db6ee8[first].head != 0)
+    if (DAT_10db6ee8[first].headNode != 0)
     {
-        DAT_10866d98.Copy(DAT_10db6ee8[first].head->worldMatrix.GetTranslation());
+        DAT_10866d98.Copy(DAT_10db6ee8[first].headNode->worldMatrix.GetTranslation());
         DAT_10866d98.z += 35.0f;
     }
     else
@@ -243,9 +232,9 @@ extern "C" int FUN_10019d80(void)
         DAT_10edbd48.RotateZ(-DAT_10db6ee8[first].heading);
         DAT_10edbd48.Copy(DAT_10edbd48 + DAT_10866d98);
     }
-    else if (DAT_10db6ee8[second].head != 0)
+    else if (DAT_10db6ee8[second].headNode != 0)
     {
-        DAT_10edbd48.Copy(DAT_10db6ee8[second].head->worldMatrix.GetTranslation());
+        DAT_10edbd48.Copy(DAT_10db6ee8[second].headNode->worldMatrix.GetTranslation());
         DAT_10edbd48.z += 35.0f;
     }
     else

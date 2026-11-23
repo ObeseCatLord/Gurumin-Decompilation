@@ -8,38 +8,9 @@
 
 #include "matrix4.h"
 
-// A model's motion playback state (model_state.cpp Playback), only the fields used here.
-struct Playback
-{
-    char pad_0000[0x1c];
-    int layer;                // 0x1c: layer playing (-1 = none)
-    int frame;                // 0x20: current frame
-    char pad_0024[0x7c50];
-    int blending;             // 0x7c74: non-zero while blending into another layer
-};
+#include "anim_model.h"
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    char pad_0000[0x294];
-    int holding;              // 0x294: 1 while the sleeper holds its sleeping frame
-    Playback *motion;         // 0x298: the model's motion playback state
-    char pad_029c[0x208c];
-    Matrix4 matrix;           // 0x2328: world matrix
-    int heldFrame;            // 0x2368: the frame held while sleeping
-    char pad_236c[0x20];
-    int m_238c;               // 0x238c: Character::m_239c (non-zero while the player runs)
-    char pad_2390[0x28];
-    Vec4 speed;               // 0x23b8: current speed vector
-    char pad_23c8[0xb4];
-    float heading;            // 0x247c: facing angle in radians
-    float targetHeading;      // 0x2480: angle the character turns towards
-    char pad_2484[0x14];
-    int m_2498;               // 0x2498: set to 1 by the scene start for the player (cleared here)
-};
-
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // Per-character AI state (world.h CharState).
 struct NpcState
@@ -60,7 +31,6 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
 extern "C" char DAT_10255a88[0x80];
@@ -82,7 +52,7 @@ extern "C" int FUN_10043cc0(int index);                                     // C
 extern "C" int FUN_10045830(int index)
 {
     int awake = 0;
-    DAT_10db6ee8[index].m_2498 = 0;
+    DAT_10db6ee8[index].mode = 0;
     Vec4 player;
     Vec4 self;
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
@@ -92,7 +62,7 @@ extern "C" int FUN_10045830(int index)
     DAT_10255a88[index] = 0;
     if ((DAT_1020b430[index].m_0038 != 0 && DAT_1020b430[index].talk / 100 != 0) ||
         (distance < (float)(DAT_1020b430[index].talk % 100 * 10) && DAT_10db6ee8[0].m_238c != 0 &&
-         DAT_10db6ee8[0].speed.LengthSquared3() > 256.0f) ||
+         DAT_10db6ee8[0].velocity.LengthSquared3() > 256.0f) ||
         (distance < (float)(DAT_1020b430[index].talk % 100 * 10) && DAT_104c00e0 != 0) ||
         DAT_10210b30[index] != 0 || DAT_102550e0[index] != 0)
     {
@@ -108,7 +78,7 @@ extern "C" int FUN_10045830(int index)
     {
         if (DAT_10db6ee8[index].motion->layer == 2 && DAT_10db6ee8[index].motion->blending == 0)
         {
-            DAT_10db6ee8[index].heldFrame = DAT_10db6ee8[index].motion->frame;
+            DAT_10db6ee8[index].motionFrame = DAT_10db6ee8[index].motion->frame;
             DAT_10db6ee8[index].holding = 1;
         }
         FUN_1000d620(index, 10, 15);

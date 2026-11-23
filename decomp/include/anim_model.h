@@ -59,6 +59,9 @@ struct Playback
     void M_1016a020(void *owner);                                      // binds the playback to its model
     int SetLayer(int layer, int a, int first, int last, int b, int c); // 0x1016a100
     int Play(int layer, int restart, int blendFrames, float speed);    // 0x1016a2e0
+    int M_1016a220(void *source, int slot, int value);                 // layer-slot setters (mesh_cache.cpp)
+    int M_1016a260(int layer, int slot, int x, int y);
+    int M_1016a2a0(int layer, int slot, int value);
 };
 
 // One key-framed motion channel of a model (0xa98 bytes): a key bank and its playback range.

@@ -5,28 +5,15 @@
 
 #include "matrix4.h"
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    char pad_0000[0x12];
-    char m_0012;              // 0x12: set to 2 when the shadow is placed
-    char pad_0013[0x254];
-    char m_0267;              // 0x267: 1 while an NPC idles (char_move.cpp)
-    char pad_0268[0x20c0];
-    Matrix4 matrix;        // 0x2328: world matrix
-    char pad_2368[0xcc];
-    Matrix4 m_2434;        // 0x2434: the shadow's matrix (placed on the ground below)
-    char pad_2474[0x24];
-    int m_2498;               // 0x2498: set to 1 by the scene start for the player
-};
+#include "anim_model.h"
 
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // The model bank at 0x10804bf8 (model_bank.cpp).
 struct ModelBank
 {
     // 0x10164c10: a direction for model `model` from the player's position and velocity (0 when the bank is off).
-    const Vec4 *M_10164c10(CharRecord *model, Vec4 *position, Vec4 *velocity);
+    const Vec4 *M_10164c10(AnimModel *model, Vec4 *position, Vec4 *velocity);
 };
 
 struct CollisionWorld
@@ -43,7 +30,6 @@ struct NpcState
     int behaviour;            // 0x3c: behaviour number (0 = not unpacked from the script parameter yet)
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" ModelBank DAT_10804bf8;
 extern "C" CollisionWorld *DAT_10255f08;
@@ -110,7 +96,7 @@ extern "C" int FUN_100b9930(int index);                    // Enemy_DragToPit
 // state. Returns 0.
 extern "C" int FUN_100dfcf0(int index)
 {
-    if ((DAT_10db6ee8[index].m_2498 == 0 || DAT_10db6ee8[index].m_0267 == 1) && DAT_104c0380 % 30 == index % 30)
+    if ((DAT_10db6ee8[index].mode == 0 || DAT_10db6ee8[index].m_0267 == 1) && DAT_104c0380 % 30 == index % 30)
     {
         DAT_10db6ee8[index].m_0012 = 2;
         if (DAT_102022b8 != 0)

@@ -12,28 +12,7 @@ struct Object
 
 #include "vec4.h"
 
-struct Scene
-{
-    void M_10169f90();
-    void M_1016a020(void *owner);
-    void M_1016a100(int a, int b, int c, int d, int e, int f);
-    int M_1016a260(int layer, int slot, int x, int y);
-    int M_1016a220(int a, int slot, int value);
-    int M_1016a2a0(int layer, int slot, int value);
-    char pad_0000[0xbec];
-    int m_0bec;
-};
-
-struct SceneOwner
-{
-    char pad_0000[0x298];
-    Scene *scene;
-    int M_1017af40(int a, int b, int c, int d, int e, int f);
-    int M_1017afb0(int layer, int slot, int x, int y);
-    int M_1017b020(int a, int slot, int value);
-    int M_1017b080(int layer, int slot, int value);
-    int M_1017b160();
-};
+#include "anim_model.h"
 
 #include "node_data.h"
 
@@ -97,28 +76,28 @@ Widget::~Widget()
 }
 
 // Forwards a six-value playback setting to the playback object (Playback::M_1016a100).
-int SceneOwner::M_1017af40(int a, int b, int c, int d, int e, int f)
+int AnimModel::SetPlayback(int a, int b, int c, int d, int e, int f)
 {
-    if (scene == 0)
+    if (motion == 0)
     {
-        scene = (Scene *)DAT_11b0b938(0x7c84, "");
-        scene->M_10169f90();
-        scene->M_1016a020(this);
+        motion = (Playback *)DAT_11b0b938(0x7c84, "");
+        motion->Init();
+        motion->M_1016a020(this);
     }
-    scene->M_1016a100(a, b, c, d, e, f);
+    motion->SetLayer(a, b, c, d, e, f);
     return 1;
 }
 
 // Sets the (x, y) offset of slot `slot` in layer `layer` (LayerTable::M_1016a260).
-int SceneOwner::M_1017afb0(int layer, int slot, int x, int y)
+int AnimModel::SetLayerOffset(int layer, int slot, int x, int y)
 {
-    if (scene == 0)
+    if (motion == 0)
     {
-        scene = (Scene *)DAT_11b0b938(0x7c84, "");
-        scene->M_10169f90();
-        scene->M_1016a020(this);
+        motion = (Playback *)DAT_11b0b938(0x7c84, "");
+        motion->Init();
+        motion->M_1016a020(this);
     }
-    scene->M_1016a260(layer, slot, x, y);
+    motion->M_1016a260(layer, slot, x, y);
     return 1;
 }
 
@@ -137,39 +116,39 @@ extern "C" int __stdcall FUN_1016fa40(int index)
 }
 
 // Sets slot `slot`'s layer source and value (LayerTable::M_1016a220).
-int SceneOwner::M_1017b020(int a, int slot, int value)
+int AnimModel::SetLayerSource(void *source, int slot, int value)
 {
-    if (scene == 0)
+    if (motion == 0)
     {
-        scene = (Scene *)DAT_11b0b938(0x7c84, "");
-        scene->M_10169f90();
-        scene->M_1016a020(this);
+        motion = (Playback *)DAT_11b0b938(0x7c84, "");
+        motion->Init();
+        motion->M_1016a020(this);
     }
-    scene->M_1016a220(a, slot, value);
+    motion->M_1016a220(source, slot, value);
     return 1;
 }
 
 // Sets parameter `slot` of layer `layer` (LayerTable::M_1016a2a0).
-int SceneOwner::M_1017b080(int layer, int slot, int value)
+int AnimModel::SetLayerParameter(int layer, int slot, int value)
 {
-    if (scene == 0)
+    if (motion == 0)
     {
-        scene = (Scene *)DAT_11b0b938(0x7c84, "");
-        scene->M_10169f90();
-        scene->M_1016a020(this);
+        motion = (Playback *)DAT_11b0b938(0x7c84, "");
+        motion->Init();
+        motion->M_1016a020(this);
     }
-    scene->M_1016a2a0(layer, slot, value);
+    motion->M_1016a2a0(layer, slot, value);
     return 1;
 }
 
 // 1 when the playback has reached its end state (m_0bec == 1).
-int SceneOwner::M_1017b160()
+int AnimModel::M_1017b160()
 {
-    if (scene == 0)
+    if (motion == 0)
     {
-        scene = (Scene *)DAT_11b0b938(0x7c84, "");
-        scene->M_10169f90();
-        scene->M_1016a020(this);
+        motion = (Playback *)DAT_11b0b938(0x7c84, "");
+        motion->Init();
+        motion->M_1016a020(this);
     }
-    return scene->m_0bec == 1;
+    return motion->m_0bec == 1;
 }

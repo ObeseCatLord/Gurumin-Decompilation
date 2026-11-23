@@ -6,21 +6,9 @@
 
 #include "matrix4.h"
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    void SetPosition(float x, float y, float z);             // 0x10162610: moves the model
-    int IsClearOfMapLimited(const Vec4 *offset);             // 0x101641b0 (AnimModel::IsClearOfMapLimited)
-    char pad_0000[0xd4c];
-    float alpha;              // 0xd4c: model opacity (1.0 = solid)
-    char pad_0d50[0x15d8];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x130];
-    int m_2498;               // 0x2498: set to 1 by the scene start for the player
-};
+#include "anim_model.h"
 
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // Per-character AI state (world.h CharState).
 struct NpcState
@@ -51,7 +39,6 @@ struct CollisionWorld
     VisData *vis;             // 0x1864: visibility cells (0 = none)
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" char DAT_1020d540[0x80];           // 1 = the character is in play
@@ -126,7 +113,7 @@ extern "C" int FUN_10046f10(int index)
                 DAT_10db6ee8[index].SetPosition(spot.x, spot.y, spot.z);
                 DAT_10802bf8[index].position.Copy(DAT_10802bf8[index].position - spot);
                 DAT_10802bf8[index].position.Copy(DAT_10802bf8[index].position * 0.1f);
-                DAT_10db6ee8[index].m_2498 = 0;
+                DAT_10db6ee8[index].mode = 0;
                 DAT_10db6ee8[index].alpha = 0.5f;
                 return 0;
             }
@@ -144,7 +131,7 @@ extern "C" int FUN_10046f10(int index)
         if (DAT_1020b430[index].wait == 10)
         {
             DAT_10db6ee8[index].alpha = 1.0f;
-            DAT_10db6ee8[index].m_2498 = 1;
+            DAT_10db6ee8[index].mode = 1;
             FUN_10043cc0(index);
         }
     }

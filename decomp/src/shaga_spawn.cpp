@@ -20,18 +20,9 @@ struct Engine
     int M_1013eee0();
 };
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    char pad_0000[0x2328];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x114];
-    float heading;            // 0x247c: facing angle in radians
-    char pad_2480[0x1c];
-};
+#include "anim_model.h"
 
 extern "C" Engine DAT_10836c70;
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" int DAT_1030b668[0x80];            // base kind of each character
 extern "C" int DAT_10c64ad8;                  // the player's stamina gauge
 extern "C" void FUN_1000e750(void);           // AntiTamper_Store

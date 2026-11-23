@@ -13,17 +13,13 @@ Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);         // 0x101b10
 
 #include "node.h"
 
-// A character record (char_move.cpp CharRecord); only its address is used here.
-struct CharRecord
-{
-    char data[0x249c];
-};
+#include "anim_model.h"
 
 // The model bank at 0x10804bf8 (model_bank.cpp).
 struct ModelBank
 {
     // 0x10164c10: a direction for model `model` from the camera position and target (0 when the bank is off).
-    const Vec4 *M_10164c10(CharRecord *model, Vec4 *position, Vec4 *target);
+    const Vec4 *M_10164c10(AnimModel *model, Vec4 *position, Vec4 *target);
 };
 
 struct EffectManager
@@ -78,7 +74,6 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
     return map;
 }
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" ModelBank DAT_10804bf8;
 extern "C" EffectManager DAT_10daaa80;
 extern "C" Matrix4 DAT_10836ec8;           // parent matrix of the overhead pass (identity, set in game_reset.cpp)

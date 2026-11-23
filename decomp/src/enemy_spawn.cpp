@@ -15,20 +15,9 @@ struct EffectManager
               const Matrix4 *matrix, const EffectOptions *options, int *pause);  // 0x10172350
 };
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    void SetPosition(float x, float y, float z);             // 0x10162610: moves the model
-    char pad_0000[0x2328];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x114];
-    float heading;            // 0x247c: facing angle in radians
-    float targetHeading;      // 0x2480: angle the character turns towards
-    char pad_2484[0x18];
-};
+#include "anim_model.h"
 
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // Per-character AI state (world.h CharState).
 struct NpcState
@@ -39,7 +28,6 @@ struct NpcState
     char pad_000c[0x34];
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" EffectManager DAT_10daaa80;
 extern "C" char DAT_1049efb0[10][10];         // the wave groups: character of each slot (0 = empty)

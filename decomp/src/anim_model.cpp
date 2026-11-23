@@ -7,65 +7,9 @@
 
 #include "key_track.h"
 
-struct AnimTrack
-{
-    KeyBank keys;
-    int last;
-    int first;
-    int m_008;                // current frame while playing
-    int m_00c;                // 1 while playing
-    int m_010;                // 1 = loop back to `first` at the end
-};
+#include "anim_model.h"
 
-// Playback object of the model (scene_misc.cpp); m_0020 is the frame it shows.
-struct ScenePlayback
-{
-    char pad_0000[0x20];
-    int frame;
-};
-
-struct Motion
-{
-    void M_1019e830(int from, int count);
-};
-
-struct AnimModel
-{
-    char pad_0000[0x298];
-    ScenePlayback *scene;     // 0x298
-    char pad_029c[0x10];
-    AnimTrack trackA;
-    char pad_0d44[0xc];
-    AnimTrack trackB;
-    char pad_17e8;
-    char m_17e9;
-    char pad_17ea[2];
-    AnimTrack trackC;
-    char pad_2284[4];
-    char m_2288;
-    char pad_2289[3];
-    int m_228c;
-    int m_2290;
-    int m_2294;
-    char pad_2298[0x68];
-    Motion *motion1;
-    Motion *motion2;
-    char pad_2308[0x60];
-    int motionFrame;          // 0x2368: frame of the motion file shown now
-
-    int M_10161a20(int count);
-    void M_10161a60();
-    int M_10161af0(int frame, float x, float y, float z);
-    int M_10161b40(int a, int b);
-    void M_10161b60();
-    int M_10161b90(int frame, float value);
-    int M_10161be0(int a, int b);
-    void M_10161f30();
-    int M_10161f60(int a, int b);
-    int M_101628b0(int a, int b, int c, char d);
-    int M_10161a90(int frame, float x, float y, float z, char flag);
-    int StepTrackA();
-};
+#include "node.h"
 
 extern "C" int DAT_10faaa88[0x100];
 
@@ -80,10 +24,10 @@ int AnimModel::M_10161a20(int count)
 {
     if (count > 0)
     {
-        if (motion1 != 0)
-            motion1->M_1019e830(-1, count);
-        if (motion2 != 0)
-            motion2->M_1019e830(-1, count);
+        if (swapNode1 != 0)
+            swapNode1->ReplaceMaterial(-1, count);
+        if (swapNode2 != 0)
+            swapNode2->ReplaceMaterial(-1, count);
     }
     return 1;
 }
@@ -94,8 +38,8 @@ void AnimModel::M_10161a60()
     trackC.keys.Clear();
     trackC.last = 0;
     trackC.first = 10000;
-    trackC.m_008 = 0;
-    trackC.m_00c = 0;
+    trackC.frame = 0;
+    trackC.playing = 0;
 }
 
 // Adds key (a, b, c) at `frame` to track C and widens its frame range.
@@ -112,8 +56,8 @@ int AnimModel::M_10161af0(int frame, float x, float y, float z)
 // Sets track C's two playback options (loop mode and speed).
 int AnimModel::M_10161b40(int a, int b)
 {
-    trackC.m_00c = a;
-    trackC.m_010 = b;
+    trackC.playing = a;
+    trackC.looping = b;
     return 0;
 }
 
@@ -123,8 +67,8 @@ void AnimModel::M_10161b60()
     trackA.keys.Clear();
     trackA.last = 0;
     trackA.first = 10000;
-    trackA.m_008 = 0;
-    trackA.m_00c = 0;
+    trackA.frame = 0;
+    trackA.playing = 0;
 }
 
 // Adds a motion key at `frame` to track A (key flag 4 = motion frame) and widens its frame range.
@@ -141,8 +85,8 @@ int AnimModel::M_10161b90(int frame, float value)
 // Sets track A's two playback options (char_motion.cpp: 1 and "loop").
 int AnimModel::M_10161be0(int a, int b)
 {
-    trackA.m_00c = a;
-    trackA.m_010 = b;
+    trackA.playing = a;
+    trackA.looping = b;
     return 0;
 }
 
@@ -152,27 +96,27 @@ void AnimModel::M_10161f30()
     trackB.keys.Clear();
     trackB.last = 0;
     trackB.first = 10000;
-    trackB.m_008 = 0;
-    trackB.m_00c = 0;
+    trackB.frame = 0;
+    trackB.playing = 0;
 }
 
 // Sets track B's two playback options.
 int AnimModel::M_10161f60(int a, int b)
 {
-    trackB.m_00c = a;
-    trackB.m_010 = b;
+    trackB.playing = a;
+    trackB.looping = b;
     return 0;
 }
 
-// Stores a pending action (a, b, c, flag d) unless the model is locked (m_17e9).
-int AnimModel::M_101628b0(int a, int b, int c, char d)
+// 0x101628b0. Queues a push (x, y, z) with `flag` unless the model is locked. Returns 0.
+int AnimModel::SetPendingPush(float x, float y, float z, char flag)
 {
-    if (m_17e9 == 0)
+    if (locked == 0)
     {
-        m_2288 = d;
-        m_228c = a;
-        m_2290 = b;
-        m_2294 = c;
+        m_2288 = flag;
+        m_228c.x = x;
+        m_228c.y = y;
+        m_228c.z = z;
     }
     return 0;
 }
@@ -191,22 +135,22 @@ int AnimModel::M_10161a90(int frame, float x, float y, float z, char flag)
 // last one. Returns 0.
 int AnimModel::StepTrackA()
 {
-    if (trackA.m_00c != 0)
+    if (trackA.playing != 0)
     {
         float frame, y, z, w;
-        trackA.keys.Sample(trackA.m_008, &frame, &y, &z, &w, 0);
+        trackA.keys.Sample(trackA.frame, &frame, &y, &z, &w, 0);
         motionFrame = (int)frame;
-        if (scene != 0)
-            scene->frame = motionFrame;
-        if (++trackA.m_008 >= trackA.last)
+        if (motion != 0)
+            motion->frame = motionFrame;
+        if (++trackA.frame >= trackA.last)
         {
-            if (trackA.m_010 != 0)
+            if (trackA.looping != 0)
             {
-                trackA.m_008 = trackA.first;
+                trackA.frame = trackA.first;
                 return 0;
             }
-            trackA.m_00c = 0;
-            trackA.m_008--;
+            trackA.playing = 0;
+            trackA.frame--;
         }
     }
     return 0;

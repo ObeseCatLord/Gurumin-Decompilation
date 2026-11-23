@@ -8,11 +8,7 @@
 
 #include "matrix4.h"
 
-struct AnimModel
-{
-    int SetPosition(float x, float y, float z);  // 0x10162610 (model_place.cpp PathMover::SetPosition)
-    int IsClearAny(const Vec4 *move);            // 0x101640b0: 0 when the move collides
-};
+#include "anim_model.h"
 
 #include "node.h"
 

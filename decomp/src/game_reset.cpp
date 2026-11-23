@@ -68,10 +68,7 @@ struct MmvPlayer
     void Close();                                // 0x101609b0
 };
 
-struct PlayerModel
-{
-    void M_10162c50();                           // 0x10162c50
-};
+#include "anim_model.h"
 
 extern "C" int DAT_10202348;
 extern "C" float DAT_1020234c;
@@ -608,7 +605,6 @@ extern "C" EffectManager DAT_10daaa80;
 extern "C" Vec4 DAT_10daaad4;
 extern "C" int DAT_10daabb4;
 extern "C" CharParams DAT_10db4408;                 // their starting values
-extern "C" PlayerModel DAT_10db6ee8;
 extern "C" int DAT_10db9368;
 extern "C" Vec4 DAT_10edbd38;
 extern "C" Vec4 DAT_10edbdd8;
@@ -853,7 +849,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104d29f8.Fill(0.0f);
   DAT_10c67f50.Fill(0.0f);
   DAT_10db9368 = 0;
-  DAT_10db6ee8.M_10162c50();
+  DAT_10db6ee8[0].Unload();
   for (int i = 0; i < 0x80; i++)
   {
     DAT_10837fc8[i].Fill(0.0f);

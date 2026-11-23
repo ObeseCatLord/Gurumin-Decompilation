@@ -5,21 +5,7 @@
 
 #include "matrix4.h"
 
-struct CharRecord
-{
-    void Place(float x, float y, float z);       // 0x10162610: moves the model
-    char pad_0000[0x270];
-    int flag;                 // 0x270: script flag set when it is destroyed (0 = none)
-    int model;                // 0x274: index of the model left behind (path table DAT_10894698)
-    char pad_0278[0x10];
-    int m_0288;               // 0x288: set to 6 when destroyed
-    int m_028c;               // 0x28c: cleared when destroyed
-    char pad_0290[0x2098];
-    Matrix4 matrix;        // 0x2328: world matrix
-    char pad_2368[0x118];
-    float targetHeading;      // 0x2480: angle the character turns towards
-    char pad_2484[0x18];
-};
+#include "anim_model.h"
 
 struct EffectManager
 {
@@ -33,7 +19,6 @@ struct Engine
     int ResetFrameTimer();                       // 0x1013eee0: FrameTimer_ResetNext
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" EffectManager DAT_10daaa80;
 extern "C" Engine DAT_10836c70;
 extern "C" char DAT_10894698[][0x124];   // model paths
@@ -65,16 +50,16 @@ extern "C" int FUN_100541f0(int index)
         Vec4 position = DAT_10db6ee8[index].matrix.GetTranslation();
         DAT_1021f3c0[index] = (char)0xaf;
         FUN_1003ad20(0x337, DAT_10db6ee8[index].matrix.GetTranslation(), 1.0f);
-        int model = DAT_10db6ee8[index].model;
+        int model = DAT_10db6ee8[index].leftModel;
         Vec4 colour;
         colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
         FUN_1003a880(DAT_10894698[model], position.x, position.y, position.z, 0, 0, 0,
                      DAT_10db6ee8[index].targetHeading * 180.0f / 3.1415f, colour);
         DAT_10836c70.ResetFrameTimer();
-        int flag = DAT_10db6ee8[index].flag;
+        int flag = DAT_10db6ee8[index].scriptFlag;
         if (flag <= 3999 && flag != 0)
             DAT_10c62edc[flag] = 0x29a;
-        DAT_10db6ee8[index].Place(-250000.0f, 0, 0);
+        DAT_10db6ee8[index].SetPosition(-250000.0f, 0, 0);
     }
     return 0;
 }

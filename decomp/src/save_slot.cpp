@@ -110,11 +110,7 @@ int FUN_10011240(const char *name, void *thumbnail)
     return 0;
 }
 
-// The player character's model (CharModel::M_10162420): places it at (x, y, z).
-struct PlayerModel
-{
-    int M_10162420(float x, float y, float z);
-};
+#include "anim_model.h"
 
 extern "C" char DAT_10daaae8[0x188];             // the player's slot record (CharSlot, 4 bytes before slot 0's)
 extern "C" int DAT_10c62edc[0x1000];             // script flags
@@ -131,7 +127,6 @@ extern "C" float DAT_108029c0;
 extern "C" int DAT_104bfd50;
 extern "C" char DAT_10daac2d[];                  // the player's name
 extern "C" int DAT_10daabb4;
-extern "C" PlayerModel DAT_10db6ee8;
 extern "C" int FUN_1013e6f0(int a, const char *text, const char *name);
 extern "C" int FUN_100154c0(int value);
 extern "C" void FUN_10015910(void);
@@ -229,7 +224,7 @@ int FUN_1003b2c0(const char *path, int mode)
         DAT_108029bc = y;
         DAT_108029c0 = z;
         FUN_1013e6f0(0, "\x83p\x83\x8a\x83\x93", DAT_10daac2d);
-        DAT_10db6ee8.M_10162420(x, y, z);
+        DAT_10db6ee8[0].Teleport(x, y, z);
         FUN_100154c0(DAT_10daabb4);
         DAT_104bfd50 = 1;
         FUN_10015910();

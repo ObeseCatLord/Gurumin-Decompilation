@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.6582,
+  "fuzzy_match_percent": 14.6579,
   "total_code": "1720206",
   "matched_code": "199043",
   "matched_code_percent": 11.5709,
@@ -377,7 +377,7 @@
      }
     },
     {
-     "name": "?M_10161af0@AnimModel@@QAEHHHHH@Z",
+     "name": "?M_10161af0@AnimModel@@QAEHHMMM@Z",
      "size": "77",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -401,7 +401,7 @@
      }
     },
     {
-     "name": "?M_10161b90@AnimModel@@QAEHHH@Z",
+     "name": "?M_10161b90@AnimModel@@QAEHHM@Z",
      "size": "74",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -433,7 +433,7 @@
      }
     },
     {
-     "name": "?M_101628b0@AnimModel@@QAEHHHHD@Z",
+     "name": "?SetPendingPush@AnimModel@@QAEHMMMD@Z",
      "size": "55",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -441,7 +441,7 @@
      }
     },
     {
-     "name": "?M_10161a90@AnimModel@@QAEHHHHHD@Z",
+     "name": "?M_10161a90@AnimModel@@QAEHHMMMD@Z",
      "size": "88",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -3595,7 +3595,7 @@
   {
    "name": "app/char_script",
    "measures": {
-    "fuzzy_match_percent": 89.881,
+    "fuzzy_match_percent": 90.1786,
     "total_code": "325",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -3616,14 +3616,14 @@
     {
      "name": ".text",
      "size": "325",
-     "fuzzy_match_percent": 89.881
+     "fuzzy_match_percent": 90.1786
     }
    ],
    "functions": [
     {
      "name": "_FUN_1002a340",
      "size": "325",
-     "fuzzy_match_percent": 89.881,
+     "fuzzy_match_percent": 90.1786,
      "metadata": {
       "virtual_address": "268608320"
      }
@@ -9413,7 +9413,7 @@
    ],
    "functions": [
     {
-     "name": "?Teleport@PathMover@@QAEHMMM@Z",
+     "name": "?Teleport@AnimModel@@QAEHMMM@Z",
      "size": "494",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -9421,7 +9421,7 @@
      }
     },
     {
-     "name": "?SetPosition@PathMover@@QAEHMMM@Z",
+     "name": "?SetPosition@AnimModel@@QAEHMMM@Z",
      "size": "436",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -10827,7 +10827,7 @@
    ],
    "functions": [
     {
-     "name": "?StepPath@PathMover@@QAEHXZ",
+     "name": "?StepPath@AnimModel@@QAEHXZ",
      "size": "160",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -11219,7 +11219,7 @@
   {
    "name": "app/pushing_platform",
    "measures": {
-    "fuzzy_match_percent": 82.8488,
+    "fuzzy_match_percent": 81.9767,
     "total_code": "685",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -11240,14 +11240,14 @@
     {
      "name": ".text",
      "size": "685",
-     "fuzzy_match_percent": 82.8488
+     "fuzzy_match_percent": 81.9767
     }
    ],
    "functions": [
     {
      "name": "_FUN_1002a490",
      "size": "685",
-     "fuzzy_match_percent": 82.8488,
+     "fuzzy_match_percent": 81.9767,
      "metadata": {
       "virtual_address": "268608656"
      }
@@ -11953,7 +11953,7 @@
      }
     },
     {
-     "name": "?M_1017af40@SceneOwner@@QAEHHHHHHH@Z",
+     "name": "?SetPlayback@AnimModel@@QAEHHHHHHH@Z",
      "size": "107",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -11961,7 +11961,7 @@
      }
     },
     {
-     "name": "?M_1017afb0@SceneOwner@@QAEHHHHH@Z",
+     "name": "?SetLayerOffset@AnimModel@@QAEHHHHH@Z",
      "size": "97",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -11977,7 +11977,7 @@
      }
     },
     {
-     "name": "?M_1017b020@SceneOwner@@QAEHHHH@Z",
+     "name": "?SetLayerSource@AnimModel@@QAEHPAXHH@Z",
      "size": "92",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -11985,7 +11985,7 @@
      }
     },
     {
-     "name": "?M_1017b080@SceneOwner@@QAEHHHH@Z",
+     "name": "?SetLayerParameter@AnimModel@@QAEHHHH@Z",
      "size": "92",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -11993,7 +11993,7 @@
      }
     },
     {
-     "name": "?M_1017b160@SceneOwner@@QAEHXZ",
+     "name": "?M_1017b160@AnimModel@@QAEHXZ",
      "size": "81",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -14497,7 +14497,7 @@
      }
     },
     {
-     "name": "?M_1017b1c0@SceneOwner@@QAEHXZ",
+     "name": "?M_1017b1c0@AnimModel@@QAEHXZ",
      "size": "79",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -14545,7 +14545,7 @@
      }
     },
     {
-     "name": "?PlayMotion@SceneOwner@@QAEXHHHM@Z",
+     "name": "?PlayMotion@AnimModel@@QAEXHHHM@Z",
      "size": "116",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -14553,7 +14553,7 @@
      }
     },
     {
-     "name": "?LoadModel@SceneOwner@@QAEHPBD@Z",
+     "name": "?LoadModel@AnimModel@@QAEHPBD@Z",
      "size": "129",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -14561,7 +14561,7 @@
      }
     },
     {
-     "name": "?UpdateCollision@SceneOwner@@QAEHXZ",
+     "name": "?UpdateCollision@AnimModel@@QAEHXZ",
      "size": "138",
      "fuzzy_match_percent": 100.0,
      "metadata": {

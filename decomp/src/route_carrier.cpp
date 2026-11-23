@@ -7,24 +7,9 @@
 
 #include "matrix4.h"
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct WalkerRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    void SetPosition(float x, float y, float z);             // 0x10162610: moves the model
-    char pad_0000[0xd4c];
-    float alpha;              // 0xd4c: model opacity (1.0 = solid)
-    char pad_0d50[0x159c];
-    void *root;               // 0x22ec: root node of the model (0 = no model loaded)
-    char pad_22f0[0x38];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x118];
-    float targetHeading;      // 0x2480: angle the character turns towards
-    char pad_2484[0x14];
-    int m_2498;               // 0x2498: set to 1 by the scene start for the player
-};
+#include "anim_model.h"
 
-typedef char check_walker[sizeof(WalkerRecord) == 0x249c ? 1 : -1];
+typedef char check_walker[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // Per-character AI state (world.h CharState).
 struct NpcState
@@ -67,7 +52,6 @@ struct RoutePoint
     int code;
 };
 
-extern "C" WalkerRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
@@ -106,7 +90,7 @@ extern "C" int FUN_100451c0(int index)
     int action;
     int value;
     int group;
-    DAT_10db6ee8[index].m_2498 = 0;
+    DAT_10db6ee8[index].mode = 0;
     if (DAT_10210b30[index] != 0)
     {
         DAT_1020b430[index].state = 4;

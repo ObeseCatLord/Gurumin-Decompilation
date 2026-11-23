@@ -5,34 +5,9 @@
 
 #include "matrix4.h"
 
-// A model's motion playback state (model_state.cpp Playback), only the fields used here.
-struct Playback
-{
-    char pad_0000[0x7c74];
-    int blending;             // 0x7c74: non-zero while blending into another layer
-    int pad_7c78;
-    int nextLayer;            // 0x7c7c: layer being blended into
-};
+#include "anim_model.h"
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    void SetPosition(float x, float y, float z);             // 0x10162610: moves the model
-    char pad_0000[0x265];
-    char m_0265;              // 0x265
-    char pad_0266[0x32];
-    Playback *motion;         // 0x298: the model's motion playback state
-    char pad_029c[0xa90];
-    int m_0d2c;               // 0xd2c
-    char pad_0d30[0x15f8];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x114];
-    float heading;            // 0x247c: facing angle in radians
-    char pad_2480[0x1c];
-};
-
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // Per-character AI state (world.h CharState).
 struct NpcState
@@ -44,7 +19,6 @@ struct NpcState
     char pad_0010[0x30];
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" int DAT_10c62ed0;                  // current map
 extern "C" int DAT_10c6351c;                  // the character being talked to
@@ -67,7 +41,7 @@ extern "C" int FUN_100e21a0(int index)
     if (index == 14)
     {
         if (DAT_10c62ed0 < 20)
-            DAT_10db6ee8[index].m_0d2c = 0;
+            DAT_10db6ee8[index].trackA.keys.count = 0;
     }
     else if (index == 20 && DAT_10c6351c == 0xdc)
     {
@@ -103,7 +77,7 @@ extern "C" int FUN_100e21a0(int index)
     if (index == 0x19 || index == 0xc || index == 0x14 || index == 0xe || index > 0x39)
     {
         if (index == 0x14)
-            DAT_10db6ee8[index].m_0265 = 1;
+            DAT_10db6ee8[index].important = 1;
         DAT_1020b430[index].state = 0;
     }
     if (index == 0xb && DAT_10c6564c != 0 && DAT_10c65648 == 0)

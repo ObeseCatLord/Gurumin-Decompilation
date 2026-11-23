@@ -7,17 +7,7 @@
 
 #include "matrix4.h"
 
-struct CharRecord
-{
-    char pad_0000[0xd4c];
-    float alpha;              // 0xd4c: model opacity (Character::m_0d5c)
-    char pad_0d50[0x15d8];
-    Matrix4 matrix;        // 0x2328: world matrix
-    Vec3 position;            // 0x2358: the matrix translation
-    char pad_2364[0x134];
-    int m_2498;               // 0x2498
-    void Place(float x, float y, float z);  // 0x10162610: moves the model
-};
+#include "anim_model.h"
 
 // Per-character script state (world.h CharState).
 struct ScriptState
@@ -33,7 +23,6 @@ struct ScriptState
     char pad_0020[0x20];
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" ScriptState DAT_1020b430[0x80];
 extern "C" Vec3 *DAT_1032d5b8[];      // positions the camera keeps in view
 extern "C" char DAT_1021bbc0[];       // a flag per camera position
@@ -57,7 +46,7 @@ extern "C" int FUN_1002a340(int index)
     int result;
     position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     int value = DAT_1020b430[index].value;
-    DAT_10db6ee8[index].m_2498 = 0;
+    DAT_10db6ee8[index].mode = 0;
     do
     {
         FUN_10029cf0(index, &a, DAT_1020b430[index].step, &nextStep, &position, &result, &value, &b);
@@ -72,11 +61,11 @@ extern "C" int FUN_1002a340(int index)
         DAT_1020b430[index].step = 0;
         DAT_1020b430[index].value = 0;
         DAT_10db6ee8[index].alpha = 0;
-        DAT_10db6ee8[index].Place(-5000.0f, -5000.0f, -5000.0f);
+        DAT_10db6ee8[index].SetPosition(-5000.0f, -5000.0f, -5000.0f);
     }
     if (DAT_1020b430[index].registered == 0)
     {
-        DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ee8[index].position;
+        DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ee8[index].matrix.translation;
         DAT_1021bbc0[DAT_1049f0f0] = 0;
         DAT_1049f0f0++;
         DAT_1020b430[index].registered = 1;

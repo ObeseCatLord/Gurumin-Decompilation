@@ -6,17 +6,7 @@
 
 #include "vec4.h"
 
-struct CharRecord
-{
-    char pad_0000[0x12];
-    char m_0012;              // 0x12
-    char pad_0013[0x7a];
-    char m_008d;              // 0x8d
-    char pad_008e[0x1d9];
-    char m_0267;              // 0x267: 1 while an NPC idles (char_move.cpp)
-    char pad_0268[0x2230];
-    int m_2498;               // 0x2498: 1 for characters that move at half speed (Character_SetMove)
-};
+#include "anim_model.h"
 
 // Per-character slot record, 0x188 bytes (world.h CharSlot).
 struct SlotRecord
@@ -48,7 +38,6 @@ struct PoseEntry
     int words[9];
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" SlotRecord DAT_10daab84[0x80];
 extern "C" AiState DAT_1020b430[0x80];
 extern "C" StartVectors DAT_10802bf8[0x80];
@@ -72,7 +61,7 @@ extern "C" int FUN_10043cc0(int index)
     DAT_10daab84[index].m_00a5 = 0;
     memset(&DAT_1020b430[index], 0, sizeof(AiState));
     DAT_10db6ee8[index].m_0267 = 0;
-    DAT_10db6ee8[index].m_2498 = 1;
+    DAT_10db6ee8[index].mode = 1;
     DAT_10255a88[index] = 1;
     DAT_10db6ee8[index].m_008d = 0;
     DAT_10802bf8[index].position.Fill(0);

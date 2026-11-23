@@ -5,17 +5,9 @@
 
 #include "vec4.h"
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    char pad_0000[0x2358];
-    Vec4 position;            // 0x2358: the world matrix's translation row
-    char pad_2368[0x114];
-    float heading;            // 0x247c: facing angle in radians
-    char pad_2480[0x1c];
-};
+#include "anim_model.h"
 
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 struct CollisionWorld
 {
@@ -24,7 +16,6 @@ struct CollisionWorld
     int CastSegment(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);   // 0x101aaa20
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" CollisionWorld *DAT_10255f08;
 extern "C" int FUN_100248e0(Vec4 position, Vec4 *ground, float height);     // Collision_ProbeDown
 
@@ -40,10 +31,10 @@ extern "C" int FUN_10050df0(int index, Vec4 *wall, Vec4 *ground, float *wallDist
     Vec4 side;
     Vec4 forward;
     Vec4 wallHit;
-    from.x = DAT_10db6ee8[index].position.x;
-    from.y = DAT_10db6ee8[index].position.y;
-    from.z = DAT_10db6ee8[index].position.z + 10.0f;
-    from.w = DAT_10db6ee8[index].position.w;
+    from.x = DAT_10db6ee8[index].matrix.translation.x;
+    from.y = DAT_10db6ee8[index].matrix.translation.y;
+    from.z = DAT_10db6ee8[index].matrix.translation.z + 10.0f;
+    from.w = DAT_10db6ee8[index].matrix._44;
     side.Fill(0.0f);
     side.y = reach;
     side.RotateZ(-DAT_10db6ee8[index].heading - 1.5708f);
@@ -56,7 +47,10 @@ extern "C" int FUN_10050df0(int index, Vec4 *wall, Vec4 *ground, float *wallDist
         Vec4 unused;
         Vec4 floor;
         floor.Fill(0.0f);
-        top = DAT_10db6ee8[index].position;
+        top.x = DAT_10db6ee8[index].matrix._41;
+        top.y = DAT_10db6ee8[index].matrix._42;
+        top.z = DAT_10db6ee8[index].matrix._43;
+        top.w = DAT_10db6ee8[index].matrix._44;
         floor.x = -200000.0f;
         bottom.Copy(top);
         bottom.z -= 100000.0f;
@@ -67,7 +61,7 @@ extern "C" int FUN_10050df0(int index, Vec4 *wall, Vec4 *ground, float *wallDist
             return 0;
     }
     ground->Copy(from);
-    *drop = fabsf(DAT_10db6ee8[index].position.z - from.z);
+    *drop = fabsf(DAT_10db6ee8[index].matrix.translation.z - from.z);
     from.z += 10.0f;
     from.Copy(from - forward * 10.0f);
     side.Copy(side + from);

@@ -14,14 +14,7 @@ struct EffectManager
               const Matrix4 *matrix, const EffectOptions *options, int *pause);  // 0x10172350
 };
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    char pad_0000[0x2328];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x134];
-};
+#include "anim_model.h"
 
 // Per-slot state table at 0x10daaaec (actor_scan.cpp ActorSlot).
 struct ActorSlot
@@ -56,7 +49,6 @@ struct Game
     int RaiseGameOverEvents();                       // 0x10054a60
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" EffectManager DAT_10daaa80;
 extern "C" MoviePlayer DAT_10f08ab0;

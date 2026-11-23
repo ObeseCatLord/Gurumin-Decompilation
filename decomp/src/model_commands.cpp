@@ -15,15 +15,7 @@ struct ModelDef
     int params[0x190][8];         // 0x1934: up to six values per command
 };
 
-// The scene owner of a model record (scene_misc.cpp SceneOwner, at the model part of a character, 0x249c bytes).
-struct SceneOwner
-{
-    int SetPlayback(int a, int b, int c, int d, int e, int f);   // 0x1017af40
-    int SetLayerOffset(int layer, int slot, int x, int y);       // 0x1017afb0
-    int SetLayerSource(void *source, int slot, int value);       // 0x1017b020
-    int SetLayerParameter(int layer, int slot, int value);       // 0x1017b080
-    char pad_0000[0x249c];
-};
+#include "anim_model.h"
 
 // Character slot record (world.h CharSlot), only the model id.
 struct CharSlot
@@ -34,7 +26,6 @@ struct CharSlot
 };
 
 extern "C" ModelDef DAT_10b314c4[];
-extern "C" SceneOwner DAT_10db6ee8[0x80];
 extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" int DAT_104c02f0;      // "DAT" source of the player for kind 4
 extern "C" int DAT_10c652cc;      // "DAT" source of the player for the other kinds

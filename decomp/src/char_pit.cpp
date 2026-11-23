@@ -4,28 +4,7 @@
 
 #include "matrix4.h"
 
-struct CharModel
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0
-    void SetPosition(float x, float y, float z);             // 0x10162610
-    int IsClearOfMapLimited(const Vec4 *move);               // 0x101641b0
-};
-
-// A character seen from its model (world.h Character + 0x10): the per-character mode at 0x2498 lies beyond the
-// 0x249c bytes of world.h's Character, which starts 0x10 bytes earlier.
-struct CharacterBody
-{
-    CharModel model;
-    char pad_0001[0xd4b];
-    float alpha;                                     // 0xd4c (Character 0xd5c)
-    char pad_0d50[0x15d8];
-    Matrix4 matrix;                                  // 0x2328 (Character 0x2338)
-    char pad_2368[0x114];
-    float heading;                                   // 0x247c (Character 0x248c)
-    float targetHeading;                             // 0x2480
-    char pad_2484[0x14];
-    int mode;                                        // 0x2498: 1 = normal, 2 = over the pit area
-};
+#include "anim_model.h"
 
 struct CharState
 {
@@ -43,7 +22,6 @@ struct CharSlotFlags
     char pad_010a[0x7e];
 };
 
-extern "C" CharacterBody DAT_10db6ee8[0x80];
 extern "C" CharState DAT_1020b430[0x80];
 extern "C" CharSlotFlags DAT_10daab20[0x80];
 extern "C" char DAT_1021f9c0[0x80];
@@ -79,7 +57,7 @@ extern "C" int FUN_100b9930(int index)
     position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     toPlayer.Copy(player - position);
     DAT_1020b430[index].frame++;
-    DAT_10db6ee8[index].model.PlayMotion(1, 0, 5, 1.0f);
+    DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
     DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y);
     move.y = -180.0f;
     move.RotateZ(-DAT_10db6ee8[index].heading);
@@ -87,7 +65,7 @@ extern "C" int FUN_100b9930(int index)
         move.z = 5.0f;
     FUN_100241e0(index, move.x, move.y, move.z);
     move.z = 10.0f;
-    if (DAT_1020b430[index].frame < 0x96 && DAT_10db6ee8[index].model.IsClearOfMapLimited(&move) == 0)
+    if (DAT_1020b430[index].frame < 0x96 && DAT_10db6ee8[index].IsClearOfMapLimited(&move) == 0)
         DAT_1020b430[index].frame = 0x96;
     int frames = DAT_1020b430[index].frame;
     if (frames > 0x96)
@@ -100,7 +78,7 @@ extern "C" int FUN_100b9930(int index)
     }
     if (frames >= 0xa5)
     {
-        DAT_10db6ee8[index].model.SetPosition(-200000.0f, 0, 0);
+        DAT_10db6ee8[index].SetPosition(-200000.0f, 0, 0);
         DAT_10867e18[index].x = -200000.0f;
     }
     if (DAT_104bfe28 != 0 && DAT_104bfe24 - 25.0f > DAT_10db6ee8[index].matrix.m[14])

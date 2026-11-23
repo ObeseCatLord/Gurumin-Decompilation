@@ -9,26 +9,9 @@ Matrix4 RotationY(float angle);                  // 0x101b1bb0
 
 #include "node.h"
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    void SetPosition(float x, float y, float z);             // 0x10162610: moves the model
-    char pad_0000[0xd4c];
-    float alpha;              // 0xd4c: model opacity (1.0 = solid)
-    char pad_0d50[0x159c];
-    Node *root;               // 0x22ec: root node of the model
-    char pad_22f0[0x38];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x24];
-    int m_238c;               // 0x238c: Character::m_239c (non-zero once its motion has settled)
-    char pad_2390[0xec];
-    float heading;            // 0x247c: facing angle in radians
-    char pad_2480[0x18];
-    int m_2498;               // 0x2498: set to 1 by the scene start for the player
-};
+#include "anim_model.h"
 
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // Per-character AI state (world.h CharState).
 struct NpcState
@@ -64,7 +47,6 @@ struct CollisionWorld
     int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" CharSlot DAT_10daab84[0x80];
@@ -122,7 +104,7 @@ extern "C" int FUN_10044560(int index)
         DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z + 500.0f);
         DAT_1020b430[index].state = 1;
         DAT_10db6ee8[index].alpha = 0;
-        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_10db6ee8[index].mode = 0;
         return 0;
     }
     if (DAT_1020b430[index].state == 1)
@@ -130,14 +112,14 @@ extern "C" int FUN_10044560(int index)
         DAT_10db6ee8[index].PlayMotion(3, 0, 5, 1.0f);
         frames = ++DAT_1020b430[index].wait;
         DAT_1020b430[index].fall -= 3;
-        DAT_10db6ee8[index].m_2498 = 0;
+        DAT_10db6ee8[index].mode = 0;
         if (frames < 30)
             DAT_10db6ee8[index].alpha = (float)frames / 30.0f;
         else if (frames == 30)
             DAT_10db6ee8[index].alpha = 1.0f;
         if ((DAT_10802bf8[index].position - self).LengthSquared3() < 400.0f)
         {
-            DAT_10db6ee8[index].m_2498 = 0;
+            DAT_10db6ee8[index].mode = 0;
             DAT_1020b430[index].state = 2;
             DAT_1020b430[index].swing = DAT_1020b430[index].talk % 100;
             DAT_1020b430[index].fall = -(DAT_1020b430[index].fall / 2);
@@ -185,7 +167,7 @@ extern "C" int FUN_10044560(int index)
             DAT_1020b430[index].state = 3;
             DAT_1020b430[index].wait = 0;
             DAT_10db6ee8[index].alpha = 1.0f;
-            DAT_10db6ee8[index].m_2498 = 1;
+            DAT_10db6ee8[index].mode = 1;
             DAT_10db6ee8[index].m_238c = 0;
             return 0;
         }
@@ -195,7 +177,7 @@ extern "C" int FUN_10044560(int index)
         DAT_10db6ee8[index].root->matrix.SetIdentity();
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         DAT_1020b430[index].wait++;
-        DAT_10db6ee8[index].m_2498 = 1;
+        DAT_10db6ee8[index].mode = 1;
         if (DAT_10db6ee8[index].m_238c != 0)
             FUN_10043cc0(index);
     }

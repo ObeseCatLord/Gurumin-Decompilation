@@ -7,27 +7,7 @@
 
 #include "matrix4.h"
 
-// Motion playback state of a model (world.h MotionState).
-struct MotionState
-{
-    char pad_0000[0x1c];
-    int current;              // 0x1c: motion number playing
-    char pad_0020[0x7c5c];
-    int next;                 // 0x7c7c: motion being blended into
-};
-
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    char pad_0000[0x298];
-    MotionState *motion;      // 0x298: the model's motion playback state
-    char pad_029c[0x208c];
-    Matrix4 matrix;        // 0x2328: world matrix
-    char pad_2368[0x118];
-    float targetHeading;      // 0x2480: angle the character turns towards
-    char pad_2484[0x14];
-    int m_2498;               // 0x2498
-};
+#include "anim_model.h"
 
 // Per-character script state (world.h CharState).
 struct NpcState
@@ -40,7 +20,6 @@ struct NpcState
     char pad_0010[0x30];
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" int DAT_10c6351c;             // the character being talked to
 
@@ -60,7 +39,7 @@ extern "C" int FUN_1001b880(int index)
         DAT_1020b430[index].started = 1;
     }
     int state = DAT_1020b430[index].state;
-    DAT_10db6ee8[index].m_2498 = 0;
+    DAT_10db6ee8[index].mode = 0;
     if (state == 0)
         DAT_10db6ee8[index].targetHeading = (float)(DAT_1020b430[index].facing % 100) * 94.245f / 180.0f;
     else if (state == 1)
@@ -104,18 +83,18 @@ extern "C" int FUN_1001c210(int index)
         DAT_1020b430[index].started = 1;
     }
     int state = DAT_1020b430[index].state;
-    DAT_10db6ee8[index].m_2498 = 0;
+    DAT_10db6ee8[index].mode = 0;
     if (state == 0)
         DAT_10db6ee8[index].targetHeading = (float)(DAT_1020b430[index].facing % 100) * 94.245f / 180.0f;
     else if (state == 1)
     {
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
-        int current = DAT_10db6ee8[index].motion->current;
-        int next = DAT_10db6ee8[index].motion->next;
+        int current = DAT_10db6ee8[index].motion->layer;
+        int next = DAT_10db6ee8[index].motion->nextLayer;
         if (current != 2 && current != 3 && next != 2 && next != 3)
         {
             DAT_10db6ee8[index].PlayMotion(2, 1, 5, 1.0f);
-            if (DAT_10db6ee8[index].motion->next != 2)
+            if (DAT_10db6ee8[index].motion->nextLayer != 2)
                 DAT_10db6ee8[index].PlayMotion(0, 1, 5, 1.0f);
         }
         if (DAT_1020b430[index].facing / 100 == 0)

@@ -6,12 +6,7 @@
 
 #include "vec4.h"
 
-// A character seen from its model (char_pit.cpp CharacterBody): only the mode is used here.
-struct CharacterBody
-{
-    char pad_0000[0x2498];
-    int mode;                                        // 0x2498: 2 = over a pit
-};
+#include "anim_model.h"
 
 // Absolute value of a float (an inline helper: its argument is rounded to float first).
 inline float AbsFloat(float value)
@@ -24,7 +19,6 @@ extern "C" int DAT_104c0364;                         // the character whose voic
 extern "C" int DAT_104c0368;                         // that voice (-5000..5000, 0x240 = first voice sound)
 extern "C" int DAT_104c0370;
 extern "C" int DAT_104c0378;                         // frames before the voice is cleared after walking away
-extern "C" CharacterBody DAT_10db6ee8[0x80];
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 
 // 0x100ba040 (Npc_PlayGreeting). While the player stands on the ground (m_239c == 1): if the character greeted

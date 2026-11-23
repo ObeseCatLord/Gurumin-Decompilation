@@ -7,107 +7,37 @@
 
 #include "matrix4.h"
 
+#include "node.h"
+
+#include "anim_model.h"
+
 // 0x101ae060: transforms `point` by `matrix` and divides by w (projection to -1..1 screen space).
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);
 
-// Model table (anim_model.cpp: DAT_10faaa88): the loaded models, each with its collision state in m_00a8.
-struct LoadedModel
-{
-    char pad_0000[0xa8];
-    int m_00a8;               // non-zero while the model takes part in collision
-    char pad_00ac[0x1a0];
-    Matrix4 worldMatrix;      // 0x24c: world matrix of the node (scene_node.cpp Node::worldMatrix)
-    LoadedModel *Find(const char *name, int flags);  // Node::Find 0x1019ece0
-};
-
-extern "C" LoadedModel *DAT_10faaa88[0x100];
+extern "C" Node *DAT_10faaa88[0x100];
 extern "C" int DAT_10ff19e8[0x100];   // per model: its collision data
 
 // Collision test of a model (world matrix) against another model: 0x10193140 (stdcall, recursive over nodes).
-extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, LoadedModel *other, int otherData, Vec4 *probe, int count,
+extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, Node *other, int otherData, Vec4 *probe, int count,
                                       int *hitCount, int *hitIds, Vec4 *hits, int *hitOther, int mode, int a, int b,
                                       int c, int flags);
 
-#include "node.h"
-
-extern "C" int DAT_11b002c0;    // collision filter of the current test (the model's m_0070)
+extern "C" int DAT_11b002c0;    // collision filter of the current test (the model's collisionFilter)
 extern "C" char DAT_11b002c8;   // 1 while a model-against-world test runs
-
-struct AnimModel
-{
-    char pad_0000[0x70];
-    int m_0070;                  // 0x70: collision filter
-    char pad_0074[0x10];
-    unsigned char speedDivisor;  // 0x84: slows every motion of this model down (0 = no division)
-    char pad_0085[0x1c3];
-    float holdWeight;            // 0x248: blend weight while holding (at most 0.9)
-    char pad_024c[0x50];
-    float scale;
-    char pad_02a0[4];
-    char holdState;              // 0x2a4: 0 = free, 1 = holding, 2 = released
-    char pad_02a5[0x1ff7];
-    int m_229c;                  // 0x229c: blend frames, 8 when unset
-    char pad_22a0[0x4c];
-    LoadedModel *root;           // 0x22ec: this model's own entry in the model table
-    char pad_22f0[0x18];
-    Node *collider;     // 0x2308: the map collision this model moves against
-    char pad_230c[0xc];
-    int m_2318;
-    int m_231c;
-    char pad_2320[8];
-    Matrix4 world;               // 0x2328: world matrix (translation = position)
-    char pad_2368[4];
-    float motionSpeed;           // 0x236c: current motion playback speed (at most 60)
-    char pad_2370[0x18];
-    int m_2388;                  // 0x2388: 1 once a speed change is pending
-    int m_238c;
-    int m_2390;                  // 0x2390: limit for map collision tests
-    char pad_2394[4];
-    Vec4 holdOffset;             // 0x2398: position relative to the held model
-
-    Vec4 push;                   // 0x23a8: movement impulse applied by the next update
-    Vec4 velocity;               // 0x23b8: current movement
-    char pad_23c8[0x10];
-    float m_23d8;
-    float m_23dc;
-    int m_23e0;
-    char pad_23e4[0x9c];
-    float heading;
-    char pad_2484[0x1510];
-    int M_101627d0(float x, float y, int mode);
-    int M_101629b0(float y, float x);
-    int FaceAway(const Vec4 &point);
-    int FaceAwayFrom(AnimModel *other);
-    int AddMotionSpeed(float speed);
-    int PushMotionSpeed(float speed);
-    int MoveTowards(float x, float y, int mode);
-    int SnapHeadingToSide();
-    int ScreenPosition(int *x, int *y, const Matrix4 &viewProjection);
-    int Push(float x, float y, float z);
-    int IsClear(const Vec4 *offset);
-    int IsClearAny(const Vec4 *offset);
-    int IsClearFlagged(const Vec4 *offset);
-    int IsClearOfMap(const Vec4 *offset);
-    int IsClearOfMapLimited(const Vec4 *offset);
-    int Hold(int on, float amount, AnimModel *other);
-    int HoldAtSpine(int on, float amount);
-    int SnapHeight(float step, float offset);
-    int SnapPosition(float step, float offset);
-};
 
 // Sets the model's movement offset (x, y scaled by the model scale) and the movement mode.
 int AnimModel::M_101627d0(float x, float y, int mode)
 {
-    m_23d8 = x * scale;
-    m_23e0 = mode;
-    m_23dc = y * scale;
+    m_23d8.x = x * speedScale;
+    *(int *)&m_23d8.z = mode;  // the int mode is stored in the float slot as it is
+    m_23d8.y = y * speedScale;
     return 0;
 }
 
 // Turns the model to face the direction (x, y): heading = atan2(y, x) + pi (3.1415).
 int AnimModel::M_101629b0(float y, float x)
 {
-    heading = (float)atan2(y, x) + 3.1415f;
+    targetHeading = (float)atan2(y, x) + 3.1415f;
     return 1;
 }
 
@@ -116,9 +46,9 @@ int AnimModel::FaceAway(const Vec4 &point)
 {
     Vec4 delta;
     Vec4 unused;  // constructed but never used (the original has it too)
-    delta.Copy(world.GetTranslation());
+    delta.Copy(matrix.GetTranslation());
     delta.Copy(delta - point);
-    heading = (float)atan2(delta.x, delta.y);
+    targetHeading = (float)atan2(delta.x, delta.y);
     return 0;
 }
 
@@ -127,10 +57,10 @@ int AnimModel::FaceAwayFrom(AnimModel *other)
 {
     Vec4 position;
     Vec4 otherPosition;
-    position.Copy(world.GetTranslation());
-    otherPosition.Copy(other->world.GetTranslation());
+    position.Copy(matrix.GetTranslation());
+    otherPosition.Copy(other->matrix.GetTranslation());
     position.Copy(position - otherPosition);
-    heading = (float)atan2(position.x, position.y);
+    targetHeading = (float)atan2(position.x, position.y);
     return 0;
 }
 
@@ -180,19 +110,19 @@ int AnimModel::PushMotionSpeed(float speed)
 // movement mode. Returns 0.
 int AnimModel::MoveTowards(float x, float y, int mode)
 {
-    x = x - world.m[12];
-    y = y - world.m[13];
-    m_23d8 = x;
-    m_23dc = y;
-    m_23e0 = mode;
+    x = x - matrix.m[12];
+    y = y - matrix.m[13];
+    m_23d8.x = x;
+    m_23d8.y = y;
+    *(int *)&m_23d8.z = mode;  // the int mode is stored in the float slot as it is
     if (x > 40.0f)
-        m_23d8 = 40.0f;
-    if (m_23d8 < -40.0f)
-        m_23d8 = -40.0f;
+        m_23d8.x = 40.0f;
+    if (m_23d8.x < -40.0f)
+        m_23d8.x = -40.0f;
     if (y > 40.0f)
-        m_23dc = 40.0f;
-    if (m_23dc < -40.0f)
-        m_23dc = -40.0f;
+        m_23d8.y = 40.0f;
+    if (m_23d8.y < -40.0f)
+        m_23d8.y = -40.0f;
     return 0;
 }
 
@@ -200,16 +130,16 @@ int AnimModel::MoveTowards(float x, float y, int mode)
 // first half turn, 3pi/2 otherwise (pi = 3.1415). Returns 0.
 int AnimModel::SnapHeadingToSide()
 {
-    while (heading > 6.283f)
-        heading -= 6.283f;
-    while (heading < 0.0f)
-        heading += 6.283f;
-    if (!(heading < 0.0f) && heading < 3.1415f)
+    while (targetHeading > 6.283f)
+        targetHeading -= 6.283f;
+    while (targetHeading < 0.0f)
+        targetHeading += 6.283f;
+    if (!(targetHeading < 0.0f) && targetHeading < 3.1415f)
     {
-        heading = 3.1415f / 2;
+        targetHeading = 3.1415f / 2;
         return 0;
     }
-    heading = 3.1415f * 1.5f;
+    targetHeading = 3.1415f * 1.5f;
     return 0;
 }
 
@@ -218,7 +148,7 @@ int AnimModel::SnapHeadingToSide()
 int AnimModel::ScreenPosition(int *x, int *y, const Matrix4 &viewProjection)
 {
     Vec4 position;
-    position.Copy(world.GetTranslation());
+    position.Copy(matrix.GetTranslation());
     position.z += 50.0f;
     position.Copy(Project(position, viewProjection));
     position.x = (position.x + 1.0f) * 320.0f;
@@ -235,20 +165,20 @@ int AnimModel::Push(float x, float y, float z)
 {
     if (m_238c == 1)
     {
-        push.x = x * scale * 0.7f;
-        push.y = y * scale * 0.7f;
-        push.z = z * 0.7f;
+        move.x = x * speedScale * 0.7f;
+        move.y = y * speedScale * 0.7f;
+        move.z = z * 0.7f;
         if (velocity.LengthSquared3() < 1.0f)
         {
-            push.x = x * 1.4f;
-            push.y = y * 1.4f;
-            push.z = z * 1.4f;
+            move.x = x * 1.4f;
+            move.y = y * 1.4f;
+            move.z = z * 1.4f;
         }
     }
     else
     {
-        push.x = x * 0.55f;
-        push.y = y * 0.55f;
+        move.x = x * 0.55f;
+        move.y = y * 0.55f;
     }
     return 0;
 }
@@ -272,9 +202,9 @@ int AnimModel::IsClear(const Vec4 *offset)
     int hitIds[0x40];
     for (int i = 0; i < 0x100; i++)
     {
-        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->m_00a8 != 0)
+        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->hasCollision != 0)
         {
-            if (FUN_10193140(&world, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther,
+            if (FUN_10193140(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther,
                              -1, 0, 0, 0, 0) != 0)
                 return 0;
         }
@@ -299,8 +229,8 @@ int AnimModel::IsClearAny(const Vec4 *offset)
     int hitIds[0x40];
     for (int i = 0; i < 0x100; i++)
     {
-        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->m_00a8 != 0 &&
-            FUN_10193140(&world, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, 0,
+        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->hasCollision != 0 &&
+            FUN_10193140(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, 0,
                          0, 0, 0, 0) != 0)
             return 0;
     }
@@ -324,8 +254,8 @@ int AnimModel::IsClearFlagged(const Vec4 *offset)
     int hitIds[0x40];
     for (int i = 0; i < 0x100; i++)
     {
-        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->m_00a8 != 0 &&
-            FUN_10193140(&world, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, -1,
+        if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->hasCollision != 0 &&
+            FUN_10193140(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, -1,
                          0, 0, 0, 0x400) != 0)
             return 0;
     }
@@ -347,10 +277,10 @@ int AnimModel::IsClearOfMap(const Vec4 *offset)
     Vec4 hitNormal;
     int out5;
     int out12;
-    DAT_11b002c0 = m_0070;
+    DAT_11b002c0 = collisionFilter;
     DAT_11b002c8 = 1;
     int hitCount = 0;
-    int hit = collider->M_1019f340(0x4000000, &world, m_231c, m_2318, &out5, probe, 1, &hitCount, &hitPoint, &hitNormal, 0,
+    int hit = collider->M_1019f340(0x4000000, &matrix, m_231c, m_2318, &out5, probe, 1, &hitCount, &hitPoint, &hitNormal, 0,
                                    &out12, 0, 0, 0);
     DAT_11b002c8 = 0;
     DAT_11b002c0 = 0;
@@ -372,10 +302,10 @@ int AnimModel::IsClearOfMapLimited(const Vec4 *offset)
     Vec4 hitNormal;
     int out5;
     int out12;
-    DAT_11b002c0 = m_0070;
+    DAT_11b002c0 = collisionFilter;
     DAT_11b002c8 = 1;
     int hitCount = 0;
-    int hit = collider->M_1019f340(-1, &world, m_231c, m_2318, &out5, probe, 1, &hitCount, &hitPoint, &hitNormal, m_2390,
+    int hit = collider->M_1019f340(-1, &matrix, m_231c, m_2318, &out5, probe, 1, &hitCount, &hitPoint, &hitNormal, m_2390,
                                    &out12, 0, 0, 0);
     DAT_11b002c8 = 0;
     DAT_11b002c0 = 0;
@@ -394,8 +324,8 @@ int AnimModel::Hold(int on, float amount, AnimModel *other)
             holdOffset.Fill(0);
             if (root != 0 && root->Find("Bip01 Spine", 0) != 0)
             {
-                holdOffset.Copy(other->holdOffset + other->world.GetTranslation());
-                holdOffset.Copy(holdOffset - world.GetTranslation());
+                holdOffset.Copy(other->holdOffset + other->matrix.GetTranslation());
+                holdOffset.Copy(holdOffset - matrix.GetTranslation());
             }
         }
         float weight = amount + holdWeight;
@@ -421,11 +351,11 @@ int AnimModel::HoldAtSpine(int on, float amount)
             holdOffset.Fill(0);
             if (root != 0)
             {
-                LoadedModel *spine = root->Find("Bip01 Spine", 0);
+                Node *spine = root->Find("Bip01 Spine", 0);
                 if (spine != 0)
                 {
                     holdOffset.Copy(spine->worldMatrix.GetTranslation());
-                    holdOffset.Copy(holdOffset - world.GetTranslation());
+                    holdOffset.Copy(holdOffset - matrix.GetTranslation());
                 }
             }
         }
@@ -446,7 +376,7 @@ int AnimModel::HoldAtSpine(int on, float amount)
 int AnimModel::SnapHeight(float step, float offset)
 {
     int candidates[4];  // the multiples just below, above and two below; the fourth entry is unused
-    Vec4 position = world.GetTranslation();
+    Vec4 position = matrix.GetTranslation();
     int height = (int)(position.z * 10.0f);
     int grid = (int)(step * 10.0f);
     int below = height / grid;
@@ -460,7 +390,7 @@ int AnimModel::SnapHeight(float step, float offset)
             best = i;
     }
     position.z = (float)candidates[best] * 0.1f + offset;
-    world.SetTranslation(position);
+    matrix.SetTranslation(position);
     return 0;
 }
 
@@ -469,7 +399,7 @@ int AnimModel::SnapHeight(float step, float offset)
 int AnimModel::SnapPosition(float step, float offset)
 {
     int candidates[4];  // the multiples just below, above and two below; the fourth entry is unused
-    Vec4 position = world.GetTranslation();
+    Vec4 position = matrix.GetTranslation();
     int x = (int)(position.x * 10.0f);
     int grid = (int)(step * 10.0f);
     int below = x / grid;
@@ -496,6 +426,6 @@ int AnimModel::SnapPosition(float step, float offset)
             best = i;
     }
     position.y = (float)candidates[best] * 0.1f + offset;
-    world.SetTranslation(position);
+    matrix.SetTranslation(position);
     return 0;
 }

@@ -5,23 +5,13 @@
 
 #include "matrix4.h"
 
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    char pad_0000[0x267];
-    char m_0267;              // 0x267: 1 while an NPC idles (char_move.cpp)
-    char pad_0268[0x20c0];
-    Matrix4 matrix;        // 0x2328: world matrix
-    char pad_2368[0xcc];
-    Matrix4 m_2434;        // 0x2434: a second matrix that receives the ground position
-    char pad_2474[0x28];
-};
+#include "anim_model.h"
 
 // The model bank at 0x10804bf8 (model_bank.cpp).
 struct ModelBank
 {
     // 0x10164c10: a direction for model `model` from the player's position and velocity (0 when the bank is off).
-    const Vec4 *M_10164c10(CharRecord *model, Vec4 *position, Vec4 *velocity);
+    const Vec4 *M_10164c10(AnimModel *model, Vec4 *position, Vec4 *velocity);
 };
 
 struct CollisionWorld
@@ -31,7 +21,6 @@ struct CollisionWorld
     int CastSegment(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" ModelBank DAT_10804bf8;
 extern "C" CollisionWorld *DAT_10255f08;
 extern "C" Vec4 DAT_118e69e8;            // player position

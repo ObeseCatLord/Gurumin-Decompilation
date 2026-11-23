@@ -11,22 +11,9 @@ Matrix4 RotationX(float angle);                  // 0x101b1ad0
 
 #include "node.h"
 
-// A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
-struct CharRecord
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-    int IsClearOfMapLimited(const Vec4 *offset);             // 0x101641b0 (AnimModel::IsClearOfMapLimited)
-    char pad_0000[0x22ec];
-    Node *root;               // 0x22ec: root node of the model
-    char pad_22f0[0x38];
-    Matrix4 matrix;           // 0x2328: world matrix
-    char pad_2368[0x114];
-    float heading;            // 0x247c: facing angle in radians
-    float targetHeading;      // 0x2480: angle the character turns towards
-    char pad_2484[0x18];
-};
+#include "anim_model.h"
 
-typedef char check_charrecord[sizeof(CharRecord) == 0x249c ? 1 : -1];
+typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 // Per-character AI state (world.h CharState).
 struct NpcState
@@ -47,7 +34,6 @@ struct CharSlot
     char pad_0004[0x184];
 };
 
-extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" NpcState DAT_1020b430[0x80];
 extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" Node *DAT_1021bdf8[0x80][9];       // [0]: the cart's wheel node

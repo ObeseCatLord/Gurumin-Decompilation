@@ -57,40 +57,7 @@ struct Selection
     int AddQuad(int id, float x0, float y0, float z0, float u0, float v0, float x1, float y1, float z1, float u1, float v1, float x2, float y2, float u2, float v2, int colour, int a, int b);
 };
 
-struct Scene
-{
-    char pad_0000[0x1c];
-    int m_001c;
-    void M_10169f90();
-    void M_1016a020(void *owner);
-    void M_1016a2e0(int motion, int a, int b, float speed);
-};
-
-// Model owner (the CharModel of a Character, see world.h). `scene` is its motion playback object (0x7c84 bytes,
-// Playback in model_state.cpp), created on first use.
-struct SceneOwner
-{
-    char pad_0000[0x265];
-    char important;   // 0x265: motion changes of this model are flagged as important (DAT_11b04508) while applied
-    char pad_0266[0x32];
-    Scene *scene;     // 0x298
-    char pad_029c[7];
-    unsigned char loadCount;  // 0x2a3: number of models loaded so far (stops counting at 3)
-    char pad_02a4[0x2048];
-    struct Node *root;   // 0x22ec: root node of the loaded model
-    char pad_22f0[0x38];
-    float position[4];        // 0x2328: model position used for collision
-    char pad_2338[0x30];
-    float radius;             // 0x2368: collision radius
-    char pad_236c[0x18];
-    int m_2384;               // 0x2384: collision result, cleared before each update
-    char pad_2388[0x10c];
-    int m_2494;               // 0x2494
-    int M_1017b1c0();
-    void PlayMotion(int motion, int a, int b, float speed);
-    int LoadModel(const char *path);
-    int UpdateCollision();
-};
+#include "anim_model.h"
 
 #include "node.h"
 
@@ -191,15 +158,15 @@ void TextureManager::M_10175e70()
 }
 
 // Returns the playback's current frame, creating the playback object on first use.
-int SceneOwner::M_1017b1c0()
+int AnimModel::M_1017b1c0()
 {
-    if (scene == 0)
+    if (motion == 0)
     {
-        scene = (Scene *)DAT_11b0b938(0x7c84, "");
-        scene->M_10169f90();
-        scene->M_1016a020(this);
+        motion = (Playback *)DAT_11b0b938(0x7c84, "");
+        motion->Init();
+        motion->M_1016a020(this);
     }
-    return scene->m_001c;
+    return motion->layer;
 }
 
 // Advances the animation one step and returns its state.
@@ -281,24 +248,24 @@ extern "C" char DAT_11b04508;  // set while an important model changes motion (r
 
 // Starts motion `motion` on this model (0x1017b0e0, CharModel::M_1017b0e0 in other files): creates the playback
 // object on first use, then hands the request to it. `a`/`b` are the playback options (loop mode, blend frames).
-void SceneOwner::PlayMotion(int motion, int a, int b, float speed)
+void AnimModel::PlayMotion(int layer, int a, int b, float speed)
 {
-    if (scene == 0)
+    if (motion == 0)
     {
-        scene = (Scene *)DAT_11b0b938(0x7c84, "");
-        scene->M_10169f90();
-        scene->M_1016a020(this);
+        motion = (Playback *)DAT_11b0b938(0x7c84, "");
+        motion->Init();
+        motion->M_1016a020(this);
     }
     if (important != 0)
         DAT_11b04508 = 1;
-    scene->M_1016a2e0(motion, a, b, speed);
+    motion->Play(layer, a, b, speed);
     DAT_11b04508 = 0;
 }
 
 // Loads model file `path` into this model's existing node tree (0x1017aeb0, CharModel::M_1017aeb0 elsewhere).
 // Counts the loads, looks up the biped root "Bip01" (the result is unused in the shipped code), resets m_2494 and
 // rebinds the motion playback to the new model. Returns 0 when the model has no node tree yet.
-int SceneOwner::LoadModel(const char *path)
+int AnimModel::LoadModel(const char *path)
 {
     if (root == 0)
         return 0;
@@ -309,20 +276,20 @@ int SceneOwner::LoadModel(const char *path)
     ZeroVec unused1;
     ZeroVec unused2;
     m_2494 = 0;
-    if (scene != 0)
-        scene->M_1016a020(this);
+    if (motion != 0)
+        motion->M_1016a020(this);
     return 1;
 }
 
 // Updates this model's collision: releases the saved matrix states of the node tree (Node::ReleaseSavedStates) and collides the model's position and radius
 // with an identity-like work matrix (Node::StartProximityPass, scene_node.cpp).
 // Returns 0.
-int SceneOwner::UpdateCollision()
+int AnimModel::UpdateCollision()
 {
-    Matrix4 matrix;
+    Matrix4 work;
     if (root != 0)
         root->ReleaseSavedStates();
     m_2384 = 0;
-    root->StartProximityPass(position, &matrix, 0, radius, 0);
+    root->StartProximityPass(matrix.m, &work, 0, radius, 0);
     return 0;
 }

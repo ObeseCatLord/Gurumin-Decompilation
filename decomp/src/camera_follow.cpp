@@ -44,7 +44,7 @@ extern "C" int FUN_100184e0(void)
     {
         FUN_1016a8d0();
         DAT_104c0358 = 1;
-        DAT_1020b430[0].words[3] = 0;
+        DAT_1020b430[0].cameraFrames = 0;
         Node *stand;
         if (DAT_10255f08 != 0 && (stand = DAT_10255f08->Find("@kagudai", 0)) != 0)
         {
@@ -55,12 +55,12 @@ extern "C" int FUN_100184e0(void)
                 item->ClearFlags(0x20);
         }
     }
-    if (DAT_1020b430[0].words[3] % 65 == 0)
+    if (DAT_1020b430[0].cameraFrames % 65 == 0)
     {
         Vec4 position;
         DAT_10daaa80.Start(0x75f, position, -1, -1, &DAT_10868838[0][0], 0, 0, 0, 0, 0);
     }
-    DAT_1020b430[0].words[3]++;
+    DAT_1020b430[0].cameraFrames++;
     if (DAT_1021bdf8[0][0] != 0)
     {
         DAT_1021bdf8[0][0]->matrix.SetTranslation(DAT_10edbd48);
@@ -77,10 +77,10 @@ extern "C" int FUN_100184e0(void)
     offset.Copy(DAT_10866d98 - DAT_10edbd48);
     offset.RotateZ(-0.012f);
     DAT_10866d98.Copy(DAT_10edbd48 + offset);
-    if (DAT_1020b430[0].words[3] > 120)
+    if (DAT_1020b430[0].cameraFrames > 120)
         DAT_10edbd48.z -= 4.0f;
-    else if (DAT_1020b430[0].words[3] > 90)
-        DAT_10edbd48.z -= (float)(DAT_1020b430[0].words[3] - 90) * 4.0f / 30.0f;
+    else if (DAT_1020b430[0].cameraFrames > 90)
+        DAT_10edbd48.z -= (float)(DAT_1020b430[0].cameraFrames - 90) * 4.0f / 30.0f;
     DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8) * 0.2f +
                       (DAT_10f08aa0 - DAT_118e6cb8) * 0.8f);
     DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8) * 0.2f +

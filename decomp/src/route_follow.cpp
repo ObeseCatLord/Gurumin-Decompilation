@@ -115,7 +115,7 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
         switch (*outType)
         {
         case 0:
-            if (DAT_1020b430[walker].words[0] != 0)
+            if (DAT_1020b430[walker].walkingBack != 0)
                 point--;
             else
                 point++;
@@ -123,7 +123,7 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
         case 1:
             if (DAT_10874848.TestScriptFlag(*outValue) != 0)
                 point = parameter;
-            else if (DAT_1020b430[walker].words[0] != 0)
+            else if (DAT_1020b430[walker].walkingBack != 0)
                 point--;
             else
                 point++;
@@ -132,19 +132,19 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
             result = 1;
             if (parameter != 0)
             {
-                DAT_1020b430[walker].words[0] = 1;
+                DAT_1020b430[walker].walkingBack = 1;
                 point--;
             }
             else
                 point = 0;
             break;
         case 3:
-            if (DAT_1020b430[walker].words[1] == 0)
-                DAT_1020b430[walker].words[1] = parameter;
-            if (--DAT_1020b430[walker].words[1] < 1)
+            if (DAT_1020b430[walker].wait == 0)
+                DAT_1020b430[walker].wait = parameter;
+            if (--DAT_1020b430[walker].wait < 1)
             {
-                DAT_1020b430[walker].words[1] = 0;
-                if (DAT_1020b430[walker].words[0] != 0)
+                DAT_1020b430[walker].wait = 0;
+                if (DAT_1020b430[walker].walkingBack != 0)
                     point--;
                 else
                     point++;
@@ -152,7 +152,7 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
             break;
         case 4:
             result = 1;
-            DAT_1020b430[walker].words[0] = 0;
+            DAT_1020b430[walker].walkingBack = 0;
             point++;
             break;
         }

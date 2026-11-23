@@ -19,7 +19,7 @@ extern "C" const char *FUN_1013f8a0(const char *name, int folder);  // builds th
 // 0x1001a990 (Char_AttachWeapon). Gives character `index` weapon `weapon` (0x32..0x3d; 0 keeps the current ones):
 // removes the old right and/or left hand models (as asked by `right` and `left`), then loads the weapon's model
 // file(s) EEQ_19..EEQ_24 under "Bip01 R Hand" (and "Bip01 L Hand" for the two-model weapons). An unknown weapon
-// marks AI state slots 2 and 3 with -2. Then restarts the "anime2" motion of display node `slot` (or clears its
+// marks weaponMarkA and weaponMarkB with -2. Then restarts the "anime2" motion of display node `slot` (or clears its
 // counter) and refreshes the model. Returns 0.
 extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot)
 {
@@ -97,8 +97,8 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
             models = 2;
             break;
         default:
-            DAT_1020b430[index].words[2] = -2;
-            DAT_1020b430[index].words[3] = -2;
+            DAT_1020b430[index].weaponMarkA = -2;
+            DAT_1020b430[index].weaponMarkB = -2;
             goto attached;
         }
         switch (models)

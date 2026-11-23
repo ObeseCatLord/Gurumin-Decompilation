@@ -32,6 +32,7 @@ struct CharState
                 int turn;                         // damage_zone.cpp: turn counter of the zone
                 int counterValue;                 // digit_counter.cpp: the value shown (0..1000)
                 int approachStarted;              // npc_approach.cpp: 1 once the approach has begun
+                int walkingBack;                  // route_follow.cpp: 1 while walking the route backwards
             };
             union                                 // 0x04..0x37: behaviour variables
             {
@@ -44,6 +45,7 @@ struct CharState
                         int cooldown;             // kind4a_turret.cpp: frames before the next random attack
                         int routeStopped;         // route_walk.cpp: non-zero = the character stays where it is
                         int counterPhase;         // digit_counter.cpp: 0 = idle, 1..10 = turning to count + 1
+                        // (route_follow.cpp uses `wait` for the frames left at a pause point)
                     };
                     union                         // 0x08
                     {
@@ -57,6 +59,11 @@ struct CharState
                         int approachCode;         // npc_approach.cpp: stop distance / 10 (% 100) and release flag
                                                   // (/ 100)
                         int targetPoint;          // route_walk.cpp: route point the character heads for
+                        int hideCount;            // companion_update.cpp (companion slot): frames the companion
+                                                  // stays hidden (2 in the areas 0x13 and 0x30), counted down
+                        int keepCompanionUp;      // companion_update.cpp (owner slot): 0 = a hidden companion
+                                                  // sinks 50 units
+                        int weaponMarkA;          // weapon_attach.cpp: -2 after an unknown weapon (no model)
                     };
                     union                         // 0x0c
                     {
@@ -73,6 +80,13 @@ struct CharState
                         int attackTimer;          // kind4a_turret.cpp: frames left of the attack
                         int stopDistance;         // npc_approach.cpp
                         int placed;               // route_walk.cpp: 1 once the character was put on its route
+                        int cameraFrames;         // camera_follow.cpp (slot 0): frames since the closing camera
+                                                  // started (effect every 65, sinks after 90)
+                        int downTimer;            // companion_update.cpp (companion slot): frames counted in
+                                                  // the down / revive cycle
+                        int companionHealthCap;   // companion_update.cpp (owner slot): a revived companion gets
+                                                  // at most 2000 + this
+                        int weaponMarkB;          // weapon_attach.cpp: -2 after an unknown weapon (no model)
                     };
                     union                         // 0x10
                     {
@@ -82,12 +96,16 @@ struct CharState
                         int running;              // enemy_chase.cpp: 1 = running (faster) after the player was far
                         int swingingBack;         // enemy_pendulum.cpp: 1 while swinging back
                         int nextPoint;            // route_carrier.cpp: the route point headed for
+                        int downMode;             // companion_update.cpp (companion slot): 0 = active,
+                                                  // 1 = reviving, 2 = recovering, 10 and above = going down
                     };
                     union                         // 0x14
                     {
                         int alarmFlashes;         // char_move.cpp: alarm flashes so far (Npc_RideAlarm)
                         int swing;                // enemy_pendulum.cpp: angle change per frame
                         int reversed;             // route_carrier.cpp: 1 while walking the route backwards
+                        int reviveHealth;         // companion_update.cpp (companion slot): health it revives
+                                                  // with (0 = its maximum + 2000)
                         int scriptValue;          // char_script.cpp: value carried between steps (opacity in
                                                   // tenths)
                     };

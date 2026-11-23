@@ -135,8 +135,9 @@ extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
                 memset(DAT_10255160[index], 0, sizeof(DAT_10255160[index]));
                 if (*kind == 0x55)
                 {
-                    DAT_1020b430[index].words[0] = 0;
-                    DAT_1020b430[index].words[1] = 0;
+                    DAT_1020b430[index].state = 0;
+                    DAT_1020b430[index].wait = 0;
+                    // words 4..15: every variable after `range` (0x0c); talk and range are kept
                     memset(&DAT_1020b430[index].words[4], 0, 12 * sizeof(int));
                     DAT_1021bdf8[index][0] = 0;
                     DAT_1021bdf8[index][1] = 0;
@@ -150,8 +151,8 @@ extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
                 DAT_10802bf8[index].position.Fill(0.0f);
                 DAT_10802bf8[index].step.Fill(0.0f);
                 DAT_10255a88[index] = 1;
-                DAT_1020b430[index].words[2] = 0x3cd;
-                DAT_1020b430[index].words[15] = 0x26;
+                DAT_1020b430[index].talk = 0x3cd;
+                DAT_1020b430[index].behaviour = 0x26;
                 *kind = 0x62;
                 apply = 0;
             }
@@ -214,8 +215,9 @@ extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
         *kind = value % 10000;
         if (value % 10000 == 0x55 || DAT_1030b668[index] == 0x31)
         {
-            DAT_1020b430[index].words[0] = 0;
-            DAT_1020b430[index].words[1] = 0;
+            DAT_1020b430[index].state = 0;
+            DAT_1020b430[index].wait = 0;
+            // words 4..15: every variable after `range` (0x0c); talk and range are kept
             memset(&DAT_1020b430[index].words[4], 0, 12 * sizeof(int));
             DAT_1021bdf8[index][0] = 0;
             DAT_1021bdf8[index][1] = 0;

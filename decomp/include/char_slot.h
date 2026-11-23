@@ -7,8 +7,10 @@
 #ifndef GURUMIN_CHAR_SLOT_H
 #define GURUMIN_CHAR_SLOT_H
 
-// Number of character slots.
+// Number of character slots (also defined by char_state.h).
+#ifndef CHAR_SLOT_COUNT
 #define CHAR_SLOT_COUNT 0x80
+#endif
 // CharSlot::kind of an enemy.
 #define CHAR_KIND_ENEMY 0x62
 

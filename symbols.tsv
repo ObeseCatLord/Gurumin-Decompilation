@@ -13,6 +13,7 @@ address	name	evidence
 1001ed80	Map_DrawMovie	map-screen background movie with shadow (map_movie_draw.cpp, draft)
 10020090	Collide_RayThroughRegions	probe ray against the visible region nodes (collide_regions.cpp)
 10026730	Watcher_Update	hovering watcher: faces the player, keeps its home height, eases its turn (behaviour from 0x100f9670)
+10026d80	Enemy_WanderNearHome	enemy wander move near its home (enemy_wander.cpp, draft)
 100279b0	Enemy_BackAwayFromPlayer	enemy walks away from the player veering 5 degrees (enemy_flee.cpp)
 10027da0	Enemy_KeepDistanceFromPlayer	enemy holds about 200 units from the player (enemy_flee.cpp, draft)
 10029730	Route_StepPatrol	steps a patrolling character along its map record route (route_step.cpp, draft)

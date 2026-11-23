@@ -145,23 +145,22 @@ extern "C" int FUN_10027da0(int index, int chanceEnd)
         }
         else
             step.Fill(0.0f);
-        float *speed = &DAT_10255160[index][0];
-        if (step.Length() > *speed)
+        if (step.Length() > DAT_10255160[index][0])
         {
-            *speed += KEEP_SPEED_EASE;
+            DAT_10255160[index][0] += KEEP_SPEED_EASE;
             if (distance < FLEE_MAX_RANGE)
-                *speed += KEEP_SPEED_EASE;
+                DAT_10255160[index][0] += KEEP_SPEED_EASE;
         }
-        else if (step.Length() < *speed)
+        else if (step.Length() < DAT_10255160[index][0])
         {
-            *speed -= KEEP_SPEED_EASE;
+            DAT_10255160[index][0] -= KEEP_SPEED_EASE;
             if (distance < FLEE_MAX_RANGE)
-                *speed += KEEP_SPEED_EASE;
+                DAT_10255160[index][0] += KEEP_SPEED_EASE;
         }
         if (step.x != 0.0f || step.y != 0.0f || step.z != 0.0f)
         {
             step.Normalized3();
-            step.Copy(step * *speed);
+            step.Copy(step * DAT_10255160[index][0]);
         }
         if (distance < KEEP_CLOSE_RANGE)
         {
@@ -202,7 +201,10 @@ extern "C" int FUN_10027da0(int index, int chanceEnd)
             DAT_10db6ee8[index].move.Fill(0.0f);
             DAT_1020b430[index].running = 2;
         }
-        DAT_10db6ee8[index].PlayMotion(step.Length() < KEEP_WALK_STEP ? 0 : 1, 0, 5, 1.0f);
+        if (step.Length() < KEEP_WALK_STEP)
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
+        else
+            DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
         if (DAT_1020b430[index].running == 2)
             DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         if ((FUN_1013f880() % KEEP_ROLL_PAUSE != 0 || DAT_1020b430[index].running == 2) &&

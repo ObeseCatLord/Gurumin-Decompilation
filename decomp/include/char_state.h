@@ -66,6 +66,7 @@ struct CharState
                                                   // sinks 50 units
                         int weaponMarkA;          // weapon_attach.cpp: -2 after an unknown weapon (no model)
                         int stuckFrames;          // enemy_slash.cpp: frames counted without moving
+                        int wanderState;          // enemy_wander.cpp: 0 = walking, 1 or 2 = looking for a heading
                     };
                     union                         // 0x0c
                     {

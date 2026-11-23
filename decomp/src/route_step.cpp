@@ -48,7 +48,6 @@ extern "C" int FUN_10029730(int slot, int *lastPoint, int point, int *nextPoint,
 {
     float reach = DAT_10802bf8[slot].step.Length() + POINT_REACH_MARGIN;
     int record = DAT_10db6ee8[slot].bankIndex;
-    int result = 0;
     int packedX = DAT_10210fc0[record].points[point].x / 10000;
     if (packedX > 5000)
         packedX -= 10000;
@@ -57,6 +56,7 @@ extern "C" int FUN_10029730(int slot, int *lastPoint, int point, int *nextPoint,
     if (packedY > 5000)
         packedY -= 10000;
     float y = (float)packedY;
+    int result = 0;
     int packedZ = DAT_10210fc0[record].points[point].y / 10000;
     if (packedZ > 5000)
         packedZ -= 10000;
@@ -204,7 +204,8 @@ extern "C" int FUN_10029730(int slot, int *lastPoint, int point, int *nextPoint,
     position->x = x;
     position->y = y;
     position->z = z;
-    if (DAT_1020b430[slot].forceStep != 0)
+    int forced = DAT_1020b430[slot].forceStep;
+    if (forced != 0)
     {
         DAT_1020b430[slot].forceStep = 0;
         return 0;

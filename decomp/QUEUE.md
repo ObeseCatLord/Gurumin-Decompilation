@@ -55,9 +55,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100242c0` 487 — Char_ProbeAhead: logic identical; the original keeps the testOnly path's `return 1` block in place and the final test jumps back to it (ours puts it at the end); three return layouts tried
 - [ ] `100244b0` 502 — Char_ProbeDirection: same return-block layout residue as Char_ProbeAhead 0x100242c0
 - [ ] `10024d00` 377 — Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
+- [ ] `10026d80` 1658 — Enemy_WanderNearHome (enemy_wander.cpp, 1664 vs 1658 bytes): logic identical; the original keeps a dead first store of rand() % 3 to the wander state word before storing (x >= 2) + 1 (13.00 drops it), the zero/angle variable sits in the lowest slot (frame 0x88 vs ours 0x90), and the index*0x40 spill is stored before [ebx+4] = 0. FUN_10024d00 takes the step as a Vec4 by value here but four floats in enemy_moves.cpp
 - [ ] `10027630` 882 — Enemy_ChasePlayer (enemy_chase.cpp): all but the step setup identical; the original loads the heading and m_0010 (into eax) before storing -2/-8 into step.y and computes the speed pointer with lea; if/else, ternary and local forms tried
-- [ ] `10027da0` 1461 — Enemy_KeepDistanceFromPlayer (enemy_flee.cpp, 1488 bytes, 450 diffs): esi/edi swapped (CharState vs AnimModel offsets), the original keeps int 0 in ecx around the DAT_104bfd08 test, and pushes PlayMotion's first argument in two branches (next: the call written in both branches of an if/else); references, ternary and >= forms tried
-- [ ] `10029730` 1440 — Route_StepPatrol (route_step.cpp, rule-clean draft, 1488 vs 1440 bytes): switch, decode and heading code match; register allocation (point/record registers swapped, slot*0x249c and bankIndex kept in stack temporaries in the original) and the duplicated forceStep ret tail; next: one int per decoded part (the Char_RunScriptStep idiom)
+- [ ] `10029730` 1440 — Route_StepPatrol (route_step.cpp, 1456 vs 1440 bytes): stack slots now match (result declared just before packedZ); register naming only (original esi = slot<<6, edi = point, ebx = record<<4; ours ebx/ebp/esi) and the forceStep tail compares with eax = 0 (cmp ecx,eax) in the original; point copy, result positions and three tail spellings tried
 - [ ] `1002a110` 559 — Char_WalkRoute: code identical; the original keeps the next route point in the slot parameter's stack home (frame 4 bytes smaller), ours gives it a local; declaration positions tried
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
 - [ ] `1002a490` 685 — Block_Update: statements and layout identical; the original computes the block model address once into esi on the standing path and reuses it for the second IsClearAny, ours recomputes it (combined, nested and goto forms and a model pointer local tried)
@@ -223,13 +223,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (70)
+## 4. Large functions (801-3000 bytes) (69)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)
 - [ ] `10143180` 1633 bytes (calls 42)
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
-- [ ] `10026d80` 1658 bytes (float, loops 1, calls 48)
 - [ ] `100627d0` 1685 bytes (float, loops 1, calls 35)
 - [ ] `1014ce40` 1685 bytes TextureObject::DrawFill (float, loops 1, calls 19)
 - [ ] `10044b10` 1711 bytes (float, loops 2, calls 44)

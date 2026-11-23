@@ -94,6 +94,7 @@ extern "C" int DAT_1030c990;
 extern "C" int DAT_103154b0[0x6000];
 extern "C" int DAT_1032d67c[0x8];
 extern "C" int DAT_1032d6a0;
+extern "C" int DAT_1032d6a4;                              // set to 9 when the player is knocked back (0x10055ee0)
 extern "C" int DAT_1032d6a8[0x40];
 extern "C" int DAT_1032d7a8[0x30];
 extern "C" int DAT_1042d918[0x10];
@@ -268,6 +269,7 @@ extern "C" int DAT_104c0074;
 extern "C" int DAT_104c0078;
 extern "C" char DAT_104c0088;
 extern "C" int DAT_104c008c;
+extern "C" char DAT_104c0090;
 extern "C" char DAT_104c0091;
 extern "C" char DAT_104c0092;
 extern "C" char DAT_104c0095;

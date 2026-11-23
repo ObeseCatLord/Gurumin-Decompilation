@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (157)
+## 1. Walls to retry (158)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -78,6 +78,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10054d50` 476 — Game::RaiseFireEvents: the event-pointer form of the other Raise* functions fixes the loop pointer, but cl 13.00 inlines no TestScriptFlag here (the original expands flags[0] once per loop and calls the rest), even compiled alone; swapped loop order and a function-scope pointer tried
 - [ ] `10054f30` 476 — Game::RaiseLeverEvents: same inline-budget residue as 0x10054d50
 - [ ] `10055110` 476 — Game::RaiseDoorEvents: same inline-budget residue as 0x10054d50
+- [ ] `10055ee0` 881 — Player_KnockBack (player_knockback.cpp): 18 bytes; the original materialises each ground-probe result as a 0/1 int (neg/sbb/inc) and stores it in a stack slot (the slot the later Fill temp reuses) before testing it, ours tests eax directly; function-scope, bool and float-slot forms tried
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
 - [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
@@ -180,11 +181,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (148)
+## 4. Large functions (801-3000 bytes) (146)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `1014f590` 865 bytes (float, loops 5, calls 11)
-- [ ] `10055ee0` 881 bytes (loops 4, calls 17)
 - [ ] `100d2110` 894 bytes (float, loops 4, calls 12)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
 - [ ] `1001bb20` 925 bytes (float, loops 2, calls 23)
@@ -450,12 +449,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (1 files)
+## 7. Comment pass (2 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
 - [ ] `src/route_carrier.cpp`: 0 of 2 functions without a comment, no header
+- [ ] `src/route_follow.cpp`: 0 of 0 functions without a comment, no header
 
 ## 8. Structures and globals
 

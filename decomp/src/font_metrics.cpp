@@ -7,6 +7,7 @@
 
 #include <windows.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "font_renderer.h"
 
@@ -14,7 +15,7 @@
 // The arguments mirror the character-draw function so callers can pass the same list; only `code` is used.
 // `code` arrives with its two bytes in memory order (lead byte first) and is swapped into a numeric SJIS code here.
 // Codes outside the font fall back to record 4 (index 0x1c0 = 4 * 72 words, a full-width space in the table).
-int FontRenderer::GlyphWidth(int x, int y, int color, unsigned short code, int a, int b)
+int FontRenderer::GlyphWidth(int color, int x, int y, unsigned short code, unsigned short size, unsigned short sizeAgain)
 {
     unsigned short *font = glyphs;
     if (useAlt == 1 && altGlyphs != 0)
@@ -86,6 +87,191 @@ int FontRenderer::DrawGlyph(unsigned short *pixels, int x, int y, unsigned short
     for (int k = width; k < advance; k++)
         bottom[k - width] = color;
     return advance;
+}
+
+// Full-width Shift-JIS codes (bytes in memory order, lead byte first) that replace the ASCII digits and marks in
+// proportional text.
+#define SJIS_FULLWIDTH_ZERO     0x4f82  // "０"; "１".."９" follow at 0x5082..0x5882 (lead byte 0x82, trail + 1)
+#define SJIS_FULLWIDTH_STEP     0x0100  // next digit: trail byte + 1
+#define SJIS_FULLWIDTH_MINUS    0x7c81  // "－"
+#define SJIS_FULLWIDTH_PERIOD   0x4481  // "．"
+#define SJIS_MIDDLE_DOT         0x4581  // "・", drawn for '_' with a 1-pixel advance
+
+#define FONT_LINE_HEIGHT        17      // rows per glyph = line spacing for '\n'
+#define FIXED_MINUS_ADVANCE     9       // '-' in fixed-advance text only moves the pen
+#define PAD_COLUMN_SCALE        1.13636f  // "snnn" columns are given in 1/1.13636 pixels (640 vs 563 units)
+#define PAD_SEARCH_PASSES       17
+
+// 0x1014f590. Measures (and, through GlyphWidth's argument list, lays out) the string `text` starting at (x, y) and
+// returns the pen position after the last character. Inline commands in the text:
+//   "Lnn"  sets the glyph size to nn (passed on to every following glyph),
+//   "snnn" moves the pen to column nnn (scaled by 1.13636 in proportional text),
+//   '\n'   returns to the start column and moves down one line.
+// With fixedAdvance == 0 the text is proportional and ASCII digits, '-', '.' and '_' are shown as their full-width
+// Shift-JIS forms; otherwise every character advances by fixedAdvance pixels and '-' leaves a 9-pixel gap.
+// Called by TextWidth (0x1014fd30).
+int FontRenderer::DrawString(int color, int x, int y, const char *text, unsigned short size, int fixedAdvance)
+{
+    int length = strlen(text);
+    int pen = 0;
+    char number[4];
+    int i;
+
+    if (fixedAdvance == 0)
+    {
+        for (i = 0; i < length; )
+        {
+            char c = text[i];
+            if (c == '0')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO, size, size);
+            }
+            else if (c == '1')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 1 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '2')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 2 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '3')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 3 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '4')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 4 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '5')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 5 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '6')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 6 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '7')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 7 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '8')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 8 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '9')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_ZERO + 9 * SJIS_FULLWIDTH_STEP, size, size);
+            }
+            else if (c == '-')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_MINUS, size, size);
+            }
+            else if (c == '.')
+            {
+                i++;
+                pen += GlyphWidth(color, x + pen, y, SJIS_FULLWIDTH_PERIOD, size, size);
+            }
+            else if (c == '_')
+            {
+                i++;
+                GlyphWidth(color, x + pen, y, SJIS_MIDDLE_DOT, size, size);
+                pen += 1;
+            }
+            else if (c == 'L')
+            {
+                i++;  // skip the command letter
+                number[0] = text[i];
+                number[1] = text[i + 1];
+                number[2] = 0;
+                size = (unsigned char)atol(number);
+                i += 2;
+            }
+            else if (c == 's')
+            {
+                i++;  // skip the command letter
+                number[0] = text[i];
+                number[1] = text[i + 1];
+                number[2] = text[i + 2];
+                number[3] = 0;
+                // Searches the first pixel column at or past the target (the result is not used: the pen is set
+                // from the target directly below).
+                for (int pass = PAD_SEARCH_PASSES; pass != 0; pass--)
+                {
+                    int column = pen;
+                    while ((float)column < (float)atol(number) * PAD_COLUMN_SCALE)
+                        column++;
+                }
+                pen = (int)((float)atol(number) * PAD_COLUMN_SCALE);
+                i += 3;
+            }
+            else if (c == '\n')
+            {
+                i++;
+                pen = 0;
+                y += FONT_LINE_HEIGHT;
+            }
+            else
+            {
+                // Double-byte Shift-JIS character.
+                pen += GlyphWidth(color, x + pen, y, *(const unsigned short *)(text + i), size, size);
+                i += 2;
+            }
+        }
+        return pen;
+    }
+
+    for (i = 0; i < length; )
+    {
+        char c = text[i];
+        if (c == '-')
+        {
+            i++;
+            pen += FIXED_MINUS_ADVANCE;
+        }
+        else if (c == 'L')
+        {
+            i++;  // skip the command letter
+            number[0] = text[i];
+            number[1] = text[i + 1];
+            number[2] = 0;
+            size = (unsigned char)atol(number);
+            i += 2;
+        }
+        else if (c == 's')
+        {
+            i++;  // skip the command letter
+            number[0] = text[i];
+            number[1] = text[i + 1];
+            number[2] = text[i + 2];
+            number[3] = 0;
+            pen = (unsigned char)atol(number);
+            i += 3;
+        }
+        else if (c == '\n')
+        {
+            i++;
+            pen = 0;
+            y += FONT_LINE_HEIGHT;
+        }
+        else
+        {
+            GlyphWidth(color, x + pen, y, *(const unsigned short *)(text + i), size, size);
+            pen += fixedAdvance;
+            i += 2;
+        }
+    }
+    return pen;
 }
 
 // Width in pixels of `text` drawn at `scale`: measured with the bitmap font when one is loaded (the text-draw

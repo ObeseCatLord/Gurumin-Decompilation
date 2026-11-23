@@ -974,3 +974,5 @@ address	name	evidence
 10166100	ModelBank::DrawShadowsInto	DrawShadows through the scene matrix (caster shadow matrix raised 6.1) (matched, decomp/src/model_bank.cpp)
 1016a090	Playback::BindNode	matched decompiled source (decomp/obj_symbols.tsv)
 1016a020	Playback::BindModel	matched decompiled source (decomp/obj_symbols.tsv)
+1014f590	FontRenderer::DrawString	lays out text with the Lnn/snnn/newline commands, full-width digits in proportional mode; returns the pen position (matched, decomp/src/font_metrics.cpp)
+10055ee0	Player_KnockBack	knock-back motion, rumble and sound 0x35c; knock-back timer DAT_10468128 refills the position history (open, decomp/src/player_knockback.cpp)

@@ -42,6 +42,9 @@ extern "C" int DAT_104bfeb0;
 extern "C" int DAT_104bfeb4;
 extern "C" int DAT_104c0198;
 extern "C" int DAT_104c0228;
+extern "C" unsigned char DAT_104c022c;                    // write index of the player position history
+extern "C" unsigned char DAT_104c022d;
+extern "C" Vec4 DAT_10802ad8[16];                         // recent player positions (ring of 16, DAT_104c022c)
 extern "C" int DAT_104c02f0;                              // "DAT" source of the player for kind 4
 extern "C" char DAT_104c0309;
 extern "C" int DAT_104c0314;                              // "DAT" source of the other characters

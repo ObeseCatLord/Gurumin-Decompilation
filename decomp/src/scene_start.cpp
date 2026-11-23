@@ -59,9 +59,6 @@ extern "C" void FUN_100cc1d0(const char *characterFile, int value)
 extern "C" void FUN_100123d0(void);              // Chars_ReloadModels
 extern "C" int FUN_1015c9e0(int mode);           // Screen_StartTransition (0 = end the transition)
 extern "C" int FUN_10001b40(void);               // SoundArc_Message221
-extern "C" unsigned char DAT_104c022c;           // write index of the position history
-extern "C" unsigned char DAT_104c022d;
-extern "C" Vec4 DAT_10802ad8[16];                // recent player positions (ring of 16)
 extern "C" Matrix4 DAT_10db9210;                 // the player's world matrix (character 0)
 
 // Finishes a pending scene start (DAT_104bfeb0) unless a cut-scene runs: reloads the character models, ends the

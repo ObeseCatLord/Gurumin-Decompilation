@@ -80,11 +80,8 @@ extern "C" int DAT_104bfb08[0x80];
 extern "C" int DAT_104bfd5c;
 extern "C" int DAT_104bfe24;
 #include "win_vars.h"
-extern "C" char DAT_104c022c;
-extern "C" char DAT_104c022d;
 extern "C" EmptyObject DAT_1065cb28;
 extern "C" Vec4 DAT_108029b8;
-extern "C" Vec4 DAT_10802ad8[0x10];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" EmptyObject DAT_10836c70;
 extern "C" SmallRecord DAT_10860de8[0x40];

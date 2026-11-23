@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.6643,
+  "fuzzy_match_percent": 14.7525,
   "total_code": "1720206",
-  "matched_code": "199043",
-  "matched_code_percent": 11.5709,
+  "matched_code": "199908",
+  "matched_code_percent": 11.6212,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 789,
-  "matched_functions_percent": 65.099,
+  "matched_functions": 790,
+  "matched_functions_percent": 65.1815,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 250,
+  "total_units": 251,
   "complete_units": 147,
-  "matched_rules_code": "106538",
-  "matched_rules_code_percent": 6.1933,
-  "matched_rules_functions": 488,
-  "matched_rules_functions_percent": 40.264
+  "matched_rules_code": "107403",
+  "matched_rules_code_percent": 6.2436,
+  "matched_rules_functions": 489,
+  "matched_rules_functions_percent": 40.3465
  },
  "units": [
   {
@@ -6463,37 +6463,37 @@
   {
    "name": "app/font_metrics",
    "measures": {
-    "fuzzy_match_percent": 51.4824,
-    "total_code": "1640",
-    "matched_code": "154",
-    "matched_code_percent": 9.3902,
+    "fuzzy_match_percent": 68.236,
+    "total_code": "2505",
+    "matched_code": "1019",
+    "matched_code_percent": 40.6786,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 4,
-    "matched_functions": 1,
-    "matched_functions_percent": 25.0,
+    "total_functions": 5,
+    "matched_functions": 2,
+    "matched_functions_percent": 40.0,
     "complete_code": "0",
     "complete_code_percent": 0.0,
     "complete_data": "0",
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 0,
-    "matched_rules_code": "154",
-    "matched_rules_code_percent": 9.3902,
-    "matched_rules_functions": 1,
-    "matched_rules_functions_percent": 25.0
+    "matched_rules_code": "1019",
+    "matched_rules_code_percent": 40.6786,
+    "matched_rules_functions": 2,
+    "matched_rules_functions_percent": 40.0
    },
    "sections": [
     {
      "name": ".text",
-     "size": "1640",
-     "fuzzy_match_percent": 51.4824
+     "size": "2505",
+     "fuzzy_match_percent": 68.236
     }
    ],
    "functions": [
     {
-     "name": "?GlyphWidth@FontRenderer@@QAEHHHHGHH@Z",
+     "name": "?GlyphWidth@FontRenderer@@QAEHHHHGGG@Z",
      "size": "87",
      "fuzzy_match_percent": 37.5,
      "metadata": {
@@ -6506,6 +6506,14 @@
      "fuzzy_match_percent": 10.7143,
      "metadata": {
       "virtual_address": "269767648"
+     }
+    },
+    {
+     "name": "?DrawString@FontRenderer@@QAEHHHHPBDGH@Z",
+     "size": "865",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269809040"
      }
     },
     {
@@ -8243,7 +8251,7 @@
   {
    "name": "app/map_enter_reset",
    "measures": {
-    "fuzzy_match_percent": 95.4291,
+    "fuzzy_match_percent": 95.8022,
     "total_code": "1069",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -8268,14 +8276,14 @@
     {
      "name": ".text",
      "size": "1069",
-     "fuzzy_match_percent": 95.4291
+     "fuzzy_match_percent": 95.8022
     }
    ],
    "functions": [
     {
      "name": "_FUN_10023900",
      "size": "1069",
-     "fuzzy_match_percent": 95.4291,
+     "fuzzy_match_percent": 95.8022,
      "metadata": {
       "virtual_address": "268581120"
      }
@@ -11766,6 +11774,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/player_damage.cpp"
+   }
+  },
+  {
+   "name": "app/player_knockback",
+   "measures": {
+    "fuzzy_match_percent": 73.4954,
+    "total_code": "881",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "881",
+     "fuzzy_match_percent": 73.4954
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10055ee0",
+     "size": "881",
+     "fuzzy_match_percent": 73.4954,
+     "metadata": {
+      "virtual_address": "268787424"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/player_knockback.cpp"
    }
   },
   {
@@ -17040,13 +17094,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1435615",
+    "total_code": "1433869",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 268,
+    "total_functions": 266,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -17063,7 +17117,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1435615",
+     "size": "1433869",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -17714,14 +17768,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268775456"
-     }
-    },
-    {
-     "name": "FUN_10055ee0",
-     "size": "881",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268787424"
      }
     },
     {
@@ -18666,14 +18712,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269802992"
-     }
-    },
-    {
-     "name": "FUN_1014f590",
-     "size": "865",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269809040"
      }
     },
     {

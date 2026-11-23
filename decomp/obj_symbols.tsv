@@ -116,7 +116,7 @@ _atan2f	10001f80
 ?Load@Node@@QAEHPBDHHH@Z	101ac010
 ?FreeVertices@VertexPack@@QAEHXZ	101acfc0
 ?Free@IndexList@@QAEHXZ	101ad0e0
-?GlyphWidth@FontRenderer@@QAEHHHHGHH@Z	10145380
+?GlyphWidth@FontRenderer@@QAEHHHHGGG@Z	10145380
 ??0EffectModel@@QAE@XZ	1000be40
 ??0Matrix4@@QAE@XZ	101ae770
 ?Flush@TriangleBatch@@QAEHXZ	101733f0
@@ -478,3 +478,4 @@ _FUN_101426d0@8	101426d0
 ?Recreate@TextureObject@@QAEHXZ	10169df0
 ?Restore@TextureObject@@QAEHXZ	10169e10
 ?UpdateImage@TextureObject@@QAEHH@Z	10169f70
+?DrawString@FontRenderer@@QAEHHHHPBDGH@Z	1014f590

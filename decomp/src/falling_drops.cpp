@@ -3,23 +3,14 @@
 
 struct Matrix4;
 
+#include "tri_batch.h"
 #include "vec4.h"
 #include "render_vars.h"
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060 (vec4.cpp)
 
-// The 2D triangle batch at 0x1021cffc (texture_mgr.cpp TriangleBatch).
-struct TriangleBatch
-{
-    int Reset();                                   // 0x10172aa0
-    // 0x10172cb0: adds a quad from (left, top) to (right, bottom) at depth z with UVs (u0, v0)-(u1, v1).
-    void DrawQuad(float left, float top, float right, float bottom, float u0, float v0, float u1, float v1, float z,
-                  float alpha, float r, float g, float b, int a0, int a1, int a2, int a3);
-};
-
 #define DROP_COUNT 0x400
 
-extern "C" TriangleBatch DAT_1021cffc;
 extern "C" unsigned char DAT_10254c40[DROP_COUNT]; // 0 = unused, 1 = falling, 2..30 = fading out
 #include "char_vars.h"
 
@@ -45,7 +36,7 @@ extern "C" int FUN_1000c390(void)
             {
                 float size = (1.0f - screen.z) * 344.0f;
                 float alpha = 1.0f - (float)DAT_10254c40[i] / 30.0f;
-                DAT_1021cffc.DrawQuad(screen.x - size, screen.y - size, size + screen.x, size + screen.y, 0, 0, 1.0f,
+                DAT_1021cffc.AppendQuad(screen.x - size, screen.y - size, size + screen.x, size + screen.y, 0, 0, 1.0f,
                                       1.0f, screen.z, alpha, 1.0f, 1.0f, 1.0f, 0, 0, 0, 0);
             }
             int offsets[2];

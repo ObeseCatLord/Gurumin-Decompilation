@@ -9,11 +9,10 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..
 
 #include "texture_object.h"
 
-#include "sprite_batch.h"
+#include "tri_batch.h"
 
 #include "effect_manager.h"
 
-extern "C" SpriteBatch DAT_1101c804;
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
 // 0x101890f0 (EffectManager::DrawSpriteA). Queues sprite `index` of table A: its world position is projected with
@@ -52,7 +51,7 @@ int EffectManager::DrawSpriteA(int index, const Matrix4 &view, const Matrix4 *ca
         if (DAT_1101dfdc[type].flat)
             screen.z = 0;
         if (DAT_1101dfdc[type].fullAlphaA != 0)
-            DAT_1101c804.AddSprite(&DAT_118d0ba8[DAT_1101dfdc[type].texture], screen.x - size, screen.y - size,
+            DAT_1101c804.AddQuad(&DAT_118d0ba8[DAT_1101dfdc[type].texture], screen.x - size, screen.y - size,
                                    screen.x + size, screen.y + size, DAT_11134cc8[index].u0,
                                    DAT_11134cc8[index].v0, DAT_11134cc8[index].u1, DAT_11134cc8[index].v1, screen.z,
                                    (float)(DAT_11134cc8[index].lifetime - DAT_11134cc8[index].age) *
@@ -63,7 +62,7 @@ int EffectManager::DrawSpriteA(int index, const Matrix4 &view, const Matrix4 *ca
                                    DAT_11134cc8[index].colour2[1], DAT_11134cc8[index].colour2[2],
                                    DAT_11134cc8[index].m_0078);
         else
-            DAT_1101c804.AddSprite(&DAT_118d0ba8[DAT_1101dfdc[type].texture], screen.x - size, screen.y - size,
+            DAT_1101c804.AddQuad(&DAT_118d0ba8[DAT_1101dfdc[type].texture], screen.x - size, screen.y - size,
                                    screen.x + size, screen.y + size, DAT_11134cc8[index].u0,
                                    DAT_11134cc8[index].v0, DAT_11134cc8[index].u1, DAT_11134cc8[index].v1, screen.z,
                                    (float)(DAT_11134cc8[index].lifetime - DAT_11134cc8[index].age) *
@@ -108,7 +107,7 @@ int EffectManager::DrawSpriteB(int index, const Matrix4 &view, const Matrix4 *ca
         else if (blend == 6)
             DAT_1101c804.SetBlend(13, 0);
         if (DAT_1101dfdc[type].fullAlphaB != 0)
-            DAT_1101c804.AddSprite(&DAT_118d0ba8[DAT_1101dfdc[type].texture], screen.x - size, screen.y - size,
+            DAT_1101c804.AddQuad(&DAT_118d0ba8[DAT_1101dfdc[type].texture], screen.x - size, screen.y - size,
                                    screen.x + size, screen.y + size, DAT_118a8888[index].u0,
                                    DAT_118a8888[index].v0, DAT_118a8888[index].u1, DAT_118a8888[index].v1, screen.z,
                                    (float)(DAT_118a8888[index].lifetime - DAT_118a8888[index].age) *
@@ -119,7 +118,7 @@ int EffectManager::DrawSpriteB(int index, const Matrix4 &view, const Matrix4 *ca
                                    DAT_118a8888[index].colour2[1], DAT_118a8888[index].colour2[2],
                                    DAT_118a8888[index].m_0078);
         else
-            DAT_1101c804.AddSprite(&DAT_118d0ba8[DAT_1101dfdc[type].texture], screen.x - size, screen.y - size,
+            DAT_1101c804.AddQuad(&DAT_118d0ba8[DAT_1101dfdc[type].texture], screen.x - size, screen.y - size,
                                    screen.x + size, screen.y + size, DAT_118a8888[index].u0,
                                    DAT_118a8888[index].v0, DAT_118a8888[index].u1, DAT_118a8888[index].v1, screen.z,
                                    (float)(DAT_118a8888[index].lifetime - DAT_118a8888[index].age) *

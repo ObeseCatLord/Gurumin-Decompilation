@@ -1,4 +1,4 @@
-// SmallRecord, EffectTable, EmptyObject, GameObject: declared here once (first used by src/game_reset.cpp).
+// SmallRecord, EmptyObject, GameObject: declared here once (first used by src/game_reset.cpp).
 #ifndef GURUMIN_GAME_RESET_H
 #define GURUMIN_GAME_RESET_H
 
@@ -10,10 +10,6 @@ struct SmallRecord
     char pad_0008[0xec];
     int m_00f4;
     int m_00f8;
-};
-struct EffectTable
-{
-    void M_10172a80(char *table, int count);     // 0x10172a80
 };
 struct EmptyObject
 {

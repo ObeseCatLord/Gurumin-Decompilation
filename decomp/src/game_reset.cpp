@@ -2,6 +2,7 @@
 // game global is cleared, the HUD textures are released, the camera, sound, scene and script systems reset and the
 // player's parameters set back to their starting values.
 
+#include "tri_batch.h"
 #include "mmv_player.h"
 #include "last_position.h"
 #include <string.h>
@@ -41,7 +42,6 @@ extern "C" int DAT_1020d860[0x60];
 extern "C" int DAT_10219c40[0x40];
 extern "C" int DAT_10219fc0[0x40];
 extern "C" int DAT_1021bbc0[0xc];
-extern "C" EffectTable DAT_1021cffc;
 extern "C" int DAT_1021f640[0x20];
 extern "C" int DAT_10254c40[0x100];
 extern "C" int DAT_10255b08[0x40];
@@ -159,7 +159,7 @@ extern "C" void FUN_1003e710(void)
   }
   DAT_104c013c = 0;
   DAT_104c0140 = FUN_10161920("lens05");
-  DAT_1021cffc.M_10172a80(DAT_10223a58, 0x400);
+  DAT_1021cffc.SetBuffer(DAT_10223a58, 0x400);
   memset(DAT_10254c40, 0, sizeof(DAT_10254c40));
   DAT_10804bf8.Reset();
   DAT_102027e4 = 180.0f;

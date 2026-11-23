@@ -2,12 +2,11 @@
 
 #include <string.h>
 
-#include "renderer.h"
+#include "tri_batch.h"
 
 #include "texture_object.h"
 
 extern "C" void FUN_1013f070(int, int, int);
-extern "C" Renderer DAT_1021cffc;
 #include "game_vars.h"
 #include "ui_vars.h"
 
@@ -16,7 +15,7 @@ extern "C" int FUN_1000c340(void)
 {
     FUN_1013f070(9, 0, 0);
     FUN_1013f070(0, 1, 0);
-    DAT_1021cffc.M_10172a40(&DAT_118d0ba8[DAT_104c0140]);
+    DAT_1021cffc.DrawWith(&DAT_118d0ba8[DAT_104c0140]);
     FUN_1013f070(0, 0, 0);
     return 1;
 }

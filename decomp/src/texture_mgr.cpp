@@ -1,4 +1,4 @@
-// Texture manager, triangle batches (Selection = TriangleBatch in tri_batch.cpp), model owners and helpers.
+// Texture manager, triangle batches (TriangleBatch, tri_batch.h), model owners and helpers.
 
 #include "texture_object.h"
 
@@ -25,33 +25,33 @@ Transform::Transform()
 }
 
 // Sets the batch's vertex buffer and capacity.
-int Selection::M_10172a80(int a, int b)
+int TriangleBatch::SetBuffer(void *buffer, int capacity)
 {
-    m_0000 = a;
-    m_0004 = b;
+    vertices = buffer;
+    this->capacity = capacity;
     return 1;
 }
 
 // Empties the batch and forgets its texture.
-int Selection::M_10172aa0()
+int TriangleBatch::Reset()
 {
-    m_0008 = 0;
-    m_0010 = 0;
-    current = -1;
+    count = 0;
+    texture = 0;
+    blendMode = BLEND_MODE_UNSET;
     return 1;
 }
 
-// Switches the batch to texture `id`, flushing the queued triangles when the texture changes.
-int Selection::M_10173450(int id, int unused)
+// Switches the batch to blend mode `mode`, flushing the queued triangles when the mode changes.
+int TriangleBatch::SetBlend(int mode, int unused)
 {
-    if (current != -1)
+    if (blendMode != BLEND_MODE_UNSET)
     {
-        if (current != id)
-            M_101733f0();
-        current = id;
+        if (blendMode != mode)
+            Flush();
+        blendMode = mode;
         return 0;
     }
-    current = id;
+    blendMode = mode;
     return 0;
 }
 
@@ -144,27 +144,30 @@ extern "C" void __stdcall FUN_101911b0(VertexPack *packs, int count)
 
 
 // Queues `count` vertices for texture `id`, flushing first when the texture changes or the buffer is full.
-int Selection::M_10188eb0(int id, int a, int count)
+int TriangleBatch::AddVertices(TextureObject *texture, void *source, int count)
 {
     DAT_10ff1dec++;
-    if (m_0010 != 0 && m_0010 != id)
-        M_101733f0();
-    m_0010 = id;
-    if (m_0008 + count >= m_0004)
-        M_101733f0();
-    M_10172ac0(a, count);
+    if (this->texture != 0 && this->texture != texture)
+        Flush();
+    this->texture = texture;
+    if (this->count + count >= capacity)
+        Flush();
+    AppendVertices(source, count);
     return 0;
 }
-// Queues a textured quad (two triangles) given three corners with UVs and a colour.
-int Selection::AddQuad(int id, float x0, float y0, float z0, float u0, float v0, float x1, float y1, float z1, float u1, float v1, float x2, float y2, float u2, float v2, int colour, int a, int b)
+// Queues a textured quad (two triangles, six vertices) with `texture`, flushing first when the texture changes or
+// the buffer is full.
+int TriangleBatch::AddQuad(TextureObject *texture, float left, float top, float right, float bottom, float u0,
+                           float v0, float u1, float v1, float z, float alpha, float r, float g, float b, float r2,
+                           float g2, float b2, float m_0078)
 {
     DAT_10ff1dec++;
-    if (m_0010 != 0 && m_0010 != id)
-        M_101733f0();
-    m_0010 = id;
-    if (m_0008 + 6 >= m_0004)
-        M_101733f0();
-    M_10172cb0(x0, y0, z0, u0, v0, x1, y1, z1, u1, v1, x2, y2, u2, v2, colour, a, b);
+    if (this->texture != 0 && this->texture != texture)
+        Flush();
+    this->texture = texture;
+    if (count + 6 >= capacity)
+        Flush();
+    AppendQuad(left, top, right, bottom, u0, v0, u1, v1, z, alpha, r, g, b, r2, g2, b2, m_0078);
     return 0;
 }
 

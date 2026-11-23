@@ -1,6 +1,7 @@
 // Per-character effect spawning: the effect manager (DAT_10daaa80, EffectManager) starts an effect and writes
 // its handle into the character's entry of DAT_10219770.
 
+#include "tri_batch.h"
 #include <string.h>
 
 #include <stdio.h>
@@ -20,15 +21,6 @@ extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, in
     return 0;
 }
 
-// Triangle batch used for effect sprites (texture_mgr.cpp TriangleBatch).
-struct TriangleBatch
-{
-    int SetBuffer(void *buffer, int capacity);  // 0x10172a80
-    int Reset();                                // 0x10172aa0
-    void Flush();                               // 0x101733f0
-};
-
-extern "C" TriangleBatch DAT_1101c804;
 // Stops every effect: rebinds the effect batch to its buffer, clears all effect tables and marks their slots free
 // (-1), and resets the six group offsets. The offset table has only five values in the original; the sixth group
 // gets whatever was on the stack (kept as is).

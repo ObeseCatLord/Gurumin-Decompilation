@@ -92,7 +92,7 @@
 ??GVec4@@QBE?AU0@ABU0@@Z	101aca40
 ?Cross@@YA?AUVec4@@ABU1@0@Z	101ae820
 ?CreateChildCopies@Node@@QAEHXZ	101abb70
-?AddQuad@Selection@@QAEHHMMMMMMMMMMMMMMHHH@Z	10188f10
+?AddQuad@TriangleBatch@@QAEHPAUTextureObject@@MMMMMMMMMMMMMMMMM@Z	10188f10
 ??0AnimChannels@@QAE@XZ	101727f0
 ??0KeyTrack@@QAE@XZ	101ad9e0
 ??0ModelInstance@@QAE@XZ	101728c0
@@ -479,3 +479,9 @@ _FUN_101426d0@8	101426d0
 ?Restore@TextureObject@@QAEHXZ	10169e10
 ?UpdateImage@TextureObject@@QAEHH@Z	10169f70
 ?DrawString@FontRenderer@@QAEHHHHPBDGH@Z	1014f590
+
+?DrawWith@TriangleBatch@@QAEHPAUTextureObject@@@Z	10172a40
+?SetBuffer@TriangleBatch@@QAEHPAXH@Z	10172a80
+?Reset@TriangleBatch@@QAEHXZ	10172aa0
+?SetBlend@TriangleBatch@@QAEHHH@Z	10173450
+?AddVertices@TriangleBatch@@QAEHPAUTextureObject@@PAXH@Z	10188eb0

@@ -2,24 +2,14 @@
 
 #include "texture_object.h"
 
-struct TriangleBatch
-{
-    void *vertices;          // 0x00: vertex buffer
-    int pad_0004;
-    int count;               // 0x08: number of vertices queued (three per triangle)
-    int pad_000c;
-    TextureObject *texture;  // 0x10: texture to draw with (0 = nothing to draw)
-    int blendMode;           // 0x14: render mode passed to FUN_1013f070 while drawing
-    int M_10172a40(TextureObject *texture);
-    int Flush();
-};
+#include "tri_batch.h"
 
 extern "C" void FUN_1013f070(int state, int value, int extra);  // render-state switch (0 = blend mode)
 #include "render_vars.h"
 
 // Draws the queued triangles with `texture` (instead of the batch's own); nothing happens with fewer than
 // three vertices or without a texture. Returns the draw call's result, or 0.
-int TriangleBatch::M_10172a40(TextureObject *texture)
+int TriangleBatch::DrawWith(TextureObject *texture)
 {
     if (count < 3)
         return 0;

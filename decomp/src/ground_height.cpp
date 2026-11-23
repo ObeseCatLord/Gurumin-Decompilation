@@ -10,7 +10,6 @@
 
 
 #include "anim_model.h"
-extern "C" GroundOrigin *DAT_1020d860[0x60];         // the ground objects (0 = free)
 #include "map_vars.h"
 
 // 0x10016700 (Ground_HeightAt). Picks the ground object nearest to the player and averages its height samples

@@ -418,8 +418,11 @@ extern "C" Matrix4 DAT_1065ca08[4];
 extern "C" Vec4 DAT_1065cb08;
 extern "C" EmptyObject DAT_1065cb28;
 extern "C" Vec4 DAT_108029a8;
-extern "C" float DAT_108029bc;
-extern "C" float DAT_108029c0;
+extern "C" Vec4 DAT_108029b8;                             // where the player starts on entering the map (x, y, z;
+                                                          // set from a save by save_slot.cpp, cleared by game_reset.cpp)
+extern "C" char DAT_1042de28[0x80];                       // 1 for each item ever obtained (inventory.cpp; the first
+                                                          // 0x60 are saved as bits by save_write.cpp)
+extern "C" int DAT_10202464[4];                           // 16 bytes of game state stored in the save after the play time
 extern "C" Vec4 DAT_10802bd8;
 extern "C" int DAT_108360f8;                              // texture slot of the save thumbnail
 extern "C" Vec4 DAT_1083631c;

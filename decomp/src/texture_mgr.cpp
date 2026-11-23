@@ -27,7 +27,7 @@ Transform::Transform()
 // Sets the batch's vertex buffer and capacity.
 int TriangleBatch::SetBuffer(void *buffer, int capacity)
 {
-    vertices = buffer;
+    vertices = (ScreenVertex *)buffer;
     this->capacity = capacity;
     return 1;
 }
@@ -152,7 +152,7 @@ int TriangleBatch::AddVertices(TextureObject *texture, void *source, int count)
     this->texture = texture;
     if (this->count + count >= capacity)
         Flush();
-    AppendVertices(source, count);
+    AppendVertices((const ScreenVertex *)source, count);
     return 0;
 }
 // Queues a textured quad (two triangles, six vertices) with `texture`, flushing first when the texture changes or

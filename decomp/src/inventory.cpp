@@ -2,7 +2,6 @@
 #include "item_info.h"
 #include "game_vars.h"
 
-extern "C" char DAT_1042de28[0x50];
 extern "C" int FUN_1000e810(void);
 
 // Inventory_Add: adds *count of item *item. Most items stack to 3; item 0x10 and type-4 items stack to 99.

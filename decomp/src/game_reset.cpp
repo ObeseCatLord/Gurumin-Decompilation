@@ -32,26 +32,21 @@ Matrix4 IdentityMatrix();                        // 0x101b0ba0
 #include "char_tables.h"
 #include "char_vars.h"
 #include "game_vars.h"
+#include "ground_height.h"
 #include "map_vars.h"
 #include "render_vars.h"
 #include "script_vars.h"
 #include "sound_vars.h"
 #include "ui_vars.h"
 #include "world.h"
-extern "C" int DAT_10202464;
-extern "C" int DAT_1020d860[0x60];
 extern "C" int DAT_10219c40[0x40];
 extern "C" int DAT_10219fc0[0x40];
 extern "C" int DAT_10255b08[0x40];
 extern "C" int DAT_1030bbf8[0x40];
-extern "C" int DAT_1042de28[0x20];
 extern "C" int DAT_1042e0a8[0x40];
 extern "C" int DAT_10453208[0x4000];
 extern "C" GameObject DAT_104b7200;
 #include "win_vars.h"
-extern "C" EmptyObject DAT_1065cb28;
-extern "C" Vec4 DAT_108029b8;
-extern "C" SmallRecord DAT_10860de8[0x40];
 
 extern "C" int FUN_10001b40(void);               // SoundArc_Message221
 extern "C" int FUN_10174c70(int slot, int force);  // Texture_Release
@@ -161,7 +156,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104c0234 = 0;
   DAT_104c0232 = 0;
   DAT_104bfe20 = 0;
-  DAT_10202464 = 0;
+  DAT_10202464[0] = 0;
   DAT_10202468 = 0;
   DAT_1020246c = 0;
   DAT_10202470 = 0;

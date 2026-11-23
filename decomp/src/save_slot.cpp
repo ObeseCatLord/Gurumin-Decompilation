@@ -102,8 +102,6 @@ int FUN_10011240(const char *name, void *thumbnail)
 #include "anim_model.h"
 #include "char_slot.h"
 
-extern "C" int DAT_10202464[4];
-extern "C" float DAT_108029b8;                   // where the player starts (x, y, z)
 extern "C" int FUN_1013e6f0(int a, const char *text, const char *name);
 extern "C" int FUN_100154c0(int value);
 extern "C" void FUN_10015910(void);
@@ -197,9 +195,9 @@ int FUN_1003b2c0(const char *path, int mode)
         }
         DAT_104c00dc = time;
         DAT_10c62ed0 = DAT_1030b660 = map;
-        DAT_108029b8 = x;
-        DAT_108029bc = y;
-        DAT_108029c0 = z;
+        DAT_108029b8.x = x;
+        DAT_108029b8.y = y;
+        DAT_108029b8.z = z;
         FUN_1013e6f0(0, "\x83p\x83\x8a\x83\x93", DAT_10daaae8[0].name);
         DAT_10db6ee8[0].Teleport(x, y, z);
         FUN_100154c0(DAT_10daaae8[0].helmet);

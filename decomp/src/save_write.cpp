@@ -15,9 +15,6 @@
 #include "char_vars.h"
 #include "game_vars.h"
 
-extern "C" char DAT_1042de28[0x60];                  // 1 for each item ever obtained (inventory.cpp)
-extern "C" int DAT_108029b8[4];                      // where the player starts (x, y, z, w)
-extern "C" int DAT_10202464[4];
 extern "C" int FUN_101603c0(const char *name, int record, unsigned int *value);   // SystemSav_ReadRecord
 extern "C" int FUN_1015fea0(const char *name, int record, unsigned int value);    // SystemSav_WriteRecord
 extern "C" int FUN_10161120(char *out, const char *path);                         // Path_GetBaseName
@@ -60,10 +57,11 @@ int FUN_100106e0(const char *path)
         DAT_118d0ba8[DAT_108360f8].CaptureRgb24(thumbnail);
         memcpy(body, thumbnail, 0x30000);
         int map = DAT_10c62ed0;
-        int x = DAT_108029b8[0];
-        int y = DAT_108029b8[1];
-        int z = DAT_108029b8[2];
-        int w = DAT_108029b8[3];
+        // the start position is copied as raw bits
+        int x = *(int *)&DAT_108029b8.x;
+        int y = *(int *)&DAT_108029b8.y;
+        int z = *(int *)&DAT_108029b8.z;
+        int w = *(int *)&DAT_108029b8.w;
         // the state behind the thumbnail, written with a cursor (`size` follows it)
         unsigned char *p = body + 0x30000;
         size += 0x30000;

@@ -1,21 +1,13 @@
-// A batch of screen-space vertices: 2D quads are laid out for a 640x480 screen and scaled to the real back buffer
-// size when they are added.
+// Adding screen-space vertices to a triangle batch (tri_batch.h): 2D quads are laid out for a 640x480 screen and
+// scaled to the real back buffer size when they are added.
 
 #include "screen_vertex.h"
-
-struct ScreenBatch
-{
-    ScreenVertex *vertices;      // room for the batch
-    int pad_0004;
-    int count;                   // 0x08: vertices added so far
-    int Add(const ScreenVertex *source, int sourceCount);
-};
-
+#include "tri_batch.h"
 #include "render_vars.h"
 
-// 0x10172ac0 (ScreenBatch::Add). Appends `sourceCount` vertices given for a 640x480 screen, scaling their positions
-// to the back buffer. Returns 1.
-int ScreenBatch::Add(const ScreenVertex *source, int sourceCount)
+// 0x10172ac0 (TriangleBatch::AppendVertices). Appends `sourceCount` vertices given for a 640x480 screen, scaling their positions
+// to the back buffer (DAT_10202b34 x DAT_10202b38). Called by AddVertices. Returns 1.
+int TriangleBatch::AppendVertices(const ScreenVertex *source, int sourceCount)
 {
     float scaleX = (float)DAT_10202b34 / 640.0f;
     float scaleY = (float)DAT_10202b38 / 480.0f;

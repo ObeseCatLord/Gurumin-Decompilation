@@ -4,13 +4,14 @@
 #define GURUMIN_TRI_BATCH_H
 
 struct TextureObject;   // texture_object.h
+struct ScreenVertex;    // screen_vertex.h
 
 // TriangleBatch::blendMode before any SetBlend.
 #define BLEND_MODE_UNSET -1
 
 struct TriangleBatch
 {
-    void *vertices;          // 0x00: vertex buffer
+    ScreenVertex *vertices;  // 0x00: vertex buffer (screen vertices, 0x20 bytes each)
     int capacity;            // 0x04: number of vertices the buffer holds
     int count;               // 0x08: number of vertices queued (three per triangle)
     int pad_000c;
@@ -20,7 +21,9 @@ struct TriangleBatch
     int DrawWith(TextureObject *texture);           // 0x10172a40
     int SetBuffer(void *buffer, int capacity);      // 0x10172a80
     int Reset();                                    // 0x10172aa0
-    void AppendVertices(void *source, int count);   // 0x10172ac0: copies `count` vertices to the end of the buffer
+    // 0x10172ac0 (screen_vertices.cpp): copies `count` vertices given for a 640x480 screen to the end of the
+    // buffer, scaling their positions to the back buffer; returns 1.
+    int AppendVertices(const ScreenVertex *source, int count);
     // 0x10172cb0: appends a quad (two triangles) from (left, top) to (right, bottom) at depth z with texture
     // coordinates (u0, v0)-(u1, v1), the alpha and two colours.
     void AppendQuad(float left, float top, float right, float bottom, float u0, float v0, float u1, float v1, float z,

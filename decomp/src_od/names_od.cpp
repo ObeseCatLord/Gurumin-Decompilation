@@ -3,9 +3,9 @@
 // Build with: tools/variants.py ..\src_od\<file> 1 /Od /Oi  (not part of build_all).
 #include <string.h>
 
-extern "C" char DAT_10f0ec60[][0x20];
-extern "C" char DAT_10f0d548[][0x20];
+#include "name_paths.h"
 
+// 0x1013e6f0. Registers `name` in slot `index` with the path that replaces it in Names_Expand. Returns 0.
 extern "C" int FUN_1013e6f0(int index, const char *name, const char *path)
 {
     strcpy(DAT_10f0ec60[index], name);
@@ -23,8 +23,8 @@ extern "C" int FUN_1013e790(char *out, const char *text)
     {
         int best;
         int found = best = 0;
-        int matches[4];
-        for (int i = 0; i < 4; i++)
+        int matches[NAME_PATH_SLOTS];   // where each name occurs next (0 = not found)
+        for (int i = 0; i < NAME_PATH_SLOTS; i++)
         {
             matches[i] = 0;
             if (DAT_10f0ec60[i][0] != 0)

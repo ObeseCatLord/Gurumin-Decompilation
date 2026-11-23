@@ -19,4 +19,9 @@ struct GroundOrigin
     float base;                                      // 0x204: height added to the samples
 };
 
+// Number of ground object slots.
+#define GROUND_OBJECT_SLOTS 0x60
+
+extern "C" GroundOrigin *DAT_1020d860[GROUND_OBJECT_SLOTS];   // the ground objects (0 = free); cleared by game_reset
+
 #endif

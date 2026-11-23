@@ -435,3 +435,28 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `&matrix._41` is cast there until Vec3 is shared.
 - `node_dtor.cpp` `NodeBody::~NodeBody` destroys Matrix4 members with the shared empty destructor; its other member
   type `Element` (float v[4] with an out-of-line destructor) looks like Vec4 with an empty destructor. Unconfirmed.
+
+## 2026-11-22: Vec3, Node and the COM/D3D views shared
+- `include/vec3.h` is a plain POD (x, y, z). The `Vec3_Dot`/`Vec3_LengthSquared`/`Vec3_Length` helpers take `Vec4`
+  pointers at every call site (vec4.cpp defines them that way), so they are declared once in `vec4.h`. `Matrix4` has
+  a third union view of its rows as `Vec3 axisX/axisY/axisZ/translation` (POD, so allowed in the union); the camera
+  list `DAT_1032d5b8` takes `&matrix.translation` without a cast.
+- `include/node.h` is the one `Node` (0x18a0 bytes); 45 files plus nine aliases (RootNode, HeadNode, PathNode,
+  AnimNode, CollisionNode, PlacedNode, ShagaNode, ModelNode, VisNode) use it, and world.h's `m_22fc`/`headNode` are
+  `Node *`. Facts the merge settled:
+  - `QueueDraw` (0x10199e20) takes the parent matrix first: `DAT_10836ec8` is a Matrix4 (game_reset.cpp sets it to
+    identity), not a draw list.
+  - `M_101946b0` takes an `unsigned char` (its callers push 0xfe, not -2) and sets `unsigned char m_189a`;
+    `m_189a`/`m_189b` must be unsigned or Init's 0xff stores become `or al, 0xff`.
+  - `M_10191920` collects up to 8 nodes in state 0x4000 and `M_10191990` stores them in the saved block
+    (`NodeSaved::linkedNodes`, Node pointers).
+  - `RestartColourPlugs` (0x1019b300) passes the motion name through to the keys (`const char *motion`).
+  - Copying the float fields 0x1880/0x1888 with `=` compiles to integer moves, so one typed field set serves both
+    Init (float stores) and Clone (copies).
+  - `Node::tint` (0x2ac) w is the alpha node_fade.cpp fades; `pathKind` (0x1879) = 2 marks camera paths.
+- `include/com_min.h` holds `IUnknownLike` (QueryInterface takes `const _GUID &`), `include/ddraw_min.h` the full
+  `SurfaceDesc` and `IDirectDrawSurfaceLike`; `d3d9_min.h` gained `LockedRect`, the texture's typed
+  GetSurfaceLevel/LockRect/UnlockRect slots and `IDirect3DSurface9Like` (slots named after the real API).
+- `CharRecord` (`DAT_10db6ee8`) is the AnimModel embedded at `Character + 0x10` (`DAT_10db6ed8`): merging it means
+  sharing AnimModel (anim_model.cpp, `CharModel` in world.h) as `Character::model` first. A field at CharRecord
+  offset o is at Character offset o + 0x10.

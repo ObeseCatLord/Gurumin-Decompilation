@@ -334,3 +334,6 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 270 | shadow | 10166100 | ModelBank::DrawShadowsInto matched (model_bank.cpp; first build) |
 | 271 | phase0 | - | Vec4 merged into include/vec4.h in 110 files (Box2 too; scene_node, visibility, world.h by hand; npc_greet.cpp left, open.tsv); 789 matched unchanged |
 | 272 | phase0 | - | Matrix4 merged into include/matrix4.h in 77 files plus world.h (Matrix/CharMatrix/NodeMatrix views too; Character position union became matrix._41/_42/_43; npc_greet.cpp left, open.tsv); 789 matched unchanged, 4 renamed symbols |
+| 273 | phase0 | - | Vec3 into include/vec3.h (world.h + 6 files; Vec3_* helpers declared once in vec4.h; Matrix4 row vectors drop the camera-list casts); 789 matched unchanged |
+| 274 | phase0 | - | Node into include/node.h (45 files + RootNode/HeadNode/PathNode/AnimNode/CollisionNode/PlacedNode/ShagaNode/ModelNode/VisNode; world.h uses Node); 789 matched unchanged, 7 methods renamed at the same address |
+| 275 | phase0 | - | com_min.h, ddraw_min.h, d3d9_min.h texture/surface slots (dshow_stream, surface_copy, screenshot, texture_bind); 789 matched unchanged |

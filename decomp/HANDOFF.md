@@ -25,55 +25,58 @@ Under AGENTS.md rules 1-2 most matches are still MATCH-PENDING until their other
 (Phase 0 of `BACKLOG.md`).
 
 ## State
-- **Vec4 merge done** (`include/vec4.h`, 110 files). **Matrix4 merge done** (`include/matrix4.h`, 77 files plus
-  `world.h`, commits 6bf56b5 and 2f8989e). No match lost; four symbols were renamed (same address, count
-  unchanged): `SetTranslation` now takes a `Vec4`, and `Draw@MeshSlot`, `StartProximityPass@Node` and
-  `TagRegion@Node` mangle `Matrix4` instead of `Matrix`. `obj_symbols.tsv` holds only the new names.
-- `Matrix4` has an anonymous union: `m[16]` plus D3DMATRIX-style `_11`..`_44`. The `Character` position union in
-  `world.h` became plain `Matrix4 matrix` (constructors cannot sit in unions), so the position is
-  `matrix._41/_42/_43`. `app_0010.cpp` and `pushing_platform.cpp` cast `&matrix._41` to `Vec3 *` for the camera
-  list `DAT_1032d5b8`. Remove the cast when Vec3 is shared.
-- **Exception:** `src/npc_greet.cpp` keeps its own Vec4 and CharMatrix (open.tsv 100b8220). Npc_Greet loses its match
-  with `vec4.h` (register allocation tips). Retry it later, with member order or Copy as `operator=`.
-- Still duplicated small types: `Vec3` (`char_script`, `damage_zone`, `head_look`, `pushing_platform`,
-  `sound_effects`, `vec_math`, `world.h`), and `ParamVector` in `char_params.h`. `node_dtor.cpp` `Element`
-  (float v[4], out-of-line destructor) may be Vec4 with an empty destructor (NOTES).
-- Other views still per file: `CharMatrixView` (char_status.cpp), the `CharRecord` views that hold a matrix
-  (char_script, char_shove, pushing_platform ...).
-- Raw offset casts left: `src/listbank.cpp` lines 760, 773, 796.
+- Shared so far: `vec4.h` (Vec4, Box2), `matrix4.h`, `vec3.h`, `node.h`, `com_min.h`, `ddraw_min.h`, `d3d9_min.h`
+  (device, texture, surface, LockedRect). Commits 8dd6794 (Vec3), 452759b (Node, 45 files), c44b074 (Node aliases,
+  world.h uses Node), 7c30db1 (COM/DirectDraw/D3D views). No match lost; renamed symbols at the same address:
+  `SetFlags`, `ClearFlags`, `RestartColourPlugs`, `AllocSaved`, `EnterTargetState`, `FreeSaved`, `ReplaceMaterial`
+  (were `M_<address>`), `M_101946b0` now takes `unsigned char`. `check_matches.py` exits 0 against HEAD.
+- `node.h` keeps scene_node.cpp's `M_<address>` names where no caller gave a better one; its comments say what each
+  does. The pointer types it only forward-declares (`PackHeader`, `KeyPair`, `Material`, `MeshData`, `Channel`,
+  `TextureRef`, `NodeExtra`, `NodeSkin`, `NodeSaved`, `GameFile`, `VisData`) are still declared per file.
+- Node views left per file: `SceneNode` (node_ctor.cpp constructor, model_state.cpp: its `M_1019b630` call passes an
+  int where `BlendFrames` takes a float, which changes the caller's code), `WorldNode` (world_ctor.cpp
+  constructor/destructor, world_frame.cpp), `FadeNode`/`FadeParent`/`FadeOwner` (node_fade.cpp; FadeParent's `glow`
+  at 0x204 lies inside `Node::matrix`). Giving Node a constructor or destructor changes every file that creates
+  one, so do these with care.
+- **CharRecord is not a Character view:** `DAT_10db6ee8` is the AnimModel embedded at `Character + 0x10`
+  (`DAT_10db6ed8`). Merging the ~21 CharRecord copies means declaring AnimModel (anim_model.cpp; `CharModel` in
+  world.h is its method list) once and putting it in `Character` as `model`.
+- `src/npc_greet.cpp` still keeps its own Vec4 and CharMatrix (open.tsv 100b8220). Raw offset casts left:
+  `src/listbank.cpp` lines 760, 773, 796.
 
 ## Next steps
-1. **Vec3 merge**: write `include/vec3.h` (POD, x/y/z; `Vec3_Length`/`Vec3_Dot`/`Vec3_LengthSquared` are cdecl free
-   functions in vec_math.cpp). Move world.h's Vec3 there, convert the 6 files, then drop the `(Vec3 *)` casts if
-   a typed path exists (a `Vec3`-typed view of the translation row is not allowed in a union with Matrix4's
-   constructor; keep the cast with its comment otherwise).
-2. Then `Node`, the D3D interface views, `CharRecord`, `NpcState`, `TextureObject`, `ModelBank`.
-3. Then return to `QUEUE.md`.
+1. `NodeSaved` and the Node pointer types (`PackHeader`, `KeyPair`, `Material`, `MeshData`, `NodeExtra`, `NodeSkin`)
+   into headers (scene_node.cpp, node_sort_packs.cpp, node_colours.cpp, draw_list.cpp, node_bones.cpp hold them).
+2. AnimModel into a header, then `Character::model`, then the CharRecord copies (offset + 0x10).
+3. The DirectInput views (`InputDevice`, `InputEffect`, `Input`: input_font.cpp, input_poll.cpp), then `NpcState`,
+   `TextureObject`, `ModelBank`, and the remaining Node views above.
+4. Then return to `QUEUE.md`.
 
 ## How the merges were run (reuse)
-- One Python driver (keep it outside the repo, e.g. in the session scratchpad) per type. For each file it: removes the
-  local struct block (plus the comment lines directly above it), writes `#include "<type>.h"` where the struct stood,
-  renames view names (`Matrix`, `CharMatrix`, ...) to the canonical one outside `//` comments, rebuilds with
-  `cmd /c .\build.bat <file>`, and compares the matched addresses with the committed `progress/jp/report.json`
-  (map mangled names to addresses through `obj_symbols.tsv`; `_FUN_xxxxxxxx` carries its own). On a loss or a
-  compile error it runs `git checkout -- <file>` and logs the reason. Three copies ran in parallel on disjoint file
-  lists; 67 of 69 files converted unattended, the other two needed a by-hand rename. This costs far fewer tokens than
-  Sonnet subagents; use subagents only for files that the script reverts.
-- Before converting, add `obj_symbols.tsv` rows for every C++ symbol whose mangled name contains the old view name
-  (old rows stay until the end, then go).
-- Edit with binary-safe Python (keep CRLF/LF). `sed -i` flips line endings.
+- One Python driver per type, kept outside the repo (the Node one is `node_merge_driver.py` in the session notes
+  folder; copy and adapt it). For each file it builds a baseline, removes the local struct block (plus the comment
+  lines directly above it), writes `#include "<type>.h"` where the struct stood, renames the view's fields and
+  methods to the header's names (matched by offset and by address), rebuilds with `cmd /c .uild.bat <file>`, adds
+  `obj_symbols.tsv` rows for renamed definitions, and compares matched addresses; on a loss or a compile error it
+  runs `git checkout -- <file>` and logs why. Three copies run in parallel on disjoint file lists. Node: 41 of 45
+  files converted unattended, the other four took a few minutes by hand.
+- Process each file as bytes and keep each line's own ending: some files mix CRLF and LF (char_move.cpp,
+  actor_scan.cpp), and normalising them rewrites the whole file. Check `git diff --stat` before committing.
+- Rename bare field names only in files that define the type's methods, and expect a field name to also be a
+  parameter name there (`frames` became `frameMatrices` in a parameter list once).
+- A view whose type a shared header references (world.h's `RootNode *`) must move in the same step as the header.
 - `check_matches.py` reports a renamed symbol as LOST + new. If the address and the count are unchanged, it is a
   rename; commit, then `check_matches.py` exits 0 against the new HEAD.
-- A header that a shared header (`world.h`) includes must be adopted by that header's includers in the same step,
-  or their local copies collide.
 
 ## Continuation prompt
-"Continue the Gurumin Phase 0 type merge with Vec3. Read `decomp/HANDOFF.md` (including its Standing instructions)
-and `AGENTS.md`. Survey the Vec3 declarations, write `include/vec3.h` (world.h includes it), convert the files with a
-per-file baseline/convert/rebuild/revert-on-loss driver as described under 'How the merges were run', and use Sonnet
-subagents only for files the driver reverts. Then continue with `Node`, the D3D interface views and `CharRecord` as
-far as the session allows. After each batch run `python tools/build_all.py --report ../progress/jp/report.json` and
-`python tools/check_matches.py` from `decomp/`; commit and push only with no real loss (renames at the same address
-are fine). Keep everything human-readable (named constants instead of magic numbers, liberal comments, informative
-names). Rewrite HANDOFF.md at the end with the Fully linked / Matched / Fuzzy numbers, keeping its Standing
-instructions section and a continuation prompt for the next task."
+"Continue the Gurumin Phase 0 type merge. Read `decomp/HANDOFF.md` (including its Standing instructions) and
+`AGENTS.md`. Move `NodeSaved` and the pointer types node.h forward-declares (`PackHeader`, `KeyPair`, `Material`,
+`MeshData`, `NodeExtra`, `NodeSkin`) into shared headers, then declare AnimModel once and make it `Character::model`
+so the CharRecord copies (AnimModel at Character + 0x10) can go; then the DirectInput views. Convert files with a
+per-file baseline/convert/rebuild/revert-on-loss driver as described under 'How the merges were run' (byte-level,
+keep each line's ending) and use Sonnet subagents only for files the driver reverts. After each batch run
+`python tools/build_all.py --report ../progress/jp/report.json` and `python tools/check_matches.py` from `decomp/`;
+commit and push only with no real loss (renames at the same address are fine). Keep everything human-readable
+(named constants instead of magic numbers, liberal comments, informative names). Rewrite HANDOFF.md at the end with
+the Fully linked / Matched / Fuzzy numbers, keeping its Standing instructions section and a continuation prompt for
+the next task."

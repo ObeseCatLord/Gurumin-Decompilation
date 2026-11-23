@@ -415,6 +415,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   the same instructions with the float slots permuted (Node::IntersectTriangle 0x1019dca0).
 - `DAT_11affdd8[name[3] * 10 + name[4]]` was `DAT_11afffe8[(name[3] - '0') * 10 + (name[4] - '0')]`: cl folds the
   '0' digits into the displacement (0x11afffe8 - 0x210), so a fake global appears 0x210 below the real table.
+- Rule merge trap: reading a global array through a struct that has any union or nested POD struct member (even
+  `union { int a; float b; } u;` far from the fields used) changed register allocation in Npc_Greet 0x100b8220
+  (an extra `push ebx` and a CSE of `index * 4`); the same offsets in a struct whose members are only scalars,
+  arrays, pointers and Matrix4 match. AnimModel has four anonymous unions, so npc_greet.cpp keeps its Character view.
 - Three FILETIMEs in ascending address order with an 8-byte gap after the last-write time are an array
   `FILETIME times[4]` used as times[0..2] (SystemSav_WriteRecord 0x1015fea0); separate variables are ordered differently.
 - Copying a byte buffer once per loop iteration into an `int c` local gives the original's movsx/xor/add sequence

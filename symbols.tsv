@@ -986,3 +986,4 @@ address	name	evidence
 1017b210	AnimModel::CloneModel	matched decompiled source (decomp/obj_symbols.tsv)
 1017b9b0	AnimModel::LoadFile	matched decompiled source (decomp/obj_symbols.tsv)
 101a8780	Node::SegmentHitsMesh	matched decompiled source (decomp/obj_symbols.tsv)
+1019dca0	Node::IntersectTriangle	matched decompiled source (decomp/obj_symbols.tsv)

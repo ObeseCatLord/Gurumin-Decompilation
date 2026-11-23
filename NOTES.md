@@ -377,6 +377,13 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - An `inline` helper with a call and three stores was not inlined at /Ob1 here; duplicated statements matched.
 - `cmp eax, ebx` (the zero register) after a call where cl 13.00 gives `test eax, eax`: the result went into a
   local first (`void *opened = file.Open(...); if (opened == 0)`) (MmvPlayer::Open 0x10160a90).
+- A zero register (`xor ebx, ebx` in the prologue, `push ebx` for every 0) can lose ebx to a CSE of an address
+  used at the top and again deep in the function (`&DAT_10db6ee8[index].matrix`); reaching the second use
+  through a local pointer (`AnimModel *model = &DAT_10db6ee8[index]; ... &model->matrix`) stops the CSE and
+  brings the zero register (and the original frame size) back. Stores issued before the Vec4 constructor calls
+  come from statements written before the Vec4 declarations (Enemy_ChaseAndSlash 0x1009d490).
+- cl 13.00 cross-jumps identical tails of sibling if-blocks and canonicalises the order of plain constant
+  stores while doing so: swapping two stores in the source does not change which blocks merge.
 - A palette built with `movzx reg16` and `and reg, 0xfff8` works on unsigned shorts:
   `(unsigned short)(unsigned char)r & ~7` (MmvPlayer::Open).
 - Reads from a buffer with a moving cursor whose position is also counted in an address-taken int (`p += n;

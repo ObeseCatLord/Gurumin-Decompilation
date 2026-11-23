@@ -64,6 +64,7 @@ struct CharState
                         int keepCompanionUp;      // companion_update.cpp (owner slot): 0 = a hidden companion
                                                   // sinks 50 units
                         int weaponMarkA;          // weapon_attach.cpp: -2 after an unknown weapon (no model)
+                        int stuckFrames;          // enemy_slash.cpp: frames counted without moving
                     };
                     union                         // 0x0c
                     {

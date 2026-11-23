@@ -996,3 +996,4 @@ address	name	evidence
 101ab3e0	Node::SegmentHitsBox	matched decompiled source (decomp/obj_symbols.tsv)
 101a82d0	Node::BuildMesh	matched decompiled source (decomp/obj_symbols.tsv)
 10167440	WorldRenderer::DrawPictures	matched decompiled source (decomp/obj_symbols.tsv)
+1009d490	Enemy_ChaseAndSlash	kind 0x4f (FUN_1009e2d0); "@Bip01 R Fin"/"@Bip01 R Fore" trail effect 0x4c, sound 0x152; enemy_slash.cpp

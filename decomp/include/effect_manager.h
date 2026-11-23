@@ -9,6 +9,7 @@
 
 #include "vec4.h"
 #include "matrix4.h"
+#include "key_track.h"
 
 // Number of effect lists (render groups) the manager keeps.
 #define EFFECT_GROUP_COUNT 6
@@ -88,11 +89,17 @@ struct EffectDef
 {
     int id;                                          // 0x00: script id, EFFECT_NONE = free
     int kind;                                        // 0x04: 1 and 0x12 are sprites; 6, 7, 0x11 and 0x16 have lights
-    char pad_0008[0x64];
+    int m_0008;                                      // 0x08
+    int m_000c;                                      // 0x0c
+    int m_0010;                                      // 0x10
+    int m_0014;                                      // 0x14
+    char m_0018[0x40];                               // 0x18
+    char m_0058[0x10];                               // 0x58
+    int m_0068;                                      // 0x68: first of 0x10 bytes read from the definition file
     int depthTest;                                   // 0x6c: non-zero = drawn with render state 9 on
     char pad_0070[0x8];
     int startFrame;                                  // 0x78: frame the effect starts at
-    char pad_007c[0x4];
+    int m_007c;                                      // 0x7c: first of 0x20 (old files) or 0x80 bytes of the file
     int lightFrames;                                 // 0x80: how long its light lasts (fades out over lightFrames + 10)
     char pad_0084[0x4];
     int fullAlphaB;                                  // 0x88: sprite table B: non-zero = starts at full alpha (else half)
@@ -102,18 +109,25 @@ struct EffectDef
     int fixedList;                                   // 0xf8: non-zero = always started in the definition's list
     int texture;                                     // 0xfc: texture slot, -1 = not looked up yet (-1 after Init)
     int blend;                                       // 0x100: sprite blend mode 0-6
-    char pad_0104[0x50];
+    char m_0104[0x10];                               // 0x104
+    char m_0114[0x40];                               // 0x114
     int m_0154;
     char pad_0158[0xc];
     int m_0164;                                      // 0x164: 50 for a new definition
-    char pad_0168[0x8c];
+    char pad_0168[0xc];
+    char m_0174[0x40];                               // 0x174
+    char m_01b4[0x40];                               // 0x1b4
     int spawnKind;                                   // 0x1f4: 2 and 4 are effects whose Start returns 1
-    char pad_01f8[0x7];
+    char trackFlags[7];                              // 0x1f8: one byte after each of tracks 3 to 9 in the file
     char name[0x20];                                 // 0x1ff: display name
     char textureName[0x40];                          // 0x21f: texture looked up into `texture`
     unsigned char list;                              // 0x25f: effect list (0 = the caller's choice)
     char flat;                                       // 0x260: sprite table A: drawn at depth 0
-    char pad_0261[0x177];
+    char m_0261;                                     // 0x261
+    char pad_0262[2];
+    char m_0264[8][0x10];                            // 0x264
+    KeyTrack tracks[12];                             // 0x2e4
+    int m_03d4;                                      // 0x3d4
 };
 
 // A running effect (0x1dc bytes; EFFECT_RECORD_COUNT of them at DAT_1115cfe8), linked into one of the
@@ -214,6 +228,9 @@ struct EffectManager
     int m_004c;
     int m_0050;                                      // 0x50: number of running effects
 
+    // 0x101886d0 (effect_definition_loader.cpp): loads the effect definitions from the file `path`. Returns 1, 0 when
+    // the file is missing or not an effect definition file.
+    int LoadDefinitions(const char *path);
     int Reset();                                     // 0x10184170: removes every running effect
     int Init();                                      // 0x101842a0: Reset plus the effect definitions
     void M_1016fab0();                               // 0x1016fab0 (called by Init)

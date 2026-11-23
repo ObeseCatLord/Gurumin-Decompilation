@@ -7,5 +7,7 @@ extern "C" int FUN_10018870(void);   // Camera_PullToItemStand: orbits the playe
 // changes the code of UpdateDrillLevel).
 Matrix4 ZeroMatrix();
 extern "C" int FUN_10019670(void);   // Camera_ShiftOrbit: a camera shift that turns about orbit centres (camera_shift_orbit.cpp)
+struct Vec4;
+extern "C" int FUN_10035050(Vec4 *player, Vec4 *target, int index);   // Camera_ChaseTarget: camera mode 0x11, follows the player and swings behind it (camera_chase.cpp)
 
 #endif

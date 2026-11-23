@@ -46,9 +46,9 @@ extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);     
 // its alert motion while its push lock is 0x41f). Returns 0.
 int UpdateDrillLevel(void)
 {
+    int level = DAT_10c64ad4;
     int gauge = DAT_10c64ad8;
     int limit = (DAT_10c64ad0 != 0 ? GAUGE_MAX_BANK_BONUS : 0) + GAUGE_MAX_BASE;
-    int level = DAT_10c64ad4;
     if (DAT_10c6566c != 0)
         limit = GAUGE_MAX_DRILL5;
     int clamped = 0;

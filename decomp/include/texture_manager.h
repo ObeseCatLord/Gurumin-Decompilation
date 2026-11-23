@@ -18,6 +18,10 @@ struct TextureManager
     int OnResetDevice();  // 0x1013fbb0 (Render_OnResetDevice)
     int Shutdown();       // 0x1015c730: unloads the textures and shuts the renderer down (render_shutdown.cpp)
     int PumpAndRecover(); // 0x1015c850: the message pump with device-lost recovery
+    int PumpMessages();   // 0x1013ec90 (engine_1013e.cpp): handles at most 30 pending messages
+    int PaceFrame();      // 0x1014ade0 (frame_pacer.cpp): waits for the 60 Hz deadline
+    int PresentFrame();   // 0x1015c960: ends the scene and flips the back buffer after the pre-present pass
+    int PresentSimple();  // 0x1015c9b0: ends the scene and flips the back buffer
     void M_10175e70();    // unloads all textures, then Shutdown (texture_mgr.cpp)
 };
 

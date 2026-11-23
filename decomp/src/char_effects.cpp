@@ -13,6 +13,7 @@
 #include "char_tables.h"
 #include "char_vars.h"
 #include "render_vars.h"
+#include "render_state.h"
 #include "map_vars.h"
 
 // Starts effect `effect` at `position` for character slot `index` and records its handle in that slot.
@@ -276,7 +277,6 @@ int EffectManager::Init()
     return 0;
 }
 
-extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
 // Effect records whose slot is free must not be in a list: crash on purpose (fread on a null file).
 #define CHECK_RECORD(i)     if (DAT_1115cfe8[i].id == -1)         fread(0, 1, 1, 0)
@@ -287,9 +287,9 @@ extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render s
 // pass 0 the effect lights. Returns 0.
 int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned char pass)
 {
-    FUN_1013f070(3, 1, 0xf);
-    FUN_1013f070(7, 1, 0);
-    FUN_1013f070(9, 0, 0);
+    FUN_1013f070(RENDER_ALPHA_TEST, 1, 0xf);
+    FUN_1013f070(RENDER_TEXTURE_FILTER, 1, 0);
+    FUN_1013f070(RENDER_DEPTH_WRITE, 0, 0);
     int ranges[10] = {0, 0x1cc, 0x244, 0x2a8, 0x2f8, 0x1cc, 0x244, 0x2a8, 0x2f8, 0x348};   // first, then end per pass
     DAT_1101c804.Reset();
     int i;
@@ -304,7 +304,7 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
                 if (DAT_1115cfe8[i].partPositions[DAT_1115cfe8[i].part].InRect(&DAT_10f668a8) != 0 &&
                     DAT_10f668c0 + 20.0f > DAT_1115cfe8[i].partPositions[DAT_1115cfe8[i].part].z)
                 {
-                    FUN_1013f070(10, 1, 0);
+                    FUN_1013f070(RENDER_CULL_MODE, CULL_NONE, 0);
                     DrawRecord(i, view, camera, 1);
                     DAT_1115cfe8[i].options.drawn = 1;
                 }
@@ -322,7 +322,7 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
                 fread(0, 1, 1, 0);
             else
             {
-                FUN_1013f070(10, 1, 0);
+                FUN_1013f070(RENDER_CULL_MODE, CULL_NONE, 0);
                 DrawRecord(i, view, camera, pass);
                 CHECK_RECORD(i);
             }
@@ -337,7 +337,7 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
                 {
                     if (DAT_1115cfe8[i].options.drawn == 0)
                     {
-                        FUN_1013f070(10, 1, 0);
+                        FUN_1013f070(RENDER_CULL_MODE, CULL_NONE, 0);
                         DrawRecord(i, view, camera, 0);
                         DAT_1115cfe8[i].options.drawn = 1;
                     }
@@ -346,9 +346,9 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
             }
         }
     }
-    FUN_1013f070(3, 1, 0xf);
-    FUN_1013f070(7, 1, 0);
-    FUN_1013f070(10, 1, 0);
+    FUN_1013f070(RENDER_ALPHA_TEST, 1, 0xf);
+    FUN_1013f070(RENDER_TEXTURE_FILTER, 1, 0);
+    FUN_1013f070(RENDER_CULL_MODE, CULL_NONE, 0);
     int first = ranges[pass];
     int end = ranges[pass + 5];
     int sprite;
@@ -357,7 +357,7 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
         if (DAT_11134cc8[sprite].type != -1)
             DrawSpriteA(sprite, view, camera);
     }
-    FUN_1013f070(10, 1, 0);
+    FUN_1013f070(RENDER_CULL_MODE, CULL_NONE, 0);
     for (sprite = first; sprite < end; sprite++)
     {
         if (DAT_118a8888[sprite].type != -1)
@@ -372,9 +372,9 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
         }
     }
     DAT_1101c804.Flush();
-    FUN_1013f070(0, 0, 0);
-    FUN_1013f070(9, 1, 0);
-    FUN_1013f070(0xc, 1, 0);
-    FUN_1013f070(10, 0, 0);
+    FUN_1013f070(RENDER_BLEND_MODE, BLEND_ALPHA, 0);
+    FUN_1013f070(RENDER_DEPTH_WRITE, 1, 0);
+    FUN_1013f070(RENDER_DEPTH_TEST, 1, 0);
+    FUN_1013f070(RENDER_CULL_MODE, CULL_DEFAULT, 0);
     return 0;
 }

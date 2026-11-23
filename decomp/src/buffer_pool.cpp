@@ -7,6 +7,7 @@
 #include "bounds.h"
 
 #include "render_vars.h"
+#include "render_state.h"
 
 // Resets four bounding boxes to the 'empty' value (-30000 in each axis, w = 1) and their counts to 0.
 extern "C" int FUN_10147620(void *, Bounds *bounds, int *counts)
@@ -163,7 +164,6 @@ extern "C" int FUN_10147880(IUnknownLike **vertexBuffer, int vertexBytes, IUnkno
     return slot;
 }
 
-extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
 // 0x10148590. Returns the video-memory copy of pooled buffer `index`, creating it from `source` (width x height,
 // 16-bit: R5G6B5 for mode 1, else A4R4G4B4) when it has none. While the pool would exceed its budget, or after a
@@ -198,7 +198,7 @@ extern "C" IUnknownLike *FUN_10148590(int index, IDirect3DTexture9Like *source, 
             }
             if (oldest >= 0)
             {
-                FUN_1013f070(6, 0, 0);
+                FUN_1013f070(RENDER_FLUSH_SCENE, 0, 0);
                 if (DAT_10f1bff0[oldest] != 0)
                 {
                     DAT_10f1bff0[oldest]->Release();

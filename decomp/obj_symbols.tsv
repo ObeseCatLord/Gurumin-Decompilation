@@ -546,3 +546,5 @@ _Enemy_IsBusy	100e1c40
 ?Char_SpiritUpdate@@YAHH@Z	1002a740
 ?Sample@KeyTrack@@QAEHMPAM000H@Z	101b0240
 ?AppendQuad@TriangleBatch@@QAEHMMMMMMMMMMMMMMMMM@Z	10172cb0
+?LoadDefinitions@EffectManager@@QAEHPBD@Z	101886d0
+?FUN_100b9150@@YAHH@Z	100b9150

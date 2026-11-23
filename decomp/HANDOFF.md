@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 14.98% of code, 832 of 1212 functions |
-| Matched under the rules | 14.94% of code, 831 of the 832 matched functions |
-| Fuzzy match | 21.00% |
+| Matched | 15.43% of code, 836 of 1212 functions |
+| Matched under the rules | 15.39% of code, 835 of the 836 matched functions |
+| Fuzzy match | 21.58% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -90,6 +90,11 @@ function) and node_world.cpp (0) still break rule 2.
   camera_modes.h; keep new declarations out of the headers drill_level.cpp includes (vec4, matrix4, node,
   effect_manager, anim_model, char_vars, game_vars). Bgm_Play takes two parameters (obj_symbols row renamed).
   Drafts: MapMinigame_DrawHud 0x100301a0, Bgm_Update 0x1005c680, TriangleBatch::AppendQuad 0x10172cb0.
+- Batch 329: Camera_ChaseTarget 0x10035050, Enemy_FetchDroppedWeapon 0x100a8ac0, EffectManager::LoadDefinitions
+  0x101886d0 (EffectDef typed with its 12 key tracks) and Render_Command 0x1013f070 (render_state.h: command names)
+  matched. UpdateDrillLevel fixed for good: declaring level before gauge makes its two reloads come out in the
+  original order whatever the headers declare (the old order matched only by a tie-break that header edits moved).
+  Drafts: Game_FrameStep 0x10137b10 (was Screenshot_Capture), Npc_GestureWithNeighbour 0x100b9150 (C++ linkage).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

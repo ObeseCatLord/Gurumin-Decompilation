@@ -96,6 +96,7 @@ struct CharState
                         int fleeSide;             // enemy_flee.cpp: 1 = veers left, 2 = veers right (picked at random)
                         int spiritReady;          // char_spirit.cpp: 1 once the spirit was set up
                         int promptFrames;         // npc_lookout.cpp: frames the key prompt stays (counted down)
+                        int neighbour;            // npc_gesture.cpp: slot of the character it reacts to (own slot - talk / 100)
                     };
                     union                         // 0x10
                     {
@@ -124,6 +125,7 @@ struct CharState
                                                   // tenths)
                         int chaseFrames;          // char_spirit.cpp: frames spent chasing (swarm every 4th)
                         int reactDelay;           // npc_lookout.cpp: frames until the event is raised (0 = idle)
+                        int cheerPending;         // npc_gesture.cpp: 1 = a cheer starts this frame
                     };
                     union                         // 0x18
                     {
@@ -135,6 +137,7 @@ struct CharState
                                                   // the next shot
                         int spiritTimer;          // char_spirit.cpp: frames left of the spirit's visit (counts down)
                         int watchedCode;          // npc_lookout.cpp: item stock digits seen (-1 = none yet)
+                        int cheerReady;           // npc_gesture.cpp: 0 = the cheer is queued instead of played at once
                     };
                     union                         // 0x1c
                     {
@@ -145,6 +148,7 @@ struct CharState
                                                   // or not the character is near it (cleared by the step)
                         int spiritHaunting;       // char_spirit.cpp: 1 while the visit counts down (150+ frames left)
                         int bestValue;            // npc_lookout.cpp: the largest value seen
+                        int cheerMotion;          // npc_gesture.cpp: motion of the cheer (0x5a + random 0..3)
                     };
                     union                         // 0x20
                     {
@@ -153,6 +157,7 @@ struct CharState
                                                   // towards the next hop
                         int bestAmount;           // npc_lookout.cpp: the amount that came with it
                         int routeMode;            // spirit_route.cpp: 1..3 = put the spirit on a fixed route point
+                        int gesturing;            // npc_gesture.cpp: 1 while the gesture shows (neighbours react to it)
                     };
                     union                         // 0x24
                     {

@@ -2,6 +2,11 @@
 
 #include "com_min.h"
 
+struct D3DRECT_
+{
+    long x1, y1, x2, y2;
+};
+
 struct D3DVIEWPORT9_
 {
     unsigned long X;
@@ -65,7 +70,8 @@ struct IDirect3DDevice9
     virtual long __stdcall GetDepthStencilSurface() = 0;
     virtual long __stdcall BeginScene() = 0;
     virtual long __stdcall EndScene() = 0;
-    virtual long __stdcall Clear() = 0;
+    virtual long __stdcall Clear(unsigned long count, const struct D3DRECT_ *rects, unsigned long flags,
+                                 unsigned long colour, float depth, unsigned long stencil) = 0;
     virtual long __stdcall SetTransform() = 0;
     virtual long __stdcall GetTransform() = 0;
     virtual long __stdcall MultiplyTransform() = 0;

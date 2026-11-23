@@ -5,18 +5,18 @@
 #include "tri_batch.h"
 
 #include "texture_object.h"
+#include "render_state.h"
 
-extern "C" void FUN_1013f070(int, int, int);
 #include "game_vars.h"
 #include "ui_vars.h"
 
 // Draws the full-screen overlay quad (texture slot DAT_104c0140) with additive blending.
 extern "C" int FUN_1000c340(void)
 {
-    FUN_1013f070(9, 0, 0);
-    FUN_1013f070(0, 1, 0);
+    FUN_1013f070(RENDER_DEPTH_WRITE, 0, 0);
+    FUN_1013f070(RENDER_BLEND_MODE, BLEND_ADD, 0);
     DAT_1021cffc.DrawWith(&DAT_118d0ba8[DAT_104c0140]);
-    FUN_1013f070(0, 0, 0);
+    FUN_1013f070(RENDER_BLEND_MODE, BLEND_ALPHA, 0);
     return 1;
 }
 

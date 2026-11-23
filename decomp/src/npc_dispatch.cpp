@@ -62,7 +62,7 @@ extern "C" int FUN_100b7b10(int index);
 extern "C" int FUN_10045ed0(int index);                    // Npc_ApproachPlayer
 int FUN_100b5f80(int index);                               // Npc_AlertWhenSeen
 extern "C" int FUN_100b84a0(int index);
-extern "C" int FUN_100b9150(int index);
+int FUN_100b9150(int index);   // C++ linkage: the original has an EH frame
 extern "C" int FUN_100b9930(int index);                    // Enemy_DragToPit
 
 // 0x100dfcf0 (Char_RunBehaviour). Every 30 frames (staggered by index), for characters that are not active

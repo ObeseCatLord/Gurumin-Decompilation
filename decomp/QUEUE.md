@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (216)
+## 1. Walls to retry (218)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -117,6 +117,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100b4930` 1473 — Npc_RideAlarm (char_move.cpp): same flow and calls; the original keeps index in ebx and the marker loop counter in ebp (cl 13.00 here swaps them); with sqrtf for the marker distance the rest matches
 - [ ] `100b5550` 840 — Npc_GreetWhenNear (char_move.cpp): same flow and calls; the original keeps index in edi and the record offset in ebx (cl 13.00 here swaps them), which also moves one fadd in the facing step; condition and facing spellings tried
 - [ ] `100b7b10` 1798 — Npc_Lookout (npc_lookout.cpp, 1824 vs 1798 bytes): the original keeps index in ebx and the matrix pointer in ebp (reused as the lamp loop counter), uses edi as zero only in some places (push 0 / mov [..],0 in the mode 1 and 5 prompts) and shares one countdown tail for modes 3 and 5; != / == index, a countdown helper and counter scope tried
+- [ ] `100b9150` 2009 — Npc_GestureWithNeighbour (npc_gesture.cpp, behaviour 0x2e, C++ linkage for the EH frame): only the state-100 arm differs: if (sawPlayer == 0) state = 1; else state = 0x65; compiles branchless (neg/sbb/and 0x64/inc), the original branches (je / mov 0x65 / jmp / mov state,esi with 1 kept in esi); 7 if/else spellings tried
 - [ ] `100b9930` 637 — Enemy_DragToPit: identical except the heading store: the original rounds atan2 into the dead parameter slot and copies it with fld/fstp before the RotateZ setup, cl 13.00 here copies it through edx after; direct cast, Atan2 wrapper and local forms tried
 - [ ] `100b9bb0` 867 — Enemy_PlayVoice: same switch (jump table plus the 0x1e4.. range); the original keeps 15 and 0x2d in ebx/ebp, recomputes index*16+slot for every access and tests the cooldown kinds in turn, cl 13.00 here threads the kind tests after the reset stores; 2-D, flat and re-read kind forms tried
 - [ ] `100ba040` 604 — Npc_PlayGreeting: same statements; the original copies the AbsFloat result into the height local with fld/fstp (cl 13.00 here stores it directly) and places the new-greeting block after the walked-away block (goto and flag forms tried)
@@ -131,6 +132,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 - [ ] `100ed9b0` 1258 — ListBank::CompileStatement (listbank.cpp, 1264 vs 1258 bytes): all but the int/float/string tail matches; the original puts the string-test jne to the call block, then the shared error block, the float declare and the call block last, without cross-jumping the int/float DeclareFromText tails; every spelling gives call-first (1264) or merged declares (1248)
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
+- [ ] `10137b10` 1889 — Game_FrameStep (frame_step.cpp, 1904 vs 1889 bytes; was named Screenshot_Capture): one register residue spreads through the function: the original keeps the constant 1 in ebx throughout and writes 100 as an immediate or through esi, ours puts 100 in ebx and 1 in edi; limit local vs direct stats compare, store order, reversed compare and a mode local tried
 - [ ] `1013e260` 428 — UserFolder_FindNt: identical apart from block placement (the original puts the strcpy(base) branch out of line after the fsetup.dll loop and jumps back; ours keeps it before the loop); if/else orders and the combined test tried
 - [ ] `1013e4f0` 431 — GameWindow::WindowProc (the base RenderWindow::WindowProc 0x1013e450 is DefWindowProc): an inline base WindowProc called from each case duplicates the tails like the original but cl 13.00 then propagates message constants and does not cache window/wParam in ebx/edi; has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `1013e790` 561 — Names_Expand (/Od unit src_od/names_od.cpp): code identical, only the stack slot of `p` differs (the original puts it below found/matches/best); function-scope declaration orders tried
@@ -237,20 +239,14 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (51)
+## 4. Large functions (801-3000 bytes) (45)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
-- [ ] `10035050` 1858 bytes (float, loops 2, calls 62)
-- [ ] `10137b10` 1889 bytes Screenshot_Capture (loops 6, calls 49)
-- [ ] `100a8ac0` 1912 bytes (float, calls 58)
-- [ ] `1013f070` 1928 bytes (float, loops 3, calls 89)
 - [ ] `100b7360` 1953 bytes (float, loops 3, calls 46)
 - [ ] `100b1800` 1977 bytes (float, loops 8, calls 31)
 - [ ] `1014ddf0` 2003 bytes (float, calls 63)
 - [ ] `1007b870` 2009 bytes (float, calls 27)
-- [ ] `100b9150` 2009 bytes (float, calls 52)
-- [ ] `101886d0` 2012 bytes (loops 5, calls 81)
 - [ ] `10089210` 2033 bytes (float, loops 14, calls 40)
 - [ ] `10147a20` 2131 bytes (loops 7, calls 23)
 - [ ] `1004fbe0` 2142 bytes (float, loops 6, calls 54)
@@ -407,12 +403,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (4 files)
+## 7. Comment pass (5 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
 - [ ] `src/bgm_update.cpp`: 2 of 3 functions without a comment
+- [ ] `src/camera_chase.cpp`: 1 of 2 functions without a comment
 - [ ] `src/camera_shift_orbit.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/route_carrier.cpp`: 0 of 2 functions without a comment, no header
 - [ ] `src/route_follow.cpp`: 0 of 0 functions without a comment, no header

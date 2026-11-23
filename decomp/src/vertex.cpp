@@ -20,7 +20,7 @@ void Vertex::SetPosition(float x, float y, float z)
     colour[3] = 1.0f;
     uv[0] = 0;
     uv[1] = 0;
-    m_0038 = 0;
+    sourceMaterial = 0;
     material = 0;
     emissive[0] = 0;
     emissive[1] = 0;
@@ -53,7 +53,7 @@ void Vertex::Set(float x, float y, float z, float nx, float ny, float nz, float 
     colour[3] = a;
     uv[0] = u;
     uv[1] = t;
-    m_0038 = 0;
+    sourceMaterial = 0;
     material = 0;
     emissive[0] = 0;
     emissive[1] = 0;

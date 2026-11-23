@@ -530,3 +530,15 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - A 4-element float row zeroed with a `for` loop (`DAT_10255160[index][k] = 0`) is unrolled into stores of a zero
   register shared with the next loop's counter; four separate `= 0` statements use the callee-saved zero instead
   (Enemy_SeekShaga 0x100d2110).
+- `static const float` constants are read from memory (`push dword ptr [x]`, `fcomp [0]` relocations to our own
+  data); the original's immediates and its .rdata float constants come from `#define` literals (shadow_texture.cpp).
+- cl 13.00 unrolls a counted loop over a local table 8 times by itself (`for (m = 0; m < 0x2000; m++) if (count[m])
+  {...}` in Node::BuildMesh 0x101a82d0 gives eight bodies and `add eax, 0x20`), and turns zeroing loops over local
+  int tables into `rep stosd`; a 0x28000-byte frame of int tables gets the aligned `and esp, -8` prologue.
+- Copying a Vec4 from a pointer next to setting another Vec4's fields: the stores interleave as in the original
+  when the other vector is written first (`up.x = 0; up.y = 1; up.z = 0;` then `caster.x = p->x; ...`; Node::
+  RenderShadowTexture / DrawShadow).
+- Assigning the address of an operator temporary to the pointer
+  parameter (`colour = &(*colour * tint);`) compiles (C4238) and gives QueueDraw's frame and parameter reuse (QueueDraw itself is still open).
+- Matrix product temporaries of `projection = projection * (if/else ScaleMatrix(...))` share one slot when written
+  as an if/else with the product in each arm (two EH states, one tail); a ternary is not needed.

@@ -15,7 +15,7 @@ struct Vertex
     float normal[4];     // 0x10: x, y, z, 1
     float colour[4];     // 0x20: r, g, b, a (Node::ApplyMaterialColours copies the material's)
     float uv[2];         // 0x30: first texture coordinates
-    float m_0038;        // 0x38
+    float sourceMaterial;  // 0x38: material number as loaded; BuildMesh rounds it into `material`
     float material;      // 0x3c: material number of the vertex (stored as a float)
     float emissive[4];   // 0x40: second colour, reset to (0, 0, 0, 1) by ApplyMaterialColours
     float m_0050[4];     // 0x50

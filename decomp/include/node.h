@@ -298,6 +298,11 @@ struct Node
     // 0x101ab3e0: 1 when the segment from `from` to `to` crosses the box of a node in this tree that has a
     // box-collision flag (node_box_hit.cpp).
     int SegmentHitsBox(Vec4 *from, Vec4 *to);
+    // 0x101a82d0: builds the mesh from a triangle list, one vertex pack per material (node_mesh_build.cpp).
+    int BuildMesh(struct Vertex *vertices, int *indices, int count);
+    int M_1019c8d0();                                     // 0x1019c8d0: run by BuildMesh when DAT_11b04500 is set
+    VertexPack *AllocPackHeaders(int count);              // 0x1019c320 (scene_node.cpp)
+    IndexList *AllocIndexLists(int count);                // 0x1019c360 (scene_node.cpp)
     // 0x101a9670: casts the segment against the nodes called `name` (0 = all) whose kind and mask match; writes
     // the nearest hit point and, when `t` is given, its position along the segment. Returns 1 on a hit.
     int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,

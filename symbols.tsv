@@ -991,3 +991,4 @@ address	name	evidence
 101a29e0	Node::DrawShadow	matched decompiled source (decomp/obj_symbols.tsv)
 10199e20	Node::QueueDraw	matched decompiled source (decomp/obj_symbols.tsv)
 101ab3e0	Node::SegmentHitsBox	matched decompiled source (decomp/obj_symbols.tsv)
+101a82d0	Node::BuildMesh	matched decompiled source (decomp/obj_symbols.tsv)

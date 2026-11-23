@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (165)
+## 1. Walls to retry (166)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -165,6 +165,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019d8e0` 954 — Node::ComputeBounds: control flow and stores in place; the -999999 constant and the y min/max slots use other registers/slots (ecx and swapped 0x18/0x1c in the original), declaration orders tried
 - [ ] `1019e120` 1246 — Node::BuildCollisionSpheres: 14 bytes; identical except that the original encodes the indexed loads with the offset register as base ([ecx + ebx + 4] for vertices, [edi + edx + 4] for the pack lists), ours with the pointer register first (typed vertex struct tried)
 - [ ] `1019eeb0` 844 — Node::SetupSkinning (M_1019eeb0): identical except the bone != 0 test in the parent-name condition, which cl 13.00 here drops (the original keeps test eax, eax; je); local and re-read forms tried
+- [ ] `101a82d0` 1153 — Node::BuildMesh (node_mesh_build.cpp, rule-clean): everything matches (aligned frame, the unrolled table loop, the strength-reduced triangle loop) except the operand order of the VertexPack addresses: the original writes [index*0x74 + packs], ours [packs + index*0x74] (5 places), and the first vertex of each triangle is addressed through eax/ecx then lea esi (ours esi/edx). Tried: (list + packs)->, unsigned tables, a fresh material local, indices through a row pointer (loses the strength reduction).
 - [ ] `101a8e60` 2060 — Node::Collide (node_mesh_hits.cpp, rule-clean): body after the region prologue is SegmentHitsMesh's matched code. Original: both kind arms load the cell into bl (the register caching DAT_11b04514) and share the tail test bl,bl/mov ecx,6/je; both CDL arms cmp memory; the switched-off jump shares the tag-fail restore (mov ebp then mov edi). Ours: one arm of each pair cmp memory, the other loads, so tails do not merge. Tried (2026-11-23): local cell var (gets dl, list moves to edi), local initialised from DAT_11b04514, join-test after both arms (the compiler tail-duplicates it), inline CellState helper, bool cast, ternary on the list. The 'CDL region table' DAT_11affdd8 was DAT_11afffe8 - 0x210 (folded '0' digits): fixed.
 - [ ] `101acc60` 301 — DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
@@ -187,7 +188,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (129)
+## 4. Large functions (801-3000 bytes) (128)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
@@ -208,7 +209,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e1c40` 1082 bytes Enemy_IsBusy (float, loops 1, calls 26)
 - [ ] `1000eed0` 1101 bytes (float, calls 25)
 - [ ] `1016be80` 1139 bytes (float, loops 2, calls 14)
-- [ ] `101a82d0` 1153 bytes (float, loops 5, calls 19)
 - [ ] `100ed510` 1160 bytes (float, loops 10, calls 15)
 - [ ] `101af960` 1176 bytes (float, loops 1, calls 7)
 - [ ] `10011520` 1188 bytes (float, loops 4, calls 8)

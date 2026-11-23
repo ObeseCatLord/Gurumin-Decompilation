@@ -494,3 +494,6 @@ _FUN_101426d0@8	101426d0
 ?DrawShadow@Node@@QAEHPBUMatrix4@@0HPBUVec4@@1HMHMPAUAnimModel@@M@Z	101a29e0
 ?QueueDraw@Node@@QAEHPBUMatrix4@@0PBXIPBUVec4@@2@Z	10199e20
 ?SegmentHitsBox@Node@@QAEHPAUVec4@@0@Z	101ab3e0
+?BuildMesh@Node@@QAEHPAUVertex@@PAHH@Z	101a82d0
+?AllocPackHeaders@Node@@QAEPAUVertexPack@@H@Z	1019c320
+?AllocIndexLists@Node@@QAEPAUIndexList@@H@Z	1019c360

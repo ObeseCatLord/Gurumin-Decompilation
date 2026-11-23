@@ -501,8 +501,8 @@ int Node::ProjectPlanarUVs(int material)
     return 1;
 }
 
-// Allocates and initialises `count` pack headers.
-extern "C" VertexPack *__stdcall FUN_1019c320(int count)
+// 0x1019c320 (Node::AllocPackHeaders). Allocates and initialises `count` pack headers (BuildMesh).
+VertexPack *Node::AllocPackHeaders(int count)
 {
     VertexPack *packs = (VertexPack *)DAT_11b0b938(count * sizeof(VertexPack), "");
     for (int i = 0; i < count; i++)
@@ -513,8 +513,8 @@ extern "C" VertexPack *__stdcall FUN_1019c320(int count)
     return packs;
 }
 
-// Allocates and initialises `count` index lists.
-extern "C" IndexList *__stdcall FUN_1019c360(int count)
+// 0x1019c360 (Node::AllocIndexLists). Allocates and initialises `count` index lists (BuildMesh).
+IndexList *Node::AllocIndexLists(int count)
 {
     IndexList *lists = (IndexList *)DAT_11b0b938(count * sizeof(IndexList), "");
     for (int i = 0; i < count; i++)

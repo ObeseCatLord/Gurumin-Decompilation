@@ -9,8 +9,6 @@
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" Marker DAT_10867e18[0x80];
-
 // Retires character `index` once: moves it out of the world (matrix._41 = -100000 - matrix._41), records its two-digit
 // formation number (m_0004[1]: tens = row, ones = column) in the 10x10 grid DAT_1049efb0, marks the state as
 // retired (m_0000 = 1) and hides its marker (y = -200000). Not byte-identical yet (see open.tsv).

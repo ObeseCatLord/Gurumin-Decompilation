@@ -25,4 +25,6 @@ struct Tracker
     int M_100014a0();
 };
 
+extern "C" Tracker DAT_1020d9e0;                          // the game's mouse and key tracker
+
 #endif

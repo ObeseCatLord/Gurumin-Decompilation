@@ -5,8 +5,7 @@
 #include "map_vars.h"
 
 #include "formation.h"
-
-extern "C" int DAT_102199b8[0x5c];  // per-character group timers
+#include "char_tables.h"
 
 #include "matrix4.h"
 

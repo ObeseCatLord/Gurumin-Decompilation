@@ -39,9 +39,6 @@ extern "C" int DAT_104c03ac;
 extern "C" int DAT_10255160[0x200];
 extern "C" int DAT_1021bdf8[0x80][9];
 extern "C" char DAT_1020da50[8][0x50];
-extern "C" Vec4 DAT_10867e18[0x80];
-extern "C" int DAT_10255f10[0x5c];
-extern "C" int DAT_102199b8[0x5c];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int FUN_10174c70(int slot, int force);    // Texture_Release
 

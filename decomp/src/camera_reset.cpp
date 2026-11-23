@@ -5,8 +5,6 @@
 
 #include "camera_vars.h"
 #include "char_vars.h"
-
-extern "C" int DAT_1101c800;  // camera heading target
 extern "C" char DAT_1101d8b8;
 extern "C" int DAT_1101dde0;
 

@@ -6,7 +6,6 @@
 
 #include "render_vars.h"
 #include "win_vars.h"
-extern "C" unsigned int DAT_10f65508;  // 60 Hz steps so far; every second one is an engine tick
 // Frame blend (after-image) strength (engine_1013e.cpp).
 extern "C" void *DAT_10f6550c;    // texture bound to stage 0 (texture_bind.cpp)
 extern "C" void FUN_1013f9a0(void);   // ColourFades_Step

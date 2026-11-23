@@ -16,7 +16,6 @@
 #include "char_state.h"
 
 extern "C" DamageZone DAT_10210fc0[];
-extern "C" SavedPosition DAT_10867e18[0x80];
 #include "char_tables.h"
 #include "world.h"
 extern "C" int FUN_100119d0(int index, int damage, int a);   // shows the damage on character `index`

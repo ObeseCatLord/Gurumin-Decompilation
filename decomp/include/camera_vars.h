@@ -66,6 +66,7 @@ extern "C" int DAT_11018730;                              // effect mode
 extern "C" int DAT_11018734;
 extern "C" int DAT_11018738;
 extern "C" int DAT_11018740[];                            // 1 = active
+extern "C" float DAT_1101c800;                            // frame of the path
 extern "C" int DAT_1101d888;
 extern "C" int DAT_1101d88c;                              // frames left of a camera cut blend (0 = none)
 extern "C" int DAT_1101d890;                              // 1 while a path camera runs

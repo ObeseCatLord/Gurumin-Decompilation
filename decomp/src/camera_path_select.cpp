@@ -14,8 +14,6 @@
 #include "camera_path_select.h"
 
 #include "camera_vars.h"
-
-extern "C" float DAT_1101c800;                       // frame of the path
 extern "C" CameraTarget *DAT_1101d884;               // the model the camera follows
 
 extern "C" int FUN_1015c9e0(int mode);               // Screen_StartTransition

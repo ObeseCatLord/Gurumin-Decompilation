@@ -17,7 +17,6 @@ extern "C" int FUN_101734d0(void);            // Texture_OnLostDevice: releases 
 extern "C" int FUN_10173510(void);            // Texture_OnResetDevice: recreates them
 extern "C" int FUN_1013ed20(void);            // Render_BeginScene
 #include "win_vars.h"
-extern "C" IUnknownLike *DAT_10f141dc;
 extern "C" int FUN_101483a0(void);            // BufferPool_ReleaseAll (texcache.cpp)
 extern "C" int FUN_10148280(void);            // releases the four buffer pools
 extern "C" void FUN_101b22b0(void);

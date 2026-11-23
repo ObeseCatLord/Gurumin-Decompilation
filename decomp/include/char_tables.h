@@ -33,6 +33,7 @@ extern "C" MoveLimit DAT_102110b0[CHAR_SLOT_COUNT];
 extern "C" int DAT_10218fc0[CHAR_SLOT_COUNT];
 extern "C" short DAT_102191c0[CHAR_SLOT_COUNT];
 extern "C" int DAT_10219770[CHAR_SLOT_COUNT];             // effect handle of each character slot
+extern "C" int DAT_102199b8[0x5c];                        // per-character group timer (char_reset.cpp)
 extern "C" char DAT_10219e40[CHAR_SLOT_COUNT];
 extern "C" short DAT_10219ec0[CHAR_SLOT_COUNT];           // gimmick id controlled by the switch
 extern "C" short DAT_1021b3c8[CHAR_SLOT_COUNT];
@@ -58,6 +59,7 @@ extern "C" short DAT_10254838[CHAR_SLOT_COUNT];           // per-object switch s
 extern "C" int DAT_102548c0[CHAR_SLOT_COUNT];             // per-character packed value, four two-digit fields AABBCCDD; script code of each character (pairs of decimal digits)
 extern "C" unsigned char DAT_102550e0[CHAR_SLOT_COUNT];   // non-zero = wake at once (the character's level elsewhere); 1 = the character was hit (attack at once); level of each character
 extern "C" char DAT_10255a88[CHAR_SLOT_COUNT];
+extern "C" int DAT_10255f10[0x5c];
 extern "C" int DAT_10256218[CHAR_SLOT_COUNT];
 extern "C" char DAT_10256420[CHAR_SLOT_COUNT];
 extern "C" int DAT_103084a8[CHAR_SLOT_COUNT];             // number of words in each group
@@ -89,6 +91,7 @@ extern "C" StepRecord DAT_10802c08[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10836fc8[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10837fc8[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10864cf8[CHAR_SLOT_COUNT];            // ground point found below each slot
+extern "C" Vec4 DAT_10867e18[0x80];                       // where a character in play was placed
 extern "C" Matrix4 DAT_10868838[CHAR_SLOT_COUNT][6];      // character 0: [0] = the matrix the sparkle follows; saved node matrices of each character
 extern "C" FaceSet DAT_1087664c[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10f08080[CHAR_SLOT_COUNT];            // each character's offset from the reference position

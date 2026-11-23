@@ -298,8 +298,6 @@ int TextureObject::DrawStrip(ScreenVertex *vertices, int count)
 
 #include "texture_bind.h"
 
-extern "C" IDirect3DSurface9Like *DAT_10f141dc;  // the back buffer surface
-
 // 0x10145210. Like CaptureRgbRows for only the first 32 pixels. When the render target cannot be read back, the
 // 256x256 corner of the back buffer is stretch-copied into a scratch surface instead. Returns 1, or 0 on failure.
 int TextureObject::CaptureRgbFirst(unsigned char *out)

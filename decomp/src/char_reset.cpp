@@ -19,8 +19,6 @@
 extern "C" StartVectors DAT_10802bf8[0x80];
 extern "C" PoseEntry DAT_1021bdf8[0x80];
 #include "char_tables.h"
-
-extern "C" int DAT_102199b8[0x80];    // per-character group timer
 extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a);   // ColourFade_Start
 extern "C" int FUN_100404e0(int index, int a, int b, int c, int d, int e, int f);
 extern "C" int FUN_1001b0a0(int index, int a, int b);

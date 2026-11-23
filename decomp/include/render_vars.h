@@ -70,6 +70,7 @@ extern "C" char DAT_10f0ff84[];                           // the D3DPRESENT_PARA
 extern "C" int DAT_10f140c0;
 extern "C" int DAT_10f141d4;                              // number of texture switches this frame (statistics)
 extern "C" IUnknownLike *DAT_10f141d8;                    // the IDirect3D9 object
+extern "C" IUnknownLike *DAT_10f141dc;                    // the back buffer surface
 extern "C" unsigned long DAT_10f141e0[8][0x100];
 extern "C" int DAT_10f181e0[0x5a0];
 extern "C" IUnknownLike *DAT_10f1a864;
@@ -120,6 +121,7 @@ extern "C" int DAT_10f654f0;                              // 1 = wait with Sleep
 extern "C" int DAT_10f654f4;                              // frame blending allowed by the settings
 extern "C" char DAT_10f65500;
 extern "C" int DAT_10f65504;                              // engine ticks so far
+extern "C" unsigned int DAT_10f65508;                     // 60 Hz steps so far; every second one is an engine tick
 extern "C" int DAT_10f65514;
 extern "C" int DAT_10f65520;                              // 1 while the overhead pass draws
 extern "C" int DAT_10f6552c;                              // set when Windows asked the game to quit (WM_QUIT); 1 once WM_QUIT was received

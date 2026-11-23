@@ -6,8 +6,7 @@
 #include "anim_model.h"
 #include "char_state.h"
 #include "char_slot.h"
-
-extern "C" int DAT_10255f10[];
+#include "char_tables.h"
 extern "C" int FUN_1013f880(void);
 extern "C" void FUN_10043cc0(int);
 

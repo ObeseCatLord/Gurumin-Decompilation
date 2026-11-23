@@ -10,7 +10,6 @@
 #include "render_vars.h"
 #include "sound_vars.h"
 #include "win_vars.h"
-extern "C" int DAT_10f65508;
 // Frame blend (after-image) strength: rises by the step every other frame up to the limit (see FUN_1013fb10).
 
 // Starts a new Direct3D scene (ending the open one first).

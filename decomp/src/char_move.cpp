@@ -267,7 +267,6 @@ struct CollisionWorld
 #include "char_slot.h"
 
 extern "C" CollisionWorld *DAT_10255f08;
-extern "C" int DAT_102199b8[0x80];            // per-character group timer (char_reset.cpp)
 
 // 0x100b5c30 (Npc_TurnWhenSeen). Npc_AlertWhenSeen below with one step more: when it reacts, the character also
 // turns at once to face the player (heading and target heading). Returns 0.

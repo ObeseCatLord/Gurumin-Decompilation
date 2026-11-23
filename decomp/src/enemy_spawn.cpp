@@ -18,8 +18,6 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 #include "char_tables.h"
 #include "char_vars.h"
 #include "world.h"
-extern "C" Vec4 DAT_10867e18[0x80];           // where a character in play was placed
-extern "C" int DAT_102199b8[0x80];            // per-character group timer (char_reset.cpp)
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 
 // atan2 on floats (an inline helper: both arguments are rounded to float first, the second one first).

@@ -35,7 +35,6 @@ extern "C" void FUN_1014b390(void)
 }
 
 // Default-pool Direct3D resources that do not survive a device reset (Render_OnResetDevice recreates them).
-extern "C" IUnknownLike *DAT_10f141dc;
 extern "C" IUnknownLike *DAT_10f1fd28;            // created with the device
 extern "C" void FUN_10147760(void);  // BufferPool_ReleaseDynamic
 extern "C" int FUN_10148350(void);   // TexCache_ReleaseAll

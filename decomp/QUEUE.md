@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (163)
+## 1. Walls to retry (164)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -164,6 +164,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019d8e0` 954 — Node::ComputeBounds: control flow and stores in place; the -999999 constant and the y min/max slots use other registers/slots (ecx and swapped 0x18/0x1c in the original), declaration orders tried
 - [ ] `1019e120` 1246 — Node::BuildCollisionSpheres: 14 bytes; identical except that the original encodes the indexed loads with the offset register as base ([ecx + ebx + 4] for vertices, [edi + edx + 4] for the pack lists), ours with the pointer register first (typed vertex struct tried)
 - [ ] `1019eeb0` 844 — Node::SetupSkinning (M_1019eeb0): identical except the bone != 0 test in the parent-name condition, which cl 13.00 here drops (the original keeps test eax, eax; je); local and re-read forms tried
+- [ ] `101a8e60` 2060 — Node::Collide (node_mesh_hits.cpp, rule-clean): everything after the region prologue is SegmentHitsMesh's matched body; the original cross-jumps the four region branches (kind cells / CDL names x cell list / tables) into shared tails (mov bl,[cell]; test bl,bl; mov ecx,6; je; cmp al,0xfd; jne; mov ecx,7), ours keeps them apart (cmp byte [..],0 in the cell-list branch), which shifts the loop alignment and the children restores. Shared char local, assignment-after-test, ternary on the cell list and an inline helper (not inlined) tried
 - [ ] `101acc60` 301 — DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
 - [ ] `101ad2c0` 135 — Plane::IntersectRay: 6 bytes; term order matches with y + (x + z) grouping, but the original loads the direction operand first in the z and y products (four operand orders tried)
@@ -185,7 +186,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (136)
+## 4. Large functions (801-3000 bytes) (134)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
@@ -252,7 +253,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100a7150` 1688 bytes (float, loops 2, calls 49)
 - [ ] `10044b10` 1711 bytes (float, loops 2, calls 44)
 - [ ] `10065450` 1714 bytes (float, loops 6, calls 42)
-- [ ] `101a8780` 1751 bytes (float, loops 3, calls 45)
 - [ ] `101501f0` 1755 bytes (float, loops 10, calls 19)
 - [ ] `100a6a50` 1792 bytes (float, calls 60)
 - [ ] `100b7b10` 1798 bytes (float, loops 1, calls 33)
@@ -278,7 +278,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100b9150` 2009 bytes (float, calls 52)
 - [ ] `101886d0` 2012 bytes (loops 5, calls 81)
 - [ ] `10089210` 2033 bytes (float, loops 14, calls 40)
-- [ ] `101a8e60` 2060 bytes Node::Collide (float, loops 5, calls 47)
 - [ ] `10147a20` 2131 bytes (loops 7, calls 23)
 - [ ] `1004fbe0` 2142 bytes (float, loops 6, calls 54)
 - [ ] `1002cc70` 2150 bytes (float, loops 2, calls 37)

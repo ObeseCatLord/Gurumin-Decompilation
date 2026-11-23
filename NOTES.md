@@ -312,6 +312,12 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   dead remainder in place. A named `cost` local gives lea forms instead (Map_RouteLength 0x10049990).
 - A pointer local into a table (`RoutePoint *point = &table[i]`) changes the order of the induction increments at
   the loop end; indexing the table directly can restore it (Map_RouteLength).
+- A field read twice in a condition (`s[t].DistanceSquaredToLine(a, b) > s[t].w * s[t].w`) was written that way:
+  the radius is copied to a stack slot before the call and the array address is computed twice, which keeps
+  the triangle offset in a register. A named `float radius = s[t].w;` local CSEs the address and spills the
+  induction variables differently (Node::SegmentHitsMesh 0x101a8780).
+- A per-vertex index read once into an `int vertex` local and five `vertices[vertex].field` reads give the
+  original's single imul per corner with the vertex pointer reloaded each time (Node::SegmentHitsMesh).
 - `x = total + f(); return x;` against `total += f(); return total;`: the second rounds through total's own stack
   slot after the register pops.
 - Arrays read at `index + 3` with scaled addressing (shorts, ints, 0x188 records) keep `index + 3` in a register only

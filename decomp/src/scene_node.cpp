@@ -580,8 +580,8 @@ int Node::M_101a8760()
 // Frees the extra index lists of this node and runs M_1019e120 on the children.
 int Node::M_101ab980()
 {
-    if (m_0070 != 0 && packCount != 0)
-        M_101911e0(m_0070, packCount);
+    if (triangleSpheres != 0 && packCount != 0)
+        M_101911e0(triangleSpheres, packCount);
     for (int i = 0; i < childCount; i++)
         children[i]->BuildCollisionSpheres();
     return 0;
@@ -695,11 +695,11 @@ void Node::Release()
         M_10191210();
     else if (frameMatrixCount > 1)
         fread(0, 1, 1, 0);
-    if (m_0070 != 0)
+    if (triangleSpheres != 0)
     {
-        M_101911e0(m_0070, packCount);
-        DAT_11b1ba40(m_0070);
-        m_0070 = 0;
+        M_101911e0(triangleSpheres, packCount);
+        DAT_11b1ba40(triangleSpheres);
+        triangleSpheres = 0;
     }
     if (mesh != 0)
         ReleaseMesh();
@@ -1415,11 +1415,11 @@ void Node::ReleaseUniqueMeshData()
         DAT_10fe01d8[mesh->bufferSlot] = 0;
         M_101911b0(packs, packCount);
         M_101911e0(indexLists, packCount);
-        if (m_0070 != 0)
+        if (triangleSpheres != 0)
         {
-            M_101911e0(m_0070, packCount);
-            DAT_11b1ba40(m_0070);
-            m_0070 = 0;
+            M_101911e0(triangleSpheres, packCount);
+            DAT_11b1ba40(triangleSpheres);
+            triangleSpheres = 0;
         }
         if (packs != 0)
             DAT_11b1ba40(packs);
@@ -2003,14 +2003,14 @@ int Node::BuildCollisionSpheres()
          (name[prefix] == 'C' && name[prefix + 1] == 'T') || (flags & 4) != 0 || (flags & 0xf00) != 0) &&
         packCount > 0)
     {
-        M_101911e0(m_0070, packCount);
-        if (m_0070 != 0)
-            DAT_11b1ba40(m_0070);
-        m_0070 = (IndexList *)DAT_11b0b938(packCount * sizeof(IndexList), "m_vpackindexsp");
+        M_101911e0(triangleSpheres, packCount);
+        if (triangleSpheres != 0)
+            DAT_11b1ba40(triangleSpheres);
+        triangleSpheres = (IndexList *)DAT_11b0b938(packCount * sizeof(IndexList), "m_vpackindexsp");
         for (int p = 0; p < packCount; p++)
         {
-            m_0070[p].Init();
-            m_0070[p].ResizeSpans(indexLists[p].count / 3);
+            triangleSpheres[p].Init();
+            triangleSpheres[p].ResizeSpans(indexLists[p].count / 3);
             for (int i = 0; i < indexLists[p].count; i += 3)
             {
                 int first = indexLists[p].indices[i];
@@ -2025,13 +2025,13 @@ int Node::BuildCollisionSpheres()
                 c.x = packs[p].vertices[third].position[0];
                 c.y = packs[p].vertices[third].position[1];
                 c.z = packs[p].vertices[third].position[2];
-                m_0070[p].spheres[i / 3].x = (MAX(MAX(a.x, b.x), c.x) + MIN(MIN(a.x, b.x), c.x)) / 2.0f;
-                m_0070[p].spheres[i / 3].y = (MAX(MAX(a.y, b.y), c.y) + MIN(MIN(a.y, b.y), c.y)) / 2.0f;
-                m_0070[p].spheres[i / 3].z = (MAX(MAX(a.z, b.z), c.z) + MIN(MIN(a.z, b.z), c.z)) / 2.0f;
-                float da = m_0070[p].spheres[i / 3].Distance(a);
-                float db = m_0070[p].spheres[i / 3].Distance(b);
-                float dc = m_0070[p].spheres[i / 3].Distance(c);
-                m_0070[p].spheres[i / 3].w = MAX(MAX(da, db), dc) * 1.1f;
+                triangleSpheres[p].spheres[i / 3].x = (MAX(MAX(a.x, b.x), c.x) + MIN(MIN(a.x, b.x), c.x)) / 2.0f;
+                triangleSpheres[p].spheres[i / 3].y = (MAX(MAX(a.y, b.y), c.y) + MIN(MIN(a.y, b.y), c.y)) / 2.0f;
+                triangleSpheres[p].spheres[i / 3].z = (MAX(MAX(a.z, b.z), c.z) + MIN(MIN(a.z, b.z), c.z)) / 2.0f;
+                float da = triangleSpheres[p].spheres[i / 3].Distance(a);
+                float db = triangleSpheres[p].spheres[i / 3].Distance(b);
+                float dc = triangleSpheres[p].spheres[i / 3].Distance(c);
+                triangleSpheres[p].spheres[i / 3].w = MAX(MAX(da, db), dc) * 1.1f;
             }
         }
     }

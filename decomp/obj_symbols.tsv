@@ -101,7 +101,7 @@
 ?RegisterWindowClass@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	101489c0
 ?LoadMenuTextures@Game@@QAEHPAUFontRenderer@@@Z	10007fd0
 ?Find@Node@@QAEPAU1@PBDH@Z	1019ece0
-?Collide@Node@@QAEHHHPAUVec4@@00@Z	101a8e60
+?Collide@Node@@QAEHPBDIPAUVec4@@11@Z	101a8e60
 ?WindowProc@GameWindow@@UAGJPAUHWND__@@IIJ@Z	1013e4f0
 ?WindowProc@RenderWindow@@UAGJPAUHWND__@@IIJ@Z	1013e450
 ??0GameWindow@@QAE@XZ	1013e6a0
@@ -488,3 +488,4 @@ _FUN_101426d0@8	101426d0
 ?ProjectPlanarUVs@Node@@QAEHH@Z	1019bdd0
 ?CloneModel@AnimModel@@QAEHPAU1@H@Z	1017b210
 ?LoadFile@AnimModel@@QAEHPBD@Z	1017b9b0
+?SegmentHitsMesh@Node@@QAEHPAUVec4@@0@Z	101a8780

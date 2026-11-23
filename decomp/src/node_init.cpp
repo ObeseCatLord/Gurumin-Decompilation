@@ -74,7 +74,7 @@ void Node::Init()
     flags = 0;
     cullMargin = 3.84f;
     group = 0;
-    m_0070 = 0;
+    triangleSpheres = 0;
     m_1894 = 0;
     frameMatrixCount = 0;
     parent = 0;

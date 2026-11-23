@@ -59,7 +59,7 @@ struct Node
     int packCount;               // 0x064: entries in `packs`
     VertexPack *packs;           // 0x068: the mesh's vertex packs
     IndexList *indexLists;       // 0x06c: one index list per pack
-    IndexList *m_0070;           // 0x070: one sphere list per pack (bounding sphere per triangle)
+    IndexList *triangleSpheres;  // 0x070: one sphere list per pack (bounding sphere per triangle, 0 = none)
     int m_0074;                  // 0x074
     NodeDrawCallback drawCallback;  // 0x078: draws the node instead of the mesh code when set
     int m_007c;                  // 0x07c: number of entries in m_0080 and m_0084
@@ -249,7 +249,18 @@ struct Node
                    int b);
 
     // Collision
-    int Collide(int a, int b, Vec4 *position, Vec4 *velocity, Vec4 *hit);  // 0x101a8e60
+    // 0x101a8e60: tests the segment `from`-`to` against this subtree's triangles (nodes whose flags share a bit
+    // with `mask` and whose two-character tag is `tag`; 0 = any); the first hit point goes to `hit`. Returns 1 on
+    // a hit (node_mesh_hits.cpp).
+    int Collide(const char *tag, unsigned int mask, Vec4 *from, Vec4 *to, Vec4 *hit);
+    // 0x101a8780: tests the segment `from`-`to` against this node's own opaque triangles, from both sides; returns 1
+    // on a hit closer than the segment's length to both ends (node_mesh_hits.cpp).
+    int SegmentHitsMesh(Vec4 *from, Vec4 *to);
+    // 0x1019dca0: ray-triangle test (ray from `origin` along `direction`, triangle a-b-c). On a hit, writes the hit
+    // point into `a`, the distance along the ray into `hitT` and the texture coordinates interpolated from the
+    // corners' (uvA..uvC, x and y) into `texU`/`texV`, and returns 1; 0 when the ray misses or is parallel.
+    int IntersectTriangle(const Vec4 *origin, const Vec4 *direction, Vec4 *a, const Vec4 *b, const Vec4 *c,
+                          float *hitT, float *texU, float *texV, const Vec4 *uvA, const Vec4 *uvB, const Vec4 *uvC);
     // 0x101a9670: casts the segment against the nodes called `name` (0 = all) whose kind and mask match; writes
     // the nearest hit point and, when `t` is given, its position along the segment. Returns 1 on a hit.
     int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,

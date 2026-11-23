@@ -13,17 +13,12 @@ struct OverlayModel
     int Draw(Matrix4 *world, Matrix4 *view, Vec4 *light, int a, Vec4 *colour, int b);
 };
 
-struct ModelBank
-{
-    // 0x10164c10: the light direction for `model` from the camera position and target (char_ground.cpp).
-    Vec4 *M_10164c10(void *model, Vec4 *position, Vec4 *target);
-};
+#include "model_bank.h"
 
 extern "C" OverlayModel *DAT_104c03c8;           // the overlay mode's model (0 = none)
 extern "C" float DAT_104c03ec;                   // opening progress of the overlay mode
 extern "C" Vec4 DAT_10c66edc;                    // overlay camera position
 extern "C" Vec4 DAT_10edbdf8;                    // overlay camera target
-extern "C" ModelBank DAT_10804bf8;
 extern "C" void FUN_10194360(const Vec4 *eye, const Vec4 *target, Matrix4 *view, Matrix4 *projection, int a);  // Camera_SetMatrices
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 
@@ -49,7 +44,7 @@ int Overlay_DrawModel()
         FUN_1013f070(0xe, 0, 0);
         FUN_1013f070(10, 0, 0);
         FUN_1013f070(0xb, 0xffff, 0);
-        Vec4 *light = DAT_10804bf8.M_10164c10(0, &DAT_10c66edc, &DAT_10edbdf8);
+        Vec4 *light = DAT_10804bf8.LightDirection(0, &DAT_10c66edc, &DAT_10edbdf8);
         light->x = 0.12f;
         light->y = -1.0f;
         light->z = 1.0f;

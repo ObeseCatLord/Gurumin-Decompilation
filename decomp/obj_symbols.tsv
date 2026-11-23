@@ -147,7 +147,7 @@ _Vec3_Length	101ae890
 ?InBoxMargin@Vec4@@QAEHPBUBox2@@M@Z	101ac740
 ?Reset@ModelBank@@QAEHXZ	10164aa0
 ?CollectLights@ModelBank@@QAEHPAUNode@@@Z	10164fa0
-?Add@ModelBank@@QAEHHH@Z	1017c570
+?Add@ModelBank@@QAEHPAUNode@@PBUVec4@@@Z	1017c570
 ?IntersectRay@Plane@@QAEHPAUVec4@@PBU2@1@Z	101ad2c0
 ?Release@WorldRenderer@@QAEHXZ	1017cc10
 ?Seek@WorldRenderer@@QAEHH@Z	10189000
@@ -260,7 +260,7 @@ _Vec3_Dot	101ac200
 ?CaptureRgbRows@TextureObject@@QAEHPAE@Z	10145120
 ?DrawTriangles@TextureObject@@QAEHPBXH@Z	1014bb70
 ?Unload@AnimModel@@QAEHXZ	10162c50
-?AddLitModel@ModelBank@@QAEHPAUBankModel@@@Z	10164af0
+?AddLitModel@ModelBank@@QAEHPAUAnimModel@@@Z	10164af0
 ?Release@MeshData@@QAEXXZ	10150a90
 ?Shutdown@TextureManager@@QAEHXZ	1015c730
 ?PumpAndRecover@TextureManager@@QAEHXZ	1015c850

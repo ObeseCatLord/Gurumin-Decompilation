@@ -14,11 +14,11 @@ Matrix4 IdentityMatrix();                        // 0x101b0ba0
 // the motion and placement fields, setting the world matrix to the identity twice (two inlined resets).
 AnimModel::AnimModel()
 {
-    m_0260 = 1.0f;
+    uniformScale = 1.0f;
     speedScale = 1.0f;
     m_0268 = 0;
     motion = 0;
-    m_2284 = 0;
+    shadowHidden = 0;
     m_231c = 0;
     trackA.playing = 0;
     root = 0;
@@ -30,7 +30,7 @@ AnimModel::AnimModel()
     m_2418 = 0;
     m_22a0 = 0;
     root = 0;
-    m_22f0 = 0;
+    loadedRoot = 0;
     heading = 0;
     motionFrame = 0;
     motionSpeed = 0;

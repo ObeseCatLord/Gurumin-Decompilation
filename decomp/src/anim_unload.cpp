@@ -39,7 +39,7 @@ int AnimModel::Unload()
         motion = 0;
     }
     root = 0;
-    m_22f0 = 0;
+    loadedRoot = 0;
     heading = 0;
     motionFrame = 0;
     motionSpeed = 0;

@@ -125,7 +125,7 @@ struct AnimModel
     float holdWeight;         // 0x248: blend weight while holding (at most 0.9)
     Vec4 m_024c;
     int m_025c;
-    float m_0260;
+    float uniformScale;       // 0x260: uniform model scale (1.0; model_bank.cpp passes it to the shadow drawing)
     char m_0264;
     char important;           // 0x265: motion changes are flagged important (DAT_11b04508); set by Enemy_ShoveAndBlast
     char m_0266;
@@ -137,7 +137,7 @@ struct AnimModel
     {
         struct
         {
-            int m_0270;
+            int bankIndex;    // 0x270: a model-bank record's own index in the bank (model_bank.cpp)
             int m_0274;
             int m_0278;
             int m_027c;
@@ -191,7 +191,7 @@ struct AnimModel
     char locked;              // 0x17e9: non-zero = SetPendingPush ignores pushes
     char pad_17ea[2];
     MotionChannels trackC;    // 0x17ec: path keys (path_anim.cpp StepPath)
-    int m_2284;
+    int shadowHidden;         // 0x2284: non-zero = no shadow is drawn (model_bank.cpp)
     char m_2288;              // 0x2288: flag of the pending push
     char pad_2289[3];
     Vec4 m_228c;              // 0x228c: pending push (x, y, z), see SetPendingPush
@@ -201,7 +201,8 @@ struct AnimModel
     char m_22ac;
     char pad_22ad[0x3f];
     Node *root;               // 0x22ec: the model's node tree (its entry in the model table)
-    int m_22f0;               // 0x22f0: non-zero while the character is in use (key prompts are drawn)
+    Node *loadedRoot;         // 0x22f0: the same node tree as root while the model is in use, 0 when free (key
+                              // prompts are drawn only for loaded characters; model_bank.cpp reads its model data)
     Node *headNode;           // 0x22f4: the head bone node (0 = none)
     int m_22f8;
     int m_22fc;
@@ -223,14 +224,14 @@ struct AnimModel
     int m_2374;
     char m_2378;
     char m_2379;
-    char m_237a;
+    unsigned char shadowOpacity; // 0x237a: shadow opacity (15 when placed, 0 = no shadow)
     char pad_237b;
     float m_237c;
     int m_2380;
     int m_2384;               // 0x2384: collision result, cleared before each update
     int m_2388;               // 0x2388: 1 once a speed change is pending
     int m_238c;               // 0x238c: non-zero = play the idle motion (app_0011.cpp)
-    int m_2390;               // 0x2390: limit for map collision tests
+    int m_2390;               // 0x2390: limit for map collision tests; model_bank.cpp uses 99999 for "no timeout"
     int m_2394;
     Vec4 holdOffset;          // 0x2398: position relative to the held model
     Vec4 move;                // 0x23a8: movement impulse applied by the next update (Character_SetMove)
@@ -244,7 +245,8 @@ struct AnimModel
     char pad_241c[4];
     Vec4 m_2420;
     int m_2430;
-    Matrix4 m_2434;           // 0x2434: a second matrix that receives the ground position (char_ground.cpp)
+    Matrix4 shadowMatrix;     // 0x2434: the matrix the shadow is drawn with; receives the ground position
+                              // (char_ground.cpp)
     char m_2474;
     char pad_2475[3];
     int m_2478;
@@ -258,6 +260,7 @@ struct AnimModel
     int mode;                 // 0x2498: 1 = normal (set by the scene start for the player), 2 = over the pit area
 
     AnimModel();                                                   // 0x101629f0 (anim_ctor.cpp)
+    ~AnimModel();                                                  // 0x10007e10 (the shared empty destructor)
     int M_10161a20(int texture);                                   // 0x10161a20: material swap
     void M_10161a60();                                             // clears track C
     int M_10161a90(int frame, float x, float y, float z, char flag);

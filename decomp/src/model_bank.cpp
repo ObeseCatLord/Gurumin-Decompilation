@@ -9,83 +9,15 @@
 
 #include "matrix4.h"
 
+#include "anim_model.h"
+
+#include "model_bank.h"
+
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060 (vec4.cpp)
 // 0x101ae4d0 (View_ContainsPoint, vec4.cpp): 1 when `point` transformed by `matrix` lies inside the view volume, widened by `margin`.
 extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin);
 
-// One model record (the CharModel part of a Character, see world.h / texture_mgr.cpp SceneOwner).
-struct BankModel
-{
-    char pad_0000[0x260];
-    float scale;            // 0x260: model scale, 1.0 when added
-    char pad_0264[0xc];
-    int index;              // 0x270: the record's own index in the bank
-    char pad_0274[0xad8];
-    float shadowScale;      // 0xd4c: passed to the shadow drawing
-    char pad_0d50[0xa98];
-    char m_17e8;            // 0x17e8
-    char pad_17e9[0xa9b];
-    int hidden;             // 0x2284: non-zero = no shadow
-    char pad_2288[0x64];
-    int id;                 // 0x22ec: model id (0 = free record)
-    int id2;                // 0x22f0: copy of the id (the model's data)
-    char pad_22f4[0x34];
-    Matrix4 matrix;         // 0x2328: world matrix
-    char pad_2368[0x12];
-    unsigned char opacity;  // 0x237a: 0 = no shadow
-    char pad_237b[0x15];
-    int timer;              // 0x2390: 99999 = no timeout
-    char pad_2394[0xa0];
-    Matrix4 shadowMatrix;   // 0x2434: the matrix the shadow is drawn with
-    char pad_2474[0x28];
-    BankModel();            // 0x101629f0 (the model record constructor)
-    ~BankModel();           // 0x10007e10
-};
 
-typedef char check_bankmodel[sizeof(BankModel) == 0x249c ? 1 : -1];
-
-struct ModelBank
-{
-    Node *lights[0x20];     // 0x0000: light nodes of the scene (Omn..., then Spot...)
-    BankModel *litModels[0x80];  // 0x0080: models that take part in the scene lighting
-    int shadows[10];        // 0x0280: the shadow render targets "shadow0".."shadow9"
-    char pad_02a8[0x1d8];
-    int shadowTexture;      // 0x0480: kage.bmp
-    Vec4 m_0484[0x80];      // 0x0484: per shadow caster (passed to the shadow drawing)
-    Vec4 m_0c84[0x80];      // 0x0c84: per shadow caster
-    float casterSize[0x80]; // 0x1484: per shadow caster
-    int casters[0x80];      // 0x1684: shadow casters (indexes into litModels)
-    int m_1884;             // 0x1884: number of shadow casters
-    Vec4 lighting[0xb00];   // 0x1888: 22 vectors of light parameters for each entry of litModels
-    Vec4 m_c888[0x16];      // 0xc888
-    BankModel models[16];   // 0xc9e8
-    int params[16];         // 0x313a8: per-model parameter given when the model was added
-    int m_313e8;            // 0x313e8
-    int enabled;            // 0x313ec: 1 when the current map uses the bank
-    int lens[4];            // 0x313f0: lens01.bmp .. lens04.bmp (lens flare)
-    char pad_31400[0x70];
-    float flareAlpha[0x20]; // 0x31470: brightness of each flare point (0..1)
-    int crossfade[3];       // 0x314f0: "crossfade0".."crossfade2" render targets (screen size)
-    int mirror;             // 0x314fc: 256x256 render targets
-    int saveBuffer;         // 0x31500
-    int minimap;            // 0x31504
-    int mirror2;            // 0x31508
-    int saveBuffer2;        // 0x3150c
-    int minimap2;           // 0x31510
-    char pad_31514[0xc];
-    int flareCount;         // 0x31520: flare points collected this frame
-    Vec4 flareScreen[0x20]; // 0x31524: screen position of each flare point (x, y, depth, w)
-    ModelBank();
-    int Reset();
-    int CollectLights(Node *root);
-    int Add(int id, int param);
-    int AddLitModel(BankModel *model);
-    int AddFlarePoint(Vec4 position, const Matrix4 *viewProjection);
-    int CreateTextures();
-    int DrawLensFlares();
-    int DrawShadows(struct ShadowScene *scene, int a, int b, int c);
-    int DrawShadowsInto(struct ShadowScene *scene, int a, int b, int c);
-};
 
 // Empties the bank: clears the light list, the 0x80-entry table, every model record's id and the counters.
 int ModelBank::Reset()
@@ -93,8 +25,8 @@ int ModelBank::Reset()
     for (int j = 0; j < 0x80; j++)
         litModels[j] = 0;
     m_1884 = 0;
-    for (int i = 0; i < 16; i++)
-        models[i].id = 0;
+    for (int i = 0; i < MODEL_BANK_SIZE; i++)
+        models[i].root = 0;
     m_313e8 = 0;
     memset(lights, 0, sizeof(lights));
     return 1;
@@ -126,20 +58,20 @@ int ModelBank::CollectLights(Node *root)
     return 1;
 }
 
-// Adds model `id` to the first free record (scale 1, no timeout), remembers `param` for it and sets the record up
+// Adds the model with node tree `root` to the first free record (scale 1, no timeout), remembers the position it is placed at and sets the record up
 // (AddLitModel). Returns 0 when all 16 records are in use.
-int ModelBank::Add(int id, int param)
+int ModelBank::Add(Node *root, const Vec4 *position)
 {
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < MODEL_BANK_SIZE; i++)
     {
-        if (models[i].id == 0)
+        if (models[i].root == 0)
         {
-            models[i].id = id;
-            models[i].id2 = id;
-            models[i].scale = 1.0f;
-            models[i].timer = 99999;
-            models[i].index = i;
-            params[i] = param;
+            models[i].root = root;
+            models[i].loadedRoot = root;
+            models[i].uniformScale = 1.0f;
+            models[i].m_2390 = MODEL_BANK_NO_TIMEOUT;
+            models[i].bankIndex = i;
+            params[i] = position;
             AddLitModel(&models[i]);
             return 1;
         }
@@ -174,11 +106,11 @@ ModelBank::ModelBank()
 
 // 0x10164af0. Adds `model` to the lit models (once; only models with an id, and only while the bank is in use)
 // and gives it default light parameters. Returns 1 when it was added, else 0.
-int ModelBank::AddLitModel(BankModel *model)
+int ModelBank::AddLitModel(AnimModel *model)
 {
     if (enabled == 0)
         return 0;
-    if (model == 0 || model->id2 == 0)
+    if (model == 0 || model->loadedRoot == 0)
         return 0;
     int i;
     for (i = 0; i < 0x80; i++)
@@ -384,7 +316,7 @@ struct ShadowScene
     char pad_0000[0x24c];
     Matrix4 matrix;         // 0x24c
     int DrawShadow(int a, int b, int c, const Vec4 *p, const Vec4 *q, int texture, float scale, int size, int data,
-                   BankModel *model, float modelScale);  // 0x101a29e0
+                   AnimModel *model, float modelScale);  // 0x101a29e0
 };
 
 extern "C" int DAT_10203438;                         // shadows switched on
@@ -407,25 +339,25 @@ int ModelBank::DrawShadowsInto(ShadowScene *scene, int a, int b, int c)
     {
         for (int i = 0; i < m_1884 && i < 10; i++)
         {
-            if (litModels[casters[i]]->timer == 99999)
+            if (litModels[casters[i]]->m_2390 == MODEL_BANK_NO_TIMEOUT)
             {
                 litModels[casters[i]]->m_17e8 = 0;
                 litModels[casters[i]]->matrix.SetIdentity();
-                litModels[casters[i]]->matrix.SetTranslation(*(const Vec4 *)params[litModels[casters[i]]->index]);
+                litModels[casters[i]]->matrix.SetTranslation(*params[litModels[casters[i]]->bankIndex]);
                 litModels[casters[i]]->shadowMatrix = litModels[casters[i]]->matrix;
-                litModels[casters[i]]->hidden = 0;
-                litModels[casters[i]]->opacity = 15;
-                litModels[casters[i]]->shadowScale = 1.0f;
+                litModels[casters[i]]->shadowHidden = 0;
+                litModels[casters[i]]->shadowOpacity = 15;
+                litModels[casters[i]]->alpha = 1.0f;
             }
-            if (litModels[casters[i]]->id2 != 0 && litModels[casters[i]]->hidden == 0 &&
-                litModels[casters[i]]->opacity > 0)
+            if (litModels[casters[i]]->loadedRoot != 0 && litModels[casters[i]]->shadowHidden == 0 &&
+                litModels[casters[i]]->shadowOpacity > 0)
             {
                 scene->matrix = litModels[casters[i]]->shadowMatrix;
                 scene->matrix.Translate(0, 0, 6.1f);
                 FUN_1013f070(9, 0, 0);
-                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadows[i], litModels[casters[i]]->scale,
-                                  (int)casterSize[i], ((ModelData *)litModels[casters[i]]->id2)->m_06e0,
-                                  litModels[casters[i]], litModels[casters[i]]->shadowScale);
+                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadows[i], litModels[casters[i]]->uniformScale,
+                                  (int)casterSize[i], ((ModelData *)litModels[casters[i]]->loadedRoot)->m_06e0,
+                                  litModels[casters[i]], litModels[casters[i]]->alpha);
                 FUN_1013f070(9, 1, 0);
             }
         }
@@ -434,24 +366,24 @@ int ModelBank::DrawShadowsInto(ShadowScene *scene, int a, int b, int c)
     {
         for (int i = 0; i < m_1884 && i < 10; i++)
         {
-            if (litModels[casters[i]]->timer == 99999)
+            if (litModels[casters[i]]->m_2390 == MODEL_BANK_NO_TIMEOUT)
             {
                 litModels[casters[i]]->m_17e8 = 0;
                 litModels[casters[i]]->matrix.SetIdentity();
-                litModels[casters[i]]->matrix.SetTranslation(*(const Vec4 *)params[litModels[casters[i]]->index]);
+                litModels[casters[i]]->matrix.SetTranslation(*params[litModels[casters[i]]->bankIndex]);
                 litModels[casters[i]]->shadowMatrix = litModels[casters[i]]->matrix;
-                litModels[casters[i]]->hidden = 0;
-                litModels[casters[i]]->opacity = 15;
+                litModels[casters[i]]->shadowHidden = 0;
+                litModels[casters[i]]->shadowOpacity = 15;
             }
-            if (litModels[casters[i]]->id2 != 0 && litModels[casters[i]]->hidden == 0 &&
-                litModels[casters[i]]->opacity > 0)
+            if (litModels[casters[i]]->loadedRoot != 0 && litModels[casters[i]]->shadowHidden == 0 &&
+                litModels[casters[i]]->shadowOpacity > 0)
             {
                 scene->matrix = litModels[casters[i]]->shadowMatrix;
                 scene->matrix.Translate(0, 0, 6.1f);
                 FUN_1013f070(9, 0, 0);
-                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadowTexture, litModels[casters[i]]->scale,
-                                  (int)casterSize[i], ((ModelData *)litModels[casters[i]]->id2)->m_06e0,
-                                  litModels[casters[i]], litModels[casters[i]]->shadowScale);
+                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadowTexture, litModels[casters[i]]->uniformScale,
+                                  (int)casterSize[i], ((ModelData *)litModels[casters[i]]->loadedRoot)->m_06e0,
+                                  litModels[casters[i]], litModels[casters[i]]->alpha);
                 FUN_1013f070(9, 1, 0);
             }
         }
@@ -475,37 +407,37 @@ int ModelBank::DrawShadows(ShadowScene *scene, int a, int b, int c)
     {
         for (int i = 0; i < m_1884 && i < 10; i++)
         {
-            if (litModels[casters[i]]->timer == 99999)
+            if (litModels[casters[i]]->m_2390 == MODEL_BANK_NO_TIMEOUT)
             {
                 litModels[casters[i]]->m_17e8 = 2;
                 litModels[casters[i]]->matrix.SetIdentity();
-                litModels[casters[i]]->matrix.SetTranslation(*(const Vec4 *)params[litModels[casters[i]]->index]);
-                litModels[casters[i]]->hidden = 0;
-                litModels[casters[i]]->opacity = 15;
-                litModels[casters[i]]->shadowScale = 1.0f;
+                litModels[casters[i]]->matrix.SetTranslation(*params[litModels[casters[i]]->bankIndex]);
+                litModels[casters[i]]->shadowHidden = 0;
+                litModels[casters[i]]->shadowOpacity = 15;
+                litModels[casters[i]]->alpha = 1.0f;
             }
-            BankModel *model = litModels[casters[i]];
-            if (model->id2 != 0 && model->hidden == 0 && model->opacity > 0)
-                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadows[i], model->scale, (int)casterSize[i],
-                                  ((ModelData *)model->id2)->m_06e0, model, model->shadowScale);
+            AnimModel *model = litModels[casters[i]];
+            if (model->loadedRoot != 0 && model->shadowHidden == 0 && model->shadowOpacity > 0)
+                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadows[i], model->uniformScale, (int)casterSize[i],
+                                  ((ModelData *)model->loadedRoot)->m_06e0, model, model->alpha);
         }
     }
     else
     {
         for (int i = 0; i < m_1884 && i < 10; i++)
         {
-            if (litModels[casters[i]]->timer == 99999)
+            if (litModels[casters[i]]->m_2390 == MODEL_BANK_NO_TIMEOUT)
             {
                 litModels[casters[i]]->m_17e8 = 2;
                 litModels[casters[i]]->matrix.SetIdentity();
-                litModels[casters[i]]->matrix.SetTranslation(*(const Vec4 *)params[litModels[casters[i]]->index]);
-                litModels[casters[i]]->hidden = 0;
-                litModels[casters[i]]->opacity = 15;
+                litModels[casters[i]]->matrix.SetTranslation(*params[litModels[casters[i]]->bankIndex]);
+                litModels[casters[i]]->shadowHidden = 0;
+                litModels[casters[i]]->shadowOpacity = 15;
             }
-            BankModel *model = litModels[casters[i]];
-            if (model->id2 != 0 && model->hidden == 0 && model->opacity > 0)
-                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadowTexture, model->scale, (int)casterSize[i],
-                                  ((ModelData *)model->id2)->m_06e0, model, model->shadowScale);
+            AnimModel *model = litModels[casters[i]];
+            if (model->loadedRoot != 0 && model->shadowHidden == 0 && model->shadowOpacity > 0)
+                scene->DrawShadow(a, b, c, &m_0484[i], &m_0c84[i], shadowTexture, model->uniformScale, (int)casterSize[i],
+                                  ((ModelData *)model->loadedRoot)->m_06e0, model, model->alpha);
         }
     }
     return 1;

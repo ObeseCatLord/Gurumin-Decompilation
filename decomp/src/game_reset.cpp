@@ -37,10 +37,7 @@ struct EffectTable
     void M_10172a80(char *table, int count);     // 0x10172a80
 };
 
-struct ModelBank
-{
-    void M_10164aa0();                           // 0x10164aa0
-};
+#include "model_bank.h"
 
 struct EffectManager
 {
@@ -583,7 +580,6 @@ extern "C" Vec4 DAT_10802ac8;
 extern "C" Vec4 DAT_10802ad8[0x10];
 extern "C" Vec4 DAT_10802bd8;
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" ModelBank DAT_10804bf8;
 extern "C" Vec4 DAT_1083631c;
 extern "C" EmptyObject DAT_10836c70;
 extern "C" Vec4 DAT_10836c84;
@@ -711,7 +707,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104c0140 = FUN_10161920("lens05");
   DAT_1021cffc.M_10172a80(DAT_10223a58, 0x400);
   memset(DAT_10254c40, 0, sizeof(DAT_10254c40));
-  DAT_10804bf8.M_10164aa0();
+  DAT_10804bf8.Reset();
   DAT_102027e4 = 180.0f;
   DAT_104c0224 = 0;
   DAT_1083631c.Fill(0.0f);

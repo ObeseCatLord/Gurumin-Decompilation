@@ -8965,7 +8965,7 @@
      }
     },
     {
-     "name": "?AddLitModel@ModelBank@@QAEHPAUBankModel@@@Z",
+     "name": "?AddLitModel@ModelBank@@QAEHPAUAnimModel@@@Z",
      "size": "284",
      "fuzzy_match_percent": 19.7115,
      "metadata": {
@@ -9005,7 +9005,7 @@
      }
     },
     {
-     "name": "?Add@ModelBank@@QAEHHH@Z",
+     "name": "?Add@ModelBank@@QAEHPAUNode@@PBUVec4@@@Z",
      "size": "123",
      "fuzzy_match_percent": 100.0,
      "metadata": {

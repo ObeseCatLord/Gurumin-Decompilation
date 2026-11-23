@@ -15,12 +15,7 @@ Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);         // 0x101b10
 
 #include "anim_model.h"
 
-// The model bank at 0x10804bf8 (model_bank.cpp).
-struct ModelBank
-{
-    // 0x10164c10: a direction for model `model` from the camera position and target (0 when the bank is off).
-    const Vec4 *M_10164c10(AnimModel *model, Vec4 *position, Vec4 *target);
-};
+#include "model_bank.h"
 
 struct EffectManager
 {
@@ -74,7 +69,6 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
     return map;
 }
 
-extern "C" ModelBank DAT_10804bf8;
 extern "C" EffectManager DAT_10daaa80;
 extern "C" Matrix4 DAT_10836ec8;           // parent matrix of the overhead pass (identity, set in game_reset.cpp)
 extern "C" Matrix4 DAT_108392d8;           // the current view-projection matrix
@@ -131,7 +125,7 @@ void FUN_1000f7f0(void)
                 DAT_10f66928.x += 1100.0f;
                 DAT_10f66928.y += 1100.0f;
                 DAT_10255f08->QueueDraw(&DAT_10836ec8, &view,
-                                        DAT_10804bf8.M_10164c10(&DAT_10db6ee8[0], &DAT_118e69e8, &DAT_118e6cb8), -1,
+                                        DAT_10804bf8.LightDirection(&DAT_10db6ee8[0], &DAT_118e69e8, &DAT_118e6cb8), -1,
                                         &DAT_10da90d0, 0);
                 DAT_104c007c->flags = flags;
                 DAT_10f655bc = 0;

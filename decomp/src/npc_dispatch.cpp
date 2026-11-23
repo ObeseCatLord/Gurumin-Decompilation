@@ -9,12 +9,7 @@
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// The model bank at 0x10804bf8 (model_bank.cpp).
-struct ModelBank
-{
-    // 0x10164c10: a direction for model `model` from the player's position and velocity (0 when the bank is off).
-    const Vec4 *M_10164c10(AnimModel *model, Vec4 *position, Vec4 *velocity);
-};
+#include "model_bank.h"
 
 struct CollisionWorld
 {
@@ -25,7 +20,6 @@ struct CollisionWorld
 
 #include "char_state.h"
 
-extern "C" ModelBank DAT_10804bf8;
 extern "C" CollisionWorld *DAT_10255f08;
 extern "C" Vec4 DAT_118e69e8;            // player position
 extern "C" Vec4 DAT_118e6cb8;            // player velocity
@@ -100,7 +94,7 @@ extern "C" int FUN_100dfcf0(int index)
             Vec4 top = DAT_10db6ee8[index].matrix.GetTranslation();
             from.Copy(top);
             top.z += 10.0f;
-            Vec4 direction = *DAT_10804bf8.M_10164c10(&DAT_10db6ee8[index], &DAT_118e69e8, &DAT_118e6cb8);
+            Vec4 direction = *DAT_10804bf8.LightDirection(&DAT_10db6ee8[index], &DAT_118e69e8, &DAT_118e6cb8);
             direction.Normalized3();
             float distance = 1000.0f;
             from.Copy(from - direction * distance);
@@ -108,14 +102,14 @@ extern "C" int FUN_100dfcf0(int index)
             {
                 ground.x = from.x;
                 ground.y = from.y;
-                DAT_10db6ee8[index].m_2434.SetTranslation(ground);
+                DAT_10db6ee8[index].shadowMatrix.SetTranslation(ground);
             }
             else
             {
                 ground.x = from.x;
                 ground.y = from.y;
                 ground.z = -3500.0f;
-                DAT_10db6ee8[index].m_2434.SetTranslation(ground);
+                DAT_10db6ee8[index].shadowMatrix.SetTranslation(ground);
             }
         }
     }

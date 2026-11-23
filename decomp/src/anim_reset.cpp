@@ -9,7 +9,7 @@
 #include "anim_model.h"
 
 // 0x10161f80 (AnimModel::ResetState). A few flags are cleared, the whole object is zeroed, then the vectors are
-// set (most to 0, the scale vectors to 1) and the remaining fields cleared again (m_237a = 15, m_2380 = 40). Returns 0.
+// set (most to 0, the scale vectors to 1) and the remaining fields cleared again (shadowOpacity = 15, m_2380 = 40). Returns 0.
 int AnimModel::ResetState()
 {
     m_0012 = 0;
@@ -29,7 +29,7 @@ int AnimModel::ResetState()
     m_0240 = 0;
     m_2408.Fill(0.0f);
     speedDivisor = 0;
-    m_0260 = 1.0f;
+    uniformScale = 1.0f;
     m_0075 = 0;
     m_0078 = 0;
     m_007c = 0;
@@ -44,7 +44,7 @@ int AnimModel::ResetState()
     m_0267 = 0;
     m_0268 = 0;
     m_026c = 0;
-    m_0270 = 0;
+    bankIndex = 0;
     m_0274 = 0;
     m_0278 = 0;
     m_027c = 0;
@@ -77,7 +77,7 @@ int AnimModel::ResetState()
     trackC.frame = 0;
     trackC.playing = 0;
     trackC.looping = 0;
-    m_2284 = 0;
+    shadowHidden = 0;
     m_2288 = 0;
     m_228c.Fill(0.0f);
     m_229c = 0;
@@ -87,7 +87,7 @@ int AnimModel::ResetState()
     m_2374 = 0;
     m_2378 = 0;
     m_2379 = 0;
-    m_237a = 0;
+    shadowOpacity = 0;
     m_237c = 0;
     m_2380 = 0;
     m_2384 = 0;
@@ -112,14 +112,14 @@ int AnimModel::ResetState()
     motionFrame = 0;
     m_2418 = 0;
     holdState = 0;
-    m_0270 = 0;
+    bankIndex = 0;
     m_0274 = 0;
     m_0278 = 0;
     m_027c = 0;
     locked = 0;
     m_2379 = 0;
     m_2378 = 0;
-    m_237a = 15;
+    shadowOpacity = 15;
     loadCount = 0;
     m_0267 = 0;
     m_2474 = 0;
@@ -135,7 +135,7 @@ int AnimModel::ResetState()
     alpha = 1.0f;
     m_02a0 = 0;
     m_237c = 1.0f;
-    m_2284 = 0;
+    shadowHidden = 0;
     trackC.playing = 0;
     trackA.playing = 0;
     trackB.playing = 0;

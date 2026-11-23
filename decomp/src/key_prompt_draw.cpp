@@ -36,7 +36,7 @@ extern "C" int FUN_1000d6b0(const Matrix4 *view)
     for (int i = 0; i < 0x7c; i++)
     {
         AnimModel *character = &DAT_10db6ee8[i];
-        if (character->m_22f0 == 0 || DAT_104bf8f8[i] == 0 || !(character->matrix._41 > -100000.0f))
+        if (character->loadedRoot == 0 || DAT_104bf8f8[i] == 0 || !(character->matrix._41 > -100000.0f))
         {
             DAT_104bf8f8[i] = 0;
             continue;

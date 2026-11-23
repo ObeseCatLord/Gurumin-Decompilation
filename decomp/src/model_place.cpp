@@ -36,7 +36,7 @@ int AnimModel::Teleport(float x, float y, float z)
     if (root != 0)
         root->ReleaseSavedStates();
     matrix.SetTranslation(position);
-    m_2434.SetTranslation(position);
+    shadowMatrix.SetTranslation(position);
     DAT_118e69a8 = IdentityMatrix();
     m_2394 = 1;
     move.Set(0, 0, 0, 0);
@@ -55,7 +55,7 @@ int AnimModel::Teleport(float x, float y, float z)
     m_2384 = 0;
     m_2379 = 0;
     m_2378 = 0;
-    m_237a = 15;
+    shadowOpacity = 15;
     return 0;
 }
 
@@ -98,6 +98,6 @@ int AnimModel::SetPosition(float x, float y, float z)
     m_2384 = 0;
     m_2379 = 0;
     m_2378 = 0;
-    m_237a = 15;
+    shadowOpacity = 15;
     return 0;
 }

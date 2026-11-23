@@ -426,11 +426,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
-## 6. Naming: matched functions without a readable name (1)
+## 6. Naming: matched functions without a readable name (0)
 
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
-- [ ] `10029cf0` 999 bytes (src/char_script.cpp)
 
 ## 7. Comment pass (2 files)
 

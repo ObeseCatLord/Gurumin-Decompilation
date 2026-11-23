@@ -2,6 +2,7 @@
 // slot index + 2 + k and keeps its health and revival state in the owner's records. The three updates are the
 // same code for k = 0, 1 and 2.
 
+#include "last_position.h"
 #include "vec4.h"
 
 #include "matrix4.h"
@@ -14,15 +15,6 @@ Matrix4 RotationZ(float angle);                      // 0x101b1b40
 #include "char_state.h"
 #include "char_slot.h"
 
-// The last position and step of each character (route_walk.cpp StepRecord).
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
-
-extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" Node *DAT_1021bdf8[0x80][9];              // [1], [2]: the companion's attached effect nodes
 #include "char_tables.h"
 #include "char_vars.h"

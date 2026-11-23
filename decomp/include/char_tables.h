@@ -13,7 +13,6 @@
 #include "kind_counter.h"
 #include "matrix4.h"
 #include "move_limit.h"
-#include "step_record.h"
 #include "vec4.h"
 
 struct Node;   // node.h
@@ -87,7 +86,6 @@ extern "C" int DAT_104679a0[CHAR_SLOT_COUNT];
 extern "C" char DAT_10468730[CHAR_SLOT_COUNT];
 extern "C" int DAT_104bf8f8[CHAR_SLOT_COUNT];             // 1 while a key prompt is shown over the character; key prompt shown per character (app_0008.cpp)
 extern "C" Vec4 DAT_104c4438[CHAR_SLOT_COUNT];            // where a wave enemy came in
-extern "C" StepRecord DAT_10802c08[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10836fc8[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10837fc8[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10864cf8[CHAR_SLOT_COUNT];            // ground point found below each slot

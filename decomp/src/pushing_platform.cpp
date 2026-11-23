@@ -2,6 +2,7 @@
 // the health of character slot BLOCK_TRIGGER_SLOT falls below half of its maximum, rises back by 5 units a frame
 // and then shoves the player out of the way.
 
+#include "last_position.h"
 #include "vec4.h"
 
 #include "vec3.h"
@@ -20,15 +21,7 @@
 // The character slot whose health falling below half drops the waiting blocks.
 #define BLOCK_TRIGGER_SLOT 59
 
-// A 0x40-byte record per character slot (route_walk.cpp StepRecord): the position of the last frame.
-struct LastPosition
-{
-    Vec4 position;
-    char pad_0010[0x30];
-};
-
 extern "C" CharMoveLock DAT_10db9380[0x80];
-extern "C" LastPosition DAT_10802bf8[0x80];
 #include "char_vars.h"
 
 extern "C" Vec3 *DAT_1032d5b8[];                 // positions of the characters moved by routes

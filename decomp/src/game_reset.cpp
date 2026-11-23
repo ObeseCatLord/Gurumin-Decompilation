@@ -2,6 +2,7 @@
 // game global is cleared, the HUD textures are released, the camera, sound, scene and script systems reset and the
 // player's parameters set back to their starting values.
 
+#include "last_position.h"
 #include <string.h>
 #include "char_slot.h"
 #include "char_state.h"
@@ -11,14 +12,6 @@
 #include "matrix4.h"
 
 Matrix4 IdentityMatrix();                        // 0x101b0ba0
-
-// A 0x40-byte record per character slot (route_walk.cpp StepRecord): the position of the last frame and the step.
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
 
 #include "game_reset.h"
 
@@ -78,7 +71,6 @@ extern "C" int DAT_104bfe24;
 #include "win_vars.h"
 extern "C" EmptyObject DAT_1065cb28;
 extern "C" Vec4 DAT_108029b8;
-extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" EmptyObject DAT_10836c70;
 extern "C" SmallRecord DAT_10860de8[0x40];
 extern "C" MmvPlayer DAT_10f08ab0;

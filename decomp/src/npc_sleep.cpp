@@ -2,6 +2,7 @@
 // player wakes it, then looks around and turns to the player. Views the character records from their model part
 // (0x10db6ee8) like char_move.cpp.
 
+#include "last_position.h"
 #include <math.h>
 
 #include "vec4.h"
@@ -14,19 +15,10 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-// The last position and step of each character (route_walk.cpp StepRecord).
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
-
 #include "char_tables.h"
 #include "char_vars.h"
 
 extern "C" float DAT_10255160[0x80][4];
-extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int FUN_1000d620(int index, int key, int frames);                // KeyPrompt_Show
 extern "C" int FUN_10043cc0(int index);                                     // Char_ResetState
 

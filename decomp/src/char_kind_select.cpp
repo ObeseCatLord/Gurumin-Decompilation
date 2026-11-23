@@ -1,6 +1,7 @@
 // Choosing a character's behaviour kind from its script code (called when a character is set up or its script
 // changes it): the code's digit pairs select a kind, and a changed kind resets the character's AI state.
 
+#include "last_position.h"
 #include <string.h>
 
 #include "vec4.h"
@@ -8,19 +9,10 @@
 
 #include "char_slot.h"
 
-// The last position and step of each character (route_walk.cpp StepRecord).
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
-
 #include "char_tables.h"
 
 extern "C" int DAT_10255160[0x80][4];
 extern "C" int DAT_1021bdf8[0x80][9];
-extern "C" LastPosition DAT_10802bf8[0x80];
 
 // 0x1001b0a0 (Char_SelectKind). Sets the kind of character `index` from its script code: the millions pair picks a
 // special kind (some with an alternative when `alternative` is set), the ten-thousands pair 0x44 or 0x59, else the

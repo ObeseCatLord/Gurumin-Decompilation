@@ -8,11 +8,10 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-#include "slot_position.h"
+#include "last_position.h"
 #include "slot_motion.h"
 
 
-extern "C" SlotPosition DAT_10802bf8[0x80];
 extern "C" SlotMotion DAT_10255160[0x80];
 extern "C" int FUN_1013f880(void);  // the game's random number
 #include "char_vars.h"

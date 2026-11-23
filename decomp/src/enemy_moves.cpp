@@ -6,9 +6,8 @@
 
 #include "vec4.h"
 
-#include "start_vectors.h"
+#include "last_position.h"
 
-extern "C" StartVectors DAT_10802bf8[0x80];
 // Char_ProbeAhead (collide_query.cpp): casts a ray `depth` ahead of character `index`.
 extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, int testOnly, const Vec4 *offset);
 

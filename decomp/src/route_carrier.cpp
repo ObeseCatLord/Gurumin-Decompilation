@@ -1,3 +1,4 @@
+#include "last_position.h"
 #include <math.h>
 
 // A character that walks one of the map's routes (0x100451c0, behaviour 9 of Char_RunBehaviour 0x100dfcf0),
@@ -13,19 +14,10 @@ typedef char check_walker[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-// The last position and step of each character (route_walk.cpp StepRecord); here the position holds the velocity.
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
-
 #include "char_slot.h"
 
 #include "route_point.h"
 
-extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" RoutePoint DAT_10210fc0[][16];     // the routes of the map
 #include "char_tables.h"
 #include "world.h"

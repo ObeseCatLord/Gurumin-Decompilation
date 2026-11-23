@@ -12,11 +12,10 @@
 
 #include "char_state.h"
 
-#include "start_vectors.h"
+#include "last_position.h"
 
 #include "pose_entry.h"
 
-extern "C" StartVectors DAT_10802bf8[0x80];
 extern "C" PoseEntry DAT_1021bdf8[0x80];
 #include "char_tables.h"
 extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a);   // ColourFade_Start
@@ -38,7 +37,7 @@ extern "C" int FUN_10043cc0(int index)
     DAT_10255a88[index] = 1;
     DAT_10db6ee8[index].m_008d = 0;
     DAT_10802bf8[index].position.Fill(0);
-    DAT_10802bf8[index].m_0010.Fill(0);
+    DAT_10802bf8[index].step.Fill(0);
     DAT_10db6ee8[index].m_0012 = 0;
     memset(&DAT_1021bdf8[index], 0, sizeof(PoseEntry));
     int value = DAT_102548c0[index];

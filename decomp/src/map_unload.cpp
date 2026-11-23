@@ -2,6 +2,7 @@
 // map loader 0x10050460): the map's object records, models and textures are freed and every per-map table is
 // cleared.
 
+#include "last_position.h"
 #include <string.h>
 
 #include "vec4.h"
@@ -19,13 +20,6 @@ struct MapObject
 
 #include "char_state.h"
 
-// A 0x40-byte record per character slot (route_walk.cpp StepRecord): the position of the last frame and the step.
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
 #include "engine_memory.h"
 extern "C" MapObject *DAT_104c03c0;
 #include "camera_vars.h"
@@ -39,7 +33,6 @@ extern "C" int DAT_104c03ac;
 extern "C" int DAT_10255160[0x200];
 extern "C" int DAT_1021bdf8[0x80][9];
 extern "C" char DAT_1020da50[8][0x50];
-extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int FUN_10174c70(int slot, int force);    // Texture_Release
 
 // 0x10023d30 (Map_Unload). Frees the map object records, the held models and their data, resets the per-map

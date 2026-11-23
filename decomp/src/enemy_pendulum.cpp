@@ -1,6 +1,7 @@
 // A swinging enemy (0x10044560, called from the behaviour dispatch 0x100dfcf0): it drops from 500 units above its
 // place to 100 above it, then swings on a 400 unit line from there like a pendulum until it sees the player.
 
+#include "last_position.h"
 #include "vec4.h"
 
 #include "matrix4.h"
@@ -16,17 +17,8 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-// The last position and step of each character (route_walk.cpp StepRecord); here the position holds the pivot.
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
-
 #include "char_slot.h"
 
-extern "C" LastPosition DAT_10802bf8[0x80];
 #include "char_tables.h"
 #include "char_vars.h"
 

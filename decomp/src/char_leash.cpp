@@ -6,7 +6,7 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-#include "slot_position.h"
+#include "last_position.h"
 #include "move_limit.h"
 
 
@@ -18,7 +18,6 @@ inline float AbsFloat(float value)
 
 #include "char_tables.h"
 
-extern "C" SlotPosition DAT_10802bf8[0x80];
 
 // 0x10024e80 (Char_OutsideLimit). 1 when moving character `index` by (dx, dy) would take it further from its start
 // position than its x or y range allows, else 0.

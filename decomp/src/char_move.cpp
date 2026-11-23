@@ -1,6 +1,7 @@
 // Character movement vectors. The character records are 0x249c bytes; this file views them from their model part
 // (0x10db6ee8, 0x10 bytes into each Character of world.h), where all the fields used here fall inside one record.
 
+#include "last_position.h"
 #include <math.h>
 #include <string.h>
 #include "vec4.h"
@@ -814,16 +815,6 @@ extern "C" int FUN_100b23b0(int index)
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
-// The last position and step of each character (route_walk.cpp StepRecord); here the position holds the
-// character's own move vector.
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
-
-extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner,
                             int value, int frame, const Matrix4 *matrix, const void *options);  // Char_StartEffect
 extern "C" int FUN_100246b0(const Vec4 *from, const Vec4 *to, Vec4 *hit, int testOnly, const char *name);  // Collision_RayCast

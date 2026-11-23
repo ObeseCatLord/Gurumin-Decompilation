@@ -2,6 +2,7 @@
 // hidden far away until the player comes near its home, picks a random spot around the home that it can stand on
 // and slides into place while fading in.
 
+#include "last_position.h"
 #include "node.h"
 #include "map_vars.h"
 #include "vec4.h"
@@ -14,17 +15,8 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-// The last position and step of each character (route_walk.cpp StepRecord); here the position holds the home.
-struct LastPosition
-{
-    Vec4 position;
-    Vec4 step;
-    char pad_0020[0x20];
-};
-
 struct VisData;
 
-extern "C" LastPosition DAT_10802bf8[0x80];
 #include "char_tables.h"
 
 extern "C" int FUN_1013f880(void);            // the game's random number

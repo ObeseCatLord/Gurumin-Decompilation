@@ -8,7 +8,7 @@
 #include "anim_model.h"
 
 #include "char_move_lock.h"
-#include "step_record.h"
+#include "last_position.h"
 
 #include "char_state.h"
 
@@ -50,7 +50,7 @@ extern "C" int FUN_1002a110(int slot, int run)
         DAT_10db6ee8[slot].SetPosition(target.x, target.y, target.z);
     }
     DAT_1020b430[slot].targetPoint = next;
-    DAT_10802c08[slot].step.Fill(0.0f);
+    DAT_10802bf8[slot].step.Fill(0.0f);
     if (DAT_1020b430[slot].routeStopped == 0)
     {
         step.Copy(target - DAT_10db6ee8[slot].matrix.GetTranslation());
@@ -63,7 +63,7 @@ extern "C" int FUN_1002a110(int slot, int run)
         DAT_10db6ee8[slot].matrix.m[12] += step.x;
         DAT_10db6ee8[slot].matrix.m[13] += step.y;
         DAT_10db6ee8[slot].matrix.m[14] += step.z;
-        DAT_10802c08[slot].step.Copy(step);
+        DAT_10802bf8[slot].step.Copy(step);
         DAT_10db6ee8[slot].velocity.Fill(0.0f);
     }
     DAT_10db6ee8[slot].velocity.Fill(0.0f);

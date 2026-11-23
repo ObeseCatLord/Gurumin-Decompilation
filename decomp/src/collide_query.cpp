@@ -87,9 +87,8 @@ extern "C" int FUN_100248e0(Vec4 position, Vec4 *ground, float height)
     return 1;
 }
 
-#include "slot_vector.h"
+#include "last_position.h"
 
-extern "C" SlotVector DAT_10802bf8[0x80];
 #include "char_tables.h"
 #include "char_vars.h"
 
@@ -104,7 +103,7 @@ extern "C" int FUN_1001a450(int slot, const Vec4 *point)
         Vec4 low;
         Vec4 high;
         Vec4 hit;
-        low.Copy(DAT_10802bf8[slot].vector * 15.0f);
+        low.Copy(DAT_10802bf8[slot].position * 15.0f);
         low.Copy(low + *point);
         high.Copy(low);
         high.z += 50.0f;

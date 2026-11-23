@@ -28,6 +28,8 @@ retype those members first.
 2. Merge the struct views into one full definition each (`CharRecord`, `NpcState`, `TextureObject`, `ModelBank`,
    `BankModel`, `Game`): union the known fields, check every offset with a `sizeof`/offset assertion, and resolve
    conflicting field names from the evidence.
+   Status 2026-11-22: done for these and for TextureObject/MeshInstance, the effect tables (effect_manager.h),
+   CharSlot (char_slot.h, at DAT_10daaae8) and the CharState `words[k]` users.
 3. Move the `extern "C"` globals into headers next to their owner type, one declaration each.
 4. Teach `build_all.py` to report "matched under the rules" (no per-file type or global declarations in the
    function's file) next to the byte count.
@@ -35,7 +37,7 @@ retype those members first.
 ## Phase A: finish the medium functions (251-800 bytes)
 
 1. Effect manager family (char_effects.cpp): `EffectManager::Step` 0x10184440, `M_10172350` (start effect),
-   the remaining 0x1017xxxx/0x10188xxx effect helpers; give EffectRecordA its full field list.
+   the remaining 0x1017xxxx/0x10188xxx effect helpers; extend effect_manager.h's EffectRecord field list.
 2. Enemy behaviours (enemy_moves.cpp): 0x10027630, 0x100279b0, 0x10027da0, 0x10026d80 (largest), then the
    behaviour updaters 0x100a9240, 0x100aa820, 0x100ade30, 0x100af1b0, 0x100a5960, 0x100a6a50, 0x100a7150,
    0x100a77f0, 0x100a7db0, 0x100a8370, 0x10076790, 0x1001d2d0 (dispatched by Enemy_UpdateBehaviour).

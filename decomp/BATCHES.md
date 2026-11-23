@@ -342,3 +342,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 278 | phase0 | - | dinput_min.h (input_poll, input_font, player_damage); 789 matched unchanged |
 | 279 | phase0 | - | Character (DAT_10db6ed8) views are AnimModels at DAT_10db6ee8 (world.h + 35 files); npc_greet still deferred; 789 matched unchanged |
 | 280 | phase0 | - | char_state.h (CharState + 13 views of DAT_1020b430), model_bank.h, effect_manager.h (EffectOptions), texture_object.h, game.h globals, listbank.h, Playback for model_state/mesh_cache; 789 matched unchanged |
+| 281 | phase0 | - | MeshInstance = TextureObject (TextureHandle base); effect tables in effect_manager.h (EffectDef/EffectRecord/EffectSprite/EffectLight); CharSlot at DAT_10daaae8 in char_slot.h (CharParams, CharSlot@DAT_10daab84, ActorSlot, PlayerRecord views merged); CharState words[k] named; 789 matched unchanged |

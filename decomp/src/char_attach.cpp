@@ -21,11 +21,6 @@ struct ItemInfo
 extern "C" ItemInfo DAT_1088e6b0[];
 #include "char_vars.h"
 
-extern "C" char DAT_104c033a;            // face variant: from the costume and the helmet worn with it
-extern "C" Node *DAT_104c00f8;           // the player's "scop-pt" node (0 = none)
-extern "C" Node *DAT_104c00fc;           // the player's "charbase0" node
-extern "C" Node *DAT_104c0100;           // "scop-2pt" (costume 6 only)
-extern "C" Node *DAT_104c0104;           // "scop-3pt" (costume 6 only)
 
 // With `attach` = 1: loads model `name` as a child "scop" of the right hand of character `index` (once).
 // Otherwise removes the "scop" child again. Returns 0 when the character has no model, else 1.

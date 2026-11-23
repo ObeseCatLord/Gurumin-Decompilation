@@ -18,7 +18,6 @@
 
 extern "C" void (*DAT_11b1ba40)(void *block);        // the engine's free
 extern "C" char DAT_103150c0[0x80];
-extern "C" int DAT_10446e00[0x28];
 
 extern "C" int FUN_1013fb10(int active, int target, int frames);
 extern "C" int FUN_1000e810(void);

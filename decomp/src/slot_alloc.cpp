@@ -3,9 +3,9 @@
 #include "vec4.h"
 
 #include "effect_manager.h"
-extern "C" unsigned int DAT_104c013c;
+#include "char_vars.h"
+
 extern "C" char DAT_10254c40[0x400];
-extern "C" Vec4 DAT_104c0438[0x400];
 
 // Takes the next free entry of the 0x400-entry position ring (DAT_10254c40 = in use) after the last one used,
 // stores `position` there and returns 1; gives up after 100 tries and returns 0.

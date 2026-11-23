@@ -226,7 +226,6 @@ int EffectManager::ClearTables()
     return 0;
 }
 
-extern "C" char DAT_1101de64;
 extern "C" int FUN_1016f900(void);        // adds the default effect definition (effect_defs.cpp)
 
 // 0x101842a0. Full initialisation at load time: Reset plus the effect definitions. The colour becomes white, every

@@ -24,10 +24,6 @@ extern "C" FrameTimer DAT_10836c70;
 #include "ui_vars.h"
 
 extern "C" int DAT_1020b444;                         // frames before the "last page" message may show again
-extern "C" Node *DAT_104c03cc;                       // the turning sheet
-extern "C" Node *DAT_104c03d0;                       // the right half
-extern "C" Node *DAT_104c03d4;                       // the left half
-extern "C" Node *DAT_104c03d8;                       // the book cover
 extern "C" char DAT_10467ea0;
 
 extern "C" int FUN_1001e1a0(const char *name, const char *alphaName);  // Texture_Load

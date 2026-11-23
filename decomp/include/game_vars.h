@@ -76,7 +76,7 @@ extern "C" int DAT_102559f8;
 extern "C" int DAT_102559fc;
 extern "C" int DAT_10255a00;
 extern "C" int DAT_10255a08[0x10];
-extern "C" Node*DAT_10255f0c;
+extern "C" Node *DAT_10255f0c;
 extern "C" char DAT_10256110[];                           // name of system.sav
 extern "C" int DAT_103088b4;
 extern "C" int DAT_1030b660;                              // map to enter
@@ -349,6 +349,7 @@ extern "C" char DAT_104c01ac;
 extern "C" int DAT_104c01c8;
 extern "C" int DAT_104c01cc;
 extern "C" int DAT_104c01d8;
+extern "C" Node *DAT_104c01dc;
 extern "C" int DAT_104c01e0;
 extern "C" int DAT_104c01e4;
 extern "C" int DAT_104c01e8;
@@ -367,6 +368,7 @@ extern "C" char DAT_104c0232;
 extern "C" int DAT_104c0234;
 extern "C" char DAT_104c023c;
 extern "C" char DAT_104c023e;
+extern "C" int DAT_104c0270[0x10];                        // anti-tamper noise table
 extern "C" int DAT_104c02b0;                              // number of groups read
 extern "C" char DAT_104c02e6;
 extern "C" char DAT_104c02e7;

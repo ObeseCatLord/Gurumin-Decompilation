@@ -36,7 +36,7 @@ struct MarkerOwner
 
 extern "C" Node *DAT_10255f08;          // the world's root node
 extern "C" MarkerOwner *DAT_104c03ac;
-extern "C" char *DAT_104c0394;          // one byte per marker: 1 = no ground below it
+#include "map_vars.h"
 
 // 0x10020f60. For every marker point: sets its flag to 4 and casts a ray from 10000 units above it to 10000 units
 // below it against the world's "testatari" ("test hit") regions; the result byte in DAT_104c0394 becomes 1 when

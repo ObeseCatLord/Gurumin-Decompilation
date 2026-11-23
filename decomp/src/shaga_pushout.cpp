@@ -13,7 +13,6 @@ struct CollisionWorld
     int Query(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, int *hitId, int a, int b);  // 0x101a1640
 };
 
-extern "C" Node *DAT_10446e00[];   // the shaga models (shaga_spawn.cpp)
 #include "char_vars.h"
 
 extern "C" CollisionWorld *DAT_10255f08;

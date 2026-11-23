@@ -10,9 +10,6 @@ extern "C" Node *DAT_10255f08;                       // the map model
 #include "game_vars.h"
 #include "map_vars.h"
 
-extern "C" Node *DAT_1049ef90[];                     // alpha-pass nodes: the "Q" node of each listed part
-extern "C" Node *DAT_102550c0[];                     //   its "QQ" node
-extern "C" Node *DAT_1020aefc[];                     //   its "QQ...Alpha" node
 
 // Finds node `name` in the map model and sets or clears node state bits on it (when it exists).
 #define SET_NODE(name, bits)     node = DAT_10255f08->Find(name, 0);     if (node != 0)         node->SetFlags(bits)

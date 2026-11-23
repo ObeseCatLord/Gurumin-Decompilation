@@ -16,6 +16,7 @@ extern "C" int DAT_102028d0;
 extern "C" int DAT_102028d4;
 extern "C" int DAT_102028dc;
 extern "C" char DAT_10202b40[][0x100];
+extern "C" Node *DAT_1020aefc[0x8];                       // its "QQ...Alpha" node
 extern "C" int DAT_1020dcd0[10];
 extern "C" int DAT_102108d0[6];                           // owner of each attached matrix (0 = free)
 extern "C" int DAT_10219bb8;
@@ -25,16 +26,19 @@ extern "C" int DAT_1021bbf8[0x5c];
 extern "C" int DAT_1021d018[0x28];
 extern "C" char DAT_1021f3fa[0x42];
 extern "C" int DAT_102549a8[0x42];
+extern "C" Node *DAT_102550c0[0x8];                       // its "QQ" node
 extern "C" int DAT_10255960[3][12];
 extern "C" int DAT_102564a0;                              // number of map object records
 extern "C" int DAT_103088d0[0xb64];
 extern "C" int DAT_1032d868;                              // number of listed parts
 extern "C" int DAT_1042dea8[0x5c];                        // per-character group numbers (characters 0..0x5b)
+extern "C" Node *DAT_1049ef90[0x8];                       // alpha-pass nodes: the "Q" node of each listed part
 extern "C" int DAT_1049efd8[0x3c];
 extern "C" float DAT_1049f3dc[][16][16];                  // height samples per object, 25 units apart (-200 = none)
 extern "C" int DAT_104bfdb4;                              // the ground object nearest to the player
-extern "C" Node*DAT_104c0080;                             // second water node (found next to the surface)
-extern "C" Node*DAT_104c0084;                             // "ICERIPA": the ice surface added below the water node
+extern "C" Node *DAT_104c007c;                            // the water surface node; the map's model
+extern "C" Node *DAT_104c0080;                            // second water node (found next to the surface)
+extern "C" Node *DAT_104c0084;                            // "ICERIPA": the ice surface added below the water node
 extern "C" int DAT_104c00b8;                              // non-zero = invulnerable
 extern "C" char DAT_104c02dc;                             // 1 while the water is frozen
 extern "C" int DAT_104c0350;
@@ -44,11 +48,12 @@ extern "C" int DAT_104c0368;                              // that voice (-5000..
 extern "C" int DAT_104c036c;                              // 1 once a scripted character was registered
 extern "C" int DAT_104c0370;
 extern "C" int DAT_104c038c;
-extern "C" Node*DAT_104c0390;                             // the model of the map's held object
+extern "C" Node *DAT_104c0390;                            // the model of the map's held object
+extern "C" char *DAT_104c0394;                            // one byte per marker: 1 = no ground below it
 extern "C" short DAT_104c0398;
-extern "C" void*DAT_104c03a0;
+extern "C" void *DAT_104c03a0;
 extern "C" int DAT_104c03a4;
-extern "C" Node*DAT_104c03a8;
+extern "C" Node *DAT_104c03a8;
 extern "C" int DAT_104c03b4;
 extern "C" int DAT_104c03b8;
 extern "C" int DAT_104c03bc;

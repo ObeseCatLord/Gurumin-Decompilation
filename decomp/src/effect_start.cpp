@@ -9,7 +9,6 @@
 
 #include "render_vars.h"
 
-extern "C" unsigned char DAT_1101de64;               // next entry of that cache
 extern "C" int FUN_10161920(const char *name);       // Texture_FindByName
 
 // 0x10172350 (EffectManager::Start). Starts the effect with script id `effect` at `position`: finds its definition

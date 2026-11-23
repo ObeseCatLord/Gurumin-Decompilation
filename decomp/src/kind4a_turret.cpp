@@ -15,7 +15,6 @@
 
 #include "char_tables.h"
 
-extern "C" char DAT_102550e0[0x80];              // 1 = the character was hit (attack at once)
 extern "C" int FUN_1013f880(void);               // the game's random number
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int a, int b, int c, int d, int e, int f, int g);

@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.6645,
+  "fuzzy_match_percent": 14.6646,
   "total_code": "1720206",
   "matched_code": "199043",
   "matched_code_percent": 11.5709,
@@ -5035,7 +5035,7 @@
   {
    "name": "app/effect_start",
    "measures": {
-    "fuzzy_match_percent": 68.9366,
+    "fuzzy_match_percent": 68.75,
     "total_code": "1068",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -5056,14 +5056,14 @@
     {
      "name": ".text",
      "size": "1068",
-     "fuzzy_match_percent": 68.9366
+     "fuzzy_match_percent": 68.75
     }
    ],
    "functions": [
     {
      "name": "?Start@EffectManager@@QAEHHUVec4@@HHPBUMatrix4@@HH1PBUEffectOptions@@PAH@Z",
      "size": "1068",
-     "fuzzy_match_percent": 68.9366,
+     "fuzzy_match_percent": 68.75,
      "metadata": {
       "virtual_address": "269951824"
      }
@@ -7763,7 +7763,7 @@
   {
    "name": "app/map_enter_reset",
    "measures": {
-    "fuzzy_match_percent": 95.4291,
+    "fuzzy_match_percent": 95.8022,
     "total_code": "1069",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -7784,14 +7784,14 @@
     {
      "name": ".text",
      "size": "1069",
-     "fuzzy_match_percent": 95.4291
+     "fuzzy_match_percent": 95.8022
     }
    ],
    "functions": [
     {
      "name": "_FUN_10023900",
      "size": "1069",
-     "fuzzy_match_percent": 95.4291,
+     "fuzzy_match_percent": 95.8022,
      "metadata": {
       "virtual_address": "268581120"
      }

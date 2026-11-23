@@ -35,7 +35,6 @@ extern "C" LastPosition DAT_10802bf8[0x80];
 #include "char_vars.h"
 
 extern "C" CollisionWorld *DAT_10255f08;
-extern "C" unsigned short DAT_104c0380;       // frame counter
 extern "C" int FUN_100241e0(int index, float x, float y, float z);   // Character_SetMove
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 

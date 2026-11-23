@@ -6,7 +6,6 @@
 #include "effect_manager.h"
 #include "render_vars.h"
 
-extern "C" char DAT_1101de64;
 
 // Takes the first free effect definition, names it "未設定" ("not set"), gives it its defaults and clears the
 // lookup caches (-1). Returns its index, or -1 when all are in use.

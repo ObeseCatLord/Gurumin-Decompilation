@@ -34,7 +34,6 @@ extern "C" MoviePlayer DAT_10f08ab0;
 #include "map_vars.h"
 #include "ui_vars.h"
 
-extern "C" unsigned char DAT_104c033a;                 // face variant (char_attach.cpp)
 extern "C" char DAT_104686b0;
 extern "C" char DAT_1020d4c0;
 extern "C" int FUN_1003ad20(int sound, const Vec4 &position, float volume);  // Sound_PlayEffect

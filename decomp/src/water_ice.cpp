@@ -3,7 +3,6 @@
 
 #include "node.h"
 
-extern "C" Node *DAT_104c007c;   // the water surface node
 #include "map_vars.h"
 
 extern "C" float DAT_104bfe24;   // height of the ice surface

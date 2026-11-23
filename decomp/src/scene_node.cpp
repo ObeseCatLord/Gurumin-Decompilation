@@ -66,7 +66,7 @@ extern "C" void (*DAT_11b1ba40)(void *);
 #include "char_vars.h"
 #include "render_vars.h"
 
-extern "C" int DAT_11b002d0[0x80];
+#include "char_tables.h"
 
 // Frees the index buffers of `count` index lists.
 extern "C" void __stdcall FUN_101911e0(IndexList *pairs, int count)

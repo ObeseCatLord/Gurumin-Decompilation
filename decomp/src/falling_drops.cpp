@@ -19,7 +19,6 @@ struct TriangleBatch
 #define DROP_COUNT 0x400
 
 extern "C" TriangleBatch DAT_1021cffc;
-extern "C" Vec4 DAT_104c0438[DROP_COUNT];          // drop positions
 extern "C" unsigned char DAT_10254c40[DROP_COUNT]; // 0 = unused, 1 = falling, 2..30 = fading out
 extern "C" Matrix4 DAT_108392d8;                   // the current view-projection matrix
 #include "char_vars.h"

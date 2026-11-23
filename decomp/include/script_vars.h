@@ -13,7 +13,7 @@ extern "C" int DAT_1049eadc;
 extern "C" int DAT_1049eae4;
 extern "C" int DAT_104bfe84;                              // ring read index
 extern "C" char DAT_104c0338;
-extern "C" char*DAT_10c5e1c4[];                           // script texts by number
+extern "C" char *DAT_10c5e1c4[];                           // script texts by number
 extern "C" int DAT_10f20590[0x10000];
 extern "C" unsigned short DAT_10f65558;                   // position in the random table
 

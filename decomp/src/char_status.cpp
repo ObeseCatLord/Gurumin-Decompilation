@@ -18,10 +18,8 @@ struct CharMatrixView
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" unsigned char DAT_102550e0[];
 extern "C" char DAT_1020d4c0[];       // per-character state written here (4 or 6)
 extern "C" CharMatrixView DAT_10db9210[];
-extern "C" int DAT_104c00f8;          // non-zero = keep the offsets up to date
 
 // 0x1001a840 (Char_ClampStatus). Clamps the counter (15) and level (5), clears the flag and keeps the larger value. A character whose
 // life has run out is marked down. Otherwise, in mode 7 the state becomes 6 when the count is above 4 and 4 when

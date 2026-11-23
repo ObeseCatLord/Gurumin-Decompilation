@@ -28,7 +28,6 @@ extern "C" Engine DAT_10836c70;
 #include "map_vars.h"
 
 extern "C" void FUN_1000e750(void);           // AntiTamper_Store
-extern "C" Node *DAT_10446e00[];
 extern "C" int DAT_104bf8a4;
 extern "C" Node *DAT_10255f08;               // the map's root node
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`

@@ -6,6 +6,8 @@
 
 #include "matrix4.h"
 
+struct Node;   // node.h
+
 extern "C" char DAT_101d65b0[][0x10];                     // icon file names
 extern "C" const char DAT_101fc7e4[];                     // c_dfDIMouse
 extern "C" const char DAT_101fc9ec[];                     // c_dfDIKeyboard
@@ -46,6 +48,10 @@ extern "C" unsigned char DAT_104c0230;
 extern "C" unsigned char DAT_104c02cc;                    // caption scroll timer
 extern "C" unsigned char DAT_104c02cd;                    // how far the ability list can scroll
 extern "C" char DAT_104c0339;
+extern "C" Node *DAT_104c03cc;                            // the turning sheet
+extern "C" Node *DAT_104c03d0;                            // the right half
+extern "C" Node *DAT_104c03d4;                            // the left half
+extern "C" Node *DAT_104c03d8;                            // the book cover
 extern "C" int DAT_104c03e0;
 extern "C" int DAT_104c03e4;                              // 1 while the pages turn
 extern "C" int DAT_104c03e8;                              // non-zero in the second book
@@ -83,14 +89,14 @@ extern "C" int DAT_10f66de4;
 extern "C" int DAT_10f66de8;
 extern "C" int DAT_10f66df0;                              // 1 once input has finished
 extern "C" char DAT_10f66df8[];                           // the text entered so far
-extern "C" char*DAT_10f66ef8;                             // caller's buffer that receives the entered text (may be 0)
+extern "C" char *DAT_10f66ef8;                            // caller's buffer that receives the entered text (may be 0)
 extern "C" int DAT_10f67000;                              // 1 while text input (IME composition) is active
 extern "C" char DAT_10f68008[];
 extern "C" int DAT_10f68108;
 extern "C" int DAT_10f6810c;
 extern "C" int DAT_10f68110;
 extern "C" int DAT_10f68114;                              // index of the selected candidate
-extern "C" char*DAT_10f68118;                             // buffer that receives the text (see FUN_1015fd30)
+extern "C" char *DAT_10f68118;                            // buffer that receives the text (see FUN_1015fd30)
 extern "C" int DAT_10f6811c;
 
 #endif

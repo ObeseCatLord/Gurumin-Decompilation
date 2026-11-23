@@ -30,12 +30,10 @@ struct MeshOwner
 extern "C" void (*DAT_11b1ba40)(void *);
 #include "game_vars.h"
 
-extern "C" int DAT_104bf8f8[0x7c];
-extern "C" int DAT_1021d138[0x7c];
-extern "C" int DAT_1021f740[0x7c];
+#include "char_tables.h"
+
 extern "C" MeshHolder DAT_10edbe0c[0x40];
 extern "C" int DAT_1020247c[8];
-extern "C" int DAT_104c0270[0x10];
 
 // Releases and frees the owned mesh node and clears the two counters. Returns 1.
 int MeshOwner::M_1000be10()

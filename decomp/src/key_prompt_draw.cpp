@@ -15,8 +15,7 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..
 
 #include "texture_object.h"
 
-extern "C" int DAT_104bf8f8[0x7c];                   // 1 while a key prompt is shown over the character
-extern "C" int DAT_1021d138[0x7c];                   // the prompt: cell (0..15) + 1000 or 2000 for the other sheets
+#include "char_tables.h"
 #include "ui_vars.h"
 
 // 0x1000d6b0 (KeyPrompt_DrawAll). For every character with a prompt (and in use, not removed below x -100000) the

@@ -453,7 +453,6 @@ int TextureObject::Upload(int width, int height, unsigned char *pixels, const un
     return 1;
 }
 
-extern "C" void *DAT_10f08d38;            // depth buffer for off-screen targets
 
 // 0x10143870. Makes this texture's surface the render target (with the off-screen depth buffer) for drawing into
 // it: the textures of stages 0..3 are unbound and the viewport covers offset..width, offset..height (clamped to the

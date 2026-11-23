@@ -23,10 +23,8 @@ extern "C" Node *DAT_1021bdf8[0x80][9];       // [0]: the cart's wheel node
 #include "char_tables.h"
 
 extern "C" float DAT_10255160[0x80][4];       // [0]: the wheel's angle
-extern "C" int DAT_104bf8f8[0x7c];            // key prompt shown (app_0008.cpp)
-extern "C" int DAT_1021d138[0x7c];            // key prompt id
-extern "C" int DAT_1021f740[0x7c];            // key prompt frames left
-extern "C" unsigned short DAT_104c0380;       // frame counter
+#include "char_vars.h"
+
 extern "C" int FUN_10043e20(const Vec4 *target, const Vec4 *eye, float heading, float range, float angleRange,
                             float nearRange, int checkWalls);           // Char_CanSee
 extern "C" int FUN_1001b670(int index, float range, int count, ...);   // Enemies_WakeNearby

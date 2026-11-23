@@ -109,7 +109,6 @@ struct SlotVector
     char pad_0010[0x30];
 };
 
-extern "C" unsigned short DAT_104c0380;  // frame counter
 extern "C" SlotVector DAT_10802bf8[0x80];
 #include "char_tables.h"
 #include "char_vars.h"

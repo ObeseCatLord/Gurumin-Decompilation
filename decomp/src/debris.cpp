@@ -8,16 +8,9 @@
 
 #define DEBRIS_SLOTS 0x100
 
-extern "C" int DAT_1030bdf8[DEBRIS_SLOTS];             // piece type, 0 = free slot
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" Vec4 DAT_10c66ef0[DEBRIS_SLOTS];            // velocity
-extern "C" Vec4 DAT_10866df8[DEBRIS_SLOTS];            // scale
-extern "C" char DAT_1021b628[DEBRIS_SLOTS];            // cleared on spawn
-extern "C" char DAT_102195f0[DEBRIS_SLOTS];            // cleared on spawn
-extern "C" int DAT_104469f8[DEBRIS_SLOTS];             // frames left (0 for the simple pieces)
-extern "C" int DAT_10446eb0[DEBRIS_SLOTS];             // colour of a thrown piece
 extern "C" int FUN_1013f880(void);                     // the game's random number
 
 // 0x1000dd90 (Debris_Spawn). Starts a simple piece of type `type` at (x, y, z) in the first free slot of 0-127:

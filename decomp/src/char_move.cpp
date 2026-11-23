@@ -267,7 +267,6 @@ struct CollisionWorld
 #include "char_slot.h"
 
 extern "C" CollisionWorld *DAT_10255f08;
-extern "C" unsigned short DAT_104c0380;       // frame counter
 extern "C" int DAT_102199b8[0x80];            // per-character group timer (char_reset.cpp)
 
 // 0x100b5c30 (Npc_TurnWhenSeen). Npc_AlertWhenSeen below with one step more: when it reacts, the character also
@@ -380,9 +379,6 @@ int FUN_100b5f80(int index)
     return 0;
 }
 
-extern "C" int DAT_104bf8f8[0x7c];            // key prompt shown (app_0008.cpp)
-extern "C" int DAT_1021d138[0x7c];            // key prompt id
-extern "C" int DAT_1021f740[0x7c];            // key prompt frames left
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);  // Sound_PlayEffect
 
 // 0x100b5550 (Npc_GreetWhenNear). An idling NPC that greets: it plays voice 0x2a3 (speeding up its motion) now and
@@ -1472,7 +1468,6 @@ int FUN_10048b70(int index)
     return 0;
 }
 
-extern "C" unsigned char DAT_102550e0[0x80];  // non-zero = wake at once (the character's level elsewhere)
 
 // 0x10048e90 (Enemy_DropIn). An enemy that drops in from above: on its first frame it is refilled if defeated and
 // placed 200 units ahead and 650 below where it stands (talk id's units 1 or 2 also set DAT_103153b0 to 150), with

@@ -5,7 +5,6 @@
 
 #include "node.h"
 
-extern "C" Node *DAT_11b002d0[0x80];          // the cached models
 #include "char_tables.h"
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // the engine's allocator

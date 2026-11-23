@@ -19,7 +19,6 @@ Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);         // 0x101b10
 
 #include "effect_manager.h"
 
-extern "C" Node *DAT_104c007c;    // the map's model
 extern "C" Node *DAT_10255f08;    // the map's root node
 extern "C" float DAT_104bfe24;    // the pit's floor height
 #include "char_vars.h"

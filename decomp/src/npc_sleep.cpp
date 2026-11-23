@@ -27,10 +27,6 @@ struct LastPosition
 
 extern "C" float DAT_10255160[0x80][4];
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" unsigned char DAT_102550e0[0x80];  // non-zero = wake at once (the character's level elsewhere)
-extern "C" int DAT_104bf8f8[0x7c];            // key prompt shown (app_0008.cpp)
-extern "C" int DAT_1021d138[0x7c];            // key prompt id
-extern "C" int DAT_1021f740[0x7c];            // key prompt frames left
 extern "C" int FUN_1000d620(int index, int key, int frames);                // KeyPrompt_Show
 extern "C" int FUN_10043cc0(int index);                                     // Char_ResetState
 

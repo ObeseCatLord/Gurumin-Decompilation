@@ -15,7 +15,6 @@ extern "C" int DAT_10db9380;
 extern "C" void FUN_1000ec70(int, float, float, float, float);
 extern "C" signed char DAT_103150c0[];
 extern "C" void FUN_1000e810(void);
-extern "C" Node *DAT_104c01dc;
 
 // Opens the message window with `text` (and an optional second line) for `frames` frames.
 extern "C" int FUN_1000ed70(const char *text, const char *subtext, int frames)

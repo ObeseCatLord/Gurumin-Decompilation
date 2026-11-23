@@ -45,7 +45,6 @@ extern "C" int FUN_1000e810(void)
     return 0;
 }
 
-extern "C" int DAT_104c0270[16];
 
 // Penalty: writes a random value into a random entry of the 16-entry noise table.
 inline void TAMPER()

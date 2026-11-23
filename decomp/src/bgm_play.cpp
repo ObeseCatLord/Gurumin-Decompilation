@@ -34,7 +34,8 @@ struct GameFile
 extern "C" BgmTrack DAT_108db358[0x41];
 #include "sound_vars.h"
 
-extern "C" int DAT_104c0270[16];                 // anti-tamper noise table
+#include "game_vars.h"
+
 extern "C" DWORD DAT_104c00e4;                   // tick count when the track was started
 extern "C" void FUN_10010480(const char *name, int a, int b, int c, int d, int fade);   // Bgm_StartStream
 extern "C" int FUN_10161120(char *out, const char *path);                              // Path_GetBaseName

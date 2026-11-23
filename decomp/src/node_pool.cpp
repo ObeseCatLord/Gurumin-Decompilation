@@ -2,7 +2,8 @@
 
 #include "node.h"
 
-extern "C" Node *DAT_11b002d0[0x80];
+#include "char_tables.h"
+
 extern "C" void (*DAT_11b1ba40)(void *);
 
 // Releases and frees every node in the 0x80-entry node pool DAT_11b002d0.

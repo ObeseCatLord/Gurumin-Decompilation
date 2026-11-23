@@ -10,7 +10,6 @@
 
 #include "char_slot.h"
 
-extern "C" Node *DAT_10446e00[0x28];
 #include "char_vars.h"
 #include "map_vars.h"
 

@@ -4,13 +4,13 @@
 #ifndef GURUMIN_RENDER_VARS_H
 #define GURUMIN_RENDER_VARS_H
 
-#include "com_min.h"
 #include "d3d9_min.h"
 #include "matrix4.h"
-#include "mesh.h"
-#include "node.h"
 #include "vec4.h"
 
+struct IUnknownLike;   // com_min.h
+struct MeshData;   // mesh.h
+struct Node;   // node.h
 
 extern "C" int DAT_10202b08;                              // debug keys enabled
 extern "C" int DAT_10202b0c;                              // number of frame buffers
@@ -47,41 +47,42 @@ extern "C" Vec4 DAT_10c66edc;                             // overlay camera posi
 extern "C" Vec4 DAT_10da9150;                             // saved player position
 extern "C" Vec4 DAT_10edbdf8;                             // overlay camera target
 extern "C" int DAT_10f08d30[2];                           // frames left for each of the two colour blends (0 = idle)
+extern "C" IUnknownLike *DAT_10f08d38;                    // depth buffer for off-screen targets
 extern "C" unsigned long DAT_10f08d40[8][0x100];
 extern "C" int DAT_10f0cd40[0x200];
-extern "C" void*DAT_10f0d540;                             // saved depth buffer
+extern "C" void *DAT_10f0d540;                            // saved depth buffer
 extern "C" int DAT_10f0d5c8;                              // draw calls this frame (statistics); number of draw calls this frame
-extern "C" IUnknownLike*DAT_10f0d5e0[0x5a0];
+extern "C" IUnknownLike *DAT_10f0d5e0[0x5a0];
 extern "C" D3DVIEWPORT9_ DAT_10f0ece0;                    // saved viewport
 extern "C" int DAT_10f0edf8;
-extern "C" IUnknownLike*DAT_10f0ee00[16][0x46];           // vertex/index buffers of the 16 draw lists (FUN_1014ddf0)
+extern "C" IUnknownLike *DAT_10f0ee00[16][0x46];          // vertex/index buffers of the 16 draw lists (FUN_1014ddf0)
 extern "C" int DAT_10f0ff80;
 extern "C" char DAT_10f0ff84[];                           // the D3DPRESENT_PARAMETERS used for Reset
 extern "C" int DAT_10f140c0;
 extern "C" int DAT_10f141d4;                              // number of texture switches this frame (statistics)
-extern "C" IUnknownLike*DAT_10f141d8;                     // the IDirect3D9 object
+extern "C" IUnknownLike *DAT_10f141d8;                    // the IDirect3D9 object
 extern "C" unsigned long DAT_10f141e0[8][0x100];
 extern "C" int DAT_10f181e0[0x5a0];
-extern "C" IUnknownLike*DAT_10f1a864;
+extern "C" IUnknownLike *DAT_10f1a864;
 extern "C" int DAT_10f1a86c;
-extern "C" IUnknownLike*DAT_10f1a870[0x5a0];
-extern "C" IUnknownLike*DAT_10f1bff0[0x200];
-extern "C" IUnknownLike*DAT_10f1c7f0[0x5a0];
+extern "C" IUnknownLike *DAT_10f1a870[0x5a0];
+extern "C" IUnknownLike *DAT_10f1bff0[0x200];
+extern "C" IUnknownLike *DAT_10f1c7f0[0x5a0];
 extern "C" int DAT_10f1de70[0x200];
 extern "C" int DAT_10f1e670[0x5a0];
-extern "C" IDirect3DDevice9*DAT_10f1fcf0;                 // the Direct3D device
+extern "C" IDirect3DDevice9 *DAT_10f1fcf0;                // the Direct3D device
 extern "C" float DAT_10f1fcf8;                            // step per update; step per tick
-extern "C" IUnknownLike*DAT_10f1fcfc[2];                  // the two swap targets, created with the device (Render_CreateDevice)
-extern "C" IUnknownLike*DAT_10f1fd00;
-extern "C" IUnknownLike*DAT_10f1fd04[8];                  // render-target surfaces
-extern "C" void*DAT_10f1fd0c;                             // the crossfade pixel shader
-extern "C" IUnknownLike*DAT_10f1fd2c;
+extern "C" IUnknownLike *DAT_10f1fcfc[2];                 // the two swap targets, created with the device (Render_CreateDevice)
+extern "C" IUnknownLike *DAT_10f1fd00;
+extern "C" IUnknownLike *DAT_10f1fd04[8];                 // render-target surfaces
+extern "C" void *DAT_10f1fd0c;                            // the crossfade pixel shader
+extern "C" IUnknownLike *DAT_10f1fd2c;
 extern "C" D3DVIEWPORT9_ DAT_10f1fd30;                    // the full-screen viewport
 extern "C" D3DVIEWPORT9_ DAT_10f1fd48;                    // the off-screen viewport
 extern "C" int DAT_10f1fd90[0x200];
 extern "C" char DAT_10f60690[0x5a0];
-extern "C" void*DAT_10f60d30;                             // saved render target
-extern "C" IUnknownLike*DAT_10f60d38[0x5a0];
+extern "C" void *DAT_10f60d30;                            // saved render target
+extern "C" IUnknownLike *DAT_10f60d38[0x5a0];
 extern "C" unsigned long DAT_10f623d0[0x100];
 extern "C" float DAT_10f628d0;                            // limit
 extern "C" int DAT_10f628e8[0x5a0];
@@ -97,7 +98,7 @@ extern "C" int DAT_10f65490;                              // swap target in use 
 extern "C" int DAT_10f65494;
 extern "C" int DAT_10f65498;                              // 1 while the frame blend is active
 extern "C" float DAT_10f6549c;                            // current strength
-extern "C" IUnknownLike*DAT_10f654ac;                     // dynamic vertex buffer of the 2D drawing code
+extern "C" IUnknownLike *DAT_10f654ac;                    // dynamic vertex buffer of the 2D drawing code
 extern "C" int DAT_10f654c0;                              // counts down by one per tick
 extern "C" int DAT_10f654c4;
 extern "C" int DAT_10f654cc;                              // non-zero when off-screen render targets are supported; render-to-texture available (RenderTarget_Probe); 1 while a texture is the render target
@@ -132,7 +133,7 @@ extern "C" int DAT_10f8d9b8[10];                          // copy of the shadow 
 extern "C" char DAT_10f8dbb8[1600][0x40];
 extern "C" char DAT_10fa6db8[1600];
 extern "C" int DAT_10fa73f8[32];                          // their definitions
-extern "C" MeshData*DAT_10fa7478[];                       // per mesh buffer slot: the mesh
+extern "C" MeshData *DAT_10fa7478[];                      // per mesh buffer slot: the mesh
 extern "C" char DAT_10fada90[0xc80][0x20];
 extern "C" char DAT_10fdeb90[1600];                       // reference count per texture slot
 extern "C" int DAT_10fe01d8[];
@@ -146,16 +147,17 @@ extern "C" char DAT_10ffe5f8[1600][0x40];                 // their names (empty 
 extern "C" int DAT_110175f8;                              // number of motion blends started
 extern "C" int DAT_11017600[];                            // the number of frames
 extern "C" int DAT_110186a8[32];                          // recently started script ids
-extern "C" Matrix4*DAT_1101c820[];                        // the frame matrices
+extern "C" Matrix4 *DAT_1101c820[];                       // the frame matrices
 extern "C" int DAT_1101d864;
 extern "C" int DAT_1101d874;                              // texture memory in use (bytes)
 extern "C" int DAT_1101d878;                              // non-zero = images without generated alpha are not kept; set while loading the shared textures; set while creating shared textures
 extern "C" int DAT_1101de34;
 extern "C" int DAT_1101de60;                              // effects started so far
+extern "C" char DAT_1101de64;                             // next entry of that cache
 extern "C" Matrix4 DAT_118e69a8;
 extern "C" char DAT_11af3f68[0x40];                       // light matrix set of each node (drawing mode 2)
 extern "C" char DAT_11afffa8[0x40];                       // light set of each node (drawing mode 2)
-extern "C" Node*DAT_11b00070[0x40];                       // the queued nodes
+extern "C" Node *DAT_11b00070[0x40];                      // the queued nodes
 extern "C" int DAT_11b00170[0x40];                        // the value DAT_10f655c4 takes while the node draws
 extern "C" char DAT_11b00270[0x40];                       // the value DAT_10f65520 takes for drawing mode 2
 extern "C" int DAT_11b002b8;

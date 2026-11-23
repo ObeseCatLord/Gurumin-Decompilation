@@ -23,7 +23,6 @@ struct CollisionWorld
 extern "C" CollisionWorld *DAT_10255f08;
 #include "char_vars.h"
 
-extern "C" unsigned short DAT_104c0380;  // frame counter
 
 extern "C" int FUN_1001b5b0(int index);                    // Char_UnpackParameter
 extern "C" int FUN_10043cc0(int index);                    // Char_ResetState

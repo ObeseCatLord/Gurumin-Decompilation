@@ -146,8 +146,9 @@ def dim_value(text):
         return -1
 
 
-def merge_dims(dim_lists):
-    """One dimension list for every declaration, or None when the inner dimensions disagree."""
+def merge_dims(dim_lists, largest_first=False):
+    """One dimension list for every declaration, or None when the dimensions disagree. With `largest_first` the
+    first dimension may differ (the largest is kept: the smaller declarations saw only part of the array)."""
     depth = {len(d) for d in dim_lists}
     if len(depth) != 1:
         return None
@@ -156,10 +157,41 @@ def merge_dims(dim_lists):
     for k in range(count):
         values = {d[k] for d in dim_lists}
         sized = [v for v in values if v]
-        if (k > 0 and len(values) > 1) or len(set(sized)) > 1:
+        if (k > 0 and len(values) > 1) or (len(set(sized)) > 1 and not (k == 0 and largest_first)):
             return None   # different sizes: which one is right is open (sizeof users would change)
         merged.append(max(sized, key=dim_value) if sized else "")
     return merged
+
+
+def uses_sizeof(name, files):
+    pattern = re.compile(rb"sizeof\s*\(?\s*" + name.encode() + rb"\b")
+    return any(pattern.search(open(os.path.join(SRC, f), "rb").read()) for f in files)
+
+
+# Types that may stand for each other in a conflict, the first listed wins on a tie.
+SIGNEDNESS_GROUPS = [["char", "unsigned char", "signed char"], ["int", "unsigned int"],
+                     ["short", "unsigned short"]]
+
+
+def resolve_type(name, items):
+    """One type for a global declared with different types, or None. A single typed pointer wins over int and void*
+    (files that only cleared or compared it); a signedness conflict takes the type most files use."""
+    types = [d["type"] for d in items]
+    distinct = set(types)
+    pointers = [t for t in distinct if t.endswith("*") and t != "void*"]
+    if len(pointers) == 1 and distinct <= {pointers[0], "int", "void*"}:
+        return pointers[0]
+    for group in SIGNEDNESS_GROUPS:
+        if distinct <= set(group):
+            counts = collections.Counter(types)
+            return max(distinct, key=lambda t: (counts[t], -group.index(t)))
+    return None
+
+
+def load_hold():
+    """Globals a previous run found to cost a match when resolved (tools/merge_configs/globals_hold.txt, one name per line)."""
+    path = os.path.join(ROOT, "tools", "merge_configs", "globals_hold.txt")
+    return set(open(path).read().split()) if os.path.exists(path) else set()
 
 
 def merge_comments(comments):
@@ -179,21 +211,33 @@ def plan():
     decls = collect()
     moves = {}      # name -> (header, type, dims, comment)
     held = {}       # name -> reason it stays per file
+    hold = load_hold()
+    RESOLVED.clear()
     for name, items in decls.items():
+        files = [d["file"] for d in items]
         types = {d["type"] for d in items}
-        if len(types) > 1:
-            held[name] = "type conflict: " + " / ".join(sorted(types))
+        ctype = types.pop() if len(types) == 1 else resolve_type(name, items)
+        if ctype is None or (len(types) > 0 and name in hold):
+            held[name] = "type conflict: " + " / ".join(sorted({d["type"] for d in items}))
             continue
-        ctype = types.pop()
         words = set(re.findall(r"\w+", ctype)) - BUILTIN
         unknown = [w for w in words if w not in owners]
         if unknown:
             held[name] = "file-local type " + ", ".join(unknown)
             continue
         dims = merge_dims([d["dims"] for d in items])
+        if dims is None and name not in hold:
+            smaller = [d["file"] for d in items if d["dims"] and d["dims"][0]]
+            dims = merge_dims([d["dims"] for d in items], largest_first=True)
+            if dims is not None and uses_sizeof(name, [f for f in smaller]):
+                dims = None
         if dims is None:
-            held[name] = "dimension conflict"
+            held[name] = "dimension conflict: " + " / ".join(sorted({"".join("[%s]" % x for x in d["dims"])
+                                                                     for d in items}))
             continue
+        differ = {d["file"] for d in items if d["type"] != ctype or (d["dims"] and d["dims"] != dims)}
+        if differ:
+            RESOLVED[name] = differ
         comment = merge_comments(d["comment"] for d in items)
         if name in existing:
             moves[name] = (existing[name], ctype, dims, comment, True)
@@ -215,6 +259,9 @@ def plan():
     return decls, moves, held, owners
 
 
+# Globals whose type or size was settled by this run: name -> the files that declared it otherwise.
+RESOLVED = {}
+
 # Array-size constants used by moved declarations: name -> the `#define` line (with its comment) from a source file.
 MACROS = {}
 
@@ -233,6 +280,24 @@ def address_key(name):
     return (0, int(m.group(1), 16)) if m else (1, name)
 
 
+def generated_rows(header, skip):
+    """The declarations already in a generated header (kept when a later run adds more), and its size constants."""
+    path = os.path.join(INCLUDE, header)
+    if not os.path.exists(path):
+        return []
+    rows = []
+    for line in open(path, "rb").read().split(b"\n"):
+        line = line.rstrip(b"\r")
+        m = EXTERN_LINE.match(line)
+        if m and m.group(3).decode() not in skip:
+            rows.append((m.group(3).decode(), normalise_type(m.group(1), m.group(2)), parse_dims(m.group(4)),
+                         (m.group(5) or b"")[2:].strip().decode("latin-1")))
+        d = re.match(rb"#define\s+(\w+)\s", line)
+        if d and not d.group(1).startswith(b"GURUMIN_") and d.group(1) != b"CHAR_SLOT_COUNT":
+            MACROS.setdefault(d.group(1).decode(), line.decode("latin-1"))
+    return rows
+
+
 def write_headers(moves, owners):
     by_header = collections.defaultdict(list)
     for name, (header, ctype, dims, comment, existing) in moves.items():
@@ -241,11 +306,12 @@ def write_headers(moves, owners):
     descriptions = {h: d for h, d, _ in SUBSYSTEMS}
     descriptions[CHAR_TABLES[0]] = CHAR_TABLES[1]
     for header, rows in by_header.items():
+        rows.extend(generated_rows(header, {r[0] for r in rows}))
         guard = "GURUMIN_" + header.replace(".", "_").upper()
         includes, forwards = set(), set()
         for name, ctype, dims, comment in rows:
             for word in set(re.findall(r"\w+", ctype)) - BUILTIN:
-                if ctype.endswith("*") and not dims:
+                if ctype.endswith("*"):
                     forwards.add(word)
                 else:
                     includes.add(owners[word])
@@ -276,8 +342,9 @@ def write_headers(moves, owners):
         for name, ctype, dims, comment in sorted(rows, key=lambda r: address_key(r[0])):
             dim_text = "".join("[%s]" % ("CHAR_SLOT_COUNT" if (k == 0 and header == CHAR_TABLES[0]) else d)
                                for k, d in enumerate(dims))
-            sep = "" if ctype.endswith("*") else " "
-            line = 'extern "C" %s%s%s%s;' % (ctype, sep, name, dim_text)
+            stars = len(ctype) - len(ctype.rstrip("*"))
+            spelled = ctype.rstrip("*") + " " + "*" * stars
+            line = 'extern "C" %s%s%s;' % (spelled, name, dim_text)
             if comment:
                 line = line.ljust(56) + "  // " + comment
             out.append(line)
@@ -368,7 +435,7 @@ def main():
     baseline = matched_by_address(json.loads(subprocess.check_output(
         ["git", "show", "HEAD:progress/jp/report.json"], cwd=os.path.join(ROOT, ".."))))
     reverted = set()
-    for attempt in range(4):
+    for attempt in range(6):
         subprocess.call([sys.executable, os.path.join(ROOT, "tools", "build_all.py"), "--report", REPORT],
                         cwd=ROOT, stdout=subprocess.DEVNULL)
         now = matched_by_address(json.load(open(REPORT)))
@@ -377,7 +444,30 @@ def main():
             if percent >= 100.0 and now.get(key, (0, ""))[0] < 100.0:
                 losers.add(os.path.basename(source))
         losers &= set(changed) - reverted
+        # a fuzzy drop of more than a point in a file that saw another type or size also blames that global
+        dropped = {os.path.basename(source) for key, (percent, source) in baseline.items()
+                   if percent < 100.0 and now.get(key, (0, ""))[0] < percent - 1.0}
+        suspects = losers | (dropped & {f for files in RESOLVED.values() for f in files})
         print("build %d: %d files lost a match: %s" % (attempt + 1, len(losers), " ".join(sorted(losers))))
+        if not suspects:
+            break
+        # a loser that saw a global with another type or size: hold those globals and start again from HEAD
+        blamed = {name for name, files in RESOLVED.items() if files & suspects}
+        if blamed and attempt < 5:
+            hold = load_hold() | blamed
+            open(os.path.join(ROOT, "tools", "merge_configs", "globals_hold.txt"), "w").write("\n".join(sorted(hold)) + "\n")
+            print("  holding %d resolved globals: %s" % (len(blamed), " ".join(sorted(blamed))))
+            subprocess.call(["git", "checkout", "--", "src", "include"], cwd=ROOT)
+            for header in headers:
+                if not subprocess.call(["git", "ls-files", "--error-unmatch", "include/" + header], cwd=ROOT,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+                    os.remove(os.path.join(INCLUDE, header))
+            MACROS.clear()
+            decls, moves, held, owners = plan()
+            headers = write_headers(moves, owners)
+            changed = [os.path.basename(p) for p in sorted(glob.glob(os.path.join(SRC, "*.cpp")))
+                       if os.path.basename(p) not in SKIP_FILES and rewrite_file(p, moves)]
+            continue
         if not losers:
             break
         for name in losers:

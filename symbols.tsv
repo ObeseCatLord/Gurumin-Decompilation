@@ -28,6 +28,7 @@ address	name	evidence
 10050510	Char_SpawnEnemy	spawns an enemy in a free slot (char_spawn.cpp, draft)
 100509e0	Char_ProbeSideStep	left-side wall and ground probe (ledge_probe.cpp)
 10051190	MapCursor_Step	moves a cursor along a map record route (map_cursor.cpp, draft)
+10057ee0	UpdateDrillLevel	clamps the drill gauge and moves the drill level (drill_level.cpp)
 1005f750	Lava_Update	lava damage, camera mode and lava effects (lava_hazard.cpp)
 100ed510	ListBank_DeclareFromText	declares script variables from a declaration (listbank.cpp)
 101446f0	TextureObject_DrawBlurred	four-tap blurred full-screen quad (texture_bind.cpp)
@@ -52,6 +53,7 @@ address	name	evidence
 10137b10	Screenshot_Capture	"%s\capture\capture%05d.jpg"
 100144c0	Ability_GetDescription	copies the effect text of the highest-priority ability bit and returns the bit (matched, decomp/src/ability_text.cpp)
 1013dfb0	GuruMain	DLL export called by game.exe
+101643c0	AnimModel_LiftProbes	lifts probe points clear of models and the map (model_lift.cpp, draft)
 1016a480	Playback_Advance	steps a motion playback one frame (playback_advance.cpp, draft)
 1016be80	Camera_LiftOverGround	lifts the camera target above the ground (camera_lift.cpp)
 101af960	KeyBank_SampleFloat	key lookup with a float frame (vec4.cpp, draft)

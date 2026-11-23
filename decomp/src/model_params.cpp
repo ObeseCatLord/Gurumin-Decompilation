@@ -17,11 +17,6 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);
 #include "char_vars.h"
 #include "render_vars.h"
 
-// Collision test of a model (world matrix) against another model: 0x10193140 (stdcall, recursive over nodes).
-extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, Node *other, Matrix4 *otherMatrix, Vec4 *probe, int count,
-                                      int *hitCount, int *hitIds, Vec4 *hits, int *hitOther, int mode, int a, int b,
-                                      int c, int flags);
-
 
 // Sets the model's movement for this frame: x, y scaled by the model scale, z (the vertical step) as it is.
 // Flying enemies call it (Enemy_FlyAndStrafe).
@@ -274,12 +269,12 @@ int AnimModel::IsClearOfMap(const Vec4 *offset)
     probe[1].Fill(0);
     Vec4 hitPoint;
     Vec4 hitNormal;
-    int out5;
+    float nearest;
     int out12;
     DAT_11b002c0 = collisionFilter;
     DAT_11b002c8 = 1;
     int hitCount = 0;
-    int hit = collider->M_1019f340(0x4000000, &matrix, m_231c, colliderReach, &out5, probe, 1, &hitCount, &hitPoint, &hitNormal, 0,
+    int hit = collider->M_1019f340(0x4000000, &matrix, m_231c, colliderReach, &nearest, probe, 1, &hitCount, &hitPoint, &hitNormal, 0,
                                    &out12, 0, 0, 0);
     DAT_11b002c8 = 0;
     DAT_11b002c0 = 0;
@@ -299,12 +294,12 @@ int AnimModel::IsClearOfMapLimited(const Vec4 *offset)
     probe[1].Fill(0);
     Vec4 hitPoint;
     Vec4 hitNormal;
-    int out5;
+    float nearest;
     int out12;
     DAT_11b002c0 = collisionFilter;
     DAT_11b002c8 = 1;
     int hitCount = 0;
-    int hit = collider->M_1019f340(-1, &matrix, m_231c, colliderReach, &out5, probe, 1, &hitCount, &hitPoint, &hitNormal, m_2390,
+    int hit = collider->M_1019f340(-1, &matrix, m_231c, colliderReach, &nearest, probe, 1, &hitCount, &hitPoint, &hitNormal, m_2390,
                                    &out12, 0, 0, 0);
     DAT_11b002c8 = 0;
     DAT_11b002c0 = 0;

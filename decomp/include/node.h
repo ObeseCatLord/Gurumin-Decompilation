@@ -99,7 +99,7 @@ struct Node
     unsigned int flags;          // 0x0ac: NodeFlags
     float cullMargin;            // 0x0b0: margin of the view-volume test
     int group;                   // 0x0b4
-    int m_00b8;                  // 0x0b8: set on the whole subtree by M_1019b230
+    struct AnimModel *model;     // 0x0b8: the model the tree belongs to, set on the whole subtree by M_1019b230
     int *frameSource;            // 0x0bc: when set, the frame shown is read from here
     int plugType[NODE_PLUG_COUNT];         // 0x0c0: 0x4ee33 = the plug gives the frame
     Channel *plugs[NODE_PLUG_COUNT];       // 0x100
@@ -219,7 +219,7 @@ struct Node
     int ClearFlags(unsigned int bits);                    // 0x1019b1b0: on this node and all children
     int M_1019b190(unsigned int bits);                    // 0x1019b190: sets flag bits on this node only
     int M_1019b210(unsigned int bits);                    // 0x1019b210: clears flag bits on this node only
-    int M_1019b230(int value);                            // 0x1019b230: m_00b8 on the whole subtree
+    int M_1019b230(struct AnimModel *owner);               // 0x1019b230: model on the whole subtree
     int M_1019b050(int value);                            // 0x1019b050: render mode of the subtree
     int M_1019b0c0(int value, int except1, int except2);  // 0x1019b0c0
     int M_10193cb0(int from, int to);                     // 0x10193cb0: render mode `from` -> `to` in the subtree
@@ -325,10 +325,15 @@ struct Node
     int M_10194f40(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b, int depth);  // 0x10194f40
     int StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b);     // 0x101a2370
     // 0x1019f340: tests a moving model (probe points) against this collision node (model_params.cpp).
-    int M_1019f340(int mask, Matrix4 *world, int a, float reach, int *out5, Vec4 *probe, int probeCount, int *hitCount,
-                   Vec4 *hitPoint, Vec4 *hitNormal, int limit, int *out12, int c, int d, int e);
+    int M_1019f340(int mask, Matrix4 *world, int a, float reach, float *nearest, Vec4 *probe, int probeCount, int *hitCount,
+                   Vec4 *hitPoint, Vec4 *hitNormal, int limit, int *out12, int c, int *d, int e);
     int UpdateVisibleCells();                             // 0x10199be0 (visibility.cpp)
     int TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matrix4 *matrix);  // 0x10199cd0
 };
+
+// Collision test of a model (world matrix) against another model: 0x10193140 (stdcall, recursive over nodes).
+extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, Node *other, Matrix4 *otherMatrix, Vec4 *probe, int count,
+                                      int *hitCount, int *hitIds, Vec4 *hits, int *hitOther, int mode, int *hit,
+                                      int extra, int *outHit, int flags);
 
 #endif

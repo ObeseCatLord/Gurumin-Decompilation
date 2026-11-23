@@ -95,7 +95,8 @@ struct MotionChannels
 struct AnimModel
 {
     Vec4 m_0000;
-    char pad_0010[2];
+    char contactState;        // 0x10: 0 = not recording, set to 3 when another model blocks, 2 when the map does (LiftProbes)
+    char mapTested;           // 0x11: 0 until the first map test of LiftProbes, then 1
     char m_0012;              // 0x12: set to 2 every frame by many characters (Enemy_FlyAndStrafe)
     char m_0013;
     char pad_0014[4];
@@ -129,7 +130,8 @@ struct AnimModel
     Vec4 m_0174[6];
     int m_01d4;
     Matrix4 m_01d8;
-    char pad_0218[4];
+    char lifted;              // 0x218: 1 when LiftProbes had to raise a probe
+    char pad_0219[3];
     Vec4 scale;               // 0x21c: model scale
     Vec4 m_022c;
     int m_023c;
@@ -180,7 +182,7 @@ struct AnimModel
     char pad_0280[8];
     int m_0288;               // 0x288: set to 6 when destroyed
     int m_028c;               // 0x28c: cleared when destroyed
-    int m_0290;
+    float m_0290;             // 0x290: set to a count by LiftProbes on the model it collided with
     union
     {
         int m_0294;           // 0x294: 1 while held in its pose (npc_frozen.cpp)
@@ -256,7 +258,7 @@ struct AnimModel
     Vec4 m_23e8;
     Vec4 m_23f8;
     Vec4 m_2408;
-    int m_2418;
+    AnimModel *m_2418;        // 0x2418: the model this one is carried by or follows (0 = none)
     char pad_241c[4];
     Vec4 m_2420;
     int m_2430;
@@ -315,6 +317,8 @@ struct AnimModel
     int IsClearAny(const Vec4 *offset);                            // 0x101640b0: 0 when the move collides
     int IsClearOfMapLimited(const Vec4 *offset);                   // 0x101641b0
     int IsClearOfMap(const Vec4 *offset);                          // 0x101642c0
+    int LiftProbes(float *nearest, Vec4 *probes, int probeCount, int *hitIds, Vec4 *hits, int *hitOther, int unused1,
+                   unsigned int flags, int unused2, int mode, int extra, int *outHit, int *outFlag);  // 0x101643c0
     int StepPath();                                                // 0x10175e80 (path_anim.cpp): follows track C
     int LoadModel(const char *path);                               // 0x1017aeb0 (texture_mgr.cpp)
     int SetPlayback(int a, int b, int c, int d, int e, int f);     // 0x1017af40 (scene_misc.cpp)

@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 14.39% of code, 826 of 1212 functions |
-| Matched under the rules | 14.36% of code, 825 of the 826 matched functions |
-| Fuzzy match | 19.54% |
+| Matched | 14.48% of code, 827 of 1212 functions |
+| Matched under the rules | 14.45% of code, 826 of the 827 matched functions |
+| Fuzzy match | 19.71% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -61,6 +61,9 @@ function) and node_world.cpp (0) still break rule 2.
   (route_step.cpp) and MeshData::M_10150bb0 (mesh_build.cpp, shrink-wrapped prologue) drafted.
 - Batch 321: ListBank::DeclareFunction 0x100366c0 matched (ScriptFunction union in listbank.h); Enemy_KeepDistanceFromPlayer
   0x10027da0 (enemy_flee.cpp) and Move_SweepToWorld 0x10034210 (move_sweep.cpp, scalar stack slots) drafted.
+- Batch 322: UpdateDrillLevel 0x10057ee0 (drill_level.cpp) matched; AnimModel::LiftProbes 0x101643c0 drafted
+  (model_lift.cpp; Node::model at 0xb8, M_1019b230 takes an AnimModel *). Agents must not declare aliases of
+  DAT_10db6ee8 fields (0x10db9210 = DAT_10db6ee8[0].matrix).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

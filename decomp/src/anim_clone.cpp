@@ -172,7 +172,7 @@ int AnimModel::CloneModel(AnimModel *source, int unused)
         spineNode = loadedRoot;
     swapNode1 = root->Find("@Face", 0);
     swapNode2 = root->Find("@Face", 1);
-    root->M_1019b230((int)this);    // every node of the tree remembers its model
+    root->M_1019b230(this);    // every node of the tree remembers its model
     if (loadedRoot != 0)
         loadedRoot->worldMatrix._41 = 0;
     if (loadedRoot == 0)
@@ -379,7 +379,7 @@ int AnimModel::LoadFile(const char *path)
         spineNode = loadedRoot;
     swapNode1 = root->Find("@Face", 0);
     swapNode2 = root->Find("@Face", 1);
-    root->M_1019b230((int)this);    // every node of the tree remembers its model
+    root->M_1019b230(this);    // every node of the tree remembers its model
     if (loadedRoot != 0)
         loadedRoot->worldMatrix._41 = 0;
     if (loadedRoot == 0)

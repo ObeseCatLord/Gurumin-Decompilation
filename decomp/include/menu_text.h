@@ -7,4 +7,6 @@ struct MenuText
     char text[0x80];
 };
 
+extern "C" int FUN_1015d520(char *text);   // text_fullwidth.cpp
+
 #endif

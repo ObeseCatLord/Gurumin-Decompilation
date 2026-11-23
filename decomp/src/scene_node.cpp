@@ -389,12 +389,12 @@ int Node::M_1019b210(unsigned int bits)
     return 1;
 }
 
-// Sets m_00b8 on the whole subtree.
-int Node::M_1019b230(int value)
+// Sets the owning model on the whole subtree.
+int Node::M_1019b230(AnimModel *owner)
 {
-    m_00b8 = value;
+    model = owner;
     for (int i = 0; i < childCount; i++)
-        children[i]->M_1019b230(value);
+        children[i]->M_1019b230(owner);
     return 1;
 }
 

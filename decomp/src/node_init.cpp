@@ -70,7 +70,7 @@ void Node::Init()
         plugData[i] = 0;
     }
     hasCollision = 0;
-    m_00b8 = 0;
+    model = 0;
     flags = 0;
     cullMargin = 3.84f;
     group = 0;

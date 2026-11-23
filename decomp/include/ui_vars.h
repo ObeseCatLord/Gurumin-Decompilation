@@ -93,6 +93,7 @@ extern "C" int DAT_10f66aa8;
 extern "C" int DAT_10f66aac;
 extern "C" int DAT_10f66ab0;
 extern "C" char DAT_10f66ab8[];
+extern "C" char DAT_10f66f00[];                           // the IME mode label
 extern "C" int DAT_10f66bbc;
 extern "C" int DAT_10f66bc0;
 extern "C" int DAT_10f66bc4;

@@ -76,10 +76,7 @@ extern "C" short DAT_102548b8;
 extern "C" unsigned char DAT_10254c40[0x400];             // drop / position ring: 0 = unused, 1 = in use (falling), 2..30 = fading out
 extern "C" int DAT_10255040[0x20];                        // effect kind of each slot (0 = free)
 extern "C" int DAT_102559f0;
-extern "C" int DAT_102559f4;
-extern "C" int DAT_102559f8;
-extern "C" int DAT_102559fc;
-extern "C" int DAT_10255a00;
+extern "C" Node *DAT_102559f4[4];                         // the four "@tume01" attachments that follow the player (see Drill_UpdateLevel)
 extern "C" int DAT_10255a08[0x10];
 extern "C" Node *DAT_10255f0c;
 extern "C" char DAT_10256110[];                           // name of system.sav
@@ -311,6 +308,7 @@ extern "C" char DAT_104c00b6;
 extern "C" char DAT_104c00b7;
 extern "C" char DAT_104c00bc;
 extern "C" char DAT_104c00bd;
+extern "C" char DAT_104c01b4;                             // 1 = the drill level just went down, 0 = it went up
 extern "C" char DAT_104c00be;
 extern "C" char DAT_104c00bf;
 extern "C" short DAT_104c00c0;

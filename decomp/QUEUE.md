@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (197)
+## 1. Walls to retry (198)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -157,6 +157,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10163e90` 253 — AnimModel::IsClear (and 101640b0, 10163f90): frame identical; the original builds every argument in edx and loads root into ecx before the compare, cl 13.00 here alternates ecx/edx (compare order, local pointer, nested if tried)
 - [ ] `10163f90` 256 — see 10163e90
 - [ ] `101640b0` 253 — see 10163e90
+- [ ] `101643c0` 1520 — AnimModel::LiftProbes (model_lift.cpp, 1520 bytes, same length, 1300 diff bytes): structure and calls identical; register assignment (original this=esi, probes=edi, slot=ebp; ours ebp/esi/edi), an inline early return 0 epilogue before push ebp/edi, and the stack slot order; declaration order, scope, compound assignment and shared hit variables tried
 - [ ] `101649c0` 213 — lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
 - [ ] `10164af0` 284 — ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
 - [ ] `10164c10` 906 — ModelBank::LightDirection (model_bank.cpp, rule-clean, LIGHT_* constants in model_bank.h): same wall as 1017c5f0 (the default-light block).
@@ -218,13 +219,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (76)
+## 4. Large functions (801-3000 bytes) (73)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `1015f4e0` 1429 bytes (loops 12, calls 31)
-- [ ] `101643c0` 1520 bytes (float, loops 12, calls 9)
 - [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)
-- [ ] `10057ee0` 1550 bytes (float, loops 1, calls 52)
 - [ ] `10193d10` 1600 bytes (float, loops 3, calls 26)
 - [ ] `100564d0` 1611 bytes (float, loops 2, calls 33)
 - [ ] `10051e20` 1618 bytes (float, loops 2, calls 37)

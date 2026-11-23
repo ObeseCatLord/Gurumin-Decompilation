@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 19.536,
+  "fuzzy_match_percent": 19.7053,
   "total_code": "1720206",
-  "matched_code": "247598",
-  "matched_code_percent": 14.3935,
+  "matched_code": "249148",
+  "matched_code_percent": 14.4836,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 826,
-  "matched_functions_percent": 68.1518,
+  "matched_functions": 827,
+  "matched_functions_percent": 68.2343,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 287,
-  "complete_units": 157,
-  "matched_rules_code": "246971",
-  "matched_rules_code_percent": 14.3571,
-  "matched_rules_functions": 825,
-  "matched_rules_functions_percent": 68.0693
+  "total_units": 290,
+  "complete_units": 158,
+  "matched_rules_code": "248521",
+  "matched_rules_code_percent": 14.4472,
+  "matched_rules_functions": 826,
+  "matched_rules_functions_percent": 68.1518
  },
  "units": [
   {
@@ -5567,6 +5567,52 @@
    }
   },
   {
+   "name": "app/drill_level",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "1550",
+    "matched_code": "1550",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "1550",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1,
+    "matched_rules_code": "1550",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1550",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "?UpdateDrillLevel@@YAHXZ",
+     "size": "1550",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268795616"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/drill_level.cpp"
+   }
+  },
+  {
    "name": "app/dshow_stream",
    "measures": {
     "fuzzy_match_percent": 40.4965,
@@ -10973,6 +11019,52 @@
    }
   },
   {
+   "name": "app/model_lift",
+   "measures": {
+    "fuzzy_match_percent": 14.4737,
+    "total_code": "1520",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1520",
+     "fuzzy_match_percent": 14.4737
+    }
+   ],
+   "functions": [
+    {
+     "name": "?LiftProbes@AnimModel@@QAEHPAMPAUVec4@@HPAH12HIHHH22@Z",
+     "size": "1520",
+     "fuzzy_match_percent": 14.4737,
+     "metadata": {
+      "virtual_address": "269894592"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/model_lift.cpp"
+   }
+  },
+  {
    "name": "app/model_misc",
    "measures": {
     "fuzzy_match_percent": 92.9967,
@@ -14777,7 +14869,7 @@
      }
     },
     {
-     "name": "?M_1019b230@Node@@QAEHH@Z",
+     "name": "?M_1019b230@Node@@QAEHPAUAnimModel@@@Z",
      "size": "68",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -16742,6 +16834,52 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/text_fullwidth.cpp"
+   }
+  },
+  {
+   "name": "app/text_input",
+   "measures": {
+    "fuzzy_match_percent": 80.0272,
+    "total_code": "1429",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1429",
+     "fuzzy_match_percent": 80.0272
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1015f4e0",
+     "size": "1429",
+     "fuzzy_match_percent": 80.0272,
+     "metadata": {
+      "virtual_address": "269874400"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/text_input.cpp"
    }
   },
   {
@@ -19054,13 +19192,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1325182",
+    "total_code": "1320683",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 192,
+    "total_functions": 189,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -19077,7 +19215,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1325182",
+     "size": "1320683",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -19496,14 +19634,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268790576"
-     }
-    },
-    {
-     "name": "FUN_10057ee0",
-     "size": "1550",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268795616"
      }
     },
     {
@@ -20307,14 +20437,6 @@
      }
     },
     {
-     "name": "FUN_1015f4e0",
-     "size": "1429",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269874400"
-     }
-    },
-    {
      "name": "FUN_10160960",
      "size": "75",
      "fuzzy_match_percent": 0.0,
@@ -20344,14 +20466,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269889872"
-     }
-    },
-    {
-     "name": "FUN_101643c0",
-     "size": "1520",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269894592"
      }
     },
     {

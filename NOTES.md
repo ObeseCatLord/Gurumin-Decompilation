@@ -507,3 +507,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - Bank models are AnimModels (0x249c); the bank's `Add` stores the model's root node twice (root, loadedRoot).
 - ListBank's 0x440c table holds a constant's value or a pointer to a variable's storage (`ScriptVariableValue`
   union), and 0x2240c is the evaluation result buffer.
+- **Allocate-if-missing through a local:** `Playback *playback = motion; if (playback == 0) { motion = alloc(...);
+  playback = motion; } playback->Init();` keeps the member in ecx (the `this` of Init) as the original does
+  (AnimModel::CloneModel/LoadFile, 0x1017b210/0x1017b9b0); testing the member directly reloads it into eax, and
+  `motion = playback = alloc` keeps eax too.
+- A 4-element float row zeroed with a `for` loop (`DAT_10255160[index][k] = 0`) is unrolled into stores of a zero
+  register shared with the next loop's counter; four separate `= 0` statements use the callee-saved zero instead
+  (Enemy_SeekShaga 0x100d2110).

@@ -474,3 +474,20 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   `m_23d8.z` through `*(int *)&m_23d8.z` (the original writes the int bits there).
 - Codegen-neutral changes tested: float stores of 0 match int stores; float parameters passed through match int
   parameters (SetPendingPush, M_10161af0); KeyBank needs no destructor.
+
+## 2026-11-22: behaviour state, effects, textures, model bank, script parser shared
+
+- `DAT_1020b430` is one 0x40-byte behaviour state per character slot (`char_state.h` CharState): each behaviour
+  reads the same words under its own names, so the header gives each offset a union of the names (with the file
+  that uses each). Whole-block users index `words[16]`; char_shove.cpp sees four `Shove` entries.
+- **/GS cookie from a struct's char array:** a local of a struct type that contains a `char` array gets a security
+  cookie. EffectOptions' locals (npc_frozen.cpp, char_move.cpp) have one in the original, so the type has a char
+  array; `settings[8]` at 0x24 is the one consistent with every use. Without it the prologue lacks the cookie.
+- **throw() on a constructor changes the callers' EH states:** EffectOptions() is declared `throw()`; without it the
+  caller emits an EH state store before the call (anim_channels.cpp ModelInstance constructor).
+- An inline member defined in the class body can still be called out of line where the original did:
+  Game::TestScriptFlag (0x100022b0) stays inline in game.h and item_caption.cpp, route_follow.cpp, damage_zone.cpp
+  and tutorial_page_next.cpp still call (and emit) the out-of-line copy.
+- Bank models are AnimModels (0x249c); the bank's `Add` stores the model's root node twice (root, loadedRoot).
+- ListBank's 0x440c table holds a constant's value or a pointer to a variable's storage (`ScriptVariableValue`
+  union), and 0x2240c is the evaluation result buffer.

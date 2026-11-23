@@ -87,7 +87,7 @@ retype those members first.
 25. One shared `vec.h` (Vec4, Matrix4 with and without constructors) to replace the 40 private Vec4 definitions,
     keeping the per-file differences that change code (POD vs constructor) explicit.
 26. One shared `node.h` for the 21 Node views (scene_node.cpp is the reference layout).
-27. Shared headers for TextureObject (7 views), EffectManager, ModelBank/BankModel, AnimModel (model_params.cpp,
+27. (Done 2026-11-22 except MeshInstance, see HANDOFF.) Shared headers for TextureObject (7 views), EffectManager, ModelBank/BankModel, AnimModel (model_params.cpp,
     anim_unload.cpp), ListBank, Game.
 28. Replace raw casts in older files with typed fields once the headers exist.
 

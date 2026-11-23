@@ -25,52 +25,64 @@ Under AGENTS.md rules 1-2 most matches are still MATCH-PENDING until their other
 (Phase 0 of `BACKLOG.md`).
 
 ## State
-- Shared headers: `vec4.h`, `matrix4.h`, `vec3.h`, `node.h`, `com_min.h`, `ddraw_min.h`, `d3d9_min.h`, and new this
-  session `key_track.h` (KeyTrack, KeyBank), `node_data.h` (NodeExtra, NodeSkin, NodeSaved), `mesh.h` (Vertex,
-  VertexPack, IndexList, Material, MeshData), `anim_model.h` (AnimModel, MotionChannels, Playback, `DAT_10db6ee8`),
-  `dinput_min.h` (DirectInput views, Input `DAT_10f08008`). Commits 930f50c, 768cc82, b7ce8fd, b279ff9, 6669791.
-  No match lost; renamed symbols sit at the same addresses (rows in `obj_symbols.tsv`).
-- **AnimModel is 0x249c bytes = the record stride.** The old world.h `Character` (`DAT_10db6ed8`) was the same array
-  seen 0x10 bytes early; world.h no longer declares it and every user indexes `DAT_10db6ee8` (offset - 0x10). The
-  record id is `DAT_10db6ee8[i - 1].nextSlotId` (NOTES.md 2026-11-22 section).
-- Deferred: `src/npc_greet.cpp` keeps its own Vec4/CharMatrix/Character view (open.tsv 100b8220: the shared Vec4
-  tips register allocation). `model_state.cpp` (SceneOwner/SceneNode views, defines Playback methods),
-  `mesh_cache.cpp` LayerTable (= Playback layer setters), duplicate `DAT_10faaa88` externs. Node views with
-  constructors (`SceneNode`, `WorldNode`, `FadeNode`/`FadeParent`/`FadeOwner`) still per file. Raw offset casts:
-  `src/listbank.cpp` lines 760, 773, 796.
-- Many AnimModel methods keep `M_<address>` names and many fields `m_XXXX`; name them when evidence appears.
+- Shared headers: `vec4.h`, `matrix4.h`, `vec3.h`, `node.h`, `node_data.h`, `mesh.h`, `key_track.h`,
+  `anim_model.h` (AnimModel, Playback, DAT_10db6ee8, model table DAT_10faaa88), `com_min.h`, `ddraw_min.h`,
+  `d3d9_min.h`, `dinput_min.h`, and new this session (commits f3fbdfc..6934e47, 789 matched unchanged throughout):
+  - `char_state.h`: CharState = the 0x40-byte behaviour state of each character slot (DAT_1020b430); every offset
+    is a union of the names behaviours use (NpcState, AiState, ScriptState, ... views gone), `values[13]` by index,
+    `words[16]`, `shoves[4]` (Shove). world.h includes it.
+  - `model_bank.h`: ModelBank (DAT_10804bf8); its records are AnimModels (BankModel gone; AnimModel gained
+    uniformScale, bankIndex, shadowHidden, loadedRoot, shadowOpacity, shadowMatrix and `~AnimModel()`).
+  - `effect_manager.h`: EffectManager (DAT_10daaa80) and EffectOptions (was ModelState; ctor 0x101668b0 `throw()`,
+    byte settings are `char settings[8]`, see NOTES).
+  - `texture_object.h`: TextureObject and the 1600 texture slots DAT_118d0ba8 (RenderItem/TextureSlot gone).
+  - `game.h`: now also declares DAT_104b7200 and DAT_10874848; per-file Game views gone.
+  - `listbank.h`: ListBank (DAT_104687b8; ResourceBanks, TokenReader, ScriptCompiler views gone), with the
+    `ScriptVariableValue` union and `resultBuffer`.
+  - model_state.cpp / mesh_cache.cpp now define Playback methods on anim_model.h's Playback.
+- Deferred / open (next candidates, each a view still declared per file or a known wrinkle):
+  - Whole-block CharState users still index `words[k]` (camera_follow, char_kind_select, companion_update,
+    route_follow, weapon_attach, enemy_voice): give each index its behaviour's field name.
+  - `mesh_cache.cpp` MeshInstance is a TextureObject view (MeshInstance::M_10169f70 = TextureObject::UpdateImage;
+    m_002c/m_0030 = sourceWidth/sourceHeight).
+  - Effect records DAT_1115cfe8: `EffectRecord` (effect_start.cpp) and `EffectRecordA` (char_effects.cpp).
+  - CharSlot views (enemy_voice.cpp vs world.h), ActorSlot views (npc_frozen.cpp and others, DAT_10daaaec).
+  - ListBank::ReportError was inline in the original (listbank_vars.cpp expanded one call); the header keeps it
+    out of line because listbank.cpp's 0x100359c0 copy is matched. listbank_vars' two functions are unmatched.
+  - Playback::Play (unmatched) passes BlendFrames' third argument as an int; node.h says `float t` (fuzzy 18.8 -> 15.1).
+  - DAT_10874848 and DAT_104b7200 both behave as Game but lie 0x3bd648 bytes apart (less than sizeof(Game)).
+  - From before: `src/npc_greet.cpp` own Vec4/CharMatrix/Character view (open.tsv 100b8220); Node views with
+    constructors (SceneNode, WorldNode, FadeNode/FadeParent/FadeOwner); `extern "C"` globals next to their owners.
 
 ## Next steps
-1. `NpcState`, `TextureObject` (7 views), `ModelBank`/`BankModel`, `EffectManager`, `ListBank`, `Game` into shared
-   headers (BACKLOG Phase 0 item 2 and Phase E item 27), same driver method.
-2. model_state.cpp / mesh_cache.cpp LayerTable onto `Playback`; the remaining Node views with constructors.
-3. Move the `extern "C"` globals next to their owner types (BACKLOG Phase 0 item 3).
-4. Then return to `QUEUE.md`.
+1. The deferred views above (MeshInstance, EffectRecord/EffectRecordA, CharSlot/ActorSlot, the CharState
+   `words[k]` users), same driver method.
+2. Move the remaining `extern "C"` globals next to their owner types (BACKLOG Phase 0 item 3).
+3. Then return to `QUEUE.md`.
 
 ## How the merges were run (reuse)
-- One Python driver per type, kept outside the repo (Node: `node_merge_driver.py`; AnimModel: `am_driver.py`; Character: `ch_driver.py`, all in the session
-  notes folder; copy and adapt them). For each file it builds a baseline, removes the local struct block (plus the comment
-  lines directly above it), writes `#include "<type>.h"` where the struct stood, renames the view's fields and
-  methods to the header's names (matched by offset and by address), rebuilds with `cmd /c <absolute path to build.bat> <file>`, adds
-  `obj_symbols.tsv` rows for renamed definitions, and compares matched addresses; on a loss or a compile error it
-  runs `git checkout -- <file>` and logs why. Three copies run in parallel on disjoint file lists. Node: 41 of 45
-  files converted unattended, the other four took a few minutes by hand.
-- Process each file as bytes and keep each line's own ending: some files mix CRLF and LF (char_move.cpp,
-  actor_scan.cpp), and normalising them rewrites the whole file. Check `git diff --stat` before committing.
-- Rename bare field names only in files that define the type's methods, and expect a field name to also be a
-  parameter name there (`frames` became `frameMatrices` in a parameter list once).
-- A view whose type a shared header references (world.h's `RootNode *`) must move in the same step as the header.
+- Generic driver `tm.py <config.py> <tag> <files>` in the session notes folder
+  (`C:\Users\Michael\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\side-session-notes\local_93c4d5c5-8746-4eea-a63d-32135252eefa`; configs `cfg_charstate.py`,
+  `cfg_modelbank.py`, `cfg_effect.py`, `cfg_tex.py`, `cfg_game.py`; `lb_convert.py` for ListBank). Per file it removes
+  the view structs (with the comment lines above), drops the global's extern lines, adds the header include (after
+  the leading includes), renames types, renames fields only through roots (the global with its indexes, or pointers
+  declared with a view type), applies per-file raw regexes, rebuilds, and reverts on a loss or compile error; the
+  baseline is HEAD's report.json by address. When a C++ symbol vanished it adds obj_symbols rows for the same
+  `?Method@Class@@` at the old address. Three copies run in parallel on disjoint file lists.
+- Process files as bytes and keep each line's ending; never `sed -i` a CRLF file (it rewrote anim_reset.cpp once).
+  `obj_symbols.tsv` is LF. Check `git diff --stat` before committing.
 - `check_matches.py` reports a renamed symbol as LOST + new. If the address and the count are unchanged, it is a
-  rename; commit, then `check_matches.py` exits 0 against the new HEAD.
+  rename; commit, then `check_matches.py` exits 0 against the new HEAD. Also compare fuzzy per address against
+  HEAD: a missing obj_symbols row shows as a function dropping to 0%.
 
 ## Continuation prompt
 "Continue the Gurumin Phase 0 type merge. Read `decomp/HANDOFF.md` (including its Standing instructions) and
-`AGENTS.md`. Move `NpcState`, `TextureObject`, `ModelBank`/`BankModel`, `EffectManager`, `ListBank` and `Game` into
-shared headers under decomp/include/ (one declaration each, typed members), then put model_state.cpp and
-mesh_cache.cpp's LayerTable onto `Playback` (anim_model.h). Convert files with a per-file
-baseline/convert/rebuild/revert-on-loss driver as described under 'How the merges were run' (byte-level, keep each
-line's ending; take the baseline from a real build, not an empty list) and use Sonnet subagents only for files the
-driver reverts. After each batch run `python tools/build_all.py --report ../progress/jp/report.json` and
+`AGENTS.md`. Merge the remaining per-file views listed under 'Deferred / open' into shared headers under
+decomp/include/ (one declaration each, typed members): mesh_cache.cpp's MeshInstance onto TextureObject, the effect
+records (EffectRecord/EffectRecordA, DAT_1115cfe8) into effect_manager.h, CharSlot and ActorSlot, and give the
+CharState `words[k]` users named fields. Convert files with the generic driver `tm.py` from the session notes folder
+(byte-level, keep each line's ending; baseline from HEAD's report) and use Sonnet subagents only for files the driver
+reverts. After each batch run `python tools/build_all.py --report ../progress/jp/report.json` and
 `python tools/check_matches.py` from `decomp/`; commit and push only with no real loss (renames at the same address
 are fine). Keep everything human-readable (named constants instead of magic numbers, liberal comments, informative
 names). Rewrite HANDOFF.md at the end with the Fully linked / Matched / Fuzzy numbers, keeping its Standing

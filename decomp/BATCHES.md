@@ -341,3 +341,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 277 | phase0 | - | KeyBank into key_track.h; anim_model.h (AnimModel 0x249c, MotionChannels, Playback): 37 files drop AnimModel/CharRecord/SceneOwner/PathMover/... copies; 789 matched, renames at the same addresses |
 | 278 | phase0 | - | dinput_min.h (input_poll, input_font, player_damage); 789 matched unchanged |
 | 279 | phase0 | - | Character (DAT_10db6ed8) views are AnimModels at DAT_10db6ee8 (world.h + 35 files); npc_greet still deferred; 789 matched unchanged |
+| 280 | phase0 | - | char_state.h (CharState + 13 views of DAT_1020b430), model_bank.h, effect_manager.h (EffectOptions), texture_object.h, game.h globals, listbank.h, Playback for model_state/mesh_cache; 789 matched unchanged |

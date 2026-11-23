@@ -535,6 +535,14 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - cl 13.00 unrolls a counted loop over a local table 8 times by itself (`for (m = 0; m < 0x2000; m++) if (count[m])
   {...}` in Node::BuildMesh 0x101a82d0 gives eight bodies and `add eax, 0x20`), and turns zeroing loops over local
   int tables into `rep stosd`; a 0x28000-byte frame of int tables gets the aligned `and esp, -8` prologue.
+- **atan2 spellings decide the frame** (enemy_strafe.cpp): `(float)atan2((double)x, (double)y) + 3.1415f` gives the
+  aligned `and esp, -8` frame and rounds the result (`fstp`/`fld` of a float slot) right after the call; the float
+  `Atan2(float, float)` helper rounds the same way but leaves the frame unaligned (ebp then becomes a fourth register),
+  and helpers with double parameters (or `atan2(float, float)` from <math.h>) align the frame but drop the rounding.
+- `cond ? "a" : "b"` as a call argument is evaluated before the other arguments; the original's `push` of the common
+  arguments followed by a `jne` between two string pushes comes from an if/else with two full calls (Enemy_StrafeAndBurst).
+- Look-alike functions match from one source shape: Enemy_StrafeAndLunge 0x10099040 matched at the first build from
+  the draft of its twin 0x1009a690 with only the differing lines changed.
 - Copying a Vec4 from a pointer next to setting another Vec4's fields: the stores interleave as in the original
   when the other vector is written first (`up.x = 0; up.y = 1; up.z = 0;` then `caster.x = p->x; ...`; Node::
   RenderShadowTexture / DrawShadow).

@@ -118,6 +118,8 @@ struct CharState
                         int speed;                // route_carrier.cpp: units per frame (from the route's first
                                                   // point)
                         int keepAfterScript;      // char_script.cpp: non-zero = stay in the world after the script
+                        int shotSound;            // enemy_strafe.cpp: SHOT_SOUND_PENDING = play the shot sound with
+                                                  // the next shot
                     };
                     union                         // 0x1c
                     {

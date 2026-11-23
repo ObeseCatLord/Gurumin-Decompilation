@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (166)
+## 1. Walls to retry (169)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -82,6 +82,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
 - [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
+- [ ] `10099b30` 2897 — Enemy_StrafeAndBurst (enemy_strafe.cpp, rule-clean): the same ebx/edi swap as 1009a690, and the idle block (motion 2, then `if (rand % 100 > 2) return 0;` before the motion-speed check) is merged into two copies (chase/left/right and back) where the original has one, placed before the end check. The defeated branch matches only as an if/else with two full FUN_1003a7d0 calls (cl hoists the common arguments); a ternary path is evaluated first.
+- [ ] `1009a690` 2703 — Enemy_StrafeAndShoot (enemy_strafe.cpp, rule-clean; twin 10099040 matched from the same source shape): 1 byte longer. ebx and edi are swapped all through (ours: index in edi, the model offset index*0x249c in ebx; the original and 10099040: index in ebx), and in the chase step the far/mid tails are merged the other way round (the original keeps the walk branch's copy of the heading/stuck tail and the run branch's `action = 0` block). Tried: early return vs nested if in the attack step (the attack step's own m_238c check + return is needed: 2688 -> 2704 bytes, 1756 -> 426 diffs), switch (worse), the end check in every step (worse), stuck-check spellings (`>=` / separate increment: much worse), a local copy of the index.
 - [ ] `100b0250` 1583 — Companion0_Update: all but the idle branch identical; there the original takes eax/ecx for the first block's temporaries and edx/eax for the second (cl 13.00 here edx/eax and ecx/edx); its twins 0x100b0880 and 0x100b0f00 match with the same branch; slot-variable, local and early-return forms tried
 - [ ] `100b4300` 1583 — Npc_RaiseAlarm (char_move.cpp): all but the alarm block identical; the original pushes an immediate 0 for Sound_PlayEffect and re-zeroes edi after the red flash, cl 13.00 here re-zeroes edi before the sound. The `||` spelling of the line-of-sight test makes cl 13.00 inline atan2f (a larger frame); the `visible` local keeps it a call
 - [ ] `100b4930` 1473 — Npc_RideAlarm (char_move.cpp): same flow and calls; the original keeps index in ebx and the marker loop counter in ebp (cl 13.00 here swaps them); with sqrtf for the marker distance the rest matches
@@ -136,6 +138,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10164af0` 284 — ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
 - [ ] `10165020` 272 — bubble sort: ours stores count-1 in the dead parameter slot, the original in a separate local; a named local makes cl 13.00 unroll the inner loop by 4 (local inside/outside the loop, early return tried)
 - [ ] `10167390` 104 — WorldRenderer::StartFade: identical apart from the mode store, which the original schedules right after loading mode into edx (ours loads it into eax and stores it after the fstp); mode-first and conversion-local forms tried
+- [ ] `10167440` 2374 — WorldRenderer::DrawPictures (world_pictures.cpp, rule-clean): everything matches but the scheduling of the bottom edge in the in-world PICTURE_SCREEN_EXACT branch: the original loads offsetY + half height before pushing the two constant texture coordinates, ours after the first push (the same branch-shape spelling matches in the other in-world branches). The non-world right edges need offsetX + (centre + half width). Tried: bottom spellings (sums in every order and grouping), right-edge spellings, float or double u0/v0.
 - [ ] `10169720` 40 — memset + clear loop: register choice (edx vs eax) and ecx/eax setup order differ
 - [ ] `10169c60` 399 — TextureObject::Create (MeshInstance in mesh_cache.cpp): statements identical; the original returns from the first size test before push esi (ours pushes first) and computes width*height*3 separately in the two speckle branches (ours computes it once before the branch); split tests and loop forms tried
 - [ ] `1016a020` 109 — Playback bind to an owner's root node: same register residue as 0x1016a090 (original: ecx = -1, eax = 0, then a second zero in edi)
@@ -165,7 +168,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019d8e0` 954 — Node::ComputeBounds: control flow and stores in place; the -999999 constant and the y min/max slots use other registers/slots (ecx and swapped 0x18/0x1c in the original), declaration orders tried
 - [ ] `1019e120` 1246 — Node::BuildCollisionSpheres: 14 bytes; identical except that the original encodes the indexed loads with the offset register as base ([ecx + ebx + 4] for vertices, [edi + edx + 4] for the pack lists), ours with the pointer register first (typed vertex struct tried)
 - [ ] `1019eeb0` 844 — Node::SetupSkinning (M_1019eeb0): identical except the bone != 0 test in the parent-name condition, which cl 13.00 here drops (the original keeps test eax, eax; je); local and re-read forms tried
-- [ ] `101a82d0` 1153 — Node::BuildMesh (node_mesh_build.cpp, rule-clean): everything matches (aligned frame, the unrolled table loop, the strength-reduced triangle loop) except the operand order of the VertexPack addresses: the original writes [index*0x74 + packs], ours [packs + index*0x74] (5 places), and the first vertex of each triangle is addressed through eax/ecx then lea esi (ours esi/edx). Tried: (list + packs)->, unsigned tables, a fresh material local, indices through a row pointer (loses the strength reduction).
+- [ ] `101a82d0` 1153 — Node::BuildMesh (node_mesh_build.cpp, rule-clean): everything matches (aligned frame, the unrolled table loop, the strength-reduced triangle loop) except the operand order of the VertexPack addresses: the original writes [index*0x74 + packs], ours [packs + index*0x74] (5 places) and the register of the third vertex index load (ecx, ours esi). The first vertex now matches (index kept in `vertex`, no Vertex pointer). Tried: (list + packs)->, i + packs, char-pointer offsets in either order, unsigned/short/long/const/register indices, unsigned tables, table lookups inline, a pack pointer (caches packs), an inline PackAt(packs, i) helper, a fresh material local, indices through a row pointer (loses the strength reduction). cl seems to put a reloaded member pointer as base and a parameter as index; the original treats packs like a parameter.
 - [ ] `101a8e60` 2060 — Node::Collide (node_mesh_hits.cpp, rule-clean): body after the region prologue is SegmentHitsMesh's matched code. Original: both kind arms load the cell into bl (the register caching DAT_11b04514) and share the tail test bl,bl/mov ecx,6/je; both CDL arms cmp memory; the switched-off jump shares the tag-fail restore (mov ebp then mov edi). Ours: one arm of each pair cmp memory, the other loads, so tails do not merge. Tried (2026-11-23): local cell var (gets dl, list moves to edi), local initialised from DAT_11b04514, join-test after both arms (the compiler tail-duplicates it), inline CellState helper, bool cast, ternary on the list. The 'CDL region table' DAT_11affdd8 was DAT_11afffe8 - 0x210 (folded '0' digits): fixed.
 - [ ] `101acc60` 301 — DistanceSquaredToSegment2D: the zero-length and t<0 exits share one block; the original places it after the t test, cl 13.00 here at the end (nested, early-return and NaN-aware forms tried)
 - [ ] `101ad240` 119 — Plane::Distance: 4 bytes; the original evaluates the dot product z*c, y*b, x*a (every source order and inline Dot helper tried gives y first)
@@ -188,7 +191,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (128)
+## 4. Large functions (801-3000 bytes) (124)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
@@ -290,7 +293,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1019a6b0` 2276 bytes (float, loops 3, calls 52)
 - [ ] `100460d0` 2285 bytes (float, loops 1, calls 57)
 - [ ] `1009d490` 2368 bytes (float, loops 7, calls 76)
-- [ ] `10167440` 2374 bytes (float, loops 2, calls 44)
 - [ ] `101a0cf0` 2380 bytes (float, loops 8, calls 58)
 - [ ] `101aa080` 2442 bytes (float, loops 4, calls 48)
 - [ ] `1007a370` 2478 bytes (float, calls 52)
@@ -302,9 +304,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10167d90` 2599 bytes (float, loops 3, calls 48)
 - [ ] `10025ce0` 2608 bytes (float, loops 4, calls 48)
 - [ ] `10151150` 2621 bytes (float, loops 2, calls 79)
-- [ ] `1009a690` 2703 bytes (float, loops 5, calls 97)
 - [ ] `101687e0` 2777 bytes (float, loops 5, calls 30)
-- [ ] `10099040` 2800 bytes (float, loops 6, calls 102)
 - [ ] `10048050` 2837 bytes (float, loops 1, calls 85)
 - [ ] `10163150` 2845 bytes (float, loops 1, calls 80)
 - [ ] `1001f4d0` 2846 bytes (float, loops 4, calls 100)
@@ -312,7 +312,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100a3900` 2875 bytes (float, loops 10, calls 69)
 - [ ] `1007ad20` 2884 bytes (float, calls 37)
 - [ ] `100524d0` 2888 bytes (float, loops 3, calls 76)
-- [ ] `10099b30` 2897 bytes (float, loops 5, calls 100)
 - [ ] `10193140` 2922 bytes (float, loops 8, calls 47)
 - [ ] `100b3770` 2948 bytes (float, calls 97)
 - [ ] `10015960` 2968 bytes (float, calls 91)

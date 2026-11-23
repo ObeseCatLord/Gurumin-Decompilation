@@ -9,21 +9,8 @@
 
 #include "anim_model.h"
 
-// Per-character script state (world.h CharState).
-struct ScriptState
-{
-    int m_0000;
-    int running;              // 0x04
-    int step;                 // 0x08: current script step
-    int registered;           // 0x0c: 1 once the position is in the camera list
-    int pad_0010;
-    int value;                // 0x14: value carried between steps (the opacity in tenths)
-    int keep;                 // 0x18: non-zero = stay in the world after the script ends
-    int result;               // 0x1c: result of the last step (5 = run the next step at once, 2 = waiting)
-    char pad_0020[0x20];
-};
+#include "char_state.h"
 
-extern "C" ScriptState DAT_1020b430[0x80];
 extern "C" Vec3 *DAT_1032d5b8[];      // positions the camera keeps in view
 extern "C" char DAT_1021bbc0[];       // a flag per camera position
 extern "C" int DAT_1049f0f0;          // number of camera positions
@@ -45,21 +32,21 @@ extern "C" int FUN_1002a340(int index)
     int nextStep;
     int result;
     position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
-    int value = DAT_1020b430[index].value;
+    int value = DAT_1020b430[index].scriptValue;
     DAT_10db6ee8[index].mode = 0;
     do
     {
-        FUN_10029cf0(index, &a, DAT_1020b430[index].step, &nextStep, &position, &result, &value, &b);
-        DAT_1020b430[index].value = value;
-        DAT_1020b430[index].result = result;
-        DAT_1020b430[index].step = nextStep;
+        FUN_10029cf0(index, &a, DAT_1020b430[index].scriptStep, &nextStep, &position, &result, &value, &b);
+        DAT_1020b430[index].scriptValue = value;
+        DAT_1020b430[index].scriptResult = result;
+        DAT_1020b430[index].scriptStep = nextStep;
     } while (result == 5);
-    if (DAT_1020b430[index].keep == 0 && result != 2)
+    if (DAT_1020b430[index].keepAfterScript == 0 && result != 2)
     {
-        DAT_1020b430[index].result = 1;
-        DAT_1020b430[index].running = 0;
-        DAT_1020b430[index].step = 0;
-        DAT_1020b430[index].value = 0;
+        DAT_1020b430[index].scriptResult = 1;
+        DAT_1020b430[index].scriptRunning = 0;
+        DAT_1020b430[index].scriptStep = 0;
+        DAT_1020b430[index].scriptValue = 0;
         DAT_10db6ee8[index].alpha = 0;
         DAT_10db6ee8[index].SetPosition(-5000.0f, -5000.0f, -5000.0f);
     }

@@ -2,6 +2,7 @@
 
 #include "world.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 // 16-byte per-character marker records at 0x10867e18 (only the y value is used here).
 struct Marker
@@ -20,13 +21,13 @@ extern "C" Marker DAT_10867e18[0x80];
 // retired (m_0000 = 1) and hides its marker (y = -200000). Not byte-identical yet (see open.tsv).
 extern "C" int FUN_1001b7b0(int index)
 {
-    if (DAT_1020b430[index].m_0000 == 0)
+    if (DAT_1020b430[index].state == 0)
     {
         DAT_10db6ee8[index].matrix._41 = -100000.0f - DAT_10db6ee8[index].matrix._41 * 1.0f;
-        int value = DAT_1020b430[index].m_0004[1];
+        int value = DAT_1020b430[index].values[1];
         DAT_1020d540[index] = 0;
-        DAT_1020b430[index].m_0004[3] = value % 10;
-        DAT_1020b430[index].m_0000 = 1;
+        DAT_1020b430[index].values[3] = value % 10;
+        DAT_1020b430[index].state = 1;
         DAT_10c635a8 = 1;
         DAT_1049efb0[value / 10 % 10][value % 10] = (char)index;
         DAT_10867e18[index].y = -200000.0f;

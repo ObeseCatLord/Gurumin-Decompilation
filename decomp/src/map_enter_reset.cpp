@@ -8,13 +8,7 @@
 #include <string.h>
 #include "char_params.h"
 
-// Per-character AI state (world.h CharState): the state and fifteen fields, all cleared one by one here.
-struct EnemyState
-{
-    int state;
-    int m_0004, m_0008, m_000c, m_0010, m_0014, m_0018, m_001c, m_0020, m_0024, m_0028, m_002c, m_0030, m_0034,
-        m_0038, m_003c;
-};
+#include "char_state.h"
 
 #include "node.h"
 
@@ -22,7 +16,6 @@ extern "C" int DAT_10c62edc[0x1000];                 // script flags
 extern "C" int DAT_10c62ed0;                         // current map
 extern "C" char DAT_1021f3fa[0x42];
 extern "C" int DAT_102549a8[0x42];
-extern "C" EnemyState DAT_1020b430[0x80];
 extern "C" int DAT_104c0354;
 extern "C" Node *DAT_104c0390;                       // the model of the map's held object
 extern "C" void (*DAT_11b1ba40)(void *block);        // the engine's free
@@ -72,21 +65,21 @@ extern "C" int FUN_10023900(void)
     {
         DAT_102549a8[i] = 0;
         DAT_1020b430[58 + i].state = 0;
-        DAT_1020b430[58 + i].m_0004 = 0;
-        DAT_1020b430[58 + i].m_0008 = 0;
-        DAT_1020b430[58 + i].m_000c = 0;
-        DAT_1020b430[58 + i].m_0010 = 0;
-        DAT_1020b430[58 + i].m_0014 = 0;
-        DAT_1020b430[58 + i].m_0018 = 0;
-        DAT_1020b430[58 + i].m_001c = 0;
-        DAT_1020b430[58 + i].m_0020 = 0;
+        DAT_1020b430[58 + i].wait = 0;
+        DAT_1020b430[58 + i].talk = 0;
+        DAT_1020b430[58 + i].range = 0;
+        DAT_1020b430[58 + i].action = 0;
+        DAT_1020b430[58 + i].alarmFlashes = 0;
+        DAT_1020b430[58 + i].fall = 0;
+        DAT_1020b430[58 + i].rider = 0;
+        DAT_1020b430[58 + i].pointPause = 0;
         DAT_1020b430[58 + i].m_0024 = 0;
-        DAT_1020b430[58 + i].m_0028 = 0;
+        DAT_1020b430[58 + i].fadeActions = 0;
         DAT_1020b430[58 + i].m_002c = 0;
         DAT_1020b430[58 + i].m_0030 = 0;
         DAT_1020b430[58 + i].m_0034 = 0;
-        DAT_1020b430[58 + i].m_0038 = 0;
-        DAT_1020b430[58 + i].m_003c = 0;
+        DAT_1020b430[58 + i].sawPlayer = 0;
+        DAT_1020b430[58 + i].behaviour = 0;
         DAT_10daaae8[58 + i].m_00bc = -1;
     }
     DAT_10c62edc[0x44e] = DAT_10daaae8[0].m_0004[0];

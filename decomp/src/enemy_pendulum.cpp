@@ -13,18 +13,7 @@ Matrix4 RotationY(float angle);                  // 0x101b1bb0
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = start, 1 = dropping, 2 = swinging, 3 = landed
-    int wait;                 // 0x04: frames in the current state
-    int talk;                 // 0x08: hundreds = waits to be told, units = swing speed limit
-    int angle;                // 0x0c: swing angle in tenths of a degree
-    int backwards;            // 0x10: 1 while swinging back
-    int swing;                // 0x14: angle change per frame
-    int fall;                 // 0x18: drop speed (more negative each frame)
-    char pad_001c[0x24];
-};
+#include "char_state.h"
 
 // The last position and step of each character (route_walk.cpp StepRecord); here the position holds the pivot.
 struct LastPosition
@@ -47,7 +36,6 @@ struct CollisionWorld
     int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
 };
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
@@ -137,7 +125,7 @@ extern "C" int FUN_10044560(int index)
         else if (frames == 30)
             DAT_10db6ee8[index].alpha = 1.0f;
         DAT_1020b430[index].angle += DAT_1020b430[index].swing;
-        if (DAT_1020b430[index].backwards == 0)
+        if (DAT_1020b430[index].swingingBack == 0)
         {
             DAT_1020b430[index].swing -= 2;
             if (DAT_1020b430[index].swing < -(DAT_1020b430[index].talk % 100))
@@ -150,9 +138,9 @@ extern "C" int FUN_10044560(int index)
                 DAT_1020b430[index].swing = DAT_1020b430[index].talk % 100;
         }
         if (DAT_1020b430[index].angle <= 0 && DAT_1020b430[index].swing < 0)
-            DAT_1020b430[index].backwards = 1;
+            DAT_1020b430[index].swingingBack = 1;
         else if (DAT_1020b430[index].angle > 0 && DAT_1020b430[index].swing >= 0)
-            DAT_1020b430[index].backwards = 0;
+            DAT_1020b430[index].swingingBack = 0;
         DAT_10db6ee8[index].root->matrix = RotationY((float)DAT_1020b430[index].angle * -3.1415f / 1800.0f);
         Vec4 axis;
         Vec4 line;

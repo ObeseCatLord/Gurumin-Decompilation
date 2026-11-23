@@ -17,11 +17,7 @@ struct MapObject
     char pad_000c[0x38];
 };
 
-// Per-character AI state (world.h CharState), cleared whole here.
-struct CharState
-{
-    int data[0x10];
-};
+#include "char_state.h"
 
 // A 0x40-byte record per character slot (route_walk.cpp StepRecord): the position of the last frame and the step.
 struct LastPosition
@@ -84,7 +80,6 @@ extern "C" int DAT_102028dc;
 extern "C" int DAT_104c03b8;
 extern "C" int DAT_104c03bc;
 extern "C" int DAT_102199b8[0x5c];
-extern "C" CharState DAT_1020b430[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int DAT_102028c8;                         // texture slots held by the map (-1 = none)
 extern "C" int DAT_102028cc;

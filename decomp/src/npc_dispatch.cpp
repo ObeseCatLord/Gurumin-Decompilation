@@ -23,14 +23,8 @@ struct CollisionWorld
     int CastSegment2(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
 };
 
-// Per-character script state (world.h CharState).
-struct NpcState
-{
-    char pad_0000[0x3c];
-    int behaviour;            // 0x3c: behaviour number (0 = not unpacked from the script parameter yet)
-};
+#include "char_state.h"
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" ModelBank DAT_10804bf8;
 extern "C" CollisionWorld *DAT_10255f08;
 extern "C" Vec4 DAT_118e69e8;            // player position

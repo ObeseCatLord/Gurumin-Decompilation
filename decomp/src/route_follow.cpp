@@ -1,3 +1,4 @@
+#include "char_state.h"
 // Following the walking routes of the map: each route has 16 points (x, y, z and a code). The code holds an action
 // (code / 10000) and a value (code % 10000), each wrapped to -4999..5000; the action's low two bits say what happens
 // when the walker reaches the point and the rest is a group number.
@@ -82,7 +83,6 @@ struct Game
 };
 
 extern "C" Game DAT_10874848;
-extern "C" int DAT_1020b430[][16];               // per walker AI state: [0] = walking back, [1] = wait counter
 extern "C" int FUN_100286b0(int value);          // Angle_Wrap: -4999..5000
 
 // 0x1002f050 (Route_FollowGates). Like Route_Follow for routes whose points pack x * 10000 + y and z * 10000 + value
@@ -120,7 +120,7 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
         switch (*outType)
         {
         case 0:
-            if (DAT_1020b430[walker][0] != 0)
+            if (DAT_1020b430[walker].words[0] != 0)
                 point--;
             else
                 point++;
@@ -128,7 +128,7 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
         case 1:
             if (DAT_10874848.TestScriptFlag(*outValue) != 0)
                 point = parameter;
-            else if (DAT_1020b430[walker][0] != 0)
+            else if (DAT_1020b430[walker].words[0] != 0)
                 point--;
             else
                 point++;
@@ -137,19 +137,19 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
             result = 1;
             if (parameter != 0)
             {
-                DAT_1020b430[walker][0] = 1;
+                DAT_1020b430[walker].words[0] = 1;
                 point--;
             }
             else
                 point = 0;
             break;
         case 3:
-            if (DAT_1020b430[walker][1] == 0)
-                DAT_1020b430[walker][1] = parameter;
-            if (--DAT_1020b430[walker][1] < 1)
+            if (DAT_1020b430[walker].words[1] == 0)
+                DAT_1020b430[walker].words[1] = parameter;
+            if (--DAT_1020b430[walker].words[1] < 1)
             {
-                DAT_1020b430[walker][1] = 0;
-                if (DAT_1020b430[walker][0] != 0)
+                DAT_1020b430[walker].words[1] = 0;
+                if (DAT_1020b430[walker].words[0] != 0)
                     point--;
                 else
                     point++;
@@ -157,7 +157,7 @@ extern "C" int FUN_1002f050(int walker, int route, int point, int *outPoint, flo
             break;
         case 4:
             result = 1;
-            DAT_1020b430[walker][0] = 0;
+            DAT_1020b430[walker].words[0] = 0;
             point++;
             break;
         }

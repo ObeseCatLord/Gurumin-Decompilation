@@ -2,6 +2,7 @@
 
 #include "world.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 

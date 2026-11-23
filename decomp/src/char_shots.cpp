@@ -4,6 +4,7 @@
 
 #include "vec4.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 // The world collision (scene root node); see collide_query.cpp.
 struct CollisionWorld
@@ -41,13 +42,13 @@ extern "C" int FUN_1001a680(int owner, const Vec4 *position, int spread)
 {
     for (int slot = owner + 2; slot < owner + 8; slot++)
     {
-        if (DAT_1020b430[slot].m_0000 != 0)
+        if (DAT_1020b430[slot].state != 0)
             continue;
-        DAT_1020b430[slot].m_0000 = 1;
+        DAT_1020b430[slot].state = 1;
         DAT_10802bf8[slot].position.Copy(*position);
-        DAT_1020b430[slot].m_0004[0] = 300;
-        DAT_1020b430[slot].m_0004[1] = spread;
-        DAT_1020b430[slot].m_0004[2] = 0;
+        DAT_1020b430[slot].values[0] = 300;
+        DAT_1020b430[slot].values[1] = spread;
+        DAT_1020b430[slot].values[2] = 0;
         DAT_10255160[slot].angle = DAT_10255160[owner].angle;
         DAT_10255160[slot].heading = DAT_10db6ee8[owner].targetHeading;
         if (spread != 0)
@@ -64,7 +65,7 @@ extern "C" int FUN_1001a680(int owner, const Vec4 *position, int spread)
 // 0 when there is none or the slot's m_0028 is set.
 extern "C" int FUN_1001a590(int slot, int unused, float distance)
 {
-    if (DAT_1020b430[slot].m_0028 == 0)
+    if (DAT_1020b430[slot].skipGroundProbe == 0)
     {
         Vec4 from;
         Vec4 to;

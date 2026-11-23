@@ -37,22 +37,8 @@ extern "C" int FUN_100241e0(int index, float x, float y, float z)
     return 0;
 }
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = start, 1 = idling
-    int wait;                 // 0x04: frames until the next voice line may play
-    int talk;                 // 0x08: talk id: script number * 100 + line (line 0 = never speaks)
-    int range;                // 0x0c: distance at which a waiting character reacts
-    int m_0010;               // 0x10: per behaviour: marker to run to (Npc_RunToMarker), alarm raised (Npc_RideAlarm),
-                              //       attacks left to chain (Enemy_ShoveAndBlast)
-    int m_0014;               // 0x14: alarm flashes so far (Npc_RideAlarm)
-    char pad_0018[0x20];
-    int m_0038;               // 0x38
-    int m_003c;
-};
+#include "char_state.h"
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" int DAT_10210b30[0x80];
 extern "C" char DAT_10255a88[0x80];
 extern "C" int FUN_1013f880(void);                                          // the game's random number
@@ -80,7 +66,7 @@ extern "C" int FUN_100b58a0(int index, int wakeEnemies)
         DAT_10210b30[index] = 0;
         if (wakeEnemies != 0)
             FUN_1001b670(index, 800.0f, 0);
-        DAT_1020b430[index].m_0038 = 1;
+        DAT_1020b430[index].sawPlayer = 1;
     }
     if (DAT_1020b430[index].state == 0)
     {
@@ -102,7 +88,7 @@ extern "C" int FUN_100b58a0(int index, int wakeEnemies)
                 FUN_1000d620(index, line - 1, 60);
             DAT_1020b430[index].wait = 75;
         }
-        if (DAT_1020b430[index].m_0038 != 0)
+        if (DAT_1020b430[index].sawPlayer != 0)
         {
             DAT_10db6ee8[index].targetHeading =
                 Atan2(DAT_10db6ee8[0].matrix.m[12] - DAT_10db6ee8[index].matrix.m[12],
@@ -124,10 +110,10 @@ extern "C" int FUN_100b58a0(int index, int wakeEnemies)
 // talk prompt (key script * 1000 + line - 1) for 60 frames. Returns 0.
 extern "C" int FUN_100b5ae0(int index)
 {
-    if (DAT_10210b30[index] != 0 || DAT_1020b430[index].m_0038 != 0)
+    if (DAT_10210b30[index] != 0 || DAT_1020b430[index].sawPlayer != 0)
     {
         DAT_10210b30[index] = 0;
-        DAT_1020b430[index].m_0038 = 0;
+        DAT_1020b430[index].sawPlayer = 0;
     }
     if (DAT_1020b430[index].state == 0)
     {
@@ -165,7 +151,7 @@ extern "C" int FUN_100b5ae0(int index)
 extern "C" int FUN_10045c30(int index)
 {
     float distance = (DAT_10db6ee8[0].matrix.GetTranslation() - DAT_10db6ee8[index].matrix.GetTranslation()).Length2D();
-    NpcState *state = &DAT_1020b430[index];
+    CharState *state = &DAT_1020b430[index];
     if (DAT_1020b430[index].state == 0)
     {
         DAT_1020b430[index].state = 1;
@@ -190,13 +176,13 @@ extern "C" int FUN_10045c30(int index)
         Atan2(DAT_10db6ee8[0].matrix.m[12] - DAT_10db6ee8[index].matrix.m[12],
               DAT_10db6ee8[0].matrix.m[13] - DAT_10db6ee8[index].matrix.m[13]) + 3.1415f;
     if (distance < (float)DAT_1020b430[index].range ||
-        (DAT_1020b430[index].m_0038 != 0 && DAT_1020b430[index].talk / 100 != 0))
+        (DAT_1020b430[index].sawPlayer != 0 && DAT_1020b430[index].talk / 100 != 0))
     {
-        memset(state, 0, sizeof(NpcState));
+        memset(state, 0, sizeof(CharState));
         DAT_1020b430[index].state = 2;
         DAT_1020b430[index].wait = 0x1d;
         DAT_1020b430[index].talk = 999;
-        DAT_1020b430[index].m_003c = 0xf;
+        DAT_1020b430[index].behaviour = 0xf;
         DAT_10210b30[index] = 0;
         DAT_10db6ee8[index].mode = 1;
         Vec4 step;
@@ -236,7 +222,7 @@ extern "C" int FUN_100b1520(int index)
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         player.z += 50.0f;
         self.z += 75.0f;
-        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+        if ((DAT_1020b430[index].sawPlayer |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
                                                          (float)(DAT_1020b430[index].talk * 10), 1.099525f, 250.0f, 1)) != 0 ||
             DAT_10210b30[index] != 0)
         {
@@ -429,7 +415,7 @@ extern "C" int FUN_100b5550(int index)
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     float distanceSquared = (player - self).LengthSquared3();
     if (DAT_1020b430[index].state < 2 &&
-        (DAT_10210b30[index] != 0 || DAT_1020b430[index].m_0038 != 0 ||
+        (DAT_10210b30[index] != 0 || DAT_1020b430[index].sawPlayer != 0 ||
          distanceSquared < (float)(DAT_1020b430[index].talk / 100 * (DAT_1020b430[index].talk / 100) * 10000)))
     {
         FUN_1001b670(index, 800.0f, 0);
@@ -542,7 +528,7 @@ extern "C" int FUN_100b3430(int index)
             if (distance < 1300.0f && visible != 0)
             {
                 DAT_1020b430[index].talk /= 10;
-                DAT_1020b430[index].m_003c = 5;
+                DAT_1020b430[index].behaviour = 5;
                 DAT_1020b430[index].state = 0;
                 DAT_1020b430[index].wait = 0;
                 DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z - 400.0f);
@@ -554,7 +540,7 @@ extern "C" int FUN_100b3430(int index)
             if (distance < 1300.0f && visible != 0)
             {
                 DAT_1020b430[index].talk /= 10;
-                DAT_1020b430[index].m_003c = 6;
+                DAT_1020b430[index].behaviour = 6;
                 DAT_1020b430[index].state = 0;
                 DAT_1020b430[index].wait = 0;
                 DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z - 400.0f);
@@ -596,7 +582,7 @@ extern "C" int FUN_100b1ff0(int index)
     }
     else if (DAT_1020b430[index].state == 1)
     {
-        if (DAT_1020b430[index].m_0038 != 0 || DAT_10210b30[index] != 0)
+        if (DAT_1020b430[index].sawPlayer != 0 || DAT_10210b30[index] != 0)
         {
             FUN_1000d620(index, 15, 60);
             FUN_10065b10(index, 0x20c, 0, 0);
@@ -690,12 +676,12 @@ extern "C" int FUN_100b6290(int index)
         if (nearest != -1)
         {
             DAT_1021f3c0[nearest] = 'Q';
-            DAT_1020b430[index].m_0010 = nearest;
+            DAT_1020b430[index].action = nearest;
         }
         else
         {
             DAT_1020b430[index].state = 0;
-            DAT_1020b430[index].m_003c = 1;
+            DAT_1020b430[index].behaviour = 1;
         }
     }
     else if (DAT_1020b430[index].state == 1)
@@ -703,7 +689,7 @@ extern "C" int FUN_100b6290(int index)
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         player.z += 50.0f;
         self.z += 75.0f;
-        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+        if ((DAT_1020b430[index].sawPlayer |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
                                                          (float)(DAT_1020b430[index].talk * 10), 1.099525f, 250.0f, 1)) != 0 ||
             DAT_10210b30[index] != 0)
         {
@@ -722,7 +708,7 @@ extern "C" int FUN_100b6290(int index)
         {
             Vec4 marker;
             Vec4 step;
-            marker.Copy(DAT_10db6ee8[DAT_1020b430[index].m_0010].matrix.GetTranslation());
+            marker.Copy(DAT_10db6ee8[DAT_1020b430[index].action].matrix.GetTranslation());
             step.Copy(marker - self);
             step.Normalized3();
             step.Copy(step * 24.0f);
@@ -735,12 +721,12 @@ extern "C" int FUN_100b6290(int index)
                 step.Copy(step * 75.0f);
                 step.Copy(step + marker);
                 DAT_10db6ee8[index].SetPosition(step.x, step.y, marker.z);
-                DAT_1021f3c0[DAT_1020b430[index].m_0010] = ',';
+                DAT_1021f3c0[DAT_1020b430[index].action] = ',';
                 DAT_1020b430[index].state = 0;
                 DAT_1020b430[index].wait = 0;
                 DAT_1020b430[index].talk = 0;
-                DAT_1020b430[index].m_0038 = 0;
-                DAT_1020b430[index].m_003c = 0x1f;
+                DAT_1020b430[index].sawPlayer = 0;
+                DAT_1020b430[index].behaviour = 0x1f;
             }
             else
                 FUN_100241e0(index, step.x, step.y, 0);
@@ -780,7 +766,7 @@ extern "C" int FUN_100b23b0(int index)
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         player.z += 50.0f;
         self.z += 75.0f;
-        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+        if ((DAT_1020b430[index].sawPlayer |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
                                                          (float)(DAT_1020b430[index].talk * 10), 0.31415f, 150.0f, 0)) != 0 ||
             DAT_10210b30[index] != 0)
         {
@@ -887,7 +873,7 @@ int FUN_100b4f00(int index)
     float distance = (player - self).Length();
     if (DAT_1020b430[index].state < 3 &&
         (DAT_10210b30[index] != 0 || distance < (float)(DAT_1020b430[index].talk % 10 * 100) ||
-         DAT_1020b430[index].m_0038 != 0))
+         DAT_1020b430[index].sawPlayer != 0))
     {
         DAT_10210b30[index] = 0;
         DAT_1020b430[index].state = 3;
@@ -1044,7 +1030,7 @@ extern "C" int FUN_100b4300(int index)
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         player.z += 50.0f;
         self.z += 75.0f;
-        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+        if ((DAT_1020b430[index].sawPlayer |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
                                                          (float)(DAT_1020b430[index].talk / 100 * 200), 1.099525f, 250.0f, 1)) != 0 ||
             DAT_10468730[index] != 0 || DAT_10daaaec[index].health < DAT_10daaaec[index].maxHealth)
         {
@@ -1073,8 +1059,8 @@ extern "C" int FUN_100b4300(int index)
                 for (i = 0x3a; i < index; i++)
                 {
                     if (DAT_10db6ee8[i].matrix.m[12] > -20000.0f && DAT_10210d30[i] == 0 && DAT_10daab84[i].kind == 0x62 &&
-                        (DAT_1020b430[i].m_003c == 11 || DAT_1020b430[i].m_003c == 12) &&
-                        (DAT_1020b430[i].m_0038 != 0 || DAT_1020b430[i].state == 2))
+                        (DAT_1020b430[i].behaviour == 11 || DAT_1020b430[i].behaviour == 12) &&
+                        (DAT_1020b430[i].sawPlayer != 0 || DAT_1020b430[i].state == 2))
                         break;
                 }
                 if (i == index)
@@ -1154,7 +1140,7 @@ extern "C" int FUN_100b4930(int index)
         DAT_1020b430[index].range = nearest;
         DAT_10255160[index][0] = sqrtf(nearestSquared);
         if (nearest == -1)
-            DAT_1020b430[index].m_003c = 11;
+            DAT_1020b430[index].behaviour = 11;
     }
     else if (DAT_1020b430[index].state == 1)
     {
@@ -1183,18 +1169,18 @@ extern "C" int FUN_100b4930(int index)
             DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
         else
             DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
-        if (DAT_1020b430[index].m_0010 == 0)
+        if (DAT_1020b430[index].action == 0)
         {
             player.z += 50.0f;
             self.z += 75.0f;
-            if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+            if ((DAT_1020b430[index].sawPlayer |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
                                                              (float)(DAT_1020b430[index].talk / 100 * 200), 1.099525f, 250.0f, 1)) != 0 ||
                 DAT_10210b30[index] != 0)
             {
                 FUN_1000d620(index, 15, 60);
                 FUN_10065b10(index, 0x20c, 0, 0);
                 DAT_1020b430[index].wait = 0;
-                DAT_1020b430[index].m_0010 = 1;
+                DAT_1020b430[index].action = 1;
                 FUN_1001b670(index, 1500.0f, 0);
                 if (DAT_1020b430[index].talk % 100 != 0)
                     DAT_10874848.RegisterFlag(DAT_1020b430[index].talk % 100 + 300);
@@ -1203,12 +1189,12 @@ extern "C" int FUN_100b4930(int index)
         if (DAT_10db6ee8[DAT_1020b430[index].range].matrix.m[12] < -20000.0f)
             FUN_10043cc0(index);
     }
-    if (DAT_1020b430[index].m_0010 != 0)
+    if (DAT_1020b430[index].action != 0)
     {
         FUN_1001b670(index, 1500.0f, 0);
         if (++DAT_1020b430[index].wait == 15)
         {
-            if (DAT_1020b430[index].m_0014 < 2)
+            if (DAT_1020b430[index].alarmFlashes < 2)
             {
                 FUN_1003ad20(0x207, 0, 1.0f);
                 FUN_1000ec70(15, 1.0f, 0.5f, 0.5f, 1.0f);
@@ -1218,10 +1204,10 @@ extern "C" int FUN_100b4930(int index)
         }
         else if (DAT_1020b430[index].wait == 30)
         {
-            if (DAT_1020b430[index].m_0014 < 2)
+            if (DAT_1020b430[index].alarmFlashes < 2)
             {
                 FUN_1000ec70(15, 1.0f, 1.0f, 1.0f, 1.0f);
-                DAT_1020b430[index].m_0014++;
+                DAT_1020b430[index].alarmFlashes++;
             }
             DAT_1020b430[index].wait = 0;
         }
@@ -1266,12 +1252,12 @@ extern "C" int FUN_10098be0(int index)
         DAT_10210b30[index] = 0;
         DAT_1020b430[index].talk = 0;
         DAT_1020b430[index].wait = 0;
-        DAT_1020b430[index].m_0010 = 2;
+        DAT_1020b430[index].action = 2;
         DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
         DAT_1020b430[index].wait = 100;
         DAT_1020b430[index].talk = 1;
         DAT_1020b430[index].range = 35;
-        DAT_1020b430[index].m_0010 = 2;
+        DAT_1020b430[index].action = 2;
     }
     if (DAT_1020b430[index].talk == 1)
     {
@@ -1291,13 +1277,13 @@ extern "C" int FUN_10098be0(int index)
             FUN_10065b10(index, 0x151, 0, 0);
             FUN_1001d8b0(index, 0x61, offset, -1, -1, 0, 0, 0, &DAT_10db6ee8[index].matrix, &options);
         }
-        if (DAT_1020b430[index].range == 0 && DAT_1020b430[index].m_0010 == 2)
+        if (DAT_1020b430[index].range == 0 && DAT_1020b430[index].action == 2)
         {
             DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
             DAT_1020b430[index].wait = 100;
             DAT_1020b430[index].talk = 1;
             DAT_1020b430[index].range = 35;
-            DAT_1020b430[index].m_0010 = 1;
+            DAT_1020b430[index].action = 1;
         }
         else if (DAT_1020b430[index].range == 0)
             DAT_1020b430[index].talk = 0;
@@ -1307,7 +1293,7 @@ extern "C" int FUN_10098be0(int index)
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         if (DAT_1020b430[index].wait != 0)
             DAT_1020b430[index].wait--;
-        DAT_1020b430[index].m_0010 = 2;
+        DAT_1020b430[index].action = 2;
         if (FUN_1013f880() % 100 <= 2 && DAT_1020b430[index].wait == 0)
         {
             DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
@@ -1325,7 +1311,7 @@ extern "C" int FUN_10098be0(int index)
     {
         if (DAT_1020b430[index].wait != 0)
             DAT_1020b430[index].wait--;
-        DAT_1020b430[index].m_0010 = 2;
+        DAT_1020b430[index].action = 2;
         if (FUN_1013f880() % 100 <= 2 && DAT_1020b430[index].wait == 0)
         {
             DAT_10db6ee8[index].PlayMotion(4, 1, 5, 1.0f);
@@ -1502,8 +1488,8 @@ int FUN_10048b70(int index)
     else if (DAT_1020b430[index].state == 1)
     {
         DAT_10db6ee8[index].root->matrix = DAT_10868838[index][0] * RotationY((float)DAT_1020b430[index].range * 3.1415f / 180.0f);
-        if (DAT_1020b430[index].m_0010 != 0)
-            DAT_10db6ee8[index].matrix.m[14] += (float)(DAT_1020b430[index].m_0014-- / 2);
+        if (DAT_1020b430[index].action != 0)
+            DAT_10db6ee8[index].matrix.m[14] += (float)(DAT_1020b430[index].alarmFlashes-- / 2);
         Matrix4 matrix;
         Vec4 position;
         matrix.SetIdentity();

@@ -1,0 +1,138 @@
+// Per-character behaviour state: 0x40 bytes for each of the 0x80 character slots (DAT_1020b430). Every behaviour
+// (NPC idling and talking, enemy chases, pendulums, route walkers, scripts, scripted shoves, ...) keeps its own
+// variables here, so most words mean different things to different behaviours. The header gives each offset a
+// union of the names the behaviours use; the comment on each name says which behaviour (source file) uses it.
+// game_reset.cpp clears the whole array when a game starts; char_move.cpp clears one slot when a behaviour starts.
+// This is the one declaration of this type: include this header, never redeclare it.
+#ifndef GURUMIN_CHAR_STATE_H
+#define GURUMIN_CHAR_STATE_H
+
+// Number of character slots (DAT_1020b430, DAT_10db6ee8 and the other per-character arrays).
+#define CHAR_SLOT_COUNT 0x80
+
+// One scripted shove (char_shove.cpp): a character slides by a per-frame step for some frames, or turns to look at
+// another character. A slot's state holds four of them while shoves run.
+struct Shove
+{
+    int target;                   // character slot + 10000 * (non-zero = keep its heading), negative = look target
+    int stepX;                    // per-frame step (for a look target: the character to look at)
+    int stepY;
+    int frames;                   // frames left + 10000 * (non-zero = keep its motion)
+};
+
+struct CharState
+{
+    union
+    {
+        struct
+        {
+            union                                 // 0x00
+            {
+                int state;                        // behaviour step: 0 = not started yet, then per behaviour
+                int turn;                         // damage_zone.cpp: turn counter of the zone
+                int counterValue;                 // digit_counter.cpp: the value shown (0..1000)
+                int approachStarted;              // npc_approach.cpp: 1 once the approach has begun
+            };
+            union                                 // 0x04..0x37: behaviour variables
+            {
+                struct
+                {
+                    union                         // 0x04
+                    {
+                        int wait;                 // frames in the current step (or until the next voice line)
+                        int scriptRunning;        // char_script.cpp: 1 while the character's script runs
+                        int cooldown;             // kind4a_turret.cpp: frames before the next random attack
+                        int routeStopped;         // route_walk.cpp: non-zero = the character stays where it is
+                        int counterPhase;         // digit_counter.cpp: 0 = idle, 1..10 = turning to count + 1
+                    };
+                    union                         // 0x08
+                    {
+                        int talk;                 // talk id (script number * 100 + line) or the behaviour's
+                                                  // parameter from the map (distance, speed limit, ...)
+                        int pausing;              // enemy_chase.cpp: 1 = pausing instead of chasing
+                        int facing;               // npc_facing.cpp: idle facing in steps of pi/6 (100+ = never
+                                                  // turns to the player while talking)
+                        int scriptStep;           // char_script.cpp: current script step
+                        int attacking;            // kind4a_turret.cpp: 1 while an attack motion plays
+                        int approachCode;         // npc_approach.cpp: stop distance / 10 (% 100) and release flag
+                                                  // (/ 100)
+                        int targetPoint;          // route_walk.cpp: route point the character heads for
+                    };
+                    union                         // 0x0c
+                    {
+                        int range;                // char_move.cpp: distance at which a waiting character reacts
+                        int count;                // enemy_react.cpp: frames counted towards the next action
+                        int pauseFrames;          // enemy_chase.cpp
+                        int angle;                // enemy_pendulum.cpp: swing angle in tenths of a degree
+                        int idleStarted;          // npc_facing.cpp: 1 once the idle motion was started
+                        int saved;                // npc_frozen.cpp: the slot's m_0140 while held
+                        int marker;               // npc_ride.cpp: the marker character ridden behind
+                        int push;                 // npc_wheel.cpp: push strength (speed = push / 4 - 20)
+                        int route;                // route_carrier.cpp: the route walked
+                        int registered;           // char_script.cpp: 1 once the position is in the camera list
+                        int attackTimer;          // kind4a_turret.cpp: frames left of the attack
+                        int stopDistance;         // npc_approach.cpp
+                        int placed;               // route_walk.cpp: 1 once the character was put on its route
+                    };
+                    union                         // 0x10
+                    {
+                        int action;               // char_move.cpp: marker to run to (Npc_RunToMarker), alarm
+                                                  // raised (Npc_RideAlarm), attacks left to chain
+                                                  // (Enemy_ShoveAndBlast)
+                        int running;              // enemy_chase.cpp: 1 = running (faster) after the player was far
+                        int swingingBack;         // enemy_pendulum.cpp: 1 while swinging back
+                        int nextPoint;            // route_carrier.cpp: the route point headed for
+                    };
+                    union                         // 0x14
+                    {
+                        int alarmFlashes;         // char_move.cpp: alarm flashes so far (Npc_RideAlarm)
+                        int swing;                // enemy_pendulum.cpp: angle change per frame
+                        int reversed;             // route_carrier.cpp: 1 while walking the route backwards
+                        int scriptValue;          // char_script.cpp: value carried between steps (opacity in
+                                                  // tenths)
+                    };
+                    union                         // 0x18
+                    {
+                        int fall;                 // enemy_pendulum.cpp: drop speed (more negative each frame)
+                        int speed;                // route_carrier.cpp: units per frame (from the route's first
+                                                  // point)
+                        int keepAfterScript;      // char_script.cpp: non-zero = stay in the world after the script
+                    };
+                    union                         // 0x1c
+                    {
+                        int rider;                // route_carrier.cpp: character carried (0 = none)
+                        int scriptResult;         // char_script.cpp: result of the last step (5 = run the next
+                                                  // step at once, 2 = waiting)
+                    };
+                    int pointPause;               // 0x20: route_carrier.cpp: frames to wait at a route point
+                    int m_0024;
+                    union                         // 0x28
+                    {
+                        int fadeActions;          // route_carrier.cpp: bit n set = fade out at a point with
+                                                  // action n
+                        int skipGroundProbe;      // non-zero = skip the ground probe of a shot (0x1001a590)
+                    };
+                    int m_002c;
+                    int m_0030;
+                    int m_0034;
+                };
+                int values[13];                   // the same variables by index (enemy_ai.cpp, enemy_moves.cpp,
+                                                  // ai_pick.cpp and friends use values[0..5])
+            };
+            union                                 // 0x38
+            {
+                int sawPlayer;                    // 1 once the character saw the player (or was told to react)
+                int releasable;                   // npc_approach.cpp: non-zero = the release flag ends the approach
+            };
+            int behaviour;                        // 0x3c: behaviour number (0 = not unpacked from the script
+                                                  // parameter yet); setting it switches behaviour
+        };
+        int words[0x10];                          // the whole block by index (resets and copies)
+        Shove shoves[4];                          // char_shove.cpp: the slot's scripted shoves
+    };
+};
+
+// The behaviour state of every character slot.
+extern "C" CharState DAT_1020b430[CHAR_SLOT_COUNT];
+
+#endif

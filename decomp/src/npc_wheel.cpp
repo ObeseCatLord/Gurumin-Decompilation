@@ -15,17 +15,7 @@ Matrix4 RotationX(float angle);                  // 0x101b1ad0
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = start, 1 = pushing forwards, 2 = pulling back
-    int wait;
-    int talk;                 // 0x08: sight range
-    int push;                 // 0x0c: push strength (speed = push / 4 - 20)
-    char pad_0010[0x28];
-    int m_0038;               // 0x38: 1 once it saw the player
-    int m_003c;
-};
+#include "char_state.h"
 
 // A character slot record (world.h CharSlot), only the kind is used here.
 struct CharSlot
@@ -34,7 +24,6 @@ struct CharSlot
     char pad_0004[0x184];
 };
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" Node *DAT_1021bdf8[0x80][9];       // [0]: the cart's wheel node
 extern "C" Matrix4 DAT_10868838[0x80][6];     // saved node matrices of each character
@@ -71,9 +60,9 @@ int FUN_10047440(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     int *react = &DAT_10210b30[index];
-    if (*react == 0 && (DAT_1020b430[index].state != 1 || DAT_1020b430[index].m_0038 == 0))
+    if (*react == 0 && (DAT_1020b430[index].state != 1 || DAT_1020b430[index].sawPlayer == 0))
     {
-        if ((DAT_1020b430[index].m_0038 |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
+        if ((DAT_1020b430[index].sawPlayer |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
                                                          (float)DAT_1020b430[index].talk, 1.099525f, 250.0f, 1)) != 0)
             FUN_1001b670(index, 1500.0f, 0);
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);

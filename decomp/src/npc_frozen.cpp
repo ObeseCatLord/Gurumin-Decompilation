@@ -53,17 +53,8 @@ struct ActorSlot
     char pad_0141[0x47];
 };
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = start, 1 = held
-    int wait;                 // 0x04: frames held
-    int talk;
-    int saved;                // 0x0c: the slot's m_0140 while held
-    char pad_0010[0x30];
-};
+#include "char_state.h"
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" EffectManager DAT_10daaa80;
 extern "C" short DAT_103153b0[0x80];           // non-zero = release now

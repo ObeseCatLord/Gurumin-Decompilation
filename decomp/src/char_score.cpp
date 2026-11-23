@@ -1,6 +1,7 @@
 // Unpacking of a character's packed parameter (CharSlot::m_003c, set from the map data).
 
 #include "world.h"
+#include "char_state.h"
 
 extern "C" char DAT_1030ce38[0x80];
 extern "C" int DAT_1030b668[0x80];
@@ -17,9 +18,9 @@ extern "C" int DAT_10daaafc[];
 extern "C" int FUN_1001b5b0(int index)
 {
     int value = DAT_10daab84[index].m_003c;
-    DAT_1020b430[index].m_0004[1] = value / 100000;
+    DAT_1020b430[index].values[1] = value / 100000;
     int rest = value / 10 % 10000;
-    DAT_1020b430[index].m_003c = rest;
+    DAT_1020b430[index].behaviour = rest;
     if (rest != 0)
     {
         DAT_1030ce38[index] = 1;

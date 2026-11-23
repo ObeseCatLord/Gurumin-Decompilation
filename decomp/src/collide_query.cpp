@@ -5,6 +5,7 @@
 
 #include "matrix4.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 struct CollisionWorld
 {

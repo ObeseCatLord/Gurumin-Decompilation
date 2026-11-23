@@ -6,6 +6,7 @@
 #include "world.h"
 #include "vec4.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" int DAT_1021f338;
 extern "C" char DAT_1021f3c0[0x80];

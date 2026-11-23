@@ -17,17 +17,7 @@ struct CharMoveLock
     char pad_0004[0x2498];
 };
 
-// CharState (world.h) as the approach uses it.
-struct ApproachState
-{
-    int started;                  // 0x00: 1 once the approach has begun
-    int pad_0004;
-    int code;                     // 0x08: stop distance / 10 (% 100) and release flag (/ 100)
-    int stopDistance;             // 0x0c
-    char pad_0010[0x28];
-    int releasable;               // 0x38: non-zero = the code's release flag ends the approach
-    int pad_003c;
-};
+#include "char_state.h"
 
 // atan2 on floats (an inline helper: both arguments are rounded to float first, the second one first).
 inline float Atan2(float y, float x)
@@ -36,7 +26,6 @@ inline float Atan2(float y, float x)
 }
 
 extern "C" CharMoveLock DAT_10db9380[0x80];
-extern "C" ApproachState DAT_1020b430[0x80];
 extern "C" void FUN_10043cc0(int slot);         // Char_ResetState
 
 // 0x10045ed0 (Npc_ApproachPlayer). Runs one frame of the approach of character `slot`: the first frame unlocks it,
@@ -49,11 +38,11 @@ extern "C" int FUN_10045ed0(int slot)
     offset = DAT_10db6ee8[0].matrix.GetTranslation() - DAT_10db6ee8[slot].matrix.GetTranslation();
     offset.z *= 2.0f;
     float distance = offset.Length();
-    if (DAT_1020b430[slot].started == 0)
+    if (DAT_1020b430[slot].approachStarted == 0)
     {
-        DAT_1020b430[slot].started = 1;
+        DAT_1020b430[slot].approachStarted = 1;
         DAT_10db9380[slot].locked = 0;
-        DAT_1020b430[slot].stopDistance = DAT_1020b430[slot].code % 100 * 10;
+        DAT_1020b430[slot].stopDistance = DAT_1020b430[slot].approachCode % 100 * 10;
         DAT_10db6ee8[slot].PlayMotion(2, 0, 5, 1.0f);
         return 0;
     }
@@ -68,7 +57,7 @@ extern "C" int FUN_10045ed0(int slot)
               DAT_10db6ee8[0].matrix.m[13] - DAT_10db6ee8[slot].matrix.m[13]) +
         3.1415f;
     if (distance < (float)DAT_1020b430[slot].stopDistance ||
-        DAT_1020b430[slot].releasable != 0 && DAT_1020b430[slot].code / 100 != 0)
+        DAT_1020b430[slot].releasable != 0 && DAT_1020b430[slot].approachCode / 100 != 0)
         FUN_10043cc0(slot);
     return 0;
 }

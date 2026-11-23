@@ -3,6 +3,7 @@
 
 #include "vec4.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" int DAT_104c00d0;  // when non-zero, the player (character 0) cannot be pushed
 

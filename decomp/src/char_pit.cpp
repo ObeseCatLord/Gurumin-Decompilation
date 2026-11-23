@@ -6,12 +6,7 @@
 
 #include "anim_model.h"
 
-struct CharState
-{
-    int m_0000;
-    int frame;                                       // 0x04: frames in this behaviour
-    char pad_0008[0x38];
-};
+#include "char_state.h"
 
 // A character slot record (world.h CharSlot) seen from 0x64 bytes earlier.
 struct CharSlotFlags
@@ -22,7 +17,6 @@ struct CharSlotFlags
     char pad_010a[0x7e];
 };
 
-extern "C" CharState DAT_1020b430[0x80];
 extern "C" CharSlotFlags DAT_10daab20[0x80];
 extern "C" char DAT_1021f9c0[0x80];
 extern "C" Vec4 DAT_10867e18[0x80];
@@ -56,7 +50,7 @@ extern "C" int FUN_100b9930(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     toPlayer.Copy(player - position);
-    DAT_1020b430[index].frame++;
+    DAT_1020b430[index].wait++;
     DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
     DAT_10db6ee8[index].targetHeading = Atan2(toPlayer.x, toPlayer.y);
     move.y = -180.0f;
@@ -65,9 +59,9 @@ extern "C" int FUN_100b9930(int index)
         move.z = 5.0f;
     FUN_100241e0(index, move.x, move.y, move.z);
     move.z = 10.0f;
-    if (DAT_1020b430[index].frame < 0x96 && DAT_10db6ee8[index].IsClearOfMapLimited(&move) == 0)
-        DAT_1020b430[index].frame = 0x96;
-    int frames = DAT_1020b430[index].frame;
+    if (DAT_1020b430[index].wait < 0x96 && DAT_10db6ee8[index].IsClearOfMapLimited(&move) == 0)
+        DAT_1020b430[index].wait = 0x96;
+    int frames = DAT_1020b430[index].wait;
     if (frames > 0x96)
     {
         DAT_10db6ee8[index].mode = 1;

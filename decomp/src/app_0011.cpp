@@ -4,6 +4,7 @@
 #include <string.h>
 #include "world.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" int DAT_10255f10[];
 extern "C" int FUN_1013f880(void);
@@ -70,7 +71,7 @@ extern "C" int FUN_10034c80(int index)
     if (DAT_10210d30[index] != 0)
         return 1;
     DAT_10daab84[index].m_00a5 = 1;
-    DAT_1020b430[index].m_003c = 1;
+    DAT_1020b430[index].behaviour = 1;
     return 0;
 }
 
@@ -78,7 +79,7 @@ extern "C" int FUN_10034c80(int index)
 // links (FUN_10043cc0).
 extern "C" int FUN_10047400(int index)
 {
-    int value = DAT_1020b430[index].m_0004[1];
+    int value = DAT_1020b430[index].values[1];
     if (value == 100)
         DAT_10255f10[index] = -1;
     else

@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "vec4.h"
+#include "char_state.h"
 
 // A character slot record (world.h CharSlot): only the kind is used here.
 struct CharSlot
@@ -25,7 +26,6 @@ extern "C" int DAT_102548c0[0x80];                   // script code of each char
 extern "C" int DAT_1030b668[0x80];                   // base kind of each character (-1 or 0 = none)
 extern "C" int DAT_1020b230[0x80];                   // kind variant (the kind's ten-thousands)
 extern "C" int DAT_10255160[0x80][4];
-extern "C" int DAT_1020b430[0x80][16];               // AI state (world.h CharState)
 extern "C" int DAT_1021bdf8[0x80][9];
 extern "C" char DAT_10255a88[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
@@ -141,23 +141,23 @@ extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
                 memset(DAT_10255160[index], 0, sizeof(DAT_10255160[index]));
                 if (*kind == 0x55)
                 {
-                    DAT_1020b430[index][0] = 0;
-                    DAT_1020b430[index][1] = 0;
-                    memset(&DAT_1020b430[index][4], 0, 12 * sizeof(int));
+                    DAT_1020b430[index].words[0] = 0;
+                    DAT_1020b430[index].words[1] = 0;
+                    memset(&DAT_1020b430[index].words[4], 0, 12 * sizeof(int));
                     DAT_1021bdf8[index][0] = 0;
                     DAT_1021bdf8[index][1] = 0;
                     memset(&DAT_1021bdf8[index][4], 0, 4 * sizeof(int));
                 }
                 else
                 {
-                    memset(DAT_1020b430[index], 0, sizeof(DAT_1020b430[index]));
+                    memset(DAT_1020b430[index].words, 0, sizeof(DAT_1020b430[index].words));
                     memset(DAT_1021bdf8[index], 0, 8 * sizeof(int));
                 }
                 DAT_10802bf8[index].position.Fill(0.0f);
                 DAT_10802bf8[index].step.Fill(0.0f);
                 DAT_10255a88[index] = 1;
-                DAT_1020b430[index][2] = 0x3cd;
-                DAT_1020b430[index][15] = 0x26;
+                DAT_1020b430[index].words[2] = 0x3cd;
+                DAT_1020b430[index].words[15] = 0x26;
                 *kind = 0x62;
                 apply = 0;
             }
@@ -220,9 +220,9 @@ extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
         *kind = value % 10000;
         if (value % 10000 == 0x55 || DAT_1030b668[index] == 0x31)
         {
-            DAT_1020b430[index][0] = 0;
-            DAT_1020b430[index][1] = 0;
-            memset(&DAT_1020b430[index][4], 0, 12 * sizeof(int));
+            DAT_1020b430[index].words[0] = 0;
+            DAT_1020b430[index].words[1] = 0;
+            memset(&DAT_1020b430[index].words[4], 0, 12 * sizeof(int));
             DAT_1021bdf8[index][0] = 0;
             DAT_1021bdf8[index][1] = 0;
             memset(&DAT_1021bdf8[index][4], 0, 5 * sizeof(int));
@@ -230,7 +230,7 @@ extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
         else
         {
             for (int i = 0; i < 16; i++)
-                DAT_1020b430[index][i] = 0;
+                DAT_1020b430[index].words[i] = 0;
             memset(DAT_1021bdf8[index], 0, sizeof(DAT_1021bdf8[index]));
         }
         DAT_10802bf8[index].position.Fill(0.0f);

@@ -17,12 +17,7 @@ struct SlotRecord
     char pad_00a6[0xe2];
 };
 
-// Per-character AI state, 0x40 bytes (world.h CharState).
-struct AiState
-{
-    int words[0xf];
-    int mode;                 // 0x3c: current behaviour mode
-};
+#include "char_state.h"
 
 // Per-character start vectors, 0x40 bytes (char_shots.cpp, char_leash.cpp).
 struct StartVectors
@@ -39,7 +34,6 @@ struct PoseEntry
 };
 
 extern "C" SlotRecord DAT_10daab84[0x80];
-extern "C" AiState DAT_1020b430[0x80];
 extern "C" StartVectors DAT_10802bf8[0x80];
 extern "C" PoseEntry DAT_1021bdf8[0x80];
 extern "C" char DAT_10255a88[0x80];
@@ -56,10 +50,10 @@ extern "C" int FUN_1001b0a0(int index, int a, int b);
 // four fields of its packed value (BB, CC, DD, AA) and FUN_1001b0a0 with zeros. Returns 0.
 extern "C" int FUN_10043cc0(int index)
 {
-    if (DAT_10daab84[index].kind == 0x62 && (DAT_1020b430[index].mode == 11 || DAT_1020b430[index].mode == 12))
+    if (DAT_10daab84[index].kind == 0x62 && (DAT_1020b430[index].behaviour == 11 || DAT_1020b430[index].behaviour == 12))
         FUN_1000ec70(15, 1.0f, 1.0f, 1.0f, 1.0f);
     DAT_10daab84[index].m_00a5 = 0;
-    memset(&DAT_1020b430[index], 0, sizeof(AiState));
+    memset(&DAT_1020b430[index], 0, sizeof(CharState));
     DAT_10db6ee8[index].m_0267 = 0;
     DAT_10db6ee8[index].mode = 1;
     DAT_10255a88[index] = 1;

@@ -7,6 +7,7 @@
 #include "vec4.h"
 
 #include "anim_model.h"
+#include "char_state.h"
 
 // Absolute value of a float (an inline helper: its argument is rounded to float first).
 inline float AbsFloat(float value)
@@ -63,7 +64,7 @@ extern "C" int FUN_100ba040(void)
         if (DAT_104c0364 != i)
         {
             DAT_104c0364 = i;
-            int voice = DAT_10210fc4[DAT_10db6ee8[i].switchNode * 0x10 + DAT_1020b430[i].m_0004[1]][0] % 10000;
+            int voice = DAT_10210fc4[DAT_10db6ee8[i].switchNode * 0x10 + DAT_1020b430[i].values[1]][0] % 10000;
             if (voice > 5000)
                 voice -= 10000;
             DAT_104c0368 = voice;

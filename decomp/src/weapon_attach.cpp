@@ -6,6 +6,7 @@
 #include "node.h"
 
 #include "anim_model.h"
+#include "char_state.h"
 
 // A character slot record (world.h CharSlot): only m_0038 is used here.
 struct CharSlot
@@ -16,7 +17,6 @@ struct CharSlot
 };
 
 extern "C" CharSlot DAT_10daab84[0x80];
-extern "C" int DAT_1020b430[0x80][16];               // AI state (world.h CharState)
 extern "C" Node *DAT_10446e00[0x28];
 extern "C" int DAT_1021d018[0x28];
 extern "C" int DAT_104bf8a4;
@@ -104,8 +104,8 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
             models = 2;
             break;
         default:
-            DAT_1020b430[index][2] = -2;
-            DAT_1020b430[index][3] = -2;
+            DAT_1020b430[index].words[2] = -2;
+            DAT_1020b430[index].words[3] = -2;
             goto attached;
         }
         switch (models)

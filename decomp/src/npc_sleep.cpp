@@ -12,16 +12,7 @@
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = start, 1 = sleeping, 2 = woken
-    int wait;                 // 0x04: frames since waking
-    int talk;                 // 0x08: talk id: hundreds = wakes when it saw the player, line = wake distance / 10
-    char pad_000c[0x2c];
-    int m_0038;               // 0x38: 1 once it saw the player
-    int m_003c;
-};
+#include "char_state.h"
 
 // The last position and step of each character (route_walk.cpp StepRecord).
 struct LastPosition
@@ -31,7 +22,6 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
 extern "C" char DAT_10255a88[0x80];
 extern "C" float DAT_10255160[0x80][4];
@@ -60,7 +50,7 @@ extern "C" int FUN_10045830(int index)
     (player - self).Length();      // computed and not used
     float distance = (player - self).Length2D();
     DAT_10255a88[index] = 0;
-    if ((DAT_1020b430[index].m_0038 != 0 && DAT_1020b430[index].talk / 100 != 0) ||
+    if ((DAT_1020b430[index].sawPlayer != 0 && DAT_1020b430[index].talk / 100 != 0) ||
         (distance < (float)(DAT_1020b430[index].talk % 100 * 10) && DAT_10db6ee8[0].m_238c != 0 &&
          DAT_10db6ee8[0].velocity.LengthSquared3() > 256.0f) ||
         (distance < (float)(DAT_1020b430[index].talk % 100 * 10) && DAT_104c00e0 != 0) ||

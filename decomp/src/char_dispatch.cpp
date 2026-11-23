@@ -3,6 +3,7 @@
 
 #include "world.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" int DAT_104bfe78;  // non-zero while character updates are suspended
 extern "C" int FUN_1010c650(int index);

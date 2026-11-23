@@ -11,6 +11,7 @@ Matrix4 RotationZ(float angle);                      // 0x101b1b40
 #include "node.h"
 
 #include "anim_model.h"
+#include "char_state.h"
 
 // The last position and step of each character (route_walk.cpp StepRecord).
 struct LastPosition
@@ -21,7 +22,6 @@ struct LastPosition
 };
 
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" int DAT_1020b430[0x80][16];               // AI state (world.h CharState)
 extern "C" Node *DAT_1021bdf8[0x80][9];              // [1], [2]: the companion's attached effect nodes
 extern "C" short DAT_103153b0[0x80];
 extern "C" int DAT_10219770[0x80];
@@ -71,17 +71,17 @@ int Companion0_Update(int index)
             level = DAT_102550e0[index];
         DAT_102550e0[index] = level;
     }
-    int mode = DAT_1020b430[index + 2][4];
+    int mode = DAT_1020b430[index + 2].words[4];
     if (mode != 0)
     {
         if (mode == 1)
         {
             DAT_104686b0[index + 2] = 2;
-            if (DAT_1020b430[index + 2][3] == 1)
+            if (DAT_1020b430[index + 2].words[3] == 1)
                 FUN_10065b10(index, 0x192, 1, 0);
-            if (++DAT_1020b430[index + 2][3] == 0x3c)
+            if (++DAT_1020b430[index + 2].words[3] == 0x3c)
             {
-                DAT_1020b430[index + 2][4] = 0;
+                DAT_1020b430[index + 2].words[4] = 0;
                 Vec4 position;
                 Matrix4 matrix;
                 if (DAT_1021bdf8[index + 2][1] != 0)
@@ -104,12 +104,12 @@ int Companion0_Update(int index)
         else if (mode == 2)
         {
             DAT_104686b0[index + 2] = 2;
-            if (--DAT_1020b430[index + 2][3] == 0)
-                DAT_1020b430[index + 2][4] = 0;
+            if (--DAT_1020b430[index + 2].words[3] == 0)
+                DAT_1020b430[index + 2].words[4] = 0;
         }
         else if (mode >= 10)
         {
-            DAT_1020b430[index + 2][4] = mode - 1;
+            DAT_1020b430[index + 2].words[4] = mode - 1;
             if (mode - 1 == 0x46)
             {
                 Vec4 position;
@@ -124,22 +124,22 @@ int Companion0_Update(int index)
                 else
                     FUN_1001d8b0(index, 0x36d5, position, -1, -1, 0, 0, 0, &matrix, 0);
             }
-            if (DAT_1020b430[index + 2][4] == 0xb)
+            if (DAT_1020b430[index + 2].words[4] == 0xb)
             {
                 if (DAT_1021bdf8[index + 2][1] != 0)
                 {
                     DAT_1021bdf8[index + 2][1]->ClearFlags(0x20);
                     int health = DAT_10daadfc[index][0] + 200;
-                    if (DAT_1020b430[index][3] + 2000 <= health)
-                        health = DAT_1020b430[index][3] + 2000;
-                    DAT_1020b430[index + 2][5] = health;
+                    if (DAT_1020b430[index].words[3] + 2000 <= health)
+                        health = DAT_1020b430[index].words[3] + 2000;
+                    DAT_1020b430[index + 2].words[5] = health;
                     DAT_10daadfc[index][0] = DAT_10daae00[index][0];
                     DAT_10db6ee8[index + 2].root->M_10194730(0x2f, 0x400);
                     DAT_10daaf39[index][0] = 0;
                     DAT_1021f3c0[index + 2] = 3;
                 }
                 DAT_104686b0[index + 2] = 2;
-                DAT_1020b430[index + 2][4] = 2;
+                DAT_1020b430[index + 2].words[4] = 2;
             }
         }
     }
@@ -150,7 +150,7 @@ int Companion0_Update(int index)
         {
             int special = DAT_104c00e0;
             int area = DAT_104c00e8;
-            if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[index + 2][2] == 0 &&
+            if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[index + 2].words[2] == 0 &&
                 DAT_10c655f0 != 6)
             {
                 DAT_10daaf3a[index][0] = 1;
@@ -162,12 +162,12 @@ int Companion0_Update(int index)
                 DAT_10daaf3a[index][0] = 0;
                 DAT_10daae0c[index][0] = 999;
                 DAT_10daaf39[index][0] = 0;
-                if (DAT_1020b430[index][2] == 0)
+                if (DAT_1020b430[index].words[2] == 0)
                     DAT_10802bf8[index + 2].position.z = -50.0f;
                 if (special != 0 && (area == 0x13 || area == 0x30))
-                    DAT_1020b430[index + 2][2] = 2;
+                    DAT_1020b430[index + 2].words[2] = 2;
                 else
-                    DAT_1020b430[index + 2][2]--;
+                    DAT_1020b430[index + 2].words[2]--;
             }
             if (DAT_1042d9e8[index + 2] != 0)
             {
@@ -180,8 +180,8 @@ int Companion0_Update(int index)
             if (DAT_10daadfc[index][0] < DAT_10daae00[index][0] - 5 ||
                 (DAT_10c635f8 == 1 && DAT_10daadfc[index][0] < DAT_10daae00[index][0]))
             {
-                int revived = DAT_1020b430[index + 2][5];
-                DAT_1020b430[index + 2][4] = 1;
+                int revived = DAT_1020b430[index + 2].words[5];
+                DAT_1020b430[index + 2].words[4] = 1;
                 DAT_10daaf3a[index][0] = 0;
                 if (revived == 0)
                     revived = DAT_10daaaf0[index][0] + 2000;
@@ -239,17 +239,17 @@ int Companion1_Update(int index)
             level = DAT_102550e0[index];
         DAT_102550e0[index] = level;
     }
-    int mode = DAT_1020b430[slot + 2][4];
+    int mode = DAT_1020b430[slot + 2].words[4];
     if (mode != 0)
     {
         if (mode == 1)
         {
             DAT_104686b0[index + 3] = 2;
-            if (DAT_1020b430[slot + 2][3] == 1)
+            if (DAT_1020b430[slot + 2].words[3] == 1)
                 FUN_10065b10(index, 0x192, 1, 0);
-            if (++DAT_1020b430[slot + 2][3] == 0x3c)
+            if (++DAT_1020b430[slot + 2].words[3] == 0x3c)
             {
-                DAT_1020b430[slot + 2][4] = 0;
+                DAT_1020b430[slot + 2].words[4] = 0;
                 Vec4 position;
                 Matrix4 matrix;
                 if (DAT_1021bdf8[slot + 2][1] != 0)
@@ -271,14 +271,14 @@ int Companion1_Update(int index)
         }
         else if (mode == 2)
         {
-            DAT_1020b430[slot + 2][3]--;
+            DAT_1020b430[slot + 2].words[3]--;
             DAT_104686b0[index + 3] = 2;
-            if (DAT_1020b430[slot + 2][3] == 0)
-                DAT_1020b430[slot + 2][4] = 0;
+            if (DAT_1020b430[slot + 2].words[3] == 0)
+                DAT_1020b430[slot + 2].words[4] = 0;
         }
         else if (mode >= 10)
         {
-            DAT_1020b430[slot + 2][4] = mode - 1;
+            DAT_1020b430[slot + 2].words[4] = mode - 1;
             if (mode - 1 == 0x46)
             {
                 Vec4 position;
@@ -294,21 +294,21 @@ int Companion1_Update(int index)
                     FUN_1001d8b0(index, 0x36d4, position, -1, -1, 0, 0, 0, &matrix, 0);
                 FUN_10065b10(index, 0x193, 1, 0);
             }
-            if (DAT_1020b430[slot + 2][4] == 0xb)
+            if (DAT_1020b430[slot + 2].words[4] == 0xb)
             {
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                 {
                     DAT_1021bdf8[slot + 2][1]->ClearFlags(0x20);
                     int health = DAT_10daadfc[slot][0] + 200;
-                    if (DAT_1020b430[index][3] + 2000 <= health)
-                        health = DAT_1020b430[index][3] + 2000;
-                    DAT_1020b430[slot + 2][5] = health;
+                    if (DAT_1020b430[index].words[3] + 2000 <= health)
+                        health = DAT_1020b430[index].words[3] + 2000;
+                    DAT_1020b430[slot + 2].words[5] = health;
                     DAT_10daadfc[slot][0] = DAT_10daae00[slot][0];
                     DAT_10db6ee8[slot + 2].root->M_10194730(0x2f, 0x400);
                     DAT_10daaf39[slot][0] = 0;
                     DAT_1021f3c0[index + 3] = 3;
                 }
-                DAT_1020b430[slot + 2][4] = 2;
+                DAT_1020b430[slot + 2].words[4] = 2;
                 DAT_104686b0[index + 3] = 2;
             }
         }
@@ -321,7 +321,7 @@ int Companion1_Update(int index)
             int special = DAT_104c00e0;
             int area = DAT_104c00e8;
             DAT_10daaf39[slot][0] = 0;
-            if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[slot + 2][2] == 0 &&
+            if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[slot + 2].words[2] == 0 &&
                 DAT_10c655f0 != 6)
             {
                 DAT_10daaf3a[slot][0] = 1;
@@ -332,12 +332,12 @@ int Companion1_Update(int index)
             {
                 DAT_10daaf3a[slot][0] = 0;
                 DAT_10daae0c[slot][0] = 999;
-                if (DAT_1020b430[index][2] == 0)
+                if (DAT_1020b430[index].words[2] == 0)
                     DAT_10802bf8[slot + 2].position.z = -50.0f;
                 if (special != 0 && (area == 0x13 || area == 0x30))
-                    DAT_1020b430[slot + 2][2] = 2;
+                    DAT_1020b430[slot + 2].words[2] = 2;
                 else
-                    DAT_1020b430[slot + 2][2]--;
+                    DAT_1020b430[slot + 2].words[2]--;
             }
             if (DAT_1042d9e8[index + 3] != 0)
             {
@@ -350,8 +350,8 @@ int Companion1_Update(int index)
             if (DAT_10daadfc[slot][0] < DAT_10daae00[slot][0] - 5 ||
                 (DAT_10c635f8 == 1 && DAT_10daadfc[slot][0] < DAT_10daae00[slot][0]))
             {
-                int revived = DAT_1020b430[slot + 2][5];
-                DAT_1020b430[slot + 2][4] = 1;
+                int revived = DAT_1020b430[slot + 2].words[5];
+                DAT_1020b430[slot + 2].words[4] = 1;
                 DAT_10daaf3a[slot][0] = 0;
                 if (revived != 0)
                     DAT_10daadfc[slot][0] = revived;
@@ -410,17 +410,17 @@ int Companion2_Update(int index)
             level = DAT_102550e0[index];
         DAT_102550e0[index] = level;
     }
-    int mode = DAT_1020b430[slot + 2][4];
+    int mode = DAT_1020b430[slot + 2].words[4];
     if (mode != 0)
     {
         if (mode == 1)
         {
             DAT_104686b0[index + 4] = 2;
-            if (DAT_1020b430[slot + 2][3] == 1)
+            if (DAT_1020b430[slot + 2].words[3] == 1)
                 FUN_10065b10(index, 0x192, 1, 0);
-            if (++DAT_1020b430[slot + 2][3] == 0x3c)
+            if (++DAT_1020b430[slot + 2].words[3] == 0x3c)
             {
-                DAT_1020b430[slot + 2][4] = 0;
+                DAT_1020b430[slot + 2].words[4] = 0;
                 Vec4 position;
                 Matrix4 matrix;
                 if (DAT_1021bdf8[slot + 2][1] != 0)
@@ -441,13 +441,13 @@ int Companion2_Update(int index)
         }
         else if (mode == 2)
         {
-            if (--DAT_1020b430[slot + 2][3] == 0)
-                DAT_1020b430[slot + 2][4] = 0;
+            if (--DAT_1020b430[slot + 2].words[3] == 0)
+                DAT_1020b430[slot + 2].words[4] = 0;
             DAT_104686b0[index + 4] = 2;
         }
         else if (mode >= 10)
         {
-            DAT_1020b430[slot + 2][4] = mode - 1;
+            DAT_1020b430[slot + 2].words[4] = mode - 1;
             if (mode - 1 == 0x46)
             {
                 Vec4 position;
@@ -463,21 +463,21 @@ int Companion2_Update(int index)
                     FUN_1001d8b0(index, 0x36d3, position, -1, -1, 0, 0, 0, &matrix, 0);
                 }
             }
-            if (DAT_1020b430[slot + 2][4] == 0xb)
+            if (DAT_1020b430[slot + 2].words[4] == 0xb)
             {
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                 {
                     DAT_1021bdf8[slot + 2][1]->ClearFlags(0x20);
                     int health = DAT_10daadfc[slot][0] + 200;
-                    if (DAT_1020b430[index][3] + 2000 <= health)
-                        health = DAT_1020b430[index][3] + 2000;
-                    DAT_1020b430[slot + 2][5] = health;
+                    if (DAT_1020b430[index].words[3] + 2000 <= health)
+                        health = DAT_1020b430[index].words[3] + 2000;
+                    DAT_1020b430[slot + 2].words[5] = health;
                     DAT_10daadfc[slot][0] = DAT_10daae00[slot][0];
                     DAT_10db6ee8[slot + 2].root->M_10194730(0x2f, 0x400);
                     DAT_10daaf39[slot][0] = 0;
                     DAT_1021f3c0[index + 4] = 3;
                 }
-                DAT_1020b430[slot + 2][4] = 2;
+                DAT_1020b430[slot + 2].words[4] = 2;
                 DAT_104686b0[index + 4] = 2;
             }
         }
@@ -490,7 +490,7 @@ int Companion2_Update(int index)
             int special = DAT_104c00e0;
             int area = DAT_104c00e8;
             DAT_10daaf39[slot][0] = 0;
-            if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[slot + 2][2] == 0 &&
+            if ((special == 0 || (area != 0x13 && area != 0x30)) && DAT_1020b430[slot + 2].words[2] == 0 &&
                 DAT_10c655f0 != 6)
             {
                 DAT_10daaf3a[slot][0] = 1;
@@ -501,9 +501,9 @@ int Companion2_Update(int index)
                 DAT_10daaf3a[slot][0] = 0;
                 DAT_10daae0c[slot][0] = 999;
                 if (special != 0 && (area == 0x13 || area == 0x30))
-                    DAT_1020b430[slot + 2][2] = 2;
+                    DAT_1020b430[slot + 2].words[2] = 2;
                 else
-                    DAT_1020b430[slot + 2][2]--;
+                    DAT_1020b430[slot + 2].words[2]--;
             }
             if (DAT_1042d9e8[index + 4] != 0)
             {
@@ -516,8 +516,8 @@ int Companion2_Update(int index)
             if (DAT_10daadfc[slot][0] < DAT_10daae00[slot][0] - 10 ||
                 (DAT_10c635f8 == 1 && DAT_10daadfc[slot][0] < DAT_10daae00[slot][0]))
             {
-                DAT_1020b430[slot + 2][4] = 1;
-                int revived = DAT_1020b430[slot + 2][5];
+                DAT_1020b430[slot + 2].words[4] = 1;
+                int revived = DAT_1020b430[slot + 2].words[5];
                 DAT_10daaf3a[slot][0] = 0;
                 if (revived != 0)
                     DAT_10daadfc[slot][0] = revived;

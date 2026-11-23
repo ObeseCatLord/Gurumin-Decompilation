@@ -3,6 +3,7 @@
 
 #include "vec4.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" Vec4 DAT_118e6cb8;  // the player's position here (player_reset.cpp calls it the player velocity)
 extern "C" char DAT_104c0332;  // when set, sounds requested with `optional` are skipped

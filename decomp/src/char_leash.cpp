@@ -4,6 +4,7 @@
 
 #include "vec4.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 // Per-slot position record, 0x40 bytes (char_shots.cpp); here the start position of each character.
 struct SlotPosition

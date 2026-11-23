@@ -5,6 +5,7 @@
 
 #include "vec4.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" int FUN_10043cc0(int index);
 extern "C" char DAT_1021f3c0[0x80];   // slot kind (3 = enemy)
@@ -16,10 +17,10 @@ extern "C" int FUN_10045b80(int index)
 {
     float distance2 = (DAT_10db6ee8[0].matrix.GetTranslation() - DAT_10db6ee8[index].matrix.GetTranslation())
                           .LengthSquared3();
-    if (DAT_1020b430[index].m_0000 == 0)
+    if (DAT_1020b430[index].state == 0)
     {
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
-        if (distance2 < (float)(DAT_1020b430[index].m_0004[1] * DAT_1020b430[index].m_0004[1] * 100))
+        if (distance2 < (float)(DAT_1020b430[index].values[1] * DAT_1020b430[index].values[1] * 100))
             FUN_10043cc0(index);
     }
     return 0;
@@ -41,14 +42,14 @@ extern "C" int FUN_1001b670(int index, float radius, int count, ...)
     for (int i = 0x3a; i < 0x5c; i++)
     {
         if (DAT_10daab84[i].m_0000 == 0x62 && DAT_1021f3c0[i] == 3 && DAT_10db6ee8[i].root != 0 &&
-            DAT_10db6ee8[i].matrix._41 > -20000.0f && DAT_1020b430[i].m_0000 == 0)
+            DAT_10db6ee8[i].matrix._41 > -20000.0f && DAT_1020b430[i].state == 0)
         {
             if (count != 0)
             {
                 int g;
                 for (g = 0; g < count; g++)
                 {
-                    if (DAT_1020b430[i].m_0004[0] == ((int *)groups)[g])
+                    if (DAT_1020b430[i].values[0] == ((int *)groups)[g])
                         break;
                 }
                 if (g == count)
@@ -56,7 +57,7 @@ extern "C" int FUN_1001b670(int index, float radius, int count, ...)
             }
             other.Copy(DAT_10db6ee8[i].matrix.GetTranslation());
             if ((other - position).LengthSquared3() < radius)
-                DAT_1020b430[i].m_0000 = 1;
+                DAT_1020b430[i].state = 1;
         }
     }
     va_end(groups);

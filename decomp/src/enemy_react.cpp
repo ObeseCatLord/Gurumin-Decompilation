@@ -9,17 +9,8 @@
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = turning to the player, 1 = idling, 2 = done, else = counting to an action
-    int wait;
-    int talk;
-    int count;                // 0x0c
-    char pad_0010[0x30];
-};
+#include "char_state.h"
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" int DAT_10c62ed0;                  // current map
 extern "C" int DAT_10c6351c;                  // the character being talked to
 extern "C" int DAT_10de6e80;                  // character 20's frame counter (CharState of character 0x5d)

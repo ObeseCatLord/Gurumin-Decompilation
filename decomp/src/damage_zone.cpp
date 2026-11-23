@@ -47,15 +47,9 @@ struct Game
     int TestScriptFlag(int index);   // 0x100022b0: the out-of-line copy (game.h)
 };
 
-// Per-character AI state (world.h CharState): the zone's turn counter.
-struct ZoneState
-{
-    int turn;
-    char pad_0004[0x3c];
-};
+#include "char_state.h"
 
 extern "C" DamageZone DAT_10210fc0[];
-extern "C" ZoneState DAT_1020b430[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" SavedPosition DAT_10867e18[0x80];
 extern "C" int DAT_10210d30[0x80];               // non-zero = the character is being defeated

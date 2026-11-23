@@ -19,16 +19,8 @@ struct EffectManager
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;
-    int wait;
-    int talk;                 // 0x08: hundreds set = never brought in by a wave
-    char pad_000c[0x34];
-};
+#include "char_state.h"
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" EffectManager DAT_10daaa80;
 extern "C" char DAT_1049efb0[10][10];         // the wave groups: character of each slot (0 = empty)
 extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated

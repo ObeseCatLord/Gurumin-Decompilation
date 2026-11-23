@@ -11,18 +11,8 @@
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;
-    int wait;                 // 0x04: frames in the move (cleared here)
-    int pause;                // 0x08: 1 = pausing instead of chasing
-    int pauseFrames;          // 0x0c
-    int running;              // 0x10: 1 = running (faster) after the player was far away
-    char pad_0014[0x2c];
-};
+#include "char_state.h"
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" float DAT_10255160[0x80][4];       // [0]: the enemy's current speed
 extern "C" int DAT_104bfd08;                  // non-zero = enemies do not move
 extern "C" int FUN_1013f880(void);            // the game's random number
@@ -47,7 +37,7 @@ extern "C" int FUN_10027630(int index, int wander)
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     toPlayer.Copy(player - self);
     float distance = toPlayer.Length2D();
-    if (DAT_1020b430[index].pause == 0)
+    if (DAT_1020b430[index].pausing == 0)
     {
         step.y = -2.0f;
         if (DAT_1020b430[index].running != 0)
@@ -90,12 +80,12 @@ extern "C" int FUN_10027630(int index, int wander)
         DAT_10db6ee8[index].PlayMotion(1, 0, 5, 1.0f);
         return 0;
     }
-    if (DAT_1020b430[index].pause == 1)
+    if (DAT_1020b430[index].pausing == 1)
     {
         if (DAT_1020b430[index].pauseFrames > 0)
             DAT_1020b430[index].pauseFrames--;
         if (DAT_1020b430[index].pauseFrames == 0)
-            DAT_1020b430[index].pause = 0;
+            DAT_1020b430[index].pausing = 0;
     }
     return 0;
 }

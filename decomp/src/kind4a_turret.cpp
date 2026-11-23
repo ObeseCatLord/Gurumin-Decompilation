@@ -22,15 +22,7 @@ struct ModelState
 
 #include "matrix4.h"
 
-// Per-character AI state (world.h CharState) as this kind uses it.
-struct AttackState
-{
-    int pad_0000;
-    int cooldown;                 // 0x04: frames before the next random attack may start
-    int attacking;                // 0x08: 1 while an attack motion plays
-    int attackTimer;              // 0x0c: frames left of the attack
-    char pad_0010[0x30];
-};
+#include "char_state.h"
 
 // Per-slot state table at 0x10daaaec (actor_scan.cpp ActorSlot).
 struct ActorSlot
@@ -42,7 +34,6 @@ struct ActorSlot
     char pad_0010[0x178];
 };
 
-extern "C" AttackState DAT_1020b430[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" char DAT_10255a88[0x80];
 extern "C" char DAT_102550e0[0x80];              // 1 = the character was hit (attack at once)

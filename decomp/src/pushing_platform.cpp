@@ -19,12 +19,7 @@ struct CharMoveLock
     char pad_0004[0x2498];
 };
 
-// Per-character AI state (world.h CharState): 0 = not placed, 1 = waiting, 2 = dropped.
-struct BlockState
-{
-    int state;
-    char pad_0004[0x3c];
-};
+#include "char_state.h"
 
 // A 0x40-byte record per character slot (route_walk.cpp StepRecord): the position of the last frame.
 struct LastPosition
@@ -34,7 +29,6 @@ struct LastPosition
 };
 
 extern "C" CharMoveLock DAT_10db9380[0x80];
-extern "C" BlockState DAT_1020b430[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int DAT_10db0544;
 extern "C" int DAT_10db0548;

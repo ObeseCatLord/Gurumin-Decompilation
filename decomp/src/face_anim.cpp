@@ -6,6 +6,7 @@
 #include "texture_load.h"
 #include "world.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 // Loads ITI texture `name` from the data folder (the ITI branch of LoadTexture, texture_load.h).
 inline int LoadIti(const char *name)

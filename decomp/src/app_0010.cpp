@@ -5,6 +5,7 @@
 #include "world.h"
 #include "game.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 struct NamedPath
 {

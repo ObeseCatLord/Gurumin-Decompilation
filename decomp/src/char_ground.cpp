@@ -28,14 +28,7 @@ extern "C" Vec4 DAT_118e6cb8;            // player velocity
 extern "C" int DAT_102022b8;             // non-zero = always place characters on the ground
 extern "C" char DAT_10255a88[0x80];
 
-// Per-character script state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = not started yet
-    char pad_0004[0x3c];
-};
-
-extern "C" NpcState DAT_1020b430[0x80];
+#include "char_state.h"
 
 // 0x10011dd0 (Npc_StandOnGround). Keeps NPC `index` idle in motion 2. On its first call, when DAT_102022b8 is set,
 // it is put on the ground like Char_PlaceOnGround does (without the check for a loaded world; the start x and y

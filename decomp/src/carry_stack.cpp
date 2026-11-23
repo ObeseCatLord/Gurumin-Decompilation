@@ -8,6 +8,7 @@
 
 #include "node.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" char DAT_1021f3c0[0x80];                  // kind of each character slot
 extern "C" int DAT_104bfdd8;                         // the carried object's slot (below 0x5c: nothing carried)

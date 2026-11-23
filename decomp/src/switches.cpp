@@ -4,6 +4,7 @@
 #include "world.h"
 #include "vec4.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 // Map object (0x10874848) that animates the switch nodes ("LEVERON" and its off state).
 struct MapObject

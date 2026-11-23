@@ -9,6 +9,7 @@
 extern "C" int FUN_1013f880(void);
 
 #include "matrix4.h"
+#include "char_state.h"
 
 // Attached mesh slots (64 at 0x10edbe08, 0xb08 bytes each): extra models such as held items.
 struct MeshSlot
@@ -29,23 +30,23 @@ extern "C" int FUN_10026af0(int index)
     int roll = FUN_1013f880() % 100;
     if (roll < 40)
     {
-        DAT_1020b430[index].m_0000 = 0;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 0;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 65)
     {
-        DAT_1020b430[index].m_0000 = 1;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 1;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 100)
     {
-        DAT_1020b430[index].m_0000 = 2;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 2;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
     }
     return 0;
 }
@@ -56,23 +57,23 @@ extern "C" int FUN_10026b70(int index)
     int roll = FUN_1013f880() % 100;
     if (roll < 60)
     {
-        DAT_1020b430[index].m_0000 = 0;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 0;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 80)
     {
-        DAT_1020b430[index].m_0000 = 1;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 1;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 100)
     {
-        DAT_1020b430[index].m_0000 = 2;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 2;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
     }
     return 0;
 }
@@ -83,16 +84,16 @@ extern "C" int FUN_10026bf0(int index)
     int roll = FUN_1013f880() % 100;
     if (roll < 65)
     {
-        DAT_1020b430[index].m_0000 = 0;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 0;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 100)
     {
-        DAT_1020b430[index].m_0000 = 1;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 1;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
     }
     return 0;
 }
@@ -103,23 +104,23 @@ extern "C" int FUN_10026c80(int index)
     int roll = FUN_1013f880() % 100;
     if (roll < 60)
     {
-        DAT_1020b430[index].m_0000 = 0;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 0;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 70)
     {
-        DAT_1020b430[index].m_0000 = 1;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 1;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 100)
     {
-        DAT_1020b430[index].m_0000 = 2;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 2;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
     }
     return 0;
 }
@@ -130,23 +131,23 @@ extern "C" int FUN_10026d00(int index)
     int roll = FUN_1013f880() % 100;
     if (roll < 20)
     {
-        DAT_1020b430[index].m_0000 = 0;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 0;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 80)
     {
-        DAT_1020b430[index].m_0000 = 1;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 1;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
         return 0;
     }
     if (roll < 100)
     {
-        DAT_1020b430[index].m_0000 = 2;
-        DAT_1020b430[index].m_0004[0] = 0;
-        DAT_1020b430[index].m_0004[1] = 0;
+        DAT_1020b430[index].state = 2;
+        DAT_1020b430[index].values[0] = 0;
+        DAT_1020b430[index].values[1] = 0;
     }
     return 0;
 }

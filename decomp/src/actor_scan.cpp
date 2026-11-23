@@ -49,6 +49,7 @@ extern "C" int FUN_10011cd0(void)
 
 #include "node.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" char DAT_10315350[0x80];
 

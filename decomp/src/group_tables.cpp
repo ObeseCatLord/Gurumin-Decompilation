@@ -68,15 +68,9 @@ struct KindSlot
     char pad_0004[0x184];
 };
 
-struct SlotValues
-{
-    int m_0000;
-    int values[6];
-    char pad_001c[0x24];
-};
+#include "char_state.h"
 
 extern "C" KindSlot DAT_10daab84[0x80];
-extern "C" SlotValues DAT_1020b430[0x80];
 
 // Finds the first free attachment slot among the kind-0x58 characters 0x5c..0x7b, stores `matrix` there with the
 // four values a..d in its fourth column, records `value` for the slot and returns the character and slot index in

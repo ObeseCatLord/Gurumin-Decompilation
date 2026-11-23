@@ -11,6 +11,7 @@ Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..
 
 #include "node.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 struct TextureObject
 {

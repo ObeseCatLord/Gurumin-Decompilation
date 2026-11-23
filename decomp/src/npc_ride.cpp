@@ -11,17 +11,8 @@
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = start, 1 = riding
-    int wait;
-    int talk;
-    int marker;               // 0x0c: the marker character ridden behind
-    char pad_0010[0x30];
-};
+#include "char_state.h"
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
 extern "C" float DAT_10255160[0x80][4];       // [0]: distance kept behind the marker
 extern "C" char DAT_1021f3c0[0x80];           // slot kind of each character (',' = free marker)

@@ -14,15 +14,7 @@ struct CharMoveLock
     char pad_0004[0x2498];
 };
 
-// CharState (world.h) as the route walk uses it.
-struct RouteState
-{
-    int pad_0000;
-    int stopped;                  // 0x04: non-zero = the character stays where it is
-    int point;                    // 0x08: route point the character heads for
-    int placed;                   // 0x0c: 1 once the character was put on its route
-    char pad_0010[0x30];
-};
+#include "char_state.h"
 
 // A 0x40-byte record per character slot (DAT_10802c08): the last step taken.
 struct StepRecord
@@ -32,7 +24,6 @@ struct StepRecord
 };
 
 extern "C" CharMoveLock DAT_10db9380[0x80];
-extern "C" RouteState DAT_1020b430[0x80];
 extern "C" StepRecord DAT_10802c08[0x80];
 extern "C" int DAT_1049f0f0;                     // number of entries in the two lists below
 extern "C" Vec4 *DAT_1032d5b8[];                 // positions of the characters moved by routes
@@ -59,7 +50,7 @@ extern "C" int FUN_1002a110(int slot, int run)
     DAT_10db6ee8[slot].walkingRoute = 1;
     DAT_10db6ee8[slot].motionFrame = 0x1e;
     DAT_10db6ee8[slot].M_10161be0(0, 0);
-    FUN_100286d0(slot, &state, DAT_1020b430[slot].point, &next, &target, &group, &value, &action);
+    FUN_100286d0(slot, &state, DAT_1020b430[slot].targetPoint, &next, &target, &group, &value, &action);
     if (DAT_1020b430[slot].placed == 0)
     {
         DAT_1032d5b8[DAT_1049f0f0] = (Vec4 *)&DAT_10db6ee8[slot].matrix.m[12];
@@ -68,9 +59,9 @@ extern "C" int FUN_1002a110(int slot, int run)
         DAT_1020b430[slot].placed = 1;
         DAT_10db6ee8[slot].SetPosition(target.x, target.y, target.z);
     }
-    DAT_1020b430[slot].point = next;
+    DAT_1020b430[slot].targetPoint = next;
     DAT_10802c08[slot].step.Fill(0.0f);
-    if (DAT_1020b430[slot].stopped == 0)
+    if (DAT_1020b430[slot].routeStopped == 0)
     {
         step.Copy(target - DAT_10db6ee8[slot].matrix.GetTranslation());
         if (step.x != 0.0f || step.y != 0.0f || step.z != 0.0f)

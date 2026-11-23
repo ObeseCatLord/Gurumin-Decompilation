@@ -19,6 +19,7 @@ extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, 
 
 #include "node.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" char DAT_1021f6c0[0x80];
 
@@ -64,30 +65,30 @@ extern "C" int FUN_10024d00(int index, float distance, float minimumHome, float 
 // motion 6 for 93 frames), and waits for it to end. Returns 1 when it has ended, else 0.
 extern "C" int FUN_10027560(int index)
 {
-    DAT_1020b430[index].m_0004[0] = 1;
-    if (DAT_1020b430[index].m_0004[1] == 0)
+    DAT_1020b430[index].values[0] = 1;
+    if (DAT_1020b430[index].values[1] == 0)
     {
-        DAT_1020b430[index].m_0004[2] = 0;
+        DAT_1020b430[index].values[2] = 0;
         switch (FUN_1013f880() % 2)
         {
         case 0:
             DAT_10db6ee8[index].PlayMotion(5, 1, 5, 1.0f);
-            DAT_1020b430[index].m_0004[2] = 146;
-            DAT_1020b430[index].m_0004[1] = 1;
+            DAT_1020b430[index].values[2] = 146;
+            DAT_1020b430[index].values[1] = 1;
             return 0;
         case 1:
             DAT_10db6ee8[index].PlayMotion(6, 1, 5, 1.0f);
-            DAT_1020b430[index].m_0004[2] = 93;
-            DAT_1020b430[index].m_0004[1] = 1;
+            DAT_1020b430[index].values[2] = 93;
+            DAT_1020b430[index].values[1] = 1;
             break;
         }
     }
-    else if (DAT_1020b430[index].m_0004[1] == 1)
+    else if (DAT_1020b430[index].values[1] == 1)
     {
-        DAT_1020b430[index].m_0004[2]--;
-        if (DAT_1020b430[index].m_0004[2] == 0)
+        DAT_1020b430[index].values[2]--;
+        if (DAT_1020b430[index].values[2] == 0)
         {
-            DAT_1020b430[index].m_0004[1] = 0;
+            DAT_1020b430[index].values[1] = 0;
             return 1;
         }
     }
@@ -104,22 +105,22 @@ extern "C" int FUN_10027400(int index)
     Vec4 self;
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
-    DAT_1020b430[index].m_0004[0] = 1;
+    DAT_1020b430[index].values[0] = 1;
     move.Fill(0);
-    if (DAT_1020b430[index].m_0004[1] == 0)
+    if (DAT_1020b430[index].values[1] == 0)
     {
         Playback *motion = DAT_10db6ee8[index].motion;
-        DAT_1020b430[index].m_0004[2] = 150;
+        DAT_1020b430[index].values[2] = 150;
         if (motion->layer != 7 && (motion->blending == 0 || motion->nextLayer != 7))
             DAT_10db6ee8[index].PlayMotion(7, 1, 5, 1.0f);
-        DAT_1020b430[index].m_0004[1] = 1;
+        DAT_1020b430[index].values[1] = 1;
     }
-    else if (DAT_1020b430[index].m_0004[1] == 1)
+    else if (DAT_1020b430[index].values[1] == 1)
     {
         DAT_10db6ee8[index].targetHeading = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
         if (FUN_1013f880() % 3000 < 15)
         {
-            DAT_1020b430[index].m_0004[1] = 0;
+            DAT_1020b430[index].values[1] = 0;
             return 1;
         }
     }
@@ -136,10 +137,10 @@ extern "C" int FUN_10028360(int index, int endChance)
     Vec4 player;
     Vec4 self;
     Vec4 toPlayer;
-    DAT_1020b430[index].m_0004[0] = 0;
-    if (DAT_1020b430[index].m_003c == 0)
+    DAT_1020b430[index].values[0] = 0;
+    if (DAT_1020b430[index].behaviour == 0)
     {
-        DAT_1020b430[index].m_003c = 1;
+        DAT_1020b430[index].behaviour = 1;
         DAT_10db6ee8[index].root->M_10194630((char)index, 0x400);
         DAT_10db6ee8[index].root->M_101946b0(0xfe, 0x400);
         DAT_10db6ee8[index].root->M_10194730(0x2f, 0x400);
@@ -149,7 +150,7 @@ extern "C" int FUN_10028360(int index, int endChance)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     toPlayer.Copy(player - self);
-    if (DAT_1020b430[index].m_0004[1] == 0)
+    if (DAT_1020b430[index].values[1] == 0)
     {
         // Angle still to turn, wrapped into -pi..pi.
         float turn = (float)atan2(toPlayer.x, toPlayer.y);
@@ -161,24 +162,24 @@ extern "C" int FUN_10028360(int index, int endChance)
             turn = turn + 6.28319f;
         if ((float)fabs(turn) < 0.05236f && toPlayer.Length2D() < 1500.0f)
         {
-            if (DAT_1020b430[index].m_0004[3] == 0)
-                DAT_1020b430[index].m_0004[3] = 30;
+            if (DAT_1020b430[index].values[3] == 0)
+                DAT_1020b430[index].values[3] = 30;
             DAT_10db6ee8[index].targetHeading = DAT_10db6ee8[index].heading;
-            if (DAT_1020b430[index].m_0004[2] > 0)
+            if (DAT_1020b430[index].values[2] > 0)
             {
                 DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
-                DAT_1020b430[index].m_0004[2]--;
+                DAT_1020b430[index].values[2]--;
             }
             else
             {
                 DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
             }
         }
-        else if (((float)fabs(turn) < 3.14159f && toPlayer.Length2D() < 1500.0f) || DAT_1020b430[index].m_0004[3] > 0)
+        else if (((float)fabs(turn) < 3.14159f && toPlayer.Length2D() < 1500.0f) || DAT_1020b430[index].values[3] > 0)
         {
-            if (DAT_1020b430[index].m_0004[3] == 0)
-                DAT_1020b430[index].m_0004[3] = 30;
-            DAT_1020b430[index].m_0004[2] = 4;
+            if (DAT_1020b430[index].values[3] == 0)
+                DAT_1020b430[index].values[3] = 30;
+            DAT_1020b430[index].values[2] = 4;
             if (turn > 0.0f)
             {
                 if (turn > 0.349066f)
@@ -199,12 +200,12 @@ extern "C" int FUN_10028360(int index, int endChance)
         {
             DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         }
-        if (DAT_1020b430[index].m_0004[3] > 0)
-            DAT_1020b430[index].m_0004[3]--;
+        if (DAT_1020b430[index].values[3] > 0)
+            DAT_1020b430[index].values[3]--;
         if (FUN_1013f880() % 400 < endChance)
         {
-            DAT_1020b430[index].m_0004[3] = 0;
-            DAT_1020b430[index].m_0004[2] = 0;
+            DAT_1020b430[index].values[3] = 0;
+            DAT_1020b430[index].values[2] = 0;
             return 1;
         }
     }

@@ -9,18 +9,8 @@
 
 #include "anim_model.h"
 
-// Per-character script state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = idle, 1 = talking
-    int pad_0004;
-    int facing;               // 0x08: below 100: the idle facing in steps of pi/6; 100 and up: do not turn to the
-                              // player while talking
-    int started;              // 0x0c: 1 once the idle motion was started
-    char pad_0010[0x30];
-};
+#include "char_state.h"
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" int DAT_10c6351c;             // the character being talked to
 
 // atan2 on floats (an inline helper: both arguments are rounded to float first, the second one first).
@@ -33,10 +23,10 @@ inline float Atan2(float y, float x)
 // direction, talking in motion 3 turned to the player (unless the facing value is 100 or more). Returns 0.
 extern "C" int FUN_1001b880(int index)
 {
-    if (DAT_1020b430[index].started == 0)
+    if (DAT_1020b430[index].idleStarted == 0)
     {
         DAT_10db6ee8[index].PlayMotion(2, 1, 5, 1.0f);
-        DAT_1020b430[index].started = 1;
+        DAT_1020b430[index].idleStarted = 1;
     }
     int state = DAT_1020b430[index].state;
     DAT_10db6ee8[index].mode = 0;
@@ -77,10 +67,10 @@ extern "C" int FUN_1001b880(int index)
 // Returns 0.
 extern "C" int FUN_1001c210(int index)
 {
-    if (DAT_1020b430[index].started == 0)
+    if (DAT_1020b430[index].idleStarted == 0)
     {
         DAT_10db6ee8[index].PlayMotion(2, 1, 5, 1.0f);
-        DAT_1020b430[index].started = 1;
+        DAT_1020b430[index].idleStarted = 1;
     }
     int state = DAT_1020b430[index].state;
     DAT_10db6ee8[index].mode = 0;

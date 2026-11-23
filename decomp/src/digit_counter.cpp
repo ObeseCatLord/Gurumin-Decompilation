@@ -10,15 +10,8 @@ struct Game
     int RegisterEvent(int id);                       // 0x100020d0
 };
 
-// Per-character AI state (world.h CharState), used here as the counter state.
-struct CounterState
-{
-    int count;                                       // the value shown (0..1000)
-    int phase;                                       // 0 = idle, 1..10 = turning to count + 1
-    char pad_0008[0x38];
-};
+#include "char_state.h"
 
-extern "C" CounterState DAT_1020b430[0x80];
 extern "C" Node *DAT_10255f08;                       // the counter model
 extern "C" int DAT_104bf8a4;                         // frames of a digit motion
 extern "C" int DAT_10c62edc[0x1000];                 // script flags
@@ -32,11 +25,11 @@ extern "C" int FUN_1001d2d0(int index)
 {
     int digits[6];                                   // [0..2] the shown value, [3..5] the new one (ones first)
     Node *node;
-    if (DAT_1020b430[index].phase != 0)
+    if (DAT_1020b430[index].counterPhase != 0)
     {
-        if (DAT_1020b430[index].phase == 1)
+        if (DAT_1020b430[index].counterPhase == 1)
         {
-            int count = DAT_1020b430[index].count;
+            int count = DAT_1020b430[index].counterValue;
             int next = count + 1;
             if (next > 1000)
                 next = 1000;
@@ -101,13 +94,13 @@ extern "C" int FUN_1001d2d0(int index)
                 }
             }
         }
-        if (++DAT_1020b430[index].phase == 11)
+        if (++DAT_1020b430[index].counterPhase == 11)
         {
-            DAT_1020b430[index].phase = 0;
-            DAT_1020b430[index].count++;
-            if (DAT_1020b430[index].count > 1000)
-                DAT_1020b430[index].count = 1000;
-            int count = DAT_1020b430[index].count;
+            DAT_1020b430[index].counterPhase = 0;
+            DAT_1020b430[index].counterValue++;
+            if (DAT_1020b430[index].counterValue > 1000)
+                DAT_1020b430[index].counterValue = 1000;
+            int count = DAT_1020b430[index].counterValue;
             digits[3] = count % 10;
             digits[4] = count / 10 % 10;
             digits[5] = count / 100 % 10;
@@ -166,7 +159,7 @@ extern "C" int FUN_1001d2d0(int index)
     }
     else
     {
-        int count = DAT_1020b430[index].count;
+        int count = DAT_1020b430[index].counterValue;
         if (count == 999 && DAT_10c62edc[0x80b] == 0)
         {
             DAT_10874848.RegisterEvent(0x340);
@@ -177,10 +170,10 @@ extern "C" int FUN_1001d2d0(int index)
             return 0;
         if (count == target - 1)
         {
-            DAT_1020b430[index].phase = 1;
+            DAT_1020b430[index].counterPhase = 1;
             return 0;
         }
-        DAT_1020b430[index].count = target;
+        DAT_1020b430[index].counterValue = target;
         digits[3] = target % 10;
         digits[4] = target / 10 % 10;
         digits[5] = target / 100 % 10;

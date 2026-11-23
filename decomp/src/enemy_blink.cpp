@@ -10,14 +10,7 @@
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = start, 1 = hidden, 2 = appearing
-    int wait;                 // 0x04: frames since appearing
-    int talk;                 // 0x08: distance from its home at which the player makes it appear
-    char pad_000c[0x34];
-};
+#include "char_state.h"
 
 // The last position and step of each character (route_walk.cpp StepRecord); here the position holds the home.
 struct LastPosition
@@ -39,7 +32,6 @@ struct CollisionWorld
     VisData *vis;             // 0x1864: visibility cells (0 = none)
 };
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" char DAT_1020d540[0x80];           // 1 = the character is in play
 extern "C" CollisionWorld *DAT_10255f08;

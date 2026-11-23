@@ -11,22 +11,7 @@
 
 typedef char check_walker[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-character AI state (world.h CharState).
-struct NpcState
-{
-    int state;                // 0x00: 0 = start, 1 = pausing, 2 = walking, 4 = dropping its rider, 5 = fading out
-    int wait;                 // 0x04: frames in the current state
-    int talk;                 // 0x08: route + rider offset * 100
-    int route;                // 0x0c: the route walked
-    int point;                // 0x10: the route point headed for
-    int backwards;            // 0x14: 1 while walking the route backwards (Route_Follow)
-    int speed;                // 0x18: units per frame (from the route's first point)
-    int rider;                // 0x1c: character carried (0 = none)
-    int pause;                // 0x20: frames to wait at a point
-    int pad_0024;
-    int fadeActions;          // 0x28: bit n set = fade out when a point with action n is reached
-    char pad_002c[0x14];
-};
+#include "char_state.h"
 
 // The last position and step of each character (route_walk.cpp StepRecord); here the position holds the velocity.
 struct LastPosition
@@ -52,7 +37,6 @@ struct RoutePoint
     int code;
 };
 
-extern "C" NpcState DAT_1020b430[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" RoutePoint DAT_10210fc0[][16];     // the routes of the map
@@ -99,11 +83,11 @@ extern "C" int FUN_100451c0(int index)
     }
     if (DAT_1020b430[index].state == 0)
     {
-        DAT_1020b430[index].point = 1;
-        DAT_1020b430[index].backwards = 0;
+        DAT_1020b430[index].nextPoint = 1;
+        DAT_1020b430[index].reversed = 0;
         DAT_1020b430[index].route = DAT_1020b430[index].talk % 100;
         FUN_1002f320(index, DAT_1020b430[index].talk % 100, 1, &point, &target.x, &action, &value, &group, 20);
-        DAT_1020b430[index].point = point;
+        DAT_1020b430[index].nextPoint = point;
         DAT_1020b430[index].state = 2;
         DAT_1020b430[index].wait = 0;
         DAT_1020b430[index].rider = DAT_1020b430[index].talk / 100 + index;
@@ -111,14 +95,14 @@ extern "C" int FUN_100451c0(int index)
         DAT_1020b430[index].fadeActions = DAT_10210fc0[DAT_1020b430[index].talk % 100][0].code;
         if (value > 1)
         {
-            DAT_1020b430[index].pause = value;
+            DAT_1020b430[index].pointPause = value;
             DAT_1020b430[index].state = 1;
             DAT_1020b430[index].wait = 0;
         }
     }
     else if (DAT_1020b430[index].state == 1)
     {
-        if (++DAT_1020b430[index].wait > DAT_1020b430[index].pause)
+        if (++DAT_1020b430[index].wait > DAT_1020b430[index].pointPause)
         {
             DAT_1020b430[index].wait = 0;
             DAT_1020b430[index].state = 2;
@@ -128,11 +112,11 @@ extern "C" int FUN_100451c0(int index)
     {
         Vec4 step;
         Vec4 velocity;
-        int reached = FUN_1002f320(index, DAT_1020b430[index].route, DAT_1020b430[index].point, &point, &target.x,
+        int reached = FUN_1002f320(index, DAT_1020b430[index].route, DAT_1020b430[index].nextPoint, &point, &target.x,
                                    &action, &value, &group, DAT_1020b430[index].speed / 2 + 20);
         DAT_10db6ee8[index].targetHeading = (float)atan2(target.x - self.x, target.y - self.y) + 3.1415f;
         DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
-        if (DAT_1020b430[index].point != point)
+        if (DAT_1020b430[index].nextPoint != point)
         {
             DAT_1020b430[index].state = 2;
             DAT_1020b430[index].wait = 0;
@@ -152,7 +136,7 @@ extern "C" int FUN_100451c0(int index)
                 }
                 else if (value > 1)
                 {
-                    DAT_1020b430[index].pause = value;
+                    DAT_1020b430[index].pointPause = value;
                     DAT_1020b430[index].state = 1;
                     DAT_1020b430[index].wait = 0;
                 }
@@ -164,7 +148,7 @@ extern "C" int FUN_100451c0(int index)
             }
             else if (value > 1)
             {
-                DAT_1020b430[index].pause = value;
+                DAT_1020b430[index].pointPause = value;
                 DAT_1020b430[index].state = 1;
                 DAT_1020b430[index].wait = 0;
             }
@@ -176,7 +160,7 @@ extern "C" int FUN_100451c0(int index)
         Vec4 position;
         position.Copy(DAT_10db6ee8[index].matrix.GetTranslation() + DAT_10802bf8[index].position);
         DAT_10db6ee8[index].SetPosition(position.x, position.y, position.z);
-        DAT_1020b430[index].point = point;
+        DAT_1020b430[index].nextPoint = point;
     }
     else if (DAT_1020b430[index].state == 4)
     {

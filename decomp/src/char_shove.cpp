@@ -10,16 +10,8 @@
 
 #include "anim_model.h"
 
-// One shove (16 bytes; four per character slot).
-struct Shove
-{
-    int target;                   // character slot + 10000 * (non-zero = keep its heading), negative = look target
-    int stepX;                    // per-frame step (for a look target: the character to look at)
-    int stepY;
-    int frames;                   // frames left + 10000 * (non-zero = keep its motion)
-};
+#include "char_state.h"
 
-extern "C" Shove DAT_1020b430[0x80][4];
 extern "C" Vec4 DAT_10802ac8;     // where the player's head looks
 extern "C" int FUN_100165e0(int mode);   // starts (1) or ends head tracking
 
@@ -28,7 +20,7 @@ extern "C" int FUN_100165e0(int mode);   // starts (1) or ends head tracking
 // plays the run motion (walk below a step of 8), and on its last frame plays the idle motion. Returns 0.
 extern "C" int FUN_1002ee70(int slot)
 {
-    Shove *shove = DAT_1020b430[slot];
+    Shove *shove = DAT_1020b430[slot].shoves;
     for (int n = 4; n != 0; n--, shove++)
     {
         if (shove->target < 0)

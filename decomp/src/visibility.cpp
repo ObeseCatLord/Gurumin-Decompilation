@@ -20,6 +20,7 @@ struct VisData
 
 #include "node.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" int DAT_10f65520;
 extern "C" Vec4 DAT_10f66908;

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "world.h"
 #include "anim_model.h"
+#include "char_state.h"
 
 extern "C" int DAT_104c0370;
 extern "C" int DAT_10c62ed0;
@@ -21,8 +22,8 @@ extern "C" int FUN_1001c4c0(int low, int high)
         {
             for (int j = 0; j < 6; j++)
             {
-                if (DAT_1020b430[i].m_0004[j] >= low && DAT_1020b430[i].m_0004[j] <= high)
-                    DAT_1020b430[i].m_0004[j] = 0;
+                if (DAT_1020b430[i].values[j] >= low && DAT_1020b430[i].values[j] <= high)
+                    DAT_1020b430[i].values[j] = 0;
             }
         }
     }
@@ -36,9 +37,9 @@ extern "C" int FUN_1001dbd0(int id, int value)
     {
         if (DAT_10db6ee8[i - 1].nextSlotId == id)
         {
-            DAT_1020b430[i].m_0004[5] = value;
-            DAT_1020b430[i].m_0004[0] = 0;
-            DAT_1020b430[i].m_0004[1] = 0;
+            DAT_1020b430[i].values[5] = value;
+            DAT_1020b430[i].values[0] = 0;
+            DAT_1020b430[i].values[1] = 0;
         }
     }
     DAT_104c0370 = 2;
@@ -49,9 +50,9 @@ extern "C" int FUN_1001dbd0(int id, int value)
 extern "C" int FUN_10026c50(int index)
 {
     FUN_1013f880();
-    DAT_1020b430[index].m_0000 = 0;
-    DAT_1020b430[index].m_0004[0] = 0;
-    DAT_1020b430[index].m_0004[1] = 0;
+    DAT_1020b430[index].state = 0;
+    DAT_1020b430[index].values[0] = 0;
+    DAT_1020b430[index].values[1] = 0;
     return 0;
 }
 

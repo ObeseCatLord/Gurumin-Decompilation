@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vec3.h"
+#include "char_state.h"
 
 #include "node.h"
 #include "anim_model.h"
@@ -27,17 +28,6 @@ struct CharSlot
     char pad_00a8[0xe0];
 };
 
-struct CharState
-{
-    int m_0000;
-    int m_0004[6];
-    char pad_001c[0xc];
-    int m_0028;               // 0x28: non-zero = skip the ground probe of a shot (0x1001a590)
-    char pad_002c[0xc];
-    int m_0038;               // 0x38
-    int m_003c;
-};
-
 struct EffectSlot
 {
     int id;
@@ -54,7 +44,6 @@ struct EffectSlot
 };
 
 extern "C" CharSlot DAT_10daab84[0x80];
-extern "C" CharState DAT_1020b430[0x80];
 extern "C" EffectSlot DAT_10860df0[0x40];
 extern "C" int DAT_10210d30[0x80];
 

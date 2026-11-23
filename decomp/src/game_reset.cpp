@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include "char_params.h"
+#include "char_state.h"
 
 #include "vec4.h"
 
@@ -113,7 +114,6 @@ extern "C" int DAT_1020aee8;
 extern "C" int DAT_1020aefc[0x8];
 extern "C" short DAT_1020b128[0x80];
 extern "C" int DAT_1020b22c;
-extern "C" int DAT_1020b430[0x800];
 extern "C" int DAT_1020d430;
 extern "C" int DAT_1020d438[0x20];
 extern "C" int DAT_1020d4b8;

@@ -4,49 +4,16 @@
 
 #include <string.h>
 
-struct Object
-{
-    char data[0x40];
-    ~Object();
-};
-
 #include "vec4.h"
+#include "scene_misc.h"
 
 #include "anim_model.h"
 
 #include "node_data.h"
 
-struct ColorTables
-{
-    char pad_0000[0x14];
-    Vec4 a[0x100];
-    Vec4 b[0x100];
-    Vec4 c[0x100];
-    Vec4 d[0x100];
-    ColorTables();
-};
-
-struct Widget
-{
-    char pad_0000[0xc4];
-    Object m_00c4;
-    Object m_0104;
-    Object m_0144;
-    ~Widget();
-};
-
 #include "node.h"
 
-struct Placement
-{
-    char pad_0000[0x200];
-    int kind;
-    char pad_0204[0x37];
-    char name[0x40];
-    char pad_027b[0x15d];
-};
 #include "engine_memory.h"
-extern "C" Placement DAT_1101dde0[];
 #include "camera_vars.h"
 #include "render_vars.h"
 

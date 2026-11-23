@@ -1,8 +1,10 @@
 #pragma once
 
-// Event trigger (0xc8 bytes): runs when its map matches and all four script flags pass.
+#include "object.h"
+
 struct FontRenderer;   // font_renderer.h
 
+// Event trigger (0xc8 bytes): runs when its map matches and all four script flags pass.
 struct GameTrigger
 {
     int map;                    // map number, 9999 = any map
@@ -33,12 +35,6 @@ struct GameNamedEntry
     char title[0x50];           // 0x54
     int value;                  // 0xa4
     char pad_00a8[0x40];
-};
-
-// Empty engine base class; its destructor is the shared empty function 0x1013eda0.
-struct Object
-{
-    ~Object();
 };
 
 // One scene node body (0x18a0 bytes, destructor 0x10191480, see src/node_dtor.cpp). Game owns 32 of them.

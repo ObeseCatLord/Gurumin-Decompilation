@@ -1,11 +1,11 @@
 // Resetting the camera state when a map starts: the camera vectors are zeroed and the camera flags and blend
 // counters cleared (most of these globals are only named where they are used).
 
+#include "scene_misc.h"
 #include "vec4.h"
 
 #include "camera_vars.h"
 #include "char_vars.h"
-extern "C" int DAT_1101dde0;
 
 // 0x1016a980 (Camera_Reset). Clears the camera globals: the camera position and target vectors and their goals,
 // the blend and cut counters (DAT_10203444 = -100, DAT_10203440 = 1), and sets the scale factors to 1 and
@@ -51,7 +51,7 @@ extern "C" int FUN_1016a980(void)
     DAT_1101ddd4 = 0;
     DAT_1101ddd8 = 0;
     DAT_1101dddc = 0;
-    DAT_1101dde0 = 0;
+    DAT_1101dde0[0].m_0000 = 0;
     DAT_1101dde8 = 0;
     DAT_1101ddec = 0;
     DAT_1020344c = 1.0f;

@@ -2,11 +2,7 @@
 
 #include <stdlib.h>
 
-struct Object
-{
-    Object();
-    ~Object();
-};
+#include "object.h"
 
 #include "anim_model.h"
 

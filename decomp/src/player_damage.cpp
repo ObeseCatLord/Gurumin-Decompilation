@@ -1,6 +1,7 @@
 // The player taking damage (0x1005dbf0, called by enemy attacks, traps and map hazards): health and the anti-tamper
 // copies, the hurt voice, rumble, the game over movie and the hit effect.
 
+#include "mmv_player.h"
 #include "vec4.h"
 
 #include "matrix4.h"
@@ -14,21 +15,10 @@ struct Matrix4;
 
 #include "texture_object.h"
 
-struct MoviePlayer
-{
-    int pad_0000[4];
-    int m_0010;               // 0x10: frame counter (cleared to restart)
-    char pad_0014[0x38];
-    char m_004c;              // 0x4c: 1 = playing
-    int M_10160a90(const char *path);                // 0x10160a90 (MmvPlayer::Open)
-    int M_10160960(const TextureObject *target);     // 0x10160960: decodes the current frame into `target`
-};
-
 #include "dinput_min.h"
 
 #include "game.h"
 
-extern "C" MoviePlayer DAT_10f08ab0;
 #include "char_vars.h"
 #include "game_vars.h"
 #include "map_vars.h"
@@ -120,11 +110,11 @@ extern "C" int FUN_1005dbf0(int damage)
         }
         else
         {
-            DAT_10f08ab0.M_10160a90(FUN_1013f8a0("gameover.mmv", 0));
-            DAT_10f08ab0.M_10160960(&DAT_118d0ba8[DAT_10202478]);
+            DAT_10f08ab0.Open(FUN_1013f8a0("gameover.mmv", 0));
+            DAT_10f08ab0.DrawToTexture(&DAT_118d0ba8[DAT_10202478]);
             FUN_1003ad20(0x335, DAT_10db6ee8[0].matrix.GetTranslation(), 1.0f);
-            DAT_10f08ab0.m_004c = 1;
-            DAT_10f08ab0.m_0010 = 0;
+            DAT_10f08ab0.state = MMV_PLAYING;
+            DAT_10f08ab0.loop = 0;
             DAT_104bfe78 = 1;
             DAT_10db6ee8[0].PlayMotion(0x84, 1, 5, 1.0f);
         }

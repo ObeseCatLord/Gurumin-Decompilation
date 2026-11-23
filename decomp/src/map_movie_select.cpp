@@ -1,6 +1,7 @@
 // Choosing the background movie of the map (run from 0x100ba2a0): the camera point nearest to the player picks
 // the movie, which is opened into the movie player and rendered into the movie texture.
 
+#include "mmv_player.h"
 #include "vec4.h"
 
 #include "matrix4.h"
@@ -15,15 +16,8 @@
 
 #include "texture_object.h"
 
-struct MmvPlayer
-{
-    void M_10161050();                               // decodes the next frame
-    int M_10160960(TextureObject *texture);          // renders the current frame into `texture`
-};
-
 extern "C" Node *DAT_104c03ac;                       // the camera path node
 extern "C" CameraPoint DAT_10210fc4[];
-extern "C" MmvPlayer DAT_10f08ab0;
 extern "C" int FUN_10016580(const char *name);       // Movie_PlayToTexture
 extern "C" int FUN_1001e240(void);                   // Map_IconTexture
 
@@ -78,7 +72,7 @@ int Map_SelectMovie()
                         DAT_104bfe70 = 1;
                     for (int frame = 1; frame < DAT_104bfe70; frame += 2)
                         DAT_10f08ab0.M_10161050();
-                    DAT_10f08ab0.M_10160960(&DAT_118d0ba8[DAT_10202478]);
+                    DAT_10f08ab0.DrawToTexture(&DAT_118d0ba8[DAT_10202478]);
                 }
             }
         }

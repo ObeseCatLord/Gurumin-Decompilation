@@ -1,20 +1,11 @@
 // Movies, packed script variables and the seasonal check.
 
+#include "mmv_player.h"
 #include <windows.h>
 
 #include "texture_object.h"
 
-struct MoviePlayer
-{
-    int pad_0000[3];
-    int m_000c;
-    int M_10160a90(const char *path);
-    void M_10161050();
-    int M_10160960(const TextureObject *target);
-};
-
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
-extern "C" MoviePlayer DAT_10f08ab0;
 #include "game_vars.h"
 #include "ui_vars.h"
 
@@ -22,10 +13,10 @@ extern "C" MoviePlayer DAT_10f08ab0;
 // into the texture slot DAT_10202478 and records the movie's frame count. Returns 1.
 extern "C" int FUN_10016580(const char *name)
 {
-    DAT_10f08ab0.M_10160a90(FUN_1013f8a0(name, 0));
+    DAT_10f08ab0.Open(FUN_1013f8a0(name, 0));
     DAT_10f08ab0.M_10161050();
-    DAT_10f08ab0.M_10160960(&DAT_118d0ba8[DAT_10202478]);
-    DAT_104bfe74 = DAT_10f08ab0.m_000c;
+    DAT_10f08ab0.DrawToTexture(&DAT_118d0ba8[DAT_10202478]);
+    DAT_104bfe74 = DAT_10f08ab0.size;
     DAT_104bfe70 = 1;
     return 1;
 }

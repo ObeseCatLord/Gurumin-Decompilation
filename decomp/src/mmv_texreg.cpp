@@ -4,49 +4,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "mmv_texreg.h"
+#include "mmv_player.h"
 
 
-struct MmvPlayer
-{
-    int frameIndex;        // 0x00: number of the next frame
-    int start;             // 0x04: offset of the first frame record in `memory`
-    int offset;            // 0x08: offset of the next frame record after the header
-    int size;              // 0x0c: movie size
-    int m_0010;
-    char isOpen;           // 0x14: 1 = frames are streamed from `file`
-    char pad_0015[3];
-    MovieFile file;
-    void *m_003c;
-    short width;
-    short height;
-    char pad_0044[4];
-    short m_0048;          // 0x48: movie type (type 6 shows only its first 7 frames)
-    char m_004a;
-    char m_004b;
-    char m_004c;
-    char pad_004d;
-    unsigned short palette[0x101]; // 0x4e: the movie's 255 colours as RGB565, entry 255 = 0xfbff
-    char *memory;          // 0x250: whole movie in memory (when not streamed from the file)
-    void *frame;           // 0x254: decoded 8-bit frame (palette indexes), updated in place
-    unsigned char *data;   // 0x258: compressed data of the current frame
-
-    MmvPlayer();
-    ~MmvPlayer();
-    void Close();
-    int M_10160960(const ClipRect *clip);
-    void ReadFrame();
-    void ReadFrameOnce();
-    void M_10161050();
-    void DecodeFrameRle(int count);
-    void Open(const char *path);
-};
 #include "engine_memory.h"
 #include "render_vars.h"
 
 // Not byte-identical yet: the original keeps 0 in ebx for its compares and stores (see open.tsv).
 // Like ReadFrame for a movie that plays once: after the last frame the in-memory copy is freed or the file closed,
-// then the movie either holds its last frame (m_004c set: state 2) or stops and frees the frame buffer when it
+// then the movie either holds its last frame (state MMV_HOLD_LAST_FRAME) or stops and frees the frame buffer when it
 // owns it (m_004a).
 void MmvPlayer::ReadFrameOnce()
 {
@@ -56,7 +22,7 @@ void MmvPlayer::ReadFrameOnce()
         return;
     if (isOpen == 0)
     {
-        if (m_004c == 2)
+        if (state == MMV_HOLD_LAST_FRAME)
             return;
         int length = *(int *)(start + memory + offset);
         data = (unsigned char *)(start + memory + offset + 4);
@@ -70,7 +36,7 @@ void MmvPlayer::ReadFrameOnce()
     }
     else
     {
-        if (m_004c == 2)
+        if (state == MMV_HOLD_LAST_FRAME)
             return;
         int length;
         file.Read(&length, 1, 4);
@@ -88,9 +54,9 @@ void MmvPlayer::ReadFrameOnce()
             return;
         file.Close();
     }
-    if (m_004c != 0)
+    if (state != MMV_STOPPED)
     {
-        m_004c = 2;
+        state = MMV_HOLD_LAST_FRAME;
         return;
     }
     m_004b = 0;
@@ -152,12 +118,12 @@ extern "C" void FUN_10143b80(void);
 // Constructor: nothing open yet.
 MmvPlayer::MmvPlayer()
 {
-    m_0010 = 0;
+    loop = 0;
     memory = 0;
     m_004b = 0;
     frame = 0;
     m_004a = 0;
-    m_004c = 0;
+    state = MMV_STOPPED;
 }
 
 // Destructor: closes the movie.
@@ -191,23 +157,23 @@ void MmvPlayer::Close()
     }
 }
 
-// Copies the current frame (clipped to `clip`) into the movie texture using the frame's palette.
+// Copies the current frame (clipped to the size of `target`) into the movie texture using the frame's palette.
 // Not byte-identical yet (see open.tsv).
-int MmvPlayer::M_10160960(const ClipRect *clip)
+int MmvPlayer::DrawToTexture(const TextureObject *target)
 {
     if (frame != 0)
     {
-        int h = height > clip->bottom ? clip->bottom : height;
-        int w = width > clip->right ? clip->right : width;
+        int h = height > target->height ? target->height : height;
+        int w = width > target->width ? target->width : width;
         FUN_1014f120(0, 0, w, h, width, frame, palette);
     }
     return 1;
 }
 
-// Decodes the next frame (looping or one-shot variant depending on m_0010).
+// Decodes the next frame (looping or one-shot variant depending on loop).
 void MmvPlayer::M_10161050()
 {
-    if (m_0010 != 0)
+    if (loop != 0)
         ReadFrame();
     else
         ReadFrameOnce();
@@ -345,8 +311,8 @@ void MmvPlayer::Open(const char *path)
 {
     char base[0x100];
     char name[0x100];
-    m_0010 = 0;
-    m_004c = 0;
+    loop = 0;
+    state = MMV_STOPPED;
     isOpen = 0;
     GameFile movie;
     FUN_10161120(base, path);

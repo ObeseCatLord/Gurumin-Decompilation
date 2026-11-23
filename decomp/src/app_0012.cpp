@@ -97,12 +97,7 @@ extern "C" int FUN_10052480(void)
 
 #include "kind_counter.h"
 
-extern "C" KindCounter DAT_1020b498[0x80];  // cooldown of kind 0x64
-extern "C" KindCounter DAT_1020b49c[0x80];  // cooldown of kind 0x46
-extern "C" KindCounter DAT_1020b410[0x80];  // cooldown of kind 0x69
-extern "C" KindCounter DAT_1020b4b4[0x80];  // cooldown of kind 0x2d
-extern "C" KindCounter DAT_1020b454[0x80];  // cooldown of kind 0x3f
-extern "C" KindCounter DAT_1020b46c[0x80];  // cooldown of kind 0x43
+#include "char_tables.h"
 
 // Counts down the cooldown counter that belongs to character `index`'s kind (six kinds have one; other kinds do
 // nothing). Counters stop at 0. Each branch decrements its own counter; the compiler merges the identical tails.

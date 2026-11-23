@@ -16,7 +16,8 @@ inline float AbsFloat(float value)
     return (float)fabs(value);
 }
 
-extern "C" MoveLimit DAT_102110b0[0x80];
+#include "char_tables.h"
+
 extern "C" SlotPosition DAT_10802bf8[0x80];
 
 // 0x10024e80 (Char_OutsideLimit). 1 when moving character `index` by (dx, dy) would take it further from its start

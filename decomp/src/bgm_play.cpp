@@ -21,7 +21,6 @@ struct GameFile
     void Close();                                // 0x101b22f0
 };
 
-extern "C" BgmTrack DAT_108db358[0x41];
 #include "sound_vars.h"
 
 #include "game_vars.h"

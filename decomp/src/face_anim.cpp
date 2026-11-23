@@ -18,7 +18,6 @@ inline int LoadIti(const char *name)
 
 #include "char_slot.h"
 
-extern "C" FaceSet DAT_1087664c[0x80];
 #include "char_tables.h"
 #include "char_vars.h"
 

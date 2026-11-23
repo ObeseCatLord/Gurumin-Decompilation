@@ -16,8 +16,6 @@
 #include "render_vars.h"
 #include "ui_vars.h"
 
-extern "C" FadeNode *DAT_1021a1e0[];    // the nodes
-extern "C" FadeOwner *DAT_10254ac0[];   // owner of each node (0 = none)
 
 // For each fading node: the alpha follows the owner's brightness (brightness 5 or less = 1, 20 or more = 0; no
 // owner = 1), and the parent's glow is the square root of 40000 minus the squared distance to the viewer (0 from

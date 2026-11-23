@@ -4,6 +4,8 @@
 #ifndef GURUMIN_SOUND_VARS_H
 #define GURUMIN_SOUND_VARS_H
 
+#include "bgm_track.h"
+#include "sound_def.h"
 #include "vec4.h"
 
 extern "C" int DAT_10202358;                              // track playing
@@ -21,7 +23,9 @@ extern "C" int DAT_104c01b0;                              // non-zero = no liste
 extern "C" int DAT_104c01b8;                              // sound output setting (non-zero = mode 1)
 extern "C" int DAT_104c02e0;                              // colour of fade kind 3
 extern "C" char DAT_104c033c;                             // non-zero = always track 0
+extern "C" BgmTrack DAT_108db358[0x41];
 extern "C" char DAT_108db428[];                           // file extension of the sound files
+extern "C" SoundDef DAT_108dc158[];
 extern "C" Vec4 DAT_10c67f40;                             // listener position (scaled)
 extern "C" Vec4 DAT_10c67fe0;                             // listener direction
 extern "C" Vec4 DAT_10f08a00[10];                         // position of the sound

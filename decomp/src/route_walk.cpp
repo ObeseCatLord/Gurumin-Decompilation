@@ -13,7 +13,7 @@
 #include "char_state.h"
 
 extern "C" CharMoveLock DAT_10db9380[0x80];
-extern "C" StepRecord DAT_10802c08[0x80];
+#include "char_tables.h"
 #include "char_vars.h"
 
 extern "C" Vec4 *DAT_1032d5b8[];                 // positions of the characters moved by routes

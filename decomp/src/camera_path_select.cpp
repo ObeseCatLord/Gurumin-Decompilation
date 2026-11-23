@@ -77,7 +77,6 @@ extern "C" int FUN_1016b050(int id)
 
 #include "node.h"
 
-extern "C" PathSettings DAT_10ff17e0[];
 
 // 0x1016ac90 (Camera_CollectPaths). Adds every camera path below `node` (kind 2, name not ending in 'b') to the
 // path tables at *count: the path id is the last character of its name (atol), the camera track comes from the

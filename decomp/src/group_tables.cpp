@@ -6,7 +6,6 @@
 
 #include "formation.h"
 
-extern "C" Formation DAT_1049efdc[6];
 extern "C" int DAT_102199b8[0x5c];  // per-character group timers
 
 #include "matrix4.h"

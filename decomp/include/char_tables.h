@@ -9,16 +9,27 @@
 #define CHAR_SLOT_COUNT 0x80
 #endif
 
+#include "face_set.h"
+#include "kind_counter.h"
 #include "matrix4.h"
+#include "move_limit.h"
+#include "step_record.h"
 #include "vec4.h"
 
 struct Node;   // node.h
 
 extern "C" short DAT_1020b128[CHAR_SLOT_COUNT];           // switch animation frame
 extern "C" int DAT_1020b230[CHAR_SLOT_COUNT];             // kind variant (the kind's ten-thousands)
+extern "C" KindCounter DAT_1020b410[CHAR_SLOT_COUNT];     // cooldown of kind 0x69
+extern "C" KindCounter DAT_1020b454[CHAR_SLOT_COUNT];     // cooldown of kind 0x3f
+extern "C" KindCounter DAT_1020b46c[CHAR_SLOT_COUNT];     // cooldown of kind 0x43
+extern "C" KindCounter DAT_1020b498[CHAR_SLOT_COUNT];     // cooldown of kind 0x64
+extern "C" KindCounter DAT_1020b49c[CHAR_SLOT_COUNT];     // cooldown of kind 0x46
+extern "C" KindCounter DAT_1020b4b4[CHAR_SLOT_COUNT];     // cooldown of kind 0x2d
 extern "C" char DAT_1020d540[CHAR_SLOT_COUNT];            // 1 = the character is in play (char_retire.cpp clears it); per zone character: also hurt enemies that are away
 extern "C" int DAT_1020e138[CHAR_SLOT_COUNT];
 extern "C" int DAT_10210b30[CHAR_SLOT_COUNT];             // non-zero = told to react
+extern "C" MoveLimit DAT_102110b0[CHAR_SLOT_COUNT];
 extern "C" int DAT_10218fc0[CHAR_SLOT_COUNT];
 extern "C" short DAT_102191c0[CHAR_SLOT_COUNT];
 extern "C" int DAT_10219770[CHAR_SLOT_COUNT];             // effect handle of each character slot
@@ -74,10 +85,12 @@ extern "C" int DAT_104679a0[CHAR_SLOT_COUNT];
 extern "C" char DAT_10468730[CHAR_SLOT_COUNT];
 extern "C" int DAT_104bf8f8[CHAR_SLOT_COUNT];             // 1 while a key prompt is shown over the character; key prompt shown per character (app_0008.cpp)
 extern "C" Vec4 DAT_104c4438[CHAR_SLOT_COUNT];            // where a wave enemy came in
+extern "C" StepRecord DAT_10802c08[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10836fc8[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10837fc8[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10864cf8[CHAR_SLOT_COUNT];            // ground point found below each slot
 extern "C" Matrix4 DAT_10868838[CHAR_SLOT_COUNT][6];      // character 0: [0] = the matrix the sparkle follows; saved node matrices of each character
+extern "C" FaceSet DAT_1087664c[CHAR_SLOT_COUNT];
 extern "C" Vec4 DAT_10f08080[CHAR_SLOT_COUNT];            // each character's offset from the reference position
 extern "C" Node *DAT_11b002d0[CHAR_SLOT_COUNT];           // the cached models
 extern "C" char DAT_11b004d0[CHAR_SLOT_COUNT][0x80];      // their file names

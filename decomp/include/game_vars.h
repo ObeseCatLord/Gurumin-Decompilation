@@ -4,6 +4,8 @@
 #ifndef GURUMIN_GAME_VARS_H
 #define GURUMIN_GAME_VARS_H
 
+#include "app_0008.h"
+#include "game_reset.h"
 #include "matrix4.h"
 #include "vec4.h"
 
@@ -397,6 +399,7 @@ extern "C" int DAT_104c037c;
 extern "C" int DAT_104c03dc;
 extern "C" Matrix4 DAT_1065ca08[4];
 extern "C" Vec4 DAT_1065cb08;
+extern "C" EmptyObject DAT_1065cb28;
 extern "C" Vec4 DAT_108029a8;
 extern "C" float DAT_108029bc;
 extern "C" float DAT_108029c0;
@@ -404,6 +407,7 @@ extern "C" Vec4 DAT_10802bd8;
 extern "C" int DAT_108360f8;                              // texture slot of the save thumbnail
 extern "C" Vec4 DAT_1083631c;
 extern "C" Vec4 DAT_10836c84;
+extern "C" SmallRecord DAT_10860de8[0x40];
 extern "C" int DAT_10c62edc[0x1000];                      // script flags
 extern "C" int DAT_10c66144[15];
 extern "C" int DAT_10c66590;
@@ -423,6 +427,7 @@ extern "C" int DAT_10db9368;
 extern "C" Vec4 DAT_10edbd38;
 extern "C" Vec4 DAT_10edbdd8;
 extern "C" Vec4 DAT_10edbde8;
+extern "C" MeshHolder DAT_10edbe0c[0x40];
 extern "C" Vec4 DAT_10f08d1c;
 extern "C" char DAT_10f60590[];                           // save directory prefix, e.g. "SaveData\\"
 extern "C" int DAT_10f654b4;

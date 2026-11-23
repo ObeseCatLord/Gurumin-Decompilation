@@ -4,6 +4,7 @@
 #ifndef GURUMIN_UI_VARS_H
 #define GURUMIN_UI_VARS_H
 
+#include "item_caption.h"
 #include "matrix4.h"
 
 struct Node;   // node.h
@@ -58,6 +59,8 @@ extern "C" int DAT_104c03e8;                              // non-zero in the sec
 extern "C" char DAT_1065cb30;                             // a key of the current input frame (DemoRecording::buttons_now[4])
 extern "C" Matrix4 DAT_1086df38;                          // the player's world matrix; viewer matrix
 extern "C" char DAT_10875e48[0x40][0x20];                 // movie names
+extern "C" ItemName DAT_1088e670[];
+extern "C" ItemText DAT_108f667c[];
 extern "C" int DAT_10c64a5c;
 extern "C" int DAT_10f1bef0[];                            // per game button: what it is mapped to (0 = default)
 extern "C" int DAT_10f60c30[];                            // per game button: the key it is mapped to (0 = default)

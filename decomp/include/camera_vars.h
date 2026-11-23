@@ -4,6 +4,7 @@
 #ifndef GURUMIN_CAMERA_VARS_H
 #define GURUMIN_CAMERA_VARS_H
 
+#include "camera_path_select.h"
 #include "key_track.h"
 #include "node.h"
 #include "vec4.h"
@@ -18,10 +19,10 @@ extern "C" float DAT_10203454;
 extern "C" float DAT_10203458;
 extern "C" float DAT_1020345c;
 extern "C" float DAT_10203460;
-extern "C" Node *DAT_1021c624;                             // a node the target goal drifts towards (0 = none)
+extern "C" Node *DAT_1021c624;                            // a node the target goal drifts towards (0 = none)
 extern "C" int DAT_104c0358;                              // 1 once the camera vectors were set up
 extern "C" int DAT_104c035c;                              // frames left in the camera shift (0 = none)
-extern "C" Node *DAT_104c039c;                             // the node the camera follows (0 = none)
+extern "C" Node *DAT_104c039c;                            // the node the camera follows (0 = none)
 extern "C" Vec4 DAT_104d29d8;                             // the position of the previous frame
 extern "C" Vec4 DAT_10802be8;                             // the position goal of a camera shift
 extern "C" Vec4 DAT_108393d8;                             // the point the camera orbits (w: its heading)
@@ -52,6 +53,7 @@ extern "C" char DAT_10fabe8c;
 extern "C" int DAT_10fdeb10[];                            // 1 = has a "...b" node
 extern "C" int DAT_10fe01d0;
 extern "C" int DAT_10feb3d8;
+extern "C" PathSettings DAT_10ff17e0[];
 extern "C" int DAT_10ff19e0;
 extern "C" int DAT_10ff1df0;                              // 1 = the effect is on
 extern "C" int DAT_10ff2ff0;

@@ -50,9 +50,7 @@ struct TextRenderer
 
 
 
-extern "C" ItemName DAT_1088e670[];
 
-extern "C" ItemText DAT_108f667c[];
 
 extern "C" ItemInfo DAT_1088e6b0[];
 

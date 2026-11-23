@@ -19,7 +19,6 @@ extern "C" int FUN_100016c0(const char *file, const int *x, const int *y, const 
 
 #include "sound_def.h"
 
-extern "C" SoundDef DAT_108dc158[];
 
 // 0x1003ac20 (Sound_PlayWav). Plays "wav\<name>.<extension>" at `position` (0 = not positional) unless sound
 // effects are off. The volume is scaled first: by 0.8 for positional sounds when DAT_104bfe6c is set, otherwise by

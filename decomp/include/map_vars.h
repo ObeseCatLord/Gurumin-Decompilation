@@ -4,6 +4,7 @@
 #ifndef GURUMIN_MAP_VARS_H
 #define GURUMIN_MAP_VARS_H
 
+#include "formation.h"
 #include "matrix4.h"
 #include "vec4.h"
 
@@ -34,6 +35,7 @@ extern "C" int DAT_1032d868;                              // number of listed pa
 extern "C" int DAT_1042dea8[0x5c];                        // per-character group numbers (characters 0..0x5b)
 extern "C" Node *DAT_1049ef90[0x8];                       // alpha-pass nodes: the "Q" node of each listed part
 extern "C" int DAT_1049efd8[0x3c];
+extern "C" Formation DAT_1049efdc[6];
 extern "C" float DAT_1049f3dc[][16][16];                  // height samples per object, 25 units apart (-200 = none)
 extern "C" int DAT_104bfdb4;                              // the ground object nearest to the player
 extern "C" Node *DAT_104c007c;                            // the water surface node; the map's model

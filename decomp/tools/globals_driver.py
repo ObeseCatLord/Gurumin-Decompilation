@@ -126,6 +126,8 @@ def collect():
     decls = collections.defaultdict(list)
     for path in sorted(glob.glob(os.path.join(SRC, "*.cpp"))):
         name = os.path.basename(path)
+        if name in SKIP_FILES:
+            continue                                    # its globals stay local (see SKIP_FILES)
         for line in open(path, "rb").read().split(b"\n"):
             line = line.rstrip(b"\r")
             if not line.startswith(b'extern "C"') or b"(" in line.split(b"//")[0]:

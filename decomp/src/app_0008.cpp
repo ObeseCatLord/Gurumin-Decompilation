@@ -9,7 +9,6 @@
 
 #include "char_tables.h"
 
-extern "C" MeshHolder DAT_10edbe0c[0x40];
 extern "C" int DAT_1020247c[8];
 
 // Releases and frees the owned mesh node and clears the two counters. Returns 1.

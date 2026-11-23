@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.6646,
+  "fuzzy_match_percent": 14.6643,
   "total_code": "1720206",
   "matched_code": "199043",
   "matched_code_percent": 11.5709,
@@ -16,10 +16,10 @@
   "complete_data_percent": 0.0,
   "total_units": 250,
   "complete_units": 147,
-  "matched_rules_code": "80520",
-  "matched_rules_code_percent": 4.6808,
-  "matched_rules_functions": 312,
-  "matched_rules_functions_percent": 25.7426
+  "matched_rules_code": "81969",
+  "matched_rules_code_percent": 4.7651,
+  "matched_rules_functions": 322,
+  "matched_rules_functions_percent": 26.5677
  },
  "units": [
   {
@@ -1761,10 +1761,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "432",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 7,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -8243,7 +8243,7 @@
   {
    "name": "app/map_enter_reset",
    "measures": {
-    "fuzzy_match_percent": 95.8022,
+    "fuzzy_match_percent": 95.4291,
     "total_code": "1069",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -8268,14 +8268,14 @@
     {
      "name": ".text",
      "size": "1069",
-     "fuzzy_match_percent": 95.8022
+     "fuzzy_match_percent": 95.4291
     }
    ],
    "functions": [
     {
      "name": "_FUN_10023900",
      "size": "1069",
-     "fuzzy_match_percent": 95.8022,
+     "fuzzy_match_percent": 95.4291,
      "metadata": {
       "virtual_address": "268581120"
      }
@@ -10565,10 +10565,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "312",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -14045,10 +14045,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "705",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 2,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {

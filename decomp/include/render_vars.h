@@ -6,8 +6,11 @@
 
 #include "d3d9_min.h"
 #include "matrix4.h"
+#include "model_def.h"
 #include "vec4.h"
 
+struct FadeNode;   // node_fade.h
+struct FadeOwner;   // node_fade.h
 struct IUnknownLike;   // com_min.h
 struct MeshData;   // mesh.h
 struct Node;   // node.h
@@ -29,6 +32,8 @@ extern "C" int DAT_1020343c;                              // lens flares switche
 extern "C" int DAT_10203474;
 extern "C" int DAT_10203478;
 extern "C" int DAT_1020347c;
+extern "C" FadeNode *DAT_1021a1e0[];                      // the nodes
+extern "C" FadeOwner *DAT_10254ac0[];                     // owner of each node (0 = none)
 extern "C" int DAT_104b7224;                              // texture slot of the iris wipe
 extern "C" int DAT_104bfe68;
 extern "C" int DAT_104bfeb0;
@@ -41,6 +46,7 @@ extern "C" int DAT_104c0314;                              // "DAT" source of the
 extern "C" int DAT_104c03b0;                              // number of fading nodes
 extern "C" float DAT_104c03ec;                            // opening progress of the overlay mode
 extern "C" Vec4 DAT_10868818;                             // saved player velocity
+extern "C" ModelDef DAT_10b314c4[];
 extern "C" int DAT_10c636c4;
 extern "C" int DAT_10c652cc;                              // "DAT" source of the player for the other kinds
 extern "C" Vec4 DAT_10c66edc;                             // overlay camera position

@@ -9,7 +9,6 @@
 
 #include "char_slot.h"
 
-extern "C" ModelDef DAT_10b314c4[];
 #include "render_vars.h"
 
 // 0x10012220 (Model_ApplyCommands). Applies the commands of a model definition to a character's scene owner: with

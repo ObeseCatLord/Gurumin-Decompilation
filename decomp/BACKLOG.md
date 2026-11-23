@@ -31,6 +31,8 @@ retype those members first.
    Status 2026-11-22: done for these and for TextureObject/MeshInstance, the effect tables (effect_manager.h),
    CharSlot (char_slot.h, at DAT_10daaae8) and the CharState `words[k]` users.
 3. Move the `extern "C"` globals into headers next to their owner type, one declaration each.
+   Status 2026-11-22: done by `tools/globals_driver.py` for 1069 globals (char_tables.h + eight *_vars.h headers);
+   122 held per file (type/size conflicts, file-local types; `globals_driver.py plan` lists them), see HANDOFF.
 4. Teach `build_all.py` to report "matched under the rules" (no per-file type or global declarations in the
    function's file) next to the byte count.
 

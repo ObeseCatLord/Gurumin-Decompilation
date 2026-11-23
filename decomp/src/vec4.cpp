@@ -618,7 +618,7 @@ int KeyBank::Sample(int frame, float *x, float *y, float *z, float *w, int rotat
         return 1;
     }
 
-    unsigned int keyFlags = flags[AT_LEAST_FIRST(i)];
+    int keyFlags = flags[AT_LEAST_FIRST(i)];
     int linear = (keyFlags >> 2) & 1;     // KEY_FLAG_MOTION
     if (keyFlags & KEY_FLAG_HOLD)
     {
@@ -639,15 +639,19 @@ int KeyBank::Sample(int frame, float *x, float *y, float *z, float *w, int rotat
         return 1;
     }
 
-    // Spline through keys i - 2 .. i + 1, clamped to the first and last key.
-    float t = (float)offset / (float)span;
-    *x = Spline(t, values[AT_LEAST_FIRST(i - 2)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
+    // Spline through keys i - 2 .. i + 1, clamped to the first and last key. The blend factor is written inside
+    // each call (cl 13.00 evaluates it once, after the key indices); a separate `t` statement makes it convert
+    // `offset` before the linear/spline branch instead.
+#define SPLINE_T ((float)offset / (float)span)
+    *x = Spline(SPLINE_T,
+                values[AT_LEAST_FIRST(i - 2)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
                 values[AT_MOST_LAST(i + 1, count - 1)].x);
-    *y = Spline(t, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
+    *y = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
                 values[AT_MOST_LAST(i + 1, count - 1)].y);
-    *z = Spline(t, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
+    *z = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
                 values[AT_MOST_LAST(i + 1, count - 1)].z);
-    *w = Spline(t, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
+    *w = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
                 values[AT_MOST_LAST(i + 1, count - 1)].w);
+#undef SPLINE_T
     return 1;
 }

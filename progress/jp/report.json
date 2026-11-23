@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.7808,
+  "fuzzy_match_percent": 14.9579,
   "total_code": "1720206",
-  "matched_code": "199908",
-  "matched_code_percent": 11.6212,
+  "matched_code": "202954",
+  "matched_code_percent": 11.7982,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 790,
-  "matched_functions_percent": 65.1815,
+  "matched_functions": 793,
+  "matched_functions_percent": 65.429,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 251,
-  "complete_units": 147,
-  "matched_rules_code": "107403",
-  "matched_rules_code_percent": 6.2436,
-  "matched_rules_functions": 489,
-  "matched_rules_functions_percent": 40.3465
+  "total_units": 252,
+  "complete_units": 148,
+  "matched_rules_code": "110449",
+  "matched_rules_code_percent": 6.4207,
+  "matched_rules_functions": 492,
+  "matched_rules_functions_percent": 40.5941
  },
  "units": [
   {
@@ -7008,6 +7008,68 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/helmet_face.cpp"
+   }
+  },
+  {
+   "name": "app/hud_digits",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "3046",
+    "matched_code": "3046",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 3,
+    "matched_functions": 3,
+    "matched_functions_percent": 100.0,
+    "complete_code": "3046",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1,
+    "matched_rules_code": "3046",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 3,
+    "matched_rules_functions_percent": 100.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "3046",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10012990",
+     "size": "1006",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268511632"
+     }
+    },
+    {
+     "name": "_FUN_10012d90",
+     "size": "1028",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268512656"
+     }
+    },
+    {
+     "name": "_FUN_100131b0",
+     "size": "1012",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268513712"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/hud_digits.cpp"
    }
   },
   {
@@ -17102,13 +17164,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1432687",
+    "total_code": "1429641",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 265,
+    "total_functions": 262,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -17125,7 +17187,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1432687",
+     "size": "1429641",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -17216,30 +17278,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268506400"
-     }
-    },
-    {
-     "name": "FUN_10012990",
-     "size": "1006",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268511632"
-     }
-    },
-    {
-     "name": "FUN_10012d90",
-     "size": "1028",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268512656"
-     }
-    },
-    {
-     "name": "FUN_100131b0",
-     "size": "1012",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268513712"
      }
     },
     {

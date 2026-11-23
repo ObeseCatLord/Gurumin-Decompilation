@@ -28,7 +28,7 @@ WorldRenderer::WorldRenderer()
     for (int i = 0; i < 0x20; i++)
     {
         m_e7c38[i][0] = 0;
-        m_14109c[i] = 0;
+        pictureKind[i] = 0;
         textures[i] = -1;
         m_05bac[i] = 0;
         m_4f668[i][0] = 0;
@@ -73,7 +73,7 @@ int WorldRenderer::Bind(AnimModel *models, void *mapRoot, int *state, WorldCallb
         for (int j = 0; j < 0x10; j++)
             m_039ac[i][j][0] = 0;
         m_e7c38[i][0] = 0;
-        m_14109c[i] = 0;
+        pictureKind[i] = 0;
         textures[i] = -1;
         m_05bac[i] = 0;
         m_4f668[i][0] = 0;
@@ -189,7 +189,7 @@ int WorldRenderer::LoadCharacter(const char *path)
         m_39ee8[i] = 0;
         m_3a068[i] = 0;
         textures[i] = -1;
-        m_14109c[i] = 0;
+        pictureKind[i] = 0;
         m_4f668[i][0] = 0;
     }
     for (int i = 0; i < 0x80; i++)

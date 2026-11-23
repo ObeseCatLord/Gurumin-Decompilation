@@ -35,8 +35,6 @@ enum DebugShape
 #define SKELETON_BONE_SIZE 2.0f
 // Side of the cube drawn for a bounding sphere of radius 1 (a bit more than 1 / sqrt(3)).
 #define SPHERE_CUBE_SCALE 0.578f
-// Render command 9 (FUN_1013f070): switched off around nodes with NODE_FLAG_NO_STATE_9.
-#define RENDER_STATE_9 9
 
 // 0x10199e20 (Node::QueueDraw). Draws this node tree with the light set `lights` under `parent`, seen through
 // `view`: a node is drawn when its flags are 0 or share a bit with `passMask` (and it has NODE_FLAG_HIGHLIGHT_PASS
@@ -133,10 +131,10 @@ int Node::QueueDraw(const Matrix4 *parent, const Matrix4 *view, const void *ligh
                     mesh->SetRange(first, last);
                     FUN_1013f070(RENDER_TEXTURE_ADDRESS, TEXTURE_ADDRESS_WRAP, 0);
                     if (flags & NODE_FLAG_NO_STATE_9)
-                        FUN_1013f070(RENDER_STATE_9, 0, 0);
+                        FUN_1013f070(RENDER_DEPTH_WRITE, 0, 0);
                     mesh->DrawLit(&worldMatrix, view, drawMode, lights, &(*colour * tint), &(*addColour + m_02bc));
                     if (flags & NODE_FLAG_NO_STATE_9)
-                        FUN_1013f070(RENDER_STATE_9, 1, 0);
+                        FUN_1013f070(RENDER_DEPTH_WRITE, 1, 0);
                     if (DAT_11b044f4 != 0)
                         mesh->M_10146db0(&worldMatrix, view, box);
                 }

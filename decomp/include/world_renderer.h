@@ -14,6 +14,28 @@ struct AnimModel;
 // Host notification callback of the world (codes such as 0x5e0 on release, 9999 when a character is loaded).
 typedef int (*WorldCallback)(int code, int value);
 
+// Number of picture slots (WorldRenderer::picture*).
+#define PICTURE_COUNT 0x20
+
+// What a picture shows (WorldRenderer::pictureKind).
+enum PictureKind
+{
+    PICTURE_TEXTURE = 0,         // its texture slot with its own texture rectangle
+    PICTURE_SCREEN = 1,          // the screen copy, a 2-texel border cut off
+    PICTURE_SCREEN_FLIPPED = 2,  // the screen copy upside down, a 2-texel border cut off
+    PICTURE_SCREEN_EXACT = 3     // the screen copy with half-texel edges
+};
+
+// How a picture is blended (WorldRenderer::pictureBlend).
+enum PictureBlend
+{
+    PICTURE_BLEND_ALPHA = 0,     // BLEND_ALPHA
+    PICTURE_BLEND_ADD = 1,       // BLEND_ADD
+    PICTURE_BLEND_MULTIPLY = 2,  // BLEND_MULTIPLY
+    PICTURE_BLEND_SHADOWED = 3,  // drawn twice: darkened 2 pixels down and right, then added on top
+    PICTURE_BLEND_DARKEN = 4     // BLEND_DARKEN
+};
+
 struct WorldRenderer
 {
     Matrix4 m_00000;
@@ -121,18 +143,29 @@ struct WorldRenderer
     char barsFull;                                   // 0x13fdd8: non-zero = show the cinema bars fully at once
     char pad_13fdd9[0x3];
     int textures[0x20];                              // 0x13fddc: texture slots used by the map (-1 = none)
-    char pad_13fe5c[0x180];
-    Vec4 m_13ffdc[0x20];
+    // The 0x20 pictures (2D images placed by the scripts, drawn by DrawPictures 0x10167440): a picture shows a
+    // texture slot (`textures`) or, for a non-zero kind, the copy of the screen (`screenTexture`).
+    float pictureAlpha[0x20];                        // 0x13fe5c: opacity of each picture
+    char pad_13fedc[0x100];
+    Vec4 pictureUVs[0x20];                           // 0x13ffdc: texture rectangle u0, v0, u1, v1 (kind 0)
     Vec4 m_1401dc[0x20];
-    char pad_1403dc[0x380];
-    Vec4 m_14075c[0x20];
+    char pad_1403dc[0x80];
+    float pictureAngle[0x20];                        // 0x14045c: rotation of each picture
+    char pad_1404dc[0x100];
+    float pictureGrey[0x20];                         // 0x1405dc: grey level of the specular colour (0..1)
+    char pad_14065c[0x100];
+    Vec4 picturePositions[0x20];                     // 0x14075c: centre (640x480 screen, or world when in-world)
     Vec4 m_14095c[0x20];
     char pad_140b5c[0x80];
-    Vec4 m_140bdc[0x20];
+    Vec4 pictureSizes[0x20];                         // 0x140bdc: width (x) and height (y) on the 640x480 screen
     Vec4 m_140ddc[0x20];
-    char pad_140fdc[0xc0];
-    char m_14109c[0x20];
-    char pad_1410bc[0xc];
+    char pad_140fdc[0x80];
+    char pictureInWorld[0x20];                       // 0x14105c: non-zero = placed in the world (not drawn here)
+    char pictureBlend[0x20];                         // 0x14107c: PictureBlend
+    char pictureKind[0x20];                          // 0x14109c: PictureKind
+    int screenTexture;                               // 0x1410bc: texture slot holding the copy of the screen
+    int screenWidth;                                 // 0x1410c0: width of the screen copy in texels
+    int screenHeight;                                // 0x1410c4: height of the screen copy in texels
     int m_1410c8;
     int notifyPending;                               // 0x1410cc: a 0x5e0 notification must be sent on release
     WorldRenderer();
@@ -146,6 +179,7 @@ struct WorldRenderer
     int Release();
     int Seek(int target);                    // 0x10189000
     void DrawOverlay();
+    void DrawPictures(const Matrix4 &view);  // 0x10167440 (world_pictures.cpp)
 };
 
 extern "C" WorldRenderer DAT_10c68000;  // the world

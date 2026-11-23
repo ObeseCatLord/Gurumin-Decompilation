@@ -101,11 +101,11 @@ int Node::BuildMesh(Vertex *vertices, int *indices, int count)
 
     // Copy each triangle into its material's pack.
     for (i = 0; i < count; i += 3) {
-        Vertex *first = &vertices[indices[i]];
-        material = (int)first->sourceMaterial;
+        int vertex = indices[i];   // the triangle's first vertex
+        material = (int)vertices[vertex].sourceMaterial;
         int pack = packOfMaterial[material];
         int fill = packFill[material];
-        packs[pack].vertices[fill] = *first;
+        packs[pack].vertices[fill] = vertices[vertex];
         indexLists[pack].indices[fill] = fill;
         packs[pack].vertices[fill + 1] = vertices[indices[i + 1]];
         indexLists[pack].indices[fill + 1] = fill + 1;

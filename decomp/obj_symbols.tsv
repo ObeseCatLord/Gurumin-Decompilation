@@ -497,3 +497,4 @@ _FUN_101426d0@8	101426d0
 ?BuildMesh@Node@@QAEHPAUVertex@@PAHH@Z	101a82d0
 ?AllocPackHeaders@Node@@QAEPAUVertexPack@@H@Z	1019c320
 ?AllocIndexLists@Node@@QAEPAUIndexList@@H@Z	1019c360
+?DrawPictures@WorldRenderer@@QAEXABUMatrix4@@@Z	10167440

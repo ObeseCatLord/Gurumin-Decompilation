@@ -11,15 +11,19 @@ enum RenderCommand
     RENDER_TEXTURE_ADDRESS = 2,  // value = texture addressing of stage 0 (RenderTextureAddress)
     RENDER_CLEAR = 4,         // clears the target and the depth buffer to colour `value` (ARGB)
     RENDER_FLUSH_SCENE = 6,   // ends the current scene and begins a new one
-    RENDER_CULL_MODE = 10     // value = RenderCullMode
+    RENDER_DEPTH_WRITE = 9,   // value 0/1: D3DRS_ZWRITEENABLE off/on
+    RENDER_CULL_MODE = 10,    // value = RenderCullMode
+    RENDER_DEPTH_TEST = 12    // value 0/1: D3DRS_ZENABLE off/on
 };
 
 // Blend modes of RENDER_BLEND_MODE (the D3DRS_SRCBLEND / D3DRS_DESTBLEND pairs they set).
 enum RenderBlendMode
 {
     BLEND_ALPHA = 0,          // source alpha / inverse source alpha (the default)
+    BLEND_ADD = 1,            // source alpha / one: added to the target
     BLEND_MULTIPLY = 2,       // zero / source colour: the target is multiplied by the source (shadows)
-    BLEND_BLACK = 3           // zero / zero: whatever is drawn writes black (shadow silhouettes)
+    BLEND_BLACK = 3,          // zero / zero: whatever is drawn writes black (shadow silhouettes)
+    BLEND_DARKEN = 10         // zero / inverse source colour: the target darkened by the source colour
 };
 
 // Texture addressing of RENDER_TEXTURE_ADDRESS (D3DSAMP_ADDRESSU/V of stage 0).

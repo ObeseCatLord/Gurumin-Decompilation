@@ -10,6 +10,7 @@
 
 
 #include "node.h"
+#include "map_vars.h"
 #include "anim_model.h"
 #include "char_state.h"
 
@@ -44,7 +45,6 @@ int Node::UpdateVisibleCells()
     }
     return 0;
 }
-extern "C" Node *DAT_10255f08;
 
 // 1 when `pos` lies in a currently visible cell (or the map has no visibility data), else 0. Used to skip
 // updating or drawing objects that cannot be seen.

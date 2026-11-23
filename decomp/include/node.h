@@ -249,6 +249,20 @@ struct Node
 
     // Collision
     int Collide(int a, int b, Vec4 *position, Vec4 *velocity, Vec4 *hit);  // 0x101a8e60
+    // 0x101a9670: casts the segment against the nodes called `name` (0 = all) whose kind and mask match; writes
+    // the nearest hit point and, when `t` is given, its position along the segment. Returns 1 on a hit.
+    int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,
+                float *t);
+    // 0x101aaa20: casts the segment `from`-`to` against the collision of the nodes called `name` (0 = all) with
+    // the given mask; the nearest hit point goes to `hit` and, when `t` is given, its position along the segment.
+    int CastSegment(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
+    // 0x101aa080: same arguments and result as CastSegment (a second variant of the same search).
+    int CastSegment2(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
+    // 0x101a1640: tests a sphere of `radius` at `point` (in `matrix` space) against the collision below this node,
+    // skipping nodes not called `name` (0 = any) and nodes called `excludeName`; the hit normal goes to `normal`
+    // and the penetration value to `depth`. Returns 1 on a hit.
+    int Query(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, float *depth, const char *name,
+              const char *excludeName);
     int SpheresOverlap(const Vec4 *boundsA, const Vec4 *offsetA, const Vec4 *boundsB, const Vec4 *offsetB,
                        Vec4 *aToB, Vec4 *bToA);           // 0x10193060 (node_spheres.cpp)
     int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);  // 0x1019f210

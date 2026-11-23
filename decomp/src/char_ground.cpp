@@ -1,6 +1,8 @@
 // Putting a character on the ground below it. The character records are viewed from their model part at
 // 0x10db6ee8 (like char_move.cpp).
 
+#include "node.h"
+#include "map_vars.h"
 #include "vec4.h"
 
 #include "matrix4.h"
@@ -9,14 +11,6 @@
 
 #include "model_bank.h"
 
-struct CollisionWorld
-{
-    // 0x101aaa20 (collide_query.cpp): casts the segment `from`-`to` against the collision of the nodes called `name`
-    // (0 = all) with the given mask; the nearest hit point goes to `hit`. Returns 1 on a hit.
-    int CastSegment(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
-};
-
-extern "C" CollisionWorld *DAT_10255f08;
 #include "char_tables.h"
 #include "char_vars.h"
 

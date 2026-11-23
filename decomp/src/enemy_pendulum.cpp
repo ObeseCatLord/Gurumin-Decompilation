@@ -8,6 +8,7 @@
 Matrix4 RotationY(float angle);                  // 0x101b1bb0
 
 #include "node.h"
+#include "map_vars.h"
 
 #include "anim_model.h"
 
@@ -25,16 +26,10 @@ struct LastPosition
 
 #include "char_slot.h"
 
-struct CollisionWorld
-{
-    int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
-};
-
 extern "C" LastPosition DAT_10802bf8[0x80];
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" CollisionWorld *DAT_10255f08;
 extern "C" int FUN_100241e0(int index, float x, float y, float z);   // Character_SetMove
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 

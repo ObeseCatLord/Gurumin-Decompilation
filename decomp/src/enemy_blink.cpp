@@ -2,6 +2,8 @@
 // hidden far away until the player comes near its home, picks a random spot around the home that it can stand on
 // and slides into place while fading in.
 
+#include "node.h"
+#include "map_vars.h"
 #include "vec4.h"
 
 #include "matrix4.h"
@@ -22,20 +24,9 @@ struct LastPosition
 
 struct VisData;
 
-// The map's collision node (world.h), only what is used here.
-struct CollisionWorld
-{
-    int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
-    int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,
-                float *t);                                              // 0x101a9670
-    char pad_0000[0x1864];
-    VisData *vis;             // 0x1864: visibility cells (0 = none)
-};
-
 extern "C" LastPosition DAT_10802bf8[0x80];
 #include "char_tables.h"
 
-extern "C" CollisionWorld *DAT_10255f08;
 extern "C" int FUN_1013f880(void);            // the game's random number
 extern "C" int FUN_10015860(Vec4 pos);        // Vis_IsVisible
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
@@ -87,7 +78,7 @@ extern "C" int FUN_10046f10(int index)
                         if ((spot - probe).LengthSquared3() < 250000.0f)
                             continue;
                     }
-                    if (DAT_10255f08 != 0 && DAT_10255f08->vis != 0 && FUN_10015860(spot) == 0)
+                    if (DAT_10255f08 != 0 && DAT_10255f08->visibilityCells != 0 && FUN_10015860(spot) == 0)
                         continue;
                 }
                 DAT_10db6ee8[index].SetPosition(probe.x, probe.y, probe.z);

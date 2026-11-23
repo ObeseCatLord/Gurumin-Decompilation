@@ -22,7 +22,6 @@ extern "C" int FUN_1001fff0(Node *root, int a, int b, Vec4 *position, Vec4 *velo
 #include "collide_regions.h"
 
 
-extern "C" Node *DAT_10255f08;          // the world's root node
 extern "C" MarkerOwner *DAT_104c03ac;
 #include "map_vars.h"
 

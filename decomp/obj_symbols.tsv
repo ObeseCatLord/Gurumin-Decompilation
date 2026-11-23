@@ -72,7 +72,7 @@
 ??0Matrix4@@QAE@XZ	101ae770
 ??1Matrix4@@QAE@XZ	1013eda0
 ?Query@CollisionWorld@@QAEHPAUMatrix4@@PAUVec4@@H1PAHHH@Z	101a1640
-?Collision_ProbePoint@@YAHMMMH@Z	1000ff80
+?Collision_ProbePoint@@YAHMMMM@Z	1000ff80
 ?AdvanceFrame@WorldRenderer@@QAEHXZ	10189080
 ?M_1017cc90@WorldRenderer@@QAEHH@Z	1017cc90
 ?Rebuild@Node@@QAEHXZ	101ac1a0

@@ -1,16 +1,12 @@
 // Shots fired by characters. Each character slot `owner` has six helper slots owner+2 .. owner+7 that its shots
 // use; a helper slot is free while its state (CharState::m_0000) is 0.
+#include "node.h"
+#include "map_vars.h"
 #include "world.h"
 
 #include "vec4.h"
 #include "anim_model.h"
 #include "char_state.h"
-
-// The world collision (scene root node); see collide_query.cpp.
-struct CollisionWorld
-{
-    int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
-};
 
 #include "slot_position.h"
 #include "slot_motion.h"
@@ -19,7 +15,6 @@ struct CollisionWorld
 extern "C" SlotPosition DAT_10802bf8[0x80];
 extern "C" SlotMotion DAT_10255160[0x80];
 extern "C" int FUN_1013f880(void);  // the game's random number
-extern "C" CollisionWorld *DAT_10255f08;
 #include "char_vars.h"
 
 // 0x1001a680 (Char_FireShot). Starts a shot of character `owner` from `position` in the first free helper slot:

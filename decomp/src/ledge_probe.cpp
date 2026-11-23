@@ -1,6 +1,8 @@
 // Looking for a ledge or wall beside a character (0x10050df0, called by 0x1006be40): the ground below it, a wall to
 // its side and the ground beyond that wall.
 
+#include "node.h"
+#include "map_vars.h"
 #include <math.h>
 
 #include "vec4.h"
@@ -9,14 +11,6 @@
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-struct CollisionWorld
-{
-    int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,
-                float *t);                                              // 0x101a9670
-    int CastSegment(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);   // 0x101aaa20
-};
-
-extern "C" CollisionWorld *DAT_10255f08;
 extern "C" int FUN_100248e0(Vec4 position, Vec4 *ground, float height);     // Collision_ProbeDown
 
 // 0x10050df0 (Char_ProbeSideLedge). Casts down from character `index` for the ground (*ground; *drop = its depth

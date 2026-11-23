@@ -6,16 +6,10 @@
 #include "matrix4.h"
 
 #include "node.h"
-
-// The world collision (scene root node); see collide_normals.cpp.
-struct CollisionWorld
-{
-    int Query(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, int *hitId, int a, int b);  // 0x101a1640
-};
+#include "map_vars.h"
 
 #include "char_vars.h"
 
-extern "C" CollisionWorld *DAT_10255f08;
 
 // 0x1001af10 (Shaga_PushOut). Moves shaga model `index` out of the world collision: its centre (the placement raised
 // by its radius) is tested as a sphere of radius + 1, and while it hits something it is moved 5 units along the hit
@@ -26,7 +20,7 @@ int Shaga_PushOut(int index)
     int steps = 0;
     Vec4 position;
     Vec4 normal;
-    int hitId;
+    float depth;
     identity.SetIdentity();
     position.Copy(DAT_10446e00[index]->matrix.GetTranslation());
     position.z += DAT_1030cd98[index];
@@ -34,7 +28,7 @@ int Shaga_PushOut(int index)
     {
         if (DAT_10255f08 == 0)
             break;
-        if (DAT_10255f08->Query(&identity, &position, DAT_1030cd98[index] + 1.0f, &normal, &hitId, 0, 0) == 0)
+        if (DAT_10255f08->Query(&identity, &position, DAT_1030cd98[index] + 1.0f, &normal, &depth, 0, 0) == 0)
             break;
         normal.Normalized3();
         normal.Copy(normal * 5.0f);

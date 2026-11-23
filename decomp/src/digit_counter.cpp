@@ -3,12 +3,12 @@
 // game's spelling) or, while a digit turns over, "to0ne" .. "toZaro". The counter follows script flag 0x9c2.
 
 #include "node.h"
+#include "map_vars.h"
 
 #include "game.h"
 
 #include "char_state.h"
 
-extern "C" Node *DAT_10255f08;                       // the counter model
 extern "C" int DAT_104bf8a4;                         // frames of a digit motion
 #include "game_vars.h"
 

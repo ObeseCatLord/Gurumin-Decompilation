@@ -1,17 +1,12 @@
 // Whether a character can see a point: within a range (heights count 2.5 times), within an angle of its heading or
 // very near, and optionally with no wall in between.
 
+#include "node.h"
+#include "map_vars.h"
 #include <math.h>
 
 #include "vec4.h"
 
-struct CollisionWorld
-{
-    // 0x101a9670: casts a segment from `from` to `to` against the faces in `mask`; returns non-zero on a hit.
-    int Raycast(int a, int b, int mask, const Vec4 *from, const Vec4 *to, Vec4 *hit, int c);
-};
-
-extern "C" CollisionWorld *DAT_10255f08;         // the collision world (0 before a map is loaded)
 
 // 0x10043e20 (Char_CanSee). Returns 1 when `eye` (looking along `heading`) sees `target`: their distance, with the
 // height difference counted 2.5 times, is at most `range`, and the target lies within `angleRange` of the heading
@@ -41,7 +36,7 @@ extern "C" int FUN_10043e20(const Vec4 *target, const Vec4 *eye, float heading, 
     if (checkWalls != 0)
     {
         Vec4 hit;
-        if (DAT_10255f08 != 0 && DAT_10255f08->Raycast(0, 4, 0x4000000, eye, target, &hit, 0) != 0)
+        if (DAT_10255f08 != 0 && DAT_10255f08->RayCast(0, 4, 0x4000000, eye, target, &hit, 0) != 0)
             return 0;
     }
     return 1;

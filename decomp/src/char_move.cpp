@@ -10,6 +10,7 @@
 #include "anim_model.h"
 
 #include "node.h"
+#include "map_vars.h"
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
@@ -257,16 +258,8 @@ extern "C" int FUN_100b1520(int index)
 
 #include "effect_manager.h"
 
-struct CollisionWorld
-{
-    int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);  // Node::Collide 0x101a8e60
-    int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,
-                float *t);                                              // 0x101a9670
-};
-
 #include "char_slot.h"
 
-extern "C" CollisionWorld *DAT_10255f08;
 
 // 0x100b5c30 (Npc_TurnWhenSeen). Npc_AlertWhenSeen below with one step more: when it reacts, the character also
 // turns at once to face the player (heading and target heading). Returns 0.

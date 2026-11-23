@@ -7,6 +7,7 @@
 #include "matrix4.h"
 
 #include "node.h"
+#include "map_vars.h"
 #include "char_state.h"
 
 #include "effect_manager.h"
@@ -17,7 +18,6 @@
 
 extern "C" void FUN_1016a8d0(void);
 
-extern "C" Node *DAT_10255f08;     // the map's root node
 extern "C" Node *DAT_1021bdf8[0x80][9];       // character 0: [0] = the stand's parent node
 
 // 0x100184e0 (Camera_ItemStand). The shot of the item stand ("kagudai") rising: on the first call it finds the

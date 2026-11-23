@@ -56,7 +56,6 @@ extern "C" EffectTable DAT_1021cffc;
 extern "C" int DAT_1021f640[0x20];
 extern "C" int DAT_10254c40[0x100];
 extern "C" int DAT_10255b08[0x40];
-extern "C" Node *DAT_10255f08;                       // collision world model
 extern "C" int DAT_1030bbf8[0x40];
 extern "C" int DAT_103150c0[0x20];
 extern "C" int DAT_1032d4b0;

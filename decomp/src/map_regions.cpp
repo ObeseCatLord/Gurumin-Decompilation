@@ -10,8 +10,8 @@
 #include "vec4.h"
 
 #include "node.h"
+#include "map_vars.h"
 
-extern "C" Node *DAT_10255f08;   // the world's root node
 
 // 0x10018100 (Map_FindRegionAt). Returns the first "@CDL" region whose rectangle contains `point` (x and y) with a
 // 50-unit margin on every side, leaving out the regions whose names contain "eggobj", "croud" or "fire"; 0 when

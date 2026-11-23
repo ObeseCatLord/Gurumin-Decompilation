@@ -29,7 +29,6 @@ extern "C" Engine DAT_10836c70;
 
 extern "C" void FUN_1000e750(void);           // AntiTamper_Store
 extern "C" int DAT_104bf8a4;
-extern "C" Node *DAT_10255f08;               // the map's root node
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
 extern "C" int FUN_1013f880(void);            // the game's random number
 extern "C" int FUN_1001af10(int index);       // Shaga_PushOut

@@ -5,7 +5,6 @@
 
 #include "node.h"
 
-extern "C" Node *DAT_10255f08;                       // the map model
 #include "char_vars.h"
 #include "game_vars.h"
 #include "map_vars.h"

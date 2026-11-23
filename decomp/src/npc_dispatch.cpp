@@ -1,6 +1,8 @@
 // The per-character behaviour dispatch for NPCs and scripted characters (0x100dfcf0): every 30 frames it puts the
 // character's shadow on the ground, then runs the behaviour selected by its script parameter (CharState m_003c).
 
+#include "node.h"
+#include "map_vars.h"
 #include "vec4.h"
 
 #include "matrix4.h"
@@ -11,16 +13,8 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "model_bank.h"
 
-struct CollisionWorld
-{
-    // 0x101aa080: casts the segment `from`-`to` against the collision of the nodes called `name` (0 = all) with the
-    // given mask; the nearest hit point goes to `hit`. Returns 1 on a hit.
-    int CastSegment2(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
-};
-
 #include "char_state.h"
 
-extern "C" CollisionWorld *DAT_10255f08;
 #include "char_vars.h"
 
 

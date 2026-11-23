@@ -1,4 +1,6 @@
 // Collision queries against the world (DAT_10255f08).
+#include "node.h"
+#include "map_vars.h"
 #include "world.h"
 
 #include "vec4.h"
@@ -7,34 +9,17 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-struct CollisionWorld
-{
-    // Node::Collide (0x101a8e60) on the world's root node: the segment `from`-`to` against the collision of the
-    // given kinds; the hit point goes to `hit`. Returns 1 on a hit.
-    int Collide(int name, int mask, Vec4 *from, Vec4 *to, Vec4 *hit);
-    // 0x101aaa20: casts the segment `from`-`to` against the collision of the nodes called `name` (0 = all) with
-    // the given mask; the nearest hit point goes to `hit` and, when `t` is given, its position along the segment.
-    // Returns 1 on a hit.
-    int CastSegment(const char *name, unsigned mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
-    int Query(Matrix4 *matrix, Vec4 *point, int mask, Vec4 *hit, int *hitId, int a, int b);
-    // Casts the segment `from`-`to` against the nodes called `name` (0 = all) whose flags match; writes the
-    // nearest hit point and, when `t` is given, its position along the segment. Returns 1 on a hit.
-    int RayCast(const char *name, unsigned kind, unsigned mask, const Vec4 *to, const Vec4 *from, Vec4 *hit,
-                float *t);
-};
 
-extern "C" CollisionWorld *DAT_10255f08;
-
-// 0x1000ff80: 1 when the point (x, y, z) touches world collision of the kinds in `mask`.
-int Collision_ProbePoint(float x, float y, float z, int mask)
+// 0x1000ff80: 1 when a sphere of `radius` at the point (x, y, z) touches the world collision.
+int Collision_ProbePoint(float x, float y, float z, float radius)
 {
     Matrix4 matrix;
     matrix.SetIdentity();
     Vec4 point;
     Vec4 hit;
-    int hitId;
+    float depth;
     point.Set(x, y, z, 0);
-    return DAT_10255f08->Query(&matrix, &point, mask, &hit, &hitId, 0, 0);
+    return DAT_10255f08->Query(&matrix, &point, radius, &hit, &depth, 0, 0);
 }
 
 // Casts a ray from `from` to `to` against world collision (kind 4, mask 0x4000000) of the nodes called `name`.

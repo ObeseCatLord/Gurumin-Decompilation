@@ -29,6 +29,7 @@ extern "C" char DAT_1021f3fa[0x42];
 extern "C" int DAT_102549a8[0x42];
 extern "C" Node *DAT_102550c0[0x8];                       // its "QQ" node
 extern "C" int DAT_10255960[3][12];
+extern "C" Node *DAT_10255f08;                            // the map's root node; its collision is the world collision
 extern "C" int DAT_102564a0;                              // number of map object records
 extern "C" int DAT_103088d0[0xb64];
 extern "C" int DAT_1032d868;                              // number of listed parts

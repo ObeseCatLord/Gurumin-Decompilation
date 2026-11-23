@@ -6,7 +6,6 @@
 
 #include "node.h"
 
-extern "C" Node *DAT_10255f08;
 #include "char_vars.h"
 #include "map_vars.h"
 

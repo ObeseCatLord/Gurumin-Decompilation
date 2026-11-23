@@ -1,9 +1,15 @@
-// TextureManager: the renderer object that owns the textures; it does not use `this` in most methods.
+// TextureManager: the renderer object that owns the textures (the one instance is DAT_10836c70); it does not use
+// `this` in most methods.
 #ifndef GURUMIN_TEXTURE_MANAGER_H
 #define GURUMIN_TEXTURE_MANAGER_H
 
+struct tagRECT;   // RECT, windows.h
+
 struct TextureManager
 {
+    int Present(const tagRECT *source);   // 0x1013edc0 (Render_Present)
+    int ResetFrameTimer();                // 0x1013eee0 (FrameTimer_ResetNext, engine_1013e.cpp)
+    void M_1013ef00();                    // 0x1013ef00
     int M_10173480();
     int M_101734d0();
     int M_10173510();
@@ -13,5 +19,7 @@ struct TextureManager
     int PumpAndRecover(); // 0x1015c850: the message pump with device-lost recovery
     void M_10175e70();    // unloads all textures, then Shutdown (texture_mgr.cpp)
 };
+
+extern "C" TextureManager DAT_10836c70;   // the renderer
 
 #endif

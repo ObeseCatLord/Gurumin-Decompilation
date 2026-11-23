@@ -1,6 +1,7 @@
 // The loading indicator: while data loads, the loaders call this to keep a small spinner, a progress bar and the
 // percentage on screen (in the top-left 64x64 corner, presented on its own).
 
+#include "texture_manager.h"
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,14 +10,6 @@
 
 #include "game.h"
 
-// The engine object at 0x10836c70.
-struct Engine
-{
-    int Present(const RECT *source);   // 0x1013edc0 (Render_Present)
-    int PumpAndRecover();              // 0x1015c850 (render_shutdown.cpp)
-};
-
-extern "C" Engine DAT_10836c70;
 #include "game_vars.h"
 #include "render_vars.h"
 #include "win_vars.h"

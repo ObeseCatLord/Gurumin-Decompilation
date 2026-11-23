@@ -1,6 +1,7 @@
 // Map icons: each entry of the map table at 0x10210fc0 names an icon picture ("maruf11.bmp", ...) in the
 // name table at 0x101d65b0.
 
+#include "texture_manager.h"
 #include <string.h>
 
 // windows.h-style max: evaluates the larger argument twice.
@@ -15,16 +16,9 @@ struct MapEntry
     char pad_000c[0xf4];
 };
 
-// Engine object at 0x10836c70; M_1013eee0 is FrameTimer_ResetNext (engine_1013e.cpp).
-struct Engine
-{
-    int M_1013eee0();
-};
-
 extern "C" MapEntry DAT_10210fc0[];
 #include "ui_vars.h"
 
-extern "C" Engine DAT_10836c70;
 extern "C" int FUN_10161920(const char *name);                    // Texture_FindByName (mmv_texreg.cpp)
 extern "C" int FUN_1001e1a0(const char *name, const char *fallback);  // loads a texture, `fallback` if missing
 
@@ -48,7 +42,7 @@ extern "C" int FUN_1001e240(void)
     if (texture < 0)
     {
         texture = FUN_1001e1a0(DAT_101d65b0[DAT_10210fc0[i].icon], "maruf00a.bmp");
-        DAT_10836c70.M_1013eee0();
+        DAT_10836c70.ResetFrameTimer();
     }
     return texture;
 }

@@ -1,6 +1,7 @@
 // Destroying a character (an enemy or a breakable object). The character records are viewed from their model part
 // at 0x10db6ee8 (like char_move.cpp).
 
+#include "texture_manager.h"
 #include "vec4.h"
 
 #include "matrix4.h"
@@ -9,13 +10,6 @@
 
 #include "effect_manager.h"
 
-// The engine object at 0x10836c70 (engine_1013e.cpp).
-struct Engine
-{
-    int ResetFrameTimer();                       // 0x1013eee0: FrameTimer_ResetNext
-};
-
-extern "C" Engine DAT_10836c70;
 #include "char_tables.h"
 #include "char_vars.h"
 #include "game_vars.h"

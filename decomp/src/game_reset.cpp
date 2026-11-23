@@ -2,6 +2,7 @@
 // game global is cleared, the HUD textures are released, the camera, sound, scene and script systems reset and the
 // player's parameters set back to their starting values.
 
+#include "texture_manager.h"
 #include "tri_batch.h"
 #include "mmv_player.h"
 #include "last_position.h"
@@ -67,7 +68,6 @@ extern "C" int DAT_104bfe24;
 #include "win_vars.h"
 extern "C" EmptyObject DAT_1065cb28;
 extern "C" Vec4 DAT_108029b8;
-extern "C" EmptyObject DAT_10836c70;
 extern "C" SmallRecord DAT_10860de8[0x40];
 
 extern "C" int FUN_10001b40(void);               // SoundArc_Message221

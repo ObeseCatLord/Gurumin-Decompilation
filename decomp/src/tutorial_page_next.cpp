@@ -14,9 +14,8 @@
 
 #include "game.h"
 
-#include "frame_timer.h"
+#include "texture_manager.h"
 
-extern "C" FrameTimer DAT_10836c70;
 #include "game_vars.h"
 #include "ui_vars.h"
 
@@ -55,7 +54,7 @@ extern "C" int FUN_1004f4f0(void)
     DAT_1030b870[DAT_104483dc] = left;
     int right = FUN_1001e1a0(DAT_102028e8[DAT_104483e0], 0);
     DAT_1030b870[DAT_104483e0] = right;
-    DAT_10836c70.ResetNext();
+    DAT_10836c70.ResetFrameTimer();
     for (int i = DAT_102194c4 + 1; i < 0x22; i++)
     {
         if (DAT_1030c908[i] == 0)
@@ -147,7 +146,7 @@ extern "C" int FUN_1004f4f0(void)
         DAT_104c03d4->SetMaterialValue("paper2", left);
         DAT_104c03d4->RestartColourPlugs("stop0", DAT_102239c8 * 2);
     }
-    DAT_10836c70.ResetNext();
+    DAT_10836c70.ResetFrameTimer();
     FUN_1003ad20(0x3be, 0, 1.0f);
     return 0;
 }
@@ -186,7 +185,7 @@ extern "C" int FUN_1004f860(void)
     DAT_1030b870[DAT_104483dc] = left;
     int right = FUN_1001e1a0(DAT_102028e8[DAT_104483e0], 0);
     DAT_1030b870[DAT_104483e0] = right;
-    DAT_10836c70.ResetNext();
+    DAT_10836c70.ResetFrameTimer();
     for (int i = DAT_102194c0 - 1 > 0 ? DAT_102194c0 - 1 : 0; i >= 0; i--)
     {
         int flag = DAT_1030c908[i];
@@ -278,7 +277,7 @@ extern "C" int FUN_1004f860(void)
         DAT_104c03d4->SetMaterialValue("paper2", newLeft);
         DAT_104c03d4->RestartColourPlugs("stop1", DAT_102239c8 * 2);
     }
-    DAT_10836c70.ResetNext();
+    DAT_10836c70.ResetFrameTimer();
     FUN_1003ad20(0x3be, 0, 1.0f);
     return 0;
 }
@@ -358,7 +357,7 @@ extern "C" int FUN_1004f250(void)
         DAT_104c03d4->RestartColourPlugs("stop2", DAT_102239c8 * 2);
     if (DAT_104c03d8 != 0)
         DAT_104c03d8->RestartColourPlugs("close", DAT_102239c8 * 2);
-    DAT_10836c70.ResetNext();
+    DAT_10836c70.ResetFrameTimer();
     FUN_1003ad20(0x3bd, 0, 1.0f);
     return 0;
 }

@@ -1,6 +1,7 @@
 // "shaga" effect slots: models built from EEQR.it3 by FUN_100425f0 (node "shaga_000"), one per slot of
 // DAT_10446e00. Loading takes long, so the frame timer is reset before and after (no frame skip afterwards).
 
+#include "texture_manager.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -14,15 +15,8 @@ Matrix4 Scaling(float x, float y, float z);      // 0x101b13c0
 
 #include "node.h"
 
-// Engine object at 0x10836c70; M_1013eee0 is FrameTimer_ResetNext (engine_1013e.cpp).
-struct Engine
-{
-    int M_1013eee0();
-};
-
 #include "anim_model.h"
 
-extern "C" Engine DAT_10836c70;
 #include "char_tables.h"
 #include "char_vars.h"
 #include "map_vars.h"
@@ -117,7 +111,7 @@ int FUN_10042140(int index, const char *model, int radius, const Vec4 *position,
             piece->matrix.m[14] += lowest - above;
         DAT_102194c8[slot] = 0;
         FUN_1001af10(slot);
-        DAT_10836c70.M_1013eee0();
+        DAT_10836c70.ResetFrameTimer();
         return slot;
     }
     return -1;
@@ -189,7 +183,7 @@ int FUN_100425f0(const Vec4 *position, const char *model, int radius, float head
 extern "C" int FUN_10062750(const Vec4 *a, const char *b, int c, float d, float e)
 {
     int slot = FUN_100425f0(a, b, c, d, e);
-    DAT_10836c70.M_1013eee0();
+    DAT_10836c70.ResetFrameTimer();
     if (slot > -1)
     {
         DAT_1042db08[slot] = -1;
@@ -197,6 +191,6 @@ extern "C" int FUN_10062750(const Vec4 *a, const char *b, int c, float d, float 
         DAT_10254798[slot] = 0;
         DAT_10446e00[slot]->RestartColourPlugs("stop", DAT_104bf8a4);
     }
-    DAT_10836c70.M_1013eee0();
+    DAT_10836c70.ResetFrameTimer();
     return 0;
 }

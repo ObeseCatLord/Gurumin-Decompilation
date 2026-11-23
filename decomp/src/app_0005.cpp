@@ -4,26 +4,7 @@
 
 #include "game_vars.h"
 
-struct Tracker
-{
-    char m_0000;
-    char m_0001;
-    char m_0002;
-    char m_0003;
-    int m_0004;
-    int m_0008;
-    char pad_000c[8];
-    int m_0014;
-    int m_0018;
-    HWND window;
-    int m_0020;
-    int m_0024;
-    int M_10001110(int *pos, char *a, char *b, char *c, int *d, char *e);
-    int M_10001090(int x, int y);
-    int M_10001440();
-    int M_10001450();
-    int M_100014a0();
-};
+#include "tracker.h"
 
 // Moves the Windows cursor to game position (x, y) in 640x480 coordinates, scaled to the client area.
 int Tracker::M_10001090(int x, int y)

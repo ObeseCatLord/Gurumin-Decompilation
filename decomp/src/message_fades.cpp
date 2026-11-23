@@ -2,11 +2,7 @@
 // States 1/2/3 fade in, fade out and hold for 60 frames; states 11/12/13 do the same but hold until a key or mouse
 // button is pressed (after at least 9 frames).
 
-// Mouse and key tracker (app_0005.cpp Tracker).
-struct Tracker
-{
-    int M_10001110(int *pos, char *a, char *b, char *c, int *d, char *e);  // Mouse_GetState
-};
+#include "tracker.h"
 
 extern "C" Tracker DAT_1020d9e0;
 extern "C" int DAT_104bfb08[0x7c];   // state of each message box

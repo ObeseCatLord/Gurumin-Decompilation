@@ -6,12 +6,7 @@
 
 #include "vec4.h"
 
-// Per-slot start vectors, 0x40 bytes (char_shots.cpp, char_leash.cpp).
-struct StartVectors
-{
-    Vec4 position;            // start position
-    char pad_0010[0x30];
-};
+#include "start_vectors.h"
 
 extern "C" StartVectors DAT_10802bf8[0x80];
 // Char_ProbeAhead (collide_query.cpp): casts a ray `depth` ahead of character `index`.

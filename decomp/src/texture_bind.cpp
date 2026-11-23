@@ -260,13 +260,7 @@ int TextureObject::DrawTriangles(const void *vertices, int triangles)
 }
 
 
-// Pre-transformed vertex (FVF 0x1c4), 0x20 bytes.
-struct ScreenVertex
-{
-    float x;
-    float y;
-    char pad_0008[0x18];
-};
+#include "screen_vertex.h"
 
 // 0x1014ba20. Draws a triangle strip of `count` vertices given in 640x480 screen coordinates: the positions are
 // scaled to the back-buffer size in place, then drawn like DrawTriangles. Returns 0 when there are fewer than 3

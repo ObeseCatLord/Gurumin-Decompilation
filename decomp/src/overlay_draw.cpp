@@ -6,16 +6,10 @@
 
 #include "matrix4.h"
 
-// A model node tree (scene_node.cpp Node).
-struct OverlayModel
-{
-    // 0x10199e20: draws the tree with `world` and `view`, the light direction and colour (r, g, b, alpha).
-    int Draw(Matrix4 *world, Matrix4 *view, Vec4 *light, int a, Vec4 *colour, int b);
-};
+#include "node.h"
 
 #include "model_bank.h"
 
-extern "C" OverlayModel *DAT_104c03c8;           // the overlay mode's model (0 = none)
 #include "render_vars.h"
 
 extern "C" void FUN_10194360(const Vec4 *eye, const Vec4 *target, Matrix4 *view, Matrix4 *projection, int a);  // Camera_SetMatrices
@@ -57,7 +51,7 @@ int Overlay_DrawModel()
         }
         else
             colour.w = 1.0f;
-        DAT_104c03c8->Draw(&world, &view, light, -1, &colour, 0);
+        DAT_104c03c8->QueueDraw(&world, &view, light, -1, &colour, 0);
     }
     return 0;
 }

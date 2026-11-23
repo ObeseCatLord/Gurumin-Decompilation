@@ -11,14 +11,7 @@ extern "C" int FUN_1013f880(void);
 #include "matrix4.h"
 #include "char_state.h"
 
-// Attached mesh slots (64 at 0x10edbe08, 0xb08 bytes each): extra models such as held items.
-struct MeshSlot
-{
-    int pad_0000;
-    void *mesh;
-    char pad_0008[0xb00];
-    void M_10037b40(const void *a, const void *b);
-};
+#include "mesh_slot.h"
 
 extern "C" MeshSlot DAT_10edbe08[0x40];
 extern "C" char DAT_108392d8[];

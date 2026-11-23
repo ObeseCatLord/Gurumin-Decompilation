@@ -120,16 +120,11 @@ extern "C" int FUN_10017ad0(int id)
     return -1;
 }
 
-// Model of the overlay mode closed below (scene_node.cpp Node).
-struct OverlayModel
-{
-    void Release();  // 0x1019e9a0
-};
+#include "node.h"
 
 extern "C" float DAT_104bf8f0;        // fade value
 extern "C" float DAT_1032d4b0;        // fade step per frame
 extern "C" float DAT_104bf8e8;        // fade target (set exactly on the last frame)
-extern "C" OverlayModel *DAT_104c03c8; // its model
 #include "engine_memory.h"
 extern "C" int FUN_1000cb30(const char *text);
 extern "C" int FUN_1000cb90(const char *text);      // Caption_Set

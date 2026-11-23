@@ -46,6 +46,7 @@ extern "C" int DAT_104c02f0;                              // "DAT" source of the
 extern "C" char DAT_104c0309;
 extern "C" int DAT_104c0314;                              // "DAT" source of the other characters
 extern "C" int DAT_104c03b0;                              // number of fading nodes
+extern "C" Node *DAT_104c03c8;                           // the overlay mode's model (0 = none; drawn by overlay_draw.cpp, released in app_0010.cpp)
 extern "C" float DAT_104c03ec;                            // opening progress of the overlay mode
 extern "C" Vec4 DAT_10868818;                             // saved player velocity
 extern "C" ModelDef DAT_10b314c4[];

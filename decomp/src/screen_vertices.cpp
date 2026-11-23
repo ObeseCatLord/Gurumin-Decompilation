@@ -1,13 +1,7 @@
 // A batch of screen-space vertices: 2D quads are laid out for a 640x480 screen and scaled to the real back buffer
 // size when they are added.
 
-// A screen vertex (0x20 bytes): position, then colour and texture coordinates.
-struct ScreenVertex
-{
-    float x;
-    float y;
-    float rest[6];
-};
+#include "screen_vertex.h"
 
 struct ScreenBatch
 {

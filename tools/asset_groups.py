@@ -138,6 +138,9 @@ class AssetGroups:
                 self.characters.setdefault(alias, self.characters[base])
         self.bases = sorted(self.characters, key=len, reverse=True)
         self.texture_owner = self._link_textures() if link_textures else {}
+        # wav\*.itm are scrambled WAV sounds (voice lines and sound effects), not scripts
+        wav_dir = os.path.join(game_dir, "wav")
+        self.sound_names = {n.lower() for n in os.listdir(wav_dir)} if os.path.isdir(wav_dir) else set()
 
     def _character_for(self, stem):
         for base in self.bases:
@@ -171,6 +174,8 @@ class AssetGroups:
         stem, ext = os.path.splitext(os.path.basename(file_name).lower())
         if ext in EXTENSION_FOLDERS:
             return EXTENSION_FOLDERS[ext]
+        if os.path.basename(file_name).lower() in self.sound_names:
+            return "Sounds/Effects" if stem.startswith(("gse", "vse", "mse")) else "Sounds/Voices"
         if stem.startswith("ddfont"):
             return "Fonts"
         folder = self._character_for(stem)

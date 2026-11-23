@@ -1,6 +1,7 @@
 // Game (DAT_104b7200) drawing helpers for menus and the HUD. Coordinates are 640x480 screen pixels;
 // UV coordinates index the menu texture sheets loaded by Game::LoadMenuTextures.
 
+#include "font_renderer.h"
 #include <stdio.h>
 #include <string.h>
 #include "game.h"
@@ -195,7 +196,6 @@ int Game::MoveCursor()
     return 1;
 }
 
-#include "menu_text_renderer.h"
 
 // Scroll marks, Shift-JIS: filled while `frame` is at most 5, outlined after that (they blink).
 #define MARK_UP "\x81\xa3"              // ▲
@@ -227,17 +227,17 @@ int Game::DrawWindowMarks(int frame)
             if (m_0134[w] > 0)
             {
                 if (frame > 5)
-                    ((MenuTextRenderer *)m_7664)->M_101501f0(m_00b0[w] + 0x20, m_00bc[w], MARK_UP_OUTLINE, 0xffefcf, 0, 1.0f, 0.9f);
+                    textRenderer->DrawText(m_00b0[w] + 0x20, m_00bc[w], MARK_UP_OUTLINE, 0xffefcf, 0, 1.0f, 0.9f);
                 else
-                    ((MenuTextRenderer *)m_7664)->M_101501f0(m_00b0[w] + 0x20, m_00bc[w], MARK_UP, 0xffefcf, 0, 1.0f, 0.9f);
+                    textRenderer->DrawText(m_00b0[w] + 0x20, m_00bc[w], MARK_UP, 0xffefcf, 0, 1.0f, 0.9f);
             }
             if (m_011c[w] < 0x80 && m_069c[w][m_0134[w] + m_011c[w] + 1][0] != 0)
             {
                 if (frame > 5)
-                    ((MenuTextRenderer *)m_7664)->M_101501f0(m_00b0[w] + 0x20, m_0128[w] * m_011c[w] + 0x2c + m_00bc[w], MARK_DOWN_OUTLINE,
+                    textRenderer->DrawText(m_00b0[w] + 0x20, m_0128[w] * m_011c[w] + 0x2c + m_00bc[w], MARK_DOWN_OUTLINE,
                                      0xffefcf, 0, 1.0f, 0.9f);
                 else
-                    ((MenuTextRenderer *)m_7664)->M_101501f0(m_00b0[w] + 0x20, m_0128[w] * m_011c[w] + 0x2c + m_00bc[w], MARK_DOWN, 0xffefcf,
+                    textRenderer->DrawText(m_00b0[w] + 0x20, m_0128[w] * m_011c[w] + 0x2c + m_00bc[w], MARK_DOWN, 0xffefcf,
                                      0, 1.0f, 0.9f);
             }
             if (m_0088 == w && m_0110[w] != 0)

@@ -1,6 +1,7 @@
 // Starting a scene (map entry): the player's position and velocity are saved, the world object (0x10c68000,
 // world_frame.cpp) is bound to the loaded map and the player character file is loaded.
 
+#include "font_renderer.h"
 #include "node.h"
 #include "map_vars.h"
 #include "vec4.h"
@@ -32,7 +33,6 @@ extern "C" int FUN_10092af0(int code, int value);     // scene callback
 #include "render_vars.h"
 #include "sound_vars.h"
 
-extern "C" int DAT_1020e538;
 extern "C" int DAT_10db9380;
 
 // Starts the scene with player character file `characterFile`; `value` is kept in DAT_104bfeb4.

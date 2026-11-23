@@ -99,7 +99,7 @@
 ?Sample@KeyBank@@QAEHHPAM000H@Z	101af4c0
 ?Create@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	10148a40
 ?RegisterWindowClass@RenderWindow@@QAEXPAUHINSTANCE__@@@Z	101489c0
-?LoadMenuTextures@Game@@QAEHH@Z	10007fd0
+?LoadMenuTextures@Game@@QAEHPAUFontRenderer@@@Z	10007fd0
 ?Find@Node@@QAEPAU1@PBDH@Z	1019ece0
 ?Collide@Node@@QAEHHHPAUVec4@@00@Z	101a8e60
 ?WindowProc@GameWindow@@UAGJPAUHWND__@@IIJ@Z	1013e4f0
@@ -237,8 +237,8 @@ _Vec3_Dot	101ac200
 ?InTriangle@Vec4@@QAEHABU1@00@Z	101aeee0
 ?Slerp@@YA?AUVec4@@ABU1@0M@Z	101aeae0
 ?QuatFromMatrix@@YA?AUVec4@@ABUMatrix4@@@Z	101ae2a0
-?DrawOutlined@TextRenderer@@QAEHHHPBDHHMH@Z	101508d0
-?DrawOutlinedIn@TextRenderer@@QAEHHHPBDHHMHH@Z	101509b0
+?DrawOutlined@FontRenderer@@QAEHHHPBDHHMM@Z	101508d0
+?DrawOutlinedIn@FontRenderer@@QAEHHHPBDHHMMH@Z	101509b0
 ?Root@Node@@QAEPAU1@XZ	101992f0
 ?SetUniqueName@Node@@QAEHPBD@Z	101a52d0
 ?RemoveOwnedBy@EffectManager@@QAEHH@Z	101883b0

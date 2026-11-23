@@ -24,7 +24,16 @@ struct FontRenderer
     int GlyphWidth(int color, int x, int y, unsigned short code, unsigned short size, unsigned short sizeAgain);
     int DrawGlyph(unsigned short *pixels, int x, int y, unsigned short code, unsigned short color, int unused);
     int DrawString(int color, int x, int y, const char *text, unsigned short size, int fixedAdvance);
-    int TextWidth(const char *text, float scale);
+    int TextWidth(const char *text, float scale);   // 0x1014fd30: width of `text` in pixels
+    // 0x101501f0: draws `text` at (x, y) in `colour` with opacity `alpha`, scaled by `scale`.
+    int DrawText(int x, int y, const char *text, int colour, int a, float alpha, float scale);
+    // 0x101508d0 (text_outline.cpp): DrawText with a brown outline when outlines are on.
+    int DrawOutlined(int x, int y, const char *text, int colour, int a, float alpha, float scale);
+    // 0x101509b0 (text_outline.cpp): DrawOutlined with the outline in `outlineColour`.
+    int DrawOutlinedIn(int x, int y, const char *text, int colour, int a, float alpha, float scale,
+                       int outlineColour);
 };
+
+extern "C" FontRenderer DAT_1020e538;   // the game's text renderer
 
 #endif

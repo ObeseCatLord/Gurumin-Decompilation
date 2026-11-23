@@ -11,11 +11,11 @@ extern "C" int FUN_10173550(const char *path, const char *alphaPath, int flags);
 
 // Loads every menu, balloon, map, frame and icon texture (BMP pairs with an alpha file, see
 // docs/MODDING_MAP.md "Menu and HUD images") into the texture slots stored in the Game fields.
-int Game::LoadMenuTextures(int value)
+int Game::LoadMenuTextures(FontRenderer *renderer)
 {
     m_0690 = 0;
     M_10007f20();
-    m_7664 = value;
+    textRenderer = renderer;
     texMenu1 = FUN_10173550(DATA("menu1.bmp"), DATA("menu1a.bmp"), 0);
     texMenu4 = FUN_10173550(DATA("menu4.bmp"), 0, 0);
     texMenu2 = FUN_10173550(DATA("menu2.bmp"), 0, 0);

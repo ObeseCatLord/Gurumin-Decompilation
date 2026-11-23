@@ -1,16 +1,9 @@
 // The name banners shown when a map starts: one or two framed panels with a name in outlined text, fading in with
 // the counter DAT_104bf8d8 (full at 15).
 
+#include "font_renderer.h"
 #include "game.h"
 
-struct TextRenderer
-{
-    int Width(const char *text, float scale);   // 0x1014fd30: width of `text` in pixels
-    // 0x101508d0 (text_outline.cpp DrawOutlined): text with a brown outline.
-    int DrawOutlined(int x, int y, const char *text, int colour, int a, float alpha, float scale);
-};
-
-extern "C" TextRenderer DAT_1020e538;   // the game's text renderer
 #include "game_vars.h"
 #include "ui_vars.h"
 
@@ -21,19 +14,19 @@ extern "C" void FUN_1000cc30(void)
 {
     if (DAT_10210ae8[0] != 0)
     {
-        int width = DAT_1020e538.Width(DAT_10210ae8, 1.0f);
+        int width = DAT_1020e538.TextWidth(DAT_10210ae8, 1.0f);
         DAT_104b7200.DrawPanelAlt(32, 10, width + 40, 64, 0, (float)DAT_104bf8d8 / 15.0f);
         DAT_1020e538.DrawOutlined(52, 32, DAT_10210ae8, 0xffffff, 0, (float)DAT_104bf8d8 / 15.0f, 1.0f);
         if (DAT_1020e0f8[0] != 0)
         {
-            width = DAT_1020e538.Width(DAT_1020e0f8, 1.0f);
+            width = DAT_1020e538.TextWidth(DAT_1020e0f8, 1.0f);
             DAT_104b7200.DrawPanelAlt(310, 10, width + 40, 64, 0, (float)DAT_104bf8d8 / 15.0f);
             DAT_1020e538.DrawOutlined(330, 32, DAT_1020e0f8, 0xffffff, 0, (float)DAT_104bf8d8 / 15.0f, 1.0f);
         }
     }
     else if (DAT_1020e0f8[0] != 0)
     {
-        int width = DAT_1020e538.Width(DAT_1020e0f8, 1.0f);
+        int width = DAT_1020e538.TextWidth(DAT_1020e0f8, 1.0f);
         DAT_104b7200.DrawPanelAlt(304 - width / 2, 74, width + 32, 64, 0, (float)DAT_104bf8d8 / 15.0f);
         DAT_1020e538.DrawOutlined(320 - width / 2, 96, DAT_1020e0f8, 0xffffff, 0, (float)DAT_104bf8d8 / 15.0f, 1.0f);
     }

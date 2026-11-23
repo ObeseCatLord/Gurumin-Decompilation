@@ -1,6 +1,8 @@
 #pragma once
 
 // Event trigger (0xc8 bytes): runs when its map matches and all four script flags pass.
+struct FontRenderer;   // font_renderer.h
+
 struct GameTrigger
 {
     int map;                    // map number, 9999 = any map
@@ -127,7 +129,7 @@ struct Game : Object
     int m_7650;
     int m_7654[3];
     void (*m_7660)(int);
-    int m_7664;
+    FontRenderer *textRenderer;   // 0x7664: draws the window marks (set by LoadMenuTextures)
     float m_7668[3];            // 0x7668: per-window fade
     char pad_7674[0x11f4];
     GameNodeBody m_8868[0x20];  // 0x8868: menu model nodes, destroyed in ~Game
@@ -156,7 +158,7 @@ struct Game : Object
     ~Game();
     int FindSlot(int id);
     void M_10007f20();
-    int LoadMenuTextures(int value);
+    int LoadMenuTextures(FontRenderer *renderer);
     // Tests script flag `index` (4000 flags in m_3ee694, saved with the game). A negative index tests that the
     // flag is clear. Flag 0 is always set; out-of-range indexes read as clear (or as set for the negated test).
     // Inline: callers expand it (the out-of-line copy is at 0x100022b0).

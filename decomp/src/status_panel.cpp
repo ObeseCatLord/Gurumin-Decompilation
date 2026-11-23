@@ -1,14 +1,8 @@
 // A five-line text panel at the lower right of the screen (state DAT_1020c330).
 
+#include "font_renderer.h"
 #include "game.h"
 
-struct TextRenderer
-{
-    // 0x101508d0 (text_outline.cpp DrawOutlined): text with a brown outline.
-    int DrawOutlined(int x, int y, const char *text, int colour, int a, float alpha, float scale);
-};
-
-extern "C" TextRenderer DAT_1020e538;   // the game's text renderer
 #include "ui_vars.h"
 
 extern "C" char DAT_1020da50[];         // the five text lines

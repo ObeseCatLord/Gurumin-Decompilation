@@ -1,12 +1,7 @@
 // IME candidate list layout.
 
+#include "font_renderer.h"
 #include "menu_text.h"
-
-struct TextRenderer
-{
-    int M_1014fd30(const MenuText *line, float scale);
-    int M_101501f0(int x, int y, const MenuText *line, int colour, int a, float scaleX, float scaleY);  // draws text
-};
 
 #include "ui_vars.h"
 
@@ -26,12 +21,12 @@ extern "C" int FUN_1015fa90(void)
 }
 
 // Returns the width in pixels of the widest visible candidate.
-extern "C" int FUN_1015fac0(TextRenderer *renderer)
+extern "C" int FUN_1015fac0(FontRenderer *renderer)
 {
     int widest = 0;
     for (int i = 0; i < VisibleLines(); i++)
     {
-        int width = renderer->M_1014fd30(&DAT_10f67008[i], 1.0f);
+        int width = renderer->TextWidth(DAT_10f67008[i].text, 1.0f);
         if (widest < width)
             widest = width;
     }
@@ -42,14 +37,14 @@ extern "C" int FUN_1015fac0(TextRenderer *renderer)
 // Draws the visible candidates one below the other (16 pixels apart) at (x, y), the selected one in `selColour`
 // and the others in `colour`. Returns 0 when text input is not active, else 1.
 // Not byte-identical yet: the original keeps the counter on the stack and x/y in registers (see open.tsv).
-extern "C" int FUN_1015fb20(TextRenderer *renderer, int x, int y, int colour, int selColour)
+extern "C" int FUN_1015fb20(FontRenderer *renderer, int x, int y, int colour, int selColour)
 {
     if (DAT_10f67000 == 0)
         return 0;
     if (DAT_10f67008[0].text[0] != 0)
     {
         for (int i = 0; i < VisibleLines(); i++, y += 16)
-            renderer->M_101501f0(x, y, &DAT_10f67008[i],
+            renderer->DrawText(x, y, DAT_10f67008[i].text,
                                  DAT_10f66ab0 * DAT_10f66de8 + DAT_10f66dd0 + i == DAT_10f68114 ? selColour : colour, 0,
                                  1.0f, 1.0f);
     }

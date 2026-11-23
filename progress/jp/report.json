@@ -16,10 +16,10 @@
   "complete_data_percent": 0.0,
   "total_units": 252,
   "complete_units": 147,
-  "matched_rules_code": "162633",
-  "matched_rules_code_percent": 9.4543,
-  "matched_rules_functions": 675,
-  "matched_rules_functions_percent": 55.6931
+  "matched_rules_code": "164125",
+  "matched_rules_code_percent": 9.541,
+  "matched_rules_functions": 681,
+  "matched_rules_functions_percent": 56.1881
  },
  "units": [
   {
@@ -7645,10 +7645,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "497",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -8945,10 +8945,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 0,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "131",
+    "matched_rules_code_percent": 41.195,
+    "matched_rules_functions": 2,
+    "matched_rules_functions_percent": 66.6667
    },
    "sections": [
     {
@@ -9037,7 +9037,7 @@
      }
     },
     {
-     "name": "?LoadMenuTextures@Game@@QAEHH@Z",
+     "name": "?LoadMenuTextures@Game@@QAEHPAUFontRenderer@@@Z",
      "size": "773",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -10259,10 +10259,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "436",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -15013,10 +15013,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "428",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 2,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -15027,7 +15027,7 @@
    ],
    "functions": [
     {
-     "name": "?DrawOutlined@TextRenderer@@QAEHHHPBDHHMH@Z",
+     "name": "?DrawOutlined@FontRenderer@@QAEHHHPBDHHMM@Z",
      "size": "214",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -15035,7 +15035,7 @@
      }
     },
     {
-     "name": "?DrawOutlinedIn@TextRenderer@@QAEHHHPBDHHMHH@Z",
+     "name": "?DrawOutlinedIn@FontRenderer@@QAEHHHPBDHHMMH@Z",
      "size": "214",
      "fuzzy_match_percent": 100.0,
      "metadata": {

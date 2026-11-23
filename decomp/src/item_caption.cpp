@@ -4,6 +4,7 @@
 
 
 
+#include "font_renderer.h"
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -28,22 +29,11 @@
 
 
 
-struct TextRenderer
-
-{
-
-    // 0x101508d0 (text_outline.cpp DrawOutlined): text with a brown outline.
-
-    int DrawOutlined(int x, int y, const char *text, int colour, int a, float alpha, float scale);
-
-};
 
 
 
 
 
-
-extern "C" TextRenderer DAT_1020e538;
 
 #include "ui_vars.h"
 

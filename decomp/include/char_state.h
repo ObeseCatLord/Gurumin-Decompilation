@@ -149,6 +149,8 @@ struct CharState
                                                   // ends the strafe
                         int fadeOut;              // enemy_busy.cpp: 0 = stays, 1.. = frames of fading out as it
                                                   // leaves the queue (QUEUE_FADE_FRAMES = gone)
+                        int groundTimer;          // hover_watcher.cpp: frames counted; the shadow is put on the
+                                                  // ground when it matches the slot (mod 30)
                     };
                     union                         // 0x2c
                     {

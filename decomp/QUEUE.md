@@ -199,10 +199,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (113)
+## 4. Large functions (801-3000 bytes) (112)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `10026730` 950 bytes (float, loops 6, calls 13)
 - [ ] `10049b00` 954 bytes (float, loops 6, calls 10)
 - [ ] `10051190` 988 bytes (float, calls 5)
 - [ ] `100279b0` 998 bytes (float, calls 36)

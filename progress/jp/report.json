@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 17.61,
+  "fuzzy_match_percent": 17.6652,
   "total_code": "1720206",
-  "matched_code": "227156",
-  "matched_code_percent": 13.2052,
+  "matched_code": "228106",
+  "matched_code_percent": 13.2604,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 808,
-  "matched_functions_percent": 66.6667,
+  "matched_functions": 809,
+  "matched_functions_percent": 66.7492,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 267,
-  "complete_units": 151,
-  "matched_rules_code": "226529",
-  "matched_rules_code_percent": 13.1687,
-  "matched_rules_functions": 807,
-  "matched_rules_functions_percent": 66.5842
+  "total_units": 268,
+  "complete_units": 152,
+  "matched_rules_code": "227479",
+  "matched_rules_code_percent": 13.2239,
+  "matched_rules_functions": 808,
+  "matched_rules_functions_percent": 66.6667
  },
  "units": [
   {
@@ -7442,6 +7442,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/helmet_face.cpp"
+   }
+  },
+  {
+   "name": "app/hover_watcher",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "950",
+    "matched_code": "950",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 1,
+    "matched_functions_percent": 100.0,
+    "complete_code": "950",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1,
+    "matched_rules_code": "950",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "950",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10026730",
+     "size": "950",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "268592944"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/hover_watcher.cpp"
    }
   },
   {
@@ -17998,13 +18044,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1369663",
+    "total_code": "1368713",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 229,
+    "total_functions": 228,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -18021,7 +18067,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1369663",
+     "size": "1368713",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -18248,14 +18294,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268590304"
-     }
-    },
-    {
-     "name": "FUN_10026730",
-     "size": "950",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268592944"
      }
     },
     {

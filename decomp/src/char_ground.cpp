@@ -16,6 +16,8 @@
 
 #include "char_state.h"
 
+#include "char_ground.h"
+
 // 0x10011dd0 (Npc_StandOnGround). Keeps NPC `index` idle in motion 2. On its first call, when DAT_102022b8 is set,
 // it is put on the ground like Char_PlaceOnGround does (without the check for a loaded world; the start x and y
 // are kept whether or not something is hit). Returns 0.

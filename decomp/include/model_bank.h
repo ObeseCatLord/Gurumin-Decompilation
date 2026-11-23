@@ -15,6 +15,14 @@ struct Node;
 #define MODEL_BANK_SIZE 16
 // AnimModel::m_2390 of a bank model that never times out.
 #define MODEL_BANK_NO_TIMEOUT 99999
+// Each lit model has LIGHT_VECTORS light vectors in `lighting`; the ones LightDirection sets:
+#define LIGHT_VECTORS 22
+#define LIGHT_KEY_DIRECTION 6          // the key light, from the target towards the viewer (length 2)
+#define LIGHT_KEY_COLOUR 7             // its colour
+#define LIGHT_AMBIENT 16               // the ambient light
+#define LIGHT_SPARE_ENTRY 0x7f         // the entry used for the default lights (models that are not lit)
+#define LIGHT_FADE_DISTANCE 1500.0f    // the key light gets 1 brighter per this distance ...
+#define LIGHT_BASE_BRIGHTNESS 1.2f     // ... on top of this
 
 struct ModelBank
 {
@@ -50,6 +58,8 @@ struct ModelBank
     ModelBank();                                                         // 0x1017c8e0
     // 0x10164c10: a light direction for `model` seen from `position` towards `target` (0 when the bank is off); overlay_draw.cpp writes into the returned vector.
     Vec4 *LightDirection(AnimModel *model, Vec4 *position, Vec4 *target);
+    // 0x1017c5f0: LightDirection for the bank model with node tree `root`, else the default lights.
+    Vec4 *LightForRoot(Node *root, Vec4 *position, Vec4 *target);
     int Reset();
     int CollectLights(Node *root);
     int Add(Node *root, const Vec4 *position);

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (176)
+## 1. Walls to retry (179)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -59,6 +59,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1002ebf0` 628 — DamageZone_Update: same tests; register allocation differs from the start (the original leaves index in its stack slot and reloads it, ours keeps it in ebx, which changes the flag-test layout and hides the loop-invariant (float)left the original hoists); else-if, nested and conditional forms of the flag test tried
 - [ ] `1002f050` 690 — Route_FollowGates: same statements and jump table; the original keeps the route row in ebx and the point in edi (cl 13.00 here esi/ebx); a separate next-point variable tried
 - [ ] `10035a30` 224 — ListBank::SkipBlock: identical except the quote flag lives in its own local (push ecx) in the original; cl 13.00 here puts it in the dead text parameter slot (declaration order tried)
+- [ ] `100360f0` 939 — ListBank::ReadToken (listbank.cpp, rule-clean): logic complete; the original tests the 13 two-character operator pairs and the 10 single-operator ends as a plain linear chain (two shared return blocks, alternating), while our compiler threads the jumps (after `op == '-'` fails on *p it skips straight to the next '-' test) and is 100 bytes shorter; also inQuotes lives in ebp and `last` in memory in the original (ours the other way). Tried one || expression, separate ifs, length++ bodies and declaration orders.
 - [ ] `10036ca0` 987 — ListBank::RegisterBuiltin (Script_RegisterBuiltin): flow, calls and the inline ReportError expansion match (listbank_vars.cpp); the original frame is 4 bytes smaller and pushes ebx/esi/edi only before the parameter loop (shrink-wrapped), cl 13.00 here at the start; separate loop variables and split error returns tried
 - [ ] `10037090` 976 — ListBank::FindVariable: calls and the inline ReportError expansion match (listbank_vars.cpp sees ReportError as an inline member); the search loops keep the level in edi and spill this (cl 13.00 here keeps this in edi) and the original hoists the error flag into a local per level
 - [ ] `10037470` 235 — ListBank::FirstIndexValue: register allocation only (original: name in edi, this in ebx, flag/counter in esi); variable sharing tried
@@ -142,6 +143,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101640b0` 253 — see 10163e90
 - [ ] `101649c0` 213 — lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
 - [ ] `10164af0` 284 — ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
+- [ ] `10164c10` 906 — ModelBank::LightDirection (model_bank.cpp, rule-clean, LIGHT_* constants in model_bank.h): same wall as 1017c5f0 (the default-light block).
 - [ ] `10165020` 272 — bubble sort: ours stores count-1 in the dead parameter slot, the original in a separate local; a named local makes cl 13.00 unroll the inner loop by 4 (local inside/outside the loop, early return tried)
 - [ ] `10167390` 104 — WorldRenderer::StartFade: identical apart from the mode store, which the original schedules right after loading mode into edx (ours loads it into eax and stores it after the fstp); mode-first and conversion-local forms tried
 - [ ] `10167440` 2374 — WorldRenderer::DrawPictures (world_pictures.cpp, rule-clean): everything matches but the scheduling of the bottom edge in the in-world PICTURE_SCREEN_EXACT branch: the original loads offsetY + half height before pushing the two constant texture coordinates, ours after the first push (the same branch-shape spelling matches in the other in-world branches). The non-world right edges need offsetX + (centre + half width). Tried: bottom spellings (sums in every order and grouping), right-edge spellings, float or double u0/v0.
@@ -157,6 +159,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
 - [ ] `10172350` 1068 — EffectManager::Start: all but one cluster identical; the original loads the matrix owner before the value but stores the value first and computes the start frame early (cl 13.00 here pairs them the other way); the 24 orders of value/owner/serial/frame and a start local tried
 - [ ] `10175c90` 476 — Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
+- [ ] `1017c5f0` 750 — ModelBank::LightForRoot (model_bank.cpp, rule-clean): the 16-model search loop (unrolled by 8) and the light code match; the default-light block of both functions constructs two one-element Vec4 arrays through the vector constructor iterator 0x10004650 (count 1), while 13.00 calls the constructor directly for `Vec4 a[1]` (also tried a[1][1] and an array member of a local struct) -- the original array must be declared some other way; an inline helper for the block is not inlined under /Ob1.
 - [ ] `10187520` 3712 — EffectManager::DrawLight (effect_light.cpp, rule-clean, EffectLight points/widths/colours typed, ScreenVertex fields named): full logic drafted; frame 0x1614 vs 0x160c and ebp pushed in the prologue (the original pushes it after the first dispatch), light base in ebp instead of ebx, kinds 7/9 share one call, vertex pointer stepping differs.
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
@@ -193,16 +196,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cf80` 33 bytes
 - [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (2)
+## 3. Medium functions (251-800 bytes) (1)
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
-- [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (116)
+## 4. Large functions (801-3000 bytes) (114)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
-- [ ] `100360f0` 939 bytes (loops 4, calls 1)
 - [ ] `10026730` 950 bytes (float, loops 6, calls 13)
 - [ ] `10049b00` 954 bytes (float, loops 6, calls 10)
 - [ ] `10051190` 988 bytes (float, calls 5)

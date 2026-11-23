@@ -506,3 +506,6 @@ _FUN_101426d0@8	101426d0
 ?Char_DrawLinks@@YAHXZ	1001bb20
 ?DrawLight@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	10187520
 _Enemy_IsBusy	100e1c40
+?ReadToken@ListBank@@QAEHPAPADPAD@Z	100360f0
+?LightForRoot@ModelBank@@QAEPAUVec4@@PAUNode@@PAU2@1@Z	1017c5f0
+?LightDirection@ModelBank@@QAEPAUVec4@@PAUAnimModel@@PAU2@1@Z	10164c10

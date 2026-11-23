@@ -22,6 +22,11 @@ typedef int (*BuiltinHandler)(ListBank *bank, int id);
 #define LISTBANK_GROUP_ENTRIES 0x80
 // Size of one element of a text variable.
 #define LISTBANK_TEXT_SIZE 0x100
+// ReadToken: token[TOKEN_IS_OPERATOR] = 1 when the token read is an operator; the kind of token read last.
+#define TOKEN_IS_OPERATOR 0xff
+#define TOKEN_OPERAND 0
+#define TOKEN_OPERATOR 1
+#define TOKEN_START 2
 
 // A top-level `{ ... }` block of a script (its start in the text).
 struct ScriptBlock
@@ -103,6 +108,7 @@ struct ListBank
     int FindVariable(const char *name, int *index, int *group, int *element);  // 0x10037090
     int AssignValue(const char *name, const struct ScriptValue *value, char type);
     int ReadTerm(char **text, char *word);
+    int ReadToken(char **text, char *token);                  // 0x100360f0: next token of an expression
     int CompileStatement(const char *statement);               // 0x100ed9b0
     int CompileText();
     int LoadText(const char *source, int length);

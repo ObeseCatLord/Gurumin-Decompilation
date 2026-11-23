@@ -152,6 +152,123 @@ int ModelBank::AddLitModel(AnimModel *model)
     return 0;
 }
 
+// 0x10164c10 (ModelBank::LightDirection). Returns the 22 light vectors of `model` (0 when the bank is off or the
+// model is not lit). With `position` and `target` given, the model's key light (vector LIGHT_KEY_DIRECTION) is
+// aimed from `target` to `position` (length 2), its colour (LIGHT_KEY_COLOUR) grows with the distance (1.2 plus
+// 1/1500 per unit, times 0.8) and the ambient light (LIGHT_AMBIENT) is set to 0.1. Without a model the spare entry
+// LIGHT_SPARE_ENTRY gets default lights instead (see DefaultLight).
+Vec4 *ModelBank::LightDirection(AnimModel *model, Vec4 *position, Vec4 *target)
+{
+    if (enabled == 0)
+        return 0;
+    if (model == 0)
+    {
+        if (position != 0 && target != 0)
+        {
+            Vec4 zero;
+            zero.Set(0, 0, 0, 0);
+            Vec4 colours[1];
+            Vec4 positions[1];
+            Vec4 white(1.0f, 1.0f, 1.0f, 0);
+            colours[0].Copy(zero);
+            positions[0].Copy(zero);
+            positions[0].z += 500.0f;
+            positions[0].x += 100.0f;
+            positions[0].y -= 200.0f;
+            Vec4 *light = &lighting[LIGHT_SPARE_ENTRY * LIGHT_VECTORS];
+            light[0].Set(1.0f, -1.0f, 1.0f, 0);
+            light[1].Set(1.0f, 1.0f, 1.0f, 0);
+            light[2].Set(0, 0, 0, 0);
+            light[3].Set(0, 0, 0, 0);
+            light[4].Set(0, 0, 0, 0);
+            light[5].Set(0, 0, 0, 0);
+            light[LIGHT_AMBIENT].Set(0.1f, 0.1f, 0.1f, 0);
+            light[LIGHT_KEY_DIRECTION].Copy(*position - *target);
+            light[LIGHT_KEY_DIRECTION].Copy(Vec3_Normalized(&light[LIGHT_KEY_DIRECTION]) * 2.0f);
+            light[LIGHT_KEY_DIRECTION].w = 1.0f;
+            light[LIGHT_KEY_COLOUR].w = 1.0f;
+            float brightness = (*position - *target).Length() / LIGHT_FADE_DISTANCE + LIGHT_BASE_BRIGHTNESS;
+            light[LIGHT_KEY_COLOUR].z = brightness;
+            light[LIGHT_KEY_COLOUR].y = brightness;
+            light[LIGHT_KEY_COLOUR].x = brightness;
+            light[LIGHT_KEY_COLOUR].Copy(light[LIGHT_KEY_COLOUR] * 0.8f);
+        }
+        return &lighting[LIGHT_SPARE_ENTRY * LIGHT_VECTORS];
+    }
+    for (int i = 0; i < 0x80; i++)
+    {
+        if (litModels[i] == model)
+        {
+            if (position != 0 && target != 0)
+            {
+                Vec4 *light = &lighting[i * LIGHT_VECTORS];
+                light[LIGHT_KEY_DIRECTION].Copy(*position - *target);
+                light[LIGHT_KEY_DIRECTION].Copy(Vec3_Normalized(&light[LIGHT_KEY_DIRECTION]) * 2.0f);
+                light[LIGHT_KEY_DIRECTION].w = 1.0f;
+                light[LIGHT_KEY_COLOUR].w = 1.0f;
+                float brightness = (*position - *target).Length() / LIGHT_FADE_DISTANCE + LIGHT_BASE_BRIGHTNESS;
+                light[LIGHT_KEY_COLOUR].z = brightness;
+                light[LIGHT_KEY_COLOUR].y = brightness;
+                light[LIGHT_KEY_COLOUR].x = brightness;
+                light[LIGHT_KEY_COLOUR].Copy(light[LIGHT_KEY_COLOUR] * 0.8f);
+                light[LIGHT_AMBIENT].Set(0.1f, 0.1f, 0.1f, 0);
+            }
+            return &lighting[i * LIGHT_VECTORS];
+        }
+    }
+    return 0;
+}
+
+// 0x1017c5f0 (ModelBank::LightForRoot). Like LightDirection for the bank model whose node tree is `root`; any other
+// root (or none) gets the default lights of the spare entry.
+Vec4 *ModelBank::LightForRoot(Node *root, Vec4 *position, Vec4 *target)
+{
+    if (enabled == 0)
+        return 0;
+    if (root != 0)
+    {
+        int i;
+        for (i = 0; i < MODEL_BANK_SIZE; i++)
+        {
+            if (root == models[i].root)
+                break;
+        }
+        if (i != MODEL_BANK_SIZE)
+            return LightDirection(&models[i], position, target);
+    }
+    if (position != 0 && target != 0)
+    {
+    Vec4 zero;
+    zero.Set(0, 0, 0, 0);
+    Vec4 colours[1];
+    Vec4 positions[1];
+    Vec4 white(1.0f, 1.0f, 1.0f, 0);
+    colours[0].Copy(zero);
+    positions[0].Copy(zero);
+    positions[0].z += 500.0f;
+    positions[0].x += 100.0f;
+    positions[0].y -= 200.0f;
+    Vec4 *light = &lighting[LIGHT_SPARE_ENTRY * LIGHT_VECTORS];
+    light[0].Set(1.0f, -1.0f, 1.0f, 0);
+    light[1].Set(1.0f, 1.0f, 1.0f, 0);
+    light[2].Set(0, 0, 0, 0);
+    light[3].Set(0, 0, 0, 0);
+    light[4].Set(0, 0, 0, 0);
+    light[5].Set(0, 0, 0, 0);
+    light[LIGHT_AMBIENT].Set(0.1f, 0.1f, 0.1f, 0);
+    light[LIGHT_KEY_DIRECTION].Copy(*position - *target);
+    light[LIGHT_KEY_DIRECTION].Copy(Vec3_Normalized(&light[LIGHT_KEY_DIRECTION]) * 2.0f);
+    light[LIGHT_KEY_DIRECTION].w = 1.0f;
+    light[LIGHT_KEY_COLOUR].w = 1.0f;
+    float brightness = (*position - *target).Length() / LIGHT_FADE_DISTANCE + LIGHT_BASE_BRIGHTNESS;
+    light[LIGHT_KEY_COLOUR].z = brightness;
+    light[LIGHT_KEY_COLOUR].y = brightness;
+    light[LIGHT_KEY_COLOUR].x = brightness;
+    light[LIGHT_KEY_COLOUR].Copy(light[LIGHT_KEY_COLOUR] * 0.8f);
+    }
+    return &lighting[LIGHT_SPARE_ENTRY * LIGHT_VECTORS];
+}
+
 #include <stdio.h>
 
 #include "texture_object.h"

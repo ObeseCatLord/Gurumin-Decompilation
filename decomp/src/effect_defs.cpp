@@ -3,21 +3,8 @@
 
 #include <string.h>
 
-struct EffectDef
-{
-    int id;                   // -1 = free
-    char pad_0004[0x150];
-    int m_0154;
-    char pad_0158[0xc];
-    int m_0164;               // 0x164: 50 for a new definition
-    char pad_0168[0x97];
-    char name[0x1d9];         // 0x1ff: display name
-};
-
-extern "C" EffectDef DAT_1101dfdc[0x47e];
+#include "effect_manager.h"
 extern "C" int DAT_110186a8[32];
-extern "C" int DAT_1101d820[5];
-extern "C" int DAT_11018604[5];
 extern "C" char DAT_1101de64;
 
 // Takes the first free effect definition, names it "未設定" ("not set"), gives it its defaults and clears the

@@ -2,6 +2,7 @@
 
 #include "vec4.h"
 
+#include "effect_manager.h"
 extern "C" unsigned int DAT_104c013c;
 extern "C" char DAT_10254c40[0x400];
 extern "C" Vec4 DAT_104c0438[0x400];
@@ -27,21 +28,6 @@ extern "C" int FUN_1000c5c0(const Vec4 &position)
     return 0;
 }
 
-struct Record3d8
-{
-    int id;
-    char pad_0004[0x3d4];
-};
-
-struct RecordC4
-{
-    int id;
-    char pad_0004[0xc0];
-};
-
-extern "C" Record3d8 DAT_1101e0d8[1150];
-extern "C" RecordC4 DAT_11134cc8[840];
-extern "C" RecordC4 DAT_118a8888[840];
 
 // 0x1016fb10 (marking the three tables free) is EffectManager::ClearTables in char_effects.cpp: the effect
 // manager's Init relies on knowing its registers.

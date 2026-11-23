@@ -26,70 +26,8 @@ struct TriangleBatch
     void Flush();                               // 0x101733f0
 };
 
-// Effect slot tables.
-struct EffectRecordA
-{
-    int prev;                 // 0x00: previous record of its list, -1 = first
-    int next;                 // 0x04: next record of its list, -1 = last
-    int id;                   // 0x08: -1 = free
-    int parent;               // 0x0c: record this effect is attached to, -1 = none
-    char pad_0010[0x14];
-    Vec4 positions[0x16];     // 0x24: positions of the effect's parts
-    char pad_0184[0xa];
-    char part;                // 0x18e: the part whose position decides visibility
-    char pad_018f[3];
-    short light;              // 0x192: entry of DAT_118e99f8 (0x4014-byte records) this effect uses, 0 = none
-    char pad_0194[0xd];
-    unsigned char flags;      // 0x1a1: 1 = also updated in the restricted pass, 2 = only updated when hidden effects are
-    char pad_01a2[4];
-    char drawn;               // 0x1a6: 1 once drawn this frame (list 1)
-    char pad_01a7[0x19];
-    int owner;                // 0x1c0: character slot that started the effect
-    char pad_01c4[0x14];
-    int *pause;               // 0x1d8: when it points to a non-zero value the effect is paused
-};
-
-struct EffectRecordB
-{
-    int id;                   // -1 = free
-    char pad_0004[0xb8];
-    short lifetime;           // 0xbc: frames the record lives
-    short age;                // 0xbe: frames it has lived
-    int pad_00c0;
-};
-
-// Effect definition (effect_defs.cpp EffectDef): `id` is the effect type a script refers to.
-struct EffectType
-{
-    int id;
-    char pad_0004[0x7c];
-    int lightFrames;          // 0x80: how long the effect's light lasts (it fades out over lightFrames + 10)
-    char pad_0084[0x78];
-    int m_00fc;               // 0xfc: -1 after Init
-    char pad_0100[0x2d8];
-};
-
-extern "C" EffectType DAT_1101dfdc[0x47e];
 extern "C" TriangleBatch DAT_1101c804;
-extern "C" char DAT_10fc6a90[];                  // vertex buffer of the effect batch (0x400 entries)
-// Light of an effect, 0x4014 bytes.
-struct EffectLight
-{
-    int active;
-    int type;                 // 0x04: effect definition (DAT_1101dfdc) the light belongs to
-    int pad_0008;
-    int frame;                // 0x0c: frames since the light started (0 = not counting)
-    float fade;               // 0x10: 1 at the start, falling to 0
-    char pad_0014[0x4000];
-};
-
-extern "C" EffectLight DAT_118e99f8[0x80];
-extern "C" EffectRecordA DAT_1115cfe8[];
-extern "C" EffectRecordB DAT_11134cc8[];
-extern "C" EffectRecordB DAT_118a8888[];
-extern "C" int DAT_1101d820[5];
-extern "C" int DAT_11018604[5];
-
+extern "C" char DAT_10fc6a90[];
 // Stops every effect: rebinds the effect batch to its buffer, clears all effect tables and marks their slots free
 // (-1), and resets the six group offsets. The offset table has only five values in the original; the sixth group
 // gets whatever was on the stack (kept as is).
@@ -99,16 +37,16 @@ int EffectManager::Reset()
     DAT_1101c804.SetBuffer(DAT_10fc6a90, 0x400);
     m_0050 = 0;
     memset(DAT_118e99f8, 0, sizeof(DAT_118e99f8));
-    memset(DAT_1115cfe8, 0, 840 * sizeof(EffectRecordA));
-    memset(DAT_11134cc8, 0, 840 * sizeof(EffectRecordB));
-    memset(DAT_118a8888, 0, 840 * sizeof(EffectRecordB));
+    memset(DAT_1115cfe8, 0, EFFECT_RECORD_COUNT * sizeof(EffectRecord));
+    memset(DAT_11134cc8, 0, EFFECT_SPRITE_COUNT * sizeof(EffectSprite));
+    memset(DAT_118a8888, 0, EFFECT_SPRITE_COUNT * sizeof(EffectSprite));
     int i;
     for (i = 0; i < 840; i++)
         DAT_1115cfe8[i].id = -1;
     for (i = 0; i < 840; i++)
-        DAT_11134cc8[i].id = -1;
+        DAT_11134cc8[i].type = -1;
     for (i = 0; i < 840; i++)
-        DAT_118a8888[i].id = -1;
+        DAT_118a8888[i].type = -1;
     // The two five-entry lookup caches.
     DAT_1101d820[0] = -1;
     DAT_1101d820[1] = -1;
@@ -142,7 +80,7 @@ int EffectManager::RemoveOwnedBy(int owner)
     {
         for (int i = DAT_1101d820[list]; i > -1; i = DAT_1115cfe8[i].next)
         {
-            if (DAT_1115cfe8[i].id > -1 && DAT_1115cfe8[i].owner == owner)
+            if (DAT_1115cfe8[i].id > -1 && DAT_1115cfe8[i].options.owner == owner)
             {
                 DAT_1115cfe8[i].id = -1;
                 if (DAT_1115cfe8[i].prev == -1)
@@ -229,8 +167,8 @@ int EffectManager::Update(int restricted, int includeHidden, int ignorePause)
     {
         for (int i = DAT_1101d820[list]; i > -1; i = DAT_1115cfe8[i].next)
         {
-            if (DAT_1115cfe8[i].id != -1 && (includeHidden != 0 || (DAT_1115cfe8[i].flags & 2) == 0) &&
-                (restricted == 0 || (DAT_1115cfe8[i].flags & 1) != 0) &&
+            if (DAT_1115cfe8[i].id != -1 && (includeHidden != 0 || (DAT_1115cfe8[i].options.flags & EFFECT_FLAG_HIDDEN) == 0) &&
+                (restricted == 0 || (DAT_1115cfe8[i].options.flags & EFFECT_FLAG_RESTRICTED_PASS) != 0) &&
                 (DAT_1115cfe8[i].pause == 0 || *DAT_1115cfe8[i].pause == 0 || ignorePause != 0))
                 Step(i, list);
         }
@@ -238,20 +176,20 @@ int EffectManager::Update(int restricted, int includeHidden, int ignorePause)
     int j;
     for (j = 0; j < 840; j++)
     {
-        if (DAT_11134cc8[j].id != -1)
+        if (DAT_11134cc8[j].type != -1)
         {
             DAT_11134cc8[j].age++;
             if (DAT_11134cc8[j].age >= DAT_11134cc8[j].lifetime)
-                DAT_11134cc8[j].id = -1;
+                DAT_11134cc8[j].type = -1;
         }
     }
     for (j = 0; j < 840; j++)
     {
-        if (DAT_118a8888[j].id != -1)
+        if (DAT_118a8888[j].type != -1)
         {
             DAT_118a8888[j].age++;
             if (DAT_118a8888[j].age >= DAT_118a8888[j].lifetime)
-                DAT_118a8888[j].id = -1;
+                DAT_118a8888[j].type = -1;
         }
     }
     for (int k = 0; k < 0x80; k++)
@@ -278,12 +216,12 @@ int EffectManager::Update(int restricted, int includeHidden, int ignorePause)
 int EffectManager::ClearTables()
 {
     int i;
-    for (i = 0; i < 0x47e; i++)
-        DAT_1101dfdc[i].m_00fc = -1;
+    for (i = 0; i < EFFECT_DEFINITION_COUNT; i++)
+        DAT_1101dfdc[i].texture = -1;
     for (i = 0; i < 840; i++)
-        DAT_11134cc8[i].id = -1;
+        DAT_11134cc8[i].type = -1;
     for (i = 0; i < 840; i++)
-        DAT_118a8888[i].id = -1;
+        DAT_118a8888[i].type = -1;
     return 0;
 }
 
@@ -303,10 +241,10 @@ int EffectManager::Init()
     M_1016fab0();
     m_0050 = 0;
     memset(DAT_118e99f8, 0, sizeof(DAT_118e99f8));
-    memset(DAT_1115cfe8, 0, 840 * sizeof(EffectRecordA));
+    memset(DAT_1115cfe8, 0, EFFECT_RECORD_COUNT * sizeof(EffectRecord));
     memset(DAT_1101de68, 0, sizeof(DAT_1101de68));
-    memset(DAT_11134cc8, 0, 840 * sizeof(EffectRecordB));
-    memset(DAT_118a8888, 0, 840 * sizeof(EffectRecordB));
+    memset(DAT_11134cc8, 0, EFFECT_SPRITE_COUNT * sizeof(EffectSprite));
+    memset(DAT_118a8888, 0, EFFECT_SPRITE_COUNT * sizeof(EffectSprite));
     int i;
     for (i = 0; i < 32; i++)
         DAT_110186a8[i] = -1;
@@ -314,13 +252,13 @@ int EffectManager::Init()
     for (i = 0; i < 840; i++)
         DAT_1115cfe8[i].id = -1;
     for (i = 0; i < 840; i++)
-        DAT_11134cc8[i].id = -1;
+        DAT_11134cc8[i].type = -1;
     for (i = 0; i < 840; i++)
-        DAT_118a8888[i].id = -1;
-    for (i = 0; i < 0x47e; i++)
+        DAT_118a8888[i].type = -1;
+    for (i = 0; i < EFFECT_DEFINITION_COUNT; i++)
     {
         DAT_1101dfdc[i].id = -1;
-        DAT_1101dfdc[i].m_00fc = -1;
+        DAT_1101dfdc[i].texture = -1;
     }
     DAT_1101d820[0] = -1;
     DAT_1101d820[1] = -1;
@@ -374,15 +312,15 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
                 fread(0, 1, 1, 0);
             else
             {
-                if (DAT_1115cfe8[i].positions[DAT_1115cfe8[i].part].InRect(&DAT_10f668a8) != 0 &&
-                    DAT_10f668c0 + 20.0f > DAT_1115cfe8[i].positions[DAT_1115cfe8[i].part].z)
+                if (DAT_1115cfe8[i].partPositions[DAT_1115cfe8[i].part].InRect(&DAT_10f668a8) != 0 &&
+                    DAT_10f668c0 + 20.0f > DAT_1115cfe8[i].partPositions[DAT_1115cfe8[i].part].z)
                 {
                     FUN_1013f070(10, 1, 0);
                     DrawRecord(i, view, camera, 1);
-                    DAT_1115cfe8[i].drawn = 1;
+                    DAT_1115cfe8[i].options.drawn = 1;
                 }
                 else
-                    DAT_1115cfe8[i].drawn = 0;
+                    DAT_1115cfe8[i].options.drawn = 0;
                 CHECK_RECORD(i);
             }
         }
@@ -408,11 +346,11 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
                     fread(0, 1, 1, 0);
                 else
                 {
-                    if (DAT_1115cfe8[i].drawn == 0)
+                    if (DAT_1115cfe8[i].options.drawn == 0)
                     {
                         FUN_1013f070(10, 1, 0);
                         DrawRecord(i, view, camera, 0);
-                        DAT_1115cfe8[i].drawn = 1;
+                        DAT_1115cfe8[i].options.drawn = 1;
                     }
                     CHECK_RECORD(i);
                 }
@@ -427,13 +365,13 @@ int EffectManager::Draw(const Matrix4 &view, const Matrix4 *camera, unsigned cha
     int sprite;
     for (sprite = first; sprite < end; sprite++)
     {
-        if (DAT_11134cc8[sprite].id != -1)
+        if (DAT_11134cc8[sprite].type != -1)
             DrawSpriteA(sprite, view, camera);
     }
     FUN_1013f070(10, 1, 0);
     for (sprite = first; sprite < end; sprite++)
     {
-        if (DAT_118a8888[sprite].id != -1)
+        if (DAT_118a8888[sprite].type != -1)
             DrawSpriteB(sprite, view, camera);
     }
     if (pass == 0)

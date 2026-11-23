@@ -20,52 +20,8 @@ struct SpriteBatch
                   float m_0078);
 };
 
-// A sprite record (char_effects.cpp EffectRecordB, 0xc4 bytes).
-struct EffectSprite
-{
-    int type;                    // effect definition of the sprite, -1 = free
-    Vec4 position;               // 0x04: world position (table A) or screen position (table B)
-    float colour[3];             // 0x14
-    float alpha;                 // 0x20
-    float colour2[3];            // 0x24
-    char pad_0030[0x44];
-    float size;                  // 0x74: half the width of the square
-    float m_0078;
-    float u0;                    // 0x7c
-    float u1;                    // 0x80
-    char pad_0084[0x18];
-    float v0;                    // 0x9c
-    float v1;                    // 0xa0
-    char pad_00a4[0x18];
-    short lifetime;              // 0xbc: frames the record lives
-    short age;                   // 0xbe: frames it has lived
-    int pad_00c0;
-};
-
-// Effect definition (char_effects.cpp EffectType, 0x3d8 bytes), only the fields used here.
-struct EffectType
-{
-    int id;
-    int kind;                    // 0x04: 1 and 0x12 are sprites
-    char pad_0008[0x64];
-    int depthTest;               // 0x6c: non-zero = drawn with render state 9 on
-    char pad_0070[0x18];
-    int fullAlphaB;              // 0x88: table B: non-zero = the sprite starts at full alpha (else half)
-    char pad_008c[0xc];
-    int fullAlphaA;              // 0x98: the same for table A
-    char pad_009c[0x60];
-    int texture;                 // 0xfc: texture slot
-    int blend;                   // 0x100: 0-6
-    char pad_0104[0x15c];
-    char flat;                   // 0x260: table A: drawn at depth 0
-    char pad_0261[0x177];
-};
-
 #include "effect_manager.h"
 
-extern "C" EffectSprite DAT_11134cc8[];          // table A: sprites placed in the world
-extern "C" EffectSprite DAT_118a8888[];          // table B: sprites placed on the screen
-extern "C" EffectType DAT_1101dfdc[0x47e];
 extern "C" SpriteBatch DAT_1101c804;
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 

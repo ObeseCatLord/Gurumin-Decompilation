@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (188)
+## 1. Walls to retry (189)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -112,6 +112,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e2440` 139 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
+- [ ] `100ed9b0` 1258 — ListBank::CompileStatement (listbank.cpp, 1264 vs 1258 bytes): all but the int/float/string tail matches; the original puts the string-test jne to the call block, then the shared error block, the float declare and the call block last, without cross-jumping the int/float DeclareFromText tails; every spelling gives call-first (1264) or merged declares (1248)
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
 - [ ] `1013e260` 428 — UserFolder_FindNt: identical apart from block placement (the original puts the strcpy(base) branch out of line after the fsetup.dll loop and jumps back; ours keeps it before the loop); if/else orders and the combined test tried
 - [ ] `1013e4f0` 431 — GameWindow::WindowProc (the base RenderWindow::WindowProc 0x1013e450 is DefWindowProc): an inline base WindowProc called from each case duplicates the tails like the original but cl 13.00 then propagates message constants and does not cache window/wParam in ebx/edi; has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
@@ -209,14 +210,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (91)
+## 4. Large functions (801-3000 bytes) (88)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `100169c0` 1220 bytes (float, loops 9, calls 33)
-- [ ] `10020090` 1224 bytes (float, loops 1, calls 27)
 - [ ] `1014c960` 1234 bytes (float, calls 22)
 - [ ] `1001ed80` 1257 bytes (float, calls 11)
-- [ ] `100ed9b0` 1258 bytes Script_CompileStatement (loops 11, calls 22)
 - [ ] `1004ed60` 1262 bytes (loops 4, calls 43)
 - [ ] `101446f0` 1273 bytes (float, calls 17)
 - [ ] `1001dc20` 1397 bytes (float, loops 5, calls 18)

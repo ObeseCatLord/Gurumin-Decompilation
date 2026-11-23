@@ -68,3 +68,114 @@ extern "C" float FUN_10016700(int x, int y)
         return sum / (float)count + DAT_1020d860[DAT_104bfdb4]->base;
     }
 }
+
+#include "game_vars.h"
+#include "script_vars.h"
+
+int FUN_1014b1c0(short value);                   // 0x1014b1c0: seeds the random table position
+extern "C" int FUN_1013f880(void);               // the game's random number
+
+#define HEIGHT_GRID 14                           // samples per side of a ground object's height map
+#define HEIGHT_STEP 25                           // distance between samples
+#define HEIGHT_MIN_OFFSET (-5 * HEIGHT_STEP)     // the first sample is placed here relative to the object
+#define HEIGHT_SOURCES 5                         // hills: one in the middle and four around it
+#define HEIGHT_SOURCE_SLOTS 16
+#define HEIGHT_ROUGHNESS 20                      // random bumps of 0..19 on top of the shape
+#define HEIGHT_BASE 100.0f                       // the shape is lifted by 20 and lowered by this
+
+// 0x100169c0 (Ground_BuildHeights). Fills the 14x14 height samples of ground object `slot` (and copies them to
+// DAT_1042e3f0): the shape is the sum of five hills (one in the middle, four 80 units around it) for hill style
+// `style` (0, 2, 3 or 4; other styles stay flat) plus a random 0..19 bump per sample. Re-seeds the random table first.
+extern "C" void FUN_100169c0(int slot, int style)
+{
+    FUN_1014b1c0(0);
+    Vec4 sample;
+    Vec4 sources[HEIGHT_SOURCE_SLOTS];
+    sources[0].Set(0.0f, 0.0f, 50.0f, 0.0f);
+    sources[1].Set(80.0f, 0.0f, 40.0f, 0.0f);
+    sources[2].Set(0.0f, 80.0f, 40.0f, 0.0f);
+    sources[3].Set(-80.0f, 0.0f, 40.0f, 0.0f);
+    sources[4].Set(0.0f, -80.0f, 40.0f, 0.0f);
+    for (int i = 0; i < HEIGHT_GRID; i++)
+        for (int j = 0; j < HEIGHT_GRID; j++)
+            DAT_1049f200[slot][j][i] = 0.0f;
+    int y = HEIGHT_MIN_OFFSET;
+    float *rowStart = &DAT_1049f200[slot][2][2];
+    for (; y < 200; y += HEIGHT_STEP)
+    {
+        float *cell = rowStart;
+        for (int x = HEIGHT_MIN_OFFSET; x < 200; x += HEIGHT_STEP)
+        {
+            sample.x = (float)x;
+            sample.y = (float)y;
+            sample.z = 0.0f;
+            float height = 0.0f;
+            if (style == 0)
+            {
+                for (int i = 0; i < HEIGHT_SOURCES; i++)
+                {
+                    if ((sample - sources[i]).Length2D() < 150.0f)
+                    {
+                        float away0;
+                        if ((sample - sources[i]).Length2D() - 20.0f > 0.0f)
+                            away0 = (sample - sources[i]).Length2D() - 20.0f;
+                        else
+                            away0 = 0.0f;
+                        height += ((150.0f - away0) / 150.0f) * sources[i].z;
+                    }
+                }
+            }
+            else if (style == 2)
+            {
+                for (int i = 0; i < HEIGHT_SOURCES; i++)
+                {
+                    if ((sample - sources[i]).Length2D() < 150.0f)
+                    {
+                        float away2;
+                        if ((sample - sources[i]).Length2D() - 150.0f > 0.0f)
+                            away2 = (sample - sources[i]).Length2D() - 150.0f;
+                        else
+                            away2 = 0.0f;
+                        height += ((200.0f - away2) / 200.0f) * sources[i].z;
+                    }
+                }
+            }
+            else if (style == 3)
+            {
+                for (int i = 0; i < HEIGHT_SOURCES; i++)
+                {
+                    if ((sample - sources[i]).Length2D() < 190.0f)
+                    {
+                        float away3;
+                        if ((sample - sources[i]).Length2D() - 190.0f > 0.0f)
+                            away3 = (sample - sources[i]).Length2D() - 190.0f;
+                        else
+                            away3 = 0.0f;
+                        height += ((220.0f - away3) / 300.0f) * sources[i].z;
+                    }
+                }
+            }
+            else if (style == 4)
+            {
+                for (int i = 0; i < HEIGHT_SOURCES; i++)
+                {
+                    if ((sample - sources[i]).Length2D() < 280.0f)
+                    {
+                        float away4;
+                        if ((sample - sources[i]).Length2D() - 280.0f > 0.0f)
+                            away4 = (sample - sources[i]).Length2D() - 280.0f;
+                        else
+                            away4 = 0.0f;
+                        height += ((320.0f - away4) / 300.0f) * sources[i].z;
+                    }
+                }
+            }
+            *cell = (float)(FUN_1013f880() % HEIGHT_ROUGHNESS) + height + 20.0f - HEIGHT_BASE;
+            cell += 16;
+        }
+        rowStart++;
+    }
+    for (int i = 0; i < HEIGHT_GRID; i++)
+        for (int j = 0; j < HEIGHT_GRID; j++)
+            DAT_1042e3f0[slot][j][i] = DAT_1049f200[slot][j][i];
+}

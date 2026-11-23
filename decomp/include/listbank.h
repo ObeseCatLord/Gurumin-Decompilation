@@ -71,7 +71,16 @@ struct ListBank
     int builtinCount;         // 0x2a5d4: number of registered builtin functions
     int globalBuiltinCount;   // 0x2a5d8: builtins registered outside any script (kept between compiles)
     int variableCounts[8];    // 0x2a5dc: variables declared per nesting level
-    ScriptBlock blocks[0x800];// 0x2a5fc: top-level `{ }` blocks of the text
+    union
+    {
+        ScriptBlock blocks[0x800];    // 0x2a5fc: top-level `{ }` blocks of the text
+        struct
+        {
+            char pad_blocks[0x1000];
+            char statementParts[LISTBANK_GROUP_COUNT][6][0x100];  // 0x2b5fc: per nesting level the condition or
+                                                                  // the three parts of a `for` header (3 unused)
+        };
+    };
     int blockCount;           // 0x2e5fc
     char text[0x7d00];        // 0x2e600: script text being parsed
     int textLength;           // 0x36300
@@ -109,7 +118,8 @@ struct ListBank
     int AssignValue(const char *name, const struct ScriptValue *value, char type);
     int ReadTerm(char **text, char *word);
     int ReadToken(char **text, char *token);                  // 0x100360f0: next token of an expression
-    int CompileStatement(const char *statement);               // 0x100ed9b0
+    int CompileStatement(char *statement);                     // 0x100ed9b0
+    int DeclareFunction(char *statement);                      // 0x100366c0
     int DeclareFromText(char *declaration, int group);        // 0x100ed510
     int CompileText();
     int LoadText(const char *source, int length);

@@ -1568,3 +1568,178 @@ int ListBank::DeclareFromText(char *declaration, int group)
     }
     return 0;
 }
+
+#define NO_INTERPRETER_TEXT "\x83" "C\x83\x93\x83^\x83v\x83\x8a\x83^\x82\xc5\x82\xcd\x8eg\x97p\x82\xc5\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81" "B"
+#define NO_GOTO_TEXT "goto\x82\xcd\x8eg\x97p\x82\xc5\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81" "B"
+#define NO_FUNCTION_DEFINITION_TEXT "\x83" "C\x83\x93\x83^\x83v\x83\x8a\x83^\x82\xc5\x82\xcd\x8a\xd6\x90\x94\x92\xe8\x8b`\x82\xc5\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81" "B"
+#define NO_LOCAL_FUNCTION_TEXT "\x83\x8d\x81[\x83J\x83\x8b\x8a\xd6\x90\x94\x82\xcd\x92\xe8\x8b`\x82\xc5\x82\xab\x82\xdc\x82\xb9\x82\xf1\x81" "B"
+#define BAD_FOR_TEXT "for\x82\xcc;\x82\xaa\x82\xa8\x82\xa9\x82\xb5\x82\xa2\x81" "B"
+
+// Statement kinds CompileStatement returns (besides 0 = error and 1 = nothing to execute: a label, a declaration or
+// a call that was compiled).
+#define STATEMENT_IF 10
+#define STATEMENT_FOR 11
+#define STATEMENT_WHILE 12
+#define STATEMENT_SWITCH 13
+#define STATEMENT_BREAK 14
+#define STATEMENT_CONTINUE 15
+#define STATEMENT_RETURN 16
+
+// 0x100ed9b0 (ListBank::CompileStatement). Classifies one statement by its first word. A label (ends in ':') and
+// `case` give 1; return, break, continue, if, for, while and switch give their STATEMENT_ code, with the
+// condition (or the three `for` parts) read into statementParts[depth]; all of these are errors outside
+// CompileText ("the interpreter cannot use it"). goto is always an error. int/float/string declare variables in the
+// current level (a function definition is an error there; at level 0 it goes to DeclareFunction). Any other
+// statement is compiled as a call. Returns the statement kind, 0 after an error.
+int ListBank::CompileStatement(char *statement)
+{
+    char *cursorText = statement;
+    char word[LISTBANK_TEXT_SIZE];
+    ReadWord(&cursorText, word);
+    int length = strlen(word);
+    if (length == 0)
+        return 0;
+    if (word[length - 1] == ':')
+        return 1;
+    if (strcmp(word, "return") == 0)
+    {
+        if (compiling != 0)
+        {
+            while (*cursorText == ' ' || *cursorText == '\t' || *cursorText == '\n' || *cursorText == '\r')
+                cursorText++;
+            if (*cursorText == '(')
+                cursorText++;
+            ReadWord(&cursorText, statementParts[depth][0]);
+            return STATEMENT_RETURN;
+        }
+        ReportError(NO_INTERPRETER_TEXT);
+        return 0;
+    }
+    if (strcmp(word, "break") == 0)
+    {
+        if (compiling != 0)
+            return STATEMENT_BREAK;
+        ReportError(NO_INTERPRETER_TEXT);
+        return 0;
+    }
+    if (strcmp(word, "continue") == 0)
+    {
+        if (compiling != 0)
+            return STATEMENT_CONTINUE;
+        ReportError(NO_INTERPRETER_TEXT);
+        return 0;
+    }
+    if (strcmp(word, "case") == 0)
+    {
+        if (compiling != 0)
+            return 1;
+        ReportError(NO_INTERPRETER_TEXT);
+        return 0;
+    }
+    if (strcmp(word, "if") == 0)
+    {
+        if (compiling != 0)
+        {
+            while (*cursorText != '(')
+                cursorText++;
+            cursorText++;
+            ReadStatement(&cursorText, statementParts[depth][0]);
+            return STATEMENT_IF;
+        }
+        ReportError(NO_INTERPRETER_TEXT);
+        return 0;
+    }
+    if (strcmp(word, "for") == 0)
+    {
+        if (compiling == 0)
+        {
+            ReportError(NO_INTERPRETER_TEXT);
+            return 0;
+        }
+        while (*cursorText != '(')
+            cursorText++;
+        cursorText++;
+        ReadStatement(&cursorText, statementParts[depth][0]);
+        if (statementParts[depth][0][0] != ';')
+        {
+            ReadStatement(&cursorText, statementParts[depth][1]);
+            if (statementParts[depth][1][0] != ';')
+                goto badFor;
+        }
+        ReadStatement(&cursorText, statementParts[depth][1]);
+        if (statementParts[depth][1][0] != ';')
+        {
+            ReadStatement(&cursorText, statementParts[depth][2]);
+            if (statementParts[depth][2][0] != ';')
+            {
+            badFor:
+                ReportError(BAD_FOR_TEXT);
+                return 0;
+            }
+        }
+        else
+            strcpy(statementParts[depth][1], "1");
+        ReadStatement(&cursorText, statementParts[depth][2]);
+        return STATEMENT_FOR;
+    }
+    if (strcmp(word, "while") == 0)
+    {
+        if (compiling != 0)
+        {
+            while (*cursorText != '(')
+                cursorText++;
+            cursorText++;
+            ReadStatement(&cursorText, statementParts[depth][0]);
+            return STATEMENT_WHILE;
+        }
+        ReportError(NO_INTERPRETER_TEXT);
+        return 0;
+    }
+    if (strcmp(word, "switch") == 0)
+    {
+        if (compiling != 0)
+        {
+            while (*cursorText != '(')
+                cursorText++;
+            cursorText++;
+            ReadStatement(&cursorText, statementParts[depth][0]);
+            return STATEMENT_SWITCH;
+        }
+        ReportError(NO_INTERPRETER_TEXT);
+        return 0;
+    }
+    if (strcmp(word, "goto") == 0)
+    {
+        ReportError(NO_GOTO_TEXT);
+        return 0;
+    }
+    if (strcmp(word, "int") == 0)
+    {
+        if (M_100049e0(statement) == 0)
+        {
+            DeclareFromText(statement, depth);
+            return 1;
+        }
+    }
+    else
+    {
+        if (strcmp(word, "float") != 0 && strcmp(word, "string") != 0)
+        {
+            strcpy(word, statement);
+            CompileCall(word, 0);
+            return 1;
+        }
+        if (M_100049e0(statement) == 0)
+        {
+            DeclareFromText(statement, depth);
+            return 1;
+        }
+    }
+    if (compiling == 0)
+        ReportError(NO_FUNCTION_DEFINITION_TEXT);
+    else if (depth == 0)
+        DeclareFunction(statement);
+    else
+        ReportError(NO_LOCAL_FUNCTION_TEXT);
+    return 1;
+}

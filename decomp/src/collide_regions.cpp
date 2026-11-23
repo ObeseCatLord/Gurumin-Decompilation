@@ -19,6 +19,77 @@ extern "C" int FUN_1001fff0(Node *root, const char *tag, unsigned int mask, Vec4
     return 0;
 }
 
+#define RAY_LENGTH 1700.0f      // the probe's reach along y (back) and z (up)
+#define RAY_STRETCH 10.0f       // how far the probe is stretched before it is turned into the far end of the ray
+#define REGION_MARGIN 150.0f    // slack around a node's x/y box in the overlap test
+#define RAY_DROP 350.0f         // how far the ray's start and end are lowered in y
+
+// 0x10020090 (Collide_RayThroughRegions). Casts a ray from `position` along the probe direction (0, -1700, 1700)
+// against the visible nodes (flag 0x4) of `root`. A node is tested (Node::Collide with `tag`, `mask`, `hit`) when the
+// x/y box of the ray (both ends of the probe scaled to the node's z extent, lowered by 350) overlaps the node's x/y
+// box widened by 150 on every side. Returns 1 at the first node that reports a collision, else 0. `velocity` is unused.
+extern "C" int FUN_10020090(Node *root, const char *tag, unsigned int mask, Vec4 *position, Vec4 *velocity, Vec4 *hit)
+{
+    int i = 0;
+    Vec4 lowCorner;
+    Vec4 highCorner;
+    Vec4 nodeMin;
+    Vec4 nodeMax;
+    Vec4 ray;
+    Vec4 nearPoint;
+    Vec4 farPoint;
+    for (Node *node = root->FindByFlags(4, 0, 0); node != 0; node = root->FindByFlags(4, ++i, 0))
+    {
+        ray.x = 0.0f;
+        ray.y = -RAY_LENGTH;
+        ray.z = RAY_LENGTH;
+        float zLow = node->box[NODE_BOX_MIN].z > node->box[NODE_BOX_MAX].z ? node->box[NODE_BOX_MAX].z : node->box[NODE_BOX_MIN].z;
+        float depthLow = position->z - zLow;
+        float zHigh = node->box[NODE_BOX_MIN].z < node->box[NODE_BOX_MAX].z ? node->box[NODE_BOX_MAX].z : node->box[NODE_BOX_MIN].z;
+        float depthHigh = position->z - zHigh;
+        nearPoint.Copy(ray.Divided(ray.z) * depthLow);
+        farPoint.Copy(ray.Divided(ray.z) * depthHigh);
+        ray.x = nearPoint.x > farPoint.x ? farPoint.x : nearPoint.x;
+        ray.y = nearPoint.y > farPoint.y ? farPoint.y : nearPoint.y;
+        if (!(nearPoint.x < farPoint.x))
+            farPoint.x = nearPoint.x;
+        if (!(nearPoint.y < farPoint.y))
+            farPoint.y = nearPoint.y;
+        nearPoint.Copy(ray);
+        lowCorner.Copy(*position - nearPoint);
+        highCorner.Copy(*position - farPoint);
+        nodeMin.x = node->box[NODE_BOX_MIN].x > node->box[NODE_BOX_MAX].x ? node->box[NODE_BOX_MAX].x : node->box[NODE_BOX_MIN].x;
+        nodeMin.y = node->box[NODE_BOX_MIN].y > node->box[NODE_BOX_MAX].y ? node->box[NODE_BOX_MAX].y : node->box[NODE_BOX_MIN].y;
+        nodeMax.x = node->box[NODE_BOX_MIN].x < node->box[NODE_BOX_MAX].x ? node->box[NODE_BOX_MAX].x : node->box[NODE_BOX_MIN].x;
+        nodeMax.y = node->box[NODE_BOX_MIN].y < node->box[NODE_BOX_MAX].y ? node->box[NODE_BOX_MAX].y : node->box[NODE_BOX_MIN].y;
+        ray.x = lowCorner.x > highCorner.x ? highCorner.x : lowCorner.x;
+        ray.y = lowCorner.y > highCorner.y ? highCorner.y : lowCorner.y;
+        if (!(lowCorner.x < highCorner.x))
+            highCorner.x = lowCorner.x;
+        if (!(lowCorner.y < highCorner.y))
+            highCorner.y = lowCorner.y;
+        lowCorner.Copy(ray);
+        lowCorner.y -= RAY_DROP;
+        highCorner.y -= RAY_DROP;
+        if (lowCorner.x - REGION_MARGIN < nodeMax.x + REGION_MARGIN && lowCorner.y - REGION_MARGIN < nodeMax.y + REGION_MARGIN &&
+            highCorner.x + REGION_MARGIN > nodeMin.x - REGION_MARGIN && highCorner.y + REGION_MARGIN > nodeMin.y - REGION_MARGIN)
+        {
+            ray.x = 0.0f;
+            ray.y = -RAY_LENGTH;
+            ray.z = RAY_LENGTH;
+            float stretch = RAY_STRETCH;
+            ray.Copy(ray * stretch);
+            ray.Copy(*position - ray);
+            lowCorner.Copy(*position);
+            lowCorner.y -= RAY_DROP;
+            ray.y -= RAY_DROP;
+            if (node->Collide(tag, mask, &lowCorner, &ray, hit) != 0)
+                return 1;
+        }
+    }
+    return 0;
+}
+
 #include "node_data.h"
 
 

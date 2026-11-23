@@ -105,7 +105,7 @@ extern "C" int DAT_1032d7a8[0x30];
 extern "C" int DAT_1042d918[0x10];
 extern "C" int DAT_1042d9e4;
 extern "C" int DAT_1042da68;                              // frames left
-extern "C" int DAT_1042e3f0[0x6000];
+extern "C" float DAT_1042e3f0[0x60][16][16];                 // copy of DAT_1049f200 made when the heights are built (0x100169c0)
 extern "C" int DAT_104463f0;
 extern "C" int DAT_104463f8[0x80];                       // event slots: state
 extern "C" int DAT_10446ea8;
@@ -132,7 +132,7 @@ extern "C" char DAT_1049f1f8;
 extern "C" char DAT_1049f1f9;
 extern "C" char DAT_1049f1fa;
 extern "C" char DAT_1049f1fb;
-extern "C" int DAT_1049f200[0x6000];
+extern "C" float DAT_1049f200[0x60][16][16];                 // height samples per ground object: [object][x][y], 14x14 used
 extern "C" int DAT_104b7210;
 extern "C" int DAT_104bf888;
 extern "C" int DAT_104bf894;

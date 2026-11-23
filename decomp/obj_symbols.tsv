@@ -523,3 +523,5 @@ _Enemy_IsBusy	100e1c40
 ?DrawKeyed@EffectModel@@QAEHAAUMatrix4@@0@Z	10037b40
 ?Free@EffectModel@@QAEHXZ	1000be10
 ?DrawItemPreview@@YAHXZ	10038070
+?CompileStatement@ListBank@@QAEHPAD@Z	100ed9b0
+?DeclareFunction@ListBank@@QAEHPAD@Z	100366c0

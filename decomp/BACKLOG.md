@@ -38,6 +38,7 @@ retype those members first.
    Status 2026-11-22: done (`tools/rule_check.py`; build_all prints `RULES`, report.json measures
    `matched_rules_*`): 182 of 789 matched functions pass. `python tools/rule_check.py` lists the files that hold
    the rest, most matched functions first.
+   Later the same day: 488 of 789 (type_move_driver.py, resolve_globals.py, view merges; see HANDOFF for what is left).
 
 ## Phase A: finish the medium functions (251-800 bytes)
 

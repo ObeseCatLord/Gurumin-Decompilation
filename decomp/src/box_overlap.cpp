@@ -119,6 +119,119 @@ extern "C" int __stdcall FUN_10192200(const Box *first, const Vec4 *firstOffset,
     return 1;
 }
 
+// Whether the circle of `radiusSquared` around `point` reaches the segment (u0, v0)-(u1, v1) of a side view: written
+// as "not at least the radius away" (the original's comparison, which also counts an unordered result as near).
+#define NEAR_EDGE(u0, v0, u1, v1) (!(point.DistanceSquaredToSegment2D(u0, v0, u1, v1) >= radiusSquared))
+
+// 0x10192520 (BoxSphere_Overlap). Box `first` moved by `firstOffset` against the sphere `sphere` moved by
+// `sphereOffset` (radius w * 0.578, as in CylinderSphere_Overlap). The sphere's circle must touch the box's
+// rectangle in three views: across x (z, y), across y (z, x) and from above (x, y). Each view also records the
+// axis to push along: a circle inside the rectangle pushes along the view's own axis (x for the first view, z for
+// the top view; the second view records nothing), a circle touching an edge pushes along that edge's normal. On
+// overlap `delta`, when given, receives the box centre minus the sphere centre, and `negatedDelta`, when given, the
+// sphere centre minus the box centre with its z scaled by 0.01; in both, axes no view chose are zeroed. Returns 1
+// on overlap, else 0. Called by the scene node code at 0x10193140.
+extern "C" int __stdcall FUN_10192520(const Box *first, const Vec4 *firstOffset, const Vec4 *sphere,
+                                      const Vec4 *sphereOffset, Vec4 *delta, Vec4 *negatedDelta)
+{
+    Vec4 point;
+    Vec4 box[2];
+    box[0].x = first->min.x + firstOffset->x;
+    box[0].y = first->min.y + firstOffset->y;
+    box[0].z = first->min.z + firstOffset->z;
+    box[1].x = first->max.x + firstOffset->x;
+    box[1].y = first->max.y + firstOffset->y;
+    box[1].z = first->max.z + firstOffset->z;
+    int pushX = 0;
+    int pushY = 0;
+    int pushZ = 0;
+    float sphereRadius = sphere->w * 0.578f;
+    float radiusSquared = sphereRadius * sphereRadius;
+
+    // Across x: point = sphere (z, y).
+    point.x = sphereOffset->z + sphere->z;
+    point.y = sphereOffset->y + sphere->y;
+    if (box[0].z >= point.x || box[1].z <= point.x || box[0].y >= point.y || box[1].y <= point.y)
+    {
+        if (NEAR_EDGE(box[0].z, box[0].y, box[1].z, box[0].y))
+            pushY = 1;
+        else if (NEAR_EDGE(box[1].z, box[0].y, box[1].z, box[1].y))
+            pushZ = 1;
+        else if (NEAR_EDGE(box[0].z, box[1].y, box[1].z, box[1].y))
+            pushY = 1;
+        else if (NEAR_EDGE(box[0].z, box[0].y, box[0].z, box[1].y))
+            pushZ = 1;
+        else
+            return 0;
+    }
+    else
+        pushX = 1;
+
+    // Across y: point = sphere (z, x).
+    point.x = sphereOffset->z + sphere->z;
+    point.y = sphere->x + sphereOffset->x;
+    if (box[0].z >= point.x || box[1].z <= point.x || box[0].x >= point.y || box[1].x <= point.y)
+    {
+        if (NEAR_EDGE(box[0].z, box[0].x, box[1].z, box[0].x))
+            pushX = 1;
+        else if (NEAR_EDGE(box[1].z, box[0].x, box[1].z, box[1].x))
+            pushZ = 1;
+        else if (NEAR_EDGE(box[0].z, box[1].x, box[1].z, box[1].x))
+            pushX = 1;
+        else if (NEAR_EDGE(box[0].z, box[0].x, box[0].z, box[1].x))
+            pushZ = 1;
+        else
+            return 0;
+    }
+
+    // From above: point = sphere (x, y, z).
+    point.x = sphere->x + sphereOffset->x;
+    point.y = sphereOffset->y + sphere->y;
+    point.z = sphereOffset->z + sphere->z;
+    if (box[0].x >= point.x || box[1].x <= point.x || box[0].y >= point.y || box[1].y <= point.y)
+    {
+        if (NEAR_EDGE(box[0].x, box[0].y, box[1].x, box[0].y))
+            pushY = 1;
+        else if (NEAR_EDGE(box[1].x, box[0].y, box[1].x, box[1].y))
+            pushX = 1;
+        else if (NEAR_EDGE(box[0].x, box[1].y, box[1].x, box[1].y))
+            pushY = 1;
+        else if (NEAR_EDGE(box[0].x, box[0].y, box[0].x, box[1].y))
+            pushX = 1;
+        else
+            return 0;
+    }
+    else
+        pushZ = 1;
+
+    if (delta != 0)
+    {
+        Vec4 boxCentre;
+        boxCentre.Copy((box[0] + box[1]) * 0.5f);
+        delta->Copy(boxCentre - point);
+        if (!pushX)
+            delta->x = 0;
+        if (!pushY)
+            delta->y = 0;
+        if (!pushZ)
+            delta->z = 0;
+    }
+    if (negatedDelta != 0)
+    {
+        Vec4 boxCentre;
+        boxCentre.Copy((box[0] + box[1]) * 0.5f);
+        negatedDelta->Copy(point - boxCentre);
+        if (!pushX)
+            negatedDelta->x = 0;
+        if (!pushY)
+            negatedDelta->y = 0;
+        if (!pushZ)
+            negatedDelta->z = 0;
+        negatedDelta->z *= 0.01f;
+    }
+    return 1;
+}
+
 // 0x10192a00 (Cylinder_Overlap). The same test for upright cylinders inscribed in the boxes: each radius is half the
 // box's x/y diagonal divided by 1.414. The cylinders overlap when their centres (the offsets) are closer than the
 // two radii together in x/y and their height ranges overlap. On overlap `delta` receives the first offset minus

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (160)
+## 1. Walls to retry (161)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -150,6 +150,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
 - [ ] `10190e30` 884 — EffectManager::Draw: flow, calls and the record checks in place; scheduling residue (the 0x244 table constant, the pushes shared by the crash and draw blocks hoisted above the test) and the sprite loops keep first/end in ebp/edi in the original
+- [ ] `10192520` 1233 — BoxSphere_Overlap (box_overlap.cpp, rule-clean): 4 bytes off, only the first view's point.y = sphereOffset->y + sphere->y (the original loads the offset first; either source order gives sphere first here, the top view's identical sum comes out right; same wall as 0x10192c90). The edge tests must be written !(distance >= radiusSquared) for the original's test ah,1 jumps
 - [ ] `10192c90` 975 — CylinderSphere_Overlap (box_overlap.cpp, rule-clean): 25 bytes off; the original adds sphere->y + sphereOffset->y in that order (fld [ebx+4]) at all three point.y assignments, cl 13.00 here picks offset first whatever the source order (x and z come out right); also two stack slots (radius, sphereRadius) differ
 - [ ] `10194a10` 580 — Circle_Intersect (__stdcall): logic identical; the stack slots of d2 and disc are swapped and the original multiplies by d2 after storing (rb2 + ra2); k split, 2.0 factor and early returns tried
 - [ ] `10194c60` 629 — Node::UpdateWorld: code identical except the EH state of the AnimatedMatrix temporary (ours 1, original 5; the original unwind map has four empty states 1-4); branch order, named result locals and a conditional expression tried
@@ -182,7 +183,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (141)
+## 4. Large functions (801-3000 bytes) (140)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `100d2110` 894 bytes (float, loops 4, calls 12)
@@ -218,7 +219,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100169c0` 1220 bytes (float, loops 9, calls 33)
 - [ ] `10020090` 1224 bytes (float, loops 1, calls 27)
 - [ ] `10037b40` 1232 bytes (float, calls 42)
-- [ ] `10192520` 1233 bytes (float, loops 1, calls 26)
 - [ ] `1014c960` 1234 bytes (float, calls 22)
 - [ ] `1001ed80` 1257 bytes (float, calls 11)
 - [ ] `100ed9b0` 1258 bytes Script_CompileStatement (loops 11, calls 22)

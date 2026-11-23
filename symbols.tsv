@@ -981,3 +981,4 @@ address	name	evidence
 100131b0	Number_DrawBack	same as Number_Draw with styles 0-2 at depth 0.7 (matched, decomp/src/hud_digits.cpp)
 10192200	BoxCylinder_Overlap	box against the upright cylinder inscribed in a second box (matched, decomp/src/box_overlap.cpp)
 10192c90	CylinderSphere_Overlap	upright cylinder in a moved box against a moved sphere (open, decomp/src/box_overlap.cpp)
+10192520	BoxSphere_Overlap	moved box against a moved sphere in three views, with push axes (open, decomp/src/box_overlap.cpp)

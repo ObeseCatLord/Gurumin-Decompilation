@@ -460,3 +460,17 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - `CharRecord` (`DAT_10db6ee8`) is the AnimModel embedded at `Character + 0x10` (`DAT_10db6ed8`): merging it means
   sharing AnimModel (anim_model.cpp, `CharModel` in world.h) as `Character::model` first. A field at CharRecord
   offset o is at Character offset o + 0x10.
+
+## 2026-11-22: node data, mesh, key tracks, AnimModel and DirectInput shared
+- New headers: `key_track.h` (KeyTrack 0x14, KeyBank 0xa84), `node_data.h` (NodeExtra, NodeSkin 0x561c, NodeSaved),
+  `mesh.h` (Vertex 0x70, VertexPack 0x74, IndexList, Material 0x180, MeshData), `anim_model.h` (AnimModel 0x249c,
+  MotionChannels 0xa98, Playback 0x7c84), `dinput_min.h` (DirectInput interfaces, effect structs, Input).
+- **AnimModel is 0x249c bytes, the full record stride.** So a Character record cannot hold one at +0x10: the old
+  `Character` view (`DAT_10db6ed8`) was the same array seen 0x10 bytes early. Its `id` (0x0) is the previous slot's
+  `AnimModel::nextSlotId` (0x248c), and its 0x4-0x10 bytes are the previous model's 0x2490-0x249c. All users now
+  index `DAT_10db6ee8` (field offset - 0x10); a record's id is read as `DAT_10db6ee8[i - 1].nextSlotId`.
+- Classes with constructors (Vec4, Matrix4, KeyBank, KeyTrack) cannot sit in unions (C2620), so AnimModel's
+  multi-use slots are anonymous unions/structs of PODs only. model_params.cpp stores an int mode in the float
+  `m_23d8.z` through `*(int *)&m_23d8.z` (the original writes the int bits there).
+- Codegen-neutral changes tested: float stores of 0 match int stores; float parameters passed through match int
+  parameters (SetPendingPush, M_10161af0); KeyBank needs no destructor.

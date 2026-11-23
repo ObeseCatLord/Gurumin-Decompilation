@@ -22,8 +22,9 @@ retype those members first.
    100b8220). `Matrix4`, `Vec3`, `Node` (plus nine aliases), `IUnknownLike`, `SurfaceDesc` and the D3D texture/surface
    views done the same day. Still per file: `ParamVector` (char_params.h, maybe Vec4 with `operator=` = Copy), the
    Node views with constructors/destructors (`SceneNode` in node_ctor.cpp and model_state.cpp, `WorldNode` in
-   world_ctor.cpp/world_frame.cpp, `FadeNode`/`FadeParent`/`FadeOwner` in node_fade.cpp), `NodeSaved`, the
-   DirectInput views (`InputDevice`, `InputEffect`, `Input` in input_font.cpp/input_poll.cpp).
+   world_ctor.cpp/world_frame.cpp, `FadeNode`/`FadeParent`/`FadeOwner` in node_fade.cpp), `NodeSaved` and the
+   DirectInput views (done: node_data.h, mesh.h, key_track.h, dinput_min.h). AnimModel is shared (anim_model.h) and
+   the Character views now index it (`DAT_10db6ee8`).
 2. Merge the struct views into one full definition each (`CharRecord`, `NpcState`, `TextureObject`, `ModelBank`,
    `BankModel`, `Game`): union the known fields, check every offset with a `sizeof`/offset assertion, and resolve
    conflicting field names from the evidence.
@@ -81,7 +82,7 @@ retype those members first.
 
 ## Phase E: structures and headers
 
-24. Fix the Character base: the true record starts at 0x10db6ee8 (model part), not 0x10db6ed8. Move world.h to the
+24. (Done 2026-11-22: world.h and all users index DAT_10db6ee8 as AnimModel.) Fix the Character base: the true record starts at 0x10db6ee8 (model part), not 0x10db6ed8. Move world.h to the
     new base, merge CharRecord (char_move.cpp, char_script.cpp) into it, update all users, rebuild everything.
 25. One shared `vec.h` (Vec4, Matrix4 with and without constructors) to replace the 40 private Vec4 definitions,
     keeping the per-file differences that change code (POD vs constructor) explicit.

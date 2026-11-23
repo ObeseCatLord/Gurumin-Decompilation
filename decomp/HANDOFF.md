@@ -61,9 +61,9 @@ Under AGENTS.md rules 1-2 most matches are still MATCH-PENDING until their other
 3. Then return to `QUEUE.md`.
 
 ## How the merges were run (reuse)
-- Generic driver `tm.py <config.py> <tag> <files>` in the session notes folder
-  (`C:\Users\Michael\AppData\Local\Claude-Data\claude_pzs8sxrjxfjjc\side-session-notes\local_93c4d5c5-8746-4eea-a63d-32135252eefa`; configs `cfg_charstate.py`,
-  `cfg_modelbank.py`, `cfg_effect.py`, `cfg_tex.py`, `cfg_game.py`; `lb_convert.py` for ListBank). Per file it removes
+- Generic driver `tools/merge_driver.py <config.py> <tag> <files>` (usage in its docstring; the configs used so far are
+  in `tools/merge_configs/`: `char_state.py`, `model_bank.py`, `effect_manager.py`, `texture_object.py`, `game.py`,
+  and `listbank_convert.py` for the hand-written ListBank merge). Per file it removes
   the view structs (with the comment lines above), drops the global's extern lines, adds the header include (after
   the leading includes), renames types, renames fields only through roots (the global with its indexes, or pointers
   declared with a view type), applies per-file raw regexes, rebuilds, and reverts on a loss or compile error; the
@@ -80,7 +80,7 @@ Under AGENTS.md rules 1-2 most matches are still MATCH-PENDING until their other
 `AGENTS.md`. Merge the remaining per-file views listed under 'Deferred / open' into shared headers under
 decomp/include/ (one declaration each, typed members): mesh_cache.cpp's MeshInstance onto TextureObject, the effect
 records (EffectRecord/EffectRecordA, DAT_1115cfe8) into effect_manager.h, CharSlot and ActorSlot, and give the
-CharState `words[k]` users named fields. Convert files with the generic driver `tm.py` from the session notes folder
+CharState `words[k]` users named fields. Convert files with the generic driver `decomp/tools/merge_driver.py`
 (byte-level, keep each line's ending; baseline from HEAD's report) and use Sonnet subagents only for files the driver
 reverts. After each batch run `python tools/build_all.py --report ../progress/jp/report.json` and
 `python tools/check_matches.py` from `decomp/`; commit and push only with no real loss (renames at the same address

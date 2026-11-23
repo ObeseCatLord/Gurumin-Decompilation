@@ -22,7 +22,6 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 extern "C" Node *DAT_1021bdf8[0x80][9];       // [0]: the cart's wheel node
 #include "char_tables.h"
 
-extern "C" float DAT_10255160[0x80][4];       // [0]: the wheel's angle
 #include "char_vars.h"
 
 extern "C" int FUN_10043e20(const Vec4 *target, const Vec4 *eye, float heading, float range, float angleRange,

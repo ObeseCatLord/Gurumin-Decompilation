@@ -18,7 +18,6 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" float DAT_10255160[0x80][4];
 extern "C" int FUN_1000d620(int index, int key, int frames);                // KeyPrompt_Show
 extern "C" int FUN_10043cc0(int index);                                     // Char_ResetState
 

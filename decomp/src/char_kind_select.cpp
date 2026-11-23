@@ -11,7 +11,6 @@
 
 #include "char_tables.h"
 
-extern "C" int DAT_10255160[0x80][4];
 extern "C" int DAT_1021bdf8[0x80][9];
 
 // 0x1001b0a0 (Char_SelectKind). Sets the kind of character `index` from its script code: the millions pair picks a

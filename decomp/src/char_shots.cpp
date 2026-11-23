@@ -1,5 +1,6 @@
 // Shots fired by characters. Each character slot `owner` has six helper slots owner+2 .. owner+7 that its shots
 // use; a helper slot is free while its state (CharState::m_0000) is 0.
+#include "char_tables.h"
 #include "node.h"
 #include "map_vars.h"
 #include "world.h"
@@ -9,12 +10,17 @@
 #include "char_state.h"
 
 #include "last_position.h"
-#include "slot_motion.h"
 
-
-extern "C" SlotMotion DAT_10255160[0x80];
 extern "C" int FUN_1013f880(void);  // the game's random number
 #include "char_vars.h"
+
+// The shot's values in DAT_10255160 (char_tables.h).
+enum ShotMotionValue
+{
+    SHOT_ANGLE = 0,      // rotation about the vertical axis, copied from the owner (see FUN_1001a590)
+    SHOT_HEADING = 1,    // radians
+    SHOT_SPEED = 2
+};
 
 // 0x1001a680 (Char_FireShot). Starts a shot of character `owner` from `position` in the first free helper slot:
 // state 1, 300 frames to live, `spread` stored in the slot, the owner's pitch and target heading, speed 5. With
@@ -31,11 +37,11 @@ extern "C" int FUN_1001a680(int owner, const Vec4 *position, int spread)
         DAT_1020b430[slot].values[0] = 300;
         DAT_1020b430[slot].values[1] = spread;
         DAT_1020b430[slot].values[2] = 0;
-        DAT_10255160[slot].angle = DAT_10255160[owner].angle;
-        DAT_10255160[slot].heading = DAT_10db6ee8[owner].targetHeading;
+        DAT_10255160[slot][SHOT_ANGLE] = DAT_10255160[owner][SHOT_ANGLE];
+        DAT_10255160[slot][SHOT_HEADING] = DAT_10db6ee8[owner].targetHeading;
         if (spread != 0)
-            DAT_10255160[slot].heading = (float)(FUN_1013f880() % 250 - 125) / 5000.0f + DAT_10255160[slot].heading;
-        DAT_10255160[slot].speed = 5.0f;
+            DAT_10255160[slot][SHOT_HEADING] = (float)(FUN_1013f880() % 250 - 125) / 5000.0f + DAT_10255160[slot][SHOT_HEADING];
+        DAT_10255160[slot][SHOT_SPEED] = 5.0f;
         return 0;
     }
     return 0;
@@ -53,7 +59,7 @@ extern "C" int FUN_1001a590(int slot, int unused, float distance)
         Vec4 to;
         Vec4 hit;
         from.y = -distance;
-        from.RotateZ(-DAT_10255160[slot].angle);
+        from.RotateZ(-DAT_10255160[slot][SHOT_ANGLE]);
         from.z += 50.0f;
         to.Copy(from);
         to.z -= 350.0f;

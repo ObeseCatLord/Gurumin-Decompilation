@@ -15,7 +15,6 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_tables.h"
 
-extern "C" float DAT_10255160[0x80][4];       // [0]: distance kept behind the marker
 extern "C" int FUN_10043cc0(int index);       // Char_ResetState
 
 // atan2 on floats (an inline helper: both arguments are rounded to float first, the second one first).

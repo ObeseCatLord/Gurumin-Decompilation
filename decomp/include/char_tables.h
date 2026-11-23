@@ -57,6 +57,10 @@ extern "C" int DAT_10254598[CHAR_SLOT_COUNT];
 extern "C" short DAT_10254838[CHAR_SLOT_COUNT];           // per-object switch state; 1000 is added while it is held
 extern "C" int DAT_102548c0[CHAR_SLOT_COUNT];             // per-character packed value, four two-digit fields AABBCCDD; script code of each character (pairs of decimal digits)
 extern "C" unsigned char DAT_102550e0[CHAR_SLOT_COUNT];   // non-zero = wake at once (the character's level elsewhere); 1 = the character was hit (attack at once); level of each character
+// Four values per character slot that each mover uses its own way: [0] is the current speed (enemy_chase.cpp),
+// the distance kept behind the marker (npc_ride.cpp) or the wheel angle (npc_wheel.cpp); shots keep their angle,
+// heading and speed in [0]..[2] (char_shots.cpp).
+extern "C" float DAT_10255160[CHAR_SLOT_COUNT][4];
 extern "C" char DAT_10255a88[CHAR_SLOT_COUNT];
 extern "C" int DAT_10255f10[0x5c];
 extern "C" int DAT_10256218[CHAR_SLOT_COUNT];

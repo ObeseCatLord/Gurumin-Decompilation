@@ -1045,7 +1045,6 @@ extern "C" int FUN_100b4300(int index)
     return 0;
 }
 
-extern "C" float DAT_10255160[0x80][4];
 
 // 0x100b4930 (Npc_RideAlarm). A lookout that rides along with the nearest marker character (kind ',' with a model,
 // among 0x5c..0x7b; with none m_003c becomes 11): it keeps its distance behind the marker (stored in DAT_10255160)

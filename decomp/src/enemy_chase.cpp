@@ -1,6 +1,7 @@
 // An enemy chasing the player (0x10027630, an enemy move like those in enemy_moves.cpp, used by the AI updaters
 // 0x100e2110 and 0x100e2560): it runs towards the player with a speed that eases towards its wanted speed.
 
+#include "char_tables.h"
 #include <math.h>
 
 #include "vec4.h"
@@ -13,7 +14,6 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-extern "C" float DAT_10255160[0x80][4];       // [0]: the enemy's current speed
 #include "char_vars.h"
 
 extern "C" int FUN_1013f880(void);            // the game's random number

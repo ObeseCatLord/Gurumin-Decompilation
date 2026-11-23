@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 17.3692,
+  "fuzzy_match_percent": 17.4766,
   "total_code": "1720206",
   "matched_code": "226128",
   "matched_code_percent": 13.1454,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 264,
+  "total_units": 266,
   "complete_units": 151,
   "matched_rules_code": "225501",
   "matched_rules_code_percent": 13.109,
@@ -3365,6 +3365,52 @@
    }
   },
   {
+   "name": "app/char_links",
+   "measures": {
+    "fuzzy_match_percent": 98.0,
+    "total_code": "925",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "925",
+     "fuzzy_match_percent": 98.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "?Char_DrawLinks@@YAHXZ",
+     "size": "925",
+     "fuzzy_match_percent": 98.0,
+     "metadata": {
+      "virtual_address": "268548896"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/char_links.cpp"
+   }
+  },
+  {
    "name": "app/char_motion",
    "measures": {
     "fuzzy_match_percent": 100.0,
@@ -5280,6 +5326,52 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/effect_defs.cpp"
+   }
+  },
+  {
+   "name": "app/effect_light",
+   "measures": {
+    "fuzzy_match_percent": 25.3627,
+    "total_code": "3712",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "3712",
+     "fuzzy_match_percent": 25.3627
+    }
+   ],
+   "functions": [
+    {
+     "name": "?DrawLight@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z",
+     "size": "3712",
+     "fuzzy_match_percent": 25.3627,
+     "metadata": {
+      "virtual_address": "270038304"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/effect_light.cpp"
    }
   },
   {
@@ -17828,13 +17920,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1378976",
+    "total_code": "1374339",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 236,
+    "total_functions": 234,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -17851,7 +17943,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1378976",
+     "size": "1374339",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -17990,14 +18082,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268539504"
-     }
-    },
-    {
-     "name": "FUN_1001bb20",
-     "size": "925",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268548896"
      }
     },
     {
@@ -19582,14 +19666,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "270025792"
-     }
-    },
-    {
-     "name": "FUN_10187520",
-     "size": "3712",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270038304"
      }
     },
     {

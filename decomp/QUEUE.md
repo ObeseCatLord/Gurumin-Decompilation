@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (173)
+## 1. Walls to retry (174)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -43,6 +43,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1001b0a0` 1106 — Char_SelectKind: same statements; register roles differ from the start (original: index in ebx, kind pointer in esi, the ten-thousands pair in ebp tested with a dec chain; cl 13.00 here keeps index in ebp and compiles that switch as a compare tree) and the original reloads the kind for the 0x55 test; kind-pointer local and if-chain forms tried
 - [ ] `1001b670` 307 — enemy wake-up: 2 bytes; the original copies the position into the first-constructed vector (higher slot); every declaration order here swaps one slot
 - [ ] `1001b7b0` 138 — char retire: original keeps x*1.0f (fld x; fmul [1.0f]) where 13.00 folds it, and schedules both digit divisions (10 in edi and ebx) before the stores
+- [ ] `1001bb20` 925 — Char_DrawLinks (char_links.cpp, rule-clean, new CharLink table in char_links.h): 16 bytes of scheduling: the original stores the angle (fstp) after pushing the operator- arguments of the dropped Length2D and pushes the second -1 of the first Start after loading the offset; tried a split angle, a top-of-function angle, a named Length2D result and other option store orders.
 - [ ] `1001d2d0` 1154 — DigitCounter_Update: blocks and cases in place; the original keeps the state offset (index * 0x40) in edi and the divisor 10 in ebx, ours swaps them (and pushes ebx/edi around the first test)
 - [ ] `1001f270` 588 — Map_SelectMovie: same code apart from register roles (the original keeps the nearest index in ebx, the counter in esi and the camera-point pointer in edi, pushed inside the loop); declaration orders, pointer loop and named matrix tried
 - [ ] `100211a0` 466 — Region_WaveVertex: logic identical; ebx/ebp swapped for the flip counter and the point address, and the original rounds each sine result to float twice (helper and caller locals tried)
@@ -195,11 +196,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (118)
+## 4. Large functions (801-3000 bytes) (117)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
-- [ ] `1001bb20` 925 bytes (float, loops 2, calls 23)
 - [ ] `100360f0` 939 bytes (loops 4, calls 1)
 - [ ] `10026730` 950 bytes (float, loops 6, calls 13)
 - [ ] `10049b00` 954 bytes (float, loops 6, calls 10)
@@ -316,7 +316,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10016ec0` 2970 bytes (float, loops 6, calls 56)
 - [ ] `10165240` 2986 bytes (float, loops 15, calls 68)
 
-## 5. Very large functions (over 3000 bytes) (109)
+## 5. Very large functions (over 3000 bytes) (108)
 
 - [ ] `100094e0` 3023 bytes (float, loops 2, calls 27)
 - [ ] `100fb7b0` 3089 bytes (float, loops 16, calls 57)
@@ -338,7 +338,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10064630` 3598 bytes Menu_SaveLoad (loops 9, calls 94)
 - [ ] `101713f0` 3674 bytes (float, loops 5, calls 62)
 - [ ] `10170580` 3679 bytes (float, loops 5, calls 62)
-- [ ] `10187520` 3712 bytes (float, loops 3, calls 62)
 - [ ] `1017a010` 3719 bytes (float, loops 10, calls 70)
 - [ ] `10079470` 3839 bytes (float, loops 3, calls 70)
 - [ ] `10004b10` 3854 bytes (float, loops 14, calls 9)

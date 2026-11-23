@@ -1004,3 +1004,5 @@ address	name	evidence
 100a7150	Enemy_StarVolley	matched decompiled source (decomp/obj_symbols.tsv)
 100a6a50	Enemy_AimedShots	matched decompiled source (decomp/obj_symbols.tsv)
 100a8370	Enemy_CallBursts	matched decompiled source (decomp/obj_symbols.tsv)
+1001bb20	Char_DrawLinks	matched decompiled source (decomp/obj_symbols.tsv)
+10187520	EffectManager::DrawLight	matched decompiled source (decomp/obj_symbols.tsv)

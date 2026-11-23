@@ -15,9 +15,9 @@ extern "C" int FUN_10011c60(void)
 {
     for (int i = 0x3a; i < 0x7c; i++)
     {
-        if (DAT_1021f3c0[i] == 3 && i >= 0x3a && DAT_10db6ee8[i].matrix._41 > -49999.0f && DAT_10daaaec[i].health > 0 &&
-            DAT_10210d30[i] == 0 && DAT_10db6ee8[i].root != 0 && DAT_10daaaec[i].m_009c == 0)
-            DAT_10daaaec[i].health = 0;
+        if (DAT_1021f3c0[i] == 3 && i >= 0x3a && DAT_10db6ee8[i].matrix._41 > -49999.0f && DAT_10daaae8[i].stats[STAT_HEALTH] > 0 &&
+            DAT_10210d30[i] == 0 && DAT_10db6ee8[i].root != 0 && DAT_10daaae8[i].m_00a0 == 0)
+            DAT_10daaae8[i].stats[STAT_HEALTH] = 0;
     }
     return 1;
 }
@@ -30,7 +30,7 @@ extern "C" int FUN_10011cd0(void)
     {
         if (DAT_1021f3c0[i] == 3 && i >= 0x3a)
         {
-            if ((DAT_10db6ee8[i].matrix._41 < -50000.0f || (DAT_10daaaec[i].health <= 0 && DAT_10210d30[i] == 2)) &&
+            if ((DAT_10db6ee8[i].matrix._41 < -50000.0f || (DAT_10daaae8[i].stats[STAT_HEALTH] <= 0 && DAT_10210d30[i] == 2)) &&
                 DAT_10db6ee8[i].root != 0)
                 return i;
         }
@@ -54,7 +54,7 @@ extern "C" int FUN_10011d40(float a, float b, float c)
     {
         DAT_10db6ee8[i].root->M_101946b0(0xfe, -1);
         DAT_10db6ee8[i].root->M_10194730(0x2f, -1);
-        DAT_10daaaec[i].health = DAT_10daaaec[i].maxHealth;
+        DAT_10daaae8[i].stats[STAT_HEALTH] = DAT_10daaae8[i].stats[STAT_MAX_HEALTH];
         DAT_10210d30[i] = 0;
         DAT_10315350[i] = 0;
         DAT_10db6ee8[i].alpha = 1.0f;

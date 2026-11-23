@@ -133,7 +133,7 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
             if (left != 0)
             {
                 if (weapon == 0x36 || weapon == 0x37)
-                    DAT_10daaaec[index].twoHanded = 1;
+                    DAT_10daaae8[index].twoHanded = 1;
                 Node *hand = DAT_10db6ee8[index].root->Find("@Bip01 L Hand", 0);
                 if (hand != 0)
                 {

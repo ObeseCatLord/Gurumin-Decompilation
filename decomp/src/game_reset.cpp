@@ -3,7 +3,7 @@
 // player's parameters set back to their starting values.
 
 #include <string.h>
-#include "char_params.h"
+#include "char_slot.h"
 #include "char_state.h"
 
 #include "vec4.h"
@@ -592,7 +592,6 @@ extern "C" Vec4 DAT_10c67f50;
 extern "C" Vec4 DAT_10da9150;
 extern "C" Vec4 DAT_10daaad4;
 extern "C" int DAT_10daabb4;
-extern "C" CharParams DAT_10db4408;                 // their starting values
 extern "C" int DAT_10db9368;
 extern "C" Vec4 DAT_10edbd38;
 extern "C" Vec4 DAT_10edbdd8;

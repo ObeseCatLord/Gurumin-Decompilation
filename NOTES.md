@@ -417,7 +417,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
 - A union member cannot have a constructor (C2620): `scene_node.cpp`'s `bounds` union became plain `Vec4 bounds[3]`.
   The int fields that overlaid it were floats (first vertex z); a float-to-float field copy compiles to the same
   `mov` pair as the int copy did.
-- `char_params.h` `ParamVector::operator=` sits at 0x101acc20 (Vec4::Copy), and the implicit copy assignment
+- `char_slot.h` `ParamVector::operator=` sits at 0x101acc20 (Vec4::Copy), and the implicit copy assignment
   0x100357a0 calls it per member. This suggests Vec4::Copy is really `Vec4 &operator=(const Vec4 &)`. Unconfirmed,
   because no source file uses ParamVector yet.
 

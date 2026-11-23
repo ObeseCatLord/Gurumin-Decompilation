@@ -111,8 +111,8 @@ int FUN_10011240(const char *name, void *thumbnail)
 }
 
 #include "anim_model.h"
+#include "char_slot.h"
 
-extern "C" char DAT_10daaae8[0x188];             // the player's slot record (CharSlot, 4 bytes before slot 0's)
 extern "C" int DAT_10c62edc[0x1000];             // script flags
 extern "C" int DAT_103150c0[0x20];
 extern "C" int DAT_10202464[4];
@@ -199,7 +199,7 @@ int FUN_1003b2c0(const char *path, int mode)
             DAT_104bfd18 = *(int *)p;
             p += 0x158;
             offset += 0x158;
-            memcpy(DAT_10daaae8, p, 0x188);
+            memcpy(&DAT_10daaae8[0], p, sizeof(CharSlot));
             p += 0x188;
             offset += 0x188;
             memcpy(DAT_10c62edc, p, 0x4000);

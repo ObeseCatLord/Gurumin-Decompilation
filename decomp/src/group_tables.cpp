@@ -74,7 +74,7 @@ extern "C" int FUN_1001c410(int value, const Matrix4 *matrix, int *outChar, int 
 {
     for (int i = 0x5c; i < 0x7c; i++)
     {
-        if (DAT_10daaaec[i].kind == 0x58)
+        if (DAT_10daaae8[i].kind == 0x58)
         {
             for (int j = 1; j < 7; j++)
             {

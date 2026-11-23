@@ -42,7 +42,7 @@ extern "C" int FUN_1001b670(int index, float radius, int count, ...)
     va_start(groups, count);
     for (int i = 0x3a; i < 0x5c; i++)
     {
-        if (DAT_10daaaec[i].kind == 0x62 && DAT_1021f3c0[i] == 3 && DAT_10db6ee8[i].root != 0 &&
+        if (DAT_10daaae8[i].kind == 0x62 && DAT_1021f3c0[i] == 3 && DAT_10db6ee8[i].root != 0 &&
             DAT_10db6ee8[i].matrix._41 > -20000.0f && DAT_1020b430[i].state == 0)
         {
             if (count != 0)

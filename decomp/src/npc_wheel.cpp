@@ -140,7 +140,7 @@ int FUN_10047440(int index)
         DAT_1021f740[index] = 60;
         DAT_10db6ee8[index].targetHeading = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
         FUN_10043cc0(index);
-        int kind = DAT_10daaaec[index].kind;
+        int kind = DAT_10daaae8[index].kind;
         if (kind == 0x44 || kind == 0x59)
             *angle = saved;
         *react = 0;

@@ -79,7 +79,7 @@ extern "C" int FUN_10044560(int index)
     if (DAT_1020b430[index].state == 0)
     {
         DAT_10db6ee8[index].PlayMotion(3, 0, 5, 1.0f);
-        DAT_10daaaec[index].m_013d = 0;
+        DAT_10daaae8[index].m_0141 = 0;
         DAT_10802bf8[index].position.Copy(self);
         DAT_10802bf8[index].position.z += 100.0f;
         DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z + 500.0f);

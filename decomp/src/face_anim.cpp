@@ -35,7 +35,7 @@ extern "C" int DAT_10447dd8[0x80];       // face to show next
 // costume's own face textures: the same names with "14" in characters 3 and 4. Returns 0.
 extern "C" int FUN_1000f360(int index, int frame)
 {
-    if (DAT_10daaaec[index].faceSet < 0)
+    if (DAT_10daaae8[index].faceSet < 0)
         return 0;
     DAT_10b314c0 = (short)frame;
     if (index == 0 && DAT_10c655f0 == 6)
@@ -48,12 +48,12 @@ extern "C" int FUN_1000f360(int index, int frame)
     }
     else
         DAT_10db6ee8[index].M_10161a20(LoadIti(DAT_1087664c[index].names[frame]));
-    int next = DAT_1087664c[DAT_10daaaec[index].faceSet].next[frame];
+    int next = DAT_1087664c[DAT_10daaae8[index].faceSet].next[frame];
     if (next == frame)
         DAT_1030c278[index] = 0;
     else
     {
-        DAT_1030c278[index] = DAT_1087664c[DAT_10daaaec[index].faceSet].delay[frame] + 1;
+        DAT_1030c278[index] = DAT_1087664c[DAT_10daaae8[index].faceSet].delay[frame] + 1;
         DAT_10447dd8[index] = next;
     }
     return 0;

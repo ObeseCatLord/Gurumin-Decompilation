@@ -59,7 +59,7 @@ extern "C" int FUN_10011f80(int index)
 {
     if (DAT_10210d30[index] != 0)
         return 1;
-    DAT_10daaaec[index].m_013d = 1;
+    DAT_10daaae8[index].m_0141 = 1;
     return 0;
 }
 
@@ -77,7 +77,7 @@ extern "C" int FUN_10012100(int value)
 // Reloads character `index`'s model from the model path table.
 extern "C" int FUN_100121e0(int index)
 {
-    return DAT_10db6ee8[index].LoadModel(FUN_1013f8a0(DAT_10b314c8[DAT_10daaaec[index].model].path, 0));
+    return DAT_10db6ee8[index].LoadModel(FUN_1013f8a0(DAT_10b314c8[DAT_10daaae8[index].params[PARAM_MODEL]].path, 0));
 }
 
 // Adds character `index`'s position to the list of positions the camera keeps in view.

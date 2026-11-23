@@ -278,7 +278,7 @@ int FUN_100b5c30(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     float distance = (player - self).Length2D();
-    DAT_10daaaec[index].m_013d = 1;
+    DAT_10daaae8[index].m_0141 = 1;
     int visible = 0;
     if (DAT_104c0380 % 10 == index % 10)
     {
@@ -336,7 +336,7 @@ int FUN_100b5f80(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     float distance = (player - self).Length2D();
-    DAT_10daaaec[index].m_013d = 1;
+    DAT_10daaae8[index].m_0141 = 1;
     int visible = 0;
     if (DAT_104c0380 % 10 == index % 10)
     {
@@ -472,7 +472,7 @@ extern "C" int FUN_100b3430(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     float distance = (player - self).Length2D();
-    DAT_10daaaec[index].m_013d = 1;
+    DAT_10daaae8[index].m_0141 = 1;
     int visible = 0;
     if (DAT_104c0380 % 10 == index % 10)
     {
@@ -541,7 +541,7 @@ extern "C" int FUN_100b3430(int index)
         {
             DAT_10db6ee8[index].alpha = 1.0f;
             FUN_10043cc0(index);
-            DAT_10daaaec[index].m_013d = 0;
+            DAT_10daaae8[index].m_0141 = 0;
         }
     }
     return 0;
@@ -1002,7 +1002,7 @@ extern "C" int FUN_100b4300(int index)
         self.z += 75.0f;
         if ((DAT_1020b430[index].sawPlayer |= FUN_10043e20(&self, &player, DAT_10db6ee8[index].heading,
                                                          (float)(DAT_1020b430[index].talk / 100 * 200), 1.099525f, 250.0f, 1)) != 0 ||
-            DAT_10468730[index] != 0 || DAT_10daaaec[index].health < DAT_10daaaec[index].maxHealth)
+            DAT_10468730[index] != 0 || DAT_10daaae8[index].stats[STAT_HEALTH] < DAT_10daaae8[index].stats[STAT_MAX_HEALTH])
         {
             FUN_1000d620(index, 15, 60);
             FUN_10065b10(index, 0x20c, 0, 0);
@@ -1028,7 +1028,7 @@ extern "C" int FUN_100b4300(int index)
                 int i;
                 for (i = 0x3a; i < index; i++)
                 {
-                    if (DAT_10db6ee8[i].matrix.m[12] > -20000.0f && DAT_10210d30[i] == 0 && DAT_10daaaec[i].kind == 0x62 &&
+                    if (DAT_10db6ee8[i].matrix.m[12] > -20000.0f && DAT_10210d30[i] == 0 && DAT_10daaae8[i].kind == 0x62 &&
                         (DAT_1020b430[i].behaviour == 11 || DAT_1020b430[i].behaviour == 12) &&
                         (DAT_1020b430[i].sawPlayer != 0 || DAT_1020b430[i].state == 2))
                         break;
@@ -1225,7 +1225,7 @@ extern "C" int FUN_10098be0(int index)
             offset.Fill(0.0f);
             EffectOptions options;
             options.m_0000 = 0;
-            options.m_0004 = DAT_10daaaec[index].m_000c;
+            options.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
             options.m_0008 = 1.5f;
             options.owner = index;
             options.m_000e = 1;
@@ -1325,7 +1325,7 @@ extern "C" int FUN_1009dfd0(int index)
             offset.Fill(0.0f);
             EffectOptions options;
             options.m_0000 = 0;
-            options.m_0004 = DAT_10daaaec[index].m_000c;
+            options.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
             options.m_0008 = 1.5f;
             options.owner = index;
             options.m_000e = 1;
@@ -1391,7 +1391,7 @@ extern "C" int FUN_1009d100(int index)
             offset.Fill(0.0f);
             EffectOptions options;
             options.m_0000 = 0;
-            options.m_0004 = DAT_10daaaec[index].m_000c;
+            options.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
             options.m_0008 = 1.5f;
             options.owner = index;
             options.m_000e = 1;
@@ -1498,7 +1498,7 @@ extern "C" int FUN_10048e90(int index)
     DAT_1021f9c0[index] = 0;
     DAT_10255a88[index] = 0;
     DAT_102550e0[index] = 0;
-    if (DAT_1020b430[index].state != 0 && DAT_10daaaec[index].health <= 0)
+    if (DAT_1020b430[index].state != 0 && DAT_10daaae8[index].stats[STAT_HEALTH] <= 0)
         DAT_1021f9c0[index] = 1;
     if (DAT_10db6ee8[index].matrix.m[14] < -20000.0f)
         return 0;
@@ -1515,9 +1515,9 @@ extern "C" int FUN_10048e90(int index)
             DAT_103153b0[index] = 150;
             break;
         }
-        if (DAT_10daaaec[index].health <= 0)
+        if (DAT_10daaae8[index].stats[STAT_HEALTH] <= 0)
         {
-            DAT_10daaaec[index].health = DAT_10daaaec[index].maxHealth;
+            DAT_10daaae8[index].stats[STAT_HEALTH] = DAT_10daaae8[index].stats[STAT_MAX_HEALTH];
             DAT_10210d30[index] = 0;
         }
         DAT_1020b430[index].state = 1;
@@ -1584,7 +1584,7 @@ extern "C" int FUN_10049240(int index)
     DAT_1021f9c0[index] = 0;
     DAT_10255a88[index] = 0;
     DAT_102550e0[index] = 0;
-    if (DAT_1020b430[index].state != 0 && DAT_10daaaec[index].health <= 0)
+    if (DAT_1020b430[index].state != 0 && DAT_10daaae8[index].stats[STAT_HEALTH] <= 0)
         DAT_1021f9c0[index] = 1;
     if (DAT_10db6ee8[index].matrix.m[14] < -20000.0f)
         return 0;
@@ -1633,7 +1633,7 @@ extern "C" int FUN_10049240(int index)
     }
     else if (DAT_1020b430[index].state == 2)
     {
-        DAT_10daaaec[index].m_013d = 0;
+        DAT_10daaae8[index].m_0141 = 0;
         DAT_10db6ee8[index].mode = 0;
         switch (DAT_1020b430[index].talk % 10)
         {
@@ -1644,9 +1644,9 @@ extern "C" int FUN_10049240(int index)
             DAT_103153b0[index] = 150;
             break;
         }
-        if (DAT_10daaaec[index].health <= 0)
+        if (DAT_10daaae8[index].stats[STAT_HEALTH] <= 0)
         {
-            DAT_10daaaec[index].health = DAT_10daaaec[index].maxHealth;
+            DAT_10daaae8[index].stats[STAT_HEALTH] = DAT_10daaae8[index].stats[STAT_MAX_HEALTH];
             DAT_10210d30[index] = 0;
         }
         DAT_1020b430[index].state = 1;
@@ -1663,7 +1663,7 @@ extern "C" int FUN_10049240(int index)
     else if (DAT_1020b430[index].state == 3)
     {
         DAT_10db6ee8[index].alpha = 0;
-        DAT_10daaaec[index].m_013d = 1;
+        DAT_10daaae8[index].m_0141 = 1;
         if ((player - self).Length() < 800.0f)
             DAT_1020b430[index].state = 2;
     }

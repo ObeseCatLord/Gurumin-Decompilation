@@ -20,6 +20,7 @@ struct GameFile
 };
 
 #include "texture_object.h"
+#include "char_slot.h"
 
 extern "C" int DAT_108360f8;                         // texture slot of the save thumbnail
 extern "C" char DAT_10256110[];                      // name of system.sav
@@ -28,7 +29,6 @@ extern "C" int DAT_10c62ed0;                         // current map
 extern "C" int DAT_108029b8[4];                      // where the player starts (x, y, z, w)
 extern "C" int DAT_104bfd18;
 extern "C" int DAT_1049f200[0x6000];
-extern "C" char DAT_10daaae8[0x188];                 // the player's slot record
 extern "C" int DAT_10c62edc[0x1000];                 // script flags
 extern "C" int DAT_103150c0[0x20];
 extern "C" int DAT_10202464[4];
@@ -106,7 +106,7 @@ int FUN_100106e0(const char *path)
         memcpy(p, DAT_1049f200, 0x14);
         p += 0x14;
         size += 0x14;
-        memcpy(p, DAT_10daaae8, 0x188);
+        memcpy(p, &DAT_10daaae8[0], sizeof(CharSlot));
         p += 0x188;
         size += 0x188;
         memcpy(p, DAT_10c62edc, 0x4000);

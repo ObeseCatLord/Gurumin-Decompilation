@@ -42,9 +42,9 @@ extern "C" int FUN_1001b0a0(int index, int a, int b);
 // four fields of its packed value (BB, CC, DD, AA) and FUN_1001b0a0 with zeros. Returns 0.
 extern "C" int FUN_10043cc0(int index)
 {
-    if (DAT_10daaaec[index].kind == 0x62 && (DAT_1020b430[index].behaviour == 11 || DAT_1020b430[index].behaviour == 12))
+    if (DAT_10daaae8[index].kind == 0x62 && (DAT_1020b430[index].behaviour == 11 || DAT_1020b430[index].behaviour == 12))
         FUN_1000ec70(15, 1.0f, 1.0f, 1.0f, 1.0f);
-    DAT_10daaaec[index].m_013d = 0;
+    DAT_10daaae8[index].m_0141 = 0;
     memset(&DAT_1020b430[index], 0, sizeof(CharState));
     DAT_10db6ee8[index].m_0267 = 0;
     DAT_10db6ee8[index].mode = 1;

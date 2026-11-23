@@ -20,7 +20,7 @@ extern "C" int FUN_100b9bb0(int index, int sound, int reset, int limited)
 {
     if (DAT_10c66cc0 == 0 && limited != 0)
         return 0;
-    int kind = DAT_10daaaec[index].kind;
+    int kind = DAT_10daaae8[index].kind;
     int slot;
     if (kind == 100)
         slot = 10;

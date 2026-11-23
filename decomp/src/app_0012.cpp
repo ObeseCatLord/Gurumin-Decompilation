@@ -19,7 +19,7 @@ extern "C" int FUN_1001c4c0(int low, int high)
 {
     for (int i = 0x5c; i < 0x7c; i++)
     {
-        if (DAT_10daaaec[i].kind == 0x58)
+        if (DAT_10daaae8[i].kind == 0x58)
         {
             for (int j = 0; j < 6; j++)
             {
@@ -113,7 +113,7 @@ extern "C" KindCounter DAT_1020b46c[0x80];  // cooldown of kind 0x43
 // nothing). Counters stop at 0. Each branch decrements its own counter; the compiler merges the identical tails.
 extern "C" int FUN_1001d7d0(int index)
 {
-    int kind = DAT_10daaaec[index].kind;
+    int kind = DAT_10daaae8[index].kind;
     if (kind == 0x64)
     {
         if (DAT_1020b498[index].value > 0)

@@ -20,7 +20,7 @@ retype those members first.
    that every file keeps its `MATCH` lines.
    Status 2026-11-22: `Vec4` and `Box2` done (`include/vec4.h`, 110 files) except `npc_greet.cpp` (open.tsv
    100b8220). `Matrix4`, `Vec3`, `Node` (plus nine aliases), `IUnknownLike`, `SurfaceDesc` and the D3D texture/surface
-   views done the same day. Still per file: `ParamVector` (char_params.h, maybe Vec4 with `operator=` = Copy), the
+   views done the same day. Still per file: `ParamVector` (char_slot.h, maybe Vec4 with `operator=` = Copy), the
    Node views with constructors/destructors (`SceneNode` in node_ctor.cpp and model_state.cpp, `WorldNode` in
    world_ctor.cpp/world_frame.cpp, `FadeNode`/`FadeParent`/`FadeOwner` in node_fade.cpp), `NodeSaved` and the
    DirectInput views (done: node_data.h, mesh.h, key_track.h, dinput_min.h). AnimModel is shared (anim_model.h) and

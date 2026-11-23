@@ -33,7 +33,7 @@ extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
 {
     int code = DAT_102548c0[index];
-    int *kind = &DAT_10daaaec[index].kind;
+    int *kind = &DAT_10daaae8[index].kind;
     int old = *kind;
     int special = code / 1000000 % 100;
     int apply = 1;

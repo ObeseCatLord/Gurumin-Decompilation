@@ -40,7 +40,7 @@ extern "C" void FUN_10012220(int a, int b)
     else
     {
         index = a;
-        model = DAT_10daaaec[a].model;
+        model = DAT_10daaae8[a].params[PARAM_MODEL];
     }
     for (int i = 0; i < DAT_10b314c4[model].commandCount; i++)
     {

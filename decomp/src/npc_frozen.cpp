@@ -34,7 +34,7 @@ int FUN_100469d0(int index)
 {
     if (DAT_1020b430[index].state == 0)
     {
-        DAT_1020b430[index].saved = DAT_10daaaec[index].m_0140;
+        DAT_1020b430[index].saved = DAT_10daaae8[index].m_0144;
         DAT_1020b430[index].state = 1;
         EffectOptions options;
         Matrix4 matrix;
@@ -51,8 +51,8 @@ int FUN_100469d0(int index)
         DAT_10db6ee8[index].mode = 0;
         DAT_10db6ee8[index].m_0267 = 1;
         DAT_10db6ee8[index].m_0294 = 1;
-        DAT_10daaaec[index].held = 1;
-        DAT_10daaaec[index].m_0094 = 0x1d;
+        DAT_10daaae8[index].held = 1;
+        DAT_10daaae8[index].m_0098 = 0x1d;
         DAT_10255a88[index] = 0;
     }
     else if (++DAT_1020b430[index].wait % 8 == 0)
@@ -70,10 +70,10 @@ int FUN_100469d0(int index)
         DAT_10db6ee8[index].mode = 0;
         DAT_10db6ee8[index].m_0267 = 1;
         DAT_10db6ee8[index].m_0294 = 1;
-        DAT_10daaaec[index].held = 1;
-        DAT_10daaaec[index].m_0094 = 0x1d;
+        DAT_10daaae8[index].held = 1;
+        DAT_10daaae8[index].m_0098 = 0x1d;
         DAT_10255a88[index] = 0;
-        if (DAT_103153b0[index] == 0 && DAT_10daaaec[index].m_0080 != 1)
+        if (DAT_103153b0[index] == 0 && DAT_10daaae8[index].m_0084 != 1)
             return 0;
         if (DAT_103153b0[index] == 0)
         {
@@ -82,11 +82,11 @@ int FUN_100469d0(int index)
             position.z += 50.0f;
             DAT_10daaa80.Start(0x2265, position, -1, -1, 0, 0, 0, 0, 0, 0);
         }
-        DAT_10daaaec[index].m_0140 = (char)DAT_1020b430[index].saved;
+        DAT_10daaae8[index].m_0144 = (char)DAT_1020b430[index].saved;
         DAT_10db6ee8[index].mode = 1;
         DAT_10db6ee8[index].m_0267 = 0;
-        DAT_10daaaec[index].held = 0;
-        DAT_10daaaec[index].m_0094 = 0;
+        DAT_10daaae8[index].held = 0;
+        DAT_10daaae8[index].m_0098 = 0;
         DAT_10daaa80.RemoveOwnedBy(index + 100);
         Vec4 position;
         DAT_10daaa80.Start(0x1390, position, -1, -1, 0, 0, 0, &DAT_10db6ee8[index].matrix, 0, 0);

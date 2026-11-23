@@ -48,7 +48,7 @@ extern "C" int FUN_1009ddd0(int slot)
             position.Fill(0.0f);
             EffectOptions shot;
             shot.m_0000 = 0;
-            shot.m_0004 = DAT_10daaaec[slot].m_000c;
+            shot.m_0004 = DAT_10daaae8[slot].stats[STAT_EFFECT_PARAM];
             shot.m_0008 = 1.5f;
             shot.owner = slot;
             shot.m_000e = 6;

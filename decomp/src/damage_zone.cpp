@@ -89,7 +89,7 @@ extern "C" int FUN_1002ebf0(int index)
         {
             int damage = DAT_10210fc0[zone].damage;
             FUN_100119d0(slot, damage, 0);
-            DAT_10daaaec[slot].health -= damage;
+            DAT_10daaae8[slot].stats[STAT_HEALTH] -= damage;
         }
     }
     return 0;

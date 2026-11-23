@@ -71,7 +71,7 @@ extern "C" int FUN_10034c80(int index)
 {
     if (DAT_10210d30[index] != 0)
         return 1;
-    DAT_10daaaec[index].m_013d = 1;
+    DAT_10daaae8[index].m_0141 = 1;
     DAT_1020b430[index].behaviour = 1;
     return 0;
 }

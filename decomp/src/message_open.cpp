@@ -58,10 +58,10 @@ extern "C" int FUN_10056260(int slot, const char *line1, const char *line2, cons
         if (DAT_10c655f0 == 6)
             strcpy(text, "\x83|\x83|\x83\x93");
         else
-            strcpy(text, DAT_10daaaec[0].name);
+            strcpy(text, DAT_10daaae8[0].name);
     }
     else
-        strcpy(text, DAT_10daaaec[slot].name);
+        strcpy(text, DAT_10daaae8[slot].name);
     FUN_1000c020(DAT_10453208[slot].speaker, text);
     if (line1 != 0)
     {

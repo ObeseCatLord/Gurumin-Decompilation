@@ -6,7 +6,7 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
-#include "char_params.h"
+#include "char_slot.h"
 
 #include "char_state.h"
 
@@ -80,9 +80,9 @@ extern "C" int FUN_10023900(void)
         DAT_1020b430[58 + i].m_0034 = 0;
         DAT_1020b430[58 + i].sawPlayer = 0;
         DAT_1020b430[58 + i].behaviour = 0;
-        DAT_10daaae8[58 + i].m_00bc = -1;
+        DAT_10daaae8[58 + i].money = -1;
     }
-    DAT_10c62edc[0x44e] = DAT_10daaae8[0].m_0004[0];
+    DAT_10c62edc[0x44e] = DAT_10daaae8[0].stats[STAT_HEALTH];
     DAT_104c0354 = 0;
     if (DAT_104c0390 != 0)
     {

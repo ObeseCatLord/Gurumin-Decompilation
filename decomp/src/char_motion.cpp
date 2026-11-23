@@ -35,9 +35,9 @@ extern "C" void FUN_100123d0(void)
     {
         if (i != 0 && DAT_10db6ee8[i].matrix._41 < -50000.0f)
             continue;
-        if (DAT_10daaaec[i].m_009c != 0 && DAT_10daaaec[i - 1].m_00a4 == 0)
+        if (DAT_10daaae8[i].m_00a0 != 0 && DAT_10daaae8[i - 1].m_00a8 == 0)
             continue;
-        DAT_10db6ee8[i].LoadModel(FUN_1013f8a0(DAT_10b314c8[DAT_10daaaec[i].model].path, 0));
+        DAT_10db6ee8[i].LoadModel(FUN_1013f8a0(DAT_10b314c8[DAT_10daaae8[i].params[PARAM_MODEL]].path, 0));
         FUN_10012220(i, -1);
     }
 }

@@ -158,7 +158,7 @@ extern "C" int FUN_100451c0(int index)
     else if (DAT_1020b430[index].state == 4)
     {
         int rider = DAT_1020b430[index].rider;
-        if (rider != 0 && DAT_10db6ee8[rider].root != 0 && DAT_10210d30[rider] == 0 && DAT_10daaaec[rider].health > 0)
+        if (rider != 0 && DAT_10db6ee8[rider].root != 0 && DAT_10210d30[rider] == 0 && DAT_10daaae8[rider].stats[STAT_HEALTH] > 0)
             FUN_10043cc0(rider);
         DAT_1020b430[index].rider = 0;
         DAT_1020b430[index].state = 2;
@@ -187,7 +187,7 @@ extern "C" int FUN_100451c0(int index)
     if (DAT_10210d30[index] == 0)
     {
         int rider = DAT_1020b430[index].rider;
-        if (rider != 0 && DAT_10db6ee8[rider].root != 0 && DAT_10210d30[rider] == 0 && DAT_10daaaec[rider].health > 0)
+        if (rider != 0 && DAT_10db6ee8[rider].root != 0 && DAT_10210d30[rider] == 0 && DAT_10daaae8[rider].stats[STAT_HEALTH] > 0)
         {
             Vec4 position;
             position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());

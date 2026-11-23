@@ -110,8 +110,8 @@ extern "C" int FUN_1005dbf0(int damage)
     if (damage != 0)
         DAT_10f08008.Rumble(1.0f, 100);
     FUN_100119d0(0, damage, 2);
-    DAT_10daaaec[0].health -= damage;
-    int maxHealth = DAT_10daaaec[0].maxHealth;
+    DAT_10daaae8[0].stats[STAT_HEALTH] -= damage;
+    int maxHealth = DAT_10daaae8[0].stats[STAT_MAX_HEALTH];
     int gauge = DAT_10c64ad8;
     if (DAT_10c66d00 == 0 && damage != 0)
     {
@@ -122,12 +122,12 @@ extern "C" int FUN_1005dbf0(int damage)
     }
     DAT_10c64ad8 = gauge;
     FUN_1000e750();
-    if (DAT_10daaaec[0].health <= 0)
+    if (DAT_10daaae8[0].stats[STAT_HEALTH] <= 0)
     {
         if (DAT_104c00cc != 0)
         {
             DAT_104c00cc = 2;
-            DAT_10daaaec[0].health = maxHealth;
+            DAT_10daaae8[0].stats[STAT_HEALTH] = maxHealth;
             DAT_10874848.RaiseGameOverEvents();
             FUN_1000e750();
         }

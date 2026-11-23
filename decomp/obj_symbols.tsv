@@ -293,7 +293,7 @@ _Vec3_Dot	101ac200
 ?ReadArgument@ListBank@@QAEHPAPADPAD@Z	10035d20
 ?ReadStatement@ListBank@@QAEHPAPADPAD@Z	10035b10
 ?GetIndexPart@ListBank@@QAEHPBDPADH@Z	10036560
-??4CharParams@@QAEAAU0@ABU0@@Z	100357a0
+??4CharSlot@@QAEAAU0@ABU0@@Z	100357a0
 ?DrawNumber@Game@@QAEHHHHMMMM@Z	10008c40
 ?DrawNumberAlt@Game@@QAEHHHHMMMM@Z	10008df0
 ?DrawLabelledNumber@Game@@QAEHHHHMMMM@Z	10008a30

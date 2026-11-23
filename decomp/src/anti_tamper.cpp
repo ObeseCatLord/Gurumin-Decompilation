@@ -7,20 +7,8 @@
 
 #include <stdlib.h>
 
-// Player stats record at 0x10daaae8 (hp, max hp, money, two more guarded values).
-struct PlayerRecord
-{
-    int m_0000;
-    int hp;
-    int maxHp;
-    char pad_000c[0x10];
-    int m_001c;
-    int m_0020;
-    char pad_0024[0x94];
-    int money;
-};
+#include "char_slot.h"
 
-extern "C" PlayerRecord DAT_10daaae8;
 extern "C" int DAT_10c635f8;
 extern "C" int DAT_10c64ad4;
 extern "C" int DAT_10c64ad8;
@@ -34,11 +22,11 @@ extern "C" int DAT_104684b0[115];
 // AntiTamper_StoreValues: refreshes the guard copies of the ten single values (slots 0..9).
 extern "C" int FUN_1000e750(void)
 {
-    DAT_104684b0[0] = GUARD_VALUE(0, DAT_10daaae8.m_001c);
-    DAT_104684b0[1] = GUARD_VALUE(1, DAT_10daaae8.m_0020);
-    DAT_104684b0[2] = GUARD_VALUE(2, DAT_10daaae8.hp);
-    DAT_104684b0[3] = GUARD_VALUE(3, DAT_10daaae8.maxHp);
-    DAT_104684b0[4] = GUARD_VALUE(4, DAT_10daaae8.money);
+    DAT_104684b0[0] = GUARD_VALUE(0, DAT_10daaae8[0].stats[STAT_GUARDED_A]);
+    DAT_104684b0[1] = GUARD_VALUE(1, DAT_10daaae8[0].stats[STAT_GUARDED_B]);
+    DAT_104684b0[2] = GUARD_VALUE(2, DAT_10daaae8[0].stats[STAT_HEALTH]);
+    DAT_104684b0[3] = GUARD_VALUE(3, DAT_10daaae8[0].stats[STAT_MAX_HEALTH]);
+    DAT_104684b0[4] = GUARD_VALUE(4, DAT_10daaae8[0].money);
     DAT_104684b0[5] = GUARD_VALUE(5, DAT_10c6670c);
     DAT_104684b0[6] = GUARD_VALUE(6, DAT_10c64ad4);
     DAT_104684b0[7] = GUARD_VALUE(7, DAT_10c64ad8);
@@ -82,21 +70,21 @@ extern "C" int FUN_1000e870(void)
     DAT_104c034c++;
     if (DAT_11b044f0 != 0)
         TAMPER();
-    if (DAT_104684b0[0] != GUARD_VALUE(0, DAT_10daaae8.m_001c))
+    if (DAT_104684b0[0] != GUARD_VALUE(0, DAT_10daaae8[0].stats[STAT_GUARDED_A]))
         TAMPER();
-    if (DAT_104684b0[1] != GUARD_VALUE(1, DAT_10daaae8.m_0020))
+    if (DAT_104684b0[1] != GUARD_VALUE(1, DAT_10daaae8[0].stats[STAT_GUARDED_B]))
         TAMPER();
-    if (DAT_104684b0[2] != GUARD_VALUE(2, DAT_10daaae8.hp))
+    if (DAT_104684b0[2] != GUARD_VALUE(2, DAT_10daaae8[0].stats[STAT_HEALTH]))
     {
         TAMPER();
         DAT_104c0344++;
     }
-    if (DAT_104684b0[3] != GUARD_VALUE(3, DAT_10daaae8.maxHp))
+    if (DAT_104684b0[3] != GUARD_VALUE(3, DAT_10daaae8[0].stats[STAT_MAX_HEALTH]))
     {
         TAMPER();
         DAT_104c0344++;
     }
-    if (DAT_104684b0[4] != GUARD_VALUE(4, DAT_10daaae8.money))
+    if (DAT_104684b0[4] != GUARD_VALUE(4, DAT_10daaae8[0].money))
         TAMPER();
     if (DAT_104684b0[5] != GUARD_VALUE(5, DAT_10c6670c))
         TAMPER();

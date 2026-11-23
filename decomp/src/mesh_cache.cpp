@@ -1,34 +1,7 @@
 // Reference counts for shared model and texture files, and texture slot objects.
-// MeshInstance is the same 0x38-byte texture slot object as TextureObject (texture_bind.cpp).
+// The TextureObject methods here keep a copy of the source image so the texture can be rebuilt after a device reset.
 
-struct IntPair
-{
-    int first;
-    int second;
-    IntPair();
-};
-
-struct MeshInstance : IntPair
-{
-    char pad_0008[0x18];
-    int m_0020;               // 0x20: image pixels (1 and 2 mark built-in images that are not freed)
-    int m_0024;               // 0x24: second image buffer
-    char m_0028;              // 0x28: 1 when the image has its own alpha pixels
-    char pad_0029[3];
-    int m_002c;               // 0x2c: image width
-    int m_0030;               // 0x30: image height
-    int m_0034;
-    int Release();            // 0x1014f520 (TextureObject::Release)
-    // 0x1014f1f0: creates the Direct3D texture from `width` x `height` RGB pixels and alpha (0, 1, 2 or pixels).
-    int Upload(int width, int height, int pixels, int alpha);
-    int Create(int width, int height, int pixels, int alpha, int flags);
-    void FreeImage();
-
-    MeshInstance();
-    int M_10169df0();
-    int M_10169e10();
-    int M_10169f70(int value);
-};
+#include "texture_object.h"
 
 struct MeshRef
 {
@@ -49,8 +22,6 @@ extern "C" int DAT_10faae88[0x400];
 extern "C" char DAT_10ff65f8[0x400][0x20];
 extern "C" int DAT_1101d884;
 extern "C" int DAT_1101d88c;
-extern "C" int FUN_1014f520(void);
-extern "C" int __stdcall FUN_1014f1f0(int, int, int, int);
 extern "C" int __stdcall FUN_10143870(int, int, int);
 
 // Releases one reference to a shared model file; the name entry is freed when the count reaches 0.
@@ -107,54 +78,56 @@ extern "C" void *(*DAT_11b0b938)(int size, const char *tag);              // eng
 extern "C" void *(*DAT_11b07530)(void *dst, const void *src, int size);   // engine memcpy
 extern "C" int FUN_1013f880(void);                // the game's random number
 
-// 0x10169c60 (TextureObject::Create). Creates the texture from `width` x `height` RGB `pixels` (at most 2048 x 2048).
-// `alpha` is 0 (opaque), 1 or 2 (generated alpha) or a buffer of alpha pixels (one per RGB triple). Unless
-// DAT_1101d878 is set, the pixels and alpha pixels are kept in copies (for re-creating the texture after a device
-// reset). With `flags` set the alpha is speckled: one in four pixels at random keeps it (a new buffer when there
-// was no alpha). Returns 0 for a bad size, else the result of Upload.
-int MeshInstance::Create(int width, int height, int pixels, int alpha, int flags)
+// 0x10169c60. Creates the texture from `width` x `height` RGB `pixels` (at most TEXTURE_MAX_SIDE on each side).
+// `alpha` is ALPHA_NONE, ALPHA_GENERATED_1 / ALPHA_GENERATED_2 or a buffer of alpha pixels (one per RGB triple).
+// Unless DAT_1101d878 is set (or the alpha is generated), the pixels and alpha pixels are kept in copies for
+// re-creating the texture after a device reset. With `flags` set the alpha is speckled: one in four pixels at random
+// keeps it (a new buffer when there was no alpha). Returns 0 for a bad size, else the result of Upload. Called by
+// Texture_CreateFromPixels and Texture_CreateCopy (texture_create.cpp).
+int TextureObject::Create(int width, int height, const void *pixels, int alpha, int flags)
 {
-    if (width > 0x800 || height > 0x800)
+    if (width > TEXTURE_MAX_SIDE || height > TEXTURE_MAX_SIDE)
         return 0;
-    if (alpha == 1 || alpha == 2)
-        m_0034 = 1;
+    if (alpha == ALPHA_GENERATED_1 || alpha == ALPHA_GENERATED_2)
+        generatedAlpha = 1;
     else
-        m_0034 = 0;
-    m_0028 = 0;
-    if (m_0034 == 0 && alpha != 0)
-        m_0028 = 1;
-    m_0024 = 0;
-    m_0020 = 0;
-    m_002c = width;
-    m_0030 = height;
+        generatedAlpha = 0;
+    hasOwnAlpha = 0;
+    if (generatedAlpha == 0 && alpha != ALPHA_NONE)
+        hasOwnAlpha = 1;
+    sourcePixels = 0;
+    sourceAlpha = 0;
+    sourceWidth = width;
+    sourceHeight = height;
     if (width <= 0 || height <= 0)
         return 0;
-    if (DAT_1101d878 == 0 || m_0034 != 0)
+    if (DAT_1101d878 == 0 || generatedAlpha != 0)
     {
-        if (alpha > 2 || alpha == 0)
+        if (alpha > ALPHA_GENERATED_2 || alpha == ALPHA_NONE)
         {
             int size = width * height * 3;
-            m_0024 = (int)DAT_11b0b938(size, "m_rgb");
-            DAT_11b07530((void *)m_0024, (const void *)pixels, size);
-            if (alpha != 0 && alpha != 1)
+            sourcePixels = (unsigned char *)DAT_11b0b938(size, "m_rgb");
+            DAT_11b07530(sourcePixels, pixels, size);
+            if (alpha != ALPHA_NONE && alpha != ALPHA_GENERATED_1)
             {
-                m_0020 = (int)DAT_11b0b938(size, "m_al");
-                DAT_11b07530((void *)m_0020, (const void *)alpha, size);
+                sourceAlpha = (unsigned char *)DAT_11b0b938(size, "m_al");
+                DAT_11b07530(sourceAlpha, (const void *)alpha, size);
             }
         }
-        if (alpha == 1)
-            m_0020 = 1;
-        if (alpha == 2)
-            m_0020 = 2;
+        // The generated kinds are stored as their marker value instead of a buffer.
+        if (alpha == ALPHA_GENERATED_1)
+            sourceAlpha = (unsigned char *)ALPHA_GENERATED_1;
+        if (alpha == ALPHA_GENERATED_2)
+            sourceAlpha = (unsigned char *)ALPHA_GENERATED_2;
     }
-    if (flags != 0 && alpha != 1 && alpha != 2)
+    if (flags != 0 && alpha != ALPHA_GENERATED_1 && alpha != ALPHA_GENERATED_2)
     {
-        if (alpha == 0)
+        if (alpha == ALPHA_NONE)
         {
             int size = width * height * 3;
             unsigned char *speckles = (unsigned char *)DAT_11b0b938(size, "m_al");
             alpha = (int)speckles;
-            m_0020 = alpha;
+            sourceAlpha = speckles;
             for (int i = 0; i < size; i += 3)
                 speckles[i] = (FUN_1013f880() & 7) < 2 ? 0xff : 0;
         }
@@ -168,61 +141,62 @@ int MeshInstance::Create(int width, int height, int pixels, int alpha, int flags
             }
         }
     }
-    return Upload(width, height, pixels, alpha);
+    return Upload(width, height, (unsigned char *)pixels, (const unsigned char *)alpha);
 }
 
-// Frees the stored image and releases the Direct3D texture. The texture memory counter drops by the size of a
-// 16-bit texture with five mip levels below it.
-void MeshInstance::FreeImage()
+// 0x10169e40. Frees the kept image and releases the Direct3D texture. The texture memory counter drops by the size
+// of a 16-bit texture with five mip levels below it. Called by the texture manager when a slot is unloaded.
+void TextureObject::Unload()
 {
-    DAT_1101d874 -= m_002c * m_0030 * 2;
-    DAT_1101d874 -= (m_002c / 2) * (m_0030 / 2) * 2;
-    DAT_1101d874 -= (m_002c / 4) * (m_0030 / 4) * 2;
-    DAT_1101d874 -= (m_002c / 8) * (m_0030 / 8) * 2;
-    DAT_1101d874 -= (m_002c / 16) * (m_0030 / 16) * 2;
-    DAT_1101d874 -= (m_002c / 32) * (m_0030 / 32) * 2;
-    if (m_0020 == 1)
-        m_0020 = 0;
-    if (m_0020 == 2)
-        m_0020 = 0;
-    if (m_0024 != 0)
-        DAT_11b1ba40((void *)m_0024);
-    if (m_0020 != 0)
-        DAT_11b1ba40((void *)m_0020);
-    m_0020 = 0;
-    m_0024 = 0;
-    m_002c = 0;
-    m_0030 = 0;
+    DAT_1101d874 -= sourceWidth * sourceHeight * 2;
+    DAT_1101d874 -= (sourceWidth / 2) * (sourceHeight / 2) * 2;
+    DAT_1101d874 -= (sourceWidth / 4) * (sourceHeight / 4) * 2;
+    DAT_1101d874 -= (sourceWidth / 8) * (sourceHeight / 8) * 2;
+    DAT_1101d874 -= (sourceWidth / 16) * (sourceHeight / 16) * 2;
+    DAT_1101d874 -= (sourceWidth / 32) * (sourceHeight / 32) * 2;
+    // The generated-alpha markers are not buffers.
+    if (sourceAlpha == (unsigned char *)ALPHA_GENERATED_1)
+        sourceAlpha = 0;
+    if (sourceAlpha == (unsigned char *)ALPHA_GENERATED_2)
+        sourceAlpha = 0;
+    if (sourcePixels != 0)
+        DAT_11b1ba40(sourcePixels);
+    if (sourceAlpha != 0)
+        DAT_11b1ba40(sourceAlpha);
+    sourceAlpha = 0;
+    sourcePixels = 0;
+    sourceWidth = 0;
+    sourceHeight = 0;
     Release();
 }
 
-// Constructor: clears the two size fields (the rest is set when a texture is loaded).
-MeshInstance::MeshInstance()
+// 0x10169c40. Constructor (runs for each of the texture slots DAT_118d0ba8): no kept image yet.
+TextureObject::TextureObject()
 {
-    m_0024 = 0;
-    m_0020 = 0;
+    sourcePixels = 0;
+    sourceAlpha = 0;
 }
 
-// Releases the Direct3D texture when one was created (device lost).
-int MeshInstance::M_10169df0()
+// 0x10169df0. Releases the Direct3D texture of a generated-alpha texture before a device reset (texture manager).
+int TextureObject::Recreate()
 {
-    if (m_0034 != 0)
-        return FUN_1014f520();
+    if (generatedAlpha != 0)
+        return Release();
     return 1;
 }
 
-// Re-creates the Direct3D texture from the stored image (after a device reset).
-int MeshInstance::M_10169e10()
+// 0x10169e10. Re-uploads the kept image of a generated-alpha texture after a device reset (texture manager).
+int TextureObject::Restore()
 {
-    if (m_0034 != 0)
-        return Upload(m_002c, m_0030, m_0024, m_0020);
+    if (generatedAlpha != 0)
+        return Upload(sourceWidth, sourceHeight, sourcePixels, sourceAlpha);
     return 1;
 }
 
-// Updates the texture with `value` (FUN_10143870 on the stored image).
-int MeshInstance::M_10169f70(int value)
+// 0x10169f70. Calls FUN_10143870 with the image size and `value`.
+int TextureObject::UpdateImage(int value)
 {
-    return FUN_10143870(m_002c, m_0030, value);
+    return FUN_10143870(sourceWidth, sourceHeight, value);
 }
 
 // 0x1016a220. Sets the source and layer of motion slot `slot` (16 slots, layers up to 0x8f; a source is required).

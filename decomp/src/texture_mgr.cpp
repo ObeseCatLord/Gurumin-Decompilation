@@ -168,12 +168,12 @@ int Animator::M_10184160()
     return M_101692c0();
 }
 
-// After a map change: unloads every texture that was not marked as kept and has no Direct3D texture.
+// After a map change: unloads every texture that was not marked as kept and has no generated alpha.
 extern "C" int FUN_10188fb0(void)
 {
     for (int i = 0; i < 1600; i++)
     {
-        if (DAT_10ffe5f8[i][0] != 0 && DAT_10fa6db8[i] == 0 && DAT_118d0ba8[i].loaded == 0)
+        if (DAT_10ffe5f8[i][0] != 0 && DAT_10fa6db8[i] == 0 && DAT_118d0ba8[i].generatedAlpha == 0)
             FUN_10174c70(i, 1);
     }
     return 0;

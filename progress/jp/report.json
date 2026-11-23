@@ -5683,7 +5683,7 @@
      }
     },
     {
-     "name": "??0IntPair@@QAE@XZ",
+     "name": "??0TextureHandle@@QAE@XZ",
      "size": "16",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -8489,7 +8489,7 @@
      }
     },
     {
-     "name": "?Create@MeshInstance@@QAEHHHHHH@Z",
+     "name": "?Create@TextureObject@@QAEHHHPBXHH@Z",
      "size": "399",
      "fuzzy_match_percent": 18.75,
      "metadata": {
@@ -8497,7 +8497,7 @@
      }
     },
     {
-     "name": "?FreeImage@MeshInstance@@QAEXXZ",
+     "name": "?Unload@TextureObject@@QAEXXZ",
      "size": "297",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -8505,7 +8505,7 @@
      }
     },
     {
-     "name": "??0MeshInstance@@QAE@XZ",
+     "name": "??0TextureObject@@QAE@XZ",
      "size": "20",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -8513,7 +8513,7 @@
      }
     },
     {
-     "name": "?M_10169df0@MeshInstance@@QAEHXZ",
+     "name": "?Recreate@TextureObject@@QAEHXZ",
      "size": "18",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -8521,7 +8521,7 @@
      }
     },
     {
-     "name": "?M_10169e10@MeshInstance@@QAEHXZ",
+     "name": "?Restore@TextureObject@@QAEHXZ",
      "size": "35",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -8529,7 +8529,7 @@
      }
     },
     {
-     "name": "?M_10169f70@MeshInstance@@QAEHH@Z",
+     "name": "?UpdateImage@TextureObject@@QAEHH@Z",
      "size": "21",
      "fuzzy_match_percent": 100.0,
      "metadata": {

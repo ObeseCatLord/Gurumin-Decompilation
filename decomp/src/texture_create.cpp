@@ -57,8 +57,8 @@ extern "C" int FUN_10175c90(const char *name, int width, int height, const unsig
 // when that name is loaded), or -1 for an empty name, when no slot is free or when the texture cannot be created.
 extern "C" int FUN_10175a90(const char *name, const TextureObject *source, int flags)
 {
-    int pixels = source->sourcePixels;
-    int alpha = source->sourceAlpha;
+    const unsigned char *pixels = source->sourcePixels;
+    int alpha = (int)source->sourceAlpha;   // a pixel buffer or ALPHA_NONE / ALPHA_GENERATED_*
     int width = source->sourceWidth;
     int height = source->sourceHeight;
     if (name[0] == 0)
@@ -87,7 +87,7 @@ extern "C" int FUN_10175a90(const char *name, const TextureObject *source, int f
             }
             DAT_11b1ba40(white);
         }
-        else if (DAT_118d0ba8[slot].Create(width, height, (const void *)pixels, alpha, flags))
+        else if (DAT_118d0ba8[slot].Create(width, height, pixels, alpha, flags))
         {
             strcpy(DAT_10ffe5f8[slot], name);
             DAT_10fdeb90[slot] = 1;

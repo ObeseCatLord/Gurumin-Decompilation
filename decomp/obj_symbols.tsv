@@ -1,5 +1,5 @@
 # mangled name<TAB>address, for functions whose names carry no address (constructors, operators)
-??0IntPair@@QAE@XZ	10143bb0
+??0TextureHandle@@QAE@XZ	10143bb0
 ??0Record2c@@QAE@XZ	10148880
 ??0ImeContext@@QAE@XZ	1015d090
 ?Release@ImeContext@@QAEHXZ	1015d0a0
@@ -16,7 +16,7 @@
 ?GetCount@ImeContext@@QAEKXZ	1015d4d0
 ?GetPageSize@ImeContext@@QAEKXZ	1015d4e0
 ??0MmvPlayer@@QAE@XZ	10160890
-??0MeshInstance@@QAE@XZ	10169c40
+??0TextureObject@@QAE@XZ	10169c40
 ??0Transform@@QAE@XZ	10172a00
 ?M_10173480@TextureManager@@QAEHXZ	10173480
 ?M_101734d0@TextureManager@@QAEHXZ	101734d0
@@ -215,7 +215,7 @@ _Vec3_Dot	101ac200
 ?RaiseGameOverEvents@Game@@QAEHXZ	10054a60
 ?AddChild@Node@@QAEPAU1@PBDH@Z	101abc30
 ?Reset@EffectManager@@QAEHXZ	10184170
-?FreeImage@MeshInstance@@QAEXXZ	10169e40
+?Unload@TextureObject@@QAEXXZ	10169e40
 ?DistanceSquaredToSegment2D@Vec4@@QAEMMMMM@Z	101acc60
 ?AllocMaterials@Node@@QAEHH@Z	1019c1e0
 ?BoneMatrix@Node@@QAE?AUMatrix4@@HH@Z	101a23b0
@@ -341,9 +341,7 @@ _TestDat_Load	1000beb0
 ?Play@Playback@@QAEHHHHM@Z	1016a2e0
 ?FrameAt@MotionList@@QAEHHPAH0@Z	101ad350
 ?InitLibrary@ListBank@@QAEHXZ	10037850
-?Create@MeshInstance@@QAEHHHHHH@Z	10169c60
-?Upload@MeshInstance@@QAEHHHHH@Z	1014f1f0
-?Release@MeshInstance@@QAEHXZ	1014f520
+?Create@TextureObject@@QAEHHHPBXHH@Z	10169c60
 ?FindCase@ListBank@@QAEHPBDPADPAPAD@Z	100558d0
 ?IsQueuedEventReady@Game@@QAEHXZ	10055690
 ?Overlay_DrawModel@@YAHXZ	100236c0
@@ -477,3 +475,6 @@ _FUN_101426d0@8	101426d0
 ?SetLayerParam@Playback@@QAEHHHH@Z	1016a2a0
 ?BindNode@Playback@@QAEHPAUNode@@@Z	1016a090
 ?BindModel@Playback@@QAEHPAUAnimModel@@@Z	1016a020
+?Recreate@TextureObject@@QAEHXZ	10169df0
+?Restore@TextureObject@@QAEHXZ	10169e10
+?UpdateImage@TextureObject@@QAEHH@Z	10169f70

@@ -1,6 +1,7 @@
 // Texture stage helpers and the material slot table of a mesh.
 
 #include "d3d9_min.h"
+#include "texture_object.h"
 
 struct SlotTable
 {
@@ -29,13 +30,6 @@ struct SlotTable
     int M_101476e0(int index, int value);
 };
 
-struct IntPair
-{
-    int first;
-    int second;
-    IntPair();
-};
-
 extern "C" IDirect3DDevice9 *DAT_10f1fcf0;
 extern "C" int DAT_10f6550c;
 extern "C" int DAT_10f65510;
@@ -61,11 +55,11 @@ extern "C" void FUN_10143b80(void)
     }
 }
 
-// Constructor: both values 0.
-IntPair::IntPair()
+// 0x10143bb0. Constructor: no texture and no surface yet (called first by TextureObject's constructor).
+TextureHandle::TextureHandle()
 {
-    first = 0;
-    second = 0;
+    texture = 0;
+    surface = 0;
 }
 
 // Unbinds texture stages 0..3. Returns 0.

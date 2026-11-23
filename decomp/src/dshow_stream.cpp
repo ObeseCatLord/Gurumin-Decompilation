@@ -4,23 +4,7 @@
 #include <windows.h>
 #include <string.h>
 
-// The DirectDraw surface description (DDSURFACEDESC, 0x6c bytes; the SDK of this compiler has no ddraw.h).
-struct SurfaceDesc
-{
-    unsigned long size;
-    unsigned long flags;
-    unsigned long height;
-    unsigned long width;
-    char rest[0x5c];
-};
-
-// COM interfaces in vtable order (amstream.h / ddstream.h), with parameters for the methods used here.
-struct IUnknownLike
-{
-    virtual long __stdcall QueryInterface(const GUID &iid, void **object) = 0;
-    virtual unsigned long __stdcall AddRef() = 0;
-    virtual unsigned long __stdcall Release() = 0;
-};
+#include "ddraw_min.h"
 
 struct IDirectDrawLike : IUnknownLike
 {

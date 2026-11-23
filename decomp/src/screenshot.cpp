@@ -2,30 +2,6 @@
 
 #include "d3d9_min.h"
 
-// D3DLOCKED_RECT.
-struct LockedRect
-{
-    int pitch;
-    void *bits;
-};
-
-// IDirect3DSurface9 (LockRect at slot 13 and UnlockRect at slot 14), as in texture_bind.cpp.
-struct D3DSurface : IUnknownLike
-{
-    virtual void __stdcall Slot03() = 0;
-    virtual void __stdcall Slot04() = 0;
-    virtual void __stdcall Slot05() = 0;
-    virtual void __stdcall Slot06() = 0;
-    virtual void __stdcall Slot07() = 0;
-    virtual void __stdcall Slot08() = 0;
-    virtual void __stdcall Slot09() = 0;
-    virtual void __stdcall Slot10() = 0;
-    virtual void __stdcall Slot11() = 0;
-    virtual void __stdcall Slot12() = 0;
-    virtual long __stdcall LockRect(LockedRect *locked, const void *rect, unsigned long flags) = 0;
-    virtual long __stdcall UnlockRect() = 0;
-};
-
 extern "C" IDirect3DDevice9 *DAT_10f1fcf0;   // the Direct3D device
 extern "C" int DAT_10202b24;                 // back-buffer width
 extern "C" int DAT_10202b28;                 // back-buffer height
@@ -38,8 +14,8 @@ extern "C" int DAT_10f65540;                 // with 32-bit colour: non-zero = R
 // picture, or 0 when a Direct3D call fails.
 extern "C" unsigned char *FUN_1013e9d0(int *width, int *height)
 {
-    D3DSurface *copy;
-    D3DSurface *backBuffer;
+    IDirect3DSurface9Like *copy;
+    IDirect3DSurface9Like *backBuffer;
     LockedRect locked;
     int y;
     if (DAT_10f1fcf0->GetBackBuffer(0, 0, 0, (void **)&backBuffer) != 0)

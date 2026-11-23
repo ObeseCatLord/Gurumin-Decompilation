@@ -1,5 +1,7 @@
 #pragma once
 
+#include "com_min.h"
+
 struct D3DVIEWPORT9_
 {
     unsigned long X;
@@ -10,7 +12,6 @@ struct D3DVIEWPORT9_
     float MaxZ;
 };
 
-struct IUnknownLike;
 
 // IDirect3DDevice9 in vtable order (the VS2003 SDK has no d3d9.h). Parameters are filled in as methods get used.
 struct IDirect3DDevice9
@@ -142,11 +143,11 @@ struct IDirect3DDevice9
     virtual long __stdcall CreateQuery() = 0;
 };
 
-struct IUnknownLike
+// D3DLOCKED_RECT: what LockRect returns.
+struct LockedRect
 {
-    virtual long __stdcall QueryInterface() = 0;
-    virtual unsigned long __stdcall AddRef() = 0;
-    virtual unsigned long __stdcall Release() = 0;
+    int pitch;    // bytes per row
+    void *bits;   // the first pixel
 };
 
 // IDirect3DTexture9 up to AddDirtyRect (vtable order).
@@ -167,8 +168,26 @@ struct IDirect3DTexture9Like : IUnknownLike
     virtual int __stdcall GetAutoGenFilterType() = 0;
     virtual void __stdcall GenerateMipSubLevels() = 0;
     virtual long __stdcall GetLevelDesc() = 0;
-    virtual long __stdcall GetSurfaceLevel() = 0;
-    virtual long __stdcall LockRect() = 0;
-    virtual long __stdcall UnlockRect() = 0;
-    virtual long __stdcall AddDirtyRect(const void *rect) = 0;
+    virtual long __stdcall GetSurfaceLevel(unsigned int level, struct IDirect3DSurface9Like **surface) = 0;  // slot 18
+    virtual long __stdcall LockRect(unsigned int level, LockedRect *locked, const void *rect,
+                                    unsigned long flags) = 0;                                           // slot 19
+    virtual long __stdcall UnlockRect(unsigned int level) = 0;                                             // slot 20
+    virtual long __stdcall AddDirtyRect(const void *rect) = 0;                                             // slot 21
+};
+
+// IDirect3DSurface9 up to UnlockRect (vtable order: IUnknown, IDirect3DResource9, then the surface methods).
+struct IDirect3DSurface9Like : IUnknownLike
+{
+    virtual long __stdcall GetDevice() = 0;
+    virtual long __stdcall SetPrivateData() = 0;
+    virtual long __stdcall GetPrivateData() = 0;
+    virtual long __stdcall FreePrivateData() = 0;
+    virtual unsigned long __stdcall SetPriority() = 0;
+    virtual unsigned long __stdcall GetPriority() = 0;
+    virtual void __stdcall PreLoad() = 0;
+    virtual int __stdcall GetType() = 0;
+    virtual long __stdcall GetContainer() = 0;
+    virtual long __stdcall GetDesc() = 0;
+    virtual long __stdcall LockRect(LockedRect *locked, const void *rect, unsigned long flags) = 0;  // slot 13
+    virtual long __stdcall UnlockRect() = 0;                                                       // slot 14
 };

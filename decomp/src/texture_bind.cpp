@@ -6,57 +6,10 @@
 #include <string.h>
 #include "d3d9_min.h"
 
-// D3DLOCKED_RECT.
-struct LockedRect
-{
-    int pitch;
-    void *bits;
-};
-
-// IDirect3DTexture9 (only LockRect at slot 19 and UnlockRect at slot 20 are used here).
-struct D3DTexture : IUnknownLike
-{
-    virtual void __stdcall Slot03() = 0;
-    virtual void __stdcall Slot04() = 0;
-    virtual void __stdcall Slot05() = 0;
-    virtual void __stdcall Slot06() = 0;
-    virtual void __stdcall Slot07() = 0;
-    virtual void __stdcall Slot08() = 0;
-    virtual void __stdcall Slot09() = 0;
-    virtual void __stdcall Slot10() = 0;
-    virtual void __stdcall Slot11() = 0;
-    virtual void __stdcall Slot12() = 0;
-    virtual void __stdcall Slot13() = 0;
-    virtual void __stdcall Slot14() = 0;
-    virtual void __stdcall Slot15() = 0;
-    virtual void __stdcall Slot16() = 0;
-    virtual void __stdcall Slot17() = 0;
-    virtual long __stdcall GetSurfaceLevel(unsigned int level, struct D3DSurface **surface) = 0;
-    virtual long __stdcall LockRect(unsigned int level, LockedRect *locked, const void *rect, unsigned long flags) = 0;
-    virtual long __stdcall UnlockRect(unsigned int level) = 0;
-};
-
-// IDirect3DSurface9 (LockRect at slot 13 and UnlockRect at slot 14).
-struct D3DSurface : IUnknownLike
-{
-    virtual void __stdcall Slot03() = 0;
-    virtual void __stdcall Slot04() = 0;
-    virtual void __stdcall Slot05() = 0;
-    virtual void __stdcall Slot06() = 0;
-    virtual void __stdcall Slot07() = 0;
-    virtual void __stdcall Slot08() = 0;
-    virtual void __stdcall Slot09() = 0;
-    virtual void __stdcall Slot10() = 0;
-    virtual void __stdcall Slot11() = 0;
-    virtual void __stdcall Slot12() = 0;
-    virtual long __stdcall LockRect(LockedRect *locked, const void *rect, unsigned long flags) = 0;
-    virtual long __stdcall UnlockRect() = 0;
-};
-
 struct TextureObject
 {
-    D3DTexture *texture;     // 0x00: Direct3D texture
-    D3DSurface *surface;     // 0x04: surface of a render-target texture (or a second part), may be 0
+    IDirect3DTexture9Like *texture;     // 0x00: Direct3D texture
+    IDirect3DSurface9Like *surface;     // 0x04: surface of a render-target texture (or a second part), may be 0
     int width;               // 0x08: texture width in pixels
     int height;              // 0x0c: texture height in pixels
     int target;              // 0x10: 1 = R5G6B5 render target, 2 = A8R8G8B8 render target, else 0
@@ -267,7 +220,7 @@ int TextureObject::WriteRgb32(int left, int top, int right, int bottom, int pitc
 // or 0 when the read-back fails.
 int TextureObject::CaptureRgb24(unsigned char *out)
 {
-    D3DSurface *copy;
+    IDirect3DSurface9Like *copy;
     DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x17 /* D3DFMT_R5G6B5 */, 2 /* D3DPOOL_SYSTEMMEM */,
                                               (void **)&copy, 0);
     if (DAT_10f1fcf0->GetRenderTargetData(surface, copy) != 0)
@@ -294,7 +247,7 @@ int TextureObject::CaptureRgb24(unsigned char *out)
 // converted as R5G6B5). Called by FUN_10017d30. Returns 1, or 0 when the copy or the read-back fails.
 int TextureObject::CaptureRgbRows(unsigned char *out)
 {
-    D3DSurface *copy;
+    IDirect3DSurface9Like *copy;
     if (DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x17 /* D3DFMT_R5G6B5 */, 2 /* D3DPOOL_SYSTEMMEM */,
                                                   (void **)&copy, 0) != 0 &&
         DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x18 /* D3DFMT_X1R5G5B5 */, 2, (void **)&copy, 0) != 0)
@@ -404,13 +357,13 @@ struct Rect
     long bottom;
 };
 
-extern "C" D3DSurface *DAT_10f141dc;  // the back buffer surface
+extern "C" IDirect3DSurface9Like *DAT_10f141dc;  // the back buffer surface
 
 // 0x10145210. Like CaptureRgbRows for only the first 32 pixels. When the render target cannot be read back, the
 // 256x256 corner of the back buffer is stretch-copied into a scratch surface instead. Returns 1, or 0 on failure.
 int TextureObject::CaptureRgbFirst(unsigned char *out)
 {
-    D3DSurface *copy;
+    IDirect3DSurface9Like *copy;
     Rect rect;
     if (DAT_10f1fcf0->CreateOffscreenPlainSurface(256, 256, 0x17 /* D3DFMT_R5G6B5 */, 2 /* D3DPOOL_SYSTEMMEM */,
                                                   (void **)&copy, 0) != 0 &&

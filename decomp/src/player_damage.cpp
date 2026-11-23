@@ -39,10 +39,7 @@ struct MoviePlayer
     int M_10160960(const TextureObject *target);     // 0x10160960: decodes the current frame into `target`
 };
 
-struct Input
-{
-    int Rumble(float divisor, int milliseconds);     // 0x10142700
-};
+#include "dinput_min.h"
 
 struct Game
 {
@@ -54,7 +51,6 @@ extern "C" EffectManager DAT_10daaa80;
 extern "C" MoviePlayer DAT_10f08ab0;
 extern "C" TextureObject DAT_118d0ba8[1600];
 extern "C" int DAT_10202478;                  // texture slot the movies are decoded into
-extern "C" Input DAT_10f08008;
 extern "C" Game DAT_10874848;
 extern "C" int DAT_104bfe78;                  // 1 once the game over has started
 extern "C" int DAT_104bfe1c;

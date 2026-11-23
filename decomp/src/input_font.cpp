@@ -2,63 +2,7 @@
 
 #include <windows.h>
 
-struct ComObject
-{
-    virtual long __stdcall QueryInterface() = 0;
-    virtual unsigned long __stdcall AddRef() = 0;
-    virtual unsigned long __stdcall Release() = 0;
-};
-
-struct InputDevice
-{
-    virtual long __stdcall QueryInterface() = 0;
-    virtual unsigned long __stdcall AddRef() = 0;
-    virtual unsigned long __stdcall Release() = 0;
-    virtual long __stdcall GetCapabilities() = 0;
-    virtual long __stdcall EnumObjects() = 0;
-    virtual long __stdcall GetProperty() = 0;
-    virtual long __stdcall SetProperty() = 0;
-    virtual long __stdcall Acquire() = 0;
-    virtual long __stdcall Unacquire() = 0;
-};
-
-// IDirectInputEffect (the joystick's force-feedback effect).
-struct InputEffect
-{
-    virtual long __stdcall QueryInterface() = 0;
-    virtual unsigned long __stdcall AddRef() = 0;
-    virtual unsigned long __stdcall Release() = 0;
-    virtual long __stdcall Initialize() = 0;
-    virtual long __stdcall GetEffectGuid() = 0;
-    virtual long __stdcall GetParameters() = 0;
-    virtual long __stdcall SetParameters(void *effect, unsigned long flags) = 0;
-    virtual long __stdcall Start(unsigned long iterations, unsigned long flags) = 0;
-};
-
-// DIEFFECT: the effect description passed to SetParameters.
-struct EffectDesc
-{
-    unsigned long size;
-    unsigned long flags;
-    unsigned long duration;   // microseconds
-    char rest[0x2c];
-};
-
-struct Input
-{
-    ComObject *directInput;
-    InputDevice *joystick;
-    InputDevice *keyboard;
-    InputDevice *mouse;
-    char pad_0010[0x14];
-    int m_0024;
-    int m_0028;
-    char pad_002c[4];
-    EffectDesc effect;        // 0x30
-    long magnitude;           // 0x68: the effect's type-specific magnitude (0..10000)
-    int Shutdown();
-    int Rumble(float divisor, int milliseconds);
-};
+#include "dinput_min.h"
 
 struct FontSet
 {
@@ -70,7 +14,7 @@ struct FontSet
     int Release();
 };
 
-extern "C" ComObject *DAT_10f65578;     // the force-feedback effect (an InputEffect while it exists)
+extern "C" DirectInput *DAT_10f65578;     // the force-feedback effect (an InputEffect while it exists)
 extern "C" int DAT_10f65564;            // non-zero when force feedback is enabled
 extern "C" void (*DAT_11b1ba40)(void *);
 
@@ -81,7 +25,7 @@ int Input::Rumble(float divisor, int milliseconds)
     if (DAT_10f65578 != 0 && DAT_10f65564 != 0)
     {
         float clamped = 1.0f < divisor ? divisor : 1.0f;
-        magnitude = (long)(10000.0f / clamped);
+        periodic.magnitude = (long)(10000.0f / clamped);
         effect.duration = milliseconds * 1000;
         ((InputEffect *)DAT_10f65578)->SetParameters(&effect, 0x101);  // DIEP_DURATION | DIEP_TYPESPECIFICPARAMS
         ((InputEffect *)DAT_10f65578)->Start(1, 0);
@@ -118,8 +62,8 @@ int Input::Shutdown()
     joystick = 0;
     keyboard = 0;
     mouse = 0;
-    m_0024 = 0;
-    m_0028 = 0;
+    ready = 0;
+    enumerated = 0;
     return 0;
 }
 

@@ -655,3 +655,179 @@ int KeyBank::Sample(int frame, float *x, float *y, float *z, float *w, int rotat
 #undef SPLINE_T
     return 1;
 }
+
+// 0x101afe00 (KeyTrack::Sample). KeyBank::Sample's lookup over a KeyTrack's separately allocated frame, value and flag
+// arrays: a key exactly at `frame` is copied (returns 2); before the first key and past the last the first/last value is
+// held; between two keys `rotation` blends quaternions, KEY_FLAG_HOLD holds, KEY_FLAG_MOTION is linear, else a Spline.
+// Returns 1 unless a key sat exactly at `frame`. Used by scene nodes, camera paths and the motion channels.
+int KeyTrack::Sample(int frame, float *x, float *y, float *z, float *w, int rotation)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if (frames[i] == frame)
+        {
+            *x = values[i].x;
+            *y = values[i].y;
+            *z = values[i].z;
+            *w = values[i].w;
+            return 2;
+        }
+        if (frames[i] > frame)
+            break;
+    }
+    if (i == 0)
+    {
+        *x = values[0].x;
+        *y = values[0].y;
+        *z = values[0].z;
+        *w = values[0].w;
+        return 1;
+    }
+    if (i == count)
+    {
+        *x = values[i - 1].x;
+        *y = values[i - 1].y;
+        *z = values[i - 1].z;
+        *w = values[i - 1].w;
+        return 1;
+    }
+
+    // Between key i - 1 and key i.
+    int span = frames[i] - frames[i - 1];
+    int offset = frame - frames[i - 1];
+    if (rotation != 0)
+    {
+        Vec4 blended;
+        blended.Copy(Slerp(values[i - 1], values[i], (float)offset / (float)span));
+        *x = blended.x;
+        *y = blended.y;
+        *z = blended.z;
+        *w = blended.w;
+        return 1;
+    }
+
+    int keyFlags = flags[AT_LEAST_FIRST(i)];
+    int linear = (keyFlags >> 2) & 1;     // KEY_FLAG_MOTION
+    if (keyFlags & KEY_FLAG_HOLD)
+    {
+        *x = values[i - 1].x;
+        *y = values[i - 1].y;
+        *z = values[i - 1].z;
+        *w = values[i - 1].w;
+        return 1;
+    }
+    if (linear)
+    {
+        float along = (float)offset;
+        float length = (float)span;
+        *x = (values[i].x - values[i - 1].x) * along / length + values[i - 1].x;
+        *y = (values[i].y - values[i - 1].y) * along / length + values[i - 1].y;
+        *z = (values[i].z - values[i - 1].z) * along / length + values[i - 1].z;
+        *w = (values[i].w - values[i - 1].w) * along / length + values[i - 1].w;
+        return 1;
+    }
+
+    // Spline through keys i - 2 .. i + 1, clamped to the first and last key. The blend factor is written inside
+    // each call (cl 13.00 evaluates it once, after the key indices); a separate `t` statement makes it convert
+    // `offset` before the linear/spline branch instead.
+#define SPLINE_T ((float)offset / (float)span)
+    *x = Spline(SPLINE_T,
+                values[AT_LEAST_FIRST(i - 2)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
+                values[AT_MOST_LAST(i + 1, count - 1)].x);
+    *y = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
+                values[AT_MOST_LAST(i + 1, count - 1)].y);
+    *z = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
+                values[AT_MOST_LAST(i + 1, count - 1)].z);
+    *w = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
+                values[AT_MOST_LAST(i + 1, count - 1)].w);
+#undef SPLINE_T
+    return 1;
+}
+
+// 0x101af960 (KeyBank::Sample, float frame). KeyBank::Sample for a fractional frame: the keys' frames are compared as
+// floats and the blend factor is offset / span in float. Returns 1 unless a key sat exactly at `frame`.
+int KeyBank::Sample(float frame, float *x, float *y, float *z, float *w, int rotation)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if ((float)frames[i] == frame)
+        {
+            *x = values[i].x;
+            *y = values[i].y;
+            *z = values[i].z;
+            *w = values[i].w;
+            return 2;
+        }
+        if ((float)frames[i] > frame)
+            break;
+    }
+    if (i == 0)
+    {
+        *x = values[0].x;
+        *y = values[0].y;
+        *z = values[0].z;
+        *w = values[0].w;
+        return 1;
+    }
+    if (i == count)
+    {
+        *x = values[i - 1].x;
+        *y = values[i - 1].y;
+        *z = values[i - 1].z;
+        *w = values[i - 1].w;
+        return 1;
+    }
+
+    // Between key i - 1 and key i.
+    float span = (float)(frames[i] - frames[i - 1]);
+    float offset = frame - (float)frames[i - 1];
+    if (rotation != 0)
+    {
+        Vec4 blended;
+        blended.Copy(Slerp(values[i - 1], values[i], offset / span));
+        *x = blended.x;
+        *y = blended.y;
+        *z = blended.z;
+        *w = blended.w;
+        return 1;
+    }
+
+    int keyFlags = flags[AT_LEAST_FIRST(i)];
+    int linear = (keyFlags >> 2) & 1;     // KEY_FLAG_MOTION
+    if (keyFlags & KEY_FLAG_HOLD)
+    {
+        *x = values[i - 1].x;
+        *y = values[i - 1].y;
+        *z = values[i - 1].z;
+        *w = values[i - 1].w;
+        return 1;
+    }
+    if (linear)
+    {
+        float along = offset;
+        float length = span;
+        *x = (values[i].x - values[i - 1].x) * along / length + values[i - 1].x;
+        *y = (values[i].y - values[i - 1].y) * along / length + values[i - 1].y;
+        *z = (values[i].z - values[i - 1].z) * along / length + values[i - 1].z;
+        *w = (values[i].w - values[i - 1].w) * along / length + values[i - 1].w;
+        return 1;
+    }
+
+    // Spline through keys i - 2 .. i + 1, clamped to the first and last key. The blend factor is written inside
+    // each call (cl 13.00 evaluates it once, after the key indices); a separate `t` statement makes it convert
+    // `offset` before the linear/spline branch instead.
+#define SPLINE_T (offset / span)
+    *x = Spline(SPLINE_T,
+                values[AT_LEAST_FIRST(i - 2)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
+                values[AT_MOST_LAST(i + 1, count - 1)].x);
+    *y = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
+                values[AT_MOST_LAST(i + 1, count - 1)].y);
+    *z = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
+                values[AT_MOST_LAST(i + 1, count - 1)].z);
+    *w = Spline(SPLINE_T, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
+                values[AT_MOST_LAST(i + 1, count - 1)].w);
+#undef SPLINE_T
+    return 1;
+}

@@ -58,4 +58,6 @@ struct Matrix4
     Matrix4 operator*(const Matrix4 &other);           // 0x101b0670: matrix product
 };
 
+Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
+
 #endif

@@ -151,6 +151,8 @@ extern "C" int DAT_10f656a0;                              // 1 = keep running wh
 extern "C" char DAT_10f65754[];                           // its window class name
 extern "C" Vec4 DAT_10f657c4[2];                          // per-frame colour steps
 extern "C" Vec4 DAT_10f65828[2];                          // target colours (set exactly on the last frame to avoid rounding drift)
+extern "C" int DAT_10836100[2][2];                        // texture slot of each outline texture (first entry of each pair)
+extern "C" int DAT_10447bd0[0x80];                        // per character slot: the value DAT_10f655c4 takes while it is drawn (slots from 0x3a)
 extern "C" Vec4 DAT_10f66948;                             // the current draw colour
 extern "C" Vec4 DAT_10f66978[2];                          // current colours
 extern "C" unsigned char DAT_10f68138[0x25800];           // buffer for one streamed frame record

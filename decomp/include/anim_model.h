@@ -309,6 +309,7 @@ struct AnimModel
     int AddMotionSpeed(float speed);                               // 0x101630b0
     int HoldAtSpine(int on, float amount);                         // 0x10163c70
     int Hold(int on, float amount, AnimModel *other);              // 0x10163d60
+    int Draw(const Matrix4 *viewProjection, const Vec4 *lights, int flags);  // 0x10163150: queues the model under `viewProjection` with the light set `lights`
     int IsClear(const Vec4 *offset);                               // 0x10163e90
     int IsClearFlagged(const Vec4 *offset);                        // 0x10163f90
     int IsClearAny(const Vec4 *offset);                            // 0x101640b0: 0 when the move collides

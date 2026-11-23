@@ -380,7 +380,7 @@ _sqrtf	10002010
 ?FindLabel@ListBank@@QAEHPBDPADPAPAD@Z	10055aa0
 ?SkipStatement@ListBank@@QAEHPAPAD@Z	10055ca0
 ?RunQueuedEvents@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z	10055410
-?DrawGlyph@FontRenderer@@QAEHPAGHHGGH@Z	101453e0
+?DrawGlyph@FontRenderer@@QAEHPAGHHGGG@Z	101453e0
 ?DrawWindowMarks@Game@@QAEHH@Z	100092c0
 ?Map_SelectMovie@@YAHXZ	1001f270
 ?AssignValue@ListBank@@QAEHPBDPBUScriptValue@@D@Z	10037560
@@ -512,3 +512,9 @@ _Enemy_IsBusy	100e1c40
 ?Advance@Playback@@QAEHXZ	1016a480
 
 ?FUN_1000e340@@YAHXZ	1000e340
+?Sample@KeyBank@@QAEHMPAM000H@Z	101af960
+?Sample@KeyTrack@@QAEHHPAM000H@Z	101afe00
+?DrawStringToPixels@FontRenderer@@QAEHPAGHHPBDGH@Z	1014f900
+?Draw@AnimModel@@QAEHPBUMatrix4@@PBUVec4@@H@Z	10163150
+?FUN_1000c720@@YAHPAUMatrix4@@ABU1@PAUVec4@@@Z	1000c720
+?DrawTextClipped@FontRenderer@@QAEHHHPBDHHHHHMMM@Z	1014fdd0

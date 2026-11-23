@@ -56,6 +56,8 @@ struct KeyBank
     int CopyTo(KeyTrack *target);                                  // 0x101af450: appends every key to `target`
     // 0x101af4c0: the value at `frame` (flags as KeyTrack::Sample's `rotation`).
     int Sample(int frame, float *x, float *y, float *z, float *w, int flags);
+    // 0x101af960: the same for a fractional frame.
+    int Sample(float frame, float *x, float *y, float *z, float *w, int flags);
 };
 
 #endif

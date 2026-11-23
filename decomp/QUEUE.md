@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (179)
+## 1. Walls to retry (182)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -128,6 +128,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014c080` 943 — TextureObject::DrawQuad (texture_bind.cpp): one byte off; reading speculars[i].y the original addresses [ecx+eax] (pointer register first), cl 13.00 here [eax+ecx]; reference locals and separate specular variables tried
 - [ ] `1014d850` 1429 — TextureObject::DrawFillAlt (texture_bind.cpp): loop and calls line up; the original keeps 1 and 0 in esi/ecx while filling the shade table (and later for the render states), spills i & 1 and indexes the arrays with a byte offset, cl 13.00 here schedules the array setup differently and the frame is 0xc smaller; array declaration orders and colour forms tried
 - [ ] `1014f1f0` 806 — TextureObject::Upload (texture_bind.cpp): calls and branches line up; the original frame is 8 bytes larger (separate slots for the two lock rectangles and a row counter in memory) and its pixel loops step three separately reduced source pointers; index spellings and declaration placements tried
+- [ ] `1014f900` 1070 — FontRenderer::DrawStringToPixels (font_metrics.cpp, rule-clean, 1072 vs 1070 bytes): the proportional "s" pad loop keeps its column counter in the colour parameter slot (0x44, incremented through a register) and the final four-pixel fill keeps its pointer in edx; loop forms, function-scope column/row and tail pointer forms tried
 - [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
@@ -190,6 +191,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
 - [ ] `101af4c0` 1182 — KeyBank::Sample (vec4.cpp, after Spline so edx survives the calls): the spline blend factor written inside each Spline call removes the (float)offset hoist; left: the original keeps (keyFlags >> 2) & 1 in eax before the hold test (cl 13.00 here folds it into test al,4; ten spellings tried: ?:, !=0, bool, unsigned, separate reads, switch, ==1), i - 2 spelled (i - 1) - 1, and the Spline call loads ecx (thiscall member; declaring it breaks FUN_100b4f00)
+- [ ] `101af960` 1176 — KeyBank::Sample(float) (vec4.cpp, 1168 vs 1176 bytes): same wall as KeyBank::Sample 0x101af4c0; the original keeps the i == count copy and the hold copy as two blocks; maybe Spline is a thiscall member (mov ecx,edx before the call)
+- [ ] `101afe00` 1079 — KeyTrack::Sample (vec4.cpp, 1056 vs 1079 bytes): count/frames registers swapped (ebp/ebx) and the i == count hold copy placed after the cmp in the original (cl 13.00 emits je far); flat, nested, goto forms tried; same Spline thiscall suspicion
 
 ## 2. Small functions (30-250 bytes) (2)
 
@@ -200,17 +203,11 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (106)
+## 4. Large functions (801-3000 bytes) (100)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `1000c720` 1032 bytes (float, loops 2, calls 22)
-- [ ] `1014fdd0` 1048 bytes (float, loops 3, calls 9)
-- [ ] `1014f900` 1070 bytes (float, loops 6, calls 12)
-- [ ] `101afe00` 1079 bytes (float, loops 2, calls 7)
-- [ ] `1000eed0` 1101 bytes (float, calls 25)
 - [ ] `1016be80` 1139 bytes (float, loops 2, calls 14)
 - [ ] `100ed510` 1160 bytes (float, loops 10, calls 15)
-- [ ] `101af960` 1176 bytes (float, loops 1, calls 7)
 - [ ] `10011520` 1188 bytes (float, loops 4, calls 8)
 - [ ] `1004d4b0` 1188 bytes (float, loops 3, calls 2)
 - [ ] `10038070` 1195 bytes (float, loops 2, calls 37)

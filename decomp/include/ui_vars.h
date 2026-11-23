@@ -49,6 +49,10 @@ extern "C" int DAT_104bfd10;
 extern "C" int DAT_104bff00;
 extern "C" int DAT_104bff0c;
 extern "C" unsigned char DAT_104c0230;
+extern "C" unsigned char DAT_104c02c4;                    // selects which of the two outline textures DAT_10836100 holds (odd/even)
+extern "C" unsigned char DAT_104c02c5;                    // character slot to draw an outline around (0 = none)
+extern "C" unsigned char DAT_104c02c6;                    // 0 = outline added to the scene, otherwise darkened into it
+extern "C" unsigned char DAT_104c02c7;                    // opacity of the outline in percent
 extern "C" unsigned char DAT_104c02cc;                    // caption scroll timer
 extern "C" unsigned char DAT_104c02cd;                    // how far the ability list can scroll
 extern "C" char DAT_104c0339;

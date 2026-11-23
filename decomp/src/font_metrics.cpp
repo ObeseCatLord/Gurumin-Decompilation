@@ -10,6 +10,10 @@
 #include <stdlib.h>
 
 #include "font_renderer.h"
+#include "texture_object.h"
+
+extern "C" int FUN_101616e0(int slot, int left, int top, int right, int bottom, float u0, float v0, float u1, float v1,
+                            float z, float alpha, float angle);   // draws a texture slot as a rectangle (item_icon.cpp)
 
 // Returns the advance width in pixels of one Shift-JIS character (width bits + 1).
 // The arguments mirror the character-draw function so callers can pass the same list; only `code` is used.
@@ -39,7 +43,7 @@ int FontRenderer::GlyphWidth(int color, int x, int y, unsigned short code, unsig
 // (x, y) of the 512-pixel-wide ARGB4444 surface `pixels`: each of the 17 rows has `width` pixels whose 3-bit
 // coverage becomes the alpha nibble's top bits over `color` (coverage 0 leaves just `color`), and one column right
 // of the glyph plus one row below it are filled with `color`. Returns the advance width (glyph width + 1).
-int FontRenderer::DrawGlyph(unsigned short *pixels, int x, int y, unsigned short code, unsigned short color, int unused)
+int FontRenderer::DrawGlyph(unsigned short *pixels, int x, int y, unsigned short code, unsigned short color, unsigned short unused)
 {
     unsigned short *font = glyphs;
     if (useAlt == 1 && altGlyphs != 0)
@@ -101,6 +105,7 @@ int FontRenderer::DrawGlyph(unsigned short *pixels, int x, int y, unsigned short
 #define FIXED_MINUS_ADVANCE     9       // '-' in fixed-advance text only moves the pen
 #define PAD_COLUMN_SCALE        1.13636f  // "snnn" columns are given in 1/1.13636 pixels (640 vs 563 units)
 #define PAD_SEARCH_PASSES       17
+#define FIXED_COLUMN_SCALE      1.11111f  // "snnn" columns of fixed-advance text
 
 // 0x1014f590. Measures (and, through GlyphWidth's argument list, lays out) the string `text` starting at (x, y) and
 // returns the pen position after the last character. Inline commands in the text:
@@ -274,6 +279,269 @@ int FontRenderer::DrawString(int color, int x, int y, const char *text, unsigned
     return pen;
 }
 
+// 0x1014f900 (Font_DrawStringToPixels). DrawString for a pixel buffer: draws `text` into the 512-pixel-wide ARGB4444
+// surface `pixels` starting at (x, y) with DrawGlyph and returns the pen position after the last character.
+// Commands as in DrawString, except that "Lnn" sets the colour (nn is its low byte) and "snnn" in proportional text
+// also fills the gap up to the new column with the colour. With fixedAdvance != 0 every character advances by
+// fixedAdvance, "snnn" columns use a 1/1.11111 scale and '-' leaves a 9-pixel gap. Finally a 4-pixel wide block of the
+// colour is written after the text on each of the 17 rows.
+int FontRenderer::DrawStringToPixels(unsigned short *pixels, int x, int y, const char *text, unsigned short color, int fixedAdvance)
+{
+    int length = strlen(text);
+    int pen = 0;
+    int i = 0;
+    unsigned short *row;
+    int column;
+    char number[4];
+
+    if (fixedAdvance == 0)
+    {
+        int rowOffset;
+        if (length > 0)
+        {
+        rowOffset = y << 9;
+        do
+        {
+            char c = text[i];
+            if (c == '0')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO, color, color);
+            }
+            else if (c == '1')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 1 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '2')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 2 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '3')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 3 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '4')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 4 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '5')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 5 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '6')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 6 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '7')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 7 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '8')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 8 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '9')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_ZERO + 9 * SJIS_FULLWIDTH_STEP, color, color);
+            }
+            else if (c == '-')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_MINUS, color, color);
+            }
+            else if (c == '.')
+            {
+                i++;
+                pen += DrawGlyph(pixels, x + pen, y, SJIS_FULLWIDTH_PERIOD, color, color);
+            }
+            else if (c == '_')
+            {
+                i++;
+                DrawGlyph(pixels, x + pen, y, SJIS_MIDDLE_DOT, color, color);
+                pen += 1;
+            }
+            else if (c == 'L')
+            {
+                i++;
+                number[0] = text[i];
+                number[1] = text[i + 1];
+                number[2] = 0;
+                color = (unsigned char)atol(number);
+                i += 2;
+            }
+            else if (c == 's')
+            {
+                i++;
+                number[0] = text[i];
+                number[1] = text[i + 1];
+                number[2] = text[i + 2];
+                number[3] = 0;
+                row = &pixels[rowOffset + x + pen];
+                for (int line = FONT_LINE_HEIGHT; line != 0; line--)
+                {
+                    column = pen;
+                    unsigned short *out = row;
+                    while ((float)column < (float)atol(number) * PAD_COLUMN_SCALE)
+                    {
+                        *out++ = color;
+                        column++;
+                    }
+                    row += 0x200;
+                }
+                pen = (int)((float)atol(number) * PAD_COLUMN_SCALE);
+                i += 3;
+            }
+            else if (c == '\n')
+            {
+                i++;
+                pen = 0;
+                y += FONT_LINE_HEIGHT;
+                rowOffset += FONT_LINE_HEIGHT << 9;
+            }
+            else
+            {
+                unsigned short code = *(const unsigned short *)(text + i);
+                pen += DrawGlyph(pixels, x + pen, y, code, color, color);
+                i += 2;
+            }
+        } while (i < length);
+        }
+    }
+    else if (length > 0)
+    {
+        do
+        {
+            char c = text[i];
+            if (c == '-')
+            {
+                i++;
+                pen += FIXED_MINUS_ADVANCE;
+            }
+            else if (c == 'L')
+            {
+                i++;
+                number[0] = text[i];
+                number[1] = text[i + 1];
+                number[2] = 0;
+                color = (unsigned char)atol(number);
+                i += 2;
+            }
+            else if (c == 's')
+            {
+                i++;
+                number[0] = text[i];
+                number[1] = text[i + 1];
+                number[2] = text[i + 2];
+                number[3] = 0;
+                pen = (unsigned char)(int)((float)atol(number) * FIXED_COLUMN_SCALE);
+                i += 3;
+            }
+            else if (c == '\n')
+            {
+                i++;
+                pen = 0;
+                y += FONT_LINE_HEIGHT;
+            }
+            else
+            {
+                unsigned short code = *(const unsigned short *)(text + i);
+                DrawGlyph(pixels, x + pen, y, code, color, color);
+                pen += fixedAdvance;
+                i += 2;
+            }
+        } while (i < length);
+    }
+
+    unsigned short *edge = &pixels[y * 0x200 + pen + x];
+    for (int row = FONT_LINE_HEIGHT; row != 0; row--)
+    {
+        for (int k = pen; k < pen + 4; k++)
+            edge[k - pen] = color;
+        edge += 0x200;
+    }
+    return pen;
+}
+
+#define TEXT_TEXTURE_COUNT      0x20
+#define TEXT_TEXTURE_KEY_LENGTH 0x80    // bytes of the text kept for the cache comparison
+#define TEXT_SHADOW_SCALE       2.0f    // y offset per unit of scale
+#define TEXEL_CENTRE            0.5f    // texture coordinates start half a texel in
+#define TEXT_END_PADDING        4       // pixels of colour written after the text
+#define TEXT_TEXTURE_PITCH      0x400   // bytes per row of the text textures (512 pixels)
+
+// 0x1014fdd0 (Font_DrawCached). Draws `text` as a texture quad. The 32 text textures form a cache keyed by text,
+// colour and alpha; a miss picks a random slot, renders the text into its buffer (colour reduced to 4 bits per
+// channel) and uploads it. The quad is placed at (x, y + 2 * scale), spans width * scale by height * scale, and is
+// cut to the clip rectangle by moving its texture coordinates with it. Every draw marks its slot as the newest and
+// ages the rest. Returns the width of the text in pixels at `scale`.
+int FontRenderer::DrawTextClipped(int x, int y, const char *text, int clipLeft, int clipTop, int clipRight, int clipBottom, int colour,
+                                  float z, float alpha, float scale)
+{
+    y += (int)(scale * TEXT_SHADOW_SCALE);
+    int slot;
+    for (slot = 0; slot < TEXT_TEXTURE_COUNT; slot++)
+    {
+        if (alphas[slot] == alpha && colours[slot] == colour && strcmp(text, texts[slot]) == 0)
+            goto found;
+    }
+    slot = rand() % TEXT_TEXTURE_COUNT;
+    strncpy(texts[slot], text, TEXT_TEXTURE_KEY_LENGTH);
+    colours[slot] = colour;
+    alphas[slot] = alpha;
+    widths[slot] = DrawStringToPixels(buffers[slot], 0, 0, text,
+                                      (colour >> 4 & 0xf) | (colour >> 12 & 0xf) << 4 | (colour >> 12 & 0xff00), 0);
+    heights[slot] = FONT_LINE_HEIGHT;
+    DAT_118d0ba8[textures[slot]].Write16(0, 0, widths[slot] + TEXT_END_PADDING, FONT_LINE_HEIGHT, TEXT_TEXTURE_PITCH, buffers[slot]);
+found:
+    float textWidth = (float)widths[slot];
+    float right = textWidth * scale + (float)x;
+    float textHeight = (float)heights[slot];
+    float bottom = textHeight * scale + (float)y;
+    float u0 = TEXEL_CENTRE;
+    float v0 = TEXEL_CENTRE;
+    float u1 = textWidth - TEXEL_CENTRE;
+    float v1 = textHeight - TEXEL_CENTRE;
+    float uPerPixel = (u1 - TEXEL_CENTRE) / (right - (float)x);
+    float vPerPixel = (v1 - TEXEL_CENTRE) / (bottom - (float)y);
+    if (clipLeft > x)
+    {
+        u0 = (float)(clipLeft - x) * uPerPixel + TEXEL_CENTRE;
+        x = clipLeft;
+    }
+    if ((float)clipRight < right)
+    {
+        u1 -= (right - (float)clipRight) * uPerPixel;
+        right = (float)clipRight;
+    }
+    if (clipTop > y)
+    {
+        v0 = (float)(clipTop - y) * vPerPixel + TEXEL_CENTRE;
+        y = clipTop;
+    }
+    if ((float)clipBottom < bottom)
+    {
+        v1 -= (bottom - (float)clipBottom) * vPerPixel;
+        bottom = (float)clipBottom;
+    }
+    FUN_101616e0(textures[slot], x, y, (int)right, (int)bottom, u0, v0, u1, v1, z, alpha, 0);
+    recency[slot] = TEXT_TEXTURE_COUNT;
+    for (int other = 0; other < TEXT_TEXTURE_COUNT; other++)
+    {
+        if (other != slot && recency[slot] != 0)
+            recency[slot]--;
+    }
+    return (int)((float)widths[slot] * scale);
+}
+
 // Width in pixels of `text` drawn at `scale`: measured with the bitmap font when one is loaded (the text-draw
 // routine also returns the width), otherwise with the Windows font through GetTextExtentPoint32A.
 int FontRenderer::TextWidth(const char *text, float scale)
@@ -379,8 +647,8 @@ int FontRenderer::Init(HWND window, const char *path)
     SelectObject(dc, font);
     for (int i = 0; i < 0x20; i++)
     {
-        m_220c[i] = 0;
-        m_210c[i] = 0;
+        alphas[i] = 0;
+        recency[i] = 0;
         texts[i][0] = 0;
         unsigned int *buffer;
         int words;
@@ -394,7 +662,7 @@ int FontRenderer::Init(HWND window, const char *path)
             buffer = (unsigned int *)DAT_11b0b938(0xc000, "m_fontbuff");
             words = 0x3000;
         }
-        buffers[i] = buffer;
+        buffers[i] = (unsigned short *)buffer;
         for (; words != 0; words--)
             *buffer++ = 0;
         char name[0x80];

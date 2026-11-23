@@ -47,7 +47,7 @@ extern "C" int DAT_10202808[0x10];                        // texture slots of th
 extern "C" int DAT_1020aee8;
 extern "C" int DAT_1020b22c;
 extern "C" int DAT_1020d430;
-extern "C" int DAT_1020d438[0x20];
+extern "C" char DAT_1020d438[0x80];                       // per character slot: non-zero = drawn without the area colour (DAT_10f655c4 stays 0)
 extern "C" int DAT_1020d4b8;
 extern "C" int DAT_1020d5c8[0x20];
 extern "C" int DAT_1020d648;

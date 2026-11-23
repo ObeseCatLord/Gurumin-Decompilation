@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 13.55% of code, 814 of 1212 functions |
-| Matched under the rules | 13.51% of code (232422 bytes), 813 of the 814 matched functions |
-| Fuzzy match | 17.95% |
+| Matched | 13.73% of code, 817 of 1212 functions |
+| Matched under the rules | 13.70% of code, 816 of the 817 matched functions |
+| Fuzzy match | 18.19% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -36,6 +36,10 @@ function) and node_world.cpp (0) still break rule 2.
 - Batch 312: Debris_Draw 0x1000e340 (debris.cpp + debris.h; Node::StartProximityPass takes Matrix4 *reference),
   Char_ProbeSideStep 0x100509e0 and Char_ProbeSideLedge 0x10050df0 (ledge_probe.cpp) matched; Playback::Advance
   0x1016a480 drafted (playback_advance.cpp, shared tails; open.tsv).
+- Batch 313: Message_DrawPanel 0x1000eed0 (message_panel.cpp), Characters_Draw 0x1000c720 (character_draw.cpp) and
+  FontRenderer::DrawTextClipped 0x1014fdd0 (font_metrics.cpp) matched; DrawStringToPixels 0x1014f900 (2 bytes),
+  KeyBank::Sample(float) 0x101af960 and KeyTrack::Sample 0x101afe00 drafted. Lead: the three KeyBank/KeyTrack
+  samplers may need Spline as a thiscall member (vec4.cpp). ime_draw.cpp should call DrawTextClipped as a method.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

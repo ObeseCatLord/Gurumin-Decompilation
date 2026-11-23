@@ -46,8 +46,9 @@ the file names, so you can also add files to `edit\` by hand if you follow the n
 | Folder | Holds | Example |
 |---|---|---|
 | `edit\` | editable files: the game file's name plus a new extension | `edit\3ddata\stage01.itm.txt` |
+| `edit\...\*.mmv.frames\` | a movie: one PNG per frame (`frame_0000.png`, ...) | `edit\3ddata\logo.mmv.frames\` |
 | `out\` | rebuilt game files, ready to copy into the game | `out\3ddata\stage01.itm` |
-| `reference\` | things you can look at but not put back yet (models, movies, save thumbnails) | `reference\3ddata\pc.it3.obj` |
+| `reference\` | things you can look at but not put back yet (models, save thumbnails, movie GIFs) | `reference\3ddata\pc.it3.obj` |
 | `gurumin_mod.json` | file times recorded at export, used to tell which files you edited | |
 
 Keep the game file's name in the editable file's name: several formats are scrambled with a key made from the
@@ -61,7 +62,7 @@ file name, and the GUI uses the name to know where each file belongs.
 | `ddfont8.dat`, `ddfont8s.dat` font | `.dat.png` + `.dat.tsv` | yes (keep the `.tsv` next to the PNG) |
 | `.sav` saves | `.sav.bin` (raw game state) | yes, with the original save's key |
 | `.it3` models | `.it3.obj` + `.mtl` | not yet |
-| `.mmv` movies | `.mmv.gif` | not yet |
+| `.mmv` movies | `.mmv.frames\` folder of PNG frames | yes (keep the size and every frame; colour 255 is not used) |
 
 ## The file-type tabs
 Each type has its own tab for single files and whole folders, also outside a mod.
@@ -78,7 +79,7 @@ Each type has its own tab for single files and whole folders, also outside a mod
 | Scripts (.itm) | decode to text, encode back (the key comes from the output's name) |
 | Textures (.iti) | decode to PNG, encode a PNG, preview, count texture types in a folder |
 | Models (.it3) | node list, export OBJ (optionally in local coordinates). Decode the textures named in the `.mtl` on the Textures tab into the same folder to see the model textured. |
-| Movies (.mmv) | size and frame count, animated GIF (frames per second), every Nth frame as PNG |
+| Movies (.mmv) | size and frame count, PNG frames, animated GIF (frames per second); build a movie from PNG frames or a GIF, with the original as template (dither, and "frame 1 as in the original files" for exact rebuilds) |
 | Music (.de2) | info, decode to WAV, encode a WAV (with the original as template) |
 | Font | export the atlas (64 glyphs per row, 20x17 cells), import an edited atlas |
 | Saves | summary, decode, thumbnail, encode a `.bin` (key filled in from the original save), and change money/HP/costume/map on a **copy** of a save |
@@ -91,4 +92,5 @@ to see more. Common causes:
 - *checksum MISMATCH* when decoding a script or save: the file was renamed; decode it under its original name.
 - A 666/667 texture fails to decode: `tools/native/iti_unpack.exe` and the game's `packs.dll` are needed; set
   packs.dll on the Setup tab.
+- A rebuilt movie looks wrong: keep the original width and height, keep every frame ("write every Nth frame" must be 1), and edit the PNG frames rather than a GIF when you change an existing movie.
 - Font import complains about the `.tsv`: keep the `.tsv` written by Export next to the PNG, with the same name.

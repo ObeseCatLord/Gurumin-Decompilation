@@ -30,7 +30,7 @@ the byte share lags the function share. `python decomp/tools/build_all.py` print
 | `iti_tool.py decode/encode/info` | `.iti` textures ↔ PNG (all types; 666/667 via your packs.dll and tools/native/iti_unpack.c; writes raw type 0/1). |
 | `it3_tool.py info/obj` | `.it3` model node list; OBJ export with normals and UVs. All 945 JP models decode. |
 | `gpack.py` | Python port of packs.dll `ExecUnpack` (used by .it3 meshes). |
-| `mmv_tool.py info/frames/gif` | `.mmv` movies → PNG frames or GIF. |
+| `mmv_tool.py info/frames/gif/encode` | `.mmv` movies ↔ PNG frames or GIF. All 67 JP movies rebuild byte-identical. |
 | `de2_tool.py info/decode/encode` | `.de2` music ↔ WAV (MS ADPCM; encoding untested in game). |
 | `ddfont_tool.py export/import` | in-game font ↔ PNG atlas (byte-identical round trip). |
 | `save_tool.py decode/encode/info/thumb` | `SaveData\gdataNN.sav` ↔ raw state; thumbnail extract. |
@@ -79,4 +79,4 @@ Decompilation and naming come first. Planned once they are far enough along (det
 - A Unicode subtitle and text font from any TrueType/OpenType font, and in-game selection of voice, text and subtitle
   languages.
 - An all-in-one GUI tool (exe) for the file tools, with a model viewer and OBJ import/replacement.
-- `mmv` movie re-encoding for translations, a texture glossary, and a `textures` folder for loose texture overrides.
+- A texture glossary, and a `textures` folder for loose texture overrides.

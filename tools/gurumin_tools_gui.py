@@ -10,7 +10,8 @@ generators) as a separate process and shows what the tool prints in the log pane
 Mod folders use one simple naming rule, so a mod can be reopened at any time without a project file:
     <mod>\edit\<path in the game>.<editable extension>   e.g. edit\3ddata\stage01.itm.txt, edit\3ddata\ddfont8.dat.png
     <mod>\out\<path in the game>                        the repackaged game file,  e.g. out\3ddata\stage01.itm
-    <mod>\reference\<path in the game>.<ext>            export-only views (models as OBJ, movies as GIF)
+    <mod>\edit\<path in the game>.frames\              movies: one PNG per frame (frame_0000.png, ...)
+    <mod>\reference\<path in the game>.<ext>            export-only views (models as OBJ, save thumbnails)
 The game folder is only ever read. Nothing is written inside it; copy <mod>\out over a backup of the game yourself.
 See docs/GUI.md for a walkthrough.
 """
@@ -92,6 +93,18 @@ def cmd_mmv_gif(src_mmv, dst_gif, fps=15):
     return tool_command("mmv_tool.py", "gif", src_mmv, dst_gif, "--fps", fps)
 
 
+def cmd_mmv_encode(src_frames_or_gif, dst_mmv, template_mmv=None, dither=False, original_frame1=False):
+    # src: a folder of PNG frames (sorted by name) or an animated GIF.
+    args = ["encode", src_frames_or_gif, dst_mmv]
+    if template_mmv:
+        args += ["--template", template_mmv]   # palette for frames that are not already indexed; size check
+    if dither:
+        args.append("--dither")
+    if original_frame1:
+        args.append("--original-frame1")       # byte-identical rebuilds; loop-safe frame 1 otherwise
+    return tool_command("mmv_tool.py", *args)
+
+
 def cmd_de2_info(src_de2):
     return tool_command("de2_tool.py", "info", src_de2)
 
@@ -160,7 +173,8 @@ def cmd_doc_generator(script):
 # ----------------------------------------------------------------------------------------------------------------
 
 class FileKind:
-    def __init__(self, key, title, game_ext, edit_ext, export, repack=None, reference=False, extra_edit_files=()):
+    def __init__(self, key, title, game_ext, edit_ext, export, repack=None, reference=False, extra_edit_files=(),
+                 folder=False):
         self.key = key                    # short id
         self.title = title                # shown in the GUI
         self.game_ext = game_ext          # extension of the game file (lower case, with dot)
@@ -169,6 +183,11 @@ class FileKind:
         self.repack = repack              # function(app, edit_file, out_file, original_game_file) -> command, or None
         self.reference = reference        # True: export-only (goes to <mod>\reference)
         self.extra_edit_files = extra_edit_files   # sidecar extensions written next to the edit file (font .tsv)
+        self.folder = folder              # True: the editable item is a folder (movie frames), not one file
+
+    def edit_outputs(self, edit_path):
+        """Job outputs for an export: a trailing separator makes the runner create the folder itself."""
+        return [edit_path + os.sep] if self.folder else [edit_path]
 
     def matches(self, filename):
         name = filename.lower()
@@ -209,8 +228,9 @@ FILE_KINDS = [
              lambda app, g, e: cmd_save_decode(g, e), repack_save),
     FileKind("it3", "Models (.it3)", ".it3", ".obj",
              lambda app, g, e: cmd_it3_obj(g, e), reference=True),
-    FileKind("mmv", "Movies (.mmv)", ".mmv", ".gif",
-             lambda app, g, e: cmd_mmv_gif(g, e), reference=True),
+    FileKind("mmv", "Movies (.mmv)", ".mmv", ".frames",
+             lambda app, g, e: cmd_mmv_frames(g, e),
+             lambda app, e, o, g: cmd_mmv_encode(e, o, g if os.path.isfile(g) else None), folder=True),
 ]
 KIND_BY_KEY = {k.key: k for k in FILE_KINDS}
 
@@ -235,13 +255,12 @@ def kind_for_edit_file(path):
 
 
 def game_name_for_edit_file(edit_name, kind):
-    """Batch import: 'stage01.itm.txt' -> 'stage01.itm'; a plain 'stage01.txt' -> 'stage01.itm'."""
+    """'stage01.itm.txt' -> 'stage01.itm'; a plain 'stage01.txt' -> 'stage01.itm'; 'intro.mmv.gif' -> 'intro.mmv'."""
     if edit_name.lower().endswith(kind.edit_ext):
         stem = edit_name[:-len(kind.edit_ext)]
-        if kind.matches(stem):
-            return stem
-        return stem + kind.game_ext
-    return os.path.splitext(edit_name)[0] + kind.game_ext
+    else:
+        stem = os.path.splitext(edit_name)[0]
+    return stem if kind.matches(stem) else stem + kind.game_ext
 
 
 def is_inside(path, folder):
@@ -254,14 +273,28 @@ def is_inside(path, folder):
         return False
 
 
-def find_files(folder, predicate):
-    """Every file under folder (recursive) whose name passes predicate, sorted."""
+def find_files(folder, predicate, frame_folders=False):
+    """Every file under folder (recursive) whose name passes predicate, sorted. Movie frame folders (*.frames) are
+    never searched inside; with frame_folders=True they are returned themselves when their name passes."""
     hits = []
-    for root, _dirs, files in os.walk(folder):
+    for root, dirs, files in os.walk(folder):
+        for name in [d for d in dirs if d.lower().endswith(".frames")]:
+            dirs.remove(name)
+            if frame_folders and predicate(name):
+                hits.append(os.path.join(root, name))
         for name in files:
             if predicate(name):
                 hits.append(os.path.join(root, name))
     return sorted(hits)
+
+
+def edit_mtime(path):
+    """Modification time of an editable item; for a frames folder the newest frame (editing a PNG doesn't touch
+    the folder's own time)."""
+    if os.path.isdir(path):
+        times = [os.path.getmtime(os.path.join(path, n)) for n in os.listdir(path)]
+        return max(times + [os.path.getmtime(path)])
+    return os.path.getmtime(path)
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -604,13 +637,13 @@ def build_gui():
                 edit_file = os.path.join(out_dir, os.path.relpath(game_file, src_dir) + kind.edit_ext)
                 command = (export or kind.export)(self, game_file, edit_file)
                 jobs.append(Job("%s -> %s" % (game_file, edit_file), command,
-                                [edit_file], after=self._record_export(edit_file)))
+                                kind.edit_outputs(edit_file), after=self._record_export(edit_file)))
             return jobs
 
         def batch_repack_jobs(self, kind, src_dir, out_dir, originals_dir=""):
             """One job per edited file under src_dir (any name ending in the kind's edit extension)."""
             jobs = []
-            for edit_file in find_files(src_dir, lambda n: n.lower().endswith(kind.edit_ext)):
+            for edit_file in find_files(src_dir, lambda n: n.lower().endswith(kind.edit_ext), kind.folder):
                 named = kind_for_edit_file(edit_file)
                 if named and named[0] is not kind:
                     continue    # e.g. ddfont8.dat.png is the font, not a texture
@@ -637,9 +670,9 @@ def build_gui():
 
         def _store_export_time(self, edit_file):
             state = load_mod_state(self.mod_dir())
-            if os.path.isfile(edit_file):
+            if os.path.exists(edit_file):
                 rel = os.path.relpath(edit_file, self.mod_dir()).replace(os.sep, "/")
-                state.setdefault("exported", {})[rel] = os.path.getmtime(edit_file)
+                state.setdefault("exported", {})[rel] = edit_mtime(edit_file)
                 save_mod_state(self.mod_dir(), state)
 
         def preview_image(self, path):
@@ -721,8 +754,8 @@ def build_gui():
         # ---- Mod workflow -----------------------------------------------------------------------------------
 
         def _build_mod_tab(self):
-            tab = self.new_tab("Mod", "1. Export game files into the mod folder (edit\\ for editable files, "
-                               "reference\\ for models and movies).  2. Edit them with any editor.  3. Repackage: the "
+            tab = self.new_tab("Mod", "1. Export game files into the mod folder (edit\\ for editable files and "
+                               "movie frame folders, reference\\ for models).  2. Edit them with any editor.  3. Repackage: the "
                                "game files are rebuilt in the mod's out\\ folder with the game's folder layout.  Copy "
                                "out\\ over a backup of the game to play the mod. Reopening a mod folder later picks up "
                                "where you left off.")
@@ -767,7 +800,8 @@ def build_gui():
                 return None
             edit_file = self.edit_path_for(game_file, kind)
             return Job("%s -> %s" % (os.path.relpath(game_file, self.game_dir()), edit_file),
-                       kind.export(self, game_file, edit_file), [edit_file], after=self._record_export(edit_file))
+                       kind.export(self, game_file, edit_file), kind.edit_outputs(edit_file),
+                       after=self._record_export(edit_file))
 
         def _mod_ready(self):
             if not self.require(("game folder", self.game_dir()), ("mod folder", self.mod_dir())):
@@ -814,11 +848,11 @@ def build_gui():
                 return []
             exported = load_mod_state(mod).get("exported", {})
             rows = []
-            for edit_file in find_files(edit_root, lambda n: kind_for_edit_file(n) is not None):
+            for edit_file in find_files(edit_root, lambda n: kind_for_edit_file(n) is not None, frame_folders=True):
                 kind, game_name = kind_for_edit_file(edit_file)
                 game_rel = os.path.relpath(os.path.join(os.path.dirname(edit_file), game_name), edit_root)
                 out_file = os.path.join(mod, "out", game_rel)
-                mtime = os.path.getmtime(edit_file)
+                mtime = edit_mtime(edit_file)
                 rec = exported.get(os.path.relpath(edit_file, mod).replace(os.sep, "/"))
                 if os.path.isfile(out_file) and os.path.getmtime(out_file) >= mtime:
                     status = "repackaged"
@@ -869,6 +903,8 @@ def build_gui():
                 edit_file = self.mod_items[item][0]
                 if edit_file.lower().endswith((".png", ".gif")):
                     self.preview_image(edit_file)
+                elif os.path.isdir(edit_file):
+                    self.open_folder(edit_file)    # movie frames
                 elif hasattr(os, "startfile"):
                     os.startfile(edit_file)    # text, WAV, OBJ, BIN: open with the system's default program
 
@@ -903,7 +939,8 @@ def build_gui():
                 ("source folder", src.get()), ("output folder", out.get())) and self.run(
                 self.batch_export_jobs(kind, src.get(), out.get(), export))))
             if kind.repack:
-                esrc, eout = self.batch_rows(box, 3, "Folder with edited %s" % kind.edit_ext, "Rebuild into",
+                esrc, eout = self.batch_rows(box, 3, "Folder with edited *%s%s" % (
+                    kind.edit_ext, " folders" if kind.folder else ""), "Rebuild into",
                                              lambda: os.path.join(self.mod_dir(), "out") if self.mod_dir() else "")
                 orig = PathRow(box, 5, "Originals (game folder)", "dir")
                 orig.set(self.game_dir())
@@ -969,31 +1006,64 @@ def build_gui():
 
         def _build_mmv_tab(self):
             kind = KIND_BY_KEY["mmv"]
-            tab = self.new_tab("Movies (.mmv)", "Movies: show the size and frame count, write every frame as PNG, or "
-                               "make an animated GIF. There is no encoder back to .mmv yet.")
-            box = self.section(tab, "One file")
+            tab = self.new_tab("Movies (.mmv)", "Movies: show the size and frame count, write every frame as PNG, make "
+                               "an animated GIF, or build a movie from PNG frames or a GIF. To change an existing movie, "
+                               "edit its PNG frames: they keep the movie's own colours exactly. A GIF is fine for "
+                               "viewing or for a new animation; its colours are matched to the template's palette.")
+            box = self.section(tab, "Export one movie")
             src, dst = self.single_file_rows(box, kind, ".mmv file", [("Movies", "*.mmv")], "GIF output",
                                              [("GIF", "*.gif")])
             frames_row = PathRow(box, 2, "Frames folder", "dir")
-            src.on_change = lambda p: (dst.set(self.edit_path_for(p, kind)),
-                                       frames_row.set(os.path.splitext(self.edit_path_for(p, kind))[0] + "_frames"))
+            src.on_change = lambda p: (dst.set(self.edit_path_for(p, kind, ".gif", "reference")),
+                                       frames_row.set(self.edit_path_for(p, kind)))
             opts = ttk.Frame(box)
             opts.grid(row=3, column=1, sticky="w", padx=4)
             fps, every = tk.StringVar(value="15"), tk.StringVar(value="1")
             ttk.Label(opts, text="GIF frames per second").pack(side="left")
             ttk.Spinbox(opts, from_=1, to=60, textvariable=fps, width=5).pack(side="left", padx=4)
-            ttk.Label(opts, text="   write every Nth frame").pack(side="left")
+            ttk.Label(opts, text="   write every Nth frame (1 = all; only all frames can be rebuilt)").pack(side="left")
             ttk.Spinbox(opts, from_=1, to=100, textvariable=every, width=5).pack(side="left", padx=4)
             self.buttons(box, 4,
                          ("Info", lambda: self.require(("input", src.get())) and self.run_one(
                              "info " + src.get(), cmd_mmv_info(src.get()))),
-                         ("Make GIF", lambda: self.require(("input", src.get()), ("output", dst.get())) and self.run_one(
-                             "gif " + src.get(), cmd_mmv_gif(src.get(), dst.get(), fps.get()), [dst.get()])),
                          ("Write PNG frames", lambda: self.require(("input", src.get()), ("frames folder", frames_row.get()))
                           and self.run_one("frames " + src.get(), cmd_mmv_frames(src.get(), frames_row.get(), every.get()),
-                                           [frames_row.get() + os.sep])),
+                                           [frames_row.get() + os.sep], after=self._record_export(frames_row.get()))),
+                         ("Make GIF", lambda: self.require(("input", src.get()), ("output", dst.get())) and self.run_one(
+                             "gif " + src.get(), cmd_mmv_gif(src.get(), dst.get(), fps.get()), [dst.get()])),
                          ("Preview GIF (first frame)", lambda: self.preview_image(dst.get())))
-            self._batch_section(tab, kind, export=lambda app, g, e: cmd_mmv_gif(g, e, fps.get()))
+
+            enc = self.section(tab, "Build a movie")
+            frames_in = PathRow(enc, 0, "PNG frames folder", "dir")
+            gif_in = PathRow(enc, 1, "or an animated GIF", "open", [("GIF", "*.gif")])
+            template = PathRow(enc, 2, "Template (original .mmv)", "open", [("Movies", "*.mmv")])
+            out = PathRow(enc, 3, ".mmv output", "save", [("Movies", "*.mmv")])
+
+            def fill(path):
+                out.set(self.out_path_for(path, kind))
+                template.set(self.original_for_edit(path, kind) or template.get())
+            frames_in.on_change = lambda p: (gif_in.set(""), fill(p))
+            gif_in.on_change = lambda p: (frames_in.set(""), fill(p))
+            dither, original_frame1 = tk.BooleanVar(value=False), tk.BooleanVar(value=False)
+            flags = ttk.Frame(enc)
+            flags.grid(row=4, column=1, sticky="w", padx=4)
+            ttk.Checkbutton(flags, text="Dither (smoother gradients, larger file)", variable=dither).pack(side="left")
+            ttk.Checkbutton(flags, text="Frame 1 as in the original files (byte-identical rebuild of unedited frames)",
+                            variable=original_frame1).pack(side="left", padx=12)
+            ttk.Label(enc, wraplength=900, justify="left", text=(
+                "The template gives the palette when the frames are not already indexed, and its size is checked: keep "
+                "the original width and height. Frames written by 'Write PNG frames' keep their palette and need no "
+                "template. Index 255 is not used (the game replaces that colour).")).grid(
+                row=5, column=0, columnspan=3, sticky="w", padx=4)
+
+            def build():
+                source = frames_in.get() or gif_in.get()
+                if not self.require(("frames folder or GIF", source), ("output", out.get())):
+                    return
+                self.run_one("encode " + source, cmd_mmv_encode(source, out.get(), template.get() or None,
+                                                                dither.get(), original_frame1.get()), [out.get()])
+            self.buttons(enc, 6, ("Build .mmv", build))
+            self._batch_section(tab, kind)
 
         # ---- Music (.de2) -----------------------------------------------------------------------------------
 
@@ -1193,8 +1263,12 @@ def print_commands():
         cmd_it3_info(os.path.join(g, "model.it3")),
         cmd_it3_obj(os.path.join(g, "model.it3"), "MOD\\reference\\3ddata\\model.it3.obj", local=True),
         cmd_mmv_info("GAME\\movie.mmv"),
-        cmd_mmv_frames("GAME\\movie.mmv", "MOD\\reference\\movie_frames", every=2),
-        cmd_mmv_gif("GAME\\movie.mmv", "MOD\\reference\\movie.mmv.gif", fps=15),
+        cmd_mmv_frames("GAME\\3ddata\\logo.mmv", "MOD\\edit\\3ddata\\logo.mmv.frames"),
+        cmd_mmv_gif("GAME\\3ddata\\logo.mmv", "MOD\\reference\\3ddata\\logo.mmv.gif", fps=15),
+        cmd_mmv_encode("MOD\\edit\\3ddata\\logo.mmv.frames", "MOD\\out\\3ddata\\logo.mmv",
+                       "GAME\\3ddata\\logo.mmv"),
+        cmd_mmv_encode("new.gif", "MOD\\out\\3ddata\\logo.mmv", "GAME\\3ddata\\logo.mmv", dither=True,
+                       original_frame1=True),
         cmd_de2_info("GAME\\bgm01.de2"),
         cmd_de2_decode("GAME\\bgm01.de2", "MOD\\edit\\bgm01.de2.wav"),
         cmd_de2_encode("MOD\\edit\\bgm01.de2.wav", "MOD\\out\\bgm01.de2", "GAME\\bgm01.de2"),
@@ -1210,7 +1284,8 @@ def print_commands():
     for command in samples:
         print(subprocess.list2cmdline(command[1:]))
     print("\nmod naming:")
-    for name in ("stage01.itm.txt", "tex.iti.png", "bgm01.de2.wav", "ddfont8.dat.png", "gdata01.sav.bin", "notes.txt"):
+    for name in ("stage01.itm.txt", "tex.iti.png", "bgm01.de2.wav", "ddfont8.dat.png", "gdata01.sav.bin", "logo.mmv.frames",
+                 "notes.txt"):
         hit = kind_for_edit_file(name)
         print("  %-18s -> %s" % (name, "%s (%s)" % (hit[1], hit[0].key) if hit else "not part of the mod"))
 

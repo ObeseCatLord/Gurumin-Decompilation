@@ -5,6 +5,8 @@
 #ifndef GURUMIN_EFFECT_MANAGER_H
 #define GURUMIN_EFFECT_MANAGER_H
 
+#include "screen_vertex.h"
+
 #include "vec4.h"
 #include "matrix4.h"
 
@@ -20,6 +22,14 @@
 #define EFFECT_LIGHT_COUNT 0x80
 // A free definition, record or sprite has id (or type) -1; -1 also ends a record list.
 #define EFFECT_NONE (-1)
+// EffectDef::kind values EffectManager::DrawLight tells apart (1 and 0x12 are sprites). Kinds 7, 9, 0x16 and 0x17
+// are drawn by their own functions; kind 0x11 is the trail made of two interleaved ribbons; any other kind with a
+// light is drawn as a plain ribbon strip.
+#define EFFECT_KIND_LIGHT_7 7
+#define EFFECT_KIND_LIGHT_9 9
+#define EFFECT_KIND_LIGHT_INTERLEAVED 0x11
+#define EFFECT_KIND_LIGHT_22 0x16
+#define EFFECT_KIND_LIGHT_23 0x17
 // Bits of EffectOptions::flags as the running record's update pass reads them (char_effects.cpp).
 #define EFFECT_FLAG_RESTRICTED_PASS 1   // also updated in Update's restricted pass (the followAttachment bit)
 #define EFFECT_FLAG_HIDDEN 2            // only updated when Update includes hidden effects (the followOwner bit)
@@ -161,15 +171,28 @@ struct EffectSprite
     int pad_00c0;
 };
 
-// The light of an effect (0x4014 bytes; EFFECT_LIGHT_COUNT of them at DAT_118e99f8).
+// Number of points a light's trail can hold, and of vertices of the trail strip DAT_110187c0 (two per point).
+#define EFFECT_LIGHT_POINT_COUNT 0x100
+#define EFFECT_TRAIL_VERTEX_COUNT 0x200
+
+// The light of an effect (0x4014 bytes; EFFECT_LIGHT_COUNT of them at DAT_118e99f8): a trail of up to
+// EFFECT_LIGHT_POINT_COUNT points, each with a width and two colours, drawn as a strip by EffectManager::DrawLight
+// (effect_light.cpp). The frame counter shortens the trail once the light stops being fed.
 struct EffectLight
 {
-    int active;                                      // 0x00: non-zero while in use
+    union
+    {
+        int active;                                  // 0x00: non-zero while in use
+        int pointCount;                              // 0x00: points of the trail so far (3 are needed to draw it)
+    };
     int type;                                        // 0x04: effect definition (DAT_1101dfdc) the light belongs to
     int pad_0008;
     int frame;                                       // 0x0c: frames since the light started (0 = not counting)
     float fade;                                      // 0x10: 1 at the start, falling to 0
-    char pad_0014[0x4000];
+    Vec4 points[EFFECT_LIGHT_POINT_COUNT];           // 0x14: world position of each point
+    Vec4 widths[EFFECT_LIGHT_POINT_COUNT];           // 0x1014: x = width of the trail at the point, in 1/1000
+    Vec4 colours[EFFECT_LIGHT_POINT_COUNT];          // 0x2014: r, g, b, a of each point (1.0 = full)
+    Vec4 specular[EFFECT_LIGHT_POINT_COUNT];         // 0x3014: second colour r, g, b of each point
 };
 
 extern "C" EffectDef DAT_1101dfdc[EFFECT_DEFINITION_COUNT];      // effect definitions
@@ -177,6 +200,7 @@ extern "C" EffectRecord DAT_1115cfe8[EFFECT_RECORD_COUNT];       // running effe
 extern "C" EffectSprite DAT_11134cc8[EFFECT_SPRITE_COUNT];       // sprite table A: sprites placed in the world
 extern "C" EffectSprite DAT_118a8888[EFFECT_SPRITE_COUNT];       // sprite table B: sprites placed on the screen
 extern "C" EffectLight DAT_118e99f8[EFFECT_LIGHT_COUNT];         // effect lights
+extern "C" ScreenVertex DAT_110187c0[EFFECT_TRAIL_VERTEX_COUNT];  // vertices of the trail strip being drawn
 extern "C" int DAT_1101d820[EFFECT_LIST_COUNT];                  // first record of each effect list
 extern "C" int DAT_11018604[EFFECT_LIST_COUNT];                  // last record of each effect list
 
@@ -210,7 +234,12 @@ struct EffectManager
     int DrawRecord(int record, const Matrix4 &view, const Matrix4 *camera, int pass);   // 0x10189530
     int DrawSpriteA(int index, const Matrix4 &view, const Matrix4 *camera);            // 0x101890f0
     int DrawSpriteB(int index, const Matrix4 &view, const Matrix4 *camera);            // 0x10189340
-    int DrawLight(int index, const Matrix4 &view, const Matrix4 *camera);              // 0x10187520
+    // 0x10187520 (effect_light.cpp): draws effect light `index` as a textured trail; the light kinds 7, 9, 0x16 and
+    // 0x17 have their own versions.
+    int DrawLight(int index, const Matrix4 &view, const Matrix4 *camera);
+    int DrawLightKind7(int index, const Matrix4 &view, const Matrix4 *camera);         // 0x101713f0 (kinds 7 and 9)
+    int DrawLightKind22(int index, const Matrix4 &view, const Matrix4 *camera);        // 0x1016fb80 (kind 0x16)
+    int DrawLightKind23(int index, const Matrix4 &view, const Matrix4 *camera);        // 0x10170580 (kind 0x17)
 };
 
 // The effect manager.

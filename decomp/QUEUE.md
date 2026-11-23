@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (174)
+## 1. Walls to retry (176)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -98,6 +98,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100ba040` 604 — Npc_PlayGreeting: same statements; the original copies the AbsFloat result into the height local with fld/fstp (cl 13.00 here stores it directly) and places the new-greeting block after the walked-away block (goto and flag forms tried)
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
 - [ ] `100d2110` 894 — Enemy_SeekShaga (shaga_seek.cpp): body identical; ebx/edi pushed before the FUN_100aa820 call (original: after the step test) and the pair branch's count++ cross-jumps into the single branch; early-return, nested-if, local-placement and candidate-spelling variants tried
+- [ ] `100e1c40` 1082 — Enemy_IsBusy (enemy_busy.cpp, rule-clean, queue globals in enemy_queue.h, CharState::fadeOut): two scheduling spots: the talk branch's `+ pi` is added after `add esp,0x10; pop edi` in the original (a float local or `angle` after the join gets that order but then merges or spills the atan2 tails), and the CharState memset is `lea edi; mov ecx,16; xor eax` with `DAT_10c66cd8 = 0` as an immediate (tried memset forms, a word loop, CharState(), inline helpers, the store before the memset).
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2110` 143 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e21a0` 671 — Enemy_DefaultStep (enemy_react.cpp): same flow, calls and switch; the original keeps 0 in ebx for its stores, compares and the switch (sub eax, ebx), cl 13.00 here uses immediates
@@ -156,6 +157,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
 - [ ] `10172350` 1068 — EffectManager::Start: all but one cluster identical; the original loads the matrix owner before the value but stores the value first and computes the start frame early (cl 13.00 here pairs them the other way); the 24 orders of value/owner/serial/frame and a start local tried
 - [ ] `10175c90` 476 — Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
+- [ ] `10187520` 3712 — EffectManager::DrawLight (effect_light.cpp, rule-clean, EffectLight points/widths/colours typed, ScreenVertex fields named): full logic drafted; frame 0x1614 vs 0x160c and ebp pushed in the prologue (the original pushes it after the first dispatch), light base in ebp instead of ebx, kinds 7/9 share one call, vertex pointer stepping differs.
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
 - [ ] `10190e30` 884 — EffectManager::Draw: flow, calls and the record checks in place; scheduling residue (the 0x244 table constant, the pushes shared by the crash and draw blocks hoisted above the test) and the sprite loops keep first/end in ebp/edi in the original
@@ -196,7 +198,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (117)
+## 4. Large functions (801-3000 bytes) (116)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
@@ -213,7 +215,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014fdd0` 1048 bytes (float, loops 3, calls 9)
 - [ ] `1014f900` 1070 bytes (float, loops 6, calls 12)
 - [ ] `101afe00` 1079 bytes (float, loops 2, calls 7)
-- [ ] `100e1c40` 1082 bytes Enemy_IsBusy (float, loops 1, calls 26)
 - [ ] `1000eed0` 1101 bytes (float, calls 25)
 - [ ] `1016be80` 1139 bytes (float, loops 2, calls 14)
 - [ ] `100ed510` 1160 bytes (float, loops 10, calls 15)

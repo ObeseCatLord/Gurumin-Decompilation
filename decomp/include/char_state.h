@@ -147,6 +147,8 @@ struct CharState
                         int skipGroundProbe;      // non-zero = skip the ground probe of a shot (0x1001a590)
                         int hopBack;              // enemy_strafe.cpp (Enemy_HopAndStrafe): 1 = the next hop
                                                   // ends the strafe
+                        int fadeOut;              // enemy_busy.cpp: 0 = stays, 1.. = frames of fading out as it
+                                                  // leaves the queue (QUEUE_FADE_FRAMES = gone)
                     };
                     union                         // 0x2c
                     {

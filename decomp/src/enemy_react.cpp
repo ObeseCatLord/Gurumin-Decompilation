@@ -13,7 +13,7 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_vars.h"
 
-extern "C" int FUN_100e1c40(int index);                // Enemy_IsBusy
+#include "enemy_queue.h"
 extern "C" int FUN_10028360(int index, int a);         // Enemy_TurnToPlayer
 extern "C" int FUN_10027560(int index);                // Enemy_IdleMotion
 extern "C" int FUN_10026bf0(int index);                // Enemy_PickAction_65_35
@@ -59,7 +59,7 @@ extern "C" int FUN_100e21a0(int index)
         DAT_10db6ee8[index].SetPosition(position.x, position.y, position.z);
         return 0;
     }
-    if (FUN_100e1c40(index) != 0)
+    if (Enemy_IsBusy(index) != 0)
         return 0;
     if (index == 0x19 || index == 0xc || index == 0x14 || index == 0xe || index > 0x39)
     {

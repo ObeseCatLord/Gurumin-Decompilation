@@ -226,7 +226,7 @@ struct Node
     void M_10193d10(int index);                           // 0x10193d10
     int M_10194630(char value, unsigned int mask);        // 0x10194630: m_189c on matching kinds
     int M_101946b0(unsigned char value, unsigned int mask); // 0x101946b0: m_189a on matching kinds
-    int M_10194730(char value, unsigned int mask);        // 0x10194730: m_189b on matching kinds
+    int M_10194730(unsigned char value, unsigned int mask); // 0x10194730: m_189b on matching kinds
     int M_10191e50();                                     // 0x10191e50: element from the node names
     void M_10191d50();                                    // 0x10191d50: saves the subtree's flags
     void M_10191d90();                                    // 0x10191d90

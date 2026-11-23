@@ -504,3 +504,5 @@ _FUN_101426d0@8	101426d0
 ?Enemy_AimedShots@@YAHH@Z	100a6a50
 ?Enemy_CallBursts@@YAHHH@Z	100a8370
 ?Char_DrawLinks@@YAHXZ	1001bb20
+?DrawLight@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	10187520
+_Enemy_IsBusy	100e1c40

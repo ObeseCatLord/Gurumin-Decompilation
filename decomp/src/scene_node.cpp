@@ -811,7 +811,7 @@ int Node::M_101946b0(unsigned char value, unsigned int mask)
 }
 
 // Sets colour value m_189b the same way.
-int Node::M_10194730(char value, unsigned int mask)
+int Node::M_10194730(unsigned char value, unsigned int mask)
 {
     if ((flags & mask) != 0)
     {

@@ -8,7 +8,7 @@
 #include "world.h"
 #include "char_state.h"
 
-extern "C" int FUN_100e1c40(int index);
+#include "enemy_queue.h"
 extern "C" int FUN_10026af0(int index);
 extern "C" int FUN_10026b70(int index);
 extern "C" int FUN_10026c50(int index);
@@ -24,7 +24,7 @@ extern "C" int FUN_10028360(int index, int a);
 // Kind A: 0 = approach within 300 units (FUN_10026d80), 1 = FUN_10027560, 2 = FUN_10028360(2); picker A.
 extern "C" int FUN_100e2080(int index)
 {
-    if (FUN_100e1c40(index) != 0)
+    if (Enemy_IsBusy(index) != 0)
         return 0;
     int done;
     switch (DAT_1020b430[index].state)
@@ -57,7 +57,7 @@ extern "C" int FUN_100e2080(int index)
 // Kind B: 0 = FUN_10028360(2), 1 = FUN_100279b0(4, 0), 2 = FUN_10027630(0); picker B.
 extern "C" int FUN_100e2110(int index)
 {
-    if (FUN_100e1c40(index) != 0)
+    if (Enemy_IsBusy(index) != 0)
         return 0;
     int done;
     switch (DAT_1020b430[index].state)
@@ -90,7 +90,7 @@ extern "C" int FUN_100e2110(int index)
 // Kind C (see source for its move set).
 extern "C" int FUN_100e2440(int index)
 {
-    if (FUN_100e1c40(index) != 0)
+    if (Enemy_IsBusy(index) != 0)
         return 0;
     int done;
     switch (DAT_1020b430[index].state)
@@ -123,7 +123,7 @@ extern "C" int FUN_100e2440(int index)
 // Kind D (see source for its move set).
 extern "C" int FUN_100e24d0(int index)
 {
-    if (FUN_100e1c40(index) != 0)
+    if (Enemy_IsBusy(index) != 0)
         return 0;
     int done;
     switch (DAT_1020b430[index].state)
@@ -159,7 +159,7 @@ extern "C" int FUN_10026d00(int index);
 // other updaters.
 extern "C" int FUN_100e2560(int index)
 {
-    if (FUN_100e1c40(index) != 0)
+    if (Enemy_IsBusy(index) != 0)
         return 0;
     int done;
     switch (DAT_1020b430[index].state)

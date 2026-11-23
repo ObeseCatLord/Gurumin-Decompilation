@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 14.77% of code, 830 of 1212 functions |
-| Matched under the rules | 14.73% of code, 829 of the 830 matched functions |
-| Fuzzy match | 20.39% |
+| Matched | 14.87% of code, 831 of 1212 functions |
+| Matched under the rules | 14.84% of code, 830 of the 831 matched functions |
+| Fuzzy match | 20.77% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -76,9 +76,15 @@ function) and node_world.cpp (0) still break rule 2.
   structs; build_all now passes /Op- for src_od), TextureObject::DrawFill 0x1014ce40 (texture_fill.cpp) and
   Input::ReadControls 0x10143180 (input_controls.cpp; the joystick_buttons.cpp helpers became Input methods).
 - Batch 326: TutorialBook_Update 0x10065450 matched (tutorial_update.cpp, C++ linkage for the EH frame;
-  tutorial_book.h). Lead: the four tutorial_open/page_next drafts are extern "C" and may need C++ linkage too.
+  tutorial_book.h). The four tutorial_open/page_next drafts have no EH frame (C++ linkage changes nothing).
   Drafts: FontRenderer::DrawText 0x101501f0 (text_draw.cpp), Camera_ShiftOrbit 0x10019670 (camera_shift_orbit.cpp;
   DAT_10da93e0 is a Vec4 now), Npc_PatrolRoute 0x10044b10 (npc_patrol.cpp; CharState::arrivalAction).
+- Batch 327: SaveSummary_Draw 0x10021e70 matched (save_summary.cpp; script_flag.h holds the shared ScriptFlag
+  inline: clear_markers.cpp and helmet_face.cpp still have local copies). Drafts: Npc_Lookout 0x100b7b10,
+  Ground_Dig 0x1003bc60, Camera_TrackPathFrame 0x1016b6c0, Char_SpiritUpdate 0x1002a740 (stack slots only),
+  Spirit_StepRoute 0x10028fa0. Warning: adding five extern globals to char_vars.h cost UpdateDrillLevel its match
+  (an epilogue schedule changed although it uses none of them); they now live in npc_lookout.h. When a header
+  edit loses an unrelated match, bisect the headers with zz_ copies and move the new declarations elsewhere.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

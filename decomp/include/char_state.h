@@ -67,6 +67,8 @@ struct CharState
                         int weaponMarkA;          // weapon_attach.cpp: -2 after an unknown weapon (no model)
                         int stuckFrames;          // enemy_slash.cpp: frames counted without moving
                         int wanderState;          // enemy_wander.cpp: 0 = walking, 1 or 2 = looking for a heading
+                        int spiritStep;           // char_spirit.cpp: motion step of the character's motion table row
+                        int lookoutMode;          // npc_lookout.cpp: what the lookout watches for (1..5)
                     };
                     union                         // 0x0c
                     {
@@ -91,6 +93,8 @@ struct CharState
                                                   // at most 2000 + this
                         int weaponMarkB;          // weapon_attach.cpp: -2 after an unknown weapon (no model)
                         int fleeSide;             // enemy_flee.cpp: 1 = veers left, 2 = veers right (picked at random)
+                        int spiritReady;          // char_spirit.cpp: 1 once the spirit was set up
+                        int promptFrames;         // npc_lookout.cpp: frames the key prompt stays (counted down)
                     };
                     union                         // 0x10
                     {
@@ -102,6 +106,8 @@ struct CharState
                         int nextPoint;            // route_carrier.cpp: the route point headed for
                         int downMode;             // companion_update.cpp (companion slot): 0 = active,
                                                   // 1 = reviving, 2 = recovering, 10 and above = going down
+                        int spiritSize;           // char_spirit.cpp: 100 (with an "@O_047b" node) or 200; sets the swarm
+                        int eyeOpen;              // npc_lookout.cpp: 1 = the lamp's eye is lit
                     };
                     union                         // 0x14
                     {
@@ -115,6 +121,8 @@ struct CharState
                                                   // with (0 = its maximum + 2000)
                         int scriptValue;          // char_script.cpp: value carried between steps (opacity in
                                                   // tenths)
+                        int chaseFrames;          // char_spirit.cpp: frames spent chasing (swarm every 4th)
+                        int reactDelay;           // npc_lookout.cpp: frames until the event is raised (0 = idle)
                     };
                     union                         // 0x18
                     {
@@ -124,6 +132,8 @@ struct CharState
                         int keepAfterScript;      // char_script.cpp: non-zero = stay in the world after the script
                         int shotSound;            // enemy_strafe.cpp: SHOT_SOUND_PENDING = play the shot sound with
                                                   // the next shot
+                        int spiritTimer;          // char_spirit.cpp: frames left of the spirit's visit (counts down)
+                        int watchedCode;          // npc_lookout.cpp: item stock digits seen (-1 = none yet)
                     };
                     union                         // 0x1c
                     {
@@ -132,12 +142,16 @@ struct CharState
                                                   // step at once, 2 = waiting)
                         int forceStep;            // route_step.cpp: non-zero = take the point at once, whether
                                                   // or not the character is near it (cleared by the step)
+                        int spiritHaunting;       // char_spirit.cpp: 1 while the visit counts down (150+ frames left)
+                        int bestValue;            // npc_lookout.cpp: the largest value seen
                     };
                     union                         // 0x20
                     {
                         int pointPause;           // route_carrier.cpp: frames to wait at a route point
                         int hopRequests;          // enemy_strafe.cpp (Enemy_HopAndStrafe): frames counted
                                                   // towards the next hop
+                        int bestAmount;           // npc_lookout.cpp: the amount that came with it
+                        int routeMode;            // spirit_route.cpp: 1..3 = put the spirit on a fixed route point
                     };
                     union                         // 0x24
                     {

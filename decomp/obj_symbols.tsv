@@ -543,3 +543,5 @@ _Enemy_IsBusy	100e1c40
 ?IsKeyboardButtonDown@Input@@QAEHHPBE@Z	10142dd0
 ?DrawTextA@FontRenderer@@QAEHHHPBDHHMM@Z	101501f0
 ?TutorialBook_Update@@YAHXZ	10065450
+?Char_SpiritUpdate@@YAHH@Z	1002a740
+?Sample@KeyTrack@@QAEHMPAM000H@Z	101b0240

@@ -24,4 +24,6 @@ struct GroundOrigin
 
 extern "C" GroundOrigin *DAT_1020d860[GROUND_OBJECT_SLOTS];   // the ground objects (0 = free); cleared by game_reset
 
+extern "C" void FUN_1003bc60(int x, int y);   // Ground_Dig: digs the ground around the world point (x, y)
+
 #endif

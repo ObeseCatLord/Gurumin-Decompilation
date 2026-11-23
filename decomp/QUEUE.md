@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (208)
+## 1. Walls to retry (213)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -58,10 +58,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10024d00` 377 — Enemy_CanReturnHome: logic identical; the original copies home.x/y into the Atan2 parameters, rounds the first angle and the AbsFloat argument once more, and places the return-1 block on the fallthrough; helper variants and nesting tried
 - [ ] `10026d80` 1658 — Enemy_WanderNearHome (enemy_wander.cpp, 1664 vs 1658 bytes): logic identical; the original keeps a dead first store of rand() % 3 to the wander state word before storing (x >= 2) + 1 (13.00 drops it), the zero/angle variable sits in the lowest slot (frame 0x88 vs ours 0x90), and the index*0x40 spill is stored before [ebx+4] = 0. FUN_10024d00 takes the step as a Vec4 by value here but four floats in enemy_moves.cpp
 - [ ] `10027630` 882 — Enemy_ChasePlayer (enemy_chase.cpp): all but the step setup identical; the original loads the heading and m_0010 (into eax) before storing -2/-8 into step.y and computes the speed pointer with lea; if/else, ternary and local forms tried
+- [ ] `10028fa0` 1900 — Spirit_StepRoute (spirit_route.cpp, 1920 vs 1900 bytes): the packed-route step of Route_StepPatrol 0x10029730 plus routeMode 1-3 and the kind 6/7 remap; frame, prologue and jump-table case order (5,1,2,3,0,4) match; register allocation differs (original current in esi, lastKind in ebp) and x/z live in dead argument slots 0x5c/0x64 like Route_StepPatrol; a row variable, current = point first and mode first tried. Char_SpiritUpdate passes its fade slot as the int * last-point output
 - [ ] `10029730` 1440 — Route_StepPatrol (route_step.cpp, 1456 vs 1440 bytes): stack slots now match (result declared just before packedZ); register naming only (original esi = slot<<6, edi = point, ebx = record<<4; ours ebx/ebp/esi) and the forceStep tail compares with eax = 0 (cmp ecx,eax) in the original; point copy, result positions and three tail spellings tried
 - [ ] `1002a110` 559 — Char_WalkRoute: code identical; the original keeps the next route point in the slot parameter's stack home (frame 4 bytes smaller), ours gives it a local; declaration positions tried
 - [ ] `1002a340` 325 — Char_RunScript: the original keeps the step value in the dead index parameter slot (and one Vec4 4 bytes higher); ours gives it its own local
 - [ ] `1002a490` 685 — Block_Update: statements and layout identical; the original computes the block model address once into esi on the standing path and reuses it for the second IsClearAny, ours recomputes it (combined, nested and goto forms and a model pointer local tried)
+- [ ] `1002a740` 1833 — Char_SpiritUpdate (char_spirit.cpp, behaviour 0x25, C++ linkage for the EH frame): instructions, registers and frame size match; only stack slots differ (start at 0x64 vs 0x68, move at 0x24 vs 0x1c, world 0x1c vs 0x18, spare Vec4 order; the original puts the three FUN_10028fa0 output ints at 0x5c-0x64 just below start); block/function scope of the outputs, an int[3] and used[] placement tried
 - [ ] `1002ebf0` 628 — DamageZone_Update: same tests; register allocation differs from the start (the original leaves index in its stack slot and reloads it, ours keeps it in ebx, which changes the flag-test layout and hides the loop-invariant (float)left the original hoists); else-if, nested and conditional forms of the flag test tried
 - [ ] `1002f050` 690 — Route_FollowGates: same statements and jump table; the original keeps the route row in ebx and the point in edi (cl 13.00 here esi/ebx); a separate next-point variable tried
 - [ ] `10034210` 1460 — Move_SweepToWorld (move_sweep.cpp, 1472 vs 1460 bytes): stack slots of the scalar locals only (penetration between two float temps, arrived between contactNormal and rounded, nodeDepth below the Fill(0) temp); all 120 declaration orders and gap placements tried; next: scope/loop structure or a permuter run
@@ -75,6 +77,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10038070` 1195 — DrawItemPreview (item_preview.cpp, 1200 vs 1195 bytes): calls and EH states match; load order of ItemInfo.previewScale (+0x54, first, tested) vs previewHeight (+0x50, stored before the 0x64 default) and the item-index loads before name[0] = 0 differ; 7 statement orders tried
 - [ ] `1003ab40` 209 — Pickup_Collect: logic identical; the bank limit and the banked count use eax/ecx the other way round (compare orders, limit and bank locals tried)
 - [ ] `1003b6e0` 1208 — Costume_LoadPlayerModel (costume_load.cpp, 1200 vs 1208 bytes): logic matches; the original holds index*0x249c in ebx and reads variant from the stack (ours keeps variant in ebx); costume 11/12 sprintf pushes per-branch format constants after hoisted pushes; speedScale copy via eax vs ecx
+- [ ] `1003bc60` 1804 — Ground_Dig (ground_dig.cpp, 1824 vs 1804 bytes): register allocation only; the original keeps cellCount in memory ([esp+0x20]) with row in edi and DAT_104bfdb4 cached in esi through the dig loop, ours gives cellCount edi and row esi; declaration orders, ++ forms and row at function scope tried
 - [ ] `10043cc0` 340 — Char_ResetState: logic identical; the original stores the byte zeros as immediates and keeps index*0x249c in ebp from the start, ours keeps a zero in ebx (a record reference gets the order but adds the base); Fill(0.0f) and the reference tried
 - [ ] `10044b10` 1711 — Npc_PatrolRoute (npc_patrol.cpp, 1712 = 1712 bytes): the original shares the float temporaries with the address-taken Route_Follow outputs (action 0x20, point 0x10, keep 0x1c), stores state/keep = 1 after the talk divide, stores the state-1 angle to memory before targetHeading and branches for PlayMotion(group != 0); about 12 spellings and all 120 declaration orders tried
 - [ ] `100451c0` 1644 — Npc_WalkRoute (route_carrier.cpp): flow and calls line up; the original frame is 8 bytes smaller: the float temporaries (speed, 0.1/0.9 factors, heading) reuse the slots of the Route_Follow results (reached, action), which cl 13.00 here keeps apart
@@ -111,6 +114,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100b4300` 1583 — Npc_RaiseAlarm (char_move.cpp): all but the alarm block identical; the original pushes an immediate 0 for Sound_PlayEffect and re-zeroes edi after the red flash, cl 13.00 here re-zeroes edi before the sound. The `||` spelling of the line-of-sight test makes cl 13.00 inline atan2f (a larger frame); the `visible` local keeps it a call
 - [ ] `100b4930` 1473 — Npc_RideAlarm (char_move.cpp): same flow and calls; the original keeps index in ebx and the marker loop counter in ebp (cl 13.00 here swaps them); with sqrtf for the marker distance the rest matches
 - [ ] `100b5550` 840 — Npc_GreetWhenNear (char_move.cpp): same flow and calls; the original keeps index in edi and the record offset in ebx (cl 13.00 here swaps them), which also moves one fadd in the facing step; condition and facing spellings tried
+- [ ] `100b7b10` 1798 — Npc_Lookout (npc_lookout.cpp, 1824 vs 1798 bytes): the original keeps index in ebx and the matrix pointer in ebp (reused as the lamp loop counter), uses edi as zero only in some places (push 0 / mov [..],0 in the mode 1 and 5 prompts) and shares one countdown tail for modes 3 and 5; != / == index, a countdown helper and counter scope tried
 - [ ] `100b9930` 637 — Enemy_DragToPit: identical except the heading store: the original rounds atan2 into the dead parameter slot and copies it with fld/fstp before the RotateZ setup, cl 13.00 here copies it through edx after; direct cast, Atan2 wrapper and local forms tried
 - [ ] `100b9bb0` 867 — Enemy_PlayVoice: same switch (jump table plus the 0x1e4.. range); the original keeps 15 and 0x2d in ebx/ebp, recomputes index*16+slot for every access and tests the cooldown kinds in turn, cl 13.00 here threads the kind tests after the reset stores; 2-D, flat and re-read kind forms tried
 - [ ] `100ba040` 604 — Npc_PlayGreeting: same statements; the original copies the AbsFloat result into the height local with fld/fstp (cl 13.00 here stores it directly) and places the new-greeting block after the walked-away block (goto and flag forms tried)
@@ -183,6 +187,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016b010` 53 — original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 - [ ] `1016b050` 399 — Camera_SelectPath: body identical apart from the camera-target pointer register (eax vs ecx); the original pushes all four registers before the id == -1 test and stores the 0 as an immediate (no shrink-wrapping), cl 13.00 here shrink-wraps the early return; inverted if tried
 - [ ] `1016b400` 695 — Camera_TurnInput: same arithmetic; the original stores the blend weight a second time (integer copy into the slot of the converted frame count) and swaps the two argument loads at the end; frame-count, compound and copy-variable forms tried
+- [ ] `1016b6c0` 1833 — Camera_TrackPathFrame (camera_path_track.cpp, 1824 vs 1833 bytes): logic complete, the state-0 scan loop matches; the original frame is 4 bytes larger (state spilled at [0x1c], previousPath at [0x30], constant 1 kept in ebx), the later loops use other registers and Sample loads the frame before the track address; hoisted path = 0, a KeyTrack pointer, hoisted distance and state/startPath orders tried
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
 - [ ] `10172350` 1068 — EffectManager::Start: all but one cluster identical; the original loads the matrix owner before the value but stores the value first and computes the start frame early (cl 13.00 here pairs them the other way); the 24 orders of value/owner/serial/frame and a start local tried
 - [ ] `10175c90` 476 — Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
@@ -229,22 +234,16 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (61)
+## 4. Large functions (801-3000 bytes) (55)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
-- [ ] `100b7b10` 1798 bytes (float, loops 1, calls 33)
-- [ ] `1003bc60` 1804 bytes (float, loops 8, calls 38)
-- [ ] `1002a740` 1833 bytes (float, loops 3, calls 52)
-- [ ] `1016b6c0` 1833 bytes (float, loops 6, calls 18)
-- [ ] `10021e70` 1839 bytes (loops 5, calls 26)
 - [ ] `1005c680` 1846 bytes (float, loops 2, calls 8)
 - [ ] `10018870` 1850 bytes (float, calls 94)
 - [ ] `100301a0` 1850 bytes (float, calls 41)
 - [ ] `10172cb0` 1855 bytes (float, calls 16)
 - [ ] `10035050` 1858 bytes (float, loops 2, calls 62)
 - [ ] `10137b10` 1889 bytes Screenshot_Capture (loops 6, calls 49)
-- [ ] `10028fa0` 1900 bytes (float, calls 11)
 - [ ] `100a8ac0` 1912 bytes (float, calls 58)
 - [ ] `1013f070` 1928 bytes (float, loops 3, calls 89)
 - [ ] `100b7360` 1953 bytes (float, loops 3, calls 46)

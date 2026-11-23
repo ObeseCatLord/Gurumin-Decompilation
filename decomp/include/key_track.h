@@ -41,6 +41,8 @@ struct KeyTrack : KeyInterpolator
     int CopyFrom(const KeyTrack *source);                          // 0x101ade10: makes this track a copy of `source`
     // 0x101afe00: the value at `frame` (with `rotation` set, a quaternion interpolated as a rotation).
     int Sample(int frame, float *x, float *y, float *z, float *w, int rotation);
+    // 0x101b0240: the same for a fractional frame.
+    int Sample(float frame, float *x, float *y, float *z, float *w, int rotation);
 };
 
 // Capacity of a KeyBank.

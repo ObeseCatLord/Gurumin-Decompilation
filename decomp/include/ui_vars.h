@@ -11,6 +11,8 @@
 struct InputEffect;   // dinput_min.h
 struct Node;   // node.h
 
+extern "C" char DAT_101d6530[7][7];                         // weekday names, Sunday first (full-width, 6 bytes each)
+extern "C" short DAT_101d6578[27];                         // script flag of each map icon of the save summary
 extern "C" char DAT_101d65b0[][0x10];                     // icon file names
 extern "C" const char DAT_101fc7e4[];                     // c_dfDIMouse
 extern "C" const char DAT_101fc9ec[];                     // c_dfDIKeyboard

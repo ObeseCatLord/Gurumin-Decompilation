@@ -98,7 +98,7 @@ extern "C" int DAT_1032d67c[0x8];
 extern "C" int DAT_1032d6a0;
 extern "C" int DAT_1032d6a4;                              // set to 9 when the player is knocked back (0x10055ee0)
 extern "C" int DAT_1032d6a8[0x40];
-extern "C" int DAT_1032d7a8[0x30];
+extern "C" short DAT_1032d7a8[0x60];                    // per ground object: buried treasure marker (below 9000: depth it lies at; from 9000: level % 1000)
 extern "C" int DAT_1042d918[0x10];
 extern "C" int DAT_1042d9e4;
 extern "C" int DAT_1042da68;                              // frames left
@@ -106,7 +106,7 @@ extern "C" float DAT_1042e3f0[0x60][16][16];                 // copy of DAT_1049
 extern "C" int DAT_104463f0;
 extern "C" int DAT_104463f8[0x80];                       // event slots: state
 extern "C" int DAT_10446ea8;
-extern "C" int DAT_104472b0[0x18];
+extern "C" unsigned char DAT_104472b0[0x60];          // per ground object: dug-hole flag (below 2 = copied to DAT_104c00be)
 extern "C" short DAT_10447338[0x44c];                     // handle of each looping effect while it plays, -11 = not playing
 extern "C" char DAT_10447dd0;
 extern "C" int DAT_10447fd8[0x80];                       // event slots: third value
@@ -121,7 +121,7 @@ extern "C" int DAT_10467f20;
 extern "C" int DAT_10468128;
 extern "C" int DAT_1046812c;
 extern "C" int DAT_10468230[0x80];                       // event slots: second value
-extern "C" int DAT_10468430[0x18];
+extern "C" unsigned char DAT_10468430[0x60];          // per ground object: dig timer (1..29 = reset to 1 when dug)
 extern "C" int DAT_104684b0[115];
 extern "C" int DAT_104687b0;
 extern "C" char DAT_1049ef8c;

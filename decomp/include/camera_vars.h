@@ -57,13 +57,14 @@ extern "C" char DAT_10faa678;
 extern "C" char DAT_10faaa80;
 extern "C" int DAT_10fabe88;
 extern "C" char DAT_10fabe8c;
+extern "C" float DAT_10fdea90[];                         // per path: closest distance of the camera target seen
 extern "C" int DAT_10fdeb10[];                            // 1 = has a "...b" node
 extern "C" int DAT_10fe01d0;
 extern "C" int DAT_10feb3d8;
 extern "C" PathSettings DAT_10ff17e0[];
 extern "C" int DAT_10ff19e0;
 extern "C" int DAT_10ff1df0;                              // 1 = the effect is on
-extern "C" int DAT_10ff2ff0;
+extern "C" float DAT_10ff2ff0;                           // distance of the camera target to the path frame DAT_1101c800
 extern "C" int DAT_10ff2ff4;
 extern "C" int DAT_11018624;                              // effect timer
 extern "C" int DAT_11018628[];                            // 1 = has a second target

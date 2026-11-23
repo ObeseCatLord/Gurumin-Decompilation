@@ -31,7 +31,6 @@ extern "C" int FUN_1000e750(void)
     return 0;
 }
 
-extern "C" char DAT_103150c0[0x50];
 
 // AntiTamper_StoreArrays: refreshes the copies of the 0x50 inventory counts (slots 10..89) and of 15 more
 // values (slots 100..114). Called after every inventory change.

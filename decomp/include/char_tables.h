@@ -38,6 +38,7 @@ extern "C" char DAT_10219e40[CHAR_SLOT_COUNT];
 extern "C" short DAT_10219ec0[CHAR_SLOT_COUNT];           // gimmick id controlled by the switch
 extern "C" short DAT_1021b3c8[CHAR_SLOT_COUNT];
 extern "C" char DAT_1021b4c8[CHAR_SLOT_COUNT];
+extern "C" Node *DAT_1021bdf8[CHAR_SLOT_COUNT][9];      // per character: attached nodes ([0] the pose / stand parent / wheel node, [1], [2] effect nodes)
 extern "C" int DAT_1021d138[CHAR_SLOT_COUNT];             // the prompt: cell (0..15) + 1000 or 2000 for the other sheets; the prompt shown; key prompt id
 extern "C" char DAT_1021d338[CHAR_SLOT_COUNT][0x40];      // per character: 1 for each cell box within 75 units
 extern "C" char DAT_1021f340[CHAR_SLOT_COUNT];

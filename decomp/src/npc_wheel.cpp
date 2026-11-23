@@ -19,7 +19,6 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_slot.h"
 
-extern "C" Node *DAT_1021bdf8[0x80][9];       // [0]: the cart's wheel node
 #include "char_tables.h"
 
 #include "char_vars.h"

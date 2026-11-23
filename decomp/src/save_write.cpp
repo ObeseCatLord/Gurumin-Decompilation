@@ -17,7 +17,6 @@
 
 extern "C" char DAT_1042de28[0x60];                  // 1 for each item ever obtained (inventory.cpp)
 extern "C" int DAT_108029b8[4];                      // where the player starts (x, y, z, w)
-extern "C" int DAT_103150c0[0x20];
 extern "C" int DAT_10202464[4];
 extern "C" int FUN_101603c0(const char *name, int record, unsigned int *value);   // SystemSav_ReadRecord
 extern "C" int FUN_1015fea0(const char *name, int record, unsigned int value);    // SystemSav_WriteRecord

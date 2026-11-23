@@ -12,7 +12,6 @@ extern "C" char *FUN_1013f910(const char *name);
 extern "C" void FUN_10001980(const char *, int, int, int, int, int, int);
 extern "C" void FUN_100016c0(const char *, int, int, int, int, int, int);
 extern "C" void FUN_1000ec70(int, float, float, float, float);
-extern "C" signed char DAT_103150c0[];
 extern "C" void FUN_1000e810(void);
 
 // Opens the message window with `text` (and an optional second line) for `frames` frames.

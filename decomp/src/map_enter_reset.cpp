@@ -16,7 +16,6 @@
 #include "game_vars.h"
 #include "map_vars.h"
 #include "engine_memory.h"
-extern "C" char DAT_103150c0[0x80];
 
 extern "C" int FUN_1013fb10(int active, int target, int frames);
 extern "C" int FUN_1000e810(void);

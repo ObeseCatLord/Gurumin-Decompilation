@@ -102,7 +102,6 @@ int FUN_10011240(const char *name, void *thumbnail)
 #include "anim_model.h"
 #include "char_slot.h"
 
-extern "C" int DAT_103150c0[0x20];
 extern "C" int DAT_10202464[4];
 extern "C" float DAT_108029b8;                   // where the player starts (x, y, z)
 extern "C" int FUN_1013e6f0(int a, const char *text, const char *name);

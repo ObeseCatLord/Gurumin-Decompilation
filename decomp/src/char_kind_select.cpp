@@ -11,7 +11,6 @@
 
 #include "char_tables.h"
 
-extern "C" int DAT_1021bdf8[0x80][9];
 
 // 0x1001b0a0 (Char_SelectKind). Sets the kind of character `index` from its script code: the millions pair picks a
 // special kind (some with an alternative when `alternative` is set), the ten-thousands pair 0x44 or 0x59, else the
@@ -130,12 +129,12 @@ extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
                     memset(&DAT_1020b430[index].words[4], 0, 12 * sizeof(int));
                     DAT_1021bdf8[index][0] = 0;
                     DAT_1021bdf8[index][1] = 0;
-                    memset(&DAT_1021bdf8[index][4], 0, 4 * sizeof(int));
+                    memset(&DAT_1021bdf8[index][4], 0, 4 * sizeof(Node *));
                 }
                 else
                 {
                     memset(DAT_1020b430[index].words, 0, sizeof(DAT_1020b430[index].words));
-                    memset(DAT_1021bdf8[index], 0, 8 * sizeof(int));
+                    memset(DAT_1021bdf8[index], 0, 8 * sizeof(Node *));
                 }
                 DAT_10802bf8[index].position.Fill(0.0f);
                 DAT_10802bf8[index].step.Fill(0.0f);
@@ -210,7 +209,7 @@ extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
             memset(&DAT_1020b430[index].words[4], 0, 12 * sizeof(int));
             DAT_1021bdf8[index][0] = 0;
             DAT_1021bdf8[index][1] = 0;
-            memset(&DAT_1021bdf8[index][4], 0, 5 * sizeof(int));
+            memset(&DAT_1021bdf8[index][4], 0, 5 * sizeof(Node *));
         }
         else
         {

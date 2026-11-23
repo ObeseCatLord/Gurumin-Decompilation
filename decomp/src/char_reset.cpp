@@ -14,9 +14,8 @@
 
 #include "last_position.h"
 
-#include "pose_entry.h"
+#include "char_tables.h"
 
-extern "C" PoseEntry DAT_1021bdf8[0x80];
 #include "char_tables.h"
 extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a);   // ColourFade_Start
 extern "C" int FUN_100404e0(int index, int a, int b, int c, int d, int e, int f);
@@ -39,7 +38,7 @@ extern "C" int FUN_10043cc0(int index)
     DAT_10802bf8[index].position.Fill(0);
     DAT_10802bf8[index].step.Fill(0);
     DAT_10db6ee8[index].m_0012 = 0;
-    memset(&DAT_1021bdf8[index], 0, sizeof(PoseEntry));
+    memset(DAT_1021bdf8[index], 0, sizeof(DAT_1021bdf8[index]));
     int value = DAT_102548c0[index];
     DAT_102199b8[index] = 16;
     DAT_1020d540[index] = 1;

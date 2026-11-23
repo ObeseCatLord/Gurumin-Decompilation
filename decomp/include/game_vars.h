@@ -92,6 +92,7 @@ extern "C" char DAT_1030c47b;
 extern "C" int DAT_1030c500[0x100];                       // the overlay mode's state (entry 0x13 is cleared first)
 extern "C" int DAT_1030c568;
 extern "C" int DAT_1030c990;
+extern "C" char DAT_103150c0[0x80];                      // item stock per item id (saved with the game)
 extern "C" int DAT_103154b0[0x6000];
 extern "C" int DAT_1032d67c[0x8];
 extern "C" int DAT_1032d6a0;

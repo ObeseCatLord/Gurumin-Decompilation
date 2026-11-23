@@ -1,7 +1,7 @@
 // Item table at 0x1088e6b0 (0xc0 bytes per item). type 4 = stackable consumable.
 #include "item_info.h"
+#include "game_vars.h"
 
-extern "C" char DAT_103150c0[0x50];
 extern "C" char DAT_1042de28[0x50];
 extern "C" int FUN_1000e810(void);
 

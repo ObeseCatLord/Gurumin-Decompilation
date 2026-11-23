@@ -46,7 +46,6 @@ extern "C" int DAT_1021bbc0[0xc];
 extern "C" int DAT_1021f640[0x20];
 extern "C" int DAT_10255b08[0x40];
 extern "C" int DAT_1030bbf8[0x40];
-extern "C" int DAT_103150c0[0x20];
 extern "C" int DAT_1032d4b0;
 extern "C" int DAT_1032d5b8[0x30];
 extern "C" int DAT_1042de28[0x20];

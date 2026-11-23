@@ -15,7 +15,6 @@ Matrix4 RotationZ(float angle);                      // 0x101b1b40
 #include "char_state.h"
 #include "char_slot.h"
 
-extern "C" Node *DAT_1021bdf8[0x80][9];              // [1], [2]: the companion's attached effect nodes
 #include "char_tables.h"
 #include "char_vars.h"
 

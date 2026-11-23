@@ -8,18 +8,7 @@ struct Object
     ~Object();
 };
 
-struct CharModel
-{
-    void M_1017b0e0(int motion, int a, int b, float speed);
-};
-
-struct Character
-{
-    int id;
-    char pad_0004[0xc];
-    CharModel model;
-    char pad_0011[0x248b];
-};
+#include "anim_model.h"
 
 extern "C" void FUN_101b21c0(void);
 extern "C" void FUN_1003ad20(int, int, float);
@@ -28,7 +17,6 @@ extern "C" int DAT_102027d8;
 extern "C" int FUN_10001b70(int);
 extern "C" int DAT_104c0198;
 extern "C" int DAT_104c00d0;
-extern "C" Character DAT_10db6ed8[0x80];
 
 // Empty base class constructor.
 Object::Object()
@@ -69,7 +57,7 @@ extern "C" int FUN_1003b670(int value)
         FUN_10001b70((100 - (DAT_102027d8 * 5 + 50) / 2) * 100);
     DAT_104c0198 = value;
     DAT_104c00d0 = 0x816;
-    DAT_10db6ed8[0].model.M_1017b0e0(0x59, 1, 5, 1.0f);
+    DAT_10db6ee8[0].PlayMotion(0x59, 1, 5, 1.0f);
     rand();
     return 0;
 }

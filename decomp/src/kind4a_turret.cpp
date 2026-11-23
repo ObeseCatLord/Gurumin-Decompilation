@@ -18,24 +18,9 @@ struct ModelState
     ModelState();                 // 0x101668b0
 };
 
-struct CharModel
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0 (world.h CharModel::M_1017b0e0)
-};
+#include "anim_model.h"
 
 #include "matrix4.h"
-
-// A character record (world.h Character), only the fields used here.
-struct Character
-{
-    char pad_0000[0x10];
-    CharModel model;              // 0x10
-    char pad_0011[0x266];
-    char m_0277;                  // 0x277: set every frame by the kind updates
-    char pad_0278[0x20c0];
-    Matrix4 matrix;               // 0x2338: world matrix
-    char pad_2378[0x124];
-};
 
 // Per-character AI state (world.h CharState) as this kind uses it.
 struct AttackState
@@ -57,7 +42,6 @@ struct ActorSlot
     char pad_0010[0x178];
 };
 
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" AttackState DAT_1020b430[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" char DAT_10255a88[0x80];
@@ -73,12 +57,12 @@ extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int a, int b, 
 extern "C" int FUN_1009ddd0(int slot)
 {
     DAT_10255a88[slot] = 0;
-    DAT_10db6ed8[slot].m_0277 = 1;
+    DAT_10db6ee8[slot].m_0267 = 1;
     if (DAT_1020b430[slot].attacking != 1 && DAT_102550e0[slot] != 0)
     {
         // hit: one of the three attack motions (4-6), 100 frames of cooldown, 30 frames of attack
         DAT_102550e0[slot] = 0;
-        DAT_10db6ed8[slot].model.PlayMotion(FUN_1013f880() % 3 + 4, 1, 5, 1.0f);
+        DAT_10db6ee8[slot].PlayMotion(FUN_1013f880() % 3 + 4, 1, 5, 1.0f);
         DAT_1020b430[slot].cooldown = 100;
         DAT_1020b430[slot].attacking = 1;
         DAT_1020b430[slot].attackTimer = 0x1e;
@@ -100,17 +84,17 @@ extern "C" int FUN_1009ddd0(int slot)
             shot.m_002c = slot;
             shot.m_000e = 6;
             FUN_10065b10(slot, 0x154, 0, 0);
-            FUN_1001d8b0(slot, 0x352, position, -1, -1, 0, 0, 0, (int)&DAT_10db6ed8[slot].matrix, (int)&shot);
+            FUN_1001d8b0(slot, 0x352, position, -1, -1, 0, 0, 0, (int)&DAT_10db6ee8[slot].matrix, (int)&shot);
         }
     }
     else
     {
-        DAT_10db6ed8[slot].model.PlayMotion(2, 0, 5, 1.0f);
+        DAT_10db6ee8[slot].PlayMotion(2, 0, 5, 1.0f);
         if (DAT_1020b430[slot].cooldown != 0)
             DAT_1020b430[slot].cooldown--;
         if (FUN_1013f880() % 100 <= 3 && DAT_1020b430[slot].cooldown == 0)
         {
-            DAT_10db6ed8[slot].model.PlayMotion(FUN_1013f880() % 3 + 4, 1, 5, 1.0f);
+            DAT_10db6ee8[slot].PlayMotion(FUN_1013f880() % 3 + 4, 1, 5, 1.0f);
             DAT_1020b430[slot].cooldown = 100;
             DAT_1020b430[slot].attacking = 1;
             DAT_1020b430[slot].attackTimer = 0x1e;

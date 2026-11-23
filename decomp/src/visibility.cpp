@@ -19,6 +19,7 @@ struct VisData
 };
 
 #include "node.h"
+#include "anim_model.h"
 
 extern "C" int DAT_10f65520;
 extern "C" Vec4 DAT_10f66908;
@@ -78,7 +79,7 @@ extern "C" int FUN_10015710(int index)
     Vec4 pos;
     if (DAT_10255f08->visibilityCells == 0)
         return 1;
-    pos.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    pos.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     VisData *visibilityCells = DAT_10255f08->visibilityCells;
     for (int i = 0; i < 0x40; i++)
     {
@@ -95,10 +96,10 @@ extern "C" int FUN_100157b0(int index)
 {
     Vec4 pos;
     int i = 0;
-    DAT_10db6ed8[index].nearCells = 0;
+    DAT_10db6ee8[index].nearCells = 0;
     if (DAT_10255f08->visibilityCells == 0)
         return 1;
-    pos.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    pos.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     Box2 *box = DAT_10255f08->visibilityCells->boxes;
     for (; i < 0x40; i++, box++)
     {
@@ -106,6 +107,6 @@ extern "C" int FUN_100157b0(int index)
         if (pos.InBoxMargin(box, 75.0f) != 0)
             DAT_1021d338[index][i] = 1;
     }
-    DAT_10db6ed8[index].nearCells = DAT_1021d338[index];
+    DAT_10db6ee8[index].nearCells = DAT_1021d338[index];
     return 0;
 }

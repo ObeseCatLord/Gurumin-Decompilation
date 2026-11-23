@@ -4,6 +4,7 @@
 #include <string.h>
 #include "world.h"
 #include "game.h"
+#include "anim_model.h"
 
 struct NamedPath
 {
@@ -67,7 +68,7 @@ extern "C" int FUN_10012100(int value)
 {
     DAT_104c0198 = value;
     DAT_104c00d0 = 0x816;
-    DAT_10db6ed8[0].model.M_1017b0e0(0x59, 1, 5, 1.0f);
+    DAT_10db6ee8[0].PlayMotion(0x59, 1, 5, 1.0f);
     rand();
     return 0;
 }
@@ -75,14 +76,14 @@ extern "C" int FUN_10012100(int value)
 // Reloads character `index`'s model from the model path table.
 extern "C" int FUN_100121e0(int index)
 {
-    return DAT_10db6ed8[index].model.M_1017aeb0(FUN_1013f8a0(DAT_10b314c8[DAT_10daab84[index].m_0060].path, 0));
+    return DAT_10db6ee8[index].LoadModel(FUN_1013f8a0(DAT_10b314c8[DAT_10daab84[index].m_0060].path, 0));
 }
 
 // Adds character `index`'s position to the list of positions the camera keeps in view.
 extern "C" int FUN_100143c0(int index)
 {
     // the camera list holds Vec3 pointers; the matrix's translation row (_41, _42, _43) is the character's position
-    DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ed8[index].matrix.translation;
+    DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ee8[index].matrix.translation;
     DAT_1021bbc0[DAT_1049f0f0] = 0;
     DAT_1049f0f0++;
     return 1;
@@ -121,7 +122,7 @@ extern "C" int FUN_10017ad0(int id)
     for (int i = 0x5c; i < 0x80; i++)
     {
         char kind = DAT_1021f3c0[i];
-        if ((kind == 'F' || kind == 'M' || kind == 'N') && DAT_10db6ed8[i].id == id)
+        if ((kind == 'F' || kind == 'M' || kind == 'N') && DAT_10db6ee8[i - 1].nextSlotId == id)
             return i;
     }
     return -1;

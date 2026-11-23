@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "world.h"
+#include "anim_model.h"
 
 extern "C" int DAT_10255f10[];
 extern "C" int FUN_1013f880(void);
@@ -55,10 +56,10 @@ extern "C" int FUN_10017bb0(int id)
 // when it has one (m_239c).
 extern "C" int FUN_1001b840(int index)
 {
-    if (DAT_10db6ed8[index].m_239c != 0)
+    if (DAT_10db6ee8[index].m_238c != 0)
     {
         if (FUN_1013f880() % 10000 < 100)
-            DAT_10db6ed8[index].model.M_101630b0(30.0f);
+            DAT_10db6ee8[index].AddMotionSpeed(30.0f);
     }
     return 0;
 }

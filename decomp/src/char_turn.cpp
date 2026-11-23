@@ -2,6 +2,7 @@
 #include "world.h"
 
 #include "vec4.h"
+#include "anim_model.h"
 
 extern "C" int DAT_104c00d0;  // when non-zero, the player (character 0) cannot be pushed
 
@@ -10,7 +11,7 @@ extern "C" int DAT_104c00d0;  // when non-zero, the player (character 0) cannot 
 // -maxTurn..maxTurn and the target heading is set to heading + that difference. Returns 0.
 extern "C" int FUN_1001bfb0(int index, float maxTurn)
 {
-    float turn = DAT_10db6ed8[index].targetHeading - DAT_10db6ed8[index].heading;
+    float turn = DAT_10db6ee8[index].targetHeading - DAT_10db6ee8[index].heading;
     while (turn > 3.1415f)
         turn -= 6.283f;
     while (turn < -3.1415f)
@@ -19,7 +20,7 @@ extern "C" int FUN_1001bfb0(int index, float maxTurn)
         turn = maxTurn;
     else if (turn < -maxTurn)
         turn = -maxTurn;
-    DAT_10db6ed8[index].targetHeading = turn + DAT_10db6ed8[index].heading;
+    DAT_10db6ee8[index].targetHeading = turn + DAT_10db6ee8[index].heading;
     return 0;
 }
 
@@ -28,7 +29,7 @@ extern "C" int FUN_1001bfb0(int index, float maxTurn)
 // nothing happens when the character stands exactly on the point. Returns 0.
 extern "C" int FUN_10011b70(int strength, char flag, int index, const Vec4 *point)
 {
-    Vec4 direction = DAT_10db6ed8[index].matrix.GetTranslation();
+    Vec4 direction = DAT_10db6ee8[index].matrix.GetTranslation();
     Vec4 from;
     from.Copy(*point);
     direction.Copy(direction - from);
@@ -36,7 +37,7 @@ extern "C" int FUN_10011b70(int strength, char flag, int index, const Vec4 *poin
     if ((index != 0 || DAT_104c00d0 == 0) && (direction.x != 0.0f || direction.y != 0.0f || direction.z != 0.0f))
     {
         direction.Copy(direction * (float)strength);
-        DAT_10db6ed8[index].model.SetPendingPush(direction.x, direction.y, 0, flag);
+        DAT_10db6ee8[index].SetPendingPush(direction.x, direction.y, 0, flag);
     }
     return 0;
 }

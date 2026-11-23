@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include "world.h"
+#include "anim_model.h"
 
 extern "C" int DAT_104c0370;
 extern "C" int DAT_10c62ed0;
@@ -33,7 +34,7 @@ extern "C" int FUN_1001dbd0(int id, int value)
 {
     for (int i = 0x5c; i < 0x7c; i++)
     {
-        if (DAT_10db6ed8[i].id == id)
+        if (DAT_10db6ee8[i - 1].nextSlotId == id)
         {
             DAT_1020b430[i].m_0004[5] = value;
             DAT_1020b430[i].m_0004[0] = 0;
@@ -65,8 +66,8 @@ extern "C" int FUN_100286b0(int angle)
 // Moves character `index` to the position of character `index - 2` (a follower placed on its leader).
 extern "C" int FUN_100347d0(int index)
 {
-    DAT_10db6ed8[index].model.M_10162610(DAT_10db6ed8[index - 2].matrix._41, DAT_10db6ed8[index - 2].matrix._42,
-                                         DAT_10db6ed8[index - 2].matrix._43);
+    DAT_10db6ee8[index].SetPosition(DAT_10db6ee8[index - 2].matrix._41, DAT_10db6ee8[index - 2].matrix._42,
+                                         DAT_10db6ee8[index - 2].matrix._43);
     return 0;
 }
 
@@ -90,9 +91,6 @@ extern "C" int FUN_10052480(void)
     }
     return 0;
 }
-
-
-
 
 // One int every 0x40 bytes (laid over the CharState table at 0x1020b430, see world.h); used for the per-kind
 // cooldown counters below.

@@ -3,60 +3,11 @@
 #include "vec3.h"
 
 #include "node.h"
+#include "anim_model.h"
 
-struct CharModel
-{
-    void M_1017b0e0(int motion, int a, int b, float speed);
-    int M_10161a20(int texture);  // AnimModel::ApplyMaterialSwap
-    int M_10162420(float x, float y, float z);  // places the model at (x, y, z)
-    int M_1017b9b0(const char *path);
-    int M_1017aeb0(const char *path);
-    void M_101630b0(float value);
-    void M_10162610(float x, float y, float z);
-    void M_10161b60();
-    int M_10161b90(int frame, float value);
-    int M_10161be0(int a, int b);
-    // 0x101628b0 (anim_model.cpp AnimModel::M_101628b0): queues a push (x, y, z) with `flag` unless the model is locked.
-    int SetPendingPush(float x, float y, float z, char flag);
-};
-
-// Motion playback state of a model (only the fields used so far).
-struct MotionState
-{
-    char pad_0000[0x1c];
-    int current;              // 0x1c: motion number playing
-    char pad_0020[0x7c54];
-    int blending;             // 0x7c74: non-zero while blending into the next motion
-    int pad_7c78;
-    int next;                 // 0x7c7c: motion being blended into
-};
-
-struct Character
-{
-    int id;
-    char pad_0004[0xc];
-    CharModel model;
-    char pad_0011[0x6f];
-    char *nearCells;          // 0x80: row of DAT_1021d338 (map cells near the character), 0 = no visibility data
-    char pad_0084[0x1fc];
-    int m_0280;               // 0x280: node id of the switch this character works (see switches.cpp)
-    char pad_0284[0x24];
-    struct MotionState *motion;  // 0x2a8: the model's motion playback state
-    char pad_02ac[0xab0];
-    float m_0d5c;             // 0xd5c: 1.0 when spawned (model alpha or scale)
-    char pad_0d60[0x159c];
-    Node *m_22fc;             // 0x22fc: root node of the model (0x22ec inside CharModel)
-    int m_2300;               // 0x2300: non-zero while the character is in use (key prompts are drawn)
-    Node *headNode;           // 0x2304: the model's head bone node (head_look.cpp, the player's at 0x10db91dc)
-    char pad_2308[0x30];
-    Matrix4 matrix;           // 0x2338: world matrix; matrix._41/_42/_43 (0x2368) is the character's position
-    char pad_2378[0x24];
-    int m_239c;
-    char pad_23a0[0xec];
-    float heading;            // 0x248c: facing angle in radians
-    float targetHeading;      // 0x2490: angle the character turns towards
-    char pad_2494[8];
-};
+// The character records are the models themselves: DAT_10db6ee8 (anim_model.h), one AnimModel per slot. Older
+// code saw them 0x10 bytes earlier as Character records at DAT_10db6ed8; a record's id was the previous slot's
+// AnimModel::nextSlotId.
 
 struct CharSlot
 {
@@ -102,7 +53,6 @@ struct EffectSlot
     char pad_00f4[8];
 };
 
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" CharState DAT_1020b430[0x80];
 extern "C" EffectSlot DAT_10860df0[0x40];

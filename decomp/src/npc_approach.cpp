@@ -7,23 +7,7 @@
 
 #include "matrix4.h"
 
-struct CharModel
-{
-    void PlayMotion(int motion, int a, int b, float speed);  // 0x1017b0e0
-};
-
-// A character record (world.h Character), only the fields used here.
-struct Character
-{
-    char pad_0000[0x10];
-    CharModel model;              // 0x10
-    char pad_0011[0x2327];
-    Matrix4 matrix;            // 0x2338: world matrix (translation at 0x2368)
-    char pad_2378[0x114];
-    float heading;                // 0x248c: facing angle in radians
-    float targetHeading;          // 0x2490: angle the character turns towards
-    char pad_2494[8];
-};
+#include "anim_model.h"
 
 // Field 0x24a8 of each character record (it lies past the 0x249c bytes world.h gives a record, so it is declared
 // on its own with the record stride).
@@ -51,7 +35,6 @@ inline float Atan2(float y, float x)
     return (float)atan2(y, x);
 }
 
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" CharMoveLock DAT_10db9380[0x80];
 extern "C" ApproachState DAT_1020b430[0x80];
 extern "C" void FUN_10043cc0(int slot);         // Char_ResetState
@@ -63,7 +46,7 @@ extern "C" void FUN_10043cc0(int slot);         // Char_ResetState
 extern "C" int FUN_10045ed0(int slot)
 {
     Vec4 offset;
-    offset = DAT_10db6ed8[0].matrix.GetTranslation() - DAT_10db6ed8[slot].matrix.GetTranslation();
+    offset = DAT_10db6ee8[0].matrix.GetTranslation() - DAT_10db6ee8[slot].matrix.GetTranslation();
     offset.z *= 2.0f;
     float distance = offset.Length();
     if (DAT_1020b430[slot].started == 0)
@@ -71,18 +54,18 @@ extern "C" int FUN_10045ed0(int slot)
         DAT_1020b430[slot].started = 1;
         DAT_10db9380[slot].locked = 0;
         DAT_1020b430[slot].stopDistance = DAT_1020b430[slot].code % 100 * 10;
-        DAT_10db6ed8[slot].model.PlayMotion(2, 0, 5, 1.0f);
+        DAT_10db6ee8[slot].PlayMotion(2, 0, 5, 1.0f);
         return 0;
     }
-    float turn = DAT_10db6ed8[slot].heading - DAT_10db6ed8[slot].targetHeading;
+    float turn = DAT_10db6ee8[slot].heading - DAT_10db6ee8[slot].targetHeading;
     while (turn > 3.1415f)
         turn -= 6.283f;
     while (turn < -3.1415f)
         turn += 6.283f;
-    DAT_10db6ed8[slot].model.PlayMotion(2, 0, 5, 1.0f);
-    DAT_10db6ed8[slot].targetHeading =
-        Atan2(DAT_10db6ed8[0].matrix.m[12] - DAT_10db6ed8[slot].matrix.m[12],
-              DAT_10db6ed8[0].matrix.m[13] - DAT_10db6ed8[slot].matrix.m[13]) +
+    DAT_10db6ee8[slot].PlayMotion(2, 0, 5, 1.0f);
+    DAT_10db6ee8[slot].targetHeading =
+        Atan2(DAT_10db6ee8[0].matrix.m[12] - DAT_10db6ee8[slot].matrix.m[12],
+              DAT_10db6ee8[0].matrix.m[13] - DAT_10db6ee8[slot].matrix.m[13]) +
         3.1415f;
     if (distance < (float)DAT_1020b430[slot].stopDistance ||
         DAT_1020b430[slot].releasable != 0 && DAT_1020b430[slot].code / 100 != 0)

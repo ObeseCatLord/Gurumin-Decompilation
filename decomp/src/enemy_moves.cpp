@@ -18,6 +18,7 @@ extern "C" StartVectors DAT_10802bf8[0x80];
 extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, int testOnly, const Vec4 *offset);
 
 #include "node.h"
+#include "anim_model.h"
 
 extern "C" char DAT_1021f6c0[0x80];
 
@@ -47,11 +48,11 @@ extern "C" int FUN_10024d00(int index, float distance, float minimumHome, float 
     Vec4 offset;
     offset.Fill(0);
     offset.z += 10.0f;
-    float homeDistance = (DAT_10802bf8[index].position - DAT_10db6ed8[index].matrix.GetTranslation()).Length2D();
+    float homeDistance = (DAT_10802bf8[index].position - DAT_10db6ee8[index].matrix.GetTranslation()).Length2D();
     if (FUN_100242c0(index, 0, homeDistance, 0, 1, &offset) == 0)
         return 0;
     Vec4 home;
-    home.Copy(DAT_10802bf8[index].position - DAT_10db6ed8[index].matrix.GetTranslation());
+    home.Copy(DAT_10802bf8[index].position - DAT_10db6ee8[index].matrix.GetTranslation());
     float wanted = Atan2(dirX, dirY);
     float toHome = Atan2(home.x, home.y);
     if (AbsFloat(toHome - wanted) < 2.61799f)
@@ -70,12 +71,12 @@ extern "C" int FUN_10027560(int index)
         switch (FUN_1013f880() % 2)
         {
         case 0:
-            DAT_10db6ed8[index].model.M_1017b0e0(5, 1, 5, 1.0f);
+            DAT_10db6ee8[index].PlayMotion(5, 1, 5, 1.0f);
             DAT_1020b430[index].m_0004[2] = 146;
             DAT_1020b430[index].m_0004[1] = 1;
             return 0;
         case 1:
-            DAT_10db6ed8[index].model.M_1017b0e0(6, 1, 5, 1.0f);
+            DAT_10db6ee8[index].PlayMotion(6, 1, 5, 1.0f);
             DAT_1020b430[index].m_0004[2] = 93;
             DAT_1020b430[index].m_0004[1] = 1;
             break;
@@ -101,21 +102,21 @@ extern "C" int FUN_10027400(int index)
     Vec4 move;
     Vec4 player;
     Vec4 self;
-    player.Copy(DAT_10db6ed8[0].matrix.GetTranslation());
-    self.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     DAT_1020b430[index].m_0004[0] = 1;
     move.Fill(0);
     if (DAT_1020b430[index].m_0004[1] == 0)
     {
-        MotionState *motion = DAT_10db6ed8[index].motion;
+        Playback *motion = DAT_10db6ee8[index].motion;
         DAT_1020b430[index].m_0004[2] = 150;
-        if (motion->current != 7 && (motion->blending == 0 || motion->next != 7))
-            DAT_10db6ed8[index].model.M_1017b0e0(7, 1, 5, 1.0f);
+        if (motion->layer != 7 && (motion->blending == 0 || motion->nextLayer != 7))
+            DAT_10db6ee8[index].PlayMotion(7, 1, 5, 1.0f);
         DAT_1020b430[index].m_0004[1] = 1;
     }
     else if (DAT_1020b430[index].m_0004[1] == 1)
     {
-        DAT_10db6ed8[index].targetHeading = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
+        DAT_10db6ee8[index].targetHeading = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
         if (FUN_1013f880() % 3000 < 15)
         {
             DAT_1020b430[index].m_0004[1] = 0;
@@ -139,21 +140,21 @@ extern "C" int FUN_10028360(int index, int endChance)
     if (DAT_1020b430[index].m_003c == 0)
     {
         DAT_1020b430[index].m_003c = 1;
-        DAT_10db6ed8[index].m_22fc->M_10194630((char)index, 0x400);
-        DAT_10db6ed8[index].m_22fc->M_101946b0(0xfe, 0x400);
-        DAT_10db6ed8[index].m_22fc->M_10194730(0x2f, 0x400);
-        DAT_10db6ed8[index].m_22fc->M_10194730(0x2f, 0x200);
+        DAT_10db6ee8[index].root->M_10194630((char)index, 0x400);
+        DAT_10db6ee8[index].root->M_101946b0(0xfe, 0x400);
+        DAT_10db6ee8[index].root->M_10194730(0x2f, 0x400);
+        DAT_10db6ee8[index].root->M_10194730(0x2f, 0x200);
         DAT_1021f6c0[index] = 0;
     }
-    player.Copy(DAT_10db6ed8[0].matrix.GetTranslation());
-    self.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     toPlayer.Copy(player - self);
     if (DAT_1020b430[index].m_0004[1] == 0)
     {
         // Angle still to turn, wrapped into -pi..pi.
         float turn = (float)atan2(toPlayer.x, toPlayer.y);
         turn = turn + 3.1415f;
-        turn = turn - DAT_10db6ed8[index].heading;
+        turn = turn - DAT_10db6ee8[index].heading;
         if (turn > 3.1415f)
             turn = -(6.28319f - turn);
         else if (turn < -3.1415f)
@@ -162,15 +163,15 @@ extern "C" int FUN_10028360(int index, int endChance)
         {
             if (DAT_1020b430[index].m_0004[3] == 0)
                 DAT_1020b430[index].m_0004[3] = 30;
-            DAT_10db6ed8[index].targetHeading = DAT_10db6ed8[index].heading;
+            DAT_10db6ee8[index].targetHeading = DAT_10db6ee8[index].heading;
             if (DAT_1020b430[index].m_0004[2] > 0)
             {
-                DAT_10db6ed8[index].model.M_1017b0e0(0, 0, 5, 1.0f);
+                DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
                 DAT_1020b430[index].m_0004[2]--;
             }
             else
             {
-                DAT_10db6ed8[index].model.M_1017b0e0(2, 0, 5, 1.0f);
+                DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
             }
         }
         else if (((float)fabs(turn) < 3.14159f && toPlayer.Length2D() < 1500.0f) || DAT_1020b430[index].m_0004[3] > 0)
@@ -181,22 +182,22 @@ extern "C" int FUN_10028360(int index, int endChance)
             if (turn > 0.0f)
             {
                 if (turn > 0.349066f)
-                    DAT_10db6ed8[index].targetHeading = DAT_10db6ed8[index].heading + 0.349066f;
+                    DAT_10db6ee8[index].targetHeading = DAT_10db6ee8[index].heading + 0.349066f;
                 else
-                    DAT_10db6ed8[index].targetHeading = turn + DAT_10db6ed8[index].heading;
+                    DAT_10db6ee8[index].targetHeading = turn + DAT_10db6ee8[index].heading;
             }
             else if (turn < 0.0f)
             {
                 if (turn < -0.349066f)
-                    DAT_10db6ed8[index].targetHeading = DAT_10db6ed8[index].heading - 0.349066f;
+                    DAT_10db6ee8[index].targetHeading = DAT_10db6ee8[index].heading - 0.349066f;
                 else
-                    DAT_10db6ed8[index].targetHeading = turn + DAT_10db6ed8[index].heading;
+                    DAT_10db6ee8[index].targetHeading = turn + DAT_10db6ee8[index].heading;
             }
-            DAT_10db6ed8[index].model.M_1017b0e0(0, 0, 5, 1.0f);
+            DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
         }
         else
         {
-            DAT_10db6ed8[index].model.M_1017b0e0(2, 0, 5, 1.0f);
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         }
         if (DAT_1020b430[index].m_0004[3] > 0)
             DAT_1020b430[index].m_0004[3]--;
@@ -209,7 +210,7 @@ extern "C" int FUN_10028360(int index, int endChance)
     }
     else
     {
-        DAT_10db6ed8[index].model.M_1017b0e0(2, 0, 5, 1.0f);
+        DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
     }
     return 0;
 }

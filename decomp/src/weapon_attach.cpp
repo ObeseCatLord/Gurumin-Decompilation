@@ -5,13 +5,7 @@
 
 #include "node.h"
 
-// A character record (world.h Character): only the model's root node is used here.
-struct CharacterRoot
-{
-    char pad_0000[0x22fc];
-    Node *root;                                      // 0x22fc: root node of the model
-    char pad_2300[0x19c];
-};
+#include "anim_model.h"
 
 // A character slot record (world.h CharSlot): only m_0038 is used here.
 struct CharSlot
@@ -21,7 +15,6 @@ struct CharSlot
     char pad_003c[0x14c];
 };
 
-extern "C" CharacterRoot DAT_10db6ed8[0x80];
 extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" int DAT_1020b430[0x80][16];               // AI state (world.h CharState)
 extern "C" Node *DAT_10446e00[0x28];
@@ -39,19 +32,19 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
 {
     char rightFile[0x100];
     char leftFile[0x100];
-    if (DAT_10db6ed8[index].root == 0)
+    if (DAT_10db6ee8[index].root == 0)
         return 0;
     if (weapon != 0)
     {
         if (right != 0)
         {
-            Node *old = DAT_10db6ed8[index].root->Find("@migitesou", 0);
+            Node *old = DAT_10db6ee8[index].root->Find("@migitesou", 0);
             if (old != 0)
                 old->parent->RemoveChild(old, 0);
         }
         if (left != 0)
         {
-            Node *old = DAT_10db6ed8[index].root->Find("@hidaritesou", 0);
+            Node *old = DAT_10db6ee8[index].root->Find("@hidaritesou", 0);
             if (old != 0)
                 old->parent->RemoveChild(old, 0);
         }
@@ -120,7 +113,7 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
         case 1:
             if (right != 0)
             {
-                Node *hand = DAT_10db6ed8[index].root->Find("@Bip01 R Hand", 0);
+                Node *hand = DAT_10db6ee8[index].root->Find("@Bip01 R Hand", 0);
                 if (hand != 0)
                 {
                     Node *model = hand->AddChild(0, 0x40);
@@ -134,7 +127,7 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
         case 2:
             if (right != 0)
             {
-                Node *hand = DAT_10db6ed8[index].root->Find("@Bip01 R Hand", 0);
+                Node *hand = DAT_10db6ee8[index].root->Find("@Bip01 R Hand", 0);
                 if (hand != 0)
                 {
                     Node *model = hand->AddChild(0, 0x40);
@@ -148,7 +141,7 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
             {
                 if (weapon == 0x36 || weapon == 0x37)
                     DAT_10daab84[index].twoHanded = 1;
-                Node *hand = DAT_10db6ed8[index].root->Find("@Bip01 L Hand", 0);
+                Node *hand = DAT_10db6ee8[index].root->Find("@Bip01 L Hand", 0);
                 if (hand != 0)
                 {
                     Node *model = hand->AddChild(0, 0x40);
@@ -170,6 +163,6 @@ attached:
     else
         DAT_1021d018[slot] = 0;
     if (DAT_10f654b0 != 0)
-        DAT_10db6ed8[index].root->M_1019b0c0(0, 0, 0x1f);
+        DAT_10db6ee8[index].root->M_1019b0c0(0, 0, 0x1f);
     return 0;
 }

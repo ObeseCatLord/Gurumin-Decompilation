@@ -7,8 +7,8 @@
 #include "vec4.h"
 
 #include "node.h"
+#include "anim_model.h"
 
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" char DAT_1021f3c0[0x80];                  // kind of each character slot
 extern "C" int DAT_104bfdd8;                         // the carried object's slot (below 0x5c: nothing carried)
 extern "C" int DAT_104c0384;                         // the object it rests on (0 = none yet)
@@ -25,17 +25,17 @@ extern "C" int FUN_1001d920(void)
     if (DAT_104bfdd8 >= 0x5c)
     {
         if (DAT_104c0388 != DAT_104bfdd8 ||
-            (DAT_104c0384 >= 0x5c && DAT_10db6ed8[DAT_104c0384].matrix._41 < -20000.0f))
+            (DAT_104c0384 >= 0x5c && DAT_10db6ee8[DAT_104c0384].matrix._41 < -20000.0f))
         {
             DAT_104c0384 = 0;
             DAT_104c0388 = DAT_104bfdd8;
         }
-        Vec4 position = DAT_10db6ed8[DAT_104bfdd8].matrix.GetTranslation();
+        Vec4 position = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
         Vec4 other;
         if (DAT_104c0384 < 0x5c)
         {
             int tall = 0;
-            if (DAT_10db6ed8[DAT_104bfdd8].m_22fc->Find("@O_019b", 0) != 0)
+            if (DAT_10db6ee8[DAT_104bfdd8].root->Find("@O_019b", 0) != 0)
                 tall = 1;
             DAT_10867df8.Fill(0.0f);
             DAT_10867df8.z = 999999.0f;
@@ -43,7 +43,7 @@ extern "C" int FUN_1001d920(void)
             {
                 if (DAT_104c0384 == DAT_104bfdd8 || (DAT_1021f3c0[i] != 5 && DAT_1021f3c0[i] != '_'))
                     continue;
-                other.Copy(DAT_10db6ed8[i].matrix.GetTranslation());
+                other.Copy(DAT_10db6ee8[i].matrix.GetTranslation());
                 if (DAT_104c0384 != 0 && (DAT_104c0384 < 0x5c || !(DAT_10867df8.z > other.z)))
                     continue;
                 if (tall != 0)
@@ -66,11 +66,11 @@ extern "C" int FUN_1001d920(void)
             DAT_10867df8.z -= position.z;
             return 0;
         }
-        if (DAT_10db6ed8[DAT_104bfdd8].matrix._41 > -20000.0f)
+        if (DAT_10db6ee8[DAT_104bfdd8].matrix._41 > -20000.0f)
         {
             DAT_10867df8.x = position.x;
             DAT_10867df8.y = position.y;
-            DAT_10db6ed8[DAT_104c0384].model.M_10162610(position.x, position.y, DAT_10867df8.z + position.z);
+            DAT_10db6ee8[DAT_104c0384].SetPosition(position.x, position.y, DAT_10867df8.z + position.z);
             return 0;
         }
     }

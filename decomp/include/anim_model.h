@@ -252,7 +252,7 @@ struct AnimModel
     float targetHeading;      // 0x2480: angle the character turns towards
     int m_2484;
     char pad_2488[4];
-    int m_248c;
+    int nextSlotId;           // 0x248c: id of the next slot's character (read as DAT_10db6ee8[i - 1].nextSlotId)
     int pad_2490;
     int m_2494;               // 0x2494: cleared by LoadModel
     int mode;                 // 0x2498: 1 = normal (set by the scene start for the player), 2 = over the pit area

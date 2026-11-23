@@ -24,8 +24,8 @@ extern "C" int FUN_10011c60(void)
 {
     for (int i = 0x3a; i < 0x7c; i++)
     {
-        if (DAT_1021f3c0[i] == 3 && i >= 0x3a && DAT_10db6ed8[i].matrix._41 > -49999.0f && DAT_10daaaec[i].m_0000 > 0 &&
-            DAT_10210d30[i] == 0 && DAT_10db6ed8[i].m_22fc != 0 && DAT_10daaaec[i].m_009c == 0)
+        if (DAT_1021f3c0[i] == 3 && i >= 0x3a && DAT_10db6ee8[i].matrix._41 > -49999.0f && DAT_10daaaec[i].m_0000 > 0 &&
+            DAT_10210d30[i] == 0 && DAT_10db6ee8[i].root != 0 && DAT_10daaaec[i].m_009c == 0)
             DAT_10daaaec[i].m_0000 = 0;
     }
     return 1;
@@ -39,8 +39,8 @@ extern "C" int FUN_10011cd0(void)
     {
         if (DAT_1021f3c0[i] == 3 && i >= 0x3a)
         {
-            if ((DAT_10db6ed8[i].matrix._41 < -50000.0f || (DAT_10daaaec[i].m_0000 <= 0 && DAT_10210d30[i] == 2)) &&
-                DAT_10db6ed8[i].m_22fc != 0)
+            if ((DAT_10db6ee8[i].matrix._41 < -50000.0f || (DAT_10daaaec[i].m_0000 <= 0 && DAT_10210d30[i] == 2)) &&
+                DAT_10db6ee8[i].root != 0)
                 return i;
         }
     }
@@ -48,6 +48,7 @@ extern "C" int FUN_10011cd0(void)
 }
 
 #include "node.h"
+#include "anim_model.h"
 
 extern "C" char DAT_10315350[0x80];
 
@@ -59,13 +60,13 @@ extern "C" int FUN_10011d40(float a, float b, float c)
     int i = FUN_10011cd0();
     if (i >= 0)
     {
-        DAT_10db6ed8[i].m_22fc->M_101946b0(0xfe, -1);
-        DAT_10db6ed8[i].m_22fc->M_10194730(0x2f, -1);
+        DAT_10db6ee8[i].root->M_101946b0(0xfe, -1);
+        DAT_10db6ee8[i].root->M_10194730(0x2f, -1);
         DAT_10daaaec[i].m_0000 = DAT_10daaaec[i].m_0004;
         DAT_10210d30[i] = 0;
         DAT_10315350[i] = 0;
-        DAT_10db6ed8[i].m_0d5c = 1.0f;
-        DAT_10db6ed8[i].model.M_10162420(a, b, c);
+        DAT_10db6ee8[i].alpha = 1.0f;
+        DAT_10db6ee8[i].Teleport(a, b, c);
         return i;
     }
     return -1;
@@ -80,7 +81,7 @@ extern "C" int FUN_1001ba40(int unused, const Vec4 *point)
     {
         if (DAT_1021f3c0[i] == 0x5c)
         {
-            position.Copy(DAT_10db6ed8[i].matrix.GetTranslation());
+            position.Copy(DAT_10db6ee8[i].matrix.GetTranslation());
             if (position.x - 125.0f < point->x + 25.0f && position.x + 125.0f > point->x - 25.0f &&
                 position.y - 125.0f < point->y + 25.0f && position.y + 125.0f > point->y - 25.0f)
                 return 1;
@@ -98,7 +99,7 @@ extern "C" int FUN_1001bec0(const Vec4 *position, Vec4 *velocity)
     {
         if (DAT_1021f3c0[i] == 0x14)
         {
-            delta.Copy(DAT_10db6ed8[i].matrix.GetTranslation() - *position);
+            delta.Copy(DAT_10db6ee8[i].matrix.GetTranslation() - *position);
             float distance = delta.Length2D();
             delta.Copy(delta - *velocity);
             float distanceAfter = delta.Length2D();
@@ -120,15 +121,15 @@ extern "C" int FUN_10034e80(int index, const Vec4 *offset, int range)
 {
     Vec4 position;
     if (offset != 0)
-        position.Copy(DAT_10db6ed8[index].matrix.GetTranslation() + *offset);
+        position.Copy(DAT_10db6ee8[index].matrix.GetTranslation() + *offset);
     else
-        position.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+        position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     Vec4 other;
     for (int i = 0; i < 5; i++)
     {
         if (DAT_101d67f0[i] != index)
         {
-            other.Copy(DAT_10db6ed8[DAT_101d67f0[i]].matrix.GetTranslation());
+            other.Copy(DAT_10db6ee8[DAT_101d67f0[i]].matrix.GetTranslation());
             float distance = (other - position).Length2D();
             if (distance < (float)range)
                 return 1;
@@ -143,13 +144,13 @@ extern "C" int FUN_100249c0(int lower, int upper, int maxHeight, int maxDistance
 {
     Vec4 top;
     Vec4 bottom;
-    top.Copy(DAT_10db6ed8[upper].matrix.GetTranslation());
-    bottom.Copy(DAT_10db6ed8[lower].matrix.GetTranslation());
+    top.Copy(DAT_10db6ee8[upper].matrix.GetTranslation());
+    bottom.Copy(DAT_10db6ee8[lower].matrix.GetTranslation());
     float height = top.z - (bottom.z + 20.0f);
     top.z = 0;
     bottom.z = 0;
     float distanceSquared = (top - bottom).LengthSquared3();
     if (height < 0.0f || height > (float)maxHeight || distanceSquared > (float)maxDistanceSquared)
         return 0;
-    return DAT_10db6ed8[upper].m_239c != 0;
+    return DAT_10db6ee8[upper].m_238c != 0;
 }

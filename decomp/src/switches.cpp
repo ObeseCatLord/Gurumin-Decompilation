@@ -3,6 +3,7 @@
 
 #include "world.h"
 #include "vec4.h"
+#include "anim_model.h"
 
 // Map object (0x10874848) that animates the switch nodes ("LEVERON" and its off state).
 struct MapObject
@@ -10,9 +11,6 @@ struct MapObject
     int M_10054f30(int node, int on);
     int M_10055110(int id, int on);   // switches the map gimmick with `id` on or off
 };
-
-
-
 
 extern "C" MapObject DAT_10874848;
 extern "C" int DAT_1030bbf8[0x80];       // the held object of each slot (non-zero while used, switch_effects.cpp)
@@ -31,7 +29,7 @@ extern "C" int FUN_10057b90(int holder)
             if (who < 0x80)
             {
                 DAT_10daab84[who].m_00a4--;
-                DAT_10874848.M_10054f30(DAT_10db6ed8[who].m_0280, 0);
+                DAT_10874848.M_10054f30(DAT_10db6ee8[who].switchNode, 0);
             }
             else if (DAT_10254838[who % 0x80] >= 1000)
                 DAT_10254838[who % 0x80] -= 1000;
@@ -50,7 +48,6 @@ extern "C" int DAT_10c62edc[0x1000];      // script flags
 extern "C" int DAT_104bfe6c;              // 1 while sounds are muted (cut-scenes)
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);
 
-
 // Turns the switch in slot `slot` on: kind 0x13 shows frame 1 and plays sound 0x38a, kind 0x14 shows frame 0x1f and
 // plays 0x389. Both set their script flag and switch their gimmick (on for 0x13, off for 0x14). Returns 0.
 extern "C" int FUN_1005f530(int slot)
@@ -63,7 +60,7 @@ extern "C" int FUN_1005f530(int slot)
             DAT_10c62edc[flag] = 1;
         DAT_10874848.M_10055110(DAT_10219ec0[slot], 1);
         if (DAT_104bfe6c == 0)
-            FUN_1003ad20(0x38a, &DAT_10db6ed8[slot].matrix.GetTranslation(), 1.0f);
+            FUN_1003ad20(0x38a, &DAT_10db6ee8[slot].matrix.GetTranslation(), 1.0f);
     }
     if (DAT_1021f3c0[slot] == 0x14)
     {
@@ -73,7 +70,7 @@ extern "C" int FUN_1005f530(int slot)
             DAT_10c62edc[flag] = 1;
         DAT_10874848.M_10055110(DAT_10219ec0[slot], 0);
         if (DAT_104bfe6c == 0)
-            FUN_1003ad20(0x389, &DAT_10db6ed8[slot].matrix.GetTranslation(), 1.0f);
+            FUN_1003ad20(0x389, &DAT_10db6ee8[slot].matrix.GetTranslation(), 1.0f);
     }
     return 0;
 }
@@ -90,7 +87,7 @@ extern "C" int FUN_1005f640(int slot)
             DAT_10c62edc[flag] = 0;
         DAT_10874848.M_10055110(DAT_10219ec0[slot], 1);
         if (DAT_104bfe6c == 0)
-            FUN_1003ad20(0x38c, &DAT_10db6ed8[slot].matrix.GetTranslation(), 1.0f);
+            FUN_1003ad20(0x38c, &DAT_10db6ee8[slot].matrix.GetTranslation(), 1.0f);
     }
     if (DAT_1021f3c0[slot] == 0x14)
     {
@@ -100,7 +97,7 @@ extern "C" int FUN_1005f640(int slot)
             DAT_10c62edc[flag] = 0;
         DAT_10874848.M_10055110(DAT_10219ec0[slot], 0);
         if (DAT_104bfe6c == 0)
-            FUN_1003ad20(0x38b, &DAT_10db6ed8[slot].matrix.GetTranslation(), 1.0f);
+            FUN_1003ad20(0x38b, &DAT_10db6ee8[slot].matrix.GetTranslation(), 1.0f);
     }
     return 0;
 }
@@ -134,7 +131,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
     }
     else
     {
-        object = (int)DAT_10db6ed8[holder].m_22fc;
+        object = (int)DAT_10db6ee8[holder].root;
         for (slot = 0; slot < 0x80; slot++)
         {
             if (DAT_1030bbf8[slot] == object)
@@ -156,7 +153,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
         {
             DAT_10daab84[holder].m_00a4 |= 1;
             if (DAT_1021f3c0[holder] == 0x60)
-                DAT_10874848.M_10054f30(DAT_10db6ed8[holder].m_0280, 1);
+                DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
         }
         else
             DAT_10254838[holder % 0x80] += 1000;
@@ -167,7 +164,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
         {
             DAT_10daab84[holder].m_00a4 |= 1;
             if (DAT_1021f3c0[holder] == 0x60)
-                DAT_10874848.M_10054f30(DAT_10db6ed8[holder].m_0280, 1);
+                DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
         }
         else
             DAT_10254838[holder % 0x80] += 1000;
@@ -178,7 +175,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
         {
             DAT_10daab84[holder].m_00a4 |= 2;
             if (DAT_1021f3c0[holder] == 0x60)
-                DAT_10874848.M_10054f30(DAT_10db6ed8[holder].m_0280, 1);
+                DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
         }
         else
             DAT_10254838[holder % 0x80] += 1000;

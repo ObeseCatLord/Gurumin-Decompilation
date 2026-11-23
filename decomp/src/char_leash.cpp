@@ -3,6 +3,7 @@
 #include "world.h"
 
 #include "vec4.h"
+#include "anim_model.h"
 
 // Per-slot position record, 0x40 bytes (char_shots.cpp); here the start position of each character.
 struct SlotPosition
@@ -37,10 +38,10 @@ extern "C" int FUN_10024e80(int index, float dx, float dy)
     float rangeX = (float)DAT_102110b0[index].rangeX;
     float rangeY = (float)DAT_102110b0[index].rangeY;
     if (DAT_102110b0[index].limitX == 1 && rangeX != 0.0f &&
-        AbsFloat(dx + DAT_10db6ed8[index].matrix._41 - DAT_10802bf8[index].position.x) > rangeX)
+        AbsFloat(dx + DAT_10db6ee8[index].matrix._41 - DAT_10802bf8[index].position.x) > rangeX)
         return 1;
     if (DAT_102110b0[index].limitY == 1 && rangeY != 0.0f &&
-        AbsFloat(dy + DAT_10db6ed8[index].matrix._42 - DAT_10802bf8[index].position.y) > rangeY)
+        AbsFloat(dy + DAT_10db6ee8[index].matrix._42 - DAT_10802bf8[index].position.y) > rangeY)
         return 1;
     return 0;
 }

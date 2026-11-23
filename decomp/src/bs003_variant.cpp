@@ -13,15 +13,7 @@ inline int LoadIti(const char *name)
 
 #include "node.h"
 
-// A character record (world.h Character), only its model root.
-struct Character
-{
-    char pad_0000[0x22fc];
-    Node *root;                                      // 0x22fc
-    char pad_2300[0x19c];
-};
-
-extern "C" Character DAT_10db6ed8[0x80];
+#include "anim_model.h"
 
 // 0x10034920 (Bs003_SetVariant). Loads the four textures of variant `variant` (0-4; others load nothing) and, when
 // character `index` has a model, puts them on the BS_003 parts: the body and its second texture on BS_003.lwo, the
@@ -65,33 +57,33 @@ extern "C" int FUN_10034920(int index, int variant)
         wing2 = LoadIti("BS_003l5.iti");
         break;
     }
-    if (DAT_10db6ed8[index].root != 0)
+    if (DAT_10db6ee8[index].root != 0)
     {
-        Node *node = DAT_10db6ed8[index].root->Find("BS_003.lwo", 0);
+        Node *node = DAT_10db6ee8[index].root->Find("BS_003.lwo", 0);
         if (node != 0)
         {
             node->ReplaceMaterial(node->mesh->materials[0], body);
             *node->mesh->secondaryTextures = body2;
         }
-        node = DAT_10db6ed8[index].root->Find("BS_003w.lwo", 0);
+        node = DAT_10db6ee8[index].root->Find("BS_003w.lwo", 0);
         if (node != 0)
         {
             node->ReplaceMaterial(node->mesh->materials[0], wing);
             *node->mesh->secondaryTextures = wing2;
         }
-        node = DAT_10db6ed8[index].root->Find("BS_003b.lwo", 0);
+        node = DAT_10db6ee8[index].root->Find("BS_003b.lwo", 0);
         if (node != 0)
         {
             node->ReplaceMaterial(node->mesh->materials[0], wing);
             *node->mesh->secondaryTextures = wing2;
         }
-        node = DAT_10db6ed8[index].root->Find("BS_003c.lwo", 0);
+        node = DAT_10db6ee8[index].root->Find("BS_003c.lwo", 0);
         if (node != 0)
             node->ReplaceMaterial(node->mesh->materials[0], body);
-        node = DAT_10db6ed8[index].root->Find("BS_003f.lwo", 0);
+        node = DAT_10db6ee8[index].root->Find("BS_003f.lwo", 0);
         if (node != 0)
             node->ReplaceMaterial(node->mesh->materials[0], body);
-        node = DAT_10db6ed8[index].root->Find("BS_003ball.lwo", 0);
+        node = DAT_10db6ee8[index].root->Find("BS_003ball.lwo", 0);
         if (node != 0)
             node->ReplaceMaterial(node->mesh->materials[0], body);
     }

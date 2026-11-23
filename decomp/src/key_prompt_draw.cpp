@@ -10,6 +10,7 @@
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 
 #include "node.h"
+#include "anim_model.h"
 
 struct TextureObject
 {
@@ -19,7 +20,6 @@ struct TextureObject
                     float rhw, float alpha, int b);
 };
 
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" int DAT_104bf8f8[0x7c];                   // 1 while a key prompt is shown over the character
 extern "C" int DAT_1021d138[0x7c];                   // the prompt: cell (0..15) + 1000 or 2000 for the other sheets
 extern "C" int DAT_104b721c[0x19];                   // Game texture slots from texBalloon5 (DAT_104b7200 + 0x1c)
@@ -34,8 +34,8 @@ extern "C" int FUN_1000d6b0(const Matrix4 *view)
 {
     for (int i = 0; i < 0x7c; i++)
     {
-        Character *character = &DAT_10db6ed8[i];
-        if (character->m_2300 == 0 || DAT_104bf8f8[i] == 0 || !(character->matrix._41 > -100000.0f))
+        AnimModel *character = &DAT_10db6ee8[i];
+        if (character->m_22f0 == 0 || DAT_104bf8f8[i] == 0 || !(character->matrix._41 > -100000.0f))
         {
             DAT_104bf8f8[i] = 0;
             continue;

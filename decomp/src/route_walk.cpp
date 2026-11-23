@@ -5,26 +5,7 @@
 
 #include "matrix4.h"
 
-struct CharModel
-{
-    int M_10161be0(int a, int b);                // AnimModel::M_10161be0
-    int SetPosition(float x, float y, float z);  // 0x10162610 (model_place.cpp PathMover::SetPosition)
-};
-
-// A character record (world.h Character), only the fields used here.
-struct Character
-{
-    char pad_0000[0x10];
-    CharModel model;              // 0x10
-    char pad_0011[0x293];
-    int m_02a4;                   // 0x2a4: 1 while the character walks a route
-    char pad_02a8[0x2090];
-    Matrix4 matrix;            // 0x2338: world matrix (translation at 0x2368)
-    int m_2378;                   // 0x2378: set to 30 while walking
-    char pad_237c[0x4c];
-    Vec4 m_23c8;                  // 0x23c8: zeroed while walking
-    char pad_23d8[0xc4];
-};
+#include "anim_model.h"
 
 // Field 0x24a8 of each character record (npc_approach.cpp CharMoveLock).
 struct CharMoveLock
@@ -50,7 +31,6 @@ struct StepRecord
     char pad_0010[0x30];
 };
 
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" CharMoveLock DAT_10db9380[0x80];
 extern "C" RouteState DAT_1020b430[0x80];
 extern "C" StepRecord DAT_10802c08[0x80];
@@ -74,37 +54,37 @@ extern "C" int FUN_1002a110(int slot, int run)
     int group;
     int value;
     int action;
-    target.Copy(DAT_10db6ed8[slot].matrix.GetTranslation());
+    target.Copy(DAT_10db6ee8[slot].matrix.GetTranslation());
     DAT_10db9380[slot].locked = 0;
-    DAT_10db6ed8[slot].m_02a4 = 1;
-    DAT_10db6ed8[slot].m_2378 = 0x1e;
-    DAT_10db6ed8[slot].model.M_10161be0(0, 0);
+    DAT_10db6ee8[slot].walkingRoute = 1;
+    DAT_10db6ee8[slot].motionFrame = 0x1e;
+    DAT_10db6ee8[slot].M_10161be0(0, 0);
     FUN_100286d0(slot, &state, DAT_1020b430[slot].point, &next, &target, &group, &value, &action);
     if (DAT_1020b430[slot].placed == 0)
     {
-        DAT_1032d5b8[DAT_1049f0f0] = (Vec4 *)&DAT_10db6ed8[slot].matrix.m[12];
+        DAT_1032d5b8[DAT_1049f0f0] = (Vec4 *)&DAT_10db6ee8[slot].matrix.m[12];
         DAT_1021bbc0[DAT_1049f0f0] = 0;
         DAT_1049f0f0++;
         DAT_1020b430[slot].placed = 1;
-        DAT_10db6ed8[slot].model.SetPosition(target.x, target.y, target.z);
+        DAT_10db6ee8[slot].SetPosition(target.x, target.y, target.z);
     }
     DAT_1020b430[slot].point = next;
     DAT_10802c08[slot].step.Fill(0.0f);
     if (DAT_1020b430[slot].stopped == 0)
     {
-        step.Copy(target - DAT_10db6ed8[slot].matrix.GetTranslation());
+        step.Copy(target - DAT_10db6ee8[slot].matrix.GetTranslation());
         if (step.x != 0.0f || step.y != 0.0f || step.z != 0.0f)
             step.Normalized3();
         if (run != 0)
             step.Copy(step * 12.0f);
         else
             step.Copy(step * 5.0f);
-        DAT_10db6ed8[slot].matrix.m[12] += step.x;
-        DAT_10db6ed8[slot].matrix.m[13] += step.y;
-        DAT_10db6ed8[slot].matrix.m[14] += step.z;
+        DAT_10db6ee8[slot].matrix.m[12] += step.x;
+        DAT_10db6ee8[slot].matrix.m[13] += step.y;
+        DAT_10db6ee8[slot].matrix.m[14] += step.z;
         DAT_10802c08[slot].step.Copy(step);
-        DAT_10db6ed8[slot].m_23c8.Fill(0.0f);
+        DAT_10db6ee8[slot].velocity.Fill(0.0f);
     }
-    DAT_10db6ed8[slot].m_23c8.Fill(0.0f);
+    DAT_10db6ee8[slot].velocity.Fill(0.0f);
     return 0;
 }

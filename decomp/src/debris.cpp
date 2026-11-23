@@ -4,13 +4,7 @@
 
 #include "vec4.h"
 
-// A character record (world.h Character, base 0x10db6ed8), only the model scale used here.
-struct CharacterScale
-{
-    char pad_0000[0x22c];
-    Vec4 scale;               // 0x22c: model scale
-    char pad_023c[0x249c - 0x23c];
-};
+#include "anim_model.h"
 
 #define DEBRIS_SLOTS 0x100
 
@@ -25,7 +19,6 @@ extern "C" int DAT_104469f8[DEBRIS_SLOTS];             // frames left (0 for the
 extern "C" int DAT_104465f8[DEBRIS_SLOTS];             // spin: rotation in tenths of a radian
 extern "C" int DAT_10446eb0[DEBRIS_SLOTS];             // colour of a thrown piece
 extern "C" int DAT_10467288[0x80];                     // each character's debris colour
-extern "C" CharacterScale DAT_10db6ed8[0x80];
 extern "C" int FUN_1013f880(void);                     // the game's random number
 
 // 0x1000dd90 (Debris_Spawn). Starts a simple piece of type `type` at (x, y, z) in the first free slot of 0-127:
@@ -96,7 +89,7 @@ extern "C" int FUN_1000df10(float x, float y, float z, const Vec4 *direction, in
     DAT_10c66ef0[i].RotateY(amount * 0.28f);
     DAT_10c66ef0[i].z += 3.0f;
     DAT_10446eb0[i] = DAT_10467288[owner];
-    DAT_10866df8[i].Copy(DAT_10db6ed8[owner].scale);
+    DAT_10866df8[i].Copy(DAT_10db6ee8[owner].scale);
     return 1;
 }
 

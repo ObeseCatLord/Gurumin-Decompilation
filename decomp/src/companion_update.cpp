@@ -10,17 +10,7 @@ Matrix4 RotationZ(float angle);                      // 0x101b1b40
 
 #include "node.h"
 
-// A character record (world.h Character), 0x249c bytes.
-struct Character
-{
-    char pad_0000[0x22fc];
-    Node *root;                                      // 0x22fc: root node of the model
-    char pad_2300[0x38];
-    Matrix4 matrix;                                  // 0x2338: world matrix
-    char pad_2378[0x114];
-    float heading;                                   // 0x248c
-    char pad_2490[0xc];
-};
+#include "anim_model.h"
 
 // The last position and step of each character (route_walk.cpp StepRecord).
 struct LastPosition
@@ -30,7 +20,6 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int DAT_1020b430[0x80][16];               // AI state (world.h CharState)
 extern "C" Node *DAT_1021bdf8[0x80][9];              // [1], [2]: the companion's attached effect nodes
@@ -101,7 +90,7 @@ int Companion0_Update(int index)
                     matrix = DAT_1021bdf8[index + 2][1]->worldMatrix;
                 }
                 else
-                    matrix = RotationZ(DAT_10db6ed8[index].heading);
+                    matrix = RotationZ(DAT_10db6ee8[index].heading);
                 if (DAT_1021bdf8[index + 2][2] != 0)
                     FUN_1001d8b0(index, 0x36d2, position, -1, -1, &DAT_1021bdf8[index + 2][2]->worldMatrix, 0, 0, &matrix,
                                  0);
@@ -128,7 +117,7 @@ int Companion0_Update(int index)
                 if (DAT_1021bdf8[index + 2][1] != 0)
                     matrix = DAT_1021bdf8[index + 2][1]->worldMatrix;
                 else
-                    matrix = RotationZ(DAT_10db6ed8[index].heading);
+                    matrix = RotationZ(DAT_10db6ee8[index].heading);
                 if (DAT_1021bdf8[index + 2][2] != 0)
                     FUN_1001d8b0(index, 0x36d5, position, -1, -1, &DAT_1021bdf8[index + 2][2]->worldMatrix, 0, 0, &matrix,
                                  0);
@@ -145,7 +134,7 @@ int Companion0_Update(int index)
                         health = DAT_1020b430[index][3] + 2000;
                     DAT_1020b430[index + 2][5] = health;
                     DAT_10daadfc[index][0] = DAT_10daae00[index][0];
-                    DAT_10db6ed8[index + 2].root->M_10194730(0x2f, 0x400);
+                    DAT_10db6ee8[index + 2].root->M_10194730(0x2f, 0x400);
                     DAT_10daaf39[index][0] = 0;
                     DAT_1021f3c0[index + 2] = 3;
                 }
@@ -210,13 +199,13 @@ int Companion0_Update(int index)
                 if (DAT_1020d4c0[index + 2] > 4)
                 {
                     if (DAT_104c00f8 != 0)
-                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ed8[index].matrix.GetTranslation());
+                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ee8[index].matrix.GetTranslation());
                     DAT_1020d4c0[index + 2] = 6;
                 }
                 else
                 {
                     if (DAT_104c00f8 != 0)
-                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ed8[index].matrix.GetTranslation());
+                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ee8[index].matrix.GetTranslation());
                     DAT_1020d4c0[index + 2] = 4;
                 }
             }
@@ -269,7 +258,7 @@ int Companion1_Update(int index)
                     matrix = DAT_1021bdf8[slot + 2][1]->worldMatrix;
                 }
                 else
-                    matrix = RotationZ(DAT_10db6ed8[index].heading);
+                    matrix = RotationZ(DAT_10db6ee8[index].heading);
                 if (DAT_1021bdf8[slot + 2][2] != 0)
                     FUN_1001d8b0(index, 0x36d1, position, -1, -1, &DAT_1021bdf8[slot + 2][2]->worldMatrix, 0, 0, &matrix,
                                  0);
@@ -297,7 +286,7 @@ int Companion1_Update(int index)
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                     matrix = DAT_1021bdf8[slot + 2][1]->worldMatrix;
                 else
-                    matrix = RotationZ(DAT_10db6ed8[index].heading);
+                    matrix = RotationZ(DAT_10db6ee8[index].heading);
                 if (DAT_1021bdf8[slot + 2][2] != 0)
                     FUN_1001d8b0(index, 0x36d4, position, -1, -1, &DAT_1021bdf8[slot + 2][2]->worldMatrix, 0, 0, &matrix,
                                  0);
@@ -315,7 +304,7 @@ int Companion1_Update(int index)
                         health = DAT_1020b430[index][3] + 2000;
                     DAT_1020b430[slot + 2][5] = health;
                     DAT_10daadfc[slot][0] = DAT_10daae00[slot][0];
-                    DAT_10db6ed8[slot + 2].root->M_10194730(0x2f, 0x400);
+                    DAT_10db6ee8[slot + 2].root->M_10194730(0x2f, 0x400);
                     DAT_10daaf39[slot][0] = 0;
                     DAT_1021f3c0[index + 3] = 3;
                 }
@@ -381,13 +370,13 @@ int Companion1_Update(int index)
                 if (DAT_1020d4c0[index + 3] > 4)
                 {
                     if (DAT_104c00f8 != 0)
-                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ed8[index].matrix.GetTranslation());
+                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ee8[index].matrix.GetTranslation());
                     DAT_1020d4c0[index + 3] = 6;
                 }
                 else
                 {
                     if (DAT_104c00f8 != 0)
-                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ed8[index].matrix.GetTranslation());
+                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ee8[index].matrix.GetTranslation());
                     DAT_1020d4c0[index + 3] = 4;
                 }
             }
@@ -442,7 +431,7 @@ int Companion2_Update(int index)
                 }
                 else
                 {
-                    matrix = RotationZ(DAT_10db6ed8[index].heading);
+                    matrix = RotationZ(DAT_10db6ee8[index].heading);
                     FUN_1001d8b0(index, 0x36d0, position, -1, -1, 0, 0, 0, &matrix, 0);
                 }
                 FUN_10065b10(index, 0x194, 1, 0);
@@ -470,7 +459,7 @@ int Companion2_Update(int index)
                 }
                 else
                 {
-                    matrix = RotationZ(DAT_10db6ed8[index].heading);
+                    matrix = RotationZ(DAT_10db6ee8[index].heading);
                     FUN_1001d8b0(index, 0x36d3, position, -1, -1, 0, 0, 0, &matrix, 0);
                 }
             }
@@ -484,7 +473,7 @@ int Companion2_Update(int index)
                         health = DAT_1020b430[index][3] + 2000;
                     DAT_1020b430[slot + 2][5] = health;
                     DAT_10daadfc[slot][0] = DAT_10daae00[slot][0];
-                    DAT_10db6ed8[slot + 2].root->M_10194730(0x2f, 0x400);
+                    DAT_10db6ee8[slot + 2].root->M_10194730(0x2f, 0x400);
                     DAT_10daaf39[slot][0] = 0;
                     DAT_1021f3c0[index + 4] = 3;
                 }
@@ -546,13 +535,13 @@ int Companion2_Update(int index)
                 if (DAT_1020d4c0[index + 4] > 4)
                 {
                     if (DAT_104c00f8 != 0)
-                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ed8[index].matrix.GetTranslation());
+                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ee8[index].matrix.GetTranslation());
                     DAT_1020d4c0[index + 4] = 6;
                 }
                 else
                 {
                     if (DAT_104c00f8 != 0)
-                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ed8[index].matrix.GetTranslation());
+                        DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ee8[index].matrix.GetTranslation());
                     DAT_1020d4c0[index + 4] = 4;
                 }
             }
@@ -566,4 +555,4 @@ int Companion2_Update(int index)
     return 0;
 }
 
-typedef char check_character[sizeof(Character) == 0x249c ? 1 : -1];
+typedef char check_character[sizeof(AnimModel) == 0x249c ? 1 : -1];

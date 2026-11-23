@@ -4,32 +4,8 @@
 
 #include "node.h"
 
-// The part of a Character record (world.h) used here.
-// Motion playback state of a model (world.h MotionState), only its first word.
-struct MotionState
-{
-    int m_0000;
-};
+#include "anim_model.h"
 
-// The model part of a Character (world.h CharModel).
-struct CharModelPart
-{
-    void PlayMotion(int motion, int a, int b, float speed);   // 0x1017b0e0
-};
-
-struct CharacterRoot
-{
-    char pad_0000[0x10];
-    CharModelPart model;      // 0x10
-    char pad_0011[0x293];
-    int m_02a4;
-    MotionState *motion;      // 0x2a8
-    char pad_02ac[0x2050];
-    Node *root;               // 0x22fc: root node of the model
-    char pad_2300[0x19c];
-};
-
-extern "C" CharacterRoot DAT_10db6ed8[0x80];
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);
 extern "C" int FUN_1013faf0(void);       // FrameTimer_ResetNext2
 extern "C" int FUN_100121e0(int index);  // Char_ReloadModel (app_0010.cpp)
@@ -59,13 +35,13 @@ extern "C" Node *DAT_104c0104;           // "scop-3pt" (costume 6 only)
 // Otherwise removes the "scop" child again. Returns 0 when the character has no model, else 1.
 extern "C" int FUN_10012450(int index, int attach, const char *name)
 {
-    if (DAT_10db6ed8[index].root == 0)
+    if (DAT_10db6ee8[index].root == 0)
         return 0;
     if (attach == 1)
     {
-        if (DAT_10db6ed8[index].root->Find("scop", 0) == 0)
+        if (DAT_10db6ee8[index].root->Find("scop", 0) == 0)
         {
-            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 R Hand", 0);
+            Node *hand = DAT_10db6ee8[index].root->Find("Bip01 R Hand", 0);
             if (hand != 0)
             {
                 Node *child = hand->AddChild(0, 0x40);
@@ -79,7 +55,7 @@ extern "C" int FUN_10012450(int index, int attach, const char *name)
     }
     else
     {
-        Node *child = DAT_10db6ed8[index].root->Find("scop", 0);
+        Node *child = DAT_10db6ee8[index].root->Find("scop", 0);
         if (child != 0)
             child->parent->RemoveChild(child, 0);
     }
@@ -93,20 +69,20 @@ extern "C" int FUN_10012450(int index, int attach, const char *name)
 // character has no model, else 1.
 extern "C" int FUN_10012510(int mode, int index)
 {
-    if (DAT_10db6ed8[index].root == 0)
+    if (DAT_10db6ee8[index].root == 0)
         return 0;
     if (mode == -1)   // toggle: remove the tool when there is one, else attach the drill
     {
-        if (DAT_10db6ed8[index].root->Find("scop", 0) != 0)
+        if (DAT_10db6ee8[index].root->Find("scop", 0) != 0)
             mode = 0;
         else
             mode = 1;
     }
     if (mode == 1)
     {
-        if (DAT_10db6ed8[index].root->Find("scop", 0) == 0)
+        if (DAT_10db6ee8[index].root->Find("scop", 0) == 0)
         {
-            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 R Hand", 0);
+            Node *hand = DAT_10db6ee8[index].root->Find("Bip01 R Hand", 0);
             if (hand != 0)
             {
                 Node *child = hand->AddChild(0, 0x40);
@@ -134,9 +110,9 @@ extern "C" int FUN_10012510(int mode, int index)
     }
     else if (mode == 2)
     {
-        if (DAT_10db6ed8[index].root->Find("scop", 0) == 0)
+        if (DAT_10db6ee8[index].root->Find("scop", 0) == 0)
         {
-            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 R Hand", 0);
+            Node *hand = DAT_10db6ee8[index].root->Find("Bip01 R Hand", 0);
             if (hand != 0)
             {
                 Node *child = hand->AddChild(0, 0x40);
@@ -149,23 +125,23 @@ extern "C" int FUN_10012510(int mode, int index)
     }
     else
     {
-        Node *child = DAT_10db6ed8[index].root->Find("scop", 0);
+        Node *child = DAT_10db6ee8[index].root->Find("scop", 0);
         if (child != 0)
             child->parent->RemoveChild(child, 0);
     }
-    if (DAT_10db6ed8[0].root != 0)
+    if (DAT_10db6ee8[0].root != 0)
     {
-        DAT_104c00f8 = DAT_10db6ed8[0].root->Find("scop-pt", 0);
-        if (DAT_10db6ed8[0].root != 0)
-            DAT_104c00fc = DAT_10db6ed8[0].root->Find("charbase0", 0);
+        DAT_104c00f8 = DAT_10db6ee8[0].root->Find("scop-pt", 0);
+        if (DAT_10db6ee8[0].root != 0)
+            DAT_104c00fc = DAT_10db6ee8[0].root->Find("charbase0", 0);
         else
             DAT_104c00fc = 0;
         DAT_104c0100 = 0;
         DAT_104c0104 = 0;
         if (DAT_10c655f0 == 6)
         {
-            DAT_104c0100 = DAT_10db6ed8[0].root->Find("scop-2pt", 0);
-            DAT_104c0104 = DAT_10db6ed8[0].root->Find("scop-3pt", 0);
+            DAT_104c0100 = DAT_10db6ee8[0].root->Find("scop-2pt", 0);
+            DAT_104c0104 = DAT_10db6ee8[0].root->Find("scop-3pt", 0);
         }
     }
     else
@@ -181,20 +157,20 @@ extern "C" int FUN_10012510(int mode, int index)
 // 0x10012780 (Char_SetHandToolPlain). Char_SetHandTool without drill 5 and without loading the drill motions.
 extern "C" int FUN_10012780(int mode, int index)
 {
-    if (DAT_10db6ed8[index].root == 0)
+    if (DAT_10db6ee8[index].root == 0)
         return 0;
     if (mode == -1)   // toggle: remove the tool when there is one, else attach the drill
     {
-        if (DAT_10db6ed8[index].root->Find("scop", 0) != 0)
+        if (DAT_10db6ee8[index].root->Find("scop", 0) != 0)
             mode = 0;
         else
             mode = 1;
     }
     if (mode == 1)
     {
-        if (DAT_10db6ed8[index].root->Find("scop", 0) == 0)
+        if (DAT_10db6ee8[index].root->Find("scop", 0) == 0)
         {
-            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 R Hand", 0);
+            Node *hand = DAT_10db6ee8[index].root->Find("Bip01 R Hand", 0);
             if (hand != 0)
             {
                 Node *child = hand->AddChild(0, 0x40);
@@ -218,9 +194,9 @@ extern "C" int FUN_10012780(int mode, int index)
     }
     else if (mode == 2)
     {
-        if (DAT_10db6ed8[index].root->Find("scop", 0) == 0)
+        if (DAT_10db6ee8[index].root->Find("scop", 0) == 0)
         {
-            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 R Hand", 0);
+            Node *hand = DAT_10db6ee8[index].root->Find("Bip01 R Hand", 0);
             if (hand != 0)
             {
                 Node *child = hand->AddChild(0, 0x40);
@@ -233,23 +209,23 @@ extern "C" int FUN_10012780(int mode, int index)
     }
     else
     {
-        Node *child = DAT_10db6ed8[index].root->Find("scop", 0);
+        Node *child = DAT_10db6ee8[index].root->Find("scop", 0);
         if (child != 0)
             child->parent->RemoveChild(child, 0);
     }
-    if (DAT_10db6ed8[0].root != 0)
+    if (DAT_10db6ee8[0].root != 0)
     {
-        DAT_104c00f8 = DAT_10db6ed8[0].root->Find("scop-pt", 0);
-        if (DAT_10db6ed8[0].root != 0)
-            DAT_104c00fc = DAT_10db6ed8[0].root->Find("charbase0", 0);
+        DAT_104c00f8 = DAT_10db6ee8[0].root->Find("scop-pt", 0);
+        if (DAT_10db6ee8[0].root != 0)
+            DAT_104c00fc = DAT_10db6ee8[0].root->Find("charbase0", 0);
         else
             DAT_104c00fc = 0;
         DAT_104c0100 = 0;
         DAT_104c0104 = 0;
         if (DAT_10c655f0 == 6)
         {
-            DAT_104c0100 = DAT_10db6ed8[0].root->Find("scop-2pt", 0);
-            DAT_104c0104 = DAT_10db6ed8[0].root->Find("scop-3pt", 0);
+            DAT_104c0100 = DAT_10db6ee8[0].root->Find("scop-2pt", 0);
+            DAT_104c0104 = DAT_10db6ee8[0].root->Find("scop-3pt", 0);
         }
     }
     else
@@ -268,15 +244,15 @@ extern "C" int FUN_10012780(int mode, int index)
 // through the shared epilogue (see open.tsv).
 extern "C" int FUN_100143f0(int index, const char *name)
 {
-    Node *old = DAT_10db6ed8[index].root->Find("helmet", 0);
+    Node *old = DAT_10db6ee8[index].root->Find("helmet", 0);
     if (old != 0)
         old->parent->RemoveChild(old, 0);
     if (name == 0)
         return 0;
-    Node *helmet = DAT_10db6ed8[index].root->Find("helmet", 0);
+    Node *helmet = DAT_10db6ee8[index].root->Find("helmet", 0);
     if (helmet != 0)
         return (int)helmet;
-    Node *head = DAT_10db6ed8[index].root->Find("Bip01 Head", 0);
+    Node *head = DAT_10db6ee8[index].root->Find("Bip01 Head", 0);
     if (head != 0)
     {
         helmet = head->AddChild(0, 2);
@@ -294,13 +270,13 @@ extern "C" int FUN_100143f0(int index, const char *name)
 // the "scop_l" child. Returns 0.
 extern "C" int FUN_1001a760(int index, int attach, const char *name)
 {
-    if (DAT_10db6ed8[index].root != 0)
+    if (DAT_10db6ee8[index].root != 0)
     {
         if (attach == 1)
         {
-            if (DAT_10db6ed8[index].root->Find("scop_l", 0) != 0)
+            if (DAT_10db6ee8[index].root->Find("scop_l", 0) != 0)
                 FUN_1001a760(index, 0, 0);
-            Node *hand = DAT_10db6ed8[index].root->Find("Bip01 L Hand", 0);
+            Node *hand = DAT_10db6ee8[index].root->Find("Bip01 L Hand", 0);
             if (hand != 0)
             {
                 Node *child = hand->AddChild(0, 0x40);
@@ -313,7 +289,7 @@ extern "C" int FUN_1001a760(int index, int attach, const char *name)
         }
         else
         {
-            Node *child = DAT_10db6ed8[index].root->Find("scop_l", 0);
+            Node *child = DAT_10db6ee8[index].root->Find("scop_l", 0);
             if (child != 0)
                 child->parent->RemoveChild(child, 0);
         }
@@ -330,19 +306,19 @@ extern "C" int FUN_100154c0(int item)
 {
     if (item > 0 && DAT_1088e6b0[item].type != 1)
         return 1;
-    Node *root = DAT_10db6ed8[0].root;
+    Node *root = DAT_10db6ee8[0].root;
     if (root == 0)
         return 0;
     DAT_104c02c8 = FUN_10014d30(item);
     Node *helmet = root->Find("helmet", 0);
     if (helmet != 0)
         helmet->parent->RemoveChild(helmet, 0);
-    Node *face = DAT_10db6ed8[0].root->Find("face_char02bf.lwo", 0);
+    Node *face = DAT_10db6ee8[0].root->Find("face_char02bf.lwo", 0);
     if (item == 0x2a)
     {
         if (face != 0)
             face->flags |= 0x20;
-        face = DAT_10db6ed8[0].root->Find("face_char02bm.lwo", 0);
+        face = DAT_10db6ee8[0].root->Find("face_char02bm.lwo", 0);
         if (face != 0)
             face->flags |= 0x20;
     }
@@ -350,7 +326,7 @@ extern "C" int FUN_100154c0(int item)
     {
         if (face != 0)
             face->flags &= ~0x20;
-        face = DAT_10db6ed8[0].root->Find("face_char02bm.lwo", 0);
+        face = DAT_10db6ee8[0].root->Find("face_char02bm.lwo", 0);
         if (face != 0)
             face->flags &= ~0x20;
     }
@@ -386,9 +362,9 @@ extern "C" int FUN_100154c0(int item)
     }
     else if (DAT_10c655f0 == 6)
         DAT_104c033a = 6;
-    if (DAT_10db6ed8[0].root->Find("helmet", 0) == 0)
+    if (DAT_10db6ee8[0].root->Find("helmet", 0) == 0)
     {
-        Node *head = DAT_10db6ed8[0].root->Find("Bip01 Head", 0);
+        Node *head = DAT_10db6ee8[0].root->Find("Bip01 Head", 0);
         if (head != 0)
         {
             helmet = head->AddChild(0, 2);
@@ -400,9 +376,9 @@ extern "C" int FUN_100154c0(int item)
             helmet->BuildMesh(1, 0);
             FUN_100121e0(0);
             FUN_1013faf0();
-            DAT_10db6ed8[0].m_02a4 = 0;
-            DAT_10db6ed8[0].motion->m_0000 = 0;
-            DAT_10db6ed8[0].model.PlayMotion(2, 0, 5, 1.0f);
+            DAT_10db6ee8[0].walkingRoute = 0;
+            DAT_10db6ee8[0].motion->m_0000 = 0;
+            DAT_10db6ee8[0].PlayMotion(2, 0, 5, 1.0f);
         }
     }
     return 1;

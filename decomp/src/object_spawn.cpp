@@ -5,7 +5,7 @@
 #include <string.h>
 #include "world.h"
 #include "vec4.h"
-
+#include "anim_model.h"
 
 extern "C" int DAT_1021f338;
 extern "C" char DAT_1021f3c0[0x80];
@@ -47,14 +47,14 @@ extern "C" int FUN_10017c00(const char *name, int x, int y, int z)
         return 0;
     }
     int slot = DAT_1021f338++;
-    DAT_10db6ed8[slot].model.M_1017b9b0(FUN_1013f8a0(name, 0));
-    DAT_10db6ed8[slot].m_22fc->ReleaseUniqueMeshData();
-    DAT_10db6ed8[slot].model.M_10162420((float)x, (float)y, (float)z);
+    DAT_10db6ee8[slot].M_1017b9b0(FUN_1013f8a0(name, 0));
+    DAT_10db6ee8[slot].root->ReleaseUniqueMeshData();
+    DAT_10db6ee8[slot].Teleport((float)x, (float)y, (float)z);
     DAT_1021f3c0[slot] = 6;
-    ((ObjectView *)&DAT_10db6ed8[slot])->m_0276 = 1;
-    DAT_10db6ed8[slot].m_22fc->M_10194630(slot, -1);
-    DAT_10db6ed8[slot].m_22fc->M_101946b0(0xff, -1);
-    DAT_10db6ed8[slot].m_22fc->M_10194730(0x4f, -1);
-    ((ObjectView *)&DAT_10db6ed8[slot])->colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
+    ((ObjectView *)&DAT_10db6ee8[slot])->m_0276 = 1;
+    DAT_10db6ee8[slot].root->M_10194630(slot, -1);
+    DAT_10db6ee8[slot].root->M_101946b0(0xff, -1);
+    DAT_10db6ee8[slot].root->M_10194730(0x4f, -1);
+    ((ObjectView *)&DAT_10db6ee8[slot])->colour.Set(1.0f, 1.0f, 1.0f, 1.0f);
     return slot;
 }

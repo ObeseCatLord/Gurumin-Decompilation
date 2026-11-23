@@ -2,6 +2,7 @@
 // the special characters with their own update routines.
 
 #include "world.h"
+#include "anim_model.h"
 
 extern "C" int DAT_104bfe78;  // non-zero while character updates are suspended
 extern "C" int FUN_1010c650(int index);
@@ -24,7 +25,7 @@ extern "C" int FUN_1009c070(int index);
 // updates are not suspended. Always returns 0.
 extern "C" int FUN_101148b0(int index)
 {
-    if (DAT_10db6ed8[index].matrix._41 > -50000.0f && DAT_104bfe78 == 0)
+    if (DAT_10db6ee8[index].matrix._41 > -50000.0f && DAT_104bfe78 == 0)
     {
         switch (DAT_10daab84[index].m_0000)
         {

@@ -3,6 +3,7 @@
 #include "world.h"
 
 #include "vec4.h"
+#include "anim_model.h"
 
 // The world collision (scene root node); see collide_query.cpp.
 struct CollisionWorld
@@ -48,7 +49,7 @@ extern "C" int FUN_1001a680(int owner, const Vec4 *position, int spread)
         DAT_1020b430[slot].m_0004[1] = spread;
         DAT_1020b430[slot].m_0004[2] = 0;
         DAT_10255160[slot].angle = DAT_10255160[owner].angle;
-        DAT_10255160[slot].heading = DAT_10db6ed8[owner].targetHeading;
+        DAT_10255160[slot].heading = DAT_10db6ee8[owner].targetHeading;
         if (spread != 0)
             DAT_10255160[slot].heading = (float)(FUN_1013f880() % 250 - 125) / 5000.0f + DAT_10255160[slot].heading;
         DAT_10255160[slot].speed = 5.0f;
@@ -73,7 +74,7 @@ extern "C" int FUN_1001a590(int slot, int unused, float distance)
         from.z += 50.0f;
         to.Copy(from);
         to.z -= 350.0f;
-        DAT_11b002c0 = (int)DAT_10db6ed8[slot].nearCells;
+        DAT_11b002c0 = (int)DAT_10db6ee8[slot].nearCells;
         if (DAT_10255f08 != 0 && DAT_10255f08->Collide(0, 0x4000000, &from, &to, &hit) != 0)
         {
             DAT_11b002c0 = 0;

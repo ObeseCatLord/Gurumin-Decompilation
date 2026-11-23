@@ -1,6 +1,7 @@
 // Removing an enemy from play.
 
 #include "world.h"
+#include "anim_model.h"
 
 // 16-byte per-character marker records at 0x10867e18 (only the y value is used here).
 struct Marker
@@ -21,7 +22,7 @@ extern "C" int FUN_1001b7b0(int index)
 {
     if (DAT_1020b430[index].m_0000 == 0)
     {
-        DAT_10db6ed8[index].matrix._41 = -100000.0f - DAT_10db6ed8[index].matrix._41 * 1.0f;
+        DAT_10db6ee8[index].matrix._41 = -100000.0f - DAT_10db6ee8[index].matrix._41 * 1.0f;
         int value = DAT_1020b430[index].m_0004[1];
         DAT_1020d540[index] = 0;
         DAT_1020b430[index].m_0004[3] = value % 10;

@@ -30,14 +30,14 @@ extern "C" int FUN_100ba040(void)
 {
     if (DAT_104c0378 > 0 && --DAT_104c0378 == 0)
         DAT_104c0368 = 0;
-    if (DAT_10db6ed8[0].m_239c == 1)
+    if (DAT_10db6ee8[0].m_238c == 1)
     {
         Vec4 player;
         Vec4 other;
-        player.Copy(DAT_10db6ed8[0].matrix.GetTranslation());
+        player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
         if (DAT_104c0364 != 0)
         {
-            other.Copy(DAT_10db6ed8[DAT_104c0364].matrix.GetTranslation());
+            other.Copy(DAT_10db6ee8[DAT_104c0364].matrix.GetTranslation());
             float height = AbsFloat(other.z - player.z);
             float distance = (other - player).Length2D();
             if (height < 15.0f && distance < 125.0f)
@@ -48,7 +48,7 @@ extern "C" int FUN_100ba040(void)
         {
             if (DAT_10daab84[i].m_0000 != 0x140)
                 continue;
-            other.Copy(DAT_10db6ed8[i].matrix.GetTranslation());
+            other.Copy(DAT_10db6ee8[i].matrix.GetTranslation());
             float height = AbsFloat(other.z - player.z);
             float distance = (other - player).Length2D();
             if (height < 25.0f && distance < 125.0f)
@@ -63,7 +63,7 @@ extern "C" int FUN_100ba040(void)
         if (DAT_104c0364 != i)
         {
             DAT_104c0364 = i;
-            int voice = DAT_10210fc4[DAT_10db6ed8[i].m_0280 * 0x10 + DAT_1020b430[i].m_0004[1]][0] % 10000;
+            int voice = DAT_10210fc4[DAT_10db6ee8[i].switchNode * 0x10 + DAT_1020b430[i].m_0004[1]][0] % 10000;
             if (voice > 5000)
                 voice -= 10000;
             DAT_104c0368 = voice;

@@ -5,6 +5,7 @@
 #include <string.h>
 #include "texture_load.h"
 #include "world.h"
+#include "anim_model.h"
 
 // Loads ITI texture `name` from the data folder (the ITI branch of LoadTexture, texture_load.h).
 inline int LoadIti(const char *name)
@@ -49,10 +50,10 @@ extern "C" int FUN_1000f360(int index, int frame)
         strcpy(name, DAT_1087664c[0].names[frame]);
         name[2] = '1';
         name[3] = '4';
-        DAT_10db6ed8[index].model.M_10161a20(LoadIti(name));
+        DAT_10db6ee8[index].M_10161a20(LoadIti(name));
     }
     else
-        DAT_10db6ed8[index].model.M_10161a20(LoadIti(DAT_1087664c[index].names[frame]));
+        DAT_10db6ee8[index].M_10161a20(LoadIti(DAT_1087664c[index].names[frame]));
     int next = DAT_1087664c[DAT_10daaaec[index].faceSet].next[frame];
     if (next == frame)
         DAT_1030c278[index] = 0;

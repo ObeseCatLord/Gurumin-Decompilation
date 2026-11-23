@@ -24,15 +24,7 @@ struct DamageZone
 
 #include "vec3.h"
 
-// A character record (world.h Character), only the fields used here.
-struct Character
-{
-    char pad_0000[0x280];
-    int zone;                     // 0x280: the zone a zone character runs
-    char pad_0284[0x20e4];
-    Vec3 position;                // 0x2368: the matrix translation
-    char pad_2374[0x128];
-};
+#include "anim_model.h"
 
 // The saved position of each character slot (16 bytes per slot).
 struct SavedPosition
@@ -62,7 +54,6 @@ struct ZoneState
     char pad_0004[0x3c];
 };
 
-extern "C" Character DAT_10db6ed8[0x80];
 extern "C" DamageZone DAT_10210fc0[];
 extern "C" ZoneState DAT_1020b430[0x80];
 extern "C" ActorSlot DAT_10daaaec[0x80];
@@ -78,7 +69,7 @@ extern "C" int FUN_100119d0(int index, int damage, int a);   // shows the damage
 // character allows that) lose `damage` health. Returns 0.
 extern "C" int FUN_1002ebf0(int index)
 {
-    int zone = DAT_10db6ed8[index].zone;
+    int zone = DAT_10db6ee8[index].zone;
     if (DAT_10210fc0[zone].onFlag != 0)
     {
         int offFlag = DAT_10210fc0[zone].offFlag;
@@ -101,13 +92,13 @@ extern "C" int FUN_1002ebf0(int index)
         DAT_1020b430[index].turn = 0;
     for (int slot = DAT_1020b430[index].turn + 0x3a; slot < 0x5c; slot += __max(1, step))
     {
-        if ((DAT_10db6ed8[slot].position.x > DAT_10210fc0[zone].left &&
-             DAT_10db6ed8[slot].position.x < DAT_10210fc0[zone].right &&
-             DAT_10db6ed8[slot].position.y > DAT_10210fc0[zone].front &&
-             DAT_10db6ed8[slot].position.y < DAT_10210fc0[zone].back &&
-             DAT_10db6ed8[slot].position.z > DAT_10210fc0[zone].bottom &&
-             DAT_10db6ed8[slot].position.z < DAT_10210fc0[zone].top) ||
-            (DAT_10210d30[slot] == 0 && DAT_1020d540[index] != 0 && DAT_10db6ed8[slot].position.x < -20000.0f &&
+        if ((DAT_10db6ee8[slot].matrix.translation.x > DAT_10210fc0[zone].left &&
+             DAT_10db6ee8[slot].matrix.translation.x < DAT_10210fc0[zone].right &&
+             DAT_10db6ee8[slot].matrix.translation.y > DAT_10210fc0[zone].front &&
+             DAT_10db6ee8[slot].matrix.translation.y < DAT_10210fc0[zone].back &&
+             DAT_10db6ee8[slot].matrix.translation.z > DAT_10210fc0[zone].bottom &&
+             DAT_10db6ee8[slot].matrix.translation.z < DAT_10210fc0[zone].top) ||
+            (DAT_10210d30[slot] == 0 && DAT_1020d540[index] != 0 && DAT_10db6ee8[slot].matrix.translation.x < -20000.0f &&
              DAT_10867e18[slot].x > DAT_10210fc0[zone].left && DAT_10867e18[slot].x < DAT_10210fc0[zone].right &&
              DAT_10867e18[slot].y > DAT_10210fc0[zone].front && DAT_10867e18[slot].y < DAT_10210fc0[zone].back &&
              DAT_10867e18[slot].z > DAT_10210fc0[zone].bottom && DAT_10867e18[slot].z < DAT_10210fc0[zone].top))

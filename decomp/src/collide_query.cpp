@@ -4,6 +4,7 @@
 #include "vec4.h"
 
 #include "matrix4.h"
+#include "anim_model.h"
 
 struct CollisionWorld
 {
@@ -129,7 +130,7 @@ extern "C" int FUN_1001a450(int slot, const Vec4 *point)
         high.Copy(low);
         high.z += 50.0f;
         low.z -= 300.0f;
-        DAT_11b002c0 = (int)DAT_10db6ed8[slot].nearCells;
+        DAT_11b002c0 = (int)DAT_10db6ee8[slot].nearCells;
         if (DAT_10255f08 != 0 && DAT_10255f08->CastSegment(0, 0x4000000, &low, &high, &hit, 0) != 0)
         {
             DAT_10864cf8[slot].Copy(hit);
@@ -143,8 +144,6 @@ extern "C" int FUN_1001a450(int slot, const Vec4 *point)
     }
     return DAT_10467920[slot] != 0;
 }
-
-
 
 // 0x100242c0 (Char_ProbeAhead). Casts a ray from character `index` (from its "Bip01 Head" node when `fromHead` is
 // set, or its position when it has none; from its position otherwise), moved by `offset` when given, to the point
@@ -161,24 +160,24 @@ extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, 
     hit.x = -200000.0f;
     if (fromHead != 0)
     {
-        Node *head = DAT_10db6ed8[index].m_22fc->Find("Bip01 Head", 0);
+        Node *head = DAT_10db6ee8[index].root->Find("Bip01 Head", 0);
         if (head != 0)
             from.Copy(head->worldMatrix.GetTranslation());
         else
-            from.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+            from.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     }
     else
     {
-        from.x = DAT_10db6ed8[index].matrix._41;
-        from.y = DAT_10db6ed8[index].matrix._42;
-        from.z = DAT_10db6ed8[index].matrix._43;
-        from.w = DAT_10db6ed8[index].matrix.m[15];
+        from.x = DAT_10db6ee8[index].matrix._41;
+        from.y = DAT_10db6ee8[index].matrix._42;
+        from.z = DAT_10db6ee8[index].matrix._43;
+        from.w = DAT_10db6ee8[index].matrix.m[15];
     }
     if (offset != 0)
         from.Copy(from + *offset);
     to.Fill(0);
     to.y -= depth;
-    to.RotateZ(-DAT_10db6ed8[index].heading);
+    to.RotateZ(-DAT_10db6ee8[index].heading);
     to.Copy(to + from);
     if (testOnly != 0)
     {
@@ -208,18 +207,18 @@ extern "C" int FUN_100244b0(int index, float angle, Vec4 *ground, float depth, i
     hit.x = -200000.0f;
     if (fromHead != 0)
     {
-        Node *head = DAT_10db6ed8[index].m_22fc->Find("Bip01 Head", 0);
+        Node *head = DAT_10db6ee8[index].root->Find("Bip01 Head", 0);
         if (head != 0)
             from.Copy(head->worldMatrix.GetTranslation());
         else
-            from.Copy(DAT_10db6ed8[index].matrix.GetTranslation());
+            from.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     }
     else
     {
-        from.x = DAT_10db6ed8[index].matrix._41;
-        from.y = DAT_10db6ed8[index].matrix._42;
-        from.z = DAT_10db6ed8[index].matrix._43;
-        from.w = DAT_10db6ed8[index].matrix.m[15];
+        from.x = DAT_10db6ee8[index].matrix._41;
+        from.y = DAT_10db6ee8[index].matrix._42;
+        from.z = DAT_10db6ee8[index].matrix._43;
+        from.w = DAT_10db6ee8[index].matrix.m[15];
     }
     if (offset != 0)
         from.Copy(from + *offset);
@@ -257,16 +256,16 @@ extern "C" int FUN_10024750(int index, Vec4 *ground, float depth, int fromHead, 
     hit.Fill(zero);
     int mask = smallObjects != 0 ? 4 : 0x4000000;
     hit.x = -200000.0f;
-    if (fromHead != 0 && DAT_10db6ed8[index].headNode != 0)
+    if (fromHead != 0 && DAT_10db6ee8[index].headNode != 0)
     {
-        from.Copy(DAT_10db6ed8[index].headNode->worldMatrix.GetTranslation());
+        from.Copy(DAT_10db6ee8[index].headNode->worldMatrix.GetTranslation());
     }
     else
     {
-        from.x = DAT_10db6ed8[index].matrix._41;
-        from.y = DAT_10db6ed8[index].matrix._42;
-        from.z = DAT_10db6ed8[index].matrix._43;
-        from.w = DAT_10db6ed8[index].matrix.m[15];
+        from.x = DAT_10db6ee8[index].matrix._41;
+        from.y = DAT_10db6ee8[index].matrix._42;
+        from.z = DAT_10db6ee8[index].matrix._43;
+        from.w = DAT_10db6ee8[index].matrix.m[15];
         if (fromHead != 0)
             from.z += 30.0f;
     }

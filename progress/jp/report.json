@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.6579,
+  "fuzzy_match_percent": 14.6582,
   "total_code": "1720206",
   "matched_code": "199043",
   "matched_code_percent": 11.5709,
@@ -11219,7 +11219,7 @@
   {
    "name": "app/pushing_platform",
    "measures": {
-    "fuzzy_match_percent": 81.9767,
+    "fuzzy_match_percent": 82.8488,
     "total_code": "685",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -11240,14 +11240,14 @@
     {
      "name": ".text",
      "size": "685",
-     "fuzzy_match_percent": 81.9767
+     "fuzzy_match_percent": 82.8488
     }
    ],
    "functions": [
     {
      "name": "_FUN_1002a490",
      "size": "685",
-     "fuzzy_match_percent": 81.9767,
+     "fuzzy_match_percent": 82.8488,
      "metadata": {
       "virtual_address": "268608656"
      }

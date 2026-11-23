@@ -1,4 +1,4 @@
-// SmallRecord, EmptyObject, GameObject: declared here once (first used by src/game_reset.cpp).
+// SmallRecord, EmptyObject: declared here once (first used by src/game_reset.cpp).
 #ifndef GURUMIN_GAME_RESET_H
 #define GURUMIN_GAME_RESET_H
 
@@ -15,11 +15,6 @@ struct EmptyObject
 {
     void M_1013edb0();                           // 0x1013edb0 (an empty method)
     void M_1013ef00();                           // 0x1013ef00
-};
-struct GameObject
-{
-    void M_100082e0();                           // 0x100082e0
-    void M_10007f20();                           // 0x10007f20 (Game::M_10007f20)
 };
 
 #endif

@@ -17,6 +17,8 @@
 Matrix4 IdentityMatrix();                        // 0x101b0ba0
 
 #include "game_reset.h"
+#include "message_text.h"
+#include "game.h"
 
 #include "node.h"
 
@@ -39,13 +41,7 @@ Matrix4 IdentityMatrix();                        // 0x101b0ba0
 #include "sound_vars.h"
 #include "ui_vars.h"
 #include "world.h"
-extern "C" int DAT_10219c40[0x40];
-extern "C" int DAT_10219fc0[0x40];
-extern "C" int DAT_10255b08[0x40];
-extern "C" int DAT_1030bbf8[0x40];
-extern "C" int DAT_1042e0a8[0x40];
-extern "C" int DAT_10453208[0x4000];
-extern "C" GameObject DAT_104b7200;
+#include "switch_slots.h"
 #include "win_vars.h"
 
 extern "C" int FUN_10001b40(void);               // SoundArc_Message221
@@ -639,16 +635,17 @@ extern "C" void FUN_1003e710(void)
     DAT_10802bf8[i].step.Fill(0.0f);
   }
   memset(DAT_1020b430, 0, sizeof(DAT_1020b430));
-  memset(DAT_10453208, 0, sizeof(DAT_10453208));
+  memset(DAT_10453208, 0, MESSAGE_TEXT_CLEARED_BYTES);
   memset(DAT_1021bbc0, 0, sizeof(DAT_1021bbc0));
   memset(DAT_1032d5b8, 0, sizeof(DAT_1032d5b8));
   memset(DAT_103150c0, 0, sizeof(DAT_103150c0));
   memset(DAT_1042de28, 0, sizeof(DAT_1042de28));
-  memset(DAT_10219fc0, 0, sizeof(DAT_10219fc0));
-  memset(DAT_10219c40, 0, sizeof(DAT_10219c40));
-  memset(DAT_1042e0a8, 0, sizeof(DAT_1042e0a8));
-  memset(DAT_10255b08, 0, sizeof(DAT_10255b08));
-  memset(DAT_1030bbf8, 0, sizeof(DAT_1030bbf8));
+  // Only the first SWITCH_HOLD_SLOTS_CLEARED hold slots are cleared (see switch_slots.h).
+  memset(DAT_10219fc0, 0, SWITCH_HOLD_SLOTS_CLEARED * sizeof(DAT_10219fc0[0]));
+  memset(DAT_10219c40, 0, SWITCH_HOLD_SLOTS_CLEARED * sizeof(DAT_10219c40[0]));
+  memset(DAT_1042e0a8, 0, SWITCH_HOLD_SLOTS_CLEARED * sizeof(DAT_1042e0a8[0]));
+  memset(DAT_10255b08, 0, SWITCH_HOLD_SLOTS_CLEARED * sizeof(DAT_10255b08[0]));
+  memset(DAT_1030bbf8, 0, SWITCH_HOLD_SLOTS_CLEARED * sizeof(DAT_1030bbf8[0]));
   DAT_1032d6a0 = 0;
   DAT_1030c478 = 0;
   DAT_1030c479 = 0;

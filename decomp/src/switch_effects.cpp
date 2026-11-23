@@ -10,10 +10,7 @@
 
 #include "switch_object.h"
 
-extern "C" SwitchObject *DAT_1030bbf8[0x80];     // object of each used hold slot (0 = unused)
-extern "C" int DAT_10255b08[0x80];               // holder of each slot
-extern "C" int DAT_10219fc0[0x80];               // effect kind of each slot (0, 1 or 2)
-extern "C" int DAT_1042e0a8[0x80];               // 1 once the slot's effect was started
+#include "switch_slots.h"
 #include "char_vars.h"
 
 extern "C" int FUN_10015860(Vec4 position);      // Vis_IsVisible

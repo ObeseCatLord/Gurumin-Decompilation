@@ -8,7 +8,6 @@
 #include "char_slot.h"
 #include "game_vars.h"
 
-extern "C" MessageText DAT_10453208[0x7c];
 #include "char_vars.h"
 
 extern "C" int FUN_1003ad20(int sound, const void *position, float volume);

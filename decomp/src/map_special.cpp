@@ -7,16 +7,10 @@
 
 #include "effect_manager.h"
 
-// Map object that raises script events (switches.cpp MapObject).
-struct MapObject
-{
-    int RaiseEvent(int id);                     // 0x100020d0
-};
-
+#include "game.h"
 #include "char_vars.h"
 #include "map_vars.h"
 
-extern "C" MapObject DAT_10874848;
 extern "C" void FUN_1007dab0(void);
 extern "C" void FUN_10053020(void);
 extern "C" void FUN_100524d0(void);
@@ -48,7 +42,7 @@ int Map_UpdateSpecial()
     if (DAT_10c6505c == 0)
     {
         DAT_10c6505c = -1;
-        DAT_10874848.RaiseEvent(0x1bc);
+        DAT_10874848.RegisterEvent(0x1bc);
     }
     if (DAT_10c6505c < 0)
     {

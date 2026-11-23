@@ -154,6 +154,7 @@ struct Game : Object
     ~Game();
     int FindSlot(int id);
     void M_10007f20();
+    void M_100082e0();          // 0x100082e0: clears the three window slots' entry tables (Game_Reset)
     int LoadMenuTextures(FontRenderer *renderer);
     // Tests script flag `index` (4000 flags in m_3ee694, saved with the game). A negative index tests that the
     // flag is clear. Flag 0 is always set; out-of-range indexes read as clear (or as set for the negated test).

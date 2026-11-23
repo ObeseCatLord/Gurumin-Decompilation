@@ -13,16 +13,10 @@
 #include "ui_vars.h"
 
 // A map object record, 0x44 bytes: three blocks of its own.
-struct MapObject
-{
-    void *data[3];
-    char pad_000c[0x38];
-};
-
 #include "char_state.h"
 
 #include "engine_memory.h"
-extern "C" MapObject *DAT_104c03c0;
+#include "region_view.h"
 #include "camera_vars.h"
 #include "char_tables.h"
 #include "map_vars.h"
@@ -42,12 +36,12 @@ extern "C" void FUN_10023d30(void)
     {
         for (i = 0; i < DAT_102564a0; i++)
         {
-            DAT_11b1ba40(DAT_104c03c0[i].data[0]);
-            DAT_11b1ba40(DAT_104c03c0[i].data[2]);
-            DAT_11b1ba40(DAT_104c03c0[i].data[1]);
-            DAT_104c03c0[i].data[0] = 0;
-            DAT_104c03c0[i].data[2] = 0;
-            DAT_104c03c0[i].data[1] = 0;
+            DAT_11b1ba40(DAT_104c03c0[i].vertices);
+            DAT_11b1ba40(DAT_104c03c0[i].points);
+            DAT_11b1ba40(DAT_104c03c0[i].buffer0004);
+            DAT_104c03c0[i].vertices = 0;
+            DAT_104c03c0[i].points = 0;
+            DAT_104c03c0[i].buffer0004 = 0;
         }
         DAT_11b1ba40(DAT_104c03c0);
         DAT_104c03c0 = 0;

@@ -24,7 +24,7 @@ struct RegionPoint
 struct MapRegion
 {
     RegionVertex *vertices;   // 0x00
-    int pad_0004;
+    void *buffer0004;         // 0x04: a third buffer of the region, freed with the others (map_unload.cpp)
     RegionPoint *points;      // 0x08
     char pad_000c[8];
     Vec4 min;                 // 0x14: box corner with the smallest coordinates
@@ -33,5 +33,8 @@ struct MapRegion
     int hidden;               // 0x38: non-zero = never visible
     char pad_003c[8];
 };
+
+// The current map's regions (DAT_102564a0 of them), allocated by the map loader; 0 when no map is loaded.
+extern "C" MapRegion *DAT_104c03c0;
 
 #endif

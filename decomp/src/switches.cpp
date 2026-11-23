@@ -7,16 +7,8 @@
 #include "char_state.h"
 #include "char_slot.h"
 
-// Map object (0x10874848) that animates the switch nodes ("LEVERON" and its off state).
-struct MapObject
-{
-    int M_10054f30(int node, int on);
-    int M_10055110(int id, int on);   // switches the map gimmick with `id` on or off
-};
-
-extern "C" MapObject DAT_10874848;
-extern "C" int DAT_1030bbf8[0x80];       // the held object of each slot (non-zero while used, switch_effects.cpp)
-extern "C" int DAT_10255b08[0x80];       // holder of each slot
+#include "game.h"
+#include "switch_slots.h"
 #include "char_tables.h"
 #include "char_vars.h"
 #include "game_vars.h"
@@ -33,7 +25,7 @@ extern "C" int FUN_10057b90(int holder)
             if (who < 0x80)
             {
                 DAT_10daaae8[who].switchesHeld--;
-                DAT_10874848.M_10054f30(DAT_10db6ee8[who].switchNode, 0);
+                DAT_10874848.RaiseLeverEvents(DAT_10db6ee8[who].switchNode, 0);
             }
             else if (DAT_10254838[who % 0x80] >= 1000)
                 DAT_10254838[who % 0x80] -= 1000;
@@ -56,7 +48,7 @@ extern "C" int FUN_1005f530(int slot)
         DAT_1020b128[slot] = 1;
         if (flag <= 3999 && flag != 0)
             DAT_10c62edc[flag] = 1;
-        DAT_10874848.M_10055110(DAT_10219ec0[slot], 1);
+        DAT_10874848.RaiseDoorEvents(DAT_10219ec0[slot], 1);
         if (DAT_104bfe6c == 0)
             FUN_1003ad20(0x38a, &DAT_10db6ee8[slot].matrix.GetTranslation(), 1.0f);
     }
@@ -66,7 +58,7 @@ extern "C" int FUN_1005f530(int slot)
         DAT_1020b128[slot] = 0x1f;
         if (flag <= 3999 && flag != 0)
             DAT_10c62edc[flag] = 1;
-        DAT_10874848.M_10055110(DAT_10219ec0[slot], 0);
+        DAT_10874848.RaiseDoorEvents(DAT_10219ec0[slot], 0);
         if (DAT_104bfe6c == 0)
             FUN_1003ad20(0x389, &DAT_10db6ee8[slot].matrix.GetTranslation(), 1.0f);
     }
@@ -83,7 +75,7 @@ extern "C" int FUN_1005f640(int slot)
         DAT_1020b128[slot] = 0x3d;
         if (flag <= 3999 && flag != 0)
             DAT_10c62edc[flag] = 0;
-        DAT_10874848.M_10055110(DAT_10219ec0[slot], 1);
+        DAT_10874848.RaiseDoorEvents(DAT_10219ec0[slot], 1);
         if (DAT_104bfe6c == 0)
             FUN_1003ad20(0x38c, &DAT_10db6ee8[slot].matrix.GetTranslation(), 1.0f);
     }
@@ -93,23 +85,20 @@ extern "C" int FUN_1005f640(int slot)
         DAT_1020b128[slot] = 0x5b;
         if (flag <= 3999 && flag != 0)
             DAT_10c62edc[flag] = 0;
-        DAT_10874848.M_10055110(DAT_10219ec0[slot], 0);
+        DAT_10874848.RaiseDoorEvents(DAT_10219ec0[slot], 0);
         if (DAT_104bfe6c == 0)
             FUN_1003ad20(0x38b, &DAT_10db6ee8[slot].matrix.GetTranslation(), 1.0f);
     }
     return 0;
 }
 
-extern "C" int DAT_10219fc0[0x80];       // effect kind of each slot (switch_effects.cpp)
-extern "C" int DAT_1042e0a8[0x80];       // 1 once the slot's effect was started
-extern "C" int DAT_10219c40[0x80];
 
 // 0x10057c40 (Switch_Hold). Lets `holder` (a character slot, or 0x80 + an object index) hold `object` (0 = the
 // holder's own model) with effect kind `kind`: the object must not be held yet and needs a free slot. A character
 // gets hold bit 1 (kinds 0 and 1) or 2 (kind 2) and, for slot kind 0x60, its switch node turned on; an object gets
 // its "held" bonus of 1000. Returns 1, or 0 when the object is already held or no slot is free. (Without an
 // explicit object the original treats slot 0x40 as "none free", a leftover of a smaller table.)
-extern "C" int FUN_10057c40(int holder, int object, int kind)
+extern "C" int FUN_10057c40(int holder, SwitchObject *object, int kind)
 {
     int slot;
     if (object != 0)
@@ -129,7 +118,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
     }
     else
     {
-        object = (int)DAT_10db6ee8[holder].root;
+        object = (SwitchObject *)DAT_10db6ee8[holder].root;
         for (slot = 0; slot < 0x80; slot++)
         {
             if (DAT_1030bbf8[slot] == object)
@@ -151,7 +140,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
         {
             DAT_10daaae8[holder].switchesHeld |= 1;
             if (DAT_1021f3c0[holder] == 0x60)
-                DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
+                DAT_10874848.RaiseLeverEvents(DAT_10db6ee8[holder].switchNode, 1);
         }
         else
             DAT_10254838[holder % 0x80] += 1000;
@@ -162,7 +151,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
         {
             DAT_10daaae8[holder].switchesHeld |= 1;
             if (DAT_1021f3c0[holder] == 0x60)
-                DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
+                DAT_10874848.RaiseLeverEvents(DAT_10db6ee8[holder].switchNode, 1);
         }
         else
             DAT_10254838[holder % 0x80] += 1000;
@@ -173,7 +162,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
         {
             DAT_10daaae8[holder].switchesHeld |= 2;
             if (DAT_1021f3c0[holder] == 0x60)
-                DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
+                DAT_10874848.RaiseLeverEvents(DAT_10db6ee8[holder].switchNode, 1);
         }
         else
             DAT_10254838[holder % 0x80] += 1000;

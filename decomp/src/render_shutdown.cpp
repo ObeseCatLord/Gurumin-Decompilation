@@ -5,13 +5,7 @@
 #include <stdio.h>
 #include "d3d9_min.h"
 
-struct TextureManager
-{
-    int OnLostDevice();   // 0x1014b2a0 (render_reset.cpp Render_OnLostDevice; it does not use `this`)
-    int OnResetDevice();  // 0x1013fbb0 (Render_OnResetDevice)
-    int Shutdown();
-    int PumpAndRecover();
-};
+#include "texture_manager.h"
 
 #define D3DERR_DEVICELOST ((long)0x88760868)
 #define D3DERR_DEVICENOTRESET ((long)0x88760869)

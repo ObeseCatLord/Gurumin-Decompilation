@@ -1,11 +1,6 @@
 // Item table at 0x1088e6b0 (0xc0 bytes per item). type 4 = stackable consumable.
-struct ItemInfo
-{
-    int type;
-    char pad_0004[0xbc];
-};
+#include "item_info.h"
 
-extern "C" ItemInfo DAT_1088e6b0[];
 extern "C" char DAT_103150c0[0x50];
 extern "C" char DAT_1042de28[0x50];
 extern "C" int FUN_1000e810(void);

@@ -6,20 +6,7 @@
 
 // Save game helpers (gdataNN.sav in the save folder).
 
-// File wrapper from the engine library (0x101b2xxx): constructor 0x101ad9e0 clears the handle, destructor 0x101b2570
-// closes it. 0x28 bytes: the size comes from Save_LoadSlot's stack frame.
-struct GameFile
-{
-    FILE *handle;
-    char name[0x24];  // base name of the open file (Path_GetBaseName 0x10161120)
-    GameFile();
-    ~GameFile();
-    int Open(const char *path, const char *mode);    // 0x101b2310
-    void Close();                                    // 0x101b22f0
-    int Size();                                      // 0x101b2370
-    int Seek(int offset, int origin);                // 0x101b2380
-    int Read(void *buffer, int size, int count);     // 0x101b23a0
-};
+#include "game_file.h"
 
 #include "vec4.h"
 

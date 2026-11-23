@@ -24,17 +24,7 @@
 
 
 
-struct ItemInfo
-
-{
-
-    int type;                     // 1 = equipment with a level and abilities
-
-    int levelFlag;                // 0x04: script flag holding the item's level (minus 3205)
-
-    char pad_0008[0xb8];
-
-};
+#include "item_info.h"
 
 
 
@@ -52,7 +42,6 @@ struct TextRenderer
 
 
 
-extern "C" ItemInfo DAT_1088e6b0[];
 
 extern "C" TextRenderer DAT_1020e538;
 

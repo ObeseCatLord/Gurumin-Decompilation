@@ -4,15 +4,8 @@
 #include "texture_object.h"
 
 // Item table at 0x1088e6b0, 0xc0 bytes per item; `icon` indexes the 8x8 icon sheet texIcon01.
-struct ItemInfo
-{
-    int type;
-    char pad_0004[0x14];
-    int icon;
-    char pad_001c[0xa4];
-};
+#include "item_info.h"
 
-extern "C" ItemInfo DAT_1088e6b0[];
 #include "ui_vars.h"
 
 // Draws the icon of the item in inventory slot `slot` as a 16x16 sprite at (x, y), insetting the UVs by 0.002

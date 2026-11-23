@@ -2,14 +2,8 @@
 // plus 3205), and the level picks a bit mask for the face meshes (FUN_100154c0 stores it in DAT_104c02c8).
 
 // Item table entry (inventory.cpp ItemInfo).
-struct ItemInfo
-{
-    int type;
-    int levelFlag;            // 0x04: script flag holding the item's level (minus 3205)
-    char pad_0008[0xb8];
-};
+#include "item_info.h"
 
-extern "C" ItemInfo DAT_1088e6b0[];
 #include "game_vars.h"
 
 // Script flag `index` (as Game::TestScriptFlag does it): a negative index tests that the flag is clear, flag 0 is

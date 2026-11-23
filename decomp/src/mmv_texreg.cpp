@@ -335,19 +335,7 @@ void MmvPlayer::DecodeFrameRle(int count)
     }
 }
 
-// The engine's file object (save_slot.cpp GameFile, 0x28 bytes).
-struct GameFile
-{
-    void *handle;
-    char name[0x24];
-    GameFile();                                    // 0x101ad9e0
-    ~GameFile();                                   // 0x101b2570
-    void *Open(const char *path, const char *mode);    // 0x101b2310: the stdio handle, 0 on failure
-    void Close();                                  // 0x101b22f0
-    int Size();                                    // 0x101b2370
-    int Seek(int offset, int origin);              // 0x101b2380
-    int Read(void *buffer, int size, int count);   // 0x101b23a0
-};
+#include "game_file.h"
 extern "C" int FUN_10161120(char *out, const char *path);       // Path_GetBaseName
 
 // 0x10160a90 (MmvPlayer::Open). Loads movie `path` (looked for as .in\<base name>.MMV first) whole into memory:

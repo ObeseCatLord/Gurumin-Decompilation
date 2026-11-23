@@ -106,17 +106,7 @@ int FontRenderer::TextWidth(const char *text, float scale)
 
 #include <stdio.h>
 
-// The engine's file object (save_slot.cpp GameFile).
-struct GameFile
-{
-    FILE *handle;
-    char name[0x24];
-    GameFile();                                      // 0x101ad9e0
-    ~GameFile();                                     // 0x101b2570
-    FILE *Open(const char *path, const char *mode);  // 0x101b2310: the opened file, 0 on failure
-    void Close();                                    // 0x101b22f0
-    int Read(void *buffer, int size, int count);     // 0x101b23a0
-};
+#include "game_file.h"
 
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
 #include "engine_memory.h"

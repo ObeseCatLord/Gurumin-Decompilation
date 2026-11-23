@@ -4,16 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// File wrapper from the engine library (save_slot.cpp): constructor 0x101ad9e0, destructor 0x101b2570 closes it.
-struct GameFile
-{
-    FILE *handle;
-    char name[0x24];
-    GameFile();
-    ~GameFile();
-    FILE *Open(const char *path, const char *mode);  // 0x101b2310: the stdio handle, 0 on failure
-    void Close();                                  // 0x101b22f0
-};
+#include "game_file.h"
 
 #include "node.h"
 

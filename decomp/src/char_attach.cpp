@@ -12,13 +12,8 @@ extern "C" int FUN_100121e0(int index);  // Char_ReloadModel (app_0010.cpp)
 extern "C" int FUN_10014d30(int item);   // the face settings of a helmet item
 
 // Item table entry (inventory.cpp ItemInfo).
-struct ItemInfo
-{
-    int type;                 // 1 = helmet
-    char pad_0004[0xbc];
-};
+#include "item_info.h"
 
-extern "C" ItemInfo DAT_1088e6b0[];
 #include "char_vars.h"
 
 

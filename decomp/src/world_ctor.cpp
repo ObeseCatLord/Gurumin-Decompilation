@@ -11,19 +11,7 @@
 
 #include "key_track.h"
 
-// The engine's file object (save_slot.cpp GameFile).
-struct GameFile
-{
-    FILE *handle;
-    char name[0x24];
-    GameFile();                                      // 0x101ad9e0
-    ~GameFile();                                     // 0x101b2570
-    int Open(const char *path, const char *mode);    // 0x101b2310
-    void Close();                                    // 0x101b22f0
-    int Size();                                      // 0x101b2370
-    int Seek(int offset, int origin);                // 0x101b2380
-    int Read(void *buffer, int size, int count);     // 0x101b23a0
-};
+#include "game_file.h"
 
 // A scene node (scene_node.cpp), 0x18a0 bytes.
 struct WorldNode
@@ -395,7 +383,7 @@ int WorldRenderer::LoadCharacter(const char *path)
     char itmPath[0x104];
     strcpy(itmPath, path);
     strcpy(&itmPath[strlen(itmPath) - 3], "itm");
-    int opened = file.Open(itmPath, "rb");
+    FILE *opened = file.Open(itmPath, "rb");
     if (opened != 0)
     {
         char baseName[0x100];

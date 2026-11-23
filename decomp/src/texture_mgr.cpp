@@ -2,14 +2,7 @@
 
 #include "texture_object.h"
 
-struct TextureManager
-{
-    int M_10173480();
-    int M_101734d0();
-    int M_10173510();
-    void M_1015c730();  // Shutdown (render_shutdown.cpp)
-    void M_10175e70();
-};
+#include "texture_manager.h"
 
 #include "texture_mgr.h"
 
@@ -99,11 +92,11 @@ int TextureManager::M_10173510()
     return 1;
 }
 
-// Unloads all textures and shuts the renderer down (M_1015c730 = TextureManager::Shutdown, render_shutdown.cpp).
+// Unloads all textures and shuts the renderer down (Shutdown, render_shutdown.cpp).
 void TextureManager::M_10175e70()
 {
     M_10173480();
-    M_1015c730();
+    Shutdown();
 }
 
 // Returns the playback's current frame, creating the playback object on first use.

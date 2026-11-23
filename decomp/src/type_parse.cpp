@@ -27,16 +27,7 @@ char ListBank::ReadType(char **text)
     return 0;
 }
 
-struct GameFile
-{
-    FILE *handle;
-    char name[0x24];
-    GameFile();
-    ~GameFile();
-    int Open(const char *path, const char *mode);
-    int Read(void *buffer, int size, int count);
-    void Close();
-};
+#include "game_file.h"
 
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 

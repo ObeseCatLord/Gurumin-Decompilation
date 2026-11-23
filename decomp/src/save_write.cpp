@@ -7,17 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// The engine's file object (save_slot.cpp GameFile).
-struct GameFile
-{
-    FILE *handle;
-    char name[0x24];
-    GameFile();                                      // 0x101ad9e0
-    ~GameFile();                                     // 0x101b2570
-    int Open(const char *path, const char *mode);    // 0x101b2310
-    void Close();                                    // 0x101b22f0
-    int Write(const void *buffer, int size, int count);   // 0x101b2420
-};
+#include "game_file.h"
 
 #include "texture_object.h"
 #include "char_slot.h"

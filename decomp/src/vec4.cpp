@@ -539,3 +539,115 @@ void Vec4::Mirror(const Vec4 &normal)
     RotateZ(pitch);
     RotateZ(roll);
 }
+
+// Cubic Hermite interpolation between `b` (t = 0) and `c` (t = 1) with neighbours `a` and `d`. The tangents are
+// (b - a) / 2 + (c - b) at b and (c - b) / 2 + (d - c) at c (not the usual Catmull-Rom halves of both differences).
+// Not byte-identical yet: cl 13.00 rewrites t3 * -2 as -(t3 + t3) and shares it with the b term (see open.tsv).
+// The original is probably a member (this unused): every caller (the four Sample functions 0x101af4c0..0x101b0240)
+// loads ecx with its own key container first. Declaring it in KeyBank changes cl 13.00's output for the unrelated
+// FUN_100b4f00 (char_move.cpp), so it stays a free function until that is understood. It sits in this file so the
+// callers here know it leaves edx alone.
+float __stdcall Spline(float t, float a, float b, float c, float d)
+{
+    float bc = c - b;
+    float tangentB = (b - a) * 0.5f + bc;
+    float tangentC = (d - c) + bc * 0.5f;
+    float t2 = t * t;
+    float t3 = t2 * t;
+    float t2x3 = t2 * 3.0f;
+    return (t3 - (t2 + t2) + t) * tangentB + (t3 + t3 - t2x3 + 1.0f) * b + (t3 * -2.0f + t2x3) * c +
+           (t3 - t2) * tangentC;
+}
+
+Vec4 Slerp(const Vec4 &a, const Vec4 &b, float t);    // 0x101aeae0 (vec_math.cpp)
+
+// Key indices clamped to the bank: not before the first key, not past the last key (`last` = count - 1).
+#define AT_LEAST_FIRST(index) ((index) < 0 ? 0 : (index))
+#define AT_MOST_LAST(index, last) ((index) > (last) ? (last) : (index))
+
+// The value of the bank at `frame`, written to x/y/z/w. A key exactly at `frame` is copied (returns 2). Before the
+// first key and past the last key the first/last value is held. Between two keys: with `rotation` set the values are
+// quaternions blended with Slerp; otherwise the later key's flags choose: KEY_FLAG_HOLD keeps the earlier value,
+// KEY_FLAG_MOTION (linear) interpolates in a straight line, and anything else follows a Spline through the two
+// keys and their outer neighbours (clamped to the bank). Returns 1 unless a key sat exactly at `frame`.
+// Called by the motion channels, effect models, camera paths and the world's tables.
+int KeyBank::Sample(int frame, float *x, float *y, float *z, float *w, int rotation)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if (frames[i] == frame)
+        {
+            *x = values[i].x;
+            *y = values[i].y;
+            *z = values[i].z;
+            *w = values[i].w;
+            return 2;
+        }
+        if (frames[i] > frame)
+            break;
+    }
+    if (i == 0)
+    {
+        *x = values[0].x;
+        *y = values[0].y;
+        *z = values[0].z;
+        *w = values[0].w;
+        return 1;
+    }
+    if (i == count)
+    {
+        *x = values[i - 1].x;
+        *y = values[i - 1].y;
+        *z = values[i - 1].z;
+        *w = values[i - 1].w;
+        return 1;
+    }
+
+    // Between key i - 1 and key i.
+    int span = frames[i] - frames[i - 1];
+    int offset = frame - frames[i - 1];
+    if (rotation != 0)
+    {
+        Vec4 blended;
+        blended.Copy(Slerp(values[i - 1], values[i], (float)offset / (float)span));
+        *x = blended.x;
+        *y = blended.y;
+        *z = blended.z;
+        *w = blended.w;
+        return 1;
+    }
+
+    unsigned int keyFlags = flags[AT_LEAST_FIRST(i)];
+    int linear = (keyFlags >> 2) & 1;     // KEY_FLAG_MOTION
+    if (keyFlags & KEY_FLAG_HOLD)
+    {
+        *x = values[i - 1].x;
+        *y = values[i - 1].y;
+        *z = values[i - 1].z;
+        *w = values[i - 1].w;
+        return 1;
+    }
+    if (linear)
+    {
+        float along = (float)offset;
+        float length = (float)span;
+        *x = (values[i].x - values[i - 1].x) * along / length + values[i - 1].x;
+        *y = (values[i].y - values[i - 1].y) * along / length + values[i - 1].y;
+        *z = (values[i].z - values[i - 1].z) * along / length + values[i - 1].z;
+        *w = (values[i].w - values[i - 1].w) * along / length + values[i - 1].w;
+        return 1;
+    }
+
+    // Spline through keys i - 2 .. i + 1, clamped to the first and last key.
+    float t = (float)offset / (float)span;
+    *x = Spline(t, values[AT_LEAST_FIRST(i - 2)].x, values[AT_LEAST_FIRST(i - 1)].x, values[AT_MOST_LAST(i, count - 1)].x,
+                values[AT_MOST_LAST(i + 1, count - 1)].x);
+    *y = Spline(t, values[AT_LEAST_FIRST(i - 2)].y, values[AT_LEAST_FIRST(i - 1)].y, values[AT_MOST_LAST(i, count - 1)].y,
+                values[AT_MOST_LAST(i + 1, count - 1)].y);
+    *z = Spline(t, values[AT_LEAST_FIRST(i - 2)].z, values[AT_LEAST_FIRST(i - 1)].z, values[AT_MOST_LAST(i, count - 1)].z,
+                values[AT_MOST_LAST(i + 1, count - 1)].z);
+    *w = Spline(t, values[AT_LEAST_FIRST(i - 2)].w, values[AT_LEAST_FIRST(i - 1)].w, values[AT_MOST_LAST(i, count - 1)].w,
+                values[AT_MOST_LAST(i + 1, count - 1)].w);
+    return 1;
+}

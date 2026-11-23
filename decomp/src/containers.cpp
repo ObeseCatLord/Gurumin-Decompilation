@@ -455,21 +455,6 @@ int IndexList::ResizeSpans(int newCount)
     return 1;
 }
 
-// Cubic Hermite interpolation between `b` (t = 0) and `c` (t = 1) with neighbours `a` and `d`. The tangents are
-// (b - a) / 2 + (c - b) at b and (c - b) / 2 + (d - c) at c (not the usual Catmull-Rom halves of both differences).
-// Not byte-identical yet: cl 13.00 rewrites t3 * -2 as -(t3 + t3) and shares it with the b term (see open.tsv).
-float __stdcall Spline(float t, float a, float b, float c, float d)
-{
-    float bc = c - b;
-    float tangentB = (b - a) * 0.5f + bc;
-    float tangentC = (d - c) + bc * 0.5f;
-    float t2 = t * t;
-    float t3 = t2 * t;
-    float t2x3 = t2 * 3.0f;
-    return (t3 - (t2 + t2) + t) * tangentB + (t3 + t3 - t2x3 + 1.0f) * b + (t3 * -2.0f + t2x3) * c +
-           (t3 - t2) * tangentC;
-}
-
 // 0x101acfa0. Empties a vertex pack that was allocated without a constructor: no vertices, no count, zero bounds
 // fields (the arrays are not freed).
 void VertexPack::Init()

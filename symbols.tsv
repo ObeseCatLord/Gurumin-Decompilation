@@ -222,7 +222,7 @@ address	name	evidence
 101abb70	Node::CreateChildCopies	named in the decompiled source (decomp/obj_symbols.tsv)
 101727f0	AnimChannels::AnimChannels	named in the decompiled source (decomp/obj_symbols.tsv)
 101728c0	ModelInstance::ModelInstance	named in the decompiled source (decomp/obj_symbols.tsv)
-101af4c0	KeyBank::Sample	named in the decompiled source (decomp/obj_symbols.tsv)
+101af4c0	KeyBank::Sample	value at a frame: exact key, held ends, Slerp for rotations, hold/linear/spline by the key flags (open, decomp/src/vec4.cpp)
 10007fd0	Game::LoadMenuTextures	named in the decompiled source (decomp/obj_symbols.tsv)
 1019ece0	Node::Find	named in the decompiled source (decomp/obj_symbols.tsv)
 101a8e60	Node::Collide	named in the decompiled source (decomp/obj_symbols.tsv)

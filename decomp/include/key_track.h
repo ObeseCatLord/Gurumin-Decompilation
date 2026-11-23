@@ -10,6 +10,8 @@
 
 // Per-key flag: the key is a motion frame key (set on every key by MarkAll).
 #define KEY_FLAG_MOTION 4
+// Per-key flag of a KeyBank: hold the previous key's value up to this key (KeyBank::Sample).
+#define KEY_FLAG_HOLD 0x10
 
 struct KeyTrack
 {

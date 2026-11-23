@@ -76,6 +76,11 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   This is ordinary cl 13.00 behaviour, not /GL. Place such functions after their callee in one file: the Vec4
   operators next to `Vec4()` in vec4.cpp (0x101ac9e0..0x101acbc0), KeyBank's constructor there too (0x101af420),
   Node::M_1019d6a0 after M_1019d680 and Node::M_101a2370 after M_101944d0 in scene_node.cpp.
+  KeyBank::Sample (0x101af4c0) only gets `this` in edx when it is in vec4.cpp after Vec4() and Spline: its Vec4
+  temporary's constructor and the Spline calls must both be known to leave edx alone.
+- **Header declarations can change unrelated code** (2026-11-22): adding a member function declaration to KeyBank
+  (key_track.h) changed cl 13.00's output for FUN_100b4f00 in char_move.cpp, which only includes the header. A
+  `#define` in the same header did not. Run build_all + check_matches after every header change, however small.
 - **/GX (C++ EH) is on in the original**: destructors with EH state frames match byte for byte with `/GX` and nothing regresses, so flags are now `/O2 /Ob1 /Gy /GS /GX`.
 - Functions with an EH frame (`push -1 / push handler / fs:[0]`) must be written with **C++ linkage**: under /GX an `extern \"C\"` function is assumed not to throw and gets no frame. Map the mangled name to the address in `decomp/obj_symbols.tsv`.
 - Another recurring 13.00 habit: when 0 is stored several times it is kept in a callee-saved register (`xor ebx,ebx`); VS2003 stores immediates. Seen in the enemy AI updaters 0x100e2080.. (source otherwise identical).

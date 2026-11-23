@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (158)
+## 1. Walls to retry (159)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -169,6 +169,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101ae950` 249 — QuatFromAxisAngle: 16 bytes; the original keeps cos(half) in the angle slot and spills axis.z into the axis slot, ours the other way round (declaration order tried)
 - [ ] `101aed50` 385 — Vec4::Mirror: the original loads y into eax and x into ecx before the sqrt spill (14 bytes); helper argument order made it worse
 - [ ] `101aeee0` 411 — Vec4::InTriangle: calls and arithmetic identical; the original places the final return 0 before the return 1 block (nested, early-return and ternary forms tried)
+- [ ] `101af4c0` 1182 — KeyBank::Sample (vec4.cpp, after KeyBank::Spline so edx survives the calls): flow, frame and the clamped spline indices line up; the original keeps (keyFlags >> 2) & 1 in eax before the hold test and converts offset/span separately in the linear and spline branches, cl 13.00 here folds the flag into test al,4 and hoists (float)offset above the branch (spline block placed first); switch, mode-variable and hold-variable forms tried
 
 ## 2. Small functions (30-250 bytes) (2)
 
@@ -181,7 +182,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 - [ ] `10192200` 796 bytes (float, loops 2, calls 20)
 
-## 4. Large functions (801-3000 bytes) (146)
+## 4. Large functions (801-3000 bytes) (145)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `100d2110` 894 bytes (float, loops 4, calls 12)
@@ -212,7 +213,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101a82d0` 1153 bytes (float, loops 5, calls 19)
 - [ ] `100ed510` 1160 bytes (float, loops 10, calls 15)
 - [ ] `101af960` 1176 bytes (float, loops 1, calls 7)
-- [ ] `101af4c0` 1182 bytes KeyBank::Sample (float, loops 1, calls 7)
 - [ ] `10011520` 1188 bytes (float, loops 4, calls 8)
 - [ ] `1004d4b0` 1188 bytes (float, loops 3, calls 2)
 - [ ] `10038070` 1195 bytes (float, loops 2, calls 37)

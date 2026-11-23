@@ -14,6 +14,12 @@
 
 struct Node;
 
+// What a motion slot points at: a source that is in use while `busy` is non-zero.
+struct MotionSource
+{
+    int busy;
+};
+
 // Number of motion layers a Playback tracks.
 #define PLAYBACK_LAYER_COUNT 0x90
 // Playback::layer while blending into nextLayer.
@@ -27,7 +33,7 @@ struct Playback
     int m_0000;
     float m_0004;                                  // 0x04: frame position (-1 while blending)
     float m_0008;                                  // 0x08: playback speed (1.0)
-    char m_000c;
+    unsigned char m_000c;
     char pad_000d[3];
     int m_0010;
     int m_0014;
@@ -36,7 +42,7 @@ struct Playback
     int frame;                                     // 0x20: current frame
     int m_0024;
     int m_0028;
-    void *slotSource[16];                          // 0x2c: source of each motion slot (SetSlotSource)
+    MotionSource *slotSource[16];                        // 0x2c: source of each motion slot (SetSlotSource)
     int slotLayer[16];                             // 0x6c: layer of each motion slot (-1 = unused)
     int m_00ac[PLAYBACK_LAYER_COUNT];              // 0xac: 1 while the layer is active
     int m_02ec[PLAYBACK_LAYER_COUNT];              // 0x2ec: first frame
@@ -63,6 +69,7 @@ struct Playback
     int BindNode(Node *node);                                          // 0x1016a090: binds to `node`, resets
     int SetLayer(int layer, int a, int first, int last, int b, int c); // 0x1016a100
     int Play(int layer, int restart, int blendFrames, float speed);    // 0x1016a2e0
+    int Advance();                                                     // 0x1016a480: one frame step
     // Motion-slot setters (mesh_cache.cpp); each returns 0 for an out-of-range layer or slot, else 1.
     int SetSlotSource(void *source, int slot, int layer);              // 0x1016a220: slot's source and layer
     int SetSlotOffset(int layer, int slot, int x, int y);              // 0x1016a260

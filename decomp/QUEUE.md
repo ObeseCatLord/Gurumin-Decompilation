@@ -74,7 +74,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f250` 655 — TutorialBook_Close draft: flow and calls match (LoadTexture inline for the cover); the page loop registers differ (original: first page in edi, second in ebp, name pointer in ebx), like the other TutorialBook functions; declaration orders tried
 - [ ] `1004f4f0` 873 — draft: the last-page test (cmp in each arm, one jle) and register roles (found spills, right page not in a stack slot) differ; the right-page test is nested (three cross-jumped loads)
 - [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
-- [ ] `10050df0` 921 — Char_ProbeSideLedge (ledge_probe.cpp): statements and slots line up (inner block for the ground probe, fabsf); the original falls through from the distance test into the shared *wallDistance = -1 block, cl 13.00 here keeps it at the end and the -200000 marker is stored one instruction later
 - [ ] `10051190` 988 — MapCursor_Step (map_cursor.cpp, rule-clean draft, 1024 vs 988 bytes): register allocation from the start (original: index in edi, slot offset in ebx, rider flag in ecx and two stack slots; ours index in ebp, flag in esi) and the early-test order; held/hold-pointer/reference forms tried; next: the shared rider block written with a goto, then a permuter run
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054770` 506 — Game::MarkKilled: same statements; like RaiseGameOverEvents the original walks the events with two pointers (&flags[1] and &ids[0]) and keeps this in ebp, cl 13.00 here one event pointer and this in ebx (pointer and indexed forms tried)
@@ -154,6 +153,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016a090` 97 — register roles swapped (original: ecx=-1 then eax=0; VS2003: eax=-1, edi=0)
 - [ ] `1016a100` 280 — Playback::SetLayer: the original unrolls both 16-entry fills (zero kept in esi, -2 as immediates) and tests layer <= 0x8f; cl 13.00 here emits rep stosd (flat, nested 4x4, pointer and merged loops tried)
 - [ ] `1016a2e0` 413 — Playback::Play: control flow and stores identical; register allocation differs (original keeps the layer in eax and reuses the zero restart register as the follow-up loop counter; ours the layer in ecx); index-variable forms tried
+- [ ] `1016a480` 1045 — Playback::Advance (playback_advance.cpp, rule-clean draft, 1056 vs 1045 bytes): the original shares two tails (frame = v; m_0004 = (float)frame; m_0bec = m_09ac[layer]) reached by jumps from the hold and reverse paths with the frame in edx; ours keeps separate tails; also a folded sub in the first chain block; next: one frame = target tail with target in a local
 - [ ] `1016b010` 53 — original keeps 1.0f in edx and stores the register; VS2003 stores immediates
 - [ ] `1016b050` 399 — Camera_SelectPath: body identical apart from the camera-target pointer register (eax vs ecx); the original pushes all four registers before the id == -1 test and stores the 0 as an immediate (no shrink-wrapping), cl 13.00 here shrink-wraps the early return; inverted if tried
 - [ ] `1016b400` 695 — Camera_TurnInput: same arithmetic; the original stores the blend weight a second time (integer copy into the slot of the converted frame count) and swaps the two argument loads at the end; frame-count, compound and copy-variable forms tried
@@ -200,13 +200,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (109)
+## 4. Large functions (801-3000 bytes) (106)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `1000c720` 1032 bytes (float, loops 2, calls 22)
-- [ ] `1000e340` 1035 bytes (float, loops 1, calls 23)
-- [ ] `100509e0` 1035 bytes (float, calls 36)
-- [ ] `1016a480` 1045 bytes (float, loops 3, calls 6)
 - [ ] `1014fdd0` 1048 bytes (float, loops 3, calls 9)
 - [ ] `1014f900` 1070 bytes (float, loops 6, calls 12)
 - [ ] `101afe00` 1079 bytes (float, loops 2, calls 7)

@@ -195,7 +195,7 @@ int Playback::SetSlotSource(void *source, int slot, int layer)
     if (source == 0)
         return 0;
     slotLayer[slot] = layer;
-    slotSource[slot] = source;
+    slotSource[slot] = (MotionSource *)source;
     return 1;
 }
 

@@ -4,6 +4,7 @@
 #include "anim_model.h"
 #include "char_state.h"
 #include "char_slot.h"
+#include "char_vars.h"
 
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
@@ -20,7 +21,6 @@ extern "C" int FUN_10016500(int index, const char *path, int start, int end, int
 
 #include "model_path.h"
 
-extern "C" ModelPath DAT_10b314c8[];
 extern "C" int FUN_10012220(int index, int value);
 
 // Reloads the model of every character slot 0..0x5b that is still in the world (slot 0, the player, always)

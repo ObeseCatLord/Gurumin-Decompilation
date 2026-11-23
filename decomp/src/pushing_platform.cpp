@@ -22,8 +22,6 @@
 
 #include "char_vars.h"
 
-extern "C" Vec3 *DAT_1032d5b8[];                 // positions of the characters moved by routes
-extern "C" char DAT_1021bbc0[];
 
 // 0x1002a490 (Block_Update). One frame of block `index`. On the first call it is listed with the moved characters,
 // placed 5000 units up and node state 0x41 is set (masks 0x200 and 0x400). While waiting it drops to z -2000 once

@@ -15,8 +15,8 @@
 #include "camera_point.h"
 
 #include "texture_object.h"
+#include "map_vars.h"
 
-extern "C" Node *DAT_104c03ac;                       // the camera path node
 extern "C" CameraPoint DAT_10210fc4[];
 extern "C" int FUN_10016580(const char *name);       // Movie_PlayToTexture
 extern "C" int FUN_1001e240(void);                   // Map_IconTexture

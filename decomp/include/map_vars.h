@@ -39,6 +39,7 @@ extern "C" int DAT_1049efd8[0x3c];
 extern "C" Formation DAT_1049efdc[6];
 extern "C" float DAT_1049f3dc[][16][16];                  // height samples per object, 25 units apart (-200 = none)
 extern "C" int DAT_104bfdb4;                              // the ground object nearest to the player
+extern "C" float DAT_104bfe24;                            // the pit's floor height (the ice surface height on ice maps)
 extern "C" Node *DAT_104c007c;                            // the water surface node; the map's model
 extern "C" Node *DAT_104c0080;                            // second water node (found next to the surface)
 extern "C" Node *DAT_104c0084;                            // "ICERIPA": the ice surface added below the water node
@@ -57,6 +58,7 @@ extern "C" short DAT_104c0398;
 extern "C" void *DAT_104c03a0;
 extern "C" int DAT_104c03a4;
 extern "C" Node *DAT_104c03a8;
+extern "C" Node *DAT_104c03ac;                            // the camera path node (its translation keys are the marker points)
 extern "C" int DAT_104c03b4;
 extern "C" int DAT_104c03b8;
 extern "C" int DAT_104c03bc;

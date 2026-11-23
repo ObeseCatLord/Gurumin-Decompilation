@@ -11,8 +11,6 @@
 
 #include "char_state.h"
 
-extern "C" Vec3 *DAT_1032d5b8[];      // positions the camera keeps in view
-extern "C" char DAT_1021bbc0[];       // a flag per camera position
 #include "char_vars.h"
 #include "map_vars.h"
 

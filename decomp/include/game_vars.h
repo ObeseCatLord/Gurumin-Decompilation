@@ -94,6 +94,7 @@ extern "C" int DAT_1030c568;
 extern "C" int DAT_1030c990;
 extern "C" char DAT_103150c0[0x80];                      // item stock per item id (saved with the game)
 extern "C" int DAT_103154b0[0x6000];
+extern "C" float DAT_1032d4b0;                            // fade step per frame
 extern "C" int DAT_1032d67c[0x8];
 extern "C" int DAT_1032d6a0;
 extern "C" int DAT_1032d6a4;                              // set to 9 when the player is knocked back (0x10055ee0)
@@ -147,6 +148,8 @@ extern "C" int DAT_104bf8d8;                              // fade-in counter, 15
 extern "C" int DAT_104bf8dc;
 extern "C" int DAT_104bf8e0;
 extern "C" int DAT_104bf8e4;                              // frames left of the fade
+extern "C" float DAT_104bf8e8;                            // fade target (set exactly on the last frame)
+extern "C" float DAT_104bf8f0;                            // screen/volume fade amount, 0-100
 extern "C" int DAT_104bfaf8;
 extern "C" char DAT_104bfafc;
 extern "C" int DAT_104bfb00;

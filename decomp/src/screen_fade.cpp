@@ -8,8 +8,8 @@
 
 #include "render_vars.h"
 #include "sound_vars.h"
+#include "game_vars.h"
 
-extern "C" float DAT_104bf8f0;                   // fade amount, 0-100
 extern "C" void FUN_10143e00(int left, int top, int right, int bottom, int colour, int mode, float alpha);  // fills a rectangle
 extern "C" void FUN_1013f070(int mode, int a, int b);   // sets a 2D/3D render state
 

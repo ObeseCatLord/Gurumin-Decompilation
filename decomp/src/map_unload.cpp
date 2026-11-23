@@ -29,7 +29,6 @@ extern "C" MapObject *DAT_104c03c0;
 
 #include "char_vars.h"
 
-extern "C" int DAT_104c03ac;
 extern "C" char DAT_1020da50[8][0x50];
 extern "C" int FUN_10174c70(int slot, int force);    // Texture_Release
 

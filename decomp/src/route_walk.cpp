@@ -14,8 +14,6 @@
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" Vec4 *DAT_1032d5b8[];                 // positions of the characters moved by routes
-extern "C" char DAT_1021bbc0[];
 // 0x100286d0: the route target of character `slot` heading for `point` (writes the next point, the target and the
 // point's action, value and group).
 extern "C" int FUN_100286d0(int slot, int *state, int point, int *nextPoint, Vec4 *target, int *group, int *value,
@@ -41,7 +39,7 @@ extern "C" int FUN_1002a110(int slot, int run)
     FUN_100286d0(slot, &state, DAT_1020b430[slot].targetPoint, &next, &target, &group, &value, &action);
     if (DAT_1020b430[slot].placed == 0)
     {
-        DAT_1032d5b8[DAT_1049f0f0] = (Vec4 *)&DAT_10db6ee8[slot].matrix.m[12];
+        DAT_1032d5b8[DAT_1049f0f0] = &DAT_10db6ee8[slot].matrix.translation;
         DAT_1021bbc0[DAT_1049f0f0] = 0;
         DAT_1049f0f0++;
         DAT_1020b430[slot].placed = 1;

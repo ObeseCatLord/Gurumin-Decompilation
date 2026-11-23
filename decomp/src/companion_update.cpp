@@ -18,7 +18,6 @@ Matrix4 RotationZ(float angle);                      // 0x101b1b40
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" unsigned char DAT_104686b0[0x80];         // display state (2 = down, 7 = idle, 0x1e = revived)
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 extern "C" int FUN_1000e750(void);
 extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner,

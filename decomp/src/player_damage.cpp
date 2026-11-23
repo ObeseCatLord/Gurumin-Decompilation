@@ -25,7 +25,6 @@ struct Matrix4;
 #include "map_vars.h"
 #include "ui_vars.h"
 
-extern "C" char DAT_104686b0;
 extern "C" int FUN_1003ad20(int sound, const Vec4 &position, float volume);  // Sound_PlayEffect
 extern "C" int FUN_1013f880(void);                                          // the game's random number
 extern "C" int FUN_100119d0(int index, int damage, int a);                  // EventSlots_Add: shows the damage
@@ -119,7 +118,7 @@ extern "C" int FUN_1005dbf0(int damage)
             DAT_10db6ee8[0].PlayMotion(0x84, 1, 5, 1.0f);
         }
     }
-    DAT_104686b0 = 60;
+    DAT_104686b0[PLAYER_SLOT] = 60;
     DAT_1020d4c0[PLAYER_SLOT] = 4;
     Vec4 position = DAT_10db6ee8[0].matrix.GetTranslation();
     position.z += 50.0f;

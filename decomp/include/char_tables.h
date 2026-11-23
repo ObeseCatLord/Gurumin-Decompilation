@@ -89,6 +89,7 @@ extern "C" int DAT_10453008[CHAR_SLOT_COUNT];
 extern "C" int DAT_10467288[CHAR_SLOT_COUNT];             // each character's debris colour
 extern "C" char DAT_10467920[CHAR_SLOT_COUNT];            // 1 = no ground found below the slot
 extern "C" int DAT_104679a0[CHAR_SLOT_COUNT];
+extern "C" unsigned char DAT_104686b0[CHAR_SLOT_COUNT];    // display state (2 = down, 7 = idle, 0x1e = revived)
 extern "C" char DAT_10468730[CHAR_SLOT_COUNT];
 extern "C" int DAT_104bf8f8[CHAR_SLOT_COUNT];             // 1 while a key prompt is shown over the character; key prompt shown per character (app_0008.cpp)
 extern "C" Vec4 DAT_104c4438[CHAR_SLOT_COUNT];            // where a wave enemy came in

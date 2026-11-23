@@ -3,12 +3,9 @@
 // counter runs out. DAT_104bf8ec is the fade kind: its hundreds pick the colour (0 black, 1 white, 2 red, 3 the
 // colour in DAT_104c02e0), the rest an iris wipe (drawn by Fade_Draw, screen_fade.cpp). Script built-ins call these.
 
-extern "C" float DAT_104bf8e8;
 #include "game_vars.h"
 #include "sound_vars.h"
 
-extern "C" float DAT_104bf8f0;
-extern "C" float DAT_1032d4b0;
 
 // Starts a fade of track `id` to `value` over `frames` frames (0 = jump there at once).
 // The int-to-float conversion of `value` is rounded once (/Op) and reused for every store.

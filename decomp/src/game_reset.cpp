@@ -42,12 +42,9 @@ extern "C" int DAT_10202464;
 extern "C" int DAT_1020d860[0x60];
 extern "C" int DAT_10219c40[0x40];
 extern "C" int DAT_10219fc0[0x40];
-extern "C" int DAT_1021bbc0[0xc];
 extern "C" int DAT_1021f640[0x20];
 extern "C" int DAT_10255b08[0x40];
 extern "C" int DAT_1030bbf8[0x40];
-extern "C" int DAT_1032d4b0;
-extern "C" int DAT_1032d5b8[0x30];
 extern "C" int DAT_1042de28[0x20];
 extern "C" int DAT_1042e0a8[0x40];
 extern "C" int DAT_104463f8[0x80];
@@ -56,12 +53,8 @@ extern "C" int DAT_104481d8[0x80];
 extern "C" int DAT_10453208[0x4000];
 extern "C" int DAT_10467c20[0x80];
 extern "C" int DAT_10468230[0x80];
-extern "C" char DAT_104686b0[0x80];
 extern "C" GameObject DAT_104b7200;
-extern "C" int DAT_104bf8e8;
-extern "C" int DAT_104bf8f0;
 extern "C" int DAT_104bfb08[0x80];
-extern "C" int DAT_104bfe24;
 #include "win_vars.h"
 extern "C" EmptyObject DAT_1065cb28;
 extern "C" Vec4 DAT_108029b8;
@@ -250,7 +243,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104bfd08 = 0;
   DAT_104bf8d4 = 0;
   DAT_104bf8c8 = 0;
-  DAT_104bf8f0 = 0;
+  DAT_104bf8f0 = 0.0f;
   DAT_10f08ab0.Close();
   DAT_104c009a = 0;
   DAT_1020235c = 1;
@@ -344,9 +337,9 @@ extern "C" void FUN_1003e710(void)
   DAT_104bf8dc = 0;
   DAT_104bf8e0 = 0;
   DAT_104bf8e4 = 0;
-  DAT_104bf8e8 = 0;
+  DAT_104bf8e8 = 0.0f;
   DAT_104bf8ec = 0;
-  DAT_104bf8f0 = 0;
+  DAT_104bf8f0 = 0.0f;
   DAT_1020234c = 0.5f;
   DAT_104bfaf8 = 0;
   DAT_104bfafc = 0;
@@ -421,7 +414,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104bfe18 = 0;
   DAT_104bfe1c = 0;
   memset(DAT_104485e8, 0, sizeof(DAT_104485e8));
-  DAT_104bfe24 = 0;
+  DAT_104bfe24 = 0.0f;
   DAT_104bfe28 = 0;
   DAT_104bfe2c = 0;
   DAT_104bfe30 = 0;
@@ -808,6 +801,6 @@ extern "C" void FUN_1003e710(void)
   memset(DAT_104463f8, 0, sizeof(DAT_104463f8));
   memset(DAT_10468230, 0, sizeof(DAT_10468230));
   memset(DAT_1032d67c, 0, sizeof(DAT_1032d67c));
-  DAT_1032d4b0 = 0;
+  DAT_1032d4b0 = 0.0f;
 }
 

@@ -8,7 +8,7 @@
 #include "char_state.h"
 #include "char_slot.h"
 
-#include "named_path.h"
+#include "model_path.h"
 
 #include "char_tables.h"
 #include "char_vars.h"
@@ -18,10 +18,7 @@
 #include "ui_vars.h"
 
 extern "C" int FUN_10001b40(void);
-extern "C" NamedPath DAT_10b314c8[];
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
-extern "C" Vec3 *DAT_1032d5b8[];
-extern "C" char DAT_1021bbc0[];
 
 // Marks all 0x44c looping-sound slots free (-11) and stops the sound process' loops (command 0x221, sent
 // twice when the first call succeeds) unless sound is muted.
@@ -122,9 +119,6 @@ extern "C" int FUN_10017ad0(int id)
 
 #include "node.h"
 
-extern "C" float DAT_104bf8f0;        // fade value
-extern "C" float DAT_1032d4b0;        // fade step per frame
-extern "C" float DAT_104bf8e8;        // fade target (set exactly on the last frame)
 #include "engine_memory.h"
 extern "C" int FUN_1000cb30(const char *text);
 extern "C" int FUN_1000cb90(const char *text);      // Caption_Set

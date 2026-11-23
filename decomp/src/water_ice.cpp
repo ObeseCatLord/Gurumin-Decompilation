@@ -5,7 +5,6 @@
 
 #include "map_vars.h"
 
-extern "C" float DAT_104bfe24;   // height of the ice surface
 
 // 0x10011fb0 (Water_SetFrozen). Freezes (`frozen` != 0) or thaws the water of the current map, when the map has
 // all three water nodes. Freezing lifts the player onto the ice when below it and switches the node flags so the

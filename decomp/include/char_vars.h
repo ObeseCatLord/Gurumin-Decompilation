@@ -8,7 +8,9 @@
 #define DEBRIS_SLOTS 0x100
 #endif
 
+#include "vec3.h"
 #include "vec4.h"
+#include "model_path.h"
 
 struct Node;   // node.h
 struct Playback;   // anim_model.h
@@ -24,6 +26,7 @@ extern "C" char DAT_102195f0[0x100];                      // cleared on spawn
 extern "C" int DAT_102196f0[0x20];
 extern "C" int DAT_10219778[];                            // a per-character level, at most 5
 extern "C" char DAT_1021b628[0x100];                      // cleared on spawn
+extern "C" char DAT_1021bbc0[0x30];                      // a flag per camera position (DAT_1032d5b8)
 extern "C" int DAT_1021f338;
 extern "C" int DAT_10254798[];
 extern "C" unsigned char DAT_102550e2[];                  // a per-character value; the larger of it and DAT_102550e0 is kept
@@ -32,6 +35,7 @@ extern "C" float DAT_1030cd98[];                          // their radius
 extern "C" unsigned char DAT_10315350[0x80];             // a per-character flag (0x80 character slots)
 extern "C" unsigned char DAT_10315352[];                  // a per-character flag, cleared every frame
 extern "C" short DAT_103153b4[];                          // a per-character counter, at most 15
+extern "C" Vec3 *DAT_1032d5b8[0x30];                     // positions the camera keeps in view (characters moved by routes)
 extern "C" int DAT_1032d69c;                              // 1 once the game built-ins are registered; 0 while a queued script runs
 extern "C" int DAT_1042db08[];
 extern "C" int DAT_104465f8[DEBRIS_SLOTS];                // spin: rotation in tenths of a radian
@@ -79,6 +83,7 @@ extern "C" Vec4 DAT_10867df8;                             // top of the object b
 extern "C" char DAT_10894698[][0x124];                    // model paths
 extern "C" char DAT_108f678c[][0x240];                    // item model paths
 extern "C" short DAT_10b314c0;                            // last face frame set
+extern "C" ModelPath DAT_10b314c8[];                     // the model file of each model number
 extern "C" int DAT_10c62ed0;                              // current map
 extern "C" int DAT_10c6351c;                              // the character being talked to
 extern "C" int DAT_10c6358c;                              // look-around step: 0..9 = one side, -1..-9 = the other side

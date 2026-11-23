@@ -12,7 +12,6 @@
 #include "char_tables.h"
 #include "char_vars.h"
 #include "map_vars.h"
-extern "C" float DAT_104bfe24;                       // the pit's floor height
 extern "C" int FUN_100241e0(int index, float x, float y, float z);   // Character_SetMove
 #include <math.h>
 

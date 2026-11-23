@@ -19,10 +19,9 @@ extern "C" int FUN_1001fff0(Node *root, int a, int b, Vec4 *position, Vec4 *velo
     return 0;
 }
 
-#include "collide_regions.h"
+#include "node_data.h"
 
 
-extern "C" MarkerOwner *DAT_104c03ac;
 #include "map_vars.h"
 
 // 0x10020f60. For every marker point: sets its flag to 4 and casts a ray from 10000 units above it to 10000 units
@@ -35,10 +34,10 @@ extern "C" int FUN_10020f60(void)
     Vec4 hit;
     if (DAT_10255f08 == 0)
         return 0;
-    for (int i = 0; i < DAT_104c03ac->markers->count; i++)
+    for (int i = 0; i < DAT_104c03ac->extra->tracks[NODE_TRACK_TRANSLATION].count; i++)
     {
-        DAT_104c03ac->markers->flags[i] = 4;
-        from.Copy(DAT_104c03ac->markers->points[i]);
+        DAT_104c03ac->extra->tracks[NODE_TRACK_TRANSLATION].flags[i] = 4;
+        from.Copy(DAT_104c03ac->extra->tracks[NODE_TRACK_TRANSLATION].values[i]);
         to.Copy(from);
         from.z += 10000.0f;
         to.z -= 10000.0f;

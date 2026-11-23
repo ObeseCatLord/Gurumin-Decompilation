@@ -10,8 +10,6 @@ struct TextRenderer
 
 #include "ui_vars.h"
 
-extern "C" MenuText DAT_10f67008[];
-
 // Number of candidates shown on the current page (at most 9).
 inline int VisibleLines()
 {

@@ -5,8 +5,6 @@
 
 #include "render_vars.h"
 
-extern "C" int DAT_10f6550c;
-extern "C" int DAT_10f65510;
 extern "C" void FUN_10143b50(void);
 
 // Render_ResetState: unbinds the textures of stages 0..3, resets the cached stage states, and when an off-screen
@@ -16,9 +14,9 @@ extern "C" void FUN_1014b390(void)
 {
     DAT_10f6548c = 0;
     DAT_10f1fcf0->SetTexture(0, 0);
-    DAT_10f6550c = 1;
+    DAT_10f6550c = TEXTURE_BINDING_UNKNOWN;
     DAT_10f1fcf0->SetTexture(1, 0);
-    DAT_10f65510 = 1;
+    DAT_10f65510 = TEXTURE_BINDING_UNKNOWN;
     DAT_10f1fcf0->SetTexture(2, 0);
     DAT_10f1fcf0->SetTexture(3, 0);
     FUN_10143b50();
@@ -35,7 +33,6 @@ extern "C" void FUN_1014b390(void)
 }
 
 // Default-pool Direct3D resources that do not survive a device reset (Render_OnResetDevice recreates them).
-extern "C" IUnknownLike *DAT_10f1fd28;            // created with the device
 extern "C" void FUN_10147760(void);  // BufferPool_ReleaseDynamic
 extern "C" int FUN_10148350(void);   // TexCache_ReleaseAll
 
@@ -72,8 +69,8 @@ extern "C" int FUN_1014b2a0(void)
         DAT_10f1fcfc[0]->Release();
     if (DAT_10f1fd00 != 0)
         DAT_10f1fd00->Release();
-    if (DAT_10f1fd28 != 0)
-        DAT_10f1fd28->Release();
+    if (DAT_10f1fd28[0] != 0)
+        DAT_10f1fd28[0]->Release();
     if (DAT_10f1fd2c != 0)
         DAT_10f1fd2c->Release();
     DAT_10f1a864 = 0;
@@ -91,9 +88,9 @@ extern "C" void FUN_101439e0(void)
 {
     DAT_10f6548c = 0;
     DAT_10f1fcf0->SetTexture(0, 0);
-    DAT_10f6550c = 1;
+    DAT_10f6550c = TEXTURE_BINDING_UNKNOWN;
     DAT_10f1fcf0->SetTexture(1, 0);
-    DAT_10f65510 = 1;
+    DAT_10f65510 = TEXTURE_BINDING_UNKNOWN;
     DAT_10f1fcf0->SetTexture(2, 0);
     DAT_10f1fcf0->SetTexture(3, 0);
     DAT_10f1fcf0->SetRenderTarget(0, DAT_10f141dc);
@@ -145,9 +142,9 @@ extern "C" void FUN_1014b480(void)
 {
     DAT_10f6548c = 0;
     DAT_10f1fcf0->SetTexture(0, 0);
-    DAT_10f6550c = 1;
+    DAT_10f6550c = TEXTURE_BINDING_UNKNOWN;
     DAT_10f1fcf0->SetTexture(1, 0);
-    DAT_10f65510 = 1;
+    DAT_10f65510 = TEXTURE_BINDING_UNKNOWN;
     DAT_10f1fcf0->SetTexture(2, 0);
     DAT_10f1fcf0->SetTexture(3, 0);
     FUN_10143b50();

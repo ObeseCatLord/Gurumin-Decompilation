@@ -202,8 +202,6 @@ DWORD ImeContext::LoadCandidates()
 }
 #include "win_vars.h"
 
-extern "C" char DAT_10f67008[32][0x80];  // candidate strings
-
 // Prepares text input with `text` as the starting text: maximum length 0x80 (DAT_10f66bbc), the text is copied into
 // the input line and `text` becomes the buffer that receives the result. Clears the composition, result and
 // candidate strings and the input counters, and marks input as active. Returns 0.
@@ -231,7 +229,7 @@ extern "C" int FUN_1015f310(char *text)
     DAT_10f66bc4 = 0;
     DAT_10f66dd4 = 0;
     for (int i = 0; i < 32; i++)
-        DAT_10f67008[i][0] = 0;
+        DAT_10f67008[i].text[0] = 0;
     return 0;
 }
 

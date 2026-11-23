@@ -12,7 +12,6 @@
 
 #include "render_vars.h"
 
-extern "C" int DAT_10f6550c;                  // texture bound to stage 0 (0 = forget the binding)
 extern "C" int FUN_101734d0(void);            // Texture_OnLostDevice: releases every registered texture
 extern "C" int FUN_10173510(void);            // Texture_OnResetDevice: recreates them
 extern "C" int FUN_1013ed20(void);            // Render_BeginScene

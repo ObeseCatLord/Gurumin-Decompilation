@@ -10,8 +10,6 @@
 
 #include "render_vars.h"
 
-extern "C" TextureObject *DAT_10f6550c;         // texture bound to stage 0 (1 = none/unknown)
-extern "C" TextureObject *DAT_10f65510;         // texture bound to stage 1 (1 = none/unknown)
 extern "C" void *FUN_10148590(int poolIndex, IUnknownLike *texture, int width, int height, int slot);
 extern "C" int FUN_10148520(int poolIndex, int width, int height);
 extern "C" int FUN_101484b0(int poolIndex, int width, int height);  // drops the pooled copy (buffer_pool.cpp)
@@ -635,8 +633,6 @@ int TextureObject::DrawThroughShader(TextureObject *second, TextureObject *third
     DAT_10f1fcf0->SetTexture(3, 0);
     return 0;
 }
-
-extern "C" void *DAT_10f1fd28[2];      // textures of the two swap targets
 
 // 0x10149100 (SwapTarget_DrawPreview). Draws the swap target in use as a 256x256 quad at the top left of the screen
 // (the part of the square target the size of the back buffer), stages 1 to 3 off. Returns 1.

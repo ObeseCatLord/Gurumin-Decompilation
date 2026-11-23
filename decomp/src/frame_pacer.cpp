@@ -7,7 +7,6 @@
 #include "render_vars.h"
 #include "win_vars.h"
 // Frame blend (after-image) strength (engine_1013e.cpp).
-extern "C" void *DAT_10f6550c;    // texture bound to stage 0 (texture_bind.cpp)
 extern "C" void FUN_1013f9a0(void);   // ColourFades_Step
 extern "C" void FUN_10147a00(void);   // TextureSlots_Age
 extern "C" void FUN_101483f0(void);   // TexCache_Age

@@ -7,26 +7,24 @@
 
 #include "render_vars.h"
 
-extern "C" int DAT_10f6550c;
-extern "C" int DAT_10f65510;
 
 // Unbinds texture stage 0 (only when something is bound).
 extern "C" void FUN_10143b50(void)
 {
-    if (DAT_10f6550c != 1)
+    if (DAT_10f6550c != TEXTURE_BINDING_UNKNOWN)
     {
         DAT_10f1fcf0->SetTexture(0, 0);
-        DAT_10f6550c = 1;
+        DAT_10f6550c = TEXTURE_BINDING_UNKNOWN;
     }
 }
 
 // Unbinds texture stage 1 (only when something is bound).
 extern "C" void FUN_10143b80(void)
 {
-    if (DAT_10f65510 != 1)
+    if (DAT_10f65510 != TEXTURE_BINDING_UNKNOWN)
     {
         DAT_10f1fcf0->SetTexture(1, 0);
-        DAT_10f65510 = 1;
+        DAT_10f65510 = TEXTURE_BINDING_UNKNOWN;
     }
 }
 

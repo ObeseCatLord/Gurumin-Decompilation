@@ -13,7 +13,6 @@
 #include "map_vars.h"
 #include "render_vars.h"
 
-extern "C" int DAT_1101d884;
 extern "C" int __stdcall FUN_10143870(int, int, int);
 
 // Releases one reference to a shared model file; the name entry is freed when the count reaches 0.
@@ -223,10 +222,10 @@ int Playback::SetLayerParam(int layer, int slot, int value)
     return 1;
 }
 
-// Sets the scene parameter DAT_1101d884 and resets its timer.
-extern "C" int FUN_1016a8a0(int value)
+// Sets the model the camera follows (DAT_1101d884) and cancels any camera cut blend still running. Returns 0.
+extern "C" int FUN_1016a8a0(CameraTarget *target)
 {
-    DAT_1101d884 = value;
+    DAT_1101d884 = target;
     DAT_1101d88c = 0;
     return 0;
 }

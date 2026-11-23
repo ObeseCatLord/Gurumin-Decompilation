@@ -6,6 +6,7 @@
 
 #include "item_caption.h"
 #include "matrix4.h"
+#include "menu_text.h"
 
 struct Node;   // node.h
 
@@ -94,6 +95,7 @@ extern "C" int DAT_10f66df0;                              // 1 once input has fi
 extern "C" char DAT_10f66df8[];                           // the text entered so far
 extern "C" char *DAT_10f66ef8;                            // caller's buffer that receives the entered text (may be 0)
 extern "C" int DAT_10f67000;                              // 1 while text input (IME composition) is active
+extern "C" MenuText DAT_10f67008[32];                     // IME candidate strings (one line each)
 extern "C" char DAT_10f68008[];
 extern "C" int DAT_10f68108;
 extern "C" int DAT_10f6810c;

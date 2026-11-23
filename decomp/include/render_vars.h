@@ -15,7 +15,11 @@ struct IUnknownLike;   // com_min.h
 struct MeshData;   // mesh.h
 struct Node;   // node.h
 
+struct TextureObject;   // texture_object.h
 struct TextureRef;   // texture_ref.h
+
+// Value of a stage binding below that matches no texture, so the next Bind always calls SetTexture.
+#define TEXTURE_BINDING_UNKNOWN ((TextureObject *)1)
 
 extern "C" int DAT_10202b08;                              // debug keys enabled
 extern "C" int DAT_10202b0c;                              // number of frame buffers
@@ -89,7 +93,8 @@ extern "C" IUnknownLike *DAT_10f1fcfc[2];                 // the two swap target
 extern "C" IUnknownLike *DAT_10f1fd00;
 extern "C" IUnknownLike *DAT_10f1fd04[8];                 // render-target surfaces
 extern "C" void *DAT_10f1fd0c;                            // the crossfade pixel shader
-extern "C" IUnknownLike *DAT_10f1fd2c;
+extern "C" IUnknownLike *DAT_10f1fd28[2];                // textures of the two swap targets
+extern "C" IUnknownLike *DAT_10f1fd2c;                   // = DAT_10f1fd28[1], released on its own by Render_OnLostDevice
 extern "C" D3DVIEWPORT9_ DAT_10f1fd30;                    // the full-screen viewport
 extern "C" D3DVIEWPORT9_ DAT_10f1fd48;                    // the off-screen viewport
 extern "C" int DAT_10f1fd90[0x200];
@@ -125,6 +130,8 @@ extern "C" int DAT_10f654f4;                              // frame blending allo
 extern "C" char DAT_10f65500;
 extern "C" int DAT_10f65504;                              // engine ticks so far
 extern "C" unsigned int DAT_10f65508;                     // 60 Hz steps so far; every second one is an engine tick
+extern "C" TextureObject *DAT_10f6550c;                  // texture bound to stage 0 (TEXTURE_BINDING_UNKNOWN = none/unknown)
+extern "C" TextureObject *DAT_10f65510;                  // texture bound to stage 1 (TEXTURE_BINDING_UNKNOWN = none/unknown)
 extern "C" int DAT_10f65514;
 extern "C" int DAT_10f65520;                              // 1 while the overhead pass draws
 extern "C" int DAT_10f6552c;                              // set when Windows asked the game to quit (WM_QUIT); 1 once WM_QUIT was received

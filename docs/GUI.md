@@ -69,6 +69,19 @@ sorting folders do not matter).
 | `.it3` models | `.it3.obj` + `.mtl` | not yet |
 | `.mmv` movies | `.mmv.frames\` folder of PNG frames | yes (keep every frame; the original size, or exactly 2x or 4x it for an HD movie; colour 255 is not used) |
 
+## Editing text: the Dialogue tab
+*Load* reads all of the game's text: dialogue boxes with their speaker, short messages, menu choices, stage, item and
+character names (`bin\map.itm`) and the cutscene subtitles (`3ddata\*.itm`), 4,937 entries in 58 files. Search
+(full-width and half-width letters match each other), filter by kind or speaker, or tick *Changed only*. Select a
+line, edit up to four lines, press *Apply*; *Save* writes the changed files into the mod's `edit\` folder (the same
+`.itm.txt` files the Mod tab exports, so the Mod tab shows them as edited) and *Save and repackage* also builds
+them into `out\`. Install the mod from the Mod tab to see the text in the game.
+
+The preview draws the lines with the game's font and its text rules: half-width letters are stored as full-width
+ones, a space becomes a 5-pixel gap, and a red line marks the width of the longest original line. Warnings name
+characters the font does not have. *Export TSV* / *Import TSV* move all text to and from one spreadsheet-friendly
+file for translators. Details: [`TEXT.md`](TEXT.md).
+
 ## The file-type tabs
 Each type has its own tab for single files and whole folders, also outside a mod.
 

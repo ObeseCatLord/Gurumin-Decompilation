@@ -37,6 +37,11 @@ The Steam English `game.exe` is a 2015 VS2013 rebuild with different addresses.
 - Input: DirectInput 8; mouse helper object (0x10001090 cursor, 0x10001110 state, 0x10001450 moved-flag).
 - Fonts: 0x101455d0 (`ddfont8.dat`, MS P Gothic).
 - Screenshots: 0x10137b10 writes `capture\capture%05d.jpg`.
+- **File checksums:** Game_Startup (0x1013b700) checksums `bin\app.dll`, `app8.dll`, `map.itm`, `sound3d.dll`,
+  `3ddata\test.dat` and `game.exe` with File_Checksum 0x101602d0 (dword sum, dword xor seeded 0xcc82) against
+  pairs read from `bin\soundarc.dll` at 0x17000 + 8 x index (FUN_10160360); a mismatch feeds the 0x104c0270 table
+  below, so an edited `map.itm` closes the game unless the original is what File_Checksum reads (the mod DLL does
+  that, docs/TEXT.md).
 - **Anti-debug:** 0x1000eb90 calls `IsDebuggerPresent` (looked up at run time) and, when a debugger is attached,
   overwrites a random entry of the 16-int table at 0x104c0270 with `rand()`. **Consequence:** the main loop in
   Game_Startup posts WM_CLOSE whenever any entry is non-zero (checked on about 12 of every 570 frames), and

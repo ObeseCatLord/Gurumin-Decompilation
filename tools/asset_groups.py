@@ -141,6 +141,22 @@ class AssetGroups:
         # wav\*.itm are scrambled WAV sounds (voice lines and sound effects), not scripts
         wav_dir = os.path.join(game_dir, "wav")
         self.sound_names = {n.lower() for n in os.listdir(wav_dir)} if os.path.isdir(wav_dir) else set()
+        self.scene_names = self._scene_names()
+
+    def _scene_names(self):
+        """3ddata\\*.itm cutscene scripts (their text starts with '##'; first bytes unscrambled only)."""
+        names, data_dir = set(), os.path.join(self.game_dir, "3ddata")
+        try:
+            import itm_tool
+            for name in os.listdir(data_dir) if os.path.isdir(data_dir) else []:
+                if name.lower().endswith(".itm"):
+                    with open(os.path.join(data_dir, name), "rb") as f:
+                        head = f.read(2)
+                    if itm_tool.xor_not(head, itm_tool.keystream(name, 2)) == b"##":
+                        names.add(name.lower())
+        except Exception:
+            pass
+        return names
 
     def _character_for(self, stem):
         for base in self.bases:
@@ -176,6 +192,8 @@ class AssetGroups:
             return EXTENSION_FOLDERS[ext]
         if os.path.basename(file_name).lower() in self.sound_names:
             return "Sounds/Effects" if stem.startswith(("gse", "vse", "mse")) else "Sounds/Voices"
+        if os.path.basename(file_name).lower() in self.scene_names:
+            return "Cutscenes"
         if stem.startswith("ddfont"):
             return "Fonts"
         folder = self._character_for(stem)

@@ -28,6 +28,13 @@ whenever the PNG is newer than the cached file.
 - The exported `<texture>.iti.png` files from the GUI or `iti_tool.py` can be copied into `mod\` as they are.
 - A real `.iti` file in the same folder wins over a PNG of the same texture.
 
+## Checked files
+Game_Startup checksums `bin\map.itm` and `3ddata\test.dat` (and the program files) and closes the game when one
+differs from the values stored in `soundarc.dll` ([`TEXT.md`](TEXT.md#integrity-check)). The loader therefore gives
+that check (File_Checksum, 0x101602d0) the game's own file and every other reader the replacement: an edited
+`map.itm` works from `mod\`, but not copied over the game's file. With `log=1`, `gurumin_files.log` names the
+function that opened each file (`called from 0x...`).
+
 ## Other files
 Any game file can be replaced by a file of the same name: `.itm` scripts and tables, `.it3` models, `.mmv` movies
 (HD movies too, see [`MOVIES_HD.md`](MOVIES_HD.md)), `.de2` music, fonts. Make them with the tools or the GUI's
@@ -49,7 +56,8 @@ game and read the log. The hook is only installed when there are replacement fil
 ## From the GUI
 1. **Export** on the Mod tab sorts the files into folders by character or type: `edit\Characters\Parin\`,
    `edit\Enemies\Slime\`, `edit\Bosses\Giga\`, `edit\Maps\`, `edit\Items\`, `edit\Interface\`,
-   `edit\Scripts\<name>\`, `edit\Movies\`, and so on (`tools/asset_groups.py`). Untick *Sort exports* to mirror the
+   `edit\Cutscenes\` (scene scripts with the subtitles), `edit\Sounds\Voices\` and `edit\Sounds\Effects\` (the
+   `wav\*.itm` sounds), `edit\Scripts\<name>\`, `edit\Movies\`, and so on (`tools/asset_groups.py`). Untick *Sort exports* to mirror the
    game's own folders instead.
 2. **Edit** the files. Textures may be larger than the originals.
 3. **Repackage** writes the game files into `<mod>\out\` with the game's folder layout.

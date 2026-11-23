@@ -5,8 +5,8 @@
 
 Format (APP.dll 0x10002440 / 0x101615d0): the body is the plain text XOR-scrambled with a key derived
 from the string "GURUguruMinmIN_", a 64-byte table whose bytes 8..15 are replaced by the upper-cased file
-base name (first 8 characters), and the byte position. A 12-byte trailer follows: int32 unknown
-(written as 0), int32 sum of plain bytes, int32 running xor of plain bytes seeded with 0xde2f.
+base name (first 8 characters), and the byte position. A 12-byte trailer follows: int32 content type
+(0 = BMP, 1 = text, 3 = WAV; written from the content), int32 sum of plain bytes, int32 running xor of plain bytes seeded with 0xde2f.
 The game checks sum and xor and refuses the file if either differs.
 """
 import os
@@ -53,9 +53,20 @@ def decode(data, name):
     return plain, s == want_sum and x == want_xor, unknown
 
 
-def encode(text, name, unknown=0):
+def content_type(plain):
+    """The trailer's first word: 0 = BMP picture, 3 = WAV sound, 1 = text (scripts, tables, map.itm).
+    The game refuses bin\\map.itm stored with 0 (seen in game)."""
+    if plain[:2] == b"BM":
+        return 0
+    if plain[:4] == b"RIFF":
+        return 3
+    return 1
+
+
+def encode(text, name, unknown=None):
     s, x = checksums(text)
-    return xor_not(text, keystream(name, len(text))) + struct.pack("<iII", unknown, s, x)
+    kind = content_type(text) if unknown is None else unknown
+    return xor_not(text, keystream(name, len(text))) + struct.pack("<iII", kind, s, x)
 
 def main():
     if len(sys.argv) < 3 or sys.argv[1] not in ("decode", "encode"):

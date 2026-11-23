@@ -289,9 +289,21 @@ static int reading_only(const char *mode)
     return mode && strchr(mode, 'r') && !strchr(mode, 'w') && !strchr(mode, 'a') && !strchr(mode, '+');
 }
 
+// Game_Startup checksums app.dll, app8.dll, bin\map.itm, sound3d.dll, 3ddata\test.dat and game.exe with File_Checksum
+// (0x101602d0) against values stored in soundarc.dll and closes the game on a mismatch. That function always gets
+// the game's own file, so a replaced map.itm or test.dat passes the check while the game loads the replacement.
+#define VA_FILE_CHECKSUM_START 0x101602d0
+#define VA_FILE_CHECKSUM_END   0x10160360
+
+static int called_from_file_checksum(void *return_address)
+{
+    DWORD va = (DWORD)(UINT_PTR)return_address - (DWORD)(UINT_PTR)app_address(0x10000000) + 0x10000000;
+    return va >= VA_FILE_CHECKSUM_START && va < VA_FILE_CHECKSUM_END;
+}
+
 static FILE *__cdecl hook_fopen(const char *path, const char *mode)
 {
-    if (!path || !reading_only(mode))
+    if (!path || !reading_only(mode) || called_from_file_checksum(__builtin_return_address(0)))
         return real_fopen(path, mode);
     const char *name = path;
     for (const char *p = path; *p; p++)
@@ -313,10 +325,12 @@ static FILE *__cdecl hook_fopen(const char *path, const char *mode)
     FILE *file = real_fopen(use, mode);
     if (open_log && file)
     {
+        DWORD caller = (DWORD)(UINT_PTR)__builtin_return_address(0) - (DWORD)(UINT_PTR)app_address(0x10000000)
+                     + 0x10000000;
         if (use != path)
-            fprintf(open_log, "%s\t<- %s\n", path, use);
+            fprintf(open_log, "%s\t<- %s\tcalled from 0x%08lx\n", path, use, (unsigned long)caller);
         else
-            fprintf(open_log, "%s\n", path);
+            fprintf(open_log, "%s\tcalled from 0x%08lx\n", path, (unsigned long)caller);
         fflush(open_log);
     }
     LeaveCriticalSection(&lock);

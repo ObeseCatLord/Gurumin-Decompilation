@@ -7,7 +7,8 @@ the Gurumin-Script-Fixes repo: every one decodes with a valid checksum and re-en
 ## Layout
 ```
 body[n]      scrambled plain text (or data)
-int32        unknown (0 in all files seen; read into a local and ignored)
+int32        content type: 0 = BMP (161 files in 3ddata), 1 = text (map.itm, 75 in 3ddata), 3 = WAV (1,963 in wav);
+             sound.itm has 13309. The game refuses bin\map.itm with 0 here (tested in game), so keep the type.
 int32        sum of all plain bytes (mod 2^32)
 int32        0xDE2F xor every plain byte
 ```

@@ -24,6 +24,7 @@ import sys
 import threading
 
 import asset_groups
+import dialogue_tab
 
 TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_DIR = os.path.dirname(TOOLS_DIR)
@@ -490,6 +491,7 @@ def build_gui():
             self._build_setup_tab()
             self._build_mod_tab()
             self._build_itm_tab()
+            self.dialogue = dialogue_tab.build(self, KIND_BY_KEY["itm"])
             self._build_iti_tab()
             self._build_it3_tab()
             self._build_mmv_tab()

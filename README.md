@@ -33,6 +33,8 @@ the byte share lags the function share. `python decomp/tools/build_all.py` print
 | `mmv_tool.py info/frames/gif/encode` | `.mmv` movies ↔ PNG frames or GIF. All 67 JP movies rebuild byte-identical. 2x/4x frames make HD movies. |
 | `de2_tool.py info/decode/encode` | `.de2` music ↔ WAV (MS ADPCM; encoding untested in game). |
 | `ddfont_tool.py export/import` | in-game font ↔ PNG atlas (byte-identical round trip). |
+| `dialogue_tool.py export/import/stats` | all of the game's text (dialogue, messages, menu choices, names, cutscene subtitles) ↔ one TSV for translators. |
+| `asset_groups.py`, `mod_install.py` | sort game files by character or type; install a mod's files into the game's `mod\` folder. |
 | `save_tool.py decode/encode/info/thumb` | `SaveData\gdataNN.sav` ↔ raw state; thumbnail extract. |
 | `script_api.py`, `gen_script_api_md.py` | script built-in list → `docs/SCRIPT_API.md`. |
 | `config_keys.py`, `save_layout.py` | gurumin.def key map, save body map (from the decompiler output). |
@@ -41,8 +43,14 @@ the byte share lags the function share. `python decomp/tools/build_all.py` print
 ### Modding GUI
 `python tools/gurumin_tools_gui.py` opens one window over all the tools: pick the game folder once, then export
 files to editable PNG/text/WAV/OBJ/GIF, import them back, or batch-convert whole folders. The **Mod** tab exports
-game files into a mod folder (`edit\`), shows which ones you changed, and repackages them into `out\` with the
-game's folder layout. The game folder is only read. Walkthrough: [`docs/GUI.md`](docs/GUI.md).
+game files into a mod folder (`edit\`), sorted by character (`Characters\Parin`, `Enemies\Slime`, ...) or type,
+shows which ones you changed, repackages them into `out\` with the game's folder layout and installs them into the
+game's `mod\` folder for the mod DLL. The **Dialogue** tab lists all 4,937 lines of text (dialogue boxes with their
+speaker, messages, menu choices, names, cutscene subtitles), lets you search and edit them and previews each line in
+the game's own font. The game folder is only read. Walkthrough: [`docs/GUI.md`](docs/GUI.md).
+
+<p align="center"><img src="docs/media/gui_mod.png" alt="Mod tab: exported files sorted by character, their status, install into the game" width="760"></p>
+<p align="center"><img src="docs/media/gui_dialogue.png" alt="Dialogue tab: Hyperbolic's lines, one translated, with the preview in the game's font" width="760"></p>
 
 ### Mod DLL (`mod/`): replacement files and HD movies
 A `d3d9.dll` for the Japanese PC version, loaded next to `game.exe`; it changes nothing on disk. It loads any
@@ -55,7 +63,8 @@ on their own, and the GUI's repackage adds the DLL to `out\`. Install by hand wi
 ([`docs/DISPLAY_MOD.md`](docs/DISPLAY_MOD.md)).
 
 ### Documentation (`docs/`)
-`MODDING_MAP.md` (start here: costumes, anti-cheat guards, render states, sound, menu images), `ITM_FORMAT.md`,
+`MODDING_MAP.md` (start here: costumes, anti-cheat guards, render states, sound, menu images), `MODDING_FILES.md`
+(replacement files), `TEXT.md` (dialogue and subtitles), `GUI.md`, `ITM_FORMAT.md`,
 `SCRIPT_API.md`, `MAP_TABLES.md`, `SAVE_FORMAT.md`, `PACKS_DLL.md`, `config_keys.tsv`, `save_layout.tsv`.
 Function names: `symbols.tsv` (apply to Ghidra with `re/apply_symbols.bat`).
 

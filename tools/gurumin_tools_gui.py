@@ -28,6 +28,8 @@ REPO_DIR = os.path.dirname(TOOLS_DIR)
 SETTINGS_PATH = os.path.join(os.path.expanduser("~"), ".gurumin_tools_gui.json")
 MOD_STATE_NAME = "gurumin_mod.json"      # per-mod file: modification times recorded at export, to spot edited files
 DEFAULT_SAVE_KEY = 0x273                  # save_tool.py's own default for --key
+MOD_DLL = os.path.join(REPO_DIR, "mod", "build", "d3d9.dll")   # HD movie support (mod/, docs/MOVIES_HD.md)
+MOD_INI = os.path.join(REPO_DIR, "mod", "gurumin_mod.ini")
 
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -194,6 +196,31 @@ class FileKind:
         if self.key == "font":
             return name.startswith("ddfont") and name.endswith(".dat")
         return name.endswith(self.game_ext)
+
+
+def is_hd_movie(path):
+    """True for an .mmv whose palette carries the HD marker (see mmv_tool.py)."""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(18)
+    except OSError:
+        return False
+    return len(head) == 18 and head[:2] == b"MV" and head[9:10] == b"H" and head[13:14] == b"D" and head[17] in (2, 4)
+
+
+def add_hd_movie_support(out_root):
+    """Copies the mod DLL (and its settings, if not there yet) to where game.exe goes; returns (log line, tag)."""
+    if not os.path.isfile(MOD_DLL):
+        return ("HD movie: the mod DLL is not built yet (run mod/build.sh), so %s has no d3d9.dll. Without it the "
+                "game draws HD movies 2x or 4x too big.\n" % out_root, "error")
+    os.makedirs(out_root, exist_ok=True)
+    dll = os.path.join(out_root, "d3d9.dll")
+    if not os.path.isfile(dll) or open(dll, "rb").read() != open(MOD_DLL, "rb").read():
+        shutil.copyfile(MOD_DLL, dll)
+    ini = os.path.join(out_root, "gurumin_mod.ini")
+    if not os.path.isfile(ini) and os.path.isfile(MOD_INI):
+        shutil.copyfile(MOD_INI, ini)
+    return ("HD movie: added d3d9.dll and gurumin_mod.ini to %s (they go next to game.exe)\n" % out_root, "log")
 
 
 def repack_save(app, edit_bin, out_sav, original_sav):
@@ -658,8 +685,24 @@ def build_gui():
                              "error")
                     continue
                 jobs.append(Job("%s -> %s" % (edit_file, out_file), kind.repack(self, edit_file, out_file, original),
-                                [out_file]))
+                                [out_file], after=self._hd_movie_check(kind, out_file, out_dir)))
             return jobs
+
+        def _hd_movie_check(self, kind, out_file, out_root):
+            """After a movie is built: an HD movie needs the mod DLL, so put it into the output's root folder."""
+            if kind.key != "mmv":
+                return None
+
+            def after(ok):
+                if not ok or not is_hd_movie(out_file):
+                    return
+                if out_root:
+                    text, tag = add_hd_movie_support(out_root)
+                else:
+                    text, tag = ("HD movie: %s needs the mod DLL next to game.exe (mod\\install.bat, "
+                                 "docs/MOVIES_HD.md)\n" % out_file, "log")
+                self.messages.put((tag, text))
+            return after
 
         def _record_export(self, edit_file):
             """After an export into the mod's edit folder, remember the file's time so 'changed only' works."""
@@ -895,7 +938,8 @@ def build_gui():
                     self.log("skipped %s: original font %s not found\n" % (edit_file, original), "error")
                     continue
                 jobs.append(Job("%s -> out\\%s" % (os.path.relpath(edit_file, self.mod_dir()), game_rel),
-                                kind.repack(self, edit_file, out_file, original), [out_file]))
+                                kind.repack(self, edit_file, out_file, original), [out_file],
+                                after=self._hd_movie_check(kind, out_file, os.path.join(self.mod_dir(), "out"))))
             self.run(jobs)
 
         def _mod_preview(self):
@@ -1051,9 +1095,11 @@ def build_gui():
             ttk.Checkbutton(flags, text="Frame 1 as in the original files (byte-identical rebuild of unedited frames)",
                             variable=original_frame1).pack(side="left", padx=12)
             ttk.Label(enc, wraplength=900, justify="left", text=(
-                "The template gives the palette when the frames are not already indexed, and its size is checked: keep "
-                "the original width and height. Frames written by 'Write PNG frames' keep their palette and need no "
-                "template. Index 255 is not used (the game replaces that colour).")).grid(
+                "The template gives the palette when the frames are not already indexed, and its size decides the kind "
+                "of movie: frames at the original size make a normal movie; frames exactly 2x or 4x as wide and high "
+                "make an HD movie (sharper, same size on screen; it needs the mod DLL, which 'Repackage' adds to "
+                "out\\). Frames written by 'Write PNG frames' keep their palette. Index 255 is not used (the game "
+                "replaces that colour).")).grid(
                 row=5, column=0, columnspan=3, sticky="w", padx=4)
 
             def build():
@@ -1061,7 +1107,8 @@ def build_gui():
                 if not self.require(("frames folder or GIF", source), ("output", out.get())):
                     return
                 self.run_one("encode " + source, cmd_mmv_encode(source, out.get(), template.get() or None,
-                                                                dither.get(), original_frame1.get()), [out.get()])
+                                                                dither.get(), original_frame1.get()), [out.get()],
+                             after=self._hd_movie_check(kind, out.get(), None))
             self.buttons(enc, 6, ("Build .mmv", build))
             self._batch_section(tab, kind)
 

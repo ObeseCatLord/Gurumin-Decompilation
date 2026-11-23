@@ -11,6 +11,13 @@
                                          palette made from all frames. --dither: Floyd-Steinberg instead of nearest.
                                          --original-frame1: frame 1 as in the original files (see below); with
                                          unedited frames the rebuilt movie is then byte-identical.
+                                         HD: frames exactly 2x or 4x the --template movie's size make an HD movie
+                                         (--scale 2|4 sets it without a template). HD movies need the mod DLL
+                                         (mod/, docs/MOVIES_HD.md): it shows them at the original size with the
+                                         extra detail. Without the DLL the game would draw them 2x or 4x too big.
+
+HD movies: the unused fourth bytes of palette entries 0, 1 and 2 hold "H", "D" and the scale (2 or 4); the game
+ignores them (no original movie uses them).
 
 Format (APP.dll Mmv_Open 0x10160a90, frame decoder 0x10160a20):
   "MV", u16 width, u16 height, 256 palette entries of 4 bytes (B, G, R, unused) at offset 6,
@@ -123,13 +130,33 @@ def encode_frame(pixels, can_skip=None):
     return bytes(out)
 
 
-def encode(w, h, palette, frame_list, loop_safe=True):
+HD_SCALES = (2, 4)
+
+
+def hd_scale(data):
+    """Scale of an HD movie (its palette's spare bytes hold "H", "D", scale), else 1."""
+    if len(data) > 17 and data[9:10] == b"H" and data[13:14] == b"D" and data[17] in HD_SCALES:
+        return data[17]
+    return 1
+
+
+def scale_for(size, original_size):
+    """1 for the original size, 2 or 4 for exactly that many times it, else None."""
+    for scale in (1,) + HD_SCALES:
+        if size == (original_size[0] * scale, original_size[1] * scale):
+            return scale
+    return None
+
+
+def encode(w, h, palette, frame_list, loop_safe=True, scale=1):
     """palette: 768 RGB values; frame_list: bytes of w*h palette indexes each -> .mmv file bytes.
-    loop_safe=False encodes frame 1 against frame 0 only, as the original files do (byte-identical rebuilds)."""
+    loop_safe=False encodes frame 1 against frame 0 only, as the original files do (byte-identical rebuilds).
+    scale 2 or 4 marks an HD movie (shown at w/scale x h/scale by the mod DLL)."""
     head = bytearray(b"MV" + struct.pack("<HH", w, h))
+    marker = {0: ord("H"), 1: ord("D"), 2: scale} if scale > 1 else {}
     for i in range(256):
         r, g, b = palette[3 * i:3 * i + 3] if i < 255 else (0, 0, 0)
-        head += bytes((b, g, r, 0))
+        head += bytes((b, g, r, marker.get(i, 0)))
     body = bytearray()
     last = frame_list[-1]
     for k, px in enumerate(frame_list):
@@ -258,10 +285,25 @@ def main():
             sys.exit("all frames must have the same size")
         template = sys.argv[sys.argv.index("--template") + 1] if "--template" in sys.argv else None
         template_palette = None
+        scale = int(sys.argv[sys.argv.index("--scale") + 1]) if "--scale" in sys.argv else None
+        if scale not in (None, 1) + HD_SCALES:
+            sys.exit("--scale must be 1, 2 or 4")
         if template:
-            tw, th, template_palette = parse(open(template, "rb").read())
-            if (tw, th) != (w, h):
-                print("warning: frames are %dx%d, the template movie is %dx%d" % (w, h, tw, th))
+            template_data = open(template, "rb").read()
+            tw, th, template_palette = parse(template_data)
+            ts = hd_scale(template_data)        # an HD template: compare against its original size
+            original = (tw // ts, th // ts)
+            if scale is None:
+                scale = scale_for((w, h), original)
+                if scale is None:
+                    print("warning: frames are %dx%d, the template movie is %dx%d (not 1x, 2x or 4x): "
+                          "the game will draw it at %dx%d" % (w, h, original[0], original[1], w, h))
+            elif (w, h) != (original[0] * scale, original[1] * scale):
+                print("warning: frames are %dx%d, %dx the template movie would be %dx%d"
+                      % (w, h, scale, original[0] * scale, original[1] * scale))
+        scale = scale or 1
+        if w % scale or h % scale:
+            sys.exit("an HD x%d movie needs a size divisible by %d (frames are %dx%d)" % (scale, scale, w, h))
         exact = indexed_frames(images)
         if exact:
             palette, frame_list = exact
@@ -269,15 +311,18 @@ def main():
         else:
             palette, frame_list = quantised_frames(images, template_palette, "--dither" in sys.argv)
             how = "colours reduced to the template's palette" if template else "colours reduced to 255"
-        out = encode(w, h, palette, frame_list, "--original-frame1" not in sys.argv)
+        out = encode(w, h, palette, frame_list, "--original-frame1" not in sys.argv, scale)
         open(dst, "wb").write(out)
-        print("%s -> %s (%dx%d, %d frames, %d bytes, %s)" % (src, dst, w, h, len(frame_list), len(out), how))
+        hd = ", HD x%d: needs the mod DLL" % scale if scale > 1 else ""
+        print("%s -> %s (%dx%d, %d frames, %d bytes, %s%s)" % (src, dst, w, h, len(frame_list), len(out), how, hd))
         return
     data = open(src, "rb").read()
     w, h, palette = parse(data)
     if mode == "info":
         n = sum(1 for _ in frames(data))
-        print("%s: %dx%d, %d frames" % (src, w, h, n))
+        scale = hd_scale(data)
+        hd = ", HD x%d (shown as %dx%d with the mod DLL)" % (scale, w // scale, h // scale) if scale > 1 else ""
+        print("%s: %dx%d, %d frames%s" % (src, w, h, n, hd))
         return
     from PIL import Image
 

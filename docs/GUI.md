@@ -62,7 +62,7 @@ file name, and the GUI uses the name to know where each file belongs.
 | `ddfont8.dat`, `ddfont8s.dat` font | `.dat.png` + `.dat.tsv` | yes (keep the `.tsv` next to the PNG) |
 | `.sav` saves | `.sav.bin` (raw game state) | yes, with the original save's key |
 | `.it3` models | `.it3.obj` + `.mtl` | not yet |
-| `.mmv` movies | `.mmv.frames\` folder of PNG frames | yes (keep the size and every frame; colour 255 is not used) |
+| `.mmv` movies | `.mmv.frames\` folder of PNG frames | yes (keep every frame; the original size, or exactly 2x or 4x it for an HD movie; colour 255 is not used) |
 
 ## The file-type tabs
 Each type has its own tab for single files and whole folders, also outside a mod.
@@ -92,5 +92,12 @@ to see more. Common causes:
 - *checksum MISMATCH* when decoding a script or save: the file was renamed; decode it under its original name.
 - A 666/667 texture fails to decode: `tools/native/iti_unpack.exe` and the game's `packs.dll` are needed; set
   packs.dll on the Setup tab.
-- A rebuilt movie looks wrong: keep the original width and height, keep every frame ("write every Nth frame" must be 1), and edit the PNG frames rather than a GIF when you change an existing movie.
+- A rebuilt movie looks wrong: keep the original width and height (or exactly 2x or 4x them for an HD movie), keep every frame ("write every Nth frame" must be 1), and edit the PNG frames rather than a GIF when you change an existing movie.
 - Font import complains about the `.tsv`: keep the `.tsv` written by Export next to the PNG, with the same name.
+
+## HD movies
+
+Frames exactly 2x or 4x the original movie's width and height make an HD movie: sharper, same size on screen.
+It needs the mod DLL next to `game.exe`, so when a repackage writes an HD movie the GUI also copies
+`d3d9.dll` and `gurumin_mod.ini` into `out\` (build the DLL first with `mod/build.sh`). Details:
+[`MOVIES_HD.md`](MOVIES_HD.md).

@@ -30,7 +30,7 @@ the byte share lags the function share. `python decomp/tools/build_all.py` print
 | `iti_tool.py decode/encode/info` | `.iti` textures ↔ PNG (all types; 666/667 via your packs.dll and tools/native/iti_unpack.c; writes raw type 0/1). |
 | `it3_tool.py info/obj` | `.it3` model node list; OBJ export with normals and UVs. All 945 JP models decode. |
 | `gpack.py` | Python port of packs.dll `ExecUnpack` (used by .it3 meshes). |
-| `mmv_tool.py info/frames/gif/encode` | `.mmv` movies ↔ PNG frames or GIF. All 67 JP movies rebuild byte-identical. |
+| `mmv_tool.py info/frames/gif/encode` | `.mmv` movies ↔ PNG frames or GIF. All 67 JP movies rebuild byte-identical. 2x/4x frames make HD movies. |
 | `de2_tool.py info/decode/encode` | `.de2` music ↔ WAV (MS ADPCM; encoding untested in game). |
 | `ddfont_tool.py export/import` | in-game font ↔ PNG atlas (byte-identical round trip). |
 | `save_tool.py decode/encode/info/thumb` | `SaveData\gdataNN.sav` ↔ raw state; thumbnail extract. |
@@ -43,6 +43,14 @@ the byte share lags the function share. `python decomp/tools/build_all.py` print
 files to editable PNG/text/WAV/OBJ/GIF, import them back, or batch-convert whole folders. The **Mod** tab exports
 game files into a mod folder (`edit\`), shows which ones you changed, and repackages them into `out\` with the
 game's folder layout. The game folder is only read. Walkthrough: [`docs/GUI.md`](docs/GUI.md).
+
+### Mod DLL (`mod/`): HD movies
+A `d3d9.dll` for the Japanese PC version, loaded next to `game.exe`; it changes nothing on disk. It plays `.mmv`
+movies made at 2x or 4x their original size at the original size on screen with the extra detail
+([`docs/MOVIES_HD.md`](docs/MOVIES_HD.md)). `mmv_tool.py encode` and the GUI make an HD movie from larger frames
+on their own, and the GUI's repackage adds the DLL to `out\`. Install by hand with
+`mod\install.bat "C:\path\to\Gurumin"`. Widescreen and any resolution are in the same DLL but parked and off
+([`docs/DISPLAY_MOD.md`](docs/DISPLAY_MOD.md)).
 
 ### Documentation (`docs/`)
 `MODDING_MAP.md` (start here: costumes, anti-cheat guards, render states, sound, menu images), `ITM_FORMAT.md`,

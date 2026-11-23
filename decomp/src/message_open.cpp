@@ -6,12 +6,12 @@
 #include "message_text.h"
 
 #include "char_slot.h"
+#include "game_vars.h"
 
 extern "C" MessageText DAT_10453208[0x7c];
 extern "C" int DAT_104bfb08[0x7c];               // state of each message box
 extern "C" int DAT_104481d8[0x7c];               // fade value
 extern "C" int DAT_10467c20[0x7c];               // frames the box has been held
-extern "C" unsigned int DAT_104bfd5c;            // frames spent waiting for a key
 #include "char_vars.h"
 
 extern "C" int FUN_1003ad20(int sound, const void *position, float volume);

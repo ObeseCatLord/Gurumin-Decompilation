@@ -110,6 +110,7 @@ extern "C" int DAT_10450808[0x800];
 extern "C" int DAT_10467488[0x20];
 extern "C" int DAT_10467710;
 extern "C" int DAT_10467e20[0x20];
+extern "C" char DAT_10467ea0[];                          // message subtext line (empty = none)
 extern "C" int DAT_10467f20;
 extern "C" int DAT_10468128;
 extern "C" int DAT_1046812c;
@@ -163,6 +164,7 @@ extern "C" int DAT_104bfd44;
 extern "C" int DAT_104bfd48;
 extern "C" int DAT_104bfd4c;
 extern "C" int DAT_104bfd50;
+extern "C" unsigned int DAT_104bfd5c;                     // frames spent waiting for a key (message windows)
 extern "C" int DAT_104bfd60;
 extern "C" int DAT_104bfd64;
 extern "C" int DAT_104bfd68;

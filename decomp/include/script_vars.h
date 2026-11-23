@@ -7,6 +7,7 @@
 extern "C" const char DAT_101d7ee4[];
 extern "C" const char DAT_101d7f08[];
 extern "C" char DAT_101dc1fc[];                           // "ch" (copied as an array, not a literal)
+extern "C" int DAT_1020247c[8];                          // ring of queued script numbers (read DAT_104bfe84, write DAT_104bfe88)
 extern "C" int DAT_1020d660[0x60];
 extern "C" int DAT_10492d88;                              // 1 while a queued script runs
 extern "C" int DAT_1049eadc;

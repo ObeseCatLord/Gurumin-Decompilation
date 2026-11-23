@@ -4,6 +4,7 @@
 #include "vec4.h"
 
 #include "matrix4.h"
+#include "camera_vars.h"
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 Matrix4 LookAt(Vec4 eye, Vec4 target, const Vec4 *up, int a);        // 0x101b1c20
@@ -26,8 +27,6 @@ extern "C" float DAT_104bfe24;    // the pit's floor height
 #include "render_vars.h"
 
 extern "C" Vec4 DAT_10f668a8;     // the visible area: minimum corner
-extern "C" Vec4 DAT_10f65688;     // camera position (projected here)
-extern "C" Vec4 DAT_10f668e8;     // camera target (projected here)
 
 // 0x1000f5a0 (Map_BuildTopView). Takes the map's model (its single child when it has 0x20 children, or the map's
 // root node without one): `out` becomes an overhead projection (z mirrored, moved up twice the view height) times
@@ -65,8 +64,6 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
     return map;
 }
 
-extern "C" Matrix4 DAT_108392d8;           // the current view-projection matrix
-extern "C" Matrix4 DAT_10836330;           // the camera matrix
 extern "C" void FUN_1013f070(int mode, int a, int b);              // sets a 2D/3D render state
 extern "C" void FUN_10199860(void);                                // RenderQueue_Clear
 // 0x101999a0 (draw_list.cpp DrawList_DrawPass): draws the queued nodes of pass `pass` (the first argument is unused).

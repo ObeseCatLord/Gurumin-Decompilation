@@ -5,7 +5,6 @@
 
 #include "camera_vars.h"
 #include "char_vars.h"
-extern "C" char DAT_1101d8b8;
 extern "C" int DAT_1101dde0;
 
 // 0x1016a980 (Camera_Reset). Clears the camera globals: the camera position and target vectors and their goals,
@@ -46,7 +45,7 @@ extern "C" int FUN_1016a980(void)
     DAT_1101d8ac = 0;
     DAT_1101d8b0 = 0;
     DAT_1101d8b4 = 0;
-    DAT_1101d8b8 = 0;
+    DAT_1101d8b8[0] = 0;
     DAT_1101d9b8 = 0;
     DAT_1101ddd0 = 0;
     DAT_1101ddd4 = 0;

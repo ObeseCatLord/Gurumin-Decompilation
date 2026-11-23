@@ -5,17 +5,15 @@
 // behaviour has run its course. Changing the thresholds below changes how often each move is used.
 
 #include "world.h"
+#include "render_vars.h"
 
 extern "C" int FUN_1013f880(void);
 
 #include "matrix4.h"
 #include "char_state.h"
 
-#include "mesh_slot.h"
+#include "effect_model.h"
 
-extern "C" MeshSlot DAT_10edbe08[0x40];
-extern "C" char DAT_108392d8[];
-extern "C" char DAT_10836330[];
 
 // Picker A: behaviour 0 40 %, behaviour 1 25 %, behaviour 2 35 %.
 extern "C" int FUN_10026af0(int index)
@@ -145,13 +143,13 @@ extern "C" int FUN_10026d00(int index)
     return 0;
 }
 
-// 0x1003a940: updates every used mesh slot with the current world matrices (DAT_108392d8, DAT_10836330).
+// 0x1003a940: draws every used model slot with its key frames and the current world matrices (DAT_108392d8, DAT_10836330).
 // The identity matrix built at the end is unused (left over from older code).
 int UpdateMeshSlots()
 {
-    for (int i = 0; i < 0x40; i++)
+    for (int i = 0; i < EFFECT_MODEL_SLOTS; i++)
     {
-        if (DAT_10edbe08[i].mesh != 0)
+        if (DAT_10edbe08[i].node != 0)
             DAT_10edbe08[i].M_10037b40(DAT_108392d8, DAT_10836330);
     }
     Matrix4 identity;

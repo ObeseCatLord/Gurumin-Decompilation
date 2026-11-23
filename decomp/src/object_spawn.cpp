@@ -15,7 +15,6 @@
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);
 
 // Message window state (see Message_Show, app_0013.cpp).
-extern "C" char DAT_10467ea0[];
 
 #include "object_view.h"
 

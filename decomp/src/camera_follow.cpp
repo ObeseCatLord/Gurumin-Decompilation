@@ -15,8 +15,6 @@
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" Vec4 DAT_10f668e8;
-extern "C" Vec4 DAT_10f65688;
 extern "C" void FUN_1016a8d0(void);
 
 extern "C" Node *DAT_10255f08;     // the map's root node

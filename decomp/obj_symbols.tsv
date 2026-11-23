@@ -431,7 +431,7 @@ _FUN_101426d0@8	101426d0
 ?DrawShadowsInto@ModelBank@@QAEHPAUShadowScene@@HHH@Z	10166100
 ?StartProximityPass@Node@@QAEHPAMPAUMatrix4@@HMH@Z	101a2370
 ?TagRegion@Node@@QAEHPBUBox2@@PAY0EA@$$CBDPAUMatrix4@@@Z	10199cd0
-?Draw@MeshSlot@@QAEHABUMatrix4@@@Z	1000baf0
+?Draw@EffectModel@@QAEHABUMatrix4@@@Z	1000baf0
 ?SetTranslation@Matrix4@@QAEXUVec4@@@Z	101adef0
 ?AllocSaved@Node@@QAEHXZ	101947b0
 ?FreeSaved@Node@@QAEHXZ	10194980

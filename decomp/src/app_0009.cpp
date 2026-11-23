@@ -11,9 +11,7 @@ extern "C" void FUN_10001c50(int);
 #include "map_vars.h"
 #include "sound_vars.h"
 
-extern "C" int DAT_104bfd5c;
 // Screen colour fade: the colour moves from DAT_10da90d0 towards DAT_10c67f60 by DAT_10daa800 per frame.
-extern "C" char DAT_10467ea0[];
 
 // Starts the screen fade-in (state 1).
 extern "C" int FUN_1000ebf0(void)

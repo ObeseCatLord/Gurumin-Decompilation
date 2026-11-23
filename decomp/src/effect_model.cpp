@@ -10,9 +10,7 @@
 
 #include "effect_model.h"
 
-extern "C" EffectModel DAT_10edbe08[64];  // effect models placed by scripts (slot free while node == 0)
-
-extern "C" Matrix4 DAT_10db9210;
+#include "anim_model.h"
 #include "engine_memory.h"
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
@@ -22,21 +20,21 @@ EffectModel::EffectModel()
 }
 
 // Setup: loads the effect model `path` (folder 0 of FUN_1013f8a0) and plays frames start..end.
-// A negative start counts back from the end (stored in reverseStart, start becomes 0); a negative end means
+// A negative start counts back from the end (stored in frame, start becomes 0); a negative end means
 // "up to the model's last frame" (Node::M_10199340 returns the frame count). Releases any previous model first.
 int EffectModel::M_1000b9f0(const char *path, int value, int start, int end)
 {
     color.Set(1.0f, 1.0f, 1.0f, 1.0f);
     this->end = end;
-    m_0030 = 0;
+    visible = 0;
     this->start = start;
-    reverseStart = 0;
-    matrix = DAT_10db9210;
-    offset.Set(0.0f, 0.0f, 0.0f, 0.0f);
-    m_003c = 0;
+    frame = 0;
+    matrix = DAT_10db6ee8[PLAYER_SLOT].matrix;
+    rotation.Set(0.0f, 0.0f, 0.0f, 0.0f);
+    ownCamera = 0;
     if (start < 0)
     {
-        reverseStart = -start;
+        frame = -start;
         this->start = 0;
     }
     m_0038 = value;
@@ -60,7 +58,7 @@ int EffectModel::M_1000b9f0(const char *path, int value, int start, int end)
 // Returns the first free effect model slot, or -1.
 inline int FindFreeEffectModel()
 {
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < EFFECT_MODEL_SLOTS; i++)
     {
         if (DAT_10edbe08[i].node == 0)
             return i;
@@ -77,8 +75,8 @@ extern "C" int FUN_1003a7d0(const char *path, float x, float y, float z, int sta
     {
         DAT_10edbe08[slot].M_1000b9f0(path, 0, start, -1);
         DAT_10edbe08[slot].AddKey(0, x, y, z);
-        DAT_10edbe08[slot].SetOffset(ox, oy, oz);
-        DAT_10edbe08[slot].m_0030 = 1;
+        DAT_10edbe08[slot].SetRotation(ox, oy, oz);
+        DAT_10edbe08[slot].visible = 1;
         return slot;
     }
     return -1;
@@ -94,8 +92,8 @@ extern "C" int FUN_1003a880(const char *path, float x, float y, float z, int sta
         DAT_10edbe08[slot].M_1000b9f0(path, 0, start, -1);
         DAT_10edbe08[slot].color.Copy(colour);
         DAT_10edbe08[slot].AddKey(0, x, y, z);
-        DAT_10edbe08[slot].SetOffset(ox, oy, oz);
-        DAT_10edbe08[slot].m_0030 = 1;
+        DAT_10edbe08[slot].SetRotation(ox, oy, oz);
+        DAT_10edbe08[slot].visible = 1;
         return slot;
     }
     return -1;

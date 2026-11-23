@@ -37,6 +37,8 @@ extern "C" float DAT_10da93e8;                            // how much the target
 extern "C" Vec4 DAT_10da93f0;                             // the orbit centre (the player's position)
 extern "C" Vec4 DAT_10edbd48;                             // goal of the target (the followed node's position when there is one)
 extern "C" Vec4 DAT_10f08aa0;                             // the target of the previous frame
+extern "C" Vec4 DAT_10f65688;                            // camera position (eye)
+extern "C" Vec4 DAT_10f668e8;                            // camera target
 extern "C" int DAT_10f668f8;
 extern "C" int DAT_10f668fc;
 extern "C" int DAT_10f66900;
@@ -80,6 +82,7 @@ extern "C" int DAT_1101d8a8;
 extern "C" int DAT_1101d8ac;
 extern "C" int DAT_1101d8b0;
 extern "C" int DAT_1101d8b4;
+extern "C" char DAT_1101d8b8[0x100];                     // title caption text
 extern "C" int DAT_1101d9b8;
 extern "C" char DAT_1101d9c0[4][0x100];
 extern "C" int DAT_1101ddc0[4];

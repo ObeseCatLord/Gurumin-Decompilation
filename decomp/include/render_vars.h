@@ -55,6 +55,8 @@ extern "C" int DAT_104c0314;                              // "DAT" source of the
 extern "C" int DAT_104c03b0;                              // number of fading nodes
 extern "C" Node *DAT_104c03c8;                           // the overlay mode's model (0 = none; drawn by overlay_draw.cpp, released in app_0010.cpp)
 extern "C" float DAT_104c03ec;                            // opening progress of the overlay mode
+extern "C" Matrix4 DAT_10836330;                         // the camera matrix
+extern "C" Matrix4 DAT_108392d8;                         // the current view-projection matrix
 extern "C" Vec4 DAT_10868818;                             // saved player velocity
 extern "C" ModelDef DAT_10b314c4[];
 extern "C" int DAT_10c636c4;

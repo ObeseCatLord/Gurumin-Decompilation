@@ -6,10 +6,10 @@
 #include "app_0008.h"
 #include "engine_memory.h"
 #include "game_vars.h"
+#include "script_vars.h"
 
 #include "char_tables.h"
 
-extern "C" int DAT_1020247c[8];
 
 // Releases and frees the owned mesh node and clears the two counters. Returns 1.
 int MeshOwner::M_1000be10()

@@ -316,6 +316,8 @@ struct AnimModel
 };
 
 // The character models (one per character slot; slot 0 is the player).
+#define PLAYER_SLOT 0   // the player's character slot
+
 extern "C" AnimModel DAT_10db6ee8[0x80];
 
 // The model table: root node of each loaded model file (0 = free entry).

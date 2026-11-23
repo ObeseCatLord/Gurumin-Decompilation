@@ -21,7 +21,6 @@ extern "C" FrameTimer DAT_10836c70;
 #include "ui_vars.h"
 
 extern "C" int DAT_1020b444;                         // frames before the "last page" message may show again
-extern "C" char DAT_10467ea0;
 
 extern "C" int FUN_1001e1a0(const char *name, const char *alphaName);  // Texture_Load
 extern "C" int FUN_1000ed70(const char *text, int style, int frames);  // shows a message
@@ -122,7 +121,7 @@ extern "C" int FUN_1004f4f0(void)
         DAT_104bf8c8 = 1;
         DAT_104bf8cc = 0;
         DAT_104bf8d0 = 0;
-        DAT_10467ea0 = 0;
+        DAT_10467ea0[0] = 0;
         strcpy(DAT_10219bc0, LAST_PAGE_TEXT);
         return 0;
     }
@@ -257,7 +256,7 @@ extern "C" int FUN_1004f860(void)
         DAT_104bf8c8 = 1;
         DAT_104bf8cc = 0;
         DAT_104bf8d0 = 0;
-        DAT_10467ea0 = 0;
+        DAT_10467ea0[0] = 0;
         strcpy(DAT_10219bc0, FIRST_PAGE_TEXT);
         return 0;
     }

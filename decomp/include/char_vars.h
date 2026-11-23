@@ -29,6 +29,7 @@ extern "C" int DAT_10254798[];
 extern "C" unsigned char DAT_102550e2[];                  // a per-character value; the larger of it and DAT_102550e0 is kept
 extern "C" int DAT_1030bdf8[0x100];                       // piece type, 0 = free slot
 extern "C" float DAT_1030cd98[];                          // their radius
+extern "C" unsigned char DAT_10315350[0x80];             // a per-character flag (0x80 character slots)
 extern "C" unsigned char DAT_10315352[];                  // a per-character flag, cleared every frame
 extern "C" short DAT_103153b4[];                          // a per-character counter, at most 15
 extern "C" int DAT_1032d69c;                              // 1 once the game built-ins are registered; 0 while a queued script runs

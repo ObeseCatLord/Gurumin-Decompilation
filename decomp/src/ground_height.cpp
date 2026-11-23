@@ -9,7 +9,7 @@
 #include "ground_height.h"
 
 
-extern "C" Matrix4 DAT_10db9210;                     // the player's world matrix
+#include "anim_model.h"
 extern "C" GroundOrigin *DAT_1020d860[0x60];         // the ground objects (0 = free)
 #include "map_vars.h"
 
@@ -21,7 +21,7 @@ extern "C" float FUN_10016700(int x, int y)
 {
     Vec4 player;
     Vec4 position;
-    player.Copy(DAT_10db9210.GetTranslation());
+    player.Copy(DAT_10db6ee8[PLAYER_SLOT].matrix.GetTranslation());
     int found = 0;
     DAT_104bfdb4 = -1;
     float best = 99999.0f;

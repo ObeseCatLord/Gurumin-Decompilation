@@ -4,7 +4,6 @@
 
 #include "vec4.h"
 
-#include "fader.h"
 
 #include "node.h"
 
@@ -12,10 +11,7 @@
 #include "render_vars.h"
 
 extern "C" void FUN_10194360(const Vec4 *, const Vec4 *, int, int, int);
-extern "C" Fader DAT_10f65688;
-extern "C" Fader DAT_10f668e8;
 extern "C" void FUN_1016ac90(int, int, int *);
-extern "C" char DAT_1101d8b8[0x100];
 
 // Sets the camera control mode DAT_1101de1c to 1.
 extern "C" int FUN_1016a8c0(void)
@@ -42,8 +38,8 @@ extern "C" int FUN_1016a8e0(void)
 extern "C" int FUN_1016ac50(const Vec4 *eye, const Vec4 *target, int a, int b)
 {
     FUN_10194360(eye, target, a, b, 0);
-    DAT_10f65688.M_101acc20(*eye);
-    DAT_10f668e8.M_101acc20(*target);
+    DAT_10f65688.Copy(*eye);
+    DAT_10f668e8.Copy(*target);
     return 0;
 }
 

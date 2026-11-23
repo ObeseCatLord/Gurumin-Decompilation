@@ -17,7 +17,6 @@
 #include "char_tables.h"
 #include "render_vars.h"
 
-extern "C" Vec4 DAT_10f668e8;
 
 // Finds the cell boxes that contain the eye position and marks them and all cells listed as visible from them.
 // Not byte-identical yet (see open.tsv).

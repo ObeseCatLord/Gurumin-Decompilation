@@ -9,7 +9,6 @@
 #include "game_vars.h"
 #include "script_vars.h"
 
-extern "C" int DAT_1020247c[8];       // queued script numbers
 
 // Runs every queued script in order and empties the queue. Returns 0.
 extern "C" int FUN_100fc3e0(void)

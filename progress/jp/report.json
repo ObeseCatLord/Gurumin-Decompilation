@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 15.1296,
+  "fuzzy_match_percent": 15.1294,
   "total_code": "1720206",
   "matched_code": "203750",
   "matched_code_percent": 11.8445,
@@ -16,10 +16,10 @@
   "complete_data_percent": 0.0,
   "total_units": 252,
   "complete_units": 147,
-  "matched_rules_code": "128208",
-  "matched_rules_code_percent": 7.4531,
-  "matched_rules_functions": 568,
-  "matched_rules_functions_percent": 46.8647
+  "matched_rules_code": "133828",
+  "matched_rules_code_percent": 7.7798,
+  "matched_rules_functions": 615,
+  "matched_rules_functions_percent": 50.7426
  },
  "units": [
   {
@@ -87,10 +87,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "1276",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 7,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -181,10 +181,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "722",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 6,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -1353,10 +1353,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "417",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 7,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -1447,10 +1447,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "728",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 9,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -2459,10 +2459,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 0,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "343",
+    "matched_rules_code_percent": 75.0547,
+    "matched_rules_functions": 9,
+    "matched_rules_functions_percent": 81.8182
    },
    "sections": [
     {
@@ -5247,10 +5247,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 0,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "432",
+    "matched_rules_code_percent": 63.1579,
+    "matched_rules_functions": 3,
+    "matched_rules_functions_percent": 75.0
    },
    "sections": [
     {
@@ -6953,10 +6953,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "523",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 2,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -8329,7 +8329,7 @@
   {
    "name": "app/map_enter_reset",
    "measures": {
-    "fuzzy_match_percent": 95.8022,
+    "fuzzy_match_percent": 95.4291,
     "total_code": "1069",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -8354,14 +8354,14 @@
     {
      "name": ".text",
      "size": "1069",
-     "fuzzy_match_percent": 95.8022
+     "fuzzy_match_percent": 95.4291
     }
    ],
    "functions": [
     {
      "name": "_FUN_10023900",
      "size": "1069",
-     "fuzzy_match_percent": 95.8022,
+     "fuzzy_match_percent": 95.4291,
      "metadata": {
       "virtual_address": "268581120"
      }
@@ -9273,10 +9273,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "918",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 2,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -9287,7 +9287,7 @@
    ],
    "functions": [
     {
-     "name": "?Draw@MeshSlot@@QAEHABUMatrix4@@@Z",
+     "name": "?Draw@EffectModel@@QAEHABUMatrix4@@@Z",
      "size": "794",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -11419,10 +11419,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "82",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {
@@ -13885,10 +13885,10 @@
     "complete_data_percent": 0.0,
     "total_units": 1,
     "complete_units": 1,
-    "matched_rules_code": "0",
-    "matched_rules_code_percent": 0.0,
-    "matched_rules_functions": 0,
-    "matched_rules_functions_percent": 0.0
+    "matched_rules_code": "179",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 1,
+    "matched_rules_functions_percent": 100.0
    },
    "sections": [
     {

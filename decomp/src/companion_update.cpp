@@ -27,7 +27,6 @@ extern "C" Node *DAT_1021bdf8[0x80][9];              // [1], [2]: the companion'
 #include "char_tables.h"
 #include "char_vars.h"
 
-extern "C" unsigned char DAT_10315350[0x80];
 extern "C" unsigned char DAT_104686b0[0x80];         // display state (2 = down, 7 = idle, 0x1e = revived)
 extern "C" unsigned char DAT_1020d4c0[0x80];
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound

@@ -48,7 +48,6 @@ struct MmvPlayer
 #include "ui_vars.h"
 #include "world.h"
 extern "C" int DAT_10202464;
-extern "C" int DAT_1020247c;
 extern "C" int DAT_1020d860[0x60];
 extern "C" int DAT_10219c40[0x40];
 extern "C" int DAT_10219fc0[0x40];
@@ -60,7 +59,6 @@ extern "C" int DAT_10255b08[0x40];
 extern "C" Node *DAT_10255f08;                       // collision world model
 extern "C" int DAT_1030bbf8[0x40];
 extern "C" int DAT_103150c0[0x20];
-extern "C" int DAT_10315350[0x18];
 extern "C" int DAT_1032d4b0;
 extern "C" int DAT_1032d5b8[0x30];
 extern "C" int DAT_1042de28[0x20];
@@ -77,7 +75,6 @@ extern "C" int DAT_104bf8a4;
 extern "C" int DAT_104bf8e8;
 extern "C" int DAT_104bf8f0;
 extern "C" int DAT_104bfb08[0x80];
-extern "C" int DAT_104bfd5c;
 extern "C" int DAT_104bfe24;
 #include "win_vars.h"
 extern "C" EmptyObject DAT_1065cb28;
@@ -464,7 +461,7 @@ extern "C" void FUN_1003e710(void)
   DAT_104bfe74 = 0;
   DAT_104bfe78 = 0;
   DAT_104bfe7c = 0;
-  DAT_1020247c = -1;
+  DAT_1020247c[0] = -1;
   DAT_10202480 = -1;
   DAT_10202484 = -1;
   DAT_10202488 = -1;
@@ -714,7 +711,7 @@ extern "C" void FUN_1003e710(void)
   memset(DAT_1021b5c8, 0, sizeof(DAT_1021b5c8));
   memset(DAT_104472b0, 0, sizeof(DAT_104472b0));
   memset(DAT_1020d860, 0, sizeof(DAT_1020d860));
-  memset(DAT_10315350, 0, sizeof(DAT_10315350));
+  memset(DAT_10315350, 0, 0x60);   // the original clears only the first 0x60 bytes
   DAT_1032d868 = 0;
   DAT_102548b8 = 0;
   DAT_1021a360 = 0;

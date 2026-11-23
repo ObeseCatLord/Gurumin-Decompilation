@@ -59,7 +59,6 @@ extern "C" void FUN_100cc1d0(const char *characterFile, int value)
 extern "C" void FUN_100123d0(void);              // Chars_ReloadModels
 extern "C" int FUN_1015c9e0(int mode);           // Screen_StartTransition (0 = end the transition)
 extern "C" int FUN_10001b40(void);               // SoundArc_Message221
-extern "C" Matrix4 DAT_10db9210;                 // the player's world matrix (character 0)
 
 // Finishes a pending scene start (DAT_104bfeb0) unless a cut-scene runs: reloads the character models, ends the
 // screen transition, clears the effects, resets the per-object sound table (when DAT_104c01b0 is clear), fills the
@@ -87,7 +86,7 @@ extern "C" void FUN_1003a6c0(void)
         DAT_104c022d = 0;
         for (int i = 0; i < 16; i++)
         {
-            DAT_10802ad8[DAT_104c022c].Copy(DAT_10db9210.GetTranslation());
+            DAT_10802ad8[DAT_104c022c].Copy(DAT_10db6ee8[PLAYER_SLOT].matrix.GetTranslation());
             DAT_104c022c = (DAT_104c022c + 1) & 0xf;
         }
         DAT_118e69e8.Copy(DAT_10da9150);

@@ -46,7 +46,7 @@ extern "C" int FUN_100165e0(int mode)
 
 #include "matrix4.h"
 
-extern "C" Matrix4 DAT_10db9210;    // the player's world matrix (character 0)
+#include "anim_model.h"
 
 // 0x10019210 (Player_LookAround). Moves the head-look target to a point 1000 units to one side of the player and
 // 500 units up, switching sides every ten calls, and (re)starts head tracking. Returns 0.
@@ -57,7 +57,7 @@ extern "C" int FUN_10019210(void)
     if (DAT_10c6358c >= 0)
     {
         DAT_10802ac8.RotateZ(1.5708f - DAT_10db9364);
-        DAT_10802ac8.Copy(DAT_10802ac8 + DAT_10db9210.GetTranslation());
+        DAT_10802ac8.Copy(DAT_10802ac8 + DAT_10db6ee8[PLAYER_SLOT].matrix.GetTranslation());
         DAT_10c6358c++;
         if (DAT_10c6358c >= 10)
         {
@@ -69,7 +69,7 @@ extern "C" int FUN_10019210(void)
     else
     {
         DAT_10802ac8.RotateZ(-DAT_10db9364 - 1.5708f);
-        DAT_10802ac8.Copy(DAT_10802ac8 + DAT_10db9210.GetTranslation());
+        DAT_10802ac8.Copy(DAT_10802ac8 + DAT_10db6ee8[PLAYER_SLOT].matrix.GetTranslation());
         DAT_10c6358c--;
         if (DAT_10c6358c <= -10)
             DAT_10c6358c = 1;

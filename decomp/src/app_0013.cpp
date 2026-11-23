@@ -7,7 +7,6 @@
 #include "char_vars.h"
 #include "game_vars.h"
 
-extern "C" char DAT_10467ea0[];
 extern "C" char *FUN_1013f910(const char *name);
 extern "C" void FUN_10001980(const char *, int, int, int, int, int, int);
 extern "C" void FUN_100016c0(const char *, int, int, int, int, int, int);

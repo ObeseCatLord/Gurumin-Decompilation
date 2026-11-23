@@ -7,14 +7,13 @@
 #include "matrix4.h"
 #include "char_slot.h"
 
-#include "char_matrix_view.h"
 
 
 #include "char_tables.h"
 #include "char_vars.h"
 
 extern "C" char DAT_1020d4c0[];       // per-character state written here (4 or 6)
-extern "C" CharMatrixView DAT_10db9210[];
+#include "anim_model.h"
 
 // 0x1001a840 (Char_ClampStatus). Clamps the counter (15) and level (5), clears the flag and keeps the larger value. A character whose
 // life has run out is marked down. Otherwise, in mode 7 the state becomes 6 when the count is above 4 and 4 when
@@ -39,12 +38,12 @@ extern "C" int FUN_1001a840(int index)
             if (DAT_1020d4c2[index + 3] > 4)
             {
                 if (DAT_104c00f8 != 0)
-                    DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db9210[index].matrix.GetTranslation());
+                    DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ee8[index].matrix.GetTranslation());
                 DAT_1020d4c0[index] = 6;
                 return 0;
             }
             if (DAT_104c00f8 != 0)
-                DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db9210[index].matrix.GetTranslation());
+                DAT_10f08080[index].Copy(DAT_10836c74 - DAT_10db6ee8[index].matrix.GetTranslation());
             DAT_1020d4c0[index] = 4;
             return 0;
         }

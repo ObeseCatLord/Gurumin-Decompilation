@@ -21,13 +21,7 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-// Per-slot state table at 0x10daaaec (actor_scan.cpp ActorSlot).
-struct ActorSlot
-{
-    int health;               // 0x00
-    int maxHealth;            // 0x04
-    char pad_0008[0x180];
-};
+#include "char_slot.h"
 
 struct RoutePoint
 {
@@ -38,7 +32,6 @@ struct RoutePoint
 };
 
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" RoutePoint DAT_10210fc0[][16];     // the routes of the map
 extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
 extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated

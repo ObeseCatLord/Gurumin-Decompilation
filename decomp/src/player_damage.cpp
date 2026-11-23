@@ -10,13 +10,7 @@ struct Matrix4;
 
 #include "anim_model.h"
 
-// Per-slot state table at 0x10daaaec (actor_scan.cpp ActorSlot).
-struct ActorSlot
-{
-    int health;               // 0x00
-    int maxHealth;            // 0x04
-    char pad_0008[0x180];
-};
+#include "char_slot.h"
 
 #include "texture_object.h"
 
@@ -34,7 +28,6 @@ struct MoviePlayer
 
 #include "game.h"
 
-extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" MoviePlayer DAT_10f08ab0;
 extern "C" int DAT_10202478;                  // texture slot the movies are decoded into
 extern "C" int DAT_104bfe78;                  // 1 once the game over has started

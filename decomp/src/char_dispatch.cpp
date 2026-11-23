@@ -1,9 +1,10 @@
-// Per-kind character update dispatch. CharSlot::m_0000 (DAT_10daab84) is the character's kind; kinds 100-107 are
+// Per-kind character update dispatch. CharSlot::kind (DAT_10daaaec) is the character's kind; kinds 100-107 are
 // the special characters with their own update routines.
 
 #include "world.h"
 #include "anim_model.h"
 #include "char_state.h"
+#include "char_slot.h"
 
 extern "C" int DAT_104bfe78;  // non-zero while character updates are suspended
 extern "C" int FUN_1010c650(int index);
@@ -28,7 +29,7 @@ extern "C" int FUN_101148b0(int index)
 {
     if (DAT_10db6ee8[index].matrix._41 > -50000.0f && DAT_104bfe78 == 0)
     {
-        switch (DAT_10daab84[index].m_0000)
+        switch (DAT_10daaaec[index].kind)
         {
         case 100:
             FUN_1010c650(index);
@@ -51,7 +52,7 @@ extern "C" int FUN_101148b0(int index)
 // for other kinds.
 extern "C" int FUN_1009e2d0(int index)
 {
-    int kind = DAT_10daab84[index].m_0000;
+    int kind = DAT_10daaaec[index].kind;
     if (kind == 0x47)
         return FUN_1009d100(index);
     if (kind == 0x48)

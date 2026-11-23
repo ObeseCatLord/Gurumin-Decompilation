@@ -35,19 +35,13 @@ struct SavedPosition
     float w;
 };
 
-// Per-slot state table at 0x10daaaec (actor_scan.cpp ActorSlot).
-struct ActorSlot
-{
-    int health;
-    char pad_0004[0x184];
-};
+#include "char_slot.h"
 
 #include "game.h"
 
 #include "char_state.h"
 
 extern "C" DamageZone DAT_10210fc0[];
-extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" SavedPosition DAT_10867e18[0x80];
 extern "C" int DAT_10210d30[0x80];               // non-zero = the character is being defeated
 extern "C" char DAT_1020d540[0x80];              // per zone character: also hurt enemies that are away

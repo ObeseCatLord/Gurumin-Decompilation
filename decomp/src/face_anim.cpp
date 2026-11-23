@@ -22,16 +22,9 @@ struct FaceSet
     char names[0x40][0x10];   // 0x300: face texture names (indexed by character, see below)
 };
 
-// The part of the per-character actor table (0x10daaaec, actor_scan.cpp) used here.
-struct ActorFace
-{
-    char pad_0000[0x90];
-    int faceSet;              // 0x90: face set of the character, -1 = no face animation
-    char pad_0094[0xf4];
-};
+#include "char_slot.h"
 
 extern "C" FaceSet DAT_1087664c[0x80];
-extern "C" ActorFace DAT_10daaaec[0x80];
 extern "C" short DAT_10b314c0;           // last face frame set
 extern "C" int DAT_10c655f0;             // current costume
 extern "C" int DAT_1030c278[0x80];       // frames until the next face change (0 = none)

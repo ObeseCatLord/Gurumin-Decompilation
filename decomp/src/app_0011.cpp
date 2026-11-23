@@ -5,6 +5,7 @@
 #include "world.h"
 #include "anim_model.h"
 #include "char_state.h"
+#include "char_slot.h"
 
 extern "C" int DAT_10255f10[];
 extern "C" int FUN_1013f880(void);
@@ -70,7 +71,7 @@ extern "C" int FUN_10034c80(int index)
 {
     if (DAT_10210d30[index] != 0)
         return 1;
-    DAT_10daab84[index].m_00a5 = 1;
+    DAT_10daaaec[index].m_013d = 1;
     DAT_1020b430[index].behaviour = 1;
     return 0;
 }

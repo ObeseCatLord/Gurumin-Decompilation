@@ -6,12 +6,7 @@
 #include "vec4.h"
 #include "char_state.h"
 
-// A character slot record (world.h CharSlot): only the kind is used here.
-struct CharSlot
-{
-    int kind;                 // behaviour kind (variant * 10000 + kind while being set)
-    char pad_0004[0x184];
-};
+#include "char_slot.h"
 
 // The last position and step of each character (route_walk.cpp StepRecord).
 struct LastPosition
@@ -21,7 +16,6 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" int DAT_102548c0[0x80];                   // script code of each character (pairs of decimal digits)
 extern "C" int DAT_1030b668[0x80];                   // base kind of each character (-1 or 0 = none)
 extern "C" int DAT_1020b230[0x80];                   // kind variant (the kind's ten-thousands)
@@ -39,7 +33,7 @@ extern "C" LastPosition DAT_10802bf8[0x80];
 extern "C" int FUN_1001b0a0(int index, int alternative, int quiet)
 {
     int code = DAT_102548c0[index];
-    int *kind = &DAT_10daab84[index].kind;
+    int *kind = &DAT_10daaaec[index].kind;
     int old = *kind;
     int special = code / 1000000 % 100;
     int apply = 1;

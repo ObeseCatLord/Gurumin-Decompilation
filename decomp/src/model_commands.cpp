@@ -17,16 +17,9 @@ struct ModelDef
 
 #include "anim_model.h"
 
-// Character slot record (world.h CharSlot), only the model id.
-struct CharSlot
-{
-    char pad_0000[0x60];
-    int model;                    // 0x60: model definition of the character
-    char pad_0064[0x124];
-};
+#include "char_slot.h"
 
 extern "C" ModelDef DAT_10b314c4[];
-extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" int DAT_104c02f0;      // "DAT" source of the player for kind 4
 extern "C" int DAT_10c652cc;      // "DAT" source of the player for the other kinds
 extern "C" int DAT_104c0314;      // "DAT" source of the other characters
@@ -47,7 +40,7 @@ extern "C" void FUN_10012220(int a, int b)
     else
     {
         index = a;
-        model = DAT_10daab84[a].model;
+        model = DAT_10daaaec[a].model;
     }
     for (int i = 0; i < DAT_10b314c4[model].commandCount; i++)
     {

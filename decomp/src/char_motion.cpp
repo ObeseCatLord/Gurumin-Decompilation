@@ -3,6 +3,7 @@
 #include "world.h"
 #include "anim_model.h"
 #include "char_state.h"
+#include "char_slot.h"
 
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
 
@@ -34,9 +35,9 @@ extern "C" void FUN_100123d0(void)
     {
         if (i != 0 && DAT_10db6ee8[i].matrix._41 < -50000.0f)
             continue;
-        if (DAT_10daab84[i].m_0004 != 0 && DAT_10daab84[i - 1].m_000c == 0)
+        if (DAT_10daaaec[i].m_009c != 0 && DAT_10daaaec[i - 1].m_00a4 == 0)
             continue;
-        DAT_10db6ee8[i].LoadModel(FUN_1013f8a0(DAT_10b314c8[DAT_10daab84[i].m_0060].path, 0));
+        DAT_10db6ee8[i].LoadModel(FUN_1013f8a0(DAT_10b314c8[DAT_10daaaec[i].model].path, 0));
         FUN_10012220(i, -1);
     }
 }

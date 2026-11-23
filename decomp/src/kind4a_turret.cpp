@@ -11,17 +11,8 @@
 
 #include "char_state.h"
 
-// Per-slot state table at 0x10daaaec (actor_scan.cpp ActorSlot).
-struct ActorSlot
-{
-    int m_0000;
-    int m_0004;
-    int pad_0008;
-    int m_000c;                   // 0x0c: passed to the effects the character starts
-    char pad_0010[0x178];
-};
+#include "char_slot.h"
 
-extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" char DAT_10255a88[0x80];
 extern "C" char DAT_102550e0[0x80];              // 1 = the character was hit (attack at once)
 extern "C" int FUN_1013f880(void);               // the game's random number

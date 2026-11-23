@@ -8,6 +8,7 @@
 
 #include "anim_model.h"
 #include "char_state.h"
+#include "char_slot.h"
 
 // Absolute value of a float (an inline helper: its argument is rounded to float first).
 inline float AbsFloat(float value)
@@ -47,7 +48,7 @@ extern "C" int FUN_100ba040(void)
         int i;
         for (i = 0x5c; i < 0x80; i++)
         {
-            if (DAT_10daab84[i].m_0000 != 0x140)
+            if (DAT_10daaaec[i].kind != 0x140)
                 continue;
             other.Copy(DAT_10db6ee8[i].matrix.GetTranslation());
             float height = AbsFloat(other.z - player.z);

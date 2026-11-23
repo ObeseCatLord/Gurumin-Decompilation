@@ -8,14 +8,7 @@
 
 #include "anim_model.h"
 
-// Per-character slot record, 0x188 bytes (world.h CharSlot).
-struct SlotRecord
-{
-    int kind;                 // 0x00: character kind (0x62 = the one that fades the screen on reset)
-    char pad_0004[0xa1];
-    char m_00a5;              // 0xa5
-    char pad_00a6[0xe2];
-};
+#include "char_slot.h"
 
 #include "char_state.h"
 
@@ -33,7 +26,6 @@ struct PoseEntry
     int words[9];
 };
 
-extern "C" SlotRecord DAT_10daab84[0x80];
 extern "C" StartVectors DAT_10802bf8[0x80];
 extern "C" PoseEntry DAT_1021bdf8[0x80];
 extern "C" char DAT_10255a88[0x80];
@@ -50,9 +42,9 @@ extern "C" int FUN_1001b0a0(int index, int a, int b);
 // four fields of its packed value (BB, CC, DD, AA) and FUN_1001b0a0 with zeros. Returns 0.
 extern "C" int FUN_10043cc0(int index)
 {
-    if (DAT_10daab84[index].kind == 0x62 && (DAT_1020b430[index].behaviour == 11 || DAT_1020b430[index].behaviour == 12))
+    if (DAT_10daaaec[index].kind == 0x62 && (DAT_1020b430[index].behaviour == 11 || DAT_1020b430[index].behaviour == 12))
         FUN_1000ec70(15, 1.0f, 1.0f, 1.0f, 1.0f);
-    DAT_10daab84[index].m_00a5 = 0;
+    DAT_10daaaec[index].m_013d = 0;
     memset(&DAT_1020b430[index], 0, sizeof(CharState));
     DAT_10db6ee8[index].m_0267 = 0;
     DAT_10db6ee8[index].mode = 1;

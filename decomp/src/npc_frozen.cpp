@@ -15,25 +15,10 @@ Matrix4 RotationZ(float angle);                  // 0x101b1b40
 
 typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
-// Per-slot state table at 0x10daaaec (actor_scan.cpp ActorSlot).
-struct ActorSlot
-{
-    int health;               // 0x00
-    int maxHealth;            // 0x04
-    char pad_0008[0x78];
-    int m_0080;               // 0x80: 1 = released by its group
-    char pad_0084[0x10];
-    int m_0094;               // 0x94: 0x1d while held
-    char pad_0098[0xa6];
-    char m_013e;              // 0x13e: 1 while held
-    char pad_013f;
-    char m_0140;              // 0x140: kept in CharState m_000c while held
-    char pad_0141[0x47];
-};
+#include "char_slot.h"
 
 #include "char_state.h"
 
-extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" short DAT_103153b0[0x80];           // non-zero = release now
 extern "C" char DAT_10255a88[0x80];
 extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
@@ -66,7 +51,7 @@ int FUN_100469d0(int index)
         DAT_10db6ee8[index].mode = 0;
         DAT_10db6ee8[index].m_0267 = 1;
         DAT_10db6ee8[index].m_0294 = 1;
-        DAT_10daaaec[index].m_013e = 1;
+        DAT_10daaaec[index].held = 1;
         DAT_10daaaec[index].m_0094 = 0x1d;
         DAT_10255a88[index] = 0;
     }
@@ -85,7 +70,7 @@ int FUN_100469d0(int index)
         DAT_10db6ee8[index].mode = 0;
         DAT_10db6ee8[index].m_0267 = 1;
         DAT_10db6ee8[index].m_0294 = 1;
-        DAT_10daaaec[index].m_013e = 1;
+        DAT_10daaaec[index].held = 1;
         DAT_10daaaec[index].m_0094 = 0x1d;
         DAT_10255a88[index] = 0;
         if (DAT_103153b0[index] == 0 && DAT_10daaaec[index].m_0080 != 1)
@@ -100,7 +85,7 @@ int FUN_100469d0(int index)
         DAT_10daaaec[index].m_0140 = (char)DAT_1020b430[index].saved;
         DAT_10db6ee8[index].mode = 1;
         DAT_10db6ee8[index].m_0267 = 0;
-        DAT_10daaaec[index].m_013e = 0;
+        DAT_10daaaec[index].held = 0;
         DAT_10daaaec[index].m_0094 = 0;
         DAT_10daaa80.RemoveOwnedBy(index + 100);
         Vec4 position;

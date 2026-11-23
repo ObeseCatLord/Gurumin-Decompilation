@@ -61,16 +61,10 @@ extern "C" void FUN_10034fe0(void)
 // Per-character attachment matrices (6 per character slot) for kind-0x58 characters.
 extern "C" Matrix4 DAT_108687f8[0x80 * 6];
 
-// The parts of world.h used here (CharSlot kind, CharState slot values).
-struct KindSlot
-{
-    int kind;
-    char pad_0004[0x184];
-};
+#include "char_slot.h"
 
 #include "char_state.h"
 
-extern "C" KindSlot DAT_10daab84[0x80];
 
 // Finds the first free attachment slot among the kind-0x58 characters 0x5c..0x7b, stores `matrix` there with the
 // four values a..d in its fourth column, records `value` for the slot and returns the character and slot index in
@@ -80,7 +74,7 @@ extern "C" int FUN_1001c410(int value, const Matrix4 *matrix, int *outChar, int 
 {
     for (int i = 0x5c; i < 0x7c; i++)
     {
-        if (DAT_10daab84[i].kind == 0x58)
+        if (DAT_10daaaec[i].kind == 0x58)
         {
             for (int j = 1; j < 7; j++)
             {

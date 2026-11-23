@@ -4,20 +4,13 @@
 // A character slot record (world.h CharSlot): only the kind is used here.
 #include "char_state.h"
 
-struct CharSlot
-{
-    int kind;
-    char pad_0004[0x184];
-};
-
-extern "C" CharSlot DAT_10daab84[0x80];
+#include "char_slot.h"
 
 // The cooldown counters of the different enemy kinds live in the behaviour state words of the enemy's own slot
 // or of the slot before or after it (char_state.h).
 
 extern "C" int DAT_10c66cc0;                         // non-zero = voices are not limited
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
-
 
 // 0x100b9bb0 (Enemy_PlayVoice). Plays voice `sound` of enemy `index` unless its cooldown is running (`limited`
 // voices are skipped entirely unless DAT_10c66cc0 is set). The kinds 100, 0x46, 0x69, 0x2d, 0x3f and 0x43 keep their
@@ -27,7 +20,7 @@ extern "C" int FUN_100b9bb0(int index, int sound, int reset, int limited)
 {
     if (DAT_10c66cc0 == 0 && limited != 0)
         return 0;
-    int kind = DAT_10daab84[index].kind;
+    int kind = DAT_10daaaec[index].kind;
     int slot;
     if (kind == 100)
         slot = 10;

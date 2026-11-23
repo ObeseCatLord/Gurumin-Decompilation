@@ -17,14 +17,8 @@ typedef char check_charrecord[sizeof(AnimModel) == 0x249c ? 1 : -1];
 
 #include "char_state.h"
 
-// A character slot record (world.h CharSlot), only the kind is used here.
-struct CharSlot
-{
-    int kind;                 // 0x00: behaviour kind
-    char pad_0004[0x184];
-};
+#include "char_slot.h"
 
-extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" Node *DAT_1021bdf8[0x80][9];       // [0]: the cart's wheel node
 extern "C" Matrix4 DAT_10868838[0x80][6];     // saved node matrices of each character
 extern "C" float DAT_10255160[0x80][4];       // [0]: the wheel's angle
@@ -146,7 +140,7 @@ int FUN_10047440(int index)
         DAT_1021f740[index] = 60;
         DAT_10db6ee8[index].targetHeading = Atan2(player.x - self.x, player.y - self.y) + 3.1415f;
         FUN_10043cc0(index);
-        int kind = DAT_10daab84[index].kind;
+        int kind = DAT_10daaaec[index].kind;
         if (kind == 0x44 || kind == 0x59)
             *angle = saved;
         *react = 0;

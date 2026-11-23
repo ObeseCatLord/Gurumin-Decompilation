@@ -2,6 +2,7 @@
 
 #include "world.h"
 #include "char_state.h"
+#include "char_slot.h"
 
 extern "C" char DAT_1030ce38[0x80];
 extern "C" int DAT_1030b668[0x80];
@@ -17,7 +18,7 @@ extern "C" int DAT_10daaafc[];
 // first time so they can be restored later.
 extern "C" int FUN_1001b5b0(int index)
 {
-    int value = DAT_10daab84[index].m_003c;
+    int value = DAT_10daaaec[index].m_00d4;
     DAT_1020b430[index].values[1] = value / 100000;
     int rest = value / 10 % 10000;
     DAT_1020b430[index].behaviour = rest;
@@ -26,14 +27,14 @@ extern "C" int FUN_1001b5b0(int index)
         DAT_1030ce38[index] = 1;
         if (DAT_1030b668[index] == 0)
         {
-            DAT_1030b668[index] = DAT_10daab84[index].m_0000;
+            DAT_1030b668[index] = DAT_10daaaec[index].kind;
             if (DAT_1030b668[index] == 0)
                 DAT_1030b668[index] = -1;
-            DAT_104679a0[index] = DAT_10daab84[index].m_00a7;
+            DAT_104679a0[index] = DAT_10daaaec[index].m_013f;
             DAT_10314ec0[index] = DAT_10daaaf8[index * 0x62];
             DAT_1021f440[index] = DAT_10daaafc[index * 0x62];
         }
-        DAT_10daab84[index].m_0000 = 0x62;
+        DAT_10daaaec[index].kind = 0x62;
     }
     return 0;
 }

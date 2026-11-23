@@ -23,13 +23,7 @@ struct LastPosition
     char pad_0020[0x20];
 };
 
-// A character slot record (world.h CharSlot), only the flag used here.
-struct CharSlot
-{
-    char pad_0000[0xa5];
-    char m_00a5;              // 0xa5: cleared while it swings
-    char pad_00a6[0xe2];
-};
+#include "char_slot.h"
 
 struct CollisionWorld
 {
@@ -37,7 +31,6 @@ struct CollisionWorld
 };
 
 extern "C" LastPosition DAT_10802bf8[0x80];
-extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" int DAT_10210b30[0x80];            // non-zero = told to react
 extern "C" char DAT_10255a88[0x80];
 extern "C" CollisionWorld *DAT_10255f08;
@@ -86,7 +79,7 @@ extern "C" int FUN_10044560(int index)
     if (DAT_1020b430[index].state == 0)
     {
         DAT_10db6ee8[index].PlayMotion(3, 0, 5, 1.0f);
-        DAT_10daab84[index].m_00a5 = 0;
+        DAT_10daaaec[index].m_013d = 0;
         DAT_10802bf8[index].position.Copy(self);
         DAT_10802bf8[index].position.z += 100.0f;
         DAT_10db6ee8[index].SetPosition(self.x, self.y, self.z + 500.0f);

@@ -5,6 +5,7 @@
 #include "vec4.h"
 #include "anim_model.h"
 #include "char_state.h"
+#include "char_slot.h"
 
 // Map object (0x10874848) that animates the switch nodes ("LEVERON" and its off state).
 struct MapObject
@@ -29,7 +30,7 @@ extern "C" int FUN_10057b90(int holder)
             int who = DAT_10255b08[i];
             if (who < 0x80)
             {
-                DAT_10daab84[who].m_00a4--;
+                DAT_10daaaec[who].switchesHeld--;
                 DAT_10874848.M_10054f30(DAT_10db6ee8[who].switchNode, 0);
             }
             else if (DAT_10254838[who % 0x80] >= 1000)
@@ -152,7 +153,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
     {
         if (holder < 0x80)
         {
-            DAT_10daab84[holder].m_00a4 |= 1;
+            DAT_10daaaec[holder].switchesHeld |= 1;
             if (DAT_1021f3c0[holder] == 0x60)
                 DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
         }
@@ -163,7 +164,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
     {
         if (holder < 0x80)
         {
-            DAT_10daab84[holder].m_00a4 |= 1;
+            DAT_10daaaec[holder].switchesHeld |= 1;
             if (DAT_1021f3c0[holder] == 0x60)
                 DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
         }
@@ -174,7 +175,7 @@ extern "C" int FUN_10057c40(int holder, int object, int kind)
     {
         if (holder < 0x80)
         {
-            DAT_10daab84[holder].m_00a4 |= 2;
+            DAT_10daaaec[holder].switchesHeld |= 2;
             if (DAT_1021f3c0[holder] == 0x60)
                 DAT_10874848.M_10054f30(DAT_10db6ee8[holder].switchNode, 1);
         }

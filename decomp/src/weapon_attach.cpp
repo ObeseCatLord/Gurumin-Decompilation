@@ -8,15 +8,8 @@
 #include "anim_model.h"
 #include "char_state.h"
 
-// A character slot record (world.h CharSlot): only m_0038 is used here.
-struct CharSlot
-{
-    char pad_0000[0x38];
-    int twoHanded;                                   // 0x38: set for the two-handed weapons 0x36 and 0x37
-    char pad_003c[0x14c];
-};
+#include "char_slot.h"
 
-extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" Node *DAT_10446e00[0x28];
 extern "C" int DAT_1021d018[0x28];
 extern "C" int DAT_104bf8a4;
@@ -140,7 +133,7 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
             if (left != 0)
             {
                 if (weapon == 0x36 || weapon == 0x37)
-                    DAT_10daab84[index].twoHanded = 1;
+                    DAT_10daaaec[index].twoHanded = 1;
                 Node *hand = DAT_10db6ee8[index].root->Find("@Bip01 L Hand", 0);
                 if (hand != 0)
                 {

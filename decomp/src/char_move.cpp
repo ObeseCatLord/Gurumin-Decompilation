@@ -263,16 +263,8 @@ struct CollisionWorld
                 float *t);                                              // 0x101a9670
 };
 
-// A character slot record (world.h CharSlot).
-struct CharSlot
-{
-    int kind;                 // 0x00: behaviour kind (0x62 = enemy)
-    char pad_0004[0xa1];
-    char m_00a5;              // 0xa5: set every frame while the watcher below runs
-    char pad_00a6[0xe2];
-};
+#include "char_slot.h"
 
-extern "C" CharSlot DAT_10daab84[0x80];
 extern "C" CollisionWorld *DAT_10255f08;
 extern "C" unsigned short DAT_104c0380;       // frame counter
 extern "C" int DAT_102199b8[0x80];            // per-character group timer (char_reset.cpp)
@@ -286,7 +278,7 @@ int FUN_100b5c30(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     float distance = (player - self).Length2D();
-    DAT_10daab84[index].m_00a5 = 1;
+    DAT_10daaaec[index].m_013d = 1;
     int visible = 0;
     if (DAT_104c0380 % 10 == index % 10)
     {
@@ -344,7 +336,7 @@ int FUN_100b5f80(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     float distance = (player - self).Length2D();
-    DAT_10daab84[index].m_00a5 = 1;
+    DAT_10daaaec[index].m_013d = 1;
     int visible = 0;
     if (DAT_104c0380 % 10 == index % 10)
     {
@@ -480,7 +472,7 @@ extern "C" int FUN_100b3430(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     float distance = (player - self).Length2D();
-    DAT_10daab84[index].m_00a5 = 1;
+    DAT_10daaaec[index].m_013d = 1;
     int visible = 0;
     if (DAT_104c0380 % 10 == index % 10)
     {
@@ -549,7 +541,7 @@ extern "C" int FUN_100b3430(int index)
         {
             DAT_10db6ee8[index].alpha = 1.0f;
             FUN_10043cc0(index);
-            DAT_10daab84[index].m_00a5 = 0;
+            DAT_10daaaec[index].m_013d = 0;
         }
     }
     return 0;
@@ -975,19 +967,8 @@ int FUN_100b4f00(int index)
     return 0;
 }
 
-// Per-slot state table at 0x10daaaec, 0x188 bytes per slot (actor_scan.cpp ActorSlot).
-struct ActorSlot
-{
-    int health;               // 0x00
-    int maxHealth;            // 0x04: initial value of health
-    char pad_0008[4];
-    int m_000c;               // 0x0c: passed to the effects it starts
-    char pad_0010[0x178];
-};
-
 #include "game.h"
 
-extern "C" ActorSlot DAT_10daaaec[0x80];
 extern "C" int DAT_10210d30[0x80];            // non-zero = the character is being defeated
 extern "C" char DAT_10468730[0x80];
 extern "C" int DAT_1032d69c;                  // 1 once the game built-ins are registered
@@ -1047,7 +1028,7 @@ extern "C" int FUN_100b4300(int index)
                 int i;
                 for (i = 0x3a; i < index; i++)
                 {
-                    if (DAT_10db6ee8[i].matrix.m[12] > -20000.0f && DAT_10210d30[i] == 0 && DAT_10daab84[i].kind == 0x62 &&
+                    if (DAT_10db6ee8[i].matrix.m[12] > -20000.0f && DAT_10210d30[i] == 0 && DAT_10daaaec[i].kind == 0x62 &&
                         (DAT_1020b430[i].behaviour == 11 || DAT_1020b430[i].behaviour == 12) &&
                         (DAT_1020b430[i].sawPlayer != 0 || DAT_1020b430[i].state == 2))
                         break;
@@ -1652,7 +1633,7 @@ extern "C" int FUN_10049240(int index)
     }
     else if (DAT_1020b430[index].state == 2)
     {
-        DAT_10daab84[index].m_00a5 = 0;
+        DAT_10daaaec[index].m_013d = 0;
         DAT_10db6ee8[index].mode = 0;
         switch (DAT_1020b430[index].talk % 10)
         {
@@ -1682,7 +1663,7 @@ extern "C" int FUN_10049240(int index)
     else if (DAT_1020b430[index].state == 3)
     {
         DAT_10db6ee8[index].alpha = 0;
-        DAT_10daab84[index].m_00a5 = 1;
+        DAT_10daaaec[index].m_013d = 1;
         if ((player - self).Length() < 800.0f)
             DAT_1020b430[index].state = 2;
     }

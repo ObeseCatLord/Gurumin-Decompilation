@@ -39,10 +39,51 @@
 #define FIRE_NODE_NAME "@firenull"      // node the fire effects start from (else the head)
 #define RUN_MOTION 1                    // motion played while spinning
 
+// Enemy_StarVolley (0x100a7150). CharState words: `state` 0 = starting, 1 = running; `talk` (0x08) = volleys left,
+// `range` (0x0c) = frames to the next step of the volley, `action` (0x10) = frames before the next run may start.
+#define STAR_POINT_COUNT 5              // shot points in a ring around the enemy (DAT_10868838[index][0..4])
+#define STAR_POINT_STEP 1.25664f        // angle between the shot points (a fifth of a turn)
+#define STAR_POINT_DISTANCE -50.0f      // the ring's radius (behind the enemy before turning)
+#define STAR_POINT_HEIGHT 75.0f         // the ring's height above the enemy's feet
+#define STAR_SHOT_EFFECT 600            // one shot, fired from a ring point at the player
+#define STAR_SHOT_SOUND 0x1c5           // played with each step that fires
+#define STAR_SHOT_SCALE 1.1f            // EffectOptions::m_0008 of a shot
+#define STAR_START_DISTANCE 1000.0f     // runs start only while the player is nearer than this
+#define STAR_MAX_VOLLEYS 10             // a run fires 1 to 10 volleys
+#define STAR_VOLLEY_STEP 5              // a volley fires on the steps 10, 5 and 0 of its countdown
+#define STAR_VOLLEY_START 10
+#define STAR_VOLLEY_FRAMES 15           // the next run waits (volleys + 8) * this frames
+#define STAR_VOLLEY_GAP 25              // countdown between volleys ...
+#define STAR_VOLLEY_GAP_MODE2 15        // ... and when DAT_10c635f8 is 2
+#define STAR_SIDE_ANGLE 1.25664f        // the second step fires two shots this far left and right of straight ahead
+#define STAR_WIDE_ANGLE 2.51327f        // the third step fires two shots this far left and right
+#define STAR_TURN_LIMIT 0.5236f         // radians the enemy turns per frame towards the player (30 degrees)
+#define ONE_DEGREE 0.017453f            // radians
+#define MIN_AIM_DISTANCE 1.0f           // nearer than this a shot goes straight ahead instead of up or down
+
+// Enemy_AimedShots (0x100a6a50): the same words as Enemy_StarVolley; one shot point (DAT_10868838[index][0]) and the
+// same ring constants, a run of 1 to 10 shots 15 frames apart.
+#define AIMED_SHOT_GAP 15               // frames between two shots of a run
+#define AIMED_RUN_EXTRA 4               // the next run waits (shots + this) * STAR_VOLLEY_FRAMES frames
+#define AIMED_SIDE_ANGLE 0.5236f        // with DAT_10c635f8 == 2 two more shots fly 30 degrees left and right
+
+// Enemy_CallBursts (0x100a8370): `state` = BARRAGE_RUNNING while it runs, `wait` = frames since it started (set to
+// BURST_FIRED once the bursts are out).
+#define BURST_MOTION_SPEED 15.0f        // AnimModel::AddMotionSpeed when the call starts
+#define BURST_FIRED 1000                // `wait` jumps here once the bursts are fired ...
+#define BURST_END 1060                  // ... and the enemy walks again after this
+#define BURST_EFFECT 0x3705             // one burst
+#define BURST_SCALE 1.3f                // EffectOptions::m_0008 of a burst
+#define BURST_FRAME_SPREAD 30           // each burst starts 0 to 29 frames late
+#define BURST_NODE_NAME "Bip01 Spine"   // the bursts follow this node of the player (else the head, else the player)
+
 #define FACING_TOLERANCE_SQUARED 0.000304503f  // (one degree in radians) squared: closer than this counts as facing
 
 // The behaviours (C++ functions: their temporaries are unwound on exceptions).
 int Enemy_CallBarrage(int index);       // 0x100a77f0 (enemy_barrage.cpp)
 int Enemy_SpinFire(int index);          // 0x100a7db0 (enemy_barrage.cpp)
+int Enemy_StarVolley(int index);        // 0x100a7150 (enemy_barrage.cpp)
+int Enemy_AimedShots(int index);        // 0x100a6a50 (enemy_barrage.cpp)
+int Enemy_CallBursts(int index, int variant);  // 0x100a8370 (enemy_barrage.cpp)
 
 #endif

@@ -88,9 +88,6 @@ extern "C" int FUN_100af1b0(int index);
 extern "C" int FUN_100ade30(int index, int variant);
 extern "C" int FUN_100a5960(int index);
 extern "C" int FUN_10076790(int index, int variant);
-extern "C" int FUN_100a6a50(int index);
-extern "C" int FUN_100a7150(int index);
-extern "C" int FUN_100a8370(int index, int variant);
 extern "C" int FUN_1001d2d0(int index);
 
 // 0x100bcb30. Runs the behaviour updater of character `index` chosen by its behaviour number in DAT_1020b230
@@ -129,10 +126,10 @@ extern "C" int FUN_100bcb30(int index)
         FUN_10076790(index, 1);
         return 0;
     case 12:
-        FUN_100a6a50(index);
+        Enemy_AimedShots(index);
         return 0;
     case 13:
-        FUN_100a7150(index);
+        Enemy_StarVolley(index);
         return 0;
     case 14:
         Enemy_SpinFire(index);
@@ -141,10 +138,10 @@ extern "C" int FUN_100bcb30(int index)
         Enemy_CallBarrage(index);
         return 0;
     case 16:
-        FUN_100a8370(index, 0);
+        Enemy_CallBursts(index, 0);
         return 0;
     case 17:
-        FUN_100a8370(index, 1);
+        Enemy_CallBursts(index, 1);
         return 0;
     case 99:
         FUN_1001d2d0(index);

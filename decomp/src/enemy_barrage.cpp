@@ -16,6 +16,12 @@
 
 #include "char_state.h"
 
+#include "char_tables.h"
+
+#include "map_vars.h"
+
+#include "char_vars.h"
+
 #include "barrage_enemy.h"
 
 #include "strafe_enemy.h"
@@ -26,6 +32,8 @@ extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, in
                             int value, int frame, const Matrix4 *matrix, const void *options);  // Char_StartEffect
 extern "C" int FUN_10076790(int index, int variant);                        // the common enemy behaviour
 Matrix4 RotationZ(float angle);                                             // 0x101b1b40
+Matrix4 RotationX(float angle);                                             // 0x101b1ad0
+extern "C" int FUN_1001bfb0(int index, float maxTurn);                      // Char_LimitTurn (char_turn.cpp)
 
 #define FULL_TURN 6.283f               // two pi as the game writes it
 
@@ -213,6 +221,311 @@ int Enemy_SpinFire(int index)
             DAT_1020b430[index].wait = 0;
         }
         DAT_10db6ee8[index].PlayMotion(RUN_MOTION, starting, 5, 1.0f);
+    }
+    else
+    {
+        FUN_10076790(index, 0);
+        if (DAT_10db6ee8[index].motion->layer != BARRAGE_BLOCKING_LAYER &&
+            DAT_10db6ee8[index].motion->blending == 0 && FUN_1013f880() % 10000 < BARRAGE_CHANCE)
+        {
+            DAT_1020b430[index].state = BARRAGE_RUNNING;
+            DAT_1020b430[index].wait = 0;
+        }
+    }
+    return 0;
+}
+
+// 0x100a7150 (Enemy_StarVolley, behaviour 13 of Enemy_UpdateBehaviour). Turns to the player at most 30 degrees a
+// frame (motion 2 once facing within a degree, else motion 0). While the player is nearer than 1000 units it starts
+// runs of 1 to 10 volleys; each volley fires effect 600 at the player from points of a five-point ring around the
+// enemy (radius 50, 75 units up): point 1 straight ahead, then points 2 and 5 at 72 degrees, then points 3 and 4 at
+// 144 degrees, five frames apart (sound 0x1c5 with each step). The ring points (DAT_10868838[index][0..4]) are
+// placed again every frame. The first frame only sets `state` to 1. Returns 0.
+int Enemy_StarVolley(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    float distance = (player - self).Length();
+    (player - self).Length2D();  // computed and dropped
+    if (DAT_1020b430[index].state == 0)
+        DAT_1020b430[index].state = 1;
+    else if (DAT_1020b430[index].state == 1)
+    {
+        float dy = player.y - self.y;
+        float dx = player.x - self.x;
+        DAT_10db6ee8[index].targetHeading = (float)atan2((double)dx, (double)dy) + PI_APPROX;
+        FUN_1001bfb0(index, STAR_TURN_LIMIT);
+        float turn = DAT_10db6ee8[index].targetHeading - DAT_10db6ee8[index].heading;
+        turn = (float)fabs(turn);
+        int motion = turn > ONE_DEGREE ? 0 : 2;  // idle once facing the player
+        if (DAT_1020b430[index].action > 0)
+            DAT_1020b430[index].action--;
+        if (DAT_1020b430[index].action == 0 && distance < STAR_START_DISTANCE)
+        {
+            // a new run of volleys
+            int volleys = FUN_1013f880() % STAR_MAX_VOLLEYS;
+            DAT_1020b430[index].range = STAR_VOLLEY_START;
+            DAT_1020b430[index].talk = volleys + 1;
+            DAT_1020b430[index].action = (DAT_1020b430[index].talk + 8) * STAR_VOLLEY_FRAMES;
+        }
+        if (DAT_1020b430[index].talk != 0 && DAT_1020b430[index].range % STAR_VOLLEY_STEP == 0)
+        {
+            // which ring points fire this step, and their angles from straight ahead
+            int step = DAT_1020b430[index].range;
+            int points[2];
+            float angles[2];
+            points[0] = points[1] = 0;
+            if (step == STAR_VOLLEY_START)
+            {
+                points[0] = 1;
+                points[1] = 0;
+                angles[0] = 0.0f;
+                angles[1] = 0.0f;
+            }
+            else if (step == STAR_VOLLEY_STEP)
+            {
+                points[0] = 2;
+                points[1] = 5;
+                angles[0] = STAR_SIDE_ANGLE;
+                angles[1] = -STAR_SIDE_ANGLE;
+            }
+            else if (step == 0)
+            {
+                points[0] = 3;
+                points[1] = 4;
+                angles[0] = STAR_WIDE_ANGLE;
+                angles[1] = -STAR_WIDE_ANGLE;
+            }
+            if (DAT_1020b430[index].range == 0)
+            {
+                // the volley is done; wait for the next one
+                DAT_1020b430[index].talk--;
+                DAT_1020b430[index].range = DAT_10c635f8 == 2 ? STAR_VOLLEY_GAP_MODE2 : STAR_VOLLEY_GAP;
+            }
+            Matrix4 shot;
+            EffectOptions options;
+            Vec4 aim;
+            int fired = 0;
+            for (int i = 0; i < 2; i++)
+            {
+                if (points[i] != 0)
+                {
+                    fired = 1;
+                    aim.Copy(player - self);
+                    if (aim.Length() < MIN_AIM_DISTANCE)
+                        shot = RotationZ(angles[i] + DAT_10db6ee8[index].heading);
+                    else if (aim.z > 0.0f)
+                        shot = RotationX(acosf(aim.Length2D() / aim.Length())) *
+                               RotationZ(angles[i] + DAT_10db6ee8[index].targetHeading);
+                    else
+                        shot = RotationX(-acosf(aim.Length2D() / aim.Length())) *
+                               RotationZ(angles[i] + DAT_10db6ee8[index].targetHeading);
+                    options.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
+                    options.m_0008 = STAR_SHOT_SCALE;
+                    aim.Fill(0.0f);
+                    // ring point n is DAT_10868838[index][n - 1]
+                    FUN_1001d8b0(index, STAR_SHOT_EFFECT, aim, -1, -1, &DAT_10868838[index][points[i] - 1], 0, 0,
+                                 &shot, &options);
+                }
+            }
+            if (fired)
+                FUN_10065b10(index, STAR_SHOT_SOUND, 0, 0);
+        }
+        if (DAT_1020b430[index].range != 0)
+            DAT_1020b430[index].range--;
+        // place the ring points around the enemy
+        for (int point = 0; point < STAR_POINT_COUNT; point++)
+        {
+            DAT_10868838[index][point].SetIdentity();
+            Vec4 offset;
+            offset.z = STAR_POINT_HEIGHT;
+            offset.y = STAR_POINT_DISTANCE;
+            offset.RotateZ((float)point * STAR_POINT_STEP - DAT_10db6ee8[index].heading);
+            offset.Copy(offset + self);
+            DAT_10868838[index][point].SetTranslation(offset);
+        }
+        if (motion > -1)
+            DAT_10db6ee8[index].PlayMotion(motion, 0, 5, 1.0f);
+    }
+    return 0;
+}
+
+
+// 0x100a6a50 (Enemy_AimedShots, behaviour 12 of Enemy_UpdateBehaviour). Turns to the player like Enemy_StarVolley;
+// while the player is nearer than 1000 units it starts runs of 1 to 10 shots 15 frames apart: effect 600 from a point
+// 50 units behind and 75 units above the enemy (DAT_10868838[index][0], placed every frame), aimed at the player, plus
+// two more 30 degrees to the left and right when DAT_10c635f8 is 2 (sound 0x1c5). The first frame only sets `state`
+// to 1. Returns 0.
+int Enemy_AimedShots(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    float distance = (player - self).Length();
+    (player - self).Length2D();  // computed and dropped
+    if (DAT_1020b430[index].state == 0)
+        DAT_1020b430[index].state = 1;
+    else if (DAT_1020b430[index].state == 1)
+    {
+        float dy = player.y - self.y;
+        float dx = player.x - self.x;
+        DAT_10db6ee8[index].targetHeading = (float)atan2((double)dx, (double)dy) + PI_APPROX;
+        FUN_1001bfb0(index, STAR_TURN_LIMIT);
+        float turn = DAT_10db6ee8[index].targetHeading - DAT_10db6ee8[index].heading;
+        turn = (float)fabs(turn);
+        int motion = turn > ONE_DEGREE ? 0 : 2;  // idle once facing the player
+        if (DAT_1020b430[index].action > 0)
+            DAT_1020b430[index].action--;
+        if (DAT_1020b430[index].action == 0 && distance < STAR_START_DISTANCE)
+        {
+            // a new run of shots
+            int shots = FUN_1013f880() % STAR_MAX_VOLLEYS;
+            DAT_1020b430[index].range = 1;
+            DAT_1020b430[index].talk = shots + 1;
+            DAT_1020b430[index].action = (DAT_1020b430[index].talk + AIMED_RUN_EXTRA) * STAR_VOLLEY_FRAMES;
+        }
+        if (DAT_1020b430[index].talk != 0 && DAT_1020b430[index].range == 0)
+        {
+            DAT_1020b430[index].talk--;
+            DAT_1020b430[index].range = AIMED_SHOT_GAP;
+            Matrix4 shot;
+            EffectOptions options;
+            Vec4 aim;
+            aim.Copy(player - self);
+            if (aim.Length() < MIN_AIM_DISTANCE)
+                shot = RotationZ(DAT_10db6ee8[index].heading);
+            else if (aim.z > 0.0f)
+                shot = RotationX(acosf(aim.Length2D() / aim.Length())) * RotationZ(DAT_10db6ee8[index].targetHeading);
+            else
+                shot = RotationX(-acosf(aim.Length2D() / aim.Length())) * RotationZ(DAT_10db6ee8[index].targetHeading);
+            options.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
+            options.m_0008 = STAR_SHOT_SCALE;
+            FUN_1001d8b0(index, STAR_SHOT_EFFECT, aim, -1, -1, &DAT_10868838[index][0], 0, 0, &shot, &options);
+            if (DAT_10c635f8 == 2)
+            {
+                Matrix4 side;
+                side = shot * RotationZ(-AIMED_SIDE_ANGLE);
+                FUN_1001d8b0(index, STAR_SHOT_EFFECT, aim, -1, -1, &DAT_10868838[index][0], 0, 0, &side, &options);
+                side = shot * RotationZ(AIMED_SIDE_ANGLE);
+                FUN_1001d8b0(index, STAR_SHOT_EFFECT, aim, -1, -1, &DAT_10868838[index][0], 0, 0, &side, &options);
+            }
+            FUN_10065b10(index, STAR_SHOT_SOUND, 0, 0);
+        }
+        if (DAT_1020b430[index].range != 0)
+            DAT_1020b430[index].range--;
+        // place the shot point behind the enemy
+        DAT_10868838[index][0].SetIdentity();
+        Vec4 offset;
+        offset.z = STAR_POINT_HEIGHT;
+        offset.y = STAR_POINT_DISTANCE;
+        offset.RotateZ(-DAT_10db6ee8[index].heading);
+        offset.Copy(offset + self);
+        DAT_10868838[index][0].SetTranslation(offset);
+        if (motion > -1)
+            DAT_10db6ee8[index].PlayMotion(motion, 0, 5, 1.0f);
+    }
+    return 0;
+}
+
+
+// 0x100a8370 (Enemy_CallBursts, behaviours 16 and 17 of Enemy_UpdateBehaviour with variant 0 and 1). Walks with the
+// common enemy behaviour and, with the same 2.5 % chance per frame as Enemy_CallBarrage, stops to call bursts: it
+// faces the player, speeds its motion up and waits until its motion sets AnimModel::m_238c; then effect 0x3705 bursts
+// on the player's spine (else head, else position) at points around the enemy's facing: two 120 units up, and with
+// variant 1 four more at 45 and 87 units. It walks again 60 frames later. Returns 0.
+int Enemy_CallBursts(int index, int variant)
+{
+    if (DAT_1020b430[index].state == BARRAGE_RUNNING)
+    {
+        Vec4 player;
+        Vec4 self;
+        player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+        self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+        if (++DAT_1020b430[index].wait == 1)
+        {
+            // the call starts: face the player
+            DAT_10db6ee8[index].AddMotionSpeed(BURST_MOTION_SPEED);
+            DAT_10db6ee8[index].m_238c = 0;
+            float dy = player.y - self.y;
+            float dx = player.x - self.x;
+            DAT_10db6ee8[index].targetHeading = (float)atan2((double)dx, (double)dy) + PI_APPROX;
+        }
+        if (DAT_1020b430[index].wait < BURST_FIRED)
+        {
+            if (DAT_10db6ee8[index].m_238c == 1)
+            {
+                // the motion reached its call frame: fire the bursts
+                DAT_1020b430[index].wait = BURST_FIRED;
+                EffectOptions options;
+                Matrix4 burst;
+                Vec4 offset;
+                const Matrix4 *target;
+                if (DAT_10db6ee8[0].root->Find(BURST_NODE_NAME, 0) != 0)
+                    target = &DAT_10db6ee8[0].root->Find(BURST_NODE_NAME, 0)->worldMatrix;
+                else if (DAT_10db6ee8[0].headNode != 0)
+                    target = &DAT_10db6ee8[0].headNode->worldMatrix;
+                else
+                    target = &DAT_10db6ee8[0].matrix;
+                options.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
+                options.m_0008 = BURST_SCALE;
+                burst.SetIdentity();
+                burst = RotationZ(DAT_10db6ee8[index].heading);
+                if (variant != 0)
+                {
+                    offset.x = -52.0f;
+                    offset.z = 45.0f;
+                    offset.RotateZ(-DAT_10db6ee8[index].heading);
+                    burst.SetTranslation(offset + self);
+                    offset.Fill(0.0f);
+                    FUN_1001d8b0(index, BURST_EFFECT, offset, -1, -1, target, 0, FUN_1013f880() % BURST_FRAME_SPREAD,
+                                 &burst, &options);
+                    offset.x = 52.0f;
+                    offset.z = 45.0f;
+                    offset.RotateZ(-DAT_10db6ee8[index].heading);
+                    burst.SetTranslation(offset + self);
+                    offset.Fill(0.0f);
+                    FUN_1001d8b0(index, BURST_EFFECT, offset, -1, -1, target, 0, FUN_1013f880() % BURST_FRAME_SPREAD,
+                                 &burst, &options);
+                    offset.x = -50.0f;
+                    offset.z = 87.0f;
+                    offset.RotateZ(-DAT_10db6ee8[index].heading);
+                    burst.SetTranslation(offset + self);
+                    offset.Fill(0.0f);
+                    FUN_1001d8b0(index, BURST_EFFECT, offset, -1, -1, target, 0, FUN_1013f880() % BURST_FRAME_SPREAD,
+                                 &burst, &options);
+                    offset.x = 52.0f;
+                    offset.z = 87.0f;
+                    offset.RotateZ(-DAT_10db6ee8[index].heading);
+                    burst.SetTranslation(offset + self);
+                    offset.Fill(0.0f);
+                    FUN_1001d8b0(index, BURST_EFFECT, offset, -1, -1, target, 0, FUN_1013f880() % BURST_FRAME_SPREAD,
+                                 &burst, &options);
+                }
+                offset.x = -25.0f;
+                offset.z = 120.0f;
+                offset.RotateZ(-DAT_10db6ee8[index].heading);
+                burst.SetTranslation(offset + self);
+                offset.Fill(0.0f);
+                FUN_1001d8b0(index, BURST_EFFECT, offset, -1, -1, target, 0, FUN_1013f880() % BURST_FRAME_SPREAD, &burst,
+                             &options);
+                offset.x = 25.0f;
+                offset.z = 120.0f;
+                offset.RotateZ(-DAT_10db6ee8[index].heading);
+                burst.SetTranslation(offset + self);
+                offset.Fill(0.0f);
+                FUN_1001d8b0(index, BURST_EFFECT, offset, -1, -1, target, 0, FUN_1013f880() % BURST_FRAME_SPREAD, &burst,
+                             &options);
+            }
+            DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
+        }
+        else if (DAT_1020b430[index].wait > BURST_END)
+        {
+            DAT_1020b430[index].state = 0;
+            DAT_1020b430[index].wait = 0;
+        }
     }
     else
     {

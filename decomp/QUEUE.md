@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (171)
+## 1. Walls to retry (173)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -86,6 +86,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1009a690` 2703 — Enemy_StrafeAndShoot (enemy_strafe.cpp, rule-clean; twin 10099040 matched from the same source shape): 1 byte longer. ebx and edi are swapped all through (ours: index in edi, the model offset index*0x249c in ebx; the original and 10099040: index in ebx), and in the chase step the far/mid tails are merged the other way round (the original keeps the walk branch's copy of the heading/stuck tail and the run branch's `action = 0` block). Tried: early return vs nested if in the attack step (the attack step's own m_238c check + return is needed: 2688 -> 2704 bytes, 1756 -> 426 diffs), switch (worse), the end check in every step (worse), stuck-check spellings (`>=` / separate increment: much worse), a local copy of the index.
 - [ ] `1009c070` 4229 — Enemy_FlyAndStrafe (enemy_strafe.cpp): everything after the two height clamps matches up to frame offsets. Each clamp in the original keeps a copy of the unclamped value in ecx, compares a temporary copy against -5 and writes the value back at the second test of 5; the clamp is a double-evaluated max(min(x, 5), -5) with 5 > x as the first test. Our spellings (macros either way round, explicit ternaries, a new local, inline functions, double or int literals) never make that temporary, so the code is 24 bytes short and self / the matrix pointer sit 4 / 8 bytes lower in the frame
 - [ ] `1009d490` 2368 — Enemy_ChaseAndSlash (enemy_slash.cpp, rule-clean): frame, zero register (ebx) and the effect block match; 64 bytes short. Left: the cross-jumping of the side-step states 6-8. The original keeps state 6 whole, merges 8 into 7 from the heading fadd and 7 into 6 from the `< 200` check; ours merges 6 and 7 from RotateZ and keeps 8 whole. Store order of the stuck reset makes no difference (the compiler canonicalises it); the || form vs two ready blocks changes which pairs merge (two ready blocks in state 6 stop all merging, 2576 bytes). Key finds: the two stores before the Vec4 declarations, and the effect block reaching the model through a local `AnimModel *model` (with `&DAT_10db6ee8[index].matrix` the matrix address is CSEd with the top and takes ebx from the zero register).
+- [ ] `100a6a50` 1792 — Enemy_AimedShots (enemy_barrage.cpp, rule-clean): 13 bytes, all stack slots: the original keeps dy and motion at esp+0x28, dx, the atan2 temporary and turn at 0x10, and spills index<<6 at 0x4c and index*0x249c at 0x50; ours has each pair the other way round. Reusing dx for the turn (dx = targetHeading - heading; dx = (float)fabs(dx); motion tested on dx) fixes the spills and dx/dy and leaves 5 bytes (the atan2 temporary and motion swapped); tried a named angle, top-of-function declarations, an if for motion (flips the registers), a switch on state.
+- [ ] `100a7150` 1688 — Enemy_StarVolley (enemy_barrage.cpp, rule-clean): control flow, calls and frame match; 16 bytes long. Left: two 4-byte stack slots are swapped (original: dy, the atan2 temporary, turn and motion at esp+0x10, dx, fired and the ring counter at 0x14; ours the other way round: tried declaration orders, dy reused as the turn difference, do-while, a ternary or if for motion), and after the effect call the original copies index into edi (mov edi, esi) where ours reloads it from the argument, which also adds 4 bytes of loop alignment before the ring loop.
 - [ ] `100b0250` 1583 — Companion0_Update: all but the idle branch identical; there the original takes eax/ecx for the first block's temporaries and edx/eax for the second (cl 13.00 here edx/eax and ecx/edx); its twins 0x100b0880 and 0x100b0f00 match with the same branch; slot-variable, local and early-return forms tried
 - [ ] `100b4300` 1583 — Npc_RaiseAlarm (char_move.cpp): all but the alarm block identical; the original pushes an immediate 0 for Sound_PlayEffect and re-zeroes edi after the red flash, cl 13.00 here re-zeroes edi before the sound. The `||` spelling of the line-of-sight test makes cl 13.00 inline atan2f (a larger frame); the `visible` local keeps it a call
 - [ ] `100b4930` 1473 — Npc_RideAlarm (char_move.cpp): same flow and calls; the original keeps index in ebx and the marker loop counter in ebp (cl 13.00 here swaps them); with sqrtf for the marker distance the rest matches
@@ -193,7 +195,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (121)
+## 4. Large functions (801-3000 bytes) (118)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
@@ -250,11 +252,9 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10026d80` 1658 bytes (float, loops 1, calls 48)
 - [ ] `100627d0` 1685 bytes (float, loops 1, calls 35)
 - [ ] `1014ce40` 1685 bytes TextureObject::DrawFill (float, loops 1, calls 19)
-- [ ] `100a7150` 1688 bytes (float, loops 2, calls 49)
 - [ ] `10044b10` 1711 bytes (float, loops 2, calls 44)
 - [ ] `10065450` 1714 bytes (float, loops 6, calls 42)
 - [ ] `101501f0` 1755 bytes (float, loops 10, calls 19)
-- [ ] `100a6a50` 1792 bytes (float, calls 60)
 - [ ] `100b7b10` 1798 bytes (float, loops 1, calls 33)
 - [ ] `10019670` 1801 bytes (float, loops 4, calls 73)
 - [ ] `1003bc60` 1804 bytes (float, loops 8, calls 38)
@@ -266,7 +266,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100301a0` 1850 bytes (float, calls 41)
 - [ ] `10172cb0` 1855 bytes (float, calls 16)
 - [ ] `10035050` 1858 bytes (float, loops 2, calls 62)
-- [ ] `100a8370` 1866 bytes (float, loops 6, calls 56)
 - [ ] `10137b10` 1889 bytes Screenshot_Capture (loops 6, calls 49)
 - [ ] `10028fa0` 1900 bytes (float, calls 11)
 - [ ] `100a8ac0` 1912 bytes (float, calls 58)

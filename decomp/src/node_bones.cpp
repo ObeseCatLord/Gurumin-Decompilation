@@ -24,31 +24,7 @@ struct NodeSkin
     Matrix4 bindPose;         // 0x3518: the node's matrix when skinned
 };
 
-struct Node
-{
-    char pad_0000[0xac];
-    unsigned int flags;       // 0xac: 0x100000 = animated through its extra data
-    char pad_00b0[0x11c];
-    Matrix4 localMatrix;      // 0x1cc
-    char pad_020c[0x84];
-    Matrix4 *matrixOverride;  // 0x290: per-frame matrices used instead of localMatrix (m_0294 of them)
-    int m_0294;
-    char pad_0298[0x10];
-    NodeExtra *extra;         // 0x2a8
-    char pad_02ac[0x458];
-    char skinned;             // 0x704: 1 = the node has skinning data
-    char pad_0705[3];
-    NodeSkin *skin;           // 0x708
-    char pad_070c[0x44];
-    int childCount;
-    char pad_0754[0x1000];
-    Node *children[0x40];     // 0x1754
-    // 0x10199380: searches this subtree for bone `id`, accumulating parent matrices; returns its matrix or 0.
-    Matrix4 *FindBone(int id, Matrix4 *parent, Matrix4 *work, int flags);
-    Matrix4 BoneMatrix(int id, int flags);
-    Node *Find(const char *name, int index);   // 0x1019ece0
-    int SetupSkins(Node *root);
-};
+#include "node.h"
 
 Matrix4 InverseMatrix(const Matrix4 &matrix);   // 0x101b0d40
 
@@ -64,19 +40,19 @@ Matrix4 *Node::FindBone(int id, Matrix4 *parent, Matrix4 *work, int frame)
         int index = -1 - frame;
         if (index > 15)
             index = 15;
-        matrix = matrixOverride[index] * *parent;
+        matrix = frameMatrices[index] * *parent;
     }
     else if ((flags & 0x100000) && extra != 0)
         matrix = extra->AnimatedMatrix(frame) * *parent;
-    else if (matrixOverride != 0)
+    else if (frameMatrices != 0)
     {
         int index = frame;
-        if (m_0294 <= frame)
-            index = m_0294 - 1;
-        matrix = matrixOverride[index] * *parent;
+        if (frameMatrixCount <= frame)
+            index = frameMatrixCount - 1;
+        matrix = frameMatrices[index] * *parent;
     }
     else
-        matrix = localMatrix * *parent;
+        matrix = matrix * *parent;
     if (id == (int)this)
     {
         *work = matrix;
@@ -116,10 +92,10 @@ int Node::SetupSkins(Node *root)
     {
         if ((flags & 0x100000) && extra != 0)
             skin->bindPose = extra->AnimatedMatrix(0);
-        else if (m_0294 != 0)
-            skin->bindPose = *matrixOverride;
+        else if (frameMatrixCount != 0)
+            skin->bindPose = *frameMatrices;
         else
-            skin->bindPose = localMatrix;
+            skin->bindPose = matrix;
         skin->bone = root->Find(skin->boneName, 0);
         if (skin->bone == this)
             skin->bone = 0;

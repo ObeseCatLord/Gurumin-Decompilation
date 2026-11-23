@@ -6,10 +6,7 @@
 
 Matrix4 IdentityMatrix();  // 0x101b0ba0
 
-struct Node
-{
-    void Release();  // 0x1019e9a0: frees the node's meshes and children
-};
+#include "node.h"
 
 struct AnimModel
 {

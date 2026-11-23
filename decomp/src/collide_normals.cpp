@@ -4,20 +4,7 @@
 
 #include "matrix4.h"
 
-// Scene node (scene_node.cpp Node), only the fields used here.
-struct Node
-{
-    char pad_0000[0xac];
-    unsigned int flags;       // 0xac: 0x400 = collision probe node
-    char pad_00b0[0x19c];
-    Matrix4 worldMatrix;      // 0x24c
-    char pad_028c[0x448];
-    Vec4 bounds;              // 0x6d4: bounding sphere (centre relative to the node, radius in w)
-    char pad_06e4[0x6c];
-    int childCount;           // 0x750
-    char childNames[0x40][0x40];
-    Node *children[0x40];     // 0x1754
-};
+#include "node.h"
 
 // The world collision (scene root node); see collide_query.cpp.
 struct CollisionWorld

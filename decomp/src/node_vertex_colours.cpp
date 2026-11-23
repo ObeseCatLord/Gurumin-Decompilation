@@ -22,14 +22,7 @@ struct PackHeader
     PackVertex *vertices;        // 0x70
 };
 
-// A scene node (scene_node.cpp Node), only the fields used here.
-struct Node
-{
-    char pad_0000[0x64];
-    int packCount;               // 0x64
-    PackHeader *packs;           // 0x68
-    int ResetVertexColours(float uvScale);
-};
+#include "node.h"
 
 // 0x1019c3a0 (Node::ResetVertexColours). Makes every vertex white and clears its m_0040 values. With a non-zero
 // `uvScale` the vertices also get alpha 0.7, are raised by 5 and take their texture coordinates from their x and y

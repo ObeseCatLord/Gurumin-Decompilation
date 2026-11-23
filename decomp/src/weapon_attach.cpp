@@ -3,18 +3,7 @@
 
 #include <string.h>
 
-struct Node
-{
-    char name[0x74c];                                // 0x000: node name
-    Node *parent;                                    // 0x74c
-    Node *Find(const char *name, int index);         // 0x1019ece0
-    Node *AddChild(int a, int size);                 // 0x101abc30
-    int Load(const char *path, int a, int b, int c); // 0x101ac010
-    int RemoveChild(Node *child, int a);             // 0x101a2f30
-    void M_1019afa0(int a, int b);
-    int RestartColourPlugs(const char *motion, int frames);  // 0x1019b300
-    void M_1019b0c0(int a, int b, int c);
-};
+#include "node.h"
 
 // A character record (world.h Character): only the model's root node is used here.
 struct CharacterRoot
@@ -138,7 +127,7 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
                     model->Load(FUN_1013f8a0(rightFile, 0), 0, 0, 0);
                     strcpy(model->name, "migitesou");
                     model->parent = hand;
-                    model->M_1019afa0(1, 0);
+                    model->BuildMesh(1, 0);
                 }
             }
             break;
@@ -152,7 +141,7 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
                     model->Load(FUN_1013f8a0(rightFile, 0), 0, 0, 0);
                     strcpy(model->name, "migitesou");
                     model->parent = hand;
-                    model->M_1019afa0(1, 0);
+                    model->BuildMesh(1, 0);
                 }
             }
             if (left != 0)
@@ -166,7 +155,7 @@ extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot
                     model->Load(FUN_1013f8a0(leftFile, 0), 0, 0, 0);
                     strcpy(model->name, "hidaritesou");
                     model->parent = hand;
-                    model->M_1019afa0(1, 0);
+                    model->BuildMesh(1, 0);
                 }
             }
             break;

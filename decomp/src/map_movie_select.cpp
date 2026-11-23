@@ -10,11 +10,7 @@ struct NodeExtra
     Matrix4 AnimatedMatrix(int frame);               // 0x101693f0
 };
 
-struct Node
-{
-    char pad_0000[0x2a8];
-    NodeExtra *extra;                                // 0x2a8: the node's animation tracks
-};
+#include "node.h"
 
 // A camera point of the map (0x100 bytes): the frame of the camera path at which it lies and its movie.
 struct CameraPoint

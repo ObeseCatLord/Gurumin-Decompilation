@@ -17,12 +17,7 @@ struct Playback
     int blending;             // 0x7c74: non-zero while blending into another layer
 };
 
-// A model node, only its local matrix is used here.
-struct Node
-{
-    char pad_0000[0x1cc];
-    Matrix4 local;            // 0x1cc: matrix relative to the parent node
-};
+#include "node.h"
 
 struct CharRecord
 {
@@ -1549,12 +1544,12 @@ int FUN_10048b70(int index)
     if (DAT_1020b430[index].state == 0)
     {
         DAT_1020b430[index].range = DAT_1020b430[index].talk % 10 * 45;
-        DAT_10868838[index][0] = DAT_10db6ee8[index].root->local;
+        DAT_10868838[index][0] = DAT_10db6ee8[index].root->matrix;
         DAT_1020b430[index].state = 1;
     }
     else if (DAT_1020b430[index].state == 1)
     {
-        DAT_10db6ee8[index].root->local = DAT_10868838[index][0] * RotationY((float)DAT_1020b430[index].range * 3.1415f / 180.0f);
+        DAT_10db6ee8[index].root->matrix = DAT_10868838[index][0] * RotationY((float)DAT_1020b430[index].range * 3.1415f / 180.0f);
         if (DAT_1020b430[index].m_0010 != 0)
             DAT_10db6ee8[index].matrix.m[14] += (float)(DAT_1020b430[index].m_0014-- / 2);
         Matrix4 matrix;
@@ -1581,7 +1576,7 @@ int FUN_10048b70(int index)
             if (DAT_1020b430[index].range <= 0)
                 DAT_1020b430[index].range = 0;
         }
-        DAT_10db6ee8[index].root->local = DAT_10868838[index][0] * RotationY((float)DAT_1020b430[index].range * 3.1415f / 180.0f);
+        DAT_10db6ee8[index].root->matrix = DAT_10868838[index][0] * RotationY((float)DAT_1020b430[index].range * 3.1415f / 180.0f);
         if (DAT_1020b430[index].range == 0 && DAT_1032d69c != 0)
         {
             DAT_10db6ee8[index].m_2498 = 1;

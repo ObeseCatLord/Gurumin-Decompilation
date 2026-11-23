@@ -14,16 +14,7 @@ struct NodeSaved
     Vec3 limitMax;            // 0x88: highest rotation per axis
 };
 
-struct Node
-{
-    char pad_0000[0x74c];
-    Node *parent;             // 0x74c
-    char pad_0750[0x1104];
-    NodeSaved *saved;         // 0x1854
-    int M_101947b0();                 // allocates `saved` on first use
-    int M_101948f0(Node *target);     // enters the tracking state (0 = default target)
-    int M_10194980();                 // frees `saved`
-};
+#include "node.h"
 
 extern "C" Node *DAT_10db91dc;  // the player's head node (character 0, field 0x2304)
 
@@ -35,14 +26,14 @@ extern "C" int FUN_100165e0(int mode)
     {
         if (mode == 1)
         {
-            DAT_10db91dc->parent->M_101947b0();
+            DAT_10db91dc->parent->AllocSaved();
             DAT_10db91dc->parent->saved->limitMin.x = -1.22f;
             DAT_10db91dc->parent->saved->limitMin.y = -0.27f;
             DAT_10db91dc->parent->saved->limitMin.z = -0.17f;
             DAT_10db91dc->parent->saved->limitMax.x = 1.22f;
             DAT_10db91dc->parent->saved->limitMax.y = 0.27f;
             DAT_10db91dc->parent->saved->limitMax.z = 0.17f;
-            DAT_10db91dc->parent->M_101948f0(0);
+            DAT_10db91dc->parent->EnterTargetState(0);
             return 0;
         }
         if (mode == 0)
@@ -54,7 +45,7 @@ extern "C" int FUN_100165e0(int mode)
             }
         }
         else if (mode == -5 && DAT_10db91dc->parent->saved != 0)
-            DAT_10db91dc->parent->M_10194980();
+            DAT_10db91dc->parent->FreeSaved();
     }
     return 0;
 }

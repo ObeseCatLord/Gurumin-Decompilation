@@ -10,26 +10,8 @@ Matrix4 LookAt(Vec4 eye, Vec4 target, const Vec4 *up, int a);        // 0x101b1c
 Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);         // 0x101b10f0
 
 // A scene node (scene_node.cpp Node), only what is used here.
-struct DrawList;
 
-struct Node
-{
-    char name[0xac];          // 0x00: node name ("CDLnn" for collision regions)
-    unsigned flags;           // 0xac: 0x20 = not drawn
-    char pad_00b0[0x11c];
-    Matrix4 local;            // 0x1cc: matrix relative to the parent
-    char pad_020c[0x4d8];
-    Vec4 boundsMin;           // 0x6e4: lower corner of the node's box
-    Vec4 boundsMax;           // 0x6f4: upper corner of the node's box
-    char pad_0704[0x4c];
-    int childCount;           // 0x750
-    char pad_0754[0x1000];
-    Node *children[0x40];     // 0x1754
-    char pad_1854[0x10];
-    void *vis;                // 0x1864: visibility cells (0 = none)
-    void QueueDraw(DrawList *list, const Matrix4 *view, const Vec4 *direction, int a, const Vec4 *colour,
-                   int b);                       // 0x10199e20
-};
+#include "node.h"
 
 // A character record (char_move.cpp CharRecord); only its address is used here.
 struct CharRecord
@@ -77,7 +59,7 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
         map = DAT_10255f08;
     Matrix4 view;
     Matrix4 projection;
-    view = map->local;
+    view = map->matrix;
     DAT_104bfe24 = map->boundsMin.z;
     view.Translate(0, 0, (map->boundsMax.z + map->boundsMin.z) * 0.5f);
     projection.SetIdentity();
@@ -99,7 +81,7 @@ Node *FUN_1000f5a0(Matrix4 *out, const Matrix4 &matrix)
 extern "C" CharRecord DAT_10db6ee8[0x80];
 extern "C" ModelBank DAT_10804bf8;
 extern "C" EffectManager DAT_10daaa80;
-extern "C" DrawList DAT_10836ec8;          // the overhead pass's draw list
+extern "C" Matrix4 DAT_10836ec8;           // parent matrix of the overhead pass (identity, set in game_reset.cpp)
 extern "C" Matrix4 DAT_108392d8;           // the current view-projection matrix
 extern "C" Matrix4 DAT_10836330;           // the camera matrix
 extern "C" Matrix4 DAT_10866da8;           // the projection of the main view
@@ -118,7 +100,8 @@ extern "C" int DAT_10daaad0;               // 1 while the effects draw into it
 extern "C" char DAT_11affdd8[100];         // per collision region "CDLnn": 1 = enabled
 extern "C" void FUN_1013f070(int mode, int a, int b);              // sets a 2D/3D render state
 extern "C" void FUN_10199860(void);                                // RenderQueue_Clear
-extern "C" int FUN_101999a0(DrawList *list, const Matrix4 *view, Vec4 *lights, unsigned int pass);  // DrawList_DrawPass
+// 0x101999a0 (draw_list.cpp DrawList_DrawPass): draws the queued nodes of pass `pass` (the first argument is unused).
+extern "C" int FUN_101999a0(const Matrix4 *unused, const Matrix4 *view, Vec4 *lights, unsigned int pass);
 
 // 0x1000f7f0 (Map_DrawTopView). Builds the overhead view of the map; when the overhead pass is on (and render
 // targets work, and the map node is not a switched-off collision region) it draws the map (with its model hidden)
@@ -134,7 +117,7 @@ void FUN_1000f7f0(void)
         if (DAT_102022c4 != 0 && DAT_10f654cc != 0)
         {
             DAT_10f65520 = 1;
-            if (DAT_10255f08->vis == 0 || map->name[0] != 'C' || map->name[1] != 'D' || map->name[2] != 'L' ||
+            if (DAT_10255f08->visibilityCells == 0 || map->name[0] != 'C' || map->name[1] != 'D' || map->name[2] != 'L' ||
                 DAT_11affdd8[map->name[3] * 10 + map->name[4]] != 0)
             {
                 FUN_1013f070(0, 0, 0);

@@ -9,12 +9,7 @@ Matrix4 Perspective(float nearPlane, float farPlane, float fieldOfView);        
 Matrix4 Scaling(float x, float y, float z);                                       // 0x101b13c0
 Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);                        // 0x101b10f0
 
-// A model node, only the call used here.
-struct Node
-{
-    void QueueDraw(const Matrix4 *parent, const Matrix4 *view, const Vec4 *direction, int a, const Vec4 *colour,
-                   int b);                       // 0x10199e20
-};
+#include "node.h"
 
 struct MeshSlot
 {

@@ -21,25 +21,7 @@ struct NodeSkin
     int boneCount;            // 0x5618
 };
 
-// A scene node (scene_node.cpp Node), only the fields used here.
-struct Node
-{
-    char pad_0000[0x9c];
-    MeshData *mesh;           // 0x09c
-    int drawMode;             // 0x0a0: 2 = drawn with a light set of its own
-    char pad_00a4[8];
-    unsigned int flags;       // 0x0ac: 0x800000 = drawn with state 9 off
-    char pad_00b0[0x110];
-    int animated;             // 0x1c0: non-zero = the mesh holds several frames
-    int frameSize;            // 0x1c4: primitives per frame
-    int frameCount;           // 0x1c8
-    char pad_01cc[0x80];
-    Matrix4 world;            // 0x24c: world matrix
-    char pad_028c[0x40];
-    int frame;                // 0x2cc: frame shown
-    char pad_02d0[0x438];
-    NodeSkin *skin;           // 0x708
-};
+#include "node.h"
 
 extern "C" int DAT_11b044d0;                  // number of queued nodes
 extern "C" unsigned char DAT_11b00030[0x40];  // pass of each queued node
@@ -72,7 +54,7 @@ extern "C" int FUN_101999a0(int unused, const Matrix4 *view, int lights, unsigne
             continue;
         NodeSkin *skin = DAT_11b00070[i]->skin;
         if (skin != 0 && skin->boneCount != 0)
-            DAT_11b00070[i]->mesh->UploadBones(skin->bones, skin->boneCount, &DAT_11b00070[i]->world, (int)view);
+            DAT_11b00070[i]->mesh->UploadBones(skin->bones, skin->boneCount, &DAT_11b00070[i]->worldMatrix, (int)view);
         Node *node = DAT_11b00070[i];
         if (node->animated != 0)
         {
@@ -94,13 +76,13 @@ extern "C" int FUN_101999a0(int unused, const Matrix4 *view, int lights, unsigne
             DAT_10f65520 = DAT_11b00270[i];
             FUN_1013f070(10, 2, 0);
             FUN_1013f070(0, 0, 0);
-            DAT_11b00070[i]->mesh->DrawLit(&DAT_11b00070[i]->world, &DAT_11b06518[DAT_11af3f68[i]], 4,
+            DAT_11b00070[i]->mesh->DrawLit(&DAT_11b00070[i]->worldMatrix, &DAT_11b06518[DAT_11af3f68[i]], 4,
                                            DAT_11b04d18[DAT_11afffa8[i]], &DAT_11b04518[i], &DAT_11b04918[i]);
             DAT_10f65520 = previous;
             FUN_1013f070(10, 0, 0);
         }
         else
-            DAT_11b00070[i]->mesh->DrawLit(&DAT_11b00070[i]->world, view, mode, (const void *)lights,
+            DAT_11b00070[i]->mesh->DrawLit(&DAT_11b00070[i]->worldMatrix, view, mode, (const void *)lights,
                                            &DAT_11b04518[i], &DAT_11b04918[i]);
         if (DAT_11b00070[i]->flags & 0x800000)
             FUN_1013f070(9, 1, 0);

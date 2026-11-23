@@ -3,15 +3,7 @@
 
 #include <string.h>
 
-struct Node
-{
-    char data[0x18a0];
-    int Init();                                          // 0x10191500
-    int Release();                                       // 0x1019e9a0: frees the node's meshes and children
-    int LoadIt3(const char *path, int a, int b);         // 0x101abe30 (Model_LoadIt3)
-    int CopyFrom(Node *source, int a, int b);            // 0x101a53b0: copies a loaded node tree into this node
-    int Load(const char *path, int noCopy, int a, int b);
-};
+#include "node.h"
 
 extern "C" Node *DAT_11b002d0[0x80];          // the cached models
 extern "C" char DAT_11b004d0[0x80][0x80];     // their file names
@@ -29,7 +21,7 @@ int Node::Load(const char *path, int noCopy, int a, int b)
         if (DAT_11b002d0[i] != 0 && _stricmp(path, DAT_11b004d0[i]) == 0)
         {
             if (noCopy == 0)
-                CopyFrom(DAT_11b002d0[i], a, b);
+                Clone(DAT_11b002d0[i], a, b);
             return 1;
         }
     }
@@ -43,7 +35,7 @@ int Node::Load(const char *path, int noCopy, int a, int b)
             DAT_11b002d0[slot]->LoadIt3(path, a, b);
             strcpy(DAT_11b004d0[slot], path);
             if (noCopy == 0)
-                CopyFrom(DAT_11b002d0[slot], a, b);
+                Clone(DAT_11b002d0[slot], a, b);
             return slot;
         }
     }
@@ -54,6 +46,6 @@ int Node::Load(const char *path, int noCopy, int a, int b)
     DAT_11b002d0[slot]->LoadIt3(path, a, b);
     strcpy(DAT_11b004d0[slot], path);
     if (noCopy == 0)
-        CopyFrom(DAT_11b002d0[slot], a, b);
+        Clone(DAT_11b002d0[slot], a, b);
     return slot;
 }

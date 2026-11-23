@@ -29,10 +29,7 @@ struct SmallRecord
     int m_00f8;
 };
 
-struct Node
-{
-    int Release();                               // 0x1019e9a0: frees the node's meshes and children
-};
+#include "node.h"
 
 struct EffectTable
 {

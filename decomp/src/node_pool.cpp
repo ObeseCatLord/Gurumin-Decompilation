@@ -1,12 +1,6 @@
 // Scene node pool and node helpers.
 
-struct Node
-{
-    void Release();
-    int M_10191920(void *info, int *count);
-    int M_10191990(void *info, int count);
-    int M_1019eca0();
-};
+#include "node.h"
 
 extern "C" Node *DAT_11b002d0[0x80];
 extern "C" void (*DAT_11b1ba40)(void *);
@@ -26,13 +20,14 @@ extern "C" int FUN_101a5860(void)
     return 0;
 }
 
-// Queries the node's 32-byte info block (M_10191920) and applies it again when it reports a count.
+// Collects the subtree's nodes in state 0x4000 (up to 8, M_10191920) and links them to its state-0x1000 nodes
+// (M_10191990) when there are any.
 int Node::M_1019eca0()
 {
     int count = 0;
-    int info[8];
-    M_10191920(info, &count);
+    Node *list[8];
+    M_10191920(list, &count);
     if (count != 0)
-        M_10191990(info, count);
+        M_10191990(list, count);
     return 1;
 }

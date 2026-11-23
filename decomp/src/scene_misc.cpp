@@ -70,12 +70,7 @@ struct Widget
     ~Widget();
 };
 
-struct Node
-{
-    char data[0x18a0];
-    int M_101abe30(const char *path, int a, int b);
-    void BuildMesh(int recurse, int flags);
-};
+#include "node.h"
 
 struct Placement
 {
@@ -148,7 +143,7 @@ extern "C" int __stdcall FUN_1016fa40(int index)
     int kind = DAT_1101dde0[index].kind;
     if (kind == 4 || kind == 10 || kind == 20)
     {
-        DAT_111be9c8[index].M_101abe30(FUN_1013f8a0(DAT_1101dde0[index].name, 0), 0, 0);
+        DAT_111be9c8[index].LoadIt3(FUN_1013f8a0(DAT_1101dde0[index].name, 0), 0, 0);
         DAT_111be9c8[index].BuildMesh(1, 0);
         DAT_10ff1df8[index] = 1;
     }

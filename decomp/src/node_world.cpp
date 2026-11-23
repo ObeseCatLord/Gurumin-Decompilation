@@ -22,32 +22,7 @@ struct Channel
     Keys keys;
 };
 
-// A scene node (scene_node.cpp Node), only the fields used here.
-struct Node
-{
-    char pad_0000[0xac];
-    unsigned int flags;          // 0xac: 0x8000 = not updated, 0x100000 = animated by its extra data
-    char pad_00b0[0xc];
-    int *frameSource;            // 0xbc: when set, the frame shown is read from here
-    int plugType[16];            // 0xc0: 0x4ee33 = the plug gives the frame
-    Channel *plugs[16];          // 0x100
-    char pad_0140[0x8c];
-    Matrix4 matrix;              // 0x1cc: the node's own matrix
-    char pad_020c[0x40];
-    Matrix4 world;               // 0x24c: the node's matrix in world space
-    char pad_028c[4];
-    Matrix4 *frameMatrices;      // 0x290: one matrix per frame (0 = use `matrix`)
-    int frameMatrixCount;        // 0x294
-    char pad_0298[0x10];
-    NodeExtra *extra;            // 0x2a8
-    char pad_02ac[0x28];
-    Matrix4 backMatrices[16];    // 0x2d4: matrices for the negative frames -1 to -16
-    char pad_06d4[0x7c];
-    int childCount;              // 0x750
-    char childNames[0x40][0x40];
-    Node *children[0x40];        // 0x1754
-    int UpdateWorld(const Matrix4 &parent, int frame);
-};
+#include "node.h"
 
 extern "C" int DAT_11b044ec;     // non-zero = the plugs do not give the frame
 extern "C" float DAT_11b044f8;   // the value the frame-giving plugs are sampled at
@@ -76,10 +51,10 @@ int Node::UpdateWorld(const Matrix4 &parent, int frame)
         {
             if (back > 15)
                 back = 15;
-            world = backMatrices[back] * parent;
+            worldMatrix = poses[back] * parent;
         }
         else
-            world = matrix * parent;
+            worldMatrix = matrix * parent;
     }
     else if (!(flags & 0x100000) || extra == 0)
     {
@@ -88,14 +63,14 @@ int Node::UpdateWorld(const Matrix4 &parent, int frame)
             int index = frame;
             if (frameMatrixCount <= frame)
                 index = frameMatrixCount - 1;
-            world = frameMatrices[index] * parent;
+            worldMatrix = frameMatrices[index] * parent;
         }
         else
-            world = matrix * parent;
+            worldMatrix = matrix * parent;
     }
     else
-        world = extra->AnimatedMatrix(frame) * parent;
+        worldMatrix = extra->AnimatedMatrix(frame) * parent;
     for (int i = 0; i < childCount; i++)
-        children[i]->UpdateWorld(world, frame);
+        children[i]->UpdateWorld(worldMatrix, frame);
     return 1;
 }

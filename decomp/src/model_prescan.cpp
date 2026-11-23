@@ -15,15 +15,7 @@ struct GameFile
     void Close();                                  // 0x101b22f0
 };
 
-struct Node
-{
-    int Release();                            // 0x1019e9a0: frees the node's meshes and children
-    int ScanChunks(GameFile *file, int arg);  // 0x101a4a60: It3_ScanChunks
-    // 0x101a58a0 (It3_ParseChunks): reads the model's chunks, checking them against the name key sum and xor.
-    int ParseChunks(GameFile *file, int a, int b, int keySum, unsigned int keyCheck);
-    int PreScanFile(const char *path, int arg);
-    int LoadIt3(const char *path, int a, int b);
-};
+#include "node.h"
 
 extern "C" void (*DAT_10f65538)(const char *path, int a);   // load notification of the host (may be 0)
 extern "C" int FUN_10161120(char *name, const char *path);  // Path_GetBaseName

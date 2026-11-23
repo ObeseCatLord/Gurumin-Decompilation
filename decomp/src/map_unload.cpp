@@ -8,10 +8,7 @@
 
 #include "matrix4.h"
 
-struct Node
-{
-    void Release();                              // 0x1019e9a0: frees the node's meshes and children
-};
+#include "node.h"
 
 // A map object record, 0x44 bytes: three blocks of its own.
 struct MapObject

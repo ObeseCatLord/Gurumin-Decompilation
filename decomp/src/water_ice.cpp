@@ -1,13 +1,7 @@
 // Frozen water: maps with a water surface can freeze it (the map setup at 0x100fc4a0 finds the nodes and creates the
 // "ICERIPA" child). Node flag 0x20 makes a node solid (see wall_flags.cpp).
 
-struct Node
-{
-    char pad_0000[0x1754];
-    Node *children[0x40];     // 0x1754
-    void SetFlags(unsigned int bits);    // 0x1019b130 (also sets them on all children)
-    void ClearFlags(unsigned int bits);  // 0x1019b1b0
-};
+#include "node.h"
 
 extern "C" Node *DAT_104c007c;   // the water surface node
 extern "C" Node *DAT_104c0084;   // "ICERIPA": the ice surface added below the water node

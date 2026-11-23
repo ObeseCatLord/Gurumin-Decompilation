@@ -3,13 +3,7 @@
 // chosen by the part's script flag is shown. Version 2 parts also have alpha nodes ("Q0", "QQ0", "QQ0Alpha") that
 // are listed for the alpha pass.
 
-// A scene node (scene_node.cpp), only the calls used here.
-struct Node
-{
-    Node *Find(const char *name, int recursive);     // 0x1019ece0
-    void SetFlags(unsigned int bits);                // 0x1019b130
-    void ClearFlags(unsigned int bits);              // 0x1019b1b0
-};
+#include "node.h"
 
 extern "C" Node *DAT_10255f08;                       // the map model
 extern "C" int DAT_10c62edc[0x1000];                 // script flags

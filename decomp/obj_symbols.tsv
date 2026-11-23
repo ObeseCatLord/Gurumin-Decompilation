@@ -105,8 +105,6 @@
 ?LoadMenuTextures@Game@@QAEHH@Z	10007fd0
 ?Find@Node@@QAEPAU1@PBDH@Z	1019ece0
 ?Collide@Node@@QAEHHHPAUVec4@@00@Z	101a8e60
-?SetFlags@Node@@QAEXI@Z	1019b130
-?ClearFlags@Node@@QAEXI@Z	1019b1b0
 ?WindowProc@GameWindow@@UAGJPAUHWND__@@IIJ@Z	1013e4f0
 ?WindowProc@RenderWindow@@UAGJPAUHWND__@@IIJ@Z	1013e450
 ??0GameWindow@@QAE@XZ	1013e6a0
@@ -445,3 +443,11 @@ _FUN_101426d0@8	101426d0
 ?TagRegion@Node@@QAEHPBUBox2@@PAY0EA@$$CBDPAUMatrix4@@@Z	10199cd0
 ?Draw@MeshSlot@@QAEHABUMatrix4@@@Z	1000baf0
 ?SetTranslation@Matrix4@@QAEXUVec4@@@Z	101adef0
+?AllocSaved@Node@@QAEHXZ	101947b0
+?FreeSaved@Node@@QAEHXZ	10194980
+?SetFlags@Node@@QAEHI@Z	1019b130
+?RestartColourPlugs@Node@@QAEHPBDH@Z	1019b300
+?FindByFlags@Node@@QAEPAU1@IHPAH@Z	10191cc0
+?ClearFlags@Node@@QAEHI@Z	1019b1b0
+?ReplaceMaterial@Node@@QAEHHH@Z	1019e830
+?EnterTargetState@Node@@QAEHPAX@Z	101948f0

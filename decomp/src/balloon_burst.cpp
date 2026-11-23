@@ -9,12 +9,7 @@
 
 Matrix4 TranslationMatrix(float x, float y, float z);   // 0x101b1360
 
-// A model node (node_world.cpp Node), only its own matrix.
-struct Node
-{
-    char pad_0000[0x1cc];
-    Matrix4 matrix;               // 0x1cc
-};
+#include "node.h"
 
 struct RootNode
 {

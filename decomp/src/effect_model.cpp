@@ -14,15 +14,7 @@ struct KeyBank
     int Insert(int frame, float x, float y, float z, float w);  // 0x101ad760
 };
 
-struct Node
-{
-    void Init();
-    void Release();
-    int Load(const char *path, int a, int b, int c);
-    int Rebuild();
-    int M_10199340();
-    int BuildMesh(int recurse, int flags);
-};
+#include "node.h"
 
 struct EffectModel
 {

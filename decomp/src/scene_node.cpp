@@ -13,13 +13,15 @@
 
 #include "matrix4.h"
 
+struct Node;
+
 struct NodeSaved
 {
     char pad_0000[0x20];
     int m_0020;
     Matrix4 matrix;
     char pad_0064[0x34];
-    int m_0098[8];
+    Node *linkedNodes[8];        // 0x98: nodes of the same group linked to this one (M_10191990)
     int m_00b8;
     char pad_00bc[0x20];
     void M_10166870();
@@ -49,7 +51,7 @@ extern "C" int FUN_10169be0(TextureRef *texture);  // adds a reference
 
 struct Node;
 
-struct GlyphState
+struct NodeSkin
 {
     char pad_0000[0x84];
     char parentName[0x40];      // 0x84: name of the node this one is bound to
@@ -89,7 +91,7 @@ extern "C" int FUN_10169970(MeshData *mesh);     // MeshCache_AddRef
 struct Keys
 {
     void M_101ad690();
-    void M_101ad5c0(int a, int b, int c);
+    void M_101ad5c0(int a, const char *motion, int frames);
 };
 
 struct Channel
@@ -105,7 +107,7 @@ struct KeyTrack
     void Copy(const KeyTrack *source);           // 0x101ade10
 };
 
-struct Extra
+struct NodeExtra
 {
     KeyTrack tracks[5];          // 0x00
     char pad_0064[0xc];
@@ -154,182 +156,16 @@ struct KeyPair;
 
 Matrix4 InverseMatrix(const Matrix4 &matrix);      // 0x101b0d40 (node_bones.cpp)
 
-struct Node
+#include "node.h"
+
+// Puts the saved matrix back when the saved block holds one, and marks the block empty (the ReleaseSavedStates
+// steps; inline in the original).
+inline void Node::RestoreSavedMatrix()
 {
-    char name[0x40];
-    char folder[0x10];           // 0x40: texture folder of the model, inherited by children
-    char m_0050[0x14];           // 0x50: second inherited name
-    int packCount;
-    PackHeader *packs;
-    KeyPair *indexLists;
-    KeyPair *m_0070;
-    int m_0074;
-    int m_0078;
-    int m_007c;                  // 0x7c: number of entries in m_0080 and m_0084
-    PackHeader *m_0080;
-    KeyPair *m_0084;
-    char m_0088;
-    char isStatic;               // 0x89: 1 once the node was collected as static scenery (or is the collector)
-    short staticCount;           // 0x8a: on the collector: number of entries in `staticNodes`
-    Node **staticNodes;          // 0x8c: on the collector: the collected nodes (room for 0x200)
-    int materialCount;
-    struct Material *materials;
-    void *m_0098;
-    struct MeshData *mesh;
-    int m_00a0;
-    int built;                   // 0xa4: 1 once BuildMesh has created the mesh buffers
-    int m_00a8;
-    unsigned int flags;
-    int m_00b0;
-    int group;
-    int m_00b8;
-    char pad_00bc[4];
-    int plugType[16];
-    struct Channel *plugs[16];
-    int plugTypeCopy[16];
-    void *plugData[16];
-    int m_01c0;
-    int m_01c4;
-    int m_01c8;
-    Matrix4 matrix;
-    Matrix4 inverseMatrix;        // 0x20c: inverse of `matrix`
-    Matrix4 worldMatrix;          // 0x24c: the node's matrix in world space
-
-    struct TextureRef *m_028c;
-    Matrix4 *frames;              // 0x290: the node's matrix for each animation frame
-    int m_0294;                  // 0x294: number of frames
-    char pad_0298[0x10];
-    struct Extra *m_02a8;
-    char pad_02ac[0x20];
-    int frame;                   // 0x2cc: current animation frame (-1, -2, ...: a stored pose)
-    unsigned char kind;          // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
-    char pad_02d1[3];
-    Matrix4 poses[16];            // 0x2d4: the current pose ([0]) and stored poses
-    Vec4 bounds[3];              // 0x6d4: bounding sphere (w = radius) and the two box corners
-    char m_0704;
-    char pad_0705[3];
-    struct GlyphState *m_0708;
-    char m_070c[0x40];
-    Node *parent;
-    int childCount;
-    char childNames[0x40][0x40];
-    Node *children[0x40];
-    NodeSaved *saved;
-    unsigned char m_1858;
-    char pad_1859[3];
-    int m_185c;
-    int m_1860;
-    void *m_1864;
-    Vec4 m_1868;
-    char m_1878[7];
-    char pad_187f;
-    int m_1880[5];
-    char pad_1894[4];
-    char element;
-    char pad_1899;
-    char m_189a;
-    char m_189b;
-    char m_189c;
-    char pad_189d[3];
-
-    void M_10191d50();
-    int M_1019eeb0(Node *root, Node **list, int *count);
-    int CopyMesh(Node *source, int slot);
-    int BlendFrames(int from, int to, float t);
-    int CopyAnimation(Node *source, int slot);
-    void M_101ab9d0(Node *root);
-    int M_10191770();
-    void Release();
-    int RemoveChild(Node *child, int keep);
-    int CopyPlugData();
-    int SetMaterialValue(const char *material, int value);
-    void M_10191500();
-    void M_101a2290();
-    Node *AddChild(const char *childName, int position);
-    int AllocMaterials(int count);
-    int Clone(Node *source, int a, int b);
-    int ComputeBounds();
-    int BuildCollisionSpheres();
-
-    void M_10193d10(int index);
-    void M_101913f0();
-    int CreateChildCopies();
-    void M_1019eca0();
-    int M_10191870(Node **list, int *count);
-    int Rebuild();
-    void M_10191d90();
-    void M_10191dd0();
-    void M_10191e10();
-    int M_101944d0();
-    int M_10194f40(float *position, Matrix4 *matrix, int a, float radius, int b, int depth);
-    int StartProximityPass(float *position, Matrix4 *matrix, int a, float radius, int b);
-    int ReleaseSavedStates();
-    // Puts the saved matrix back when the saved block holds one, and marks the block empty.
-    void RestoreSavedMatrix()
-    {
-        if (saved->m_0020 != 0)
-            matrix = saved->matrix;
-        saved->m_0020 = 0;
-    }
-    int M_101947b0();
-    int M_101947f0();
-    int M_10194830();
-    int M_10194870();
-    int M_101948c0();
-    int M_10194980();
-    int M_101949d0();
-    Node *M_101992f0();
-    Node *M_10199310();
-    int M_10199340();
-    int M_1019b130(unsigned int bits);
-    int M_1019b190(unsigned int bits);
-    int M_1019b210(unsigned int bits);
-    int M_1019b230(int value);
-    int M_1019b300(int a, int b);
-    int M_1019d680();
-    int M_1019d600();
-    Node *FindRecursive(const char *name, int *skip);
-    Node *FindPrefixRecursive(const char *prefix, int *skip);
-    int M_1019e830(int a, int b);
-    int ClearSpecialPassOnLinks();
-    int M_101a8760();
-    void M_101911e0(KeyPair *pairs, int count);
-    void M_1019e120();
-    int M_101ab980();
-    Node *M_10191a30(const char *name, int *value);
-    Node *M_10191c30(const char *name, int *value);
-    int FindRecursiveStripped(const char *name, int *skip);
-    int BuildMesh(int recurse, int flags);
-    int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
-                           Vec4 *closest);
-    int FindPrefixRecursiveStripped(const char *prefix, int *skip);
-    Node *Find(const char *name, int index);
-    int M_1019ed10(const char *name, int value);
-    int M_10191920(Node **list, int *count);
-    void M_10191210();
-    int M_10191990(const int *values, int count);
-    Node *M_10191cc0(unsigned int mask, int nth, int *counter);
-    void M_101911b0(PackHeader *packs, int count);
-    void ReleaseMesh();
-    int M_10191e50();
-    int M_10193cb0(int from, int to);
-    int M_10194630(char value, unsigned int mask);
-    int M_101946b0(char value, unsigned int mask);
-    int M_10194730(char value, unsigned int mask);
-    int M_101948f0(void *target);
-    int M_10194ee0();
-    int M_1019b050(int value);
-    int M_1019b0c0(int value, int except1, int except2);
-    int M_1019b1b0(unsigned int bits);
-    int M_1019bca0(Node **keep, int count);
-    Node *Root();
-    int SetUniqueName(const char *name);
-    void MakeNameUnique();
-    void ReleaseUniqueMeshData();
-    void CollectStatic(Node *collector);
-    int Rename(const char *newName, const char *oldName);
-    int TagRegion(const Box2 *boxes, const char (*names)[0x40], Matrix4 *matrix);
-};
+    if (saved->m_0020 != 0)
+        matrix = saved->matrix;
+    saved->m_0020 = 0;
+}
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);
 extern "C" void (*DAT_11b1ba40)(void *);
@@ -387,7 +223,7 @@ void Node::M_10191d90()
 // Saves the render mode (m_00a0) of the whole subtree.
 void Node::M_10191dd0()
 {
-    m_185c = m_00a0;
+    m_185c = drawMode;
     for (int i = 0; i < childCount; i++)
         children[i]->M_10191dd0();
 }
@@ -395,7 +231,7 @@ void Node::M_10191dd0()
 // Restores the render mode saved by M_10191dd0.
 void Node::M_10191e10()
 {
-    m_00a0 = m_185c;
+    drawMode = m_185c;
     for (int i = 0; i < childCount; i++)
         children[i]->M_10191e10();
 }
@@ -403,7 +239,7 @@ void Node::M_10191e10()
 // Clears m_00a8 in the whole subtree. Returns 1.
 int Node::M_101944d0()
 {
-    m_00a8 = 0;
+    hasCollision = 0;
     for (int i = 0; i < childCount; i++)
         children[i]->M_101944d0();
     return 1;
@@ -428,7 +264,7 @@ int Node::StartProximityPass(float *position, Matrix4 *matrix, int a, float radi
 int Node::CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
                              Vec4 *closest)
 {
-    if (DAT_11b04510 != 0 || m_0704 == 0)
+    if (DAT_11b04510 != 0 || skinned == 0)
     {
         if ((flags & 0x400) == 0)
         {
@@ -439,9 +275,9 @@ int Node::CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float
                     return hit;
             }
         }
-        else if (m_00a8 != 0)
+        else if (hasCollision != 0)
         {
-            if (worldMatrix.GetTranslation().DistanceToSegment(*from, *to, *closest) < bounds[0].w * 0.578f + range)
+            if (worldMatrix.GetTranslation().DistanceToSegment(*from, *to, *closest) < bounds.w * 0.578f + range)
             {
                 if (found != 0)
                 {
@@ -474,13 +310,13 @@ int Node::ReleaseSavedStates()
         {
             flags &= ~0x40000;
             RestoreSavedMatrix();
-            M_10194980();
+            FreeSaved();
         }
         else if (flags & 0x80000)
         {
             flags &= ~0x80000;
             RestoreSavedMatrix();
-            M_10194980();
+            FreeSaved();
         }
     }
     for (int i = 0; i < childCount; i++)
@@ -496,11 +332,11 @@ Node *Node::AddChild(const char *childName, int position)
     if (childCount > 0x3f)
         return 0;
     Node *child = (Node *)DAT_11b0b938(0x18a0, "m_child[m_numchild]");
-    child->M_10191500();
+    child->Init();
     child->parent = this;
     strcpy(child->folder, folder);
     strcpy(child->m_0050, m_0050);
-    child->m_00a0 = 8;
+    child->drawMode = 8;
     child->flags = 0x40;
     if (childName == 0)
         strcpy(child->name, "none");
@@ -510,14 +346,14 @@ Node *Node::AddChild(const char *childName, int position)
     {
         children[childCount] = child;
         childCount++;
-        children[childCount - 1]->M_101a2290();
+        children[childCount - 1]->MakeNameUnique();
         return children[childCount - 1];
     }
     for (int i = childCount - 1; i >= position; i--)
         children[i + 1] = children[i];
     children[position] = child;
     childCount++;
-    children[position]->M_101a2290();
+    children[position]->MakeNameUnique();
     return children[position];
 }
 
@@ -554,7 +390,7 @@ int Node::AllocMaterials(int count)
 }
 
 // Allocates the node's saved-state block (0xdc bytes) on first use.
-int Node::M_101947b0()
+int Node::AllocSaved()
 {
     if (saved == 0)
     {
@@ -610,7 +446,7 @@ int Node::M_101948c0()
 }
 
 // Undoes every saved state and frees the saved-state block.
-int Node::M_10194980()
+int Node::FreeSaved()
 {
     if (saved != 0)
     {
@@ -627,21 +463,12 @@ int Node::M_10194980()
 // Allocates the node's 0x80-byte extra block on first use.
 int Node::M_101949d0()
 {
-    if (m_02a8 == 0)
+    if (extra == 0)
     {
-        m_02a8 = (Extra *)DAT_11b0b938(0x80, "");
-        m_02a8->M_10169660();
+        extra = (NodeExtra *)DAT_11b0b938(0x80, "");
+        extra->M_10169660();
     }
     return 1;
-}
-
-// Returns the root of the tree this node belongs to. Not byte-identical yet (see open.tsv).
-Node *Node::M_101992f0()
-{
-    Node *node = this;
-    while (node->parent != 0)
-        node = node->parent;
-    return node;
 }
 
 // Returns the highest ancestor reachable through parents in state 0x1000.
@@ -656,9 +483,9 @@ Node *Node::M_10199310()
 // Returns the last animation frame of the subtree (the highest of the nodes' frame counts).
 int Node::M_10199340()
 {
-    int last = m_0294;
-    if (last < m_01c8)
-        last = m_01c8;
+    int last = frameMatrixCount;
+    if (last < frameCount)
+        last = frameCount;
     int count = childCount;
     for (int i = 0; i < count; i++)
     {
@@ -678,11 +505,11 @@ extern "C" void FUN_10199860(void)
 }
 
 // Sets flag bits on the whole subtree. Returns 1.
-int Node::M_1019b130(unsigned int bits)
+int Node::SetFlags(unsigned int bits)
 {
     flags |= bits;
     for (int i = 0; i < childCount; i++)
-        children[i]->M_1019b130(bits);
+        children[i]->SetFlags(bits);
     return 1;
 }
 
@@ -709,15 +536,15 @@ int Node::M_1019b230(int value)
     return 1;
 }
 
-// Restarts the two colour plugs (type 0x4ee33 in plug slots 6 and 7) from (a, b).
-int Node::M_1019b300(int a, int b)
+// Restarts the two colour plugs (type 0x4ee33 in plug slots 6 and 7) with motion `motion` over `frames` frames.
+int Node::RestartColourPlugs(const char *motion, int frames)
 {
     for (int i = 0; i < 2; i++)
     {
         if (plugType[6 + i] != 0 && plugType[6 + i] == 0x4ee33)
         {
             plugs[6 + i]->keys.M_101ad690();
-            plugs[6 + i]->keys.M_101ad5c0(0, a, b);
+            plugs[6 + i]->keys.M_101ad5c0(0, motion, frames);
         }
     }
     return 0;
@@ -767,10 +594,10 @@ int Node::ClearSpecialPassOnLinks()
         flags &= ~0x8000;
     if (flags & 0x1000)
         flags &= ~0x8000;
-    if (m_0708 != 0 && m_0708->m_5618 != 0)
+    if (skin != 0 && skin->m_5618 != 0)
     {
-        for (int i = 0; i < m_0708->m_5618; i++)
-            m_0708->links[i]->M_1019d680();
+        for (int i = 0; i < skin->m_5618; i++)
+            skin->links[i]->M_1019d680();
     }
     for (int i = 0; i < childCount; i++)
         children[i]->ClearSpecialPassOnLinks();
@@ -783,8 +610,8 @@ Node *Node::Find(const char *name, int value)
 {
     int result = value;
     if (*name == '@')
-        return M_10191c30(name + 1, &result);
-    return M_10191a30(name, &result);
+        return FindPrefixRecursive(name + 1, &result);
+    return FindRecursive(name, &result);
 }
 
 // Like Find with the second pair of finders (FindPrefixRecursiveStripped / FindRecursiveStripped), which ignore the name
@@ -811,7 +638,7 @@ int Node::M_101ab980()
     if (m_0070 != 0 && packCount != 0)
         M_101911e0(m_0070, packCount);
     for (int i = 0; i < childCount; i++)
-        children[i]->M_1019e120();
+        children[i]->BuildCollisionSpheres();
     return 0;
 }
 // Collects up to 8 nodes in state 0x4000 from the subtree into `list`.
@@ -835,31 +662,31 @@ void Node::M_10191210()
     {
         DAT_11b1ba40(m_028c);
         m_028c = 0;
-        if (frames != 0)
-            DAT_11b1ba40(frames);
-        frames = 0;
-        m_0294 = 0;
+        if (frameMatrices != 0)
+            DAT_11b1ba40(frameMatrices);
+        frameMatrices = 0;
+        frameMatrixCount = 0;
     }
-    frames = 0;
-    m_0294 = 0;
+    frameMatrices = 0;
+    frameMatrixCount = 0;
     m_028c = 0;
 }
-// Stores `count` values in the saved block of every node in state 0x1000 in the subtree.
-int Node::M_10191990(const int *values, int count)
+// Stores the `count` nodes of `nodes` as linked nodes in the saved block of every node in state 0x1000 in the subtree.
+int Node::M_10191990(Node *const *nodes, int count)
 {
     if ((flags & 0x1000) != 0)
     {
         for (int i = 0; i < count; i++)
-            saved->m_0098[i] = values[i];
+            saved->linkedNodes[i] = nodes[i];
         saved->m_00b8 = count;
     }
     for (int i = 0; i < childCount; i++)
-        children[i]->M_10191990(values, count);
+        children[i]->M_10191990(nodes, count);
     return 1;
 }
 
 // Finds the nth node (0-based) in the subtree whose flags contain all bits of `mask`.
-Node *Node::M_10191cc0(unsigned int mask, int nth, int *counter)
+Node *Node::FindByFlags(unsigned int mask, int nth, int *counter)
 {
     int local = 0;
     if (counter == 0)
@@ -873,7 +700,7 @@ Node *Node::M_10191cc0(unsigned int mask, int nth, int *counter)
     {
         if (children[i] != 0)
         {
-            Node *found = children[i]->M_10191cc0(mask, nth, counter);
+            Node *found = children[i]->FindByFlags(mask, nth, counter);
             if (found != 0)
                 return found;
         }
@@ -901,27 +728,27 @@ void Node::Release()
         DAT_11b1ba40(m_0084);
     m_0080 = 0;
     m_0084 = 0;
-    if (m_02a8 != 0)
+    if (extra != 0)
     {
-        m_02a8->M_10169620();
-        DAT_11b1ba40(m_02a8);
+        extra->M_10169620();
+        DAT_11b1ba40(extra);
     }
-    m_02a8 = 0;
-    if (m_0708 != 0)
-        DAT_11b1ba40(m_0708);
-    m_0708 = 0;
+    extra = 0;
+    if (skin != 0)
+        DAT_11b1ba40(skin);
+    skin = 0;
     if (saved != 0)
         DAT_11b1ba40(saved);
     saved = 0;
-    if (m_1864 != 0)
-        DAT_11b1ba40(m_1864);
-    m_1864 = 0;
+    if (visibilityCells != 0)
+        DAT_11b1ba40(visibilityCells);
+    visibilityCells = 0;
     if (materials != 0)
         DAT_11b1ba40(materials);
     materials = 0;
     if (m_028c != 0)
         M_10191210();
-    else if (m_0294 > 1)
+    else if (frameMatrixCount > 1)
         fread(0, 1, 1, 0);
     if (m_0070 != 0)
     {
@@ -960,7 +787,7 @@ void Node::Release()
         children[i]->Release();
         DAT_11b1ba40(children[i]);
     }
-    M_10191500();
+    Init();
 }
 
 // Releases the node's shared mesh and, when it was the last user, frees the mesh, packs and index lists.
@@ -997,8 +824,8 @@ int Node::M_10191e50()
 // Replaces render mode `from` with `to` in the whole subtree.
 int Node::M_10193cb0(int from, int to)
 {
-    if (from == m_00a0)
-        m_00a0 = to;
+    if (from == drawMode)
+        drawMode = to;
     for (int i = 0; i < childCount; i++)
         children[i]->M_10193cb0(from, to);
     return 0;
@@ -1056,7 +883,7 @@ int Node::M_10194730(char value, unsigned int mask)
 }
 
 // Enters saved-matrix state 0x400000 with `target` (or the default DAT_11b07118) as the target object.
-int Node::M_101948f0(void *target)
+int Node::EnterTargetState(void *target)
 {
     if (saved != 0)
     {
@@ -1125,10 +952,10 @@ extern "C" void FUN_101997f0(void)
 // Sets the render mode of the subtree (mode 8 is ignored for nodes with an active glyph cache).
 int Node::M_1019b050(int value)
 {
-    if (value == 8 && m_0708 != 0 && m_0708->m_5618 != 0)
-        m_00a0 = 0;
+    if (value == 8 && skin != 0 && skin->m_5618 != 0)
+        drawMode = 0;
     else
-        m_00a0 = value;
+        drawMode = value;
     for (int i = 0; i < childCount; i++)
         children[i]->M_1019b050(value);
     return 1;
@@ -1137,19 +964,19 @@ int Node::M_1019b050(int value)
 // Sets the render mode of the subtree except for nodes in mode `except1` or `except2` (-1 = no exception).
 int Node::M_1019b0c0(int value, int except1, int except2)
 {
-    if ((except1 == -1 || m_00a0 != except1) && (except2 == -1 || m_00a0 != except2))
-        m_00a0 = value;
+    if ((except1 == -1 || drawMode != except1) && (except2 == -1 || drawMode != except2))
+        drawMode = value;
     for (int i = 0; i < childCount; i++)
         children[i]->M_1019b0c0(value, except1, except2);
     return 1;
 }
 
 // Clears flag bits on the whole subtree.
-int Node::M_1019b1b0(unsigned int bits)
+int Node::ClearFlags(unsigned int bits)
 {
     flags &= ~bits;
     for (int i = 0; i < childCount; i++)
-        children[i]->M_1019b1b0(bits);
+        children[i]->ClearFlags(bits);
     return 1;
 }
 // Releases the textures of every node in the subtree that is not in the `keep` list.
@@ -1174,7 +1001,7 @@ int Node::Rebuild()
     int count = 0;
     Node *list[16];
     M_1019eeb0(this, list, &count);
-    M_101ab9d0(this);
+    SetupSkins(this);
     M_10191770();
     M_1019eca0();
     M_10191870(list, &count);
@@ -1193,7 +1020,7 @@ int Node::M_10191870(Node **list, int *count)
             Node *other = list[i];
             if (group == other->group)
             {
-                saved->m_0098[linked] = (int)other;
+                saved->linkedNodes[linked] = other;
                 linked++;
             }
         }
@@ -1206,15 +1033,15 @@ int Node::M_10191870(Node **list, int *count)
 // Copies bind poses from a skinned node's glyph/bone cache into its "bip" bones.
 int Node::M_10191770()
 {
-    if (m_0708 != 0 && m_0708->m_5618 != 0)
+    if (skin != 0 && skin->m_5618 != 0)
     {
         for (int i = 0; i < 0x44; i++)
         {
-            Node *bone = m_0708->bones[i];
-            if (bone != 0 && bone->m_0704 != 0 && _strnicmp(bone->name, "bip", 3) == 0)
+            Node *bone = skin->bones[i];
+            if (bone != 0 && bone->skinned != 0 && _strnicmp(bone->name, "bip", 3) == 0)
             {
-                m_0708->bones[i]->m_0708->m_00c4 = m_0708->bindPose[i];
-                m_0708->bones[i]->m_0708->m_3518[0] = m_0708->m_3518[i];
+                skin->bones[i]->skin->m_00c4 = skin->bindPose[i];
+                skin->bones[i]->skin->m_3518[0] = skin->m_3518[i];
             }
         }
     }
@@ -1291,14 +1118,14 @@ int Node::SetMaterialValue(const char *material, int value)
 int Node::CreateChildCopies()
 {
     Node *created[0x20];
-    bounds[1].z = packs->vertices[0].position[2];
-    bounds[2].z = packs->vertices[0].position[2];
+    boundsMin.z = packs->vertices[0].position[2];
+    boundsMax.z = packs->vertices[0].position[2];
     m_1858 = 1;
     for (int i = 0; i < 0x20; i++)
     {
         Node *node = (Node *)DAT_11b0b938(0x18a0, "m_child[m_numchild]");
         created[i] = node;
-        node->M_10191500();
+        node->Init();
         node->Clone(this, 0, 1);
     }
     childCount = 0x20;
@@ -1307,9 +1134,9 @@ int Node::CreateChildCopies()
         children[i] = created[i];
         created[i]->parent = this;
         children[i]->M_10193d10(i);
-        children[i]->m_00a0 = 0xc;
+        children[i]->drawMode = 0xc;
     }
-    M_101913f0();
+    ReleaseMesh();
     return 1;
 }
 
@@ -1383,7 +1210,7 @@ int Node::FindRecursiveStripped(const char *name, int *skip)
 // children. Returns 0 when this node was marked, 1 otherwise.
 int Node::M_1019d600()
 {
-    if ((flags & 0x3e00) == 0 && (parent == 0 || (parent->flags & 0x3000) == 0) && ((flags & 0x20) != 0 || m_0704 != 0))
+    if ((flags & 0x3e00) == 0 && (parent == 0 || (parent->flags & 0x3000) == 0) && ((flags & 0x20) != 0 || skinned != 0))
     {
         flags |= 0x8000;
         return 0;
@@ -1462,13 +1289,13 @@ int Node::BuildMesh(int recurse, int flags)
 {
     if (packs == 0 && packCount == -1)
     {
-        if (m_0704 == 0)
+        if (skinned == 0)
         {
             mesh->M_10150bb0(0, indexLists, -1, materials, flags);
             built = 1;
         }
     }
-    else if (packs != 0 && m_0704 == 0)
+    else if (packs != 0 && skinned == 0)
     {
         mesh->M_10150bb0(packs, indexLists, packCount, materials, flags);
         built = 1;
@@ -1483,7 +1310,7 @@ int Node::BuildMesh(int recurse, int flags)
 
 // Runs the mesh pass M_10147690(a, b) on this node's mesh when it has materials and either no packed data
 // (packCount -1 with no packs) or packed data present, then on every child. Returns 1.
-int Node::M_1019e830(int a, int b)
+int Node::ReplaceMaterial(int a, int b)
 {
     if (materialCount != 0)
     {
@@ -1493,7 +1320,7 @@ int Node::M_1019e830(int a, int b)
             mesh->M_10147690(a, b);
     }
     for (int i = 0; i < childCount; i++)
-        children[i]->M_1019e830(a, b);
+        children[i]->ReplaceMaterial(a, b);
     return 1;
 }
 
@@ -1601,20 +1428,20 @@ int Node::Rename(const char *newName, const char *oldName)
         strcpy(name, newName);
         return 0;
     }
-    if (m_0708 != 0)
+    if (skin != 0)
     {
-        if (_stricmp(m_0708->parentName, oldName) == 0)
-            strcpy(m_0708->parentName, newName);
+        if (_stricmp(skin->parentName, oldName) == 0)
+            strcpy(skin->parentName, newName);
         int i;
         for (i = 0; i < 0x40; i++)
         {
-            if (_stricmp(m_0708->linkNames[i], oldName) == 0)
-                strcpy(m_0708->linkNames[i], newName);
+            if (_stricmp(skin->linkNames[i], oldName) == 0)
+                strcpy(skin->linkNames[i], newName);
         }
         for (i = 0; i < 0x44; i++)
         {
-            if (_stricmp(m_0708->boneNames[i], oldName) == 0)
-                strcpy(m_0708->boneNames[i], newName);
+            if (_stricmp(skin->boneNames[i], oldName) == 0)
+                strcpy(skin->boneNames[i], newName);
         }
     }
     for (int j = 0; j < childCount; j++)
@@ -1719,68 +1546,68 @@ int Node::M_1019eeb0(Node *root, Node **list, int *count)
     inverseMatrix = InverseMatrix(matrix);
     if (_strnicmp(name, "bip", 3) == 0 || _strnicmp(name, "bone", 4) == 0)
     {
-        m_0704 = 1;
-        if (m_0708 == 0)
+        skinned = 1;
+        if (skin == 0)
         {
-            m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
-            m_0708->Clear();
+            skin = (NodeSkin *)DAT_11b0b938(0x561c, "bone");
+            skin->Clear();
         }
     }
-    if (m_0708 != 0 && m_0708->m_5618 != 0)
+    if (skin != 0 && skin->m_5618 != 0)
     {
         int i;
         for (i = 0; i < 0x40; i++)
         {
-            if (m_0708->linkNames[i][0] != 0)
+            if (skin->linkNames[i][0] != 0)
             {
-                m_0708->links[i] = root->Find(m_0708->linkNames[i], 0);
-                m_0708->links[i]->m_0704 = 1;
-                if (m_0708->links[i]->m_0708 == 0)
+                skin->links[i] = root->Find(skin->linkNames[i], 0);
+                skin->links[i]->skinned = 1;
+                if (skin->links[i]->skin == 0)
                 {
-                    m_0708->links[i]->m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
-                    m_0708->links[i]->m_0708->Clear();
+                    skin->links[i]->skin = (NodeSkin *)DAT_11b0b938(0x561c, "bone");
+                    skin->links[i]->skin->Clear();
                 }
-                m_0708->links[i]->m_0708->pad_0104 = 1;
-                strcpy(m_0708->links[i]->m_0708->parentName, m_0708->parentName);
+                skin->links[i]->skin->pad_0104 = 1;
+                strcpy(skin->links[i]->skin->parentName, skin->parentName);
             }
         }
         int chain = 1;
         for (i = 0; i < 0x44; i++)
         {
-            if (m_0708->boneNames[i][0] != 0)
+            if (skin->boneNames[i][0] != 0)
             {
-                m_0708->bones[i] = root->Find(m_0708->boneNames[i], 0);
-                if (m_0708->bones[i] != 0)
+                skin->bones[i] = root->Find(skin->boneNames[i], 0);
+                if (skin->bones[i] != 0)
                 {
-                    if (_strnicmp(m_0708->bones[i]->name, "bip", 3) == 0 ||
-                        _strnicmp(m_0708->bones[i]->name, "bone", 4) == 0)
-                        m_0708->bones[i]->m_0704 = 1;
-                    Node *bone = m_0708->bones[i];
-                    if (bone->m_0704 == 0 && bone->childCount != 0)
+                    if (_strnicmp(skin->bones[i]->name, "bip", 3) == 0 ||
+                        _strnicmp(skin->bones[i]->name, "bone", 4) == 0)
+                        skin->bones[i]->skinned = 1;
+                    Node *bone = skin->bones[i];
+                    if (bone->skinned == 0 && bone->childCount != 0)
                         chain = 0;
                     if (i > 0 && chain && bone != 0)
                     {
-                        if (bone->m_0708 == 0)
+                        if (bone->skin == 0)
                         {
-                            m_0708->bones[i]->m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
-                            m_0708->bones[i]->m_0708->Clear();
+                            skin->bones[i]->skin = (NodeSkin *)DAT_11b0b938(0x561c, "bone");
+                            skin->bones[i]->skin->Clear();
                         }
-                        strcpy(m_0708->bones[i]->m_0708->parentName, m_0708->parentName);
+                        strcpy(skin->bones[i]->skin->parentName, skin->parentName);
                     }
                 }
             }
         }
     }
     if ((flags & 0x400000) != 0)
-        M_101947b0();
+        AllocSaved();
     else if ((flags & 0x1000) != 0)
     {
-        M_101947b0();
+        AllocSaved();
         *(Node **)&saved->pad_0064[0] = M_10199310();
     }
     else if ((flags & 0x4000) != 0)
     {
-        M_101947b0();
+        AllocSaved();
         list[*count] = this;
         (*count)++;
     }
@@ -1805,7 +1632,7 @@ int Node::CopyMesh(Node *source, int slot)
 {
     if (source == 0)
         return 0;
-    m_00a8 = 0;
+    hasCollision = 0;
     if (source->packCount != 0)
     {
         if (slot == 0)
@@ -1872,10 +1699,10 @@ copyMaterials:
                 FUN_10174ce0(materials[i].textures[0], 0, 0);
         }
     }
-    m_00a0 = source->m_00a0;
-    bounds[0].Copy(source->bounds[0]);
-    bounds[1].Copy(source->bounds[1]);
-    bounds[2].Copy(source->bounds[2]);
+    drawMode = source->drawMode;
+    bounds.Copy(source->bounds);
+    boundsMin.Copy(source->boundsMin);
+    boundsMax.Copy(source->boundsMax);
     return 1;
 }
 
@@ -1889,39 +1716,39 @@ int Node::BlendFrames(int from, int to, float t)
 {
     if (this == 0)
         return 0;
-    if (frames != 0)
+    if (frameMatrices != 0)
     {
         if (from < 0)
         {
-            if (m_0294 > to)
+            if (frameMatrixCount > to)
             {
                 int pose = -1 - from;
                 if (DAT_11b04508 != 0 && _stricmp(name, "Bip01") == 0)
-                    MatrixBlend(&poses[0], poses[pose], frames[to], t, 1);
+                    MatrixBlend(&poses[0], poses[pose], frameMatrices[to], t, 1);
                 else if (_strnicmp(name, "charbase", 8) == 0)
                 {
                     if (DAT_11b04508 != 0)
-                        MatrixBlend(&poses[0], poses[pose], frames[to], t, 1);
+                        MatrixBlend(&poses[0], poses[pose], frameMatrices[to], t, 1);
                     else
-                        MatrixBlend(&poses[0], poses[pose], frames[to], t, 0);
+                        MatrixBlend(&poses[0], poses[pose], frameMatrices[to], t, 0);
                 }
                 else
-                    MatrixBlend(&poses[0], poses[pose], frames[to], t, 0);
+                    MatrixBlend(&poses[0], poses[pose], frameMatrices[to], t, 0);
             }
         }
-        else if (m_0294 > from && m_0294 > to)
+        else if (frameMatrixCount > from && frameMatrixCount > to)
         {
             if (DAT_11b04508 != 0 && _stricmp(name, "Bip01") == 0)
-                MatrixBlend(&poses[0], frames[from], frames[to], t, 1);
+                MatrixBlend(&poses[0], frameMatrices[from], frameMatrices[to], t, 1);
             else if (_strnicmp(name, "charbase", 8) == 0)
             {
                 if (DAT_11b04508 != 0)
-                    MatrixBlend(&poses[0], frames[from], frames[to], t, 1);
+                    MatrixBlend(&poses[0], frameMatrices[from], frameMatrices[to], t, 1);
                 else
-                    MatrixBlend(&poses[0], frames[from], frames[to], t, 0);
+                    MatrixBlend(&poses[0], frameMatrices[from], frameMatrices[to], t, 0);
             }
             else
-                MatrixBlend(&poses[0], frames[from], frames[to], t, 0);
+                MatrixBlend(&poses[0], frameMatrices[from], frameMatrices[to], t, 0);
         }
     }
     for (int i = 0; i < childCount; i++)
@@ -1953,14 +1780,14 @@ int Node::CopyAnimation(Node *source, int slot)
                 pose = 15;
             current = poses[pose];
         }
-        else if ((flags & 0x100000) != 0 && m_02a8 != 0)
-            current = m_02a8->AnimatedMatrix(frame);
-        else if (frames != 0)
+        else if ((flags & 0x100000) != 0 && extra != 0)
+            current = extra->AnimatedMatrix(frame);
+        else if (frameMatrices != 0)
         {
             int index = frame;
-            if (m_0294 <= index)
-                index = m_0294 - 1;
-            current = frames[index];
+            if (frameMatrixCount <= index)
+                index = frameMatrixCount - 1;
+            current = frameMatrices[index];
         }
         else
             current = matrix;
@@ -1990,18 +1817,18 @@ int Node::CopyAnimation(Node *source, int slot)
             plugType[g] = source->plugType[g];
         }
     }
-    if (source->m_02a8 != 0)
+    if (source->extra != 0)
     {
         M_101949d0();
-        m_02a8->tracks[0].Copy(&source->m_02a8->tracks[1]);
-        m_02a8->tracks[1].Copy(&source->m_02a8->tracks[1]);
-        m_02a8->tracks[2].Copy(&source->m_02a8->tracks[1]);
-        m_02a8->tracks[3].Copy(&source->m_02a8->tracks[3]);
-        m_02a8->tracks[4].Copy(&source->m_02a8->tracks[4]);
-        m_02a8->m_0070[0] = source->m_02a8->m_0070[0];
-        m_02a8->m_0070[1] = source->m_02a8->m_0070[1];
-        m_02a8->m_0070[2] = source->m_02a8->m_0070[2];
-        m_02a8->m_0070[3] = source->m_02a8->m_0070[3];
+        extra->tracks[0].Copy(&source->extra->tracks[1]);
+        extra->tracks[1].Copy(&source->extra->tracks[1]);
+        extra->tracks[2].Copy(&source->extra->tracks[1]);
+        extra->tracks[3].Copy(&source->extra->tracks[3]);
+        extra->tracks[4].Copy(&source->extra->tracks[4]);
+        extra->m_0070[0] = source->extra->m_0070[0];
+        extra->m_0070[1] = source->extra->m_0070[1];
+        extra->m_0070[2] = source->extra->m_0070[2];
+        extra->m_0070[3] = source->extra->m_0070[3];
     }
     matrix = source->matrix;
     if (source->m_028c != 0)
@@ -2013,8 +1840,8 @@ int Node::CopyAnimation(Node *source, int slot)
             if (found >= 0)
             {
                 m_028c = DAT_10fdf1d0[found];
-                frames = DAT_1101c820[found];
-                m_0294 = DAT_11017600[found];
+                frameMatrices = DAT_1101c820[found];
+                frameMatrixCount = DAT_11017600[found];
                 FUN_10169be0(m_028c);
                 goto keepPose;
             }
@@ -2025,15 +1852,15 @@ int Node::CopyAnimation(Node *source, int slot)
             FUN_101699f0(motionSlot, m_0050, name);
         }
         m_028c = (TextureRef *)DAT_11b0b938(4, "motion");
-        m_0294 = source->m_0294;
-        frames = (Matrix4 *)DAT_11b0b938(source->m_0294 << 6, "tmp[i]->m_animat");
-        memcpy(frames, source->frames, source->m_0294 << 6);
+        frameMatrixCount = source->frameMatrixCount;
+        frameMatrices = (Matrix4 *)DAT_11b0b938(source->frameMatrixCount << 6, "tmp[i]->m_animat");
+        memcpy(frameMatrices, source->frameMatrices, source->frameMatrixCount << 6);
         m_028c->slot = motionSlot;
         if (motionSlot >= 0)
         {
             DAT_10fdf1d0[motionSlot] = m_028c;
-            DAT_1101c820[motionSlot] = frames;
-            DAT_11017600[motionSlot] = m_0294;
+            DAT_1101c820[motionSlot] = frameMatrices;
+            DAT_11017600[motionSlot] = frameMatrixCount;
             FUN_10169be0(m_028c);
         }
     }
@@ -2057,25 +1884,25 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     for (i = 0; i < 16; i++)
         poses[i] = source->poses[i];
     flags = source->flags;
-    m_00b0 = source->m_00b0;
+    cullMargin = source->cullMargin;
     group = source->group;
     m_1868.Copy(source->m_1868);
-    m_1878[0] = source->m_1878[0];
-    m_1880[0] = source->m_1880[0];
-    m_1880[1] = source->m_1880[1];
-    m_1880[2] = source->m_1880[2];
-    m_1880[3] = source->m_1880[3];
-    m_1880[4] = source->m_1880[4];
-    m_1878[1] = source->m_1878[1];
-    m_1878[2] = source->m_1878[2];
-    m_1878[3] = source->m_1878[3];
-    m_1878[4] = source->m_1878[4];
-    m_1878[5] = source->m_1878[5];
-    m_1878[6] = source->m_1878[6];
-    m_00a0 = source->m_00a0;
-    m_01c0 = source->m_01c0;
-    m_01c8 = source->m_01c8;
-    m_01c4 = source->m_01c4;
+    m_1878 = source->m_1878;
+    m_1880 = source->m_1880;
+    m_1884 = source->m_1884;
+    m_1888 = source->m_1888;
+    m_188c = source->m_188c;
+    m_1890 = source->m_1890;
+    m_1879 = source->m_1879;
+    m_187a = source->m_187a;
+    m_187b = source->m_187b;
+    m_187c = source->m_187c;
+    m_187d = source->m_187d;
+    m_187e = source->m_187e;
+    drawMode = source->drawMode;
+    animated = source->animated;
+    frameCount = source->frameCount;
+    frameSize = source->frameSize;
     if (source->saved != 0)
     {
         saved = (NodeSaved *)DAT_11b0b938(0xdc, "ik");
@@ -2095,19 +1922,19 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     CopyAnimation(source, motionSlot);
     CopyMesh(source, meshSlot);
     ComputeBounds();
-    if (source->m_0708 != 0 && source->m_0708->m_5618 != 0)
+    if (source->skin != 0 && source->skin->m_5618 != 0)
     {
-        m_0708 = (GlyphState *)DAT_11b0b938(0x561c, "bone");
-        m_0708->Clear();
-        strcpy(m_0708->parentName, source->m_0708->parentName);
-        m_0708->m_5618 = source->m_0708->m_5618;
-        for (i = 0; i < source->m_0708->m_5618; i++)
-            strcpy(m_0708->linkNames[i], source->m_0708->linkNames[i]);
+        skin = (NodeSkin *)DAT_11b0b938(0x561c, "bone");
+        skin->Clear();
+        strcpy(skin->parentName, source->skin->parentName);
+        skin->m_5618 = source->skin->m_5618;
+        for (i = 0; i < source->skin->m_5618; i++)
+            strcpy(skin->linkNames[i], source->skin->linkNames[i]);
         for (i = 0; i < 0x44; i++)
         {
-            strcpy(m_0708->boneNames[i], source->m_0708->boneNames[i]);
-            m_0708->bindPose[i] = source->m_0708->bindPose[i];
-            m_0708->m_3518[i] = source->m_0708->m_3518[i];
+            strcpy(skin->boneNames[i], source->skin->boneNames[i]);
+            skin->bindPose[i] = source->skin->bindPose[i];
+            skin->m_3518[i] = source->skin->m_3518[i];
         }
     }
     strcpy(m_070c, source->m_070c);
@@ -2116,11 +1943,11 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     {
         strcpy(childNames[i], source->childNames[i]);
         children[i] = (Node *)DAT_11b0b938(0x18a0, "dup");
-        children[i]->M_10191500();
+        children[i]->Init();
         children[i]->Clone(source->children[i], motionSlot, meshSlot);
         children[i]->parent = this;
     }
-    m_00a8 = 0;
+    hasCollision = 0;
     return 1;
 }
 
@@ -2204,19 +2031,19 @@ int Node::ComputeBounds()
         size.x = maxX - minX;
         size.y = maxY - minY;
         size.z = maxZ - minZ;
-        bounds[0].x = (minX + maxX) / 2.0f;
-        bounds[0].y = (minY + maxY) / 2.0f;
-        bounds[0].z = (minZ + maxZ) / 2.0f;
+        bounds.x = (minX + maxX) / 2.0f;
+        bounds.y = (minY + maxY) / 2.0f;
+        bounds.z = (minZ + maxZ) / 2.0f;
         float radius = size.Length() / 2.0f;
-        bounds[1].x = minX;
-        bounds[1].y = minY;
-        bounds[1].z = minZ;
-        bounds[2].x = maxX;
-        bounds[1].w = 1.0f;
-        bounds[2].y = maxY;
-        bounds[2].z = maxZ;
-        bounds[2].w = 1.0f;
-        bounds[0].w = radius;
+        boundsMin.x = minX;
+        boundsMin.y = minY;
+        boundsMin.z = minZ;
+        boundsMax.x = maxX;
+        boundsMin.w = 1.0f;
+        boundsMax.y = maxY;
+        boundsMax.z = maxZ;
+        boundsMax.w = 1.0f;
+        bounds.w = radius;
     }
     return 1;
 }

@@ -12,19 +12,7 @@ Matrix4 RotationX(float angle);                  // 0x101b1ad0
 Matrix4 RotationZ(float angle);                  // 0x101b1b40
 Matrix4 Scaling(float x, float y, float z);      // 0x101b13c0
 
-struct Node
-{
-    char name[0x1cc];                            // 0x00: node name
-    Matrix4 local;                               // 0x1cc: matrix relative to the parent
-    char pad_020c[0x540];
-    Node *parent;                                // 0x74c
-    int M_1019b300(const char *motion, int value);  // restarts the two colour plugs (scene_node.cpp)
-    Node *Find(const char *name, int index);     // 0x1019ece0
-    Node *AddChild(int a, int size);             // 0x101abc30
-    int Load(const char *path, int a, int b, int c); // 0x101ac010
-    void M_1019afa0(int a, int b);               // 0x1019afa0
-    int RemoveChild(Node *child, int a);         // 0x101a2f30
-};
+#include "node.h"
 
 // Engine object at 0x10836c70; M_1013eee0 is FrameTimer_ResetNext (engine_1013e.cpp).
 struct Engine
@@ -103,10 +91,10 @@ int FUN_10042140(int index, const char *model, int radius, const Vec4 *position,
         }
         part->Load(FUN_1013f8a0(model, 0), 0, 0, 0);
         part->parent = piece;
-        piece->M_1019afa0(1, 0);
-        piece->local = *matrix;
-        piece->local = piece->local * RotationZ((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f);
-        piece->local.SetTranslation(*position);
+        piece->BuildMesh(1, 0);
+        piece->matrix = *matrix;
+        piece->matrix = piece->matrix * RotationZ((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f);
+        piece->matrix.SetTranslation(*position);
         DAT_10446e00[slot] = piece;
         DAT_1030cd98[slot] = (float)radius;
         DAT_1021d018[slot] = 0x23;
@@ -121,7 +109,7 @@ int FUN_10042140(int index, const char *model, int radius, const Vec4 *position,
             velocity.RotateZ((float)(FUN_1013f880() % 100 - 50) * 3.1415f / 1800.0f - DAT_10db6ee8[index].heading);
         }
         DAT_10da9160[slot].Copy(velocity);
-        piece->M_1019b300("anime", DAT_104bf8a4);
+        piece->RestartColourPlugs("anime", DAT_104bf8a4);
         DAT_1020da24[slot] = 1;
         if (scaled != 0)
         {
@@ -137,12 +125,12 @@ int FUN_10042140(int index, const char *model, int radius, const Vec4 *position,
                 break;
             }
             DAT_1030cd98[slot] = scale * DAT_1030cd98[slot];
-            part->local = part->local * Scaling(scale, scale, scale);
+            part->matrix = part->matrix * Scaling(scale, scale, scale);
         }
         float above = position->z - DAT_10db6ee8[index].matrix.m[14];
         float lowest = DAT_1030cd98[slot] + 1.0f;
         if (above < lowest)
-            piece->local.m[14] += lowest - above;
+            piece->matrix.m[14] += lowest - above;
         DAT_102194c8[slot] = 0;
         FUN_1001af10(slot);
         DAT_10836c70.M_1013eee0();
@@ -181,11 +169,11 @@ int FUN_100425f0(const Vec4 *position, const char *model, int radius, float head
             Node *part = piece->AddChild(0, 0x40);
             part->Load(FUN_1013f8a0(model, 0), 0, 0, 0);
             part->parent = piece;
-            piece->M_1019afa0(1, 0);
-            piece->local = RotationX((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f) *
+            piece->BuildMesh(1, 0);
+            piece->matrix = RotationX((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f) *
                            RotationZ((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f);
-            piece->local = piece->local * RotationZ((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f);
-            piece->local.SetTranslation(*position);
+            piece->matrix = piece->matrix * RotationZ((float)(FUN_1013f880() % 360) * 3.1415f / 180.0f);
+            piece->matrix.SetTranslation(*position);
             DAT_10446e00[slot] = piece;
             DAT_1030cd98[slot] = (float)radius;
             DAT_1021d018[slot] = 0x23;
@@ -203,7 +191,7 @@ int FUN_100425f0(const Vec4 *position, const char *model, int radius, float head
             else
                 velocity.RotateZ((float)(FUN_1013f880() % 100 - 50) * 3.1415f / 1800.0f + heading);
             DAT_10da9160[slot].Copy(velocity);
-            piece->M_1019b300("anime", DAT_104bf8a4);
+            piece->RestartColourPlugs("anime", DAT_104bf8a4);
             DAT_102194c8[slot] = 0;
             FUN_1001af10(slot);
             return slot;
@@ -223,7 +211,7 @@ extern "C" int FUN_10062750(const Vec4 *a, const char *b, int c, float d, float 
         DAT_1042db08[slot] = -1;
         DAT_1021d018[slot] = -1;
         DAT_10254798[slot] = 0;
-        DAT_10446e00[slot]->M_1019b300("stop", DAT_104bf8a4);
+        DAT_10446e00[slot]->RestartColourPlugs("stop", DAT_104bf8a4);
     }
     DAT_10836c70.M_1013eee0();
     return 0;

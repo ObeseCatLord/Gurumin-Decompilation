@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 14.6647,
+  "fuzzy_match_percent": 14.6622,
   "total_code": "1720206",
   "matched_code": "199043",
   "matched_code_percent": 11.5709,
@@ -9619,7 +9619,7 @@
   {
    "name": "app/node_bones",
    "measures": {
-    "fuzzy_match_percent": 83.3708,
+    "fuzzy_match_percent": 79.9114,
     "total_code": "1237",
     "matched_code": "711",
     "matched_code_percent": 57.4778,
@@ -9640,14 +9640,14 @@
     {
      "name": ".text",
      "size": "1237",
-     "fuzzy_match_percent": 83.3708
+     "fuzzy_match_percent": 79.9114
     }
    ],
    "functions": [
     {
      "name": "?FindBone@Node@@QAEPAUMatrix4@@HPAU2@0H@Z",
      "size": "526",
-     "fuzzy_match_percent": 60.8929,
+     "fuzzy_match_percent": 52.7574,
      "metadata": {
       "virtual_address": "270111616"
      }
@@ -12107,14 +12107,6 @@
      }
     },
     {
-     "name": "?AddChild@Node@@QAEPAU1@PBDH@Z",
-     "size": "292",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "270187568"
-     }
-    },
-    {
      "name": "?AllocMaterials@Node@@QAEHH@Z",
      "size": "309",
      "fuzzy_match_percent": 100.0,
@@ -12123,7 +12115,7 @@
      }
     },
     {
-     "name": "?M_101947b0@Node@@QAEHXZ",
+     "name": "?AllocSaved@Node@@QAEHXZ",
      "size": "52",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12155,7 +12147,7 @@
      }
     },
     {
-     "name": "?M_10194980@Node@@QAEHXZ",
+     "name": "?FreeSaved@Node@@QAEHXZ",
      "size": "72",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12168,14 +12160,6 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270092752"
-     }
-    },
-    {
-     "name": "?M_101992f0@Node@@QAEPAU1@XZ",
-     "size": "29",
-     "fuzzy_match_percent": 84.375,
-     "metadata": {
-      "virtual_address": "270111472"
      }
     },
     {
@@ -12203,7 +12187,7 @@
      }
     },
     {
-     "name": "?M_1019b130@Node@@QAEHI@Z",
+     "name": "?SetFlags@Node@@QAEHI@Z",
      "size": "82",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12235,7 +12219,7 @@
      }
     },
     {
-     "name": "?M_1019b300@Node@@QAEHHH@Z",
+     "name": "?RestartColourPlugs@Node@@QAEHPBDH@Z",
      "size": "76",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12283,22 +12267,6 @@
      }
     },
     {
-     "name": "?Find@Node@@QAEPAU1@PBDH@Z",
-     "size": "41",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "270134496"
-     }
-    },
-    {
-     "name": "?M_101ab980@Node@@QAEHXZ",
-     "size": "75",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "270186880"
-     }
-    },
-    {
      "name": "?M_10191920@Node@@QAEHPAPAU1@PAH@Z",
      "size": "103",
      "fuzzy_match_percent": 100.0,
@@ -12315,7 +12283,7 @@
      }
     },
     {
-     "name": "?M_10191990@Node@@QAEHPBHH@Z",
+     "name": "?M_10191990@Node@@QAEHPBQAU1@H@Z",
      "size": "137",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12323,7 +12291,7 @@
      }
     },
     {
-     "name": "?M_10191cc0@Node@@QAEPAU1@IHPAH@Z",
+     "name": "?FindByFlags@Node@@QAEPAU1@IHPAH@Z",
      "size": "130",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12411,7 +12379,7 @@
      }
     },
     {
-     "name": "?M_1019b1b0@Node@@QAEHI@Z",
+     "name": "?ClearFlags@Node@@QAEHI@Z",
      "size": "82",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12507,7 +12475,7 @@
      }
     },
     {
-     "name": "?M_1019e830@Node@@QAEHHH@Z",
+     "name": "?ReplaceMaterial@Node@@QAEHHH@Z",
      "size": "142",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -12515,19 +12483,11 @@
      }
     },
     {
-     "name": "?SetUniqueName@Node@@QAEHPBD@Z",
-     "size": "215",
-     "fuzzy_match_percent": 100.0,
+     "name": "?Root@Node@@QAEPAU1@XZ",
+     "size": "29",
+     "fuzzy_match_percent": 84.375,
      "metadata": {
-      "virtual_address": "270160592"
-     }
-    },
-    {
-     "name": "?MakeNameUnique@Node@@QAEXXZ",
-     "size": "222",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "270148240"
+      "virtual_address": "270111472"
      }
     },
     {
@@ -12560,14 +12520,6 @@
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270128976"
-     }
-    },
-    {
-     "name": "?M_1019eeb0@Node@@QAEHPAU1@PAPAU1@PAH@Z",
-     "size": "844",
-     "fuzzy_match_percent": 72.5236,
-     "metadata": {
-      "virtual_address": "270134960"
      }
     },
     {
@@ -12627,6 +12579,14 @@
      }
     },
     {
+     "name": "?Find@Node@@QAEPAU1@PBDH@Z",
+     "size": "41",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270134496"
+     }
+    },
+    {
      "name": "?M_1019ed10@Node@@QAEHPBDH@Z",
      "size": "41",
      "fuzzy_match_percent": 100.0,
@@ -12643,6 +12603,14 @@
      }
     },
     {
+     "name": "?M_101ab980@Node@@QAEHXZ",
+     "size": "75",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270186880"
+     }
+    },
+    {
      "name": "?Release@Node@@QAEXXZ",
      "size": "539",
      "fuzzy_match_percent": 100.0,
@@ -12651,19 +12619,11 @@
      }
     },
     {
-     "name": "?M_101948f0@Node@@QAEHPAX@Z",
+     "name": "?EnterTargetState@Node@@QAEHPAX@Z",
      "size": "131",
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270092528"
-     }
-    },
-    {
-     "name": "?Rebuild@Node@@QAEHXZ",
-     "size": "81",
-     "fuzzy_match_percent": 100.0,
-     "metadata": {
-      "virtual_address": "270188960"
      }
     },
     {
@@ -12675,11 +12635,51 @@
      }
     },
     {
+     "name": "?SetUniqueName@Node@@QAEHPBD@Z",
+     "size": "215",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270160592"
+     }
+    },
+    {
+     "name": "?MakeNameUnique@Node@@QAEXXZ",
+     "size": "222",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270148240"
+     }
+    },
+    {
+     "name": "?M_1019eeb0@Node@@QAEHPAU1@PAPAU1@PAH@Z",
+     "size": "844",
+     "fuzzy_match_percent": 72.5236,
+     "metadata": {
+      "virtual_address": "270134960"
+     }
+    },
+    {
      "name": "?Clone@Node@@QAEHPAU1@HH@Z",
      "size": "1174",
      "fuzzy_match_percent": 100.0,
      "metadata": {
       "virtual_address": "270160816"
+     }
+    },
+    {
+     "name": "?AddChild@Node@@QAEPAU1@PBDH@Z",
+     "size": "292",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270187568"
+     }
+    },
+    {
+     "name": "?Rebuild@Node@@QAEHXZ",
+     "size": "81",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "270188960"
      }
     },
     {

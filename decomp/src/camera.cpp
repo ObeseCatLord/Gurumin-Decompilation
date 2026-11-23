@@ -9,11 +9,7 @@ struct Fader
     void M_101acc20(const Vec4 &value);
 };
 
-struct Node
-{
-    char data[0x18a0];
-    void M_1019e9a0();
-};
+#include "node.h"
 
 extern "C" int DAT_1101de1c;
 extern "C" void FUN_10194360(const Vec4 *, const Vec4 *, int, int, int);
@@ -134,7 +130,7 @@ extern "C" int FUN_1016fab0(void)
     for (int i = 0; i < 0x47e; i++)
     {
         if (DAT_10ff1df8[i] != 0)
-            DAT_111be9c8[i].M_1019e9a0();
+            DAT_111be9c8[i].Release();
     }
     return 0;
 }

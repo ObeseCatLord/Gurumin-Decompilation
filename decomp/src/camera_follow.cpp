@@ -6,19 +6,7 @@
 
 #include "matrix4.h"
 
-// A scene node (scene_node.cpp Node), only what is used here.
-struct Node
-{
-    char pad_0000[0x1cc];
-    Matrix4 local;         // 0x1cc: matrix relative to the parent
-    char pad_020c[0x40];
-    Matrix4 world;         // 0x24c
-    char pad_028c[0x4c0];
-    Node *parent;             // 0x74c
-    Node *Find(const char *name, int index);     // 0x1019ece0
-    void SetFlags(unsigned flags);               // 0x1019b130
-    void ClearFlags(unsigned flags);             // 0x1019b1b0
-};
+#include "node.h"
 
 struct EffectOptions;
 
@@ -82,8 +70,8 @@ extern "C" int FUN_100184e0(void)
     DAT_1020b430[0][3]++;
     if (DAT_1021bdf8[0][0] != 0)
     {
-        DAT_1021bdf8[0][0]->local.SetTranslation(DAT_10edbd48);
-        DAT_1021bdf8[0][0]->local.m[14] -= 50.0f;
+        DAT_1021bdf8[0][0]->matrix.SetTranslation(DAT_10edbd48);
+        DAT_1021bdf8[0][0]->matrix.m[14] -= 50.0f;
     }
     DAT_10868838[0][0].SetIdentity();
     DAT_10868838[0][0].m[14] = DAT_10edbd48.z + 115.0f;
@@ -124,7 +112,7 @@ extern "C" int FUN_10018fb0(void)
         FUN_1016a8d0();
         DAT_10866d98.Copy(DAT_118e69e8);
         if (DAT_104c039c != 0)
-            DAT_10edbd48.Copy(DAT_104c039c->world.GetTranslation());
+            DAT_10edbd48.Copy(DAT_104c039c->worldMatrix.GetTranslation());
         else
             DAT_10edbd48.Copy(DAT_118e6cb8);
         DAT_118e6cb8.Copy(DAT_10edbd48);
@@ -138,7 +126,7 @@ extern "C" int FUN_10018fb0(void)
         DAT_104c0358 = 1;
     }
     if (DAT_104c039c != 0)
-        DAT_10edbd48.Copy(DAT_104c039c->world.GetTranslation());
+        DAT_10edbd48.Copy(DAT_104c039c->worldMatrix.GetTranslation());
     DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8) * 0.15f +
                       (DAT_10f08aa0 - DAT_118e6cb8) * 0.85f);
     DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8) * 0.15f +
@@ -239,7 +227,7 @@ extern "C" int FUN_10019d80(void)
     int second = (int)rounded;
     if (DAT_10db6ee8[first].head != 0)
     {
-        DAT_10866d98.Copy(DAT_10db6ee8[first].head->world.GetTranslation());
+        DAT_10866d98.Copy(DAT_10db6ee8[first].head->worldMatrix.GetTranslation());
         DAT_10866d98.z += 35.0f;
     }
     else
@@ -257,7 +245,7 @@ extern "C" int FUN_10019d80(void)
     }
     else if (DAT_10db6ee8[second].head != 0)
     {
-        DAT_10edbd48.Copy(DAT_10db6ee8[second].head->world.GetTranslation());
+        DAT_10edbd48.Copy(DAT_10db6ee8[second].head->worldMatrix.GetTranslation());
         DAT_10edbd48.z += 35.0f;
     }
     else
@@ -301,7 +289,7 @@ extern "C" int FUN_1001a0d0(void)
     DAT_10866d98.Copy(offset);
     DAT_10edbd48.Copy(DAT_10da93f0);
     if (DAT_1021c624 != 0)
-        DAT_10edbd48.Copy(DAT_10edbd48 * 0.95f + DAT_1021c624->world.GetTranslation() * 0.05f);
+        DAT_10edbd48.Copy(DAT_10edbd48 * 0.95f + DAT_1021c624->worldMatrix.GetTranslation() * 0.05f);
     DAT_118e6cb8.Copy(DAT_118e6cb8 + (DAT_10edbd48 - DAT_118e6cb8) * 0.2f +
                       (DAT_10f08aa0 - DAT_118e6cb8) * 0.8f);
     DAT_118e69e8.Copy(DAT_118e69e8 + (DAT_10866d98 - DAT_118e69e8) * 0.2f +

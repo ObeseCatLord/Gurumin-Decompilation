@@ -9,13 +9,7 @@
 
 Matrix4 RotationX(float angle);                  // 0x101b1ad0
 
-// A model node, only what is used here.
-struct Node
-{
-    char pad_0000[0x1cc];
-    Matrix4 local;            // 0x1cc: matrix relative to the parent node
-    Node *Find(const char *name, int index);     // 0x1019ece0
-};
+#include "node.h"
 
 // A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
 struct CharRecord
@@ -105,7 +99,7 @@ int FUN_10047440(int index)
                 FUN_10043cc0(index);
                 return 0;
             }
-            DAT_10868838[index][0] = DAT_1021bdf8[index][0]->local;
+            DAT_10868838[index][0] = DAT_1021bdf8[index][0]->matrix;
             DAT_1020b430[index].state = 1;
         }
         else if (DAT_1020b430[index].state == 1)
@@ -135,8 +129,8 @@ int FUN_10047440(int index)
                 *angle = speed;
                 if (speed > 6.283f)
                     *angle = speed - 6.283f;
-                DAT_1021bdf8[index][0]->local = RotationX(-*angle);
-                DAT_1021bdf8[index][0]->local.SetTranslation(DAT_10868838[index][0].GetTranslation());
+                DAT_1021bdf8[index][0]->matrix = RotationX(-*angle);
+                DAT_1021bdf8[index][0]->matrix.SetTranslation(DAT_10868838[index][0].GetTranslation());
             }
         }
         else if (DAT_1020b430[index].state == 2)

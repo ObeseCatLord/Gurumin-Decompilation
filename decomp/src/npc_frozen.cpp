@@ -7,13 +7,7 @@
 
 Matrix4 RotationZ(float angle);                  // 0x101b1b40
 
-// A model node, only what is used here.
-struct Node
-{
-    char pad_0000[0x24c];
-    Matrix4 worldMatrix;      // 0x24c
-    Node *Find(const char *name, int index);     // 0x1019ece0
-};
+#include "node.h"
 
 // Effect start parameters (model_state.cpp ModelState), only the fields set here.
 struct ModelState

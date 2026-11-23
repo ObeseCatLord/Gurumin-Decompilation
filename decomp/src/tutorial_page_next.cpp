@@ -10,11 +10,7 @@
 // "最初のページです。" ("This is the first page."), Shift-JIS.
 #define FIRST_PAGE_TEXT "\x8d\xc5\x8f\x89\x82\xcc\x83\x79\x81\x5b\x83\x57\x82\xc5\x82\xb7\x81\x42"
 
-struct Node
-{
-    int SetMaterialValue(const char *material, int value);  // 0x1019e8c0 (Node_SetMaterialValue)
-    int RestartColourPlugs(const char *motion, int frames); // 0x1019b300
-};
+#include "node.h"
 
 // The game object (game.h Game), here with the out-of-line copy of its flag test.
 struct Game

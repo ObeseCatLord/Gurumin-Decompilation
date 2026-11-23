@@ -9,17 +9,7 @@
 
 #include "vec4.h"
 
-// A scene node (scene_node.cpp Node): its name and the corners of its bounds.
-struct Node
-{
-    char name[0x6e4];         // 0x000: the node's name (the struct starts with it)
-    float cornerAx;           // 0x6e4
-    float cornerAy;           // 0x6e8
-    char pad_06ec[8];
-    float cornerBx;           // 0x6f4
-    float cornerBy;           // 0x6f8
-    Node *Find(const char *name, int index);    // 0x1019ece0: the index-th node called `name` in the subtree, or 0
-};
+#include "node.h"
 
 extern "C" Node *DAT_10255f08;   // the world's root node
 
@@ -39,10 +29,10 @@ extern "C" Node *FUN_10018100(const Vec4 *point)
         if (strstr(region->name, "eggobj") == 0 && strstr(region->name, "croud") == 0 &&
             strstr(region->name, "fire") == 0)
         {
-            low.x = MIN(region->cornerAx, region->cornerBx);
-            low.y = MIN(region->cornerAy, region->cornerBy);
-            high.x = MAX(region->cornerAx, region->cornerBx);
-            high.y = MAX(region->cornerAy, region->cornerBy);
+            low.x = MIN(region->boundsMin.x, region->boundsMax.x);
+            low.y = MIN(region->boundsMin.y, region->boundsMax.y);
+            high.x = MAX(region->boundsMin.x, region->boundsMax.x);
+            high.y = MAX(region->boundsMin.y, region->boundsMax.y);
             if (low.x + 50.0f < point->x && high.x - 50.0f > point->x && low.y + 50.0f < point->y &&
                 high.y - 50.0f > point->y)
                 return region;

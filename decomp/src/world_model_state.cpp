@@ -17,17 +17,7 @@ struct NodeSaved
     float boxMaxZ;            // 0x90
 };
 
-// A scene node (scene_node.cpp Node).
-struct Node
-{
-    char pad_0000[0x74c];
-    Node *link;               // 0x74c: the node whose state is driven
-    char pad_0750[0x1104];
-    NodeSaved *saved;         // 0x1854
-    int AllocSaved();                     // 0x101947b0 (Node::M_101947b0)
-    int EnterTargetState(void *target);   // 0x101948f0 (Node::M_101948f0)
-    int FreeSaved();                      // 0x10194980 (Node::M_10194980)
-};
+#include "node.h"
 
 // A model record (0x249c bytes, the layout of a Character's model part).
 struct ModelRecord
@@ -57,33 +47,33 @@ int WorldRenderer::SetModelState(int index, int mode)
     {
         if (mode == 1)
         {
-            if (node->link->saved == 0)
+            if (node->parent->saved == 0)
             {
                 active[index] = 1;
-                models[index].node->link->AllocSaved();
-                models[index].node->link->saved->boxMinX = -1.22f;
-                models[index].node->link->saved->boxMinY = -0.27f;
-                models[index].node->link->saved->boxMinZ = -0.17f;
-                models[index].node->link->saved->boxMaxX = 1.22f;
-                models[index].node->link->saved->boxMaxY = 0.27f;
-                models[index].node->link->saved->boxMaxZ = 0.17f;
-                models[index].node->link->EnterTargetState(&targets[index]);
+                models[index].node->parent->AllocSaved();
+                models[index].node->parent->saved->boxMinX = -1.22f;
+                models[index].node->parent->saved->boxMinY = -0.27f;
+                models[index].node->parent->saved->boxMinZ = -0.17f;
+                models[index].node->parent->saved->boxMaxX = 1.22f;
+                models[index].node->parent->saved->boxMaxY = 0.27f;
+                models[index].node->parent->saved->boxMaxZ = 0.17f;
+                models[index].node->parent->EnterTargetState(&targets[index]);
                 return 0;
             }
         }
         else if (mode == 0)
         {
-            if (node->link->saved != 0)
+            if (node->parent->saved != 0)
             {
-                node->link->saved->state = 2;
+                node->parent->saved->state = 2;
                 return 0;
             }
         }
         else if (mode == -5)
         {
             active[index] = 0;
-            if (models[index].node->link->saved != 0)
-                models[index].node->link->FreeSaved();
+            if (models[index].node->parent->saved != 0)
+                models[index].node->parent->FreeSaved();
         }
     }
     return 0;

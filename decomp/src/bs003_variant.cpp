@@ -10,21 +10,14 @@ inline int LoadIti(const char *name)
 }
 
 // The material table of a node's mesh (engine_10143.cpp SlotTable), only the two lists used here.
-struct MaterialTable
+struct MeshData
 {
     char pad_0000[0x14];
     int *materials;                                  // 0x14: current material of each entry
     int *secondary;                                  // 0x18: the entries' second texture
 };
 
-// A scene node (scene_node.cpp).
-struct Node
-{
-    char pad_0000[0x9c];
-    MaterialTable *mesh;                             // 0x9c
-    Node *Find(const char *name, int recursive);     // 0x1019ece0
-    void ReplaceMaterial(int key, int value);        // 0x1019e830: over the whole model
-};
+#include "node.h"
 
 // A character record (world.h Character), only its model root.
 struct Character

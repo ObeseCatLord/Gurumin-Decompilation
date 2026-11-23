@@ -3,15 +3,7 @@
 
 #include "vec4.h"
 
-struct Node
-{
-    char pad_0000[0x6e4];
-    Vec4 boundsMin;           // 0x6e4: x/y/z bounds of the node's mesh
-    Vec4 boundsMax;           // 0x6f4
-    Node *FindByFlags(unsigned int mask, int nth, int *counter);
-    Node *Find(const char *name, int index);  // 0x1019ece0
-    int Collide(int a, int b, Vec4 *position, Vec4 *velocity, Vec4 *hit);
-};
+#include "node.h"
 
 // Moves `position` by `velocity` against the visible nodes of `root` whose x/y bounds contain the position
 // (strictly inside). Stops at the first node that reports a collision (Node::Collide) and returns 1; 0 if none.

@@ -5,25 +5,7 @@
 
 #include "matrix4.h"
 
-struct Node
-{
-    char pad_0000[0xa8];
-    int m_00a8;               // 0xa8: non-zero when the node has collision
-    unsigned int flags;       // 0xac: 0x400 = test this node itself, not its children
-    char pad_00b0[0x19c];
-    Matrix4 worldMatrix;       // 0x24c
-    char pad_028c[0x448];
-    Vec4 bounds;              // 0x6d4: bounding sphere (centre relative to the node, radius in w)
-    char pad_06e4[0x20];
-    char m_0704;              // 0x704: non-zero = skipped unless DAT_11b04510 is set
-    char pad_0705[0x4b];
-    int childCount;           // 0x750
-    char childNames[0x40][0x40];
-    Node *children[0x40];     // 0x1754
-    int SpheresOverlap(const Vec4 *boundsA, const Vec4 *offsetA, const Vec4 *boundsB, const Vec4 *offsetB,
-                       Vec4 *aToB, Vec4 *bToA);
-    int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);
-};
+#include "node.h"
 
 extern "C" int DAT_11b04510;  // non-zero = also test the nodes marked in m_0704
 
@@ -54,7 +36,7 @@ int Node::SpheresOverlap(const Vec4 *boundsA, const Vec4 *offsetA, const Vec4 *b
 // `found` (when given; then every hit is collected) and 1 is returned, else 0.
 int Node::FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount)
 {
-    if (DAT_11b04510 != 0 || m_0704 == 0)
+    if (DAT_11b04510 != 0 || skinned == 0)
     {
         if ((flags & 0x400) == 0)
         {
@@ -65,7 +47,7 @@ int Node::FindTouchingSphere(int unused, const Vec4 *center, float radius, Node 
                     return hit;
             }
         }
-        else if (m_00a8 != 0)
+        else if (hasCollision != 0)
         {
             Vec4 sphere;
             sphere.Fill(0);

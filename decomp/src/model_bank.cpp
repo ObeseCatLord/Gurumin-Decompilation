@@ -3,10 +3,7 @@
 // nodes. Loaded per map; the bank is only active when `enabled` is set.
 #include <string.h>
 
-struct Node
-{
-    Node *Find(const char *name, int index);  // 0x1019ece0: the index-th node called `name` in the subtree, or 0
-};
+#include "node.h"
 
 #include "vec4.h"
 

@@ -8,15 +8,7 @@
 
 Matrix4 RotationZ(float angle);                      // 0x101b1b40
 
-// A model node (scene_node.cpp Node): only what the companions use.
-struct Node
-{
-    char pad_0000[0x24c];
-    Matrix4 worldMatrix;                             // 0x24c
-    void M_1019b130(int flags);
-    void M_1019b1b0(int flags);
-    void M_10194730(int value, int mask);
-};
+#include "node.h"
 
 // A character record (world.h Character), 0x249c bytes.
 struct Character
@@ -105,7 +97,7 @@ int Companion0_Update(int index)
                 Matrix4 matrix;
                 if (DAT_1021bdf8[index + 2][1] != 0)
                 {
-                    DAT_1021bdf8[index + 2][1]->M_1019b130(0x20);
+                    DAT_1021bdf8[index + 2][1]->SetFlags(0x20);
                     matrix = DAT_1021bdf8[index + 2][1]->worldMatrix;
                 }
                 else
@@ -147,7 +139,7 @@ int Companion0_Update(int index)
             {
                 if (DAT_1021bdf8[index + 2][1] != 0)
                 {
-                    DAT_1021bdf8[index + 2][1]->M_1019b1b0(0x20);
+                    DAT_1021bdf8[index + 2][1]->ClearFlags(0x20);
                     int health = DAT_10daadfc[index][0] + 200;
                     if (DAT_1020b430[index][3] + 2000 <= health)
                         health = DAT_1020b430[index][3] + 2000;
@@ -273,7 +265,7 @@ int Companion1_Update(int index)
                 Matrix4 matrix;
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                 {
-                    DAT_1021bdf8[slot + 2][1]->M_1019b130(0x20);
+                    DAT_1021bdf8[slot + 2][1]->SetFlags(0x20);
                     matrix = DAT_1021bdf8[slot + 2][1]->worldMatrix;
                 }
                 else
@@ -317,7 +309,7 @@ int Companion1_Update(int index)
             {
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                 {
-                    DAT_1021bdf8[slot + 2][1]->M_1019b1b0(0x20);
+                    DAT_1021bdf8[slot + 2][1]->ClearFlags(0x20);
                     int health = DAT_10daadfc[slot][0] + 200;
                     if (DAT_1020b430[index][3] + 2000 <= health)
                         health = DAT_1020b430[index][3] + 2000;
@@ -444,7 +436,7 @@ int Companion2_Update(int index)
                 Matrix4 matrix;
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                 {
-                    DAT_1021bdf8[slot + 2][1]->M_1019b130(0x20);
+                    DAT_1021bdf8[slot + 2][1]->SetFlags(0x20);
                     matrix = DAT_1021bdf8[slot + 2][1]->worldMatrix;
                     FUN_1001d8b0(index, 0x36d0, position, -1, -1, &DAT_1021bdf8[slot + 2][1]->worldMatrix, 0, 0, &matrix, 0);
                 }
@@ -486,7 +478,7 @@ int Companion2_Update(int index)
             {
                 if (DAT_1021bdf8[slot + 2][1] != 0)
                 {
-                    DAT_1021bdf8[slot + 2][1]->M_1019b1b0(0x20);
+                    DAT_1021bdf8[slot + 2][1]->ClearFlags(0x20);
                     int health = DAT_10daadfc[slot][0] + 200;
                     if (DAT_1020b430[index][3] + 2000 <= health)
                         health = DAT_1020b430[index][3] + 2000;

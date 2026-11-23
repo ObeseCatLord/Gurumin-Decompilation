@@ -21,7 +21,7 @@ struct MeshPart
 };
 
 // One pack of parts, 0x74 bytes (scene_node.cpp PackHeader).
-struct MeshPack
+struct PackHeader
 {
     char pad_0000[0x1c];
     int partCount;            // 0x1c
@@ -30,7 +30,7 @@ struct MeshPack
 };
 
 // Material, 0x180 bytes (scene_node.cpp Material).
-struct MeshMaterial
+struct Material
 {
     char pad_0000[0x140];
     float colour[3];          // 0x140: r, g, b
@@ -39,15 +39,7 @@ struct MeshMaterial
     char pad_017c[4];
 };
 
-struct Node
-{
-    char pad_0000[0x64];
-    int packCount;            // 0x64
-    MeshPack *packs;          // 0x68
-    char pad_006c[0x28];
-    MeshMaterial *materials;  // 0x94
-    int ApplyMaterialColours();
-};
+#include "node.h"
 
 // 0x1019c560. Copies each part's material colour into the part (r, g, b from the material, alpha from the
 // material when positive, else 0) and resets the part's second colour to (0, 0, 0, 1). Returns 0.

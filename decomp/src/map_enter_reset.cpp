@@ -16,10 +16,7 @@ struct EnemyState
         m_0038, m_003c;
 };
 
-struct Node
-{
-    void Release();                                  // 0x1019e9a0: frees the node's meshes and children
-};
+#include "node.h"
 
 extern "C" int DAT_10c62edc[0x1000];                 // script flags
 extern "C" int DAT_10c62ed0;                         // current map

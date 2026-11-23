@@ -7,12 +7,7 @@
 
 Matrix4 RotationY(float angle);                  // 0x101b1bb0
 
-// A model node, only its local matrix is used here.
-struct Node
-{
-    char pad_0000[0x1cc];
-    Matrix4 local;            // 0x1cc: matrix relative to the parent node
-};
+#include "node.h"
 
 // A character record seen from its model part (char_move.cpp CharRecord), only the fields used here.
 struct CharRecord
@@ -176,7 +171,7 @@ extern "C" int FUN_10044560(int index)
             DAT_1020b430[index].backwards = 1;
         else if (DAT_1020b430[index].angle > 0 && DAT_1020b430[index].swing >= 0)
             DAT_1020b430[index].backwards = 0;
-        DAT_10db6ee8[index].root->local = RotationY((float)DAT_1020b430[index].angle * -3.1415f / 1800.0f);
+        DAT_10db6ee8[index].root->matrix = RotationY((float)DAT_1020b430[index].angle * -3.1415f / 1800.0f);
         Vec4 axis;
         Vec4 line;
         axis.y = -1.0f;
@@ -197,7 +192,7 @@ extern "C" int FUN_10044560(int index)
     }
     else if (DAT_1020b430[index].state == 3)
     {
-        DAT_10db6ee8[index].root->local.SetIdentity();
+        DAT_10db6ee8[index].root->matrix.SetIdentity();
         DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);
         DAT_1020b430[index].wait++;
         DAT_10db6ee8[index].m_2498 = 1;

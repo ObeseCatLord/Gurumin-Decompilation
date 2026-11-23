@@ -32,12 +32,12 @@ struct Vertex
 };
 
 // The index list of a vertex pack (8 bytes).
-struct IndexList
+struct KeyPair
 {
     int count;
     int *indices;
     void Init();                                 // 0x101ad1b0
-    void Copy(const IndexList *source);          // 0x101ad160
+    void Copy(const KeyPair *source);          // 0x101ad160
 };
 
 // The mesh buffers built from the packs (scene_node.cpp MeshData).
@@ -50,22 +50,7 @@ struct MeshData
 };
 extern "C" int FUN_10169990(MeshData *mesh);     // MeshCache_Release: drops one reference, returns those left
 
-// A scene node (scene_node.cpp Node), only the fields used here.
-struct Node
-{
-    char pad_0000[0x64];
-    int packCount;               // 0x64
-    PackHeader *packs;           // 0x68
-    IndexList *indexLists;       // 0x6c
-    char pad_0070[0x24];
-    Material *materials;         // 0x94
-    char pad_0098[4];
-    MeshData *mesh;              // 0x9c
-    void M_101911b0(PackHeader *packs, int count);   // frees the packs' vertex data
-    void M_101911e0(IndexList *lists, int count);    // frees the index lists' data
-    int SortPacks();
-    int WeldVertices();
-};
+#include "node.h"
 
 extern "C" void *(*DAT_11b0b938)(int size, const char *tag);   // the engine's allocator
 extern "C" void (*DAT_11b1ba40)(void *);                      // the engine's free
@@ -86,7 +71,7 @@ int Node::SortPacks()
         mesh = 0;
     }
     PackHeader *newPacks = (PackHeader *)DAT_11b0b938(packCount * sizeof(PackHeader), "vp");
-    IndexList *newLists = (IndexList *)DAT_11b0b938(packCount * sizeof(IndexList), "vpi");
+    KeyPair *newLists = (KeyPair *)DAT_11b0b938(packCount * sizeof(KeyPair), "vpi");
     for (i = 0; i < packCount; i++)
     {
         newPacks[i].Init();

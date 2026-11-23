@@ -2,21 +2,7 @@
 
 #include <string.h>
 
-struct Node
-{
-    char name[0x40];          // 0x00 (the rest of the node: scene_node.cpp)
-    char pad_0040[0x6c];
-    unsigned int flags;       // 0xac: 0x20 = hidden
-    char pad_00b0[0x69c];
-    Node *parent;             // 0x74c
-    Node *Find(const char *name, int flags);
-    Node *AddChild(const char *name, int a);                // 0x101abc30
-    int Load(const char *path, int a, int b, int c);        // 0x101ac010
-    int BuildMesh(int recurse, int flags);
-    int Rebuild();                                          // 0x101ac1a0
-    int RemoveChild(Node *child, int keep);                 // 0x101a2f30
-    int LoadMotion(const char *path, int a);                // 0x101abd60 (Model_LoadIt3Alt)
-};
+#include "node.h"
 
 // The part of a Character record (world.h) used here.
 // Motion playback state of a model (world.h MotionState), only its first word.
@@ -141,7 +127,7 @@ extern "C" int FUN_10012510(int mode, int index)
                 strcpy(child->name, "scop");
                 child->parent = hand;
                 child->BuildMesh(1, 0);
-                child->LoadMotion(FUN_1013f8a0("motionzD.it3", 0), 0);
+                child->PreScanFile(FUN_1013f8a0("motionzD.it3", 0), 0);
                 FUN_1013faf0();
             }
         }

@@ -4,13 +4,7 @@
 
 #include "vec4.h"
 
-struct Node
-{
-    Node *Find(const char *name, int flags);
-    int Collide(int a, int b, Vec4 *position, Vec4 *velocity, Vec4 *hit);
-    void SetFlags(unsigned int bits);
-    void ClearFlags(unsigned int bits);
-};
+#include "node.h"
 
 extern "C" Node *DAT_10255f08;
 extern "C" Vec4 DAT_118e69e8;

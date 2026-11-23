@@ -2,12 +2,7 @@
 // "@numten" and "@numhundred" of the counter model play a motion named after the digit ("Zaro" .. "Nine", the
 // game's spelling) or, while a digit turns over, "to0ne" .. "toZaro". The counter follows script flag 0x9c2.
 
-// A scene node (scene_node.cpp), only the two calls used here.
-struct Node
-{
-    Node *Find(const char *name, int recursive);         // 0x1019ece0
-    int RestartColourPlugs(const char *motion, int frames);  // 0x1019b300
-};
+#include "node.h"
 
 // The game object (game.h Game), only the event call.
 struct Game

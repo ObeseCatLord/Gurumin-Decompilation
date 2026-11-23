@@ -68,7 +68,7 @@ struct CharSlot
     int m_00ac;
     int routeRecord;          // 0xb0: the map record (DAT_10210fc0) whose route the character walks (map_cursor.cpp)
     int m_00b4;
-    int m_00b8;
+    int coins;                // 0xb8: the player's coin count (slot 0; debris_update.cpp adds the coins picked up)
     int money;                // 0xbc: the player's money (slot 0, guarded by the anti-tamper check); -1 for the
                               // slots map_enter_reset.cpp clears
     int m_00c0;

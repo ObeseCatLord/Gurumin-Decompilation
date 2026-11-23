@@ -173,6 +173,10 @@ struct AnimModel
         };
         struct
         {
+            int flameCode;    // 0x270: flame layer group * 10000 + route variant (flame_layers.cpp)
+        };
+        struct
+        {
             int pad_burst;
             int burst;        // 0x274: 1 once the balloon has burst (balloon_burst.cpp)
             int blastAngle;   // 0x278: direction of the blast (1/1000 radians)
@@ -227,7 +231,11 @@ struct AnimModel
     Node *collider;           // 0x2308: the map collision this model moves against
     char pad_230c[0xc];
     float colliderReach;      // 0x2318: 0.578 * the bounding radius of the collision node (CloneModel)
-    int m_231c;
+    union
+    {
+        int m_231c;
+        Node *dropCollider;   // 0x231c: the collision the dropped pieces bounce on (debris_update.cpp)
+    };
     int m_2320;               // 0x2320: cleared by CloneModel
     Node *bipNode;            // 0x2324: the "Bip01" bone (0 = no node tree)
     Matrix4 matrix;           // 0x2328: world matrix; matrix.translation is the position

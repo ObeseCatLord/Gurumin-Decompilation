@@ -28,6 +28,8 @@ address	name	evidence
 10050510	Char_SpawnEnemy	spawns an enemy in a free slot (char_spawn.cpp, draft)
 100509e0	Char_ProbeSideStep	left-side wall and ground probe (ledge_probe.cpp)
 10051190	MapCursor_Step	moves a cursor along a map record route (map_cursor.cpp, draft)
+10051e20	Flames_Update	drives the nine flame layer nodes (flame_layers.cpp, draft)
+100564d0	Debris_Update	per-frame debris physics and pickups (debris_update.cpp, draft)
 10057ee0	UpdateDrillLevel	clamps the drill gauge and moves the drill level (drill_level.cpp)
 1005f750	Lava_Update	lava damage, camera mode and lava effects (lava_hazard.cpp)
 100ed510	ListBank_DeclareFromText	declares script variables from a declaration (listbank.cpp)
@@ -57,6 +59,7 @@ address	name	evidence
 101643c0	AnimModel_LiftProbes	lifts probe points clear of models and the map (model_lift.cpp, draft)
 1016a480	Playback_Advance	steps a motion playback one frame (playback_advance.cpp, draft)
 1016be80	Camera_LiftOverGround	lifts the camera target above the ground (camera_lift.cpp)
+10193d10	Node_ShadeWaveCopy	wave-shaped normals and colours for a child copy (node_shade.cpp, draft)
 101af960	KeyBank_SampleFloat	key lookup with a float frame (vec4.cpp, draft)
 101afe00	KeyTrack_Sample	key lookup over a KeyTrack (vec4.cpp, draft)
 101b2a28	sprintf	CRT

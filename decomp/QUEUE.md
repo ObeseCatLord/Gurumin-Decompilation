@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (198)
+## 1. Walls to retry (202)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -88,6 +88,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1004f860` 87 — TutorialBook_PrevPage draft: flow and calls match; the start page clamp is branchless in the original (setle/dec/and), the zero and found registers are swapped (ebp/ebx) and the first-page test stores DAT_104c03e0 after the compares
 - [ ] `10050510` 1219 — Char_SpawnEnemy (char_spawn.cpp, 1232 vs 1219 bytes): the kind/route match in the slot search shares one je-break in the original (ours duplicates the compare), and packed % 100 == 0 gives test edx,edx instead of cmp edx,ebx; ~16 spellings tried
 - [ ] `10051190` 988 — MapCursor_Step (map_cursor.cpp, rule-clean draft, 1024 vs 988 bytes): register allocation from the start (original: index in edi, slot offset in ebx, rider flag in ecx and two stack slots; ours index in ebp, flag in esi) and the early-test order; held/hold-pointer/reference forms tried; next: the shared rider block written with a goto, then a permuter run
+- [ ] `10051e20` 1618 — Flames_Update (flame_layers.cpp, 1632 vs 1618 bytes): layer loop keeps the timer pointer in esi and the 10000 divisor in ebp in the original (ours swapped, spill slot 0x14 vs 0x18); pointer, do-while, reference and direct-index forms tried
 - [ ] `10054550` 191 — delayed sound queue: identical except the original keeps &DAT_1021a398[soonest] in edi for the two calls and the store; cl 13.00 here folds it into each access (pointer local, register, ternary tried)
 - [ ] `10054770` 506 — Game::MarkKilled: same statements; like RaiseGameOverEvents the original walks the events with two pointers (&flags[1] and &ids[0]) and keeps this in ebp, cl 13.00 here one event pointer and this in ebx (pointer and indexed forms tried)
 - [ ] `10054d50` 476 — Game::RaiseFireEvents: the event-pointer form of the other Raise* functions fixes the loop pointer, but cl 13.00 inlines no TestScriptFlag here (the original expands flags[0] once per loop and calls the rest), even compiled alone; swapped loop order and a function-scope pointer tried
@@ -95,6 +96,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10055110` 476 — Game::RaiseDoorEvents: same inline-budget residue as 0x10054d50
 - [ ] `10055ee0` 881 — Player_KnockBack (player_knockback.cpp): 18 bytes; the original materialises each ground-probe result as a 0/1 int (neg/sbb/inc) and stores it in a stack slot (the slot the later Fill temp reuses) before testing it, ours tests eax directly; function-scope, bool and float-slot forms tried
 - [ ] `10056260` 616 — Message_Open: identical except esi/edi swapped (the original keeps the slot in edi and the box offset in esi); box pointer local tried
+- [ ] `100564d0` 1611 — Debris_Update (debris_update.cpp, 1648 vs 1611 bytes): the state dispatch is laid out with the fly/pickup block inline and physics out of line in the original (cmp al,1; jbe; cmp al,6; jb FADE; cmp al,0x14; jne PHYS), 13.00 inlines physics and threads the 0x14 test; if/else orders, condition forms and continue forms tried; frame 0x124 vs 0x120
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
 - [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
 - [ ] `10099b30` 2897 — Enemy_StrafeAndBurst (enemy_strafe.cpp, rule-clean): the same ebx/edi swap as 1009a690, and the idle block (motion 2, then `if (rand % 100 > 2) return 0;` before the motion-speed check) is merged into two copies (chase/left/right and back) where the original has one, placed before the end check. The defeated branch matches only as an if/else with two full FUN_1003a7d0 calls (cl hoists the common arguments); a ternary path is evaluated first.
@@ -145,6 +147,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1014f900` 1070 — FontRenderer::DrawStringToPixels (font_metrics.cpp, rule-clean, 1072 vs 1070 bytes): the proportional "s" pad loop keeps its column counter in the colour parameter slot (0x44, incremented through a register) and the final four-pixel fill keeps its pointer in edx; loop forms, function-scope column/row and tail pointer forms tried
 - [ ] `10150bb0` 1421 — MeshData::M_10150bb0 / BuildBuffers (mesh_build.cpp, 1440 bytes, 505 diff bytes): the original pushes only ebx/ebp up front and esi/edi after the FUN_101477c0 call, with a two-pop early return (shrink-wrapping), keeps zero in ebx and spills totalIndices*2 into the dead materials parameter slot; early-out and declaration forms tried
 - [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
+- [ ] `1015f4e0` 1429 — TextInput_Update (text_input.cpp, 1440 vs 1429 bytes, 51 diffs): one register swap in the candidate loop (original keeps the page size DAT_10f66ab0 in esi and the line counter in edi, and pushes ebp/edi a block later); counter scope/type, compare order and pointer forms tried. Must stay out of ime.cpp (13.00 forwards the globals across the ImeContext calls in that TU)
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
 - [ ] `1015fbf0` 313 — Ime_DrawComposition: calls and arguments identical (the text callee is __stdcall); tail sharing of the last draw call differs (three source shapes tried)
 - [ ] `101603c0` 1218 — SystemSav_ReadRecord: 20 bytes; the original places the -1 (other machine) return block before the 0 return that the early exits share, ours after it (nested, else and result-variable forms tried)
@@ -184,6 +187,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10190e30` 884 — EffectManager::Draw: flow, calls and the record checks in place; scheduling residue (the 0x244 table constant, the pushes shared by the crash and draw blocks hoisted above the test) and the sprite loops keep first/end in ebp/edi in the original
 - [ ] `10192520` 1233 — BoxSphere_Overlap (box_overlap.cpp, rule-clean): 4 bytes off, only the first view's point.y = sphereOffset->y + sphere->y (the original loads the offset first; either source order gives sphere first here, the top view's identical sum comes out right; same wall as 0x10192c90). The edge tests must be written !(distance >= radiusSquared) for the original's test ah,1 jumps
 - [ ] `10192c90` 975 — CylinderSphere_Overlap (box_overlap.cpp, rule-clean): 25 bytes off; the original adds sphere->y + sphereOffset->y in that order (fld [ebx+4]) at all three point.y assignments, cl 13.00 here picks offset first whatever the source order (x and z come out right); also two stack slots (radius, sphereRadius) differ
+- [ ] `10193d10` 1600 — Node::ShadeWaveCopy (node_shade.cpp, 1600 bytes, ~900 diff bytes): vertex accesses are [edi+ptr] (index first) in the original, ours [ptr+edi]; DAT_10203418 compare hoisted above the colour store with flags kept; frame 0xcc vs 0xbc (an extra 16-byte local near the PlaneFromTriangle normal copy)
 - [ ] `10194a10` 580 — Circle_Intersect (__stdcall): logic identical; the stack slots of d2 and disc are swapped and the original multiplies by d2 after storing (rb2 + ra2); k split, 2.0 factor and early returns tried
 - [ ] `10194c60` 629 — Node::UpdateWorld: code identical except the EH state of the AnimatedMatrix temporary (ours 1, original 5; the original unwind map has four empty states 1-4); branch order, named result locals and a conditional expression tried
 - [ ] `10199380` 526 — Node::FindBone: logic identical; the original keeps 0 in ebx (zero compares, trylevel store, then the loop counter) and frame in edx, ours tests against 0 and keeps frame in ebx; a counter declared at the top and the clamp spellings tried
@@ -219,13 +223,10 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (73)
+## 4. Large functions (801-3000 bytes) (70)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)
-- [ ] `10193d10` 1600 bytes (float, loops 3, calls 26)
-- [ ] `100564d0` 1611 bytes (float, loops 2, calls 33)
-- [ ] `10051e20` 1618 bytes (float, loops 2, calls 37)
 - [ ] `10143180` 1633 bytes (calls 42)
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `10026d80` 1658 bytes (float, loops 1, calls 48)

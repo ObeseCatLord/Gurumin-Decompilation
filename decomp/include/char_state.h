@@ -44,6 +44,7 @@ struct CharState
                         int scriptRunning;        // char_script.cpp: 1 while the character's script runs
                         int cooldown;             // kind4a_turret.cpp: frames before the next random attack
                         int routeStopped;         // route_walk.cpp: non-zero = the character stays where it is
+                        int layerCount;           // flame_layers.cpp: flame layers found (their timers are values[1..])
                         int counterPhase;         // digit_counter.cpp: 0 = idle, 1..10 = turning to count + 1
                         // (route_follow.cpp uses `wait` for the frames left at a pause point)
                     };

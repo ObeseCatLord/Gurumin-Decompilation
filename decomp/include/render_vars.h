@@ -27,6 +27,7 @@ extern "C" int DAT_10202b28;                              // back-buffer height
 extern "C" int DAT_10202b34;                              // back buffer width
 extern "C" int DAT_10202b38;                              // back-buffer height
 extern "C" int DAT_10203344;
+extern "C" int DAT_10203418;                              // 0 = the darker vertex colours of the wave copies (Node::ShadeWaveCopy)
 extern "C" int DAT_1020340c;                              // texture memory budget of the pool
 extern "C" float DAT_10203420;
 extern "C" int DAT_10203424;                              // counts requests whose x is 530 or more (never read here)

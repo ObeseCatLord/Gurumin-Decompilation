@@ -223,7 +223,7 @@ struct Node
     int M_1019b050(int value);                            // 0x1019b050: render mode of the subtree
     int M_1019b0c0(int value, int except1, int except2);  // 0x1019b0c0
     int M_10193cb0(int from, int to);                     // 0x10193cb0: render mode `from` -> `to` in the subtree
-    void M_10193d10(int index);                           // 0x10193d10
+    int ShadeWaveCopy(int phase);                         // 0x10193d10: wave-shaped normals and lighting of a copy (node_shade.cpp)
     int M_10194630(char value, unsigned int mask);        // 0x10194630: m_189c on matching kinds
     int M_101946b0(unsigned char value, unsigned int mask); // 0x101946b0: m_189a on matching kinds
     int M_10194730(unsigned char value, unsigned int mask); // 0x10194730: m_189b on matching kinds

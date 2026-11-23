@@ -42,7 +42,7 @@ extern "C" int DAT_104465f8[DEBRIS_SLOTS];                // spin: rotation in t
 extern "C" int DAT_104469f8[0x100];                       // frames left (0 for the simple pieces)
 extern "C" Node *DAT_10446e00[0x28];                      // the shaga models (shaga_spawn.cpp)
 extern "C" int DAT_10446eb0[0x100];                       // colour of a thrown piece
-extern "C" char DAT_104677a0[DEBRIS_SLOTS];               // cleared on spawn
+extern "C" unsigned char DAT_104677a0[DEBRIS_SLOTS];      // bounces in a row, cleared on spawn
 extern "C" char DAT_104686b2[];                           // per-character mode (7 = the mode handled here)
 extern "C" char DAT_1049efb0[10][10];                     // the wave groups: character of each slot (0 = empty)
 extern "C" int DAT_1049f0f0;                              // number of entries in the two lists below; number of camera positions

@@ -1077,7 +1077,7 @@ int Node::CreateChildCopies()
     {
         children[i] = created[i];
         created[i]->parent = this;
-        children[i]->M_10193d10(i);
+        children[i]->ShadeWaveCopy(i);
         children[i]->drawMode = 0xc;
     }
     ReleaseMesh();

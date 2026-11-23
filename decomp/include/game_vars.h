@@ -329,6 +329,7 @@ extern "C" char DAT_104c011a;
 extern "C" char DAT_104c011b;
 extern "C" char DAT_104c011c;
 extern "C" char DAT_104c011d;
+extern "C" char DAT_104c011e;
 extern "C" char DAT_104c0120;
 extern "C" char DAT_104c0121;
 extern "C" int DAT_104c0124;

@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 19.719,
+  "fuzzy_match_percent": 19.8286,
   "total_code": "1720206",
   "matched_code": "249148",
   "matched_code_percent": 14.4836,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 290,
+  "total_units": 293,
   "complete_units": 158,
   "matched_rules_code": "248521",
   "matched_rules_code_percent": 14.4472,
@@ -5359,6 +5359,52 @@
    }
   },
   {
+   "name": "app/debris_update",
+   "measures": {
+    "fuzzy_match_percent": 35.983,
+    "total_code": "1611",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1611",
+     "fuzzy_match_percent": 35.983
+    }
+   ],
+   "functions": [
+    {
+     "name": "?FUN_100564d0@@YAHXZ",
+     "size": "1611",
+     "fuzzy_match_percent": 35.983,
+     "metadata": {
+      "virtual_address": "268788944"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/debris_update.cpp"
+   }
+  },
+  {
    "name": "app/demo_record",
    "measures": {
     "fuzzy_match_percent": 100.0,
@@ -7322,6 +7368,52 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/flag_list.cpp"
+   }
+  },
+  {
+   "name": "app/flame_layers",
+   "measures": {
+    "fuzzy_match_percent": 37.7451,
+    "total_code": "1618",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1618",
+     "fuzzy_match_percent": 37.7451
+    }
+   ],
+   "functions": [
+    {
+     "name": "?FUN_10051e20@@YAHH@Z",
+     "size": "1618",
+     "fuzzy_match_percent": 37.7451,
+     "metadata": {
+      "virtual_address": "268770848"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/flame_layers.cpp"
    }
   },
   {
@@ -12356,6 +12448,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/node_queue.cpp"
+   }
+  },
+  {
+   "name": "app/node_shade",
+   "measures": {
+    "fuzzy_match_percent": 43.5,
+    "total_code": "1600",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "1600",
+     "fuzzy_match_percent": 43.5
+    }
+   ],
+   "functions": [
+    {
+     "name": "?ShadeWaveCopy@Node@@QAEHH@Z",
+     "size": "1600",
+     "fuzzy_match_percent": 43.5,
+     "metadata": {
+      "virtual_address": "270089488"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/node_shade.cpp"
    }
   },
   {
@@ -19192,13 +19330,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1320683",
+    "total_code": "1315854",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 189,
+    "total_functions": 186,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -19215,7 +19353,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1320683",
+     "size": "1315854",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -19597,14 +19735,6 @@
      }
     },
     {
-     "name": "FUN_10051e20",
-     "size": "1618",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268770848"
-     }
-    },
-    {
      "name": "FUN_100524d0",
      "size": "2888",
      "fuzzy_match_percent": 0.0,
@@ -19618,14 +19748,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268775456"
-     }
-    },
-    {
-     "name": "FUN_100564d0",
-     "size": "1611",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268788944"
      }
     },
     {
@@ -20618,14 +20740,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "270086464"
-     }
-    },
-    {
-     "name": "FUN_10193d10",
-     "size": "1600",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270089488"
      }
     },
     {

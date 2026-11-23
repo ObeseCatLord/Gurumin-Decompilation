@@ -20,7 +20,7 @@ reading it, then `AGENTS.md`.
 | Fully linked | 0.00% of code (151 of 264 units complete) |
 | Matched | 14.48% of code, 827 of 1212 functions |
 | Matched under the rules | 14.45% of code, 826 of the 827 matched functions |
-| Fuzzy match | 19.71% |
+| Fuzzy match | 19.83% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -64,6 +64,10 @@ function) and node_world.cpp (0) still break rule 2.
 - Batch 322: UpdateDrillLevel 0x10057ee0 (drill_level.cpp) matched; AnimModel::LiftProbes 0x101643c0 drafted
   (model_lift.cpp; Node::model at 0xb8, M_1019b230 takes an AnimModel *). Agents must not declare aliases of
   DAT_10db6ee8 fields (0x10db9210 = DAT_10db6ee8[0].matrix).
+- Batch 323 (drafts): TextInput_Update 0x1015f4e0, Debris_Update 0x100564d0, Flames_Update 0x10051e20,
+  Node::ShadeWaveCopy 0x10193d10 (open.tsv). The 1400-1700 byte functions now mostly end as register-allocation
+  drafts; retries with a concrete lead (Route_StepPatrol: one int per decoded part; KeepDistance: PlayMotion call
+  written in both branches) are worth a subagent each.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

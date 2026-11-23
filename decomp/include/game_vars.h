@@ -5,6 +5,7 @@
 #define GURUMIN_GAME_VARS_H
 
 #include "app_0008.h"
+#include "demo_recording.h"
 #include "effect_holds.h"
 #include "game_reset.h"
 #include "matrix4.h"
@@ -383,7 +384,7 @@ extern "C" int DAT_104c0218;
 extern "C" int DAT_104c021c;
 extern "C" char DAT_104c0224;
 extern "C" char DAT_104c022e;
-extern "C" char DAT_104c0232;
+extern "C" unsigned char DAT_104c0232;
 extern "C" int DAT_104c0234;
 extern "C" char DAT_104c023c;
 extern "C" char DAT_104c023e;
@@ -395,7 +396,7 @@ extern "C" char DAT_104c02ec;
 extern "C" char DAT_104c02ee;
 extern "C" char DAT_104c02f4;
 extern "C" float DAT_104c02f8;
-extern "C" int DAT_104c02fc;
+extern "C" float DAT_104c02fc;
 extern "C" char DAT_104c0300;
 extern "C" char DAT_104c0301;
 extern "C" int DAT_104c0304;
@@ -416,7 +417,7 @@ extern "C" int DAT_104c037c;
 extern "C" int DAT_104c03dc;
 extern "C" Matrix4 DAT_1065ca08[4];
 extern "C" Vec4 DAT_1065cb08;
-extern "C" EmptyObject DAT_1065cb28;
+extern "C" DemoRecording DAT_1065cb28;                      // the input recorder (its first 0x20 bytes are the InputState)
 extern "C" Vec4 DAT_108029a8;
 extern "C" Vec4 DAT_108029b8;                             // where the player starts on entering the map (x, y, z;
                                                           // set from a save by save_slot.cpp, cleared by game_reset.cpp)

@@ -39,7 +39,7 @@ extern "C" int FUN_10045b80(int index);                    // Char_IdleWatchPlay
 int FUN_100b4f00(int index);                               // Npc_PopUp
 extern "C" int FUN_100b5550(int index);                    // Npc_GreetWhenNear
 extern "C" int FUN_10045c30(int index);                    // Npc_WaitFacingAway
-extern "C" int FUN_100460d0(int index);
+int FUN_100460d0(int index);                               // Npc_ShockByLink
 extern "C" int FUN_100469d0(int index);
 extern "C" int FUN_100b58a0(int index, int wakeEnemies);   // Npc_TalkWhenNear
 extern "C" int FUN_1001b7b0(int index);

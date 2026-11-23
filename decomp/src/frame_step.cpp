@@ -9,6 +9,7 @@
 #include "char_slot.h"
 #include "dinput_min.h"
 #include "font_renderer.h"
+#include "item_dictionary.h"
 #include "texture_manager.h"
 #include "tracker.h"
 
@@ -49,7 +50,6 @@ extern "C" int FUN_1000e750(void);
 extern "C" int Game_LoadData(void);
 extern "C" void FUN_10114950(void);
 extern "C" void FUN_1011d810(void);
-extern "C" void FUN_10115cd0(void);
 extern "C" void FUN_10116550(void);
 extern "C" void FUN_1011a060(void);
 extern "C" int FUN_1013f070(int command, int value, int extra);
@@ -158,7 +158,7 @@ extern "C" int FUN_10137b10(void)
         else if (DAT_104bf8c0 == MODE_PLAY)
             FUN_1011d810();
         else if (DAT_104bf8c0 == MODE_5)
-            FUN_10115cd0();
+            ItemDictionary_Update();
         else if (DAT_104bf8c0 == MODE_10)
             FUN_10116550();
         else if (DAT_104bf8c0 == MODE_15)

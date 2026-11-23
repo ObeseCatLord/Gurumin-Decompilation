@@ -554,3 +554,13 @@ _Enemy_IsBusy	100e1c40
 ?QueueDrawFading@Node@@QAEHPBUMatrix4@@0PBXIPBUVec4@@2@Z	1019a6b0
 ?FUN_100b7360@@YAHH@Z	100b7360
 ?DrawMesh@TextureObject@@QAEHPAUMatrix4@@0PAXH1HHPBUVec4@@2@Z	1014ddf0
+?ScanChunks@Node@@QAEHPAUGameFile@@H@Z	101a4a60
+?ReadPacked@GameFile@@QAEHPAXHH@Z	101b2450
+?AtEnd@GameFile@@QAEHXZ	101b2360
+?Seek@GameFile@@QAEHHH@Z	101b2380
+?DrawDebugBox@MeshData@@QAEHPAUMatrix4@@PBU2@PBUVec4@@@Z	10146db0
+?ItemDictionary_Update@@YAHXZ	10115cd0
+?UpdateWindows@Game@@QAEHXZ	1000a0b0
+?FUN_100460d0@@YAHH@Z	100460d0
+?SphereHitsMesh@Node@@QAEHPAUMatrix4@@PAUVec4@@M1PAM@Z	101a0cf0
+?CastSegment2@Node@@QAEHPBDIPAUVec4@@11PAM@Z	101aa080

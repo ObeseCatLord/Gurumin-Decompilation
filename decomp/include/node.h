@@ -320,6 +320,10 @@ struct Node
     // and the penetration value to `depth`. Returns 1 on a hit.
     int Query(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, float *depth, const char *name,
               const char *excludeName);
+    // 0x101a0cf0: tests a sphere of `radius` at `point` (offset by the translation of `matrix`) against this node's own
+    // triangles; on a hit writes the triangle's plane to `normal` and the depth to `depth` and returns -1, else 0
+    // (node_sphere_hits.cpp).
+    int SphereHitsMesh(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, float *depth);
     int SpheresOverlap(const Vec4 *boundsA, const Vec4 *offsetA, const Vec4 *boundsB, const Vec4 *offsetB,
                        Vec4 *aToB, Vec4 *bToA);           // 0x10193060 (node_spheres.cpp)
     int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);  // 0x1019f210

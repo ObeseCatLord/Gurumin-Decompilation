@@ -49,6 +49,7 @@ struct CharState
                         int routeStopped;         // route_walk.cpp: non-zero = the character stays where it is
                         int layerCount;           // flame_layers.cpp: flame layers found (their timers are values[1..])
                         int counterPhase;         // digit_counter.cpp: 0 = idle, 1..10 = turning to count + 1
+                        int shockFrames;          // npc_link_shock.cpp: 0 = standing, 1..60 = frames shaking (counted up)
                         // (route_follow.cpp uses `wait` for the frames left at a pause point)
                     };
                     union                         // 0x08
@@ -104,6 +105,7 @@ struct CharState
                         int watchPhase;           // npc_group_watch.cpp: 0 = idle, 1 = turning to a groupmate, 2 = showing an emote
                         int neighbour;            // npc_gesture.cpp: slot of the character it reacts to (own slot - talk / 100)
                         int gazeTimer;            // npc_greet.cpp: frames left in the current gaze step (counted down)
+                        int shakeX;               // npc_link_shock.cpp: shake steps of the three axes, -/+ (x)
                     };
                     union                         // 0x10
                     {
@@ -123,6 +125,7 @@ struct CharState
                         int pitPhase;             // map_cursor_walk.cpp: 0 = outside the pit area, 1 = entering, 2 = inside,
                                                   // 3 = leaving
                         int greeted;              // npc_greet.cpp: 0 = has not greeted yet
+                        int shakeY;               // npc_link_shock.cpp: shake step of the y axis
                     };
                     union                         // 0x14
                     {
@@ -144,6 +147,7 @@ struct CharState
                         int pickupBlocked;        // npc_gate_carrier.cpp: 1 = the player is outside the pick-up height band
                         int pitFrames;            // map_cursor_walk.cpp: frames in the current pit phase
                         int greetPending;         // npc_greet.cpp: 1 = greeted, the event is raised once greetings are off
+                        int shakeZ;               // npc_link_shock.cpp: shake step of the z axis
                     };
                     union                         // 0x18
                     {
@@ -159,6 +163,7 @@ struct CharState
                         int groupDigit;           // npc_group_watch.cpp: talk % 10, the group it belongs to
                         int cheerReady;           // npc_gesture.cpp: 0 = the cheer is queued instead of played at once
                         int pickupHeight;         // npc_gate_carrier.cpp: lowest player height (below the carrier) for a pick-up
+                        int shakeLevel;           // npc_link_shock.cpp: three digits (x, y, z) = how strongly each axis shakes
                     };
                     union                         // 0x1c
                     {
@@ -172,6 +177,7 @@ struct CharState
                         int bestValue;            // npc_lookout.cpp: the largest value seen
                         int sightScale;           // npc_group_watch.cpp: talk / 10, its sight range in units of 20
                         int cheerMotion;          // npc_gesture.cpp: motion of the cheer (0x5a + random 0..3)
+                        int linkIndex;            // npc_link_shock.cpp: the link (DAT_1049f0c8) the character stands at, -1 = none
                     };
                     union                         // 0x20
                     {
@@ -182,6 +188,7 @@ struct CharState
                         int routeMode;            // spirit_route.cpp: 1..3 = put the spirit on a fixed route point
                         int gesturing;            // npc_gesture.cpp: 1 while the gesture shows (neighbours react to it)
                         int hikariSound;          // char_hikari.cpp: 1 while its "anime" sound plays
+                        int releaseDistance;      // npc_link_shock.cpp: player distance (talk / 10 * 10) below which it is released
                     };
                     union                         // 0x24
                     {

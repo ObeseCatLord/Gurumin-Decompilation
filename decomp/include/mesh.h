@@ -43,6 +43,7 @@ struct VertexPack
     char pad_0048[0x28];
     Vertex *vertices;        // 0x70: `vertexCount` vertices
 
+    Vec4 *Sphere() { return (Vec4 *)this; }       // the bounding sphere (centre, radius in w) as a Vec4: the first four floats
     void Init();                                   // 0x101acfa0: empties a pack allocated raw
     int FreeVertices();                            // 0x101acfc0
     int SetVertexCount(int count);                 // 0x101acff0: reallocates the vertex array (contents lost)
@@ -115,7 +116,7 @@ struct MeshData
     int SetRange(int first, int last);                                             // 0x10146d90 (SlotTable)
     void M_10147690(int a, int b);
     void M_101476e0(int pack, int value);
-    void M_10146db0(Matrix4 *world, const Matrix4 *view, const Vec4 *box);  // 0x10146db0: debug view of the mesh box
+    int DrawDebugBox(Matrix4 *world, const Matrix4 *view, const Vec4 *box);  // 0x10146db0 (mesh_debug_box.cpp): debug view of the mesh box
     void Release();                                                                // 0x10150a90 (mesh_release.cpp)
     int M_10150bb0(VertexPack *packs, IndexList *indexLists, int packCount, Material *materials, int flags);
     // 0x10151150: draws the mesh with the world matrix and the pass-through arguments (node_draw.cpp).

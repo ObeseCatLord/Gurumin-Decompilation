@@ -84,12 +84,12 @@ extern "C" void __stdcall FUN_10004650(char *object, int stride, int count, Call
 // Toggles a 30-frame latch when in state 10: 0 -> 30, 30 -> 0.
 int Latch::M_1000b9c0()
 {
-    if (m_0014 == 10)
+    if (type == 10)
     {
-        if (m_0000 == 0)
-            m_0004 = 30;
-        else if (m_0000 == 30)
-            m_0004 = 0;
+        if (frame == 0)
+            targetFrame = 30;
+        else if (frame == 30)
+            targetFrame = 0;
     }
     return 1;
 }

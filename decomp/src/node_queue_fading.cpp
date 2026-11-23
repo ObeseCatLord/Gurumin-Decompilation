@@ -152,7 +152,7 @@ int Node::QueueDrawFading(const Matrix4 *parent, const Matrix4 *view, const void
                     if (flags & NODE_FLAG_NO_STATE_9)
                         FUN_1013f070(RENDER_DEPTH_WRITE, 1, 0);
                     if (DAT_11b044f4 != 0)
-                        mesh->M_10146db0(&worldMatrix, view, box);
+                        mesh->DrawDebugBox(&worldMatrix, view, box);
                 }
             }
         } else if (mesh != 0 && DAT_10f654bc != 0) {

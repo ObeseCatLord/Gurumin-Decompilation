@@ -99,7 +99,7 @@ struct Game : Object
     char m_01dc[0x258];
     char m_0434[0x258];
     char m_068c[4];
-    int m_0690;
+    int (*m_0690)(int x, int y, int slot, float alpha);   // 0x690: draws the icon of a list entry (Item_DrawIcon while the item list is open)
     char pad_0694[8];
     char m_069c[3][0x80][0x36]; // 0x69c: per-window item labels (0x80 items of 0x36 characters)
     GameMenuItems m_579c[3];    // 0x579c: per-window entries and result pointer
@@ -196,6 +196,7 @@ struct Game : Object
     int DrawNumber(int value, int x, int y, float z, float fade, float scale, float alpha);     // 0x10008c40
     int DrawNumberAlt(int value, int x, int y, float z, float fade, float scale, float alpha);  // 0x10008df0
     int MoveCursor();  // 0x10009050 (game_panels.cpp)
+    int UpdateWindows();  // 0x1000a0b0: advances the open menu windows by one frame (fades, cursor, entries)
     int DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade);  // fade: passed to DrawTinted, unused there
     int DrawCursor(int x, int y, float fade, int frame);
     int DrawWindowMarks(int frame);

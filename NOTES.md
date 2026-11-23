@@ -158,6 +158,17 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   inside one expression do not steer it. When the original evaluates the "wrong" term first, the first term was a
   named temporary: `float cosY = cos(a) * y; float ny = cosY + sin(a) * x;` (Vec4::RotateZ/RotateY/RotateX
   0x101ac300/0x101ac3a0/0x101ac440). Plane::Distance (0x101ad240) still resists because a temporary adds a store there.
+- **x87 compare forms decide `test ah,1`/`je` versus `test ah,5`/`jp`** (2026-11-22, box_overlap.cpp): `!(a < b && ...)`
+  gives the NaN-aware `test ah,5; jp`; the original's `test ah,1; je` / `test ah,0x41; jnp` come from the plain
+  complements written out, `a >= b || c <= d || ...` (BoxCylinder_Overlap 0x10192200). An `if (d < r)` whose
+  original is `test ah,1; je` was written `if (!(d >= r))` (BoxSphere_Overlap 0x10192520).
+- **A float used by only one branch but written as a statement before the branch is hoisted** (cl 13.00 shares
+  the `fild` with the other branch): writing it inside the call arguments (`Spline((float)offset / (float)span, ...)`
+  four times) keeps one evaluation after the integer setup, as the original does (KeyBank::Sample 0x101af4c0).
+- **Statement order before a call schedules zero/constant stores**: in Number_Draw 0x10012990 `y--; advance = 0;`
+  before the ten `widths[k] = ...` stores gives the original order; declaring/initialising `advance` first does not.
+- **Commutative sums of two pointer fields** (`sphere->y + sphereOffset->y`): the load order is the compiler's,
+  whatever the source order; in 0x10192520/0x10192c90 it differs from the original at some sites (open).
 - `-z` as a multiplication operand keeps `fld z; fchs; fmulp` when written `(-z)` (RotateY/RotateX).
 - A min/max assignment whose value is the variable itself (`x = 1 < x ? x : 1`) is folded away; when the original
   keeps the self-copy, the result went into a new local (`float clamped = ...`, Input::Rumble 0x10142700).

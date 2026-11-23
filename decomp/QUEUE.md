@@ -193,7 +193,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161781` 357 bytes (loops 2, calls 3)
 - [ ] `1017c5f0` 750 bytes (float, loops 1, calls 24)
 
-## 4. Large functions (801-3000 bytes) (123)
+## 4. Large functions (801-3000 bytes) (121)
 
 - [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
 - [ ] `10164c10` 906 bytes (float, loops 1, calls 33)
@@ -238,8 +238,6 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10029730` 1440 bytes (float, calls 9)
 - [ ] `10034210` 1460 bytes (float, loops 5, calls 42)
 - [ ] `10027da0` 1461 bytes (float, calls 37)
-- [ ] `100a77f0` 1463 bytes (float, loops 6, calls 36)
-- [ ] `100a7db0` 1471 bytes (float, calls 42)
 - [ ] `100366c0` 1495 bytes (loops 8, calls 21)
 - [ ] `101643c0` 1520 bytes (float, loops 12, calls 9)
 - [ ] `10148b00` 1534 bytes Render_CreateDevice (float, loops 1, calls 28)

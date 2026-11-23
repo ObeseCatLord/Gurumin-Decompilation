@@ -1,6 +1,7 @@
 // Per-kind character update dispatch. CharSlot::kind (DAT_10daaae8) is the character's kind; kinds 100-107 are
 // the special characters with their own update routines.
 
+#include "barrage_enemy.h"
 #include "world.h"
 #include "anim_model.h"
 #include "char_state.h"
@@ -89,8 +90,6 @@ extern "C" int FUN_100a5960(int index);
 extern "C" int FUN_10076790(int index, int variant);
 extern "C" int FUN_100a6a50(int index);
 extern "C" int FUN_100a7150(int index);
-extern "C" int FUN_100a7db0(int index);
-extern "C" int FUN_100a77f0(int index);
 extern "C" int FUN_100a8370(int index, int variant);
 extern "C" int FUN_1001d2d0(int index);
 
@@ -136,10 +135,10 @@ extern "C" int FUN_100bcb30(int index)
         FUN_100a7150(index);
         return 0;
     case 14:
-        FUN_100a7db0(index);
+        Enemy_SpinFire(index);
         return 0;
     case 15:
-        FUN_100a77f0(index);
+        Enemy_CallBarrage(index);
         return 0;
     case 16:
         FUN_100a8370(index, 0);

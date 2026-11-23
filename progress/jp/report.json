@@ -1,25 +1,25 @@
 {
  "measures": {
-  "fuzzy_match_percent": 16.9072,
+  "fuzzy_match_percent": 17.0777,
   "total_code": "1720206",
-  "matched_code": "221328",
-  "matched_code_percent": 12.8664,
+  "matched_code": "224262",
+  "matched_code_percent": 13.0369,
   "total_data": "0",
   "matched_data": "0",
   "matched_data_percent": 0.0,
   "total_functions": 1212,
-  "matched_functions": 803,
-  "matched_functions_percent": 66.2541,
+  "matched_functions": 805,
+  "matched_functions_percent": 66.4191,
   "complete_code": "0",
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 263,
-  "complete_units": 151,
-  "matched_rules_code": "220701",
-  "matched_rules_code_percent": 12.8299,
-  "matched_rules_functions": 802,
-  "matched_rules_functions_percent": 66.1716
+  "total_units": 264,
+  "complete_units": 152,
+  "matched_rules_code": "223635",
+  "matched_rules_code_percent": 13.0005,
+  "matched_rules_functions": 804,
+  "matched_rules_functions_percent": 66.3366
  },
  "units": [
   {
@@ -5528,6 +5528,60 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/enemy_ai.cpp"
+   }
+  },
+  {
+   "name": "app/enemy_barrage",
+   "measures": {
+    "fuzzy_match_percent": 100.0,
+    "total_code": "2934",
+    "matched_code": "2934",
+    "matched_code_percent": 100.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 2,
+    "matched_functions": 2,
+    "matched_functions_percent": 100.0,
+    "complete_code": "2934",
+    "complete_code_percent": 100.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 1,
+    "matched_rules_code": "2934",
+    "matched_rules_code_percent": 100.0,
+    "matched_rules_functions": 2,
+    "matched_rules_functions_percent": 100.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "2934",
+     "fuzzy_match_percent": 100.0
+    }
+   ],
+   "functions": [
+    {
+     "name": "?Enemy_CallBarrage@@YAHH@Z",
+     "size": "1463",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269121520"
+     }
+    },
+    {
+     "name": "?Enemy_SpinFire@@YAHH@Z",
+     "size": "1471",
+     "fuzzy_match_percent": 100.0,
+     "metadata": {
+      "virtual_address": "269122992"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": true,
+    "source_path": "decomp/src/enemy_barrage.cpp"
    }
   },
   {
@@ -17750,13 +17804,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "1387256",
+    "total_code": "1384322",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 241,
+    "total_functions": 239,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -17773,7 +17827,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "1387256",
+     "size": "1384322",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -18792,22 +18846,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269119824"
-     }
-    },
-    {
-     "name": "FUN_100a77f0",
-     "size": "1463",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269121520"
-     }
-    },
-    {
-     "name": "FUN_100a7db0",
-     "size": "1471",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269122992"
      }
     },
     {

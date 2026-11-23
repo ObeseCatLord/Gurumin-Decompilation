@@ -257,6 +257,10 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   and the argument pops of three calls come as one `add esp`, repeat the last call in each arm instead of writing
   it once after the if/else; the shared form pushes the saved registers too early (TextureObject::DrawFrameAlt
   0x1014e940).
+- **A fallback object written as two calls**: when a node pointer falls back to another (`fire`, else the head) and
+  the original loads the fallback into the same register before one shared call whose pops are not merged with the
+  next call, write `if (a) Call(a); else if (b) Call(b); else {...}`: the calls are cross-jumped. The `a || (a = b)`
+  spelling keeps the fail block inline and shifts registers (Enemy_SpinFire 0x100a7db0).
 - **Vertex loops**: the loop pointer starts at the second field the body writes (DrawFrameAlt writes x then y; the
   original pointer is &y).
 - **Early returns placed in the middle**: when the `return 0` block sits right after the guard tests (before the body)

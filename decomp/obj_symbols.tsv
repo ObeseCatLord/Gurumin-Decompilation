@@ -498,3 +498,5 @@ _FUN_101426d0@8	101426d0
 ?AllocPackHeaders@Node@@QAEPAUVertexPack@@H@Z	1019c320
 ?AllocIndexLists@Node@@QAEPAUIndexList@@H@Z	1019c360
 ?DrawPictures@WorldRenderer@@QAEXABUMatrix4@@@Z	10167440
+?Enemy_CallBarrage@@YAHH@Z	100a77f0
+?Enemy_SpinFire@@YAHH@Z	100a7db0

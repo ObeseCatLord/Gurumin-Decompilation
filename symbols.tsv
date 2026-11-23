@@ -999,3 +999,5 @@ address	name	evidence
 1009d490	Enemy_ChaseAndSlash	kind 0x4f (FUN_1009e2d0); "@Bip01 R Fin"/"@Bip01 R Fore" trail effect 0x4c, sound 0x152; enemy_slash.cpp
 1009b120	Enemy_HopAndStrafe	kind 0x50 (FUN_1009e2d0): strafing enemy that hops back to its last ground positions; effect 0x57, sound 0x153 (matched, decomp/src/enemy_strafe.cpp)
 1009c070	Enemy_FlyAndStrafe	kind 0x51 (FUN_1009e2d0): flying strafing enemy, height steps clamped to 5 towards player z + 40 / + 200, effect 7, sound 0x158 (draft, decomp/src/enemy_strafe.cpp)
+100a77f0	Enemy_CallBarrage	behaviour 15 (Enemy_UpdateBehaviour): walks, now and then stops to call a barrage of effect 0x429 shots on the player (matched, decomp/src/enemy_barrage.cpp)
+100a7db0	Enemy_SpinFire	matched decompiled source (decomp/obj_symbols.tsv)

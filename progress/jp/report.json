@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 34.1824,
+  "fuzzy_match_percent": 34.1818,
   "total_code": "1720206",
   "matched_code": "323573",
   "matched_code_percent": 18.8101,
@@ -8037,7 +8037,7 @@
   {
    "name": "app/enemy_pounce_breath",
    "measures": {
-    "fuzzy_match_percent": 39.9695,
+    "fuzzy_match_percent": 39.8114,
     "total_code": "6548",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -8062,14 +8062,14 @@
     {
      "name": ".text",
      "size": "6548",
-     "fuzzy_match_percent": 39.9695
+     "fuzzy_match_percent": 39.8114
     }
    ],
    "functions": [
     {
      "name": "?Enemy_PounceAndBreathe@@YAHH@Z",
      "size": "6548",
-     "fuzzy_match_percent": 39.9695,
+     "fuzzy_match_percent": 39.8114,
      "metadata": {
       "virtual_address": "268858832"
      }

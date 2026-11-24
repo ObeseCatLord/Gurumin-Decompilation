@@ -83,9 +83,9 @@ extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, in
 #define POUNCE_WHIRL_LEAP_END 0x41
 #define POUNCE_WHIRL_ARM 0x19
 #define POUNCE_WHIRL_ROLL 50000
-#define POUNCE_LEAP_SPEED 45.0f
+#define POUNCE_LEAP_SPEED 45.5f
 #define POUNCE_BOUNCE_SPEED 18.0f
-#define POUNCE_LAND_SPEED 35.0f
+#define POUNCE_LAND_SPEED 34.5f
 #define POUNCE_LEAP_LIFT 10.0f
 #define POUNCE_LANDING_LIMIT 20.0f
 #define POUNCE_LEAP_DRIFT (-30.0f)
@@ -455,9 +455,13 @@ int Enemy_PounceAndBreathe(int index)
                     else if (DAT_104bfd08 == 0 && DAT_10db6ee8[index].m_238c == 0)
                     {
                         FUN_100241e0(index, move.x, move.y, 0.0f);
-                        if (DAT_10db6ee8[index].verticalSpeed <= 0.0f)
+                        if (DAT_10db6ee8[index].verticalSpeed > 0.0f)
+                            DAT_10db6ee8[index].verticalSpeed += POUNCE_RISE;
+                        else
+                        {
                             DAT_10db6ee8[index].m_237c -= POUNCE_GRAVITY_Z;
-                        DAT_10db6ee8[index].verticalSpeed += POUNCE_RISE;
+                            DAT_10db6ee8[index].verticalSpeed += POUNCE_RISE;
+                        }
                     }
                 }
                 else

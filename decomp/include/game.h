@@ -183,6 +183,7 @@ struct Game : Object
     int FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value);
     int SetScriptFlag(int index, int value);
     int ReadWord();
+    int PointInRect(int x, int y, int left, int top, int right, int bottom);   // 0x10008430 (app_0003.cpp)
     int ReadWordInLine();
     int IsAnyWindowBusy();
     void CloseAllWindows();

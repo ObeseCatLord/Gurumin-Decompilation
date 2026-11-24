@@ -97,7 +97,7 @@ extern "C" int DAT_1101ddc0[4];
 extern "C" int DAT_1101ddd0;
 extern "C" int DAT_1101ddd4;
 extern "C" int DAT_1101ddd8;
-extern "C" int DAT_1101dddc;
+extern "C" float DAT_1101dddc;
 extern "C" float DAT_1101dde4;                            // how far the camera target is lifted (0 or up to 120)
 extern "C" int DAT_1101dde8;
 extern "C" int DAT_1101ddec;

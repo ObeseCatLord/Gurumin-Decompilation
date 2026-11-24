@@ -51,6 +51,7 @@ struct CharState
                         int counterPhase;         // digit_counter.cpp: 0 = idle, 1..10 = turning to count + 1
                         int shockFrames;          // npc_link_shock.cpp: 0 = standing, 1..60 = frames shaking (counted up)
                         int ballFrame;            // rolling_ball.cpp: 0 = not set up, 1 = waiting, then the frame count of the roll
+                        int zoneRampStep;          // area_zone.cpp: how much the push grows each frame the player is inside
                         // (route_follow.cpp uses `wait` for the frames left at a pause point)
                     };
                     union                         // 0x08
@@ -78,6 +79,8 @@ struct CharState
                         int ballSlot;             // rolling_ball.cpp: slot of the character dropped in (states 1..30)
                         int ballTimer;            // rolling_ball.cpp: frames counted in state 3000
                   int swingReady;           // swing_platform.cpp: 1 once the platform was set up
+                        int holdFrames;           // mole_game.cpp: frames to wait before the next step (counted down; 5 after a hit)
+                        int zoneRampMax;           // area_zone.cpp: the push stops growing at this strength
                     };
                     union                         // 0x0c
                     {
@@ -112,6 +115,9 @@ struct CharState
                         int shakeX;               // npc_link_shock.cpp: shake steps of the three axes, -/+ (x)
                         int ballSavedKind;        // rolling_ball.cpp: the dropped-in character's kind, restored after it landed
                   int swingStatus;          // swing_platform.cpp: 7 = the swing is running, -1 = the character was told to leave
+                  int hoverLimits;          // npc_hover_carrier.cpp: talk % 100 = bits that tie it to its home position (1/2 x/y pinned to home, 4/8 x/y kept from passing home upwards, 16/32 x/y kept from passing home downwards)
+                        int holeIndex;            // mole_game.cpp: the hole ("@p1".. "@p9" = 0..8) the mole heads for or dives into
+                        int zoneRamp;              // area_zone.cpp: the push strength now (1/100 of the force)
                     };
                     union                         // 0x10
                     {
@@ -133,6 +139,10 @@ struct CharState
                         int greeted;              // npc_greet.cpp: 0 = has not greeted yet
                         int shakeY;               // npc_link_shock.cpp: shake step of the y axis
                   int swingFlip;            // swing_platform.cpp: non-zero = the acceleration flips when the angle passes 0 or +-180
+                  int hoverGround;          // npc_hover_carrier.cpp: ground height under the carrier (-5000 = none)
+                        int lift;                 // mole_game.cpp: upward kick after a hit (0x30), 3 less each step it moves
+                        int zoneType;              // area_zone.cpp: 0..4 push, 5 / 7 / 8 camera setting, 6 = other zone
+                        int perchMode;            // npc_perch.cpp: talk % 100 (0 = copies the neighbour's heading, 1 and 2 = turn to the player and spit, 3 = carried)
                     };
                     union                         // 0x14
                     {
@@ -157,6 +167,10 @@ struct CharState
                         int shakeZ;               // npc_link_shock.cpp: shake step of the z axis
                         int ballRollFrame;        // rolling_ball.cpp: frames the ball has rolled (the ball node's frame source)
                   int swingLength;          // swing_platform.cpp: length of the arm in units (distance from the pivot + 50)
+                  int hoverLowered;         // npc_hover_carrier.cpp: non-zero = the carrier floats 10 units lower
+                        int panicked;             // mole_game.cpp: 1 after a hit (the mole runs faster), 0 once it came up again
+                        int zoneValue;             // area_zone.cpp: camera value (types 5 and 8) or 1 = the push also tests the height
+                        int shotCount;            // npc_perch.cpp: spits so far in the current round (a mode 3 rider sets its neighbour's to 1)
                     };
                     union                         // 0x18
                     {
@@ -174,10 +188,12 @@ struct CharState
                         int pickupHeight;         // npc_gate_carrier.cpp: lowest player height (below the carrier) for a pick-up
                         int shakeLevel;           // npc_link_shock.cpp: three digits (x, y, z) = how strongly each axis shakes
                   int swingMirror;          // swing_platform.cpp: non-zero = the swing turns the other way round
+                        int motionSaved;          // mole_game.cpp: 1 while the motion below is put back after a hit (1 while it dives)
+                        int zoneActive;            // area_zone.cpp: 1 while the player is inside and the zone acts
                     };
                     union                         // 0x1c
                     {
-                        int rider;                // route_carrier.cpp: character carried (0 = none)
+                        int rider;                // route_carrier.cpp, npc_hover_carrier.cpp: character carried (0 = none)
                         int scriptResult;         // char_script.cpp: result of the last step (5 = run the next
                                                   // step at once, 2 = waiting)
                         int forceStep;            // route_step.cpp: non-zero = take the point at once, whether
@@ -188,6 +204,8 @@ struct CharState
                         int sightScale;           // npc_group_watch.cpp: talk / 10, its sight range in units of 20
                         int cheerMotion;          // npc_gesture.cpp: motion of the cheer (0x5a + random 0..3)
                         int linkIndex;            // npc_link_shock.cpp: the link (DAT_1049f0c8) the character stands at, -1 = none
+                        int savedLayer;           // mole_game.cpp: motion layer playing at the end of the last frame (-1 while blending)
+                        int zoneFrame;             // area_zone.cpp: frame of the zone's cycle
                     };
                     union                         // 0x20
                     {
@@ -200,10 +218,14 @@ struct CharState
                         int hikariSound;          // char_hikari.cpp: 1 while its "anime" sound plays
                         int releaseDistance;      // npc_link_shock.cpp: player distance (talk / 10 * 10) below which it is released
                   int swingGround;          // swing_platform.cpp: highest ground under the swing so far (-3500 = none)
+                  int playerGround;         // npc_hover_carrier.cpp: height of the ground under the player
+                        int savedFrame;           // mole_game.cpp: motion frame at the end of the last frame
+                        int zonePeriod;            // area_zone.cpp: frames in the cycle
                     };
                     union                         // 0x24
                     {
                         int m_0024;
+                        int zoneActiveFrom;        // area_zone.cpp: first frame of the cycle in which the zone acts
                         int sinkLimit;            // map_cursor_walk.cpp: set to -40 while the character is not sinking
                         int restFrames;           // enemy_strafe.cpp (Enemy_HopAndStrafe): frames standing still
                                                   // in the idle motion
@@ -222,6 +244,7 @@ struct CharState
                         int headingFrom;          // route_step.cpp: heading (degrees) at the route's first point
                         int markerSlot;           // marker_rider.cpp: slot of the marker character ridden
                         int lastHealth;           // map_cursor_walk.cpp: the health of the slot, copied every frame
+                        int zoneActiveTo;          // area_zone.cpp: last frame of the cycle in which the zone acts
                   int swingMaxAngle;        // swing_platform.cpp: largest swing angle seen over ground
                     };
                     union                         // 0x2c
@@ -233,10 +256,12 @@ struct CharState
                         int hopFrame;             // enemy_strafe.cpp (Enemy_HopAndStrafe): frame of the hop
                                                   // under way (0 = not hopping)
                   int swingMinAngle;        // swing_platform.cpp: smallest swing angle seen over ground
+                        int zoneEffect;            // area_zone.cpp: effect started at one frame of the cycle (0 = none)
                     };
                     union                         // 0x30
                     {
                         int m_0030;
+                        int zoneEffectFrame;       // area_zone.cpp: the frame of the cycle that starts the effect
                         int markerPhase;          // marker_rider.cpp: 0 = new, 1 = riding (flags set), 2 = vanishing
                         int arrivalHold;          // map_cursor.cpp: frames left in which the cursor counts as
                         int hikariScanned;        // char_hikari.cpp: 1 once the character to carry along was looked up
@@ -245,6 +270,7 @@ struct CharState
                     union                         // 0x34
                     {
                         int m_0034;
+                        int zoneSound;             // area_zone.cpp: sound played with the effect (0 = none)
                         int cursorKind;           // map_cursor_walk.cpp: kind of the node last reached (MapCursor_Step)
                         int arrivalAction;        // npc_patrol.cpp: action of the last route point reached
                         int hopHistory;           // enemy_strafe.cpp (Enemy_HopAndStrafe): HopHistory state of
@@ -259,11 +285,16 @@ struct CharState
             union                                 // 0x38
             {
                 int sawPlayer;                    // 1 once the character saw the player (or was told to react)
+                int zoneSoundDelay;               // area_zone.cpp: frames before that sound plays (0 = at once)
                 int cursorPrevious;               // map_cursor_walk.cpp: the node reached before (MapCursor_Step)
                 int releasable;                   // npc_approach.cpp: non-zero = the release flag ends the approach
             };
-            int behaviour;                        // 0x3c: behaviour number (0 = not unpacked from the script
-                                                  // parameter yet); setting it switches behaviour
+            union                                 // 0x3c
+            {
+                int behaviour;                    // behaviour number (0 = not unpacked from the script parameter yet);
+                                                  // setting it switches behaviour
+                int zoneTracking;                 // area_zone.cpp (type 8): 1 once the follow height was taken
+            };
         };
         int words[0x10];                          // the whole block by index (resets and copies)
         Shove shoves[4];                          // char_shove.cpp: the slot's scripted shoves

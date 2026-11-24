@@ -14,7 +14,7 @@ int Game::SetScriptFlag(int index, int value)
 }
 
 // 1 when the point (x, y) lies inside the rectangle (edges included), else 0.
-extern "C" int __stdcall FUN_10008430(int x, int y, int left, int top, int right, int bottom)
+int Game::PointInRect(int x, int y, int left, int top, int right, int bottom)
 {
     if (x < left || y < top || x > right || y > bottom)
         return 0;

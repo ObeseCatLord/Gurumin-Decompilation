@@ -38,7 +38,7 @@ enum ContactState
 // step of m_2390 (4, 2 or 1) until they no longer touch the other loaded models and then the map collision. The
 // distance to the nearest map hit is lowered into `nearest`. Returns the result of the last collision test (-1 =
 // blocked for good, otherwise the probe that was last raised), 0 when the model has no map collision.
-int AnimModel::LiftProbes(float *nearest, Vec4 *probes, int probeCount, int *hitIds, Vec4 *hits, int *hitOther,
+int AnimModel::LiftProbes(float *nearest, Vec4 *probes, int probeCount, AnimModel **hitIds, Vec4 *hits, int *hitOther,
                           int unused1, unsigned int flags, int unused2, int mode, int extra, int *outHit,
                           int *outFlag)
 {
@@ -87,7 +87,7 @@ int AnimModel::LiftProbes(float *nearest, Vec4 *probes, int probeCount, int *hit
             {
                 int otherOwner = *hitOther;
                 hitData = probeIndex;
-                int count = FUN_10193140(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probes, probeCount, &hitData, hitIds,
+                int count = root->CollideModel(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probes, probeCount, &hitData, hitIds,
                                          hits, &otherOwner, 1, &hit, extra, 0, 0);
                 if (count != hitData)
                     DAT_10faaa88[i]->model->m_0290 = (float)(liftCount + 2);
@@ -97,7 +97,7 @@ int AnimModel::LiftProbes(float *nearest, Vec4 *probes, int probeCount, int *hit
             {
                 hit = 0;
                 hitData = 0;
-                result = FUN_10193140(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probes, probeCount, &probeIndex, hitIds, hits,
+                result = root->CollideModel(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probes, probeCount, &probeIndex, hitIds, hits,
                                       hitOther, 1, &hit, extra, &hitData, 0);
                 if ((result == -1 || result == -2 || hit != 0) && contactState != 0)
                     contactState = CONTACT_MODEL;

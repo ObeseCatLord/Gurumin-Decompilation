@@ -27,7 +27,7 @@ extern "C" int FUN_10044560(int index);                    // Enemy_Pendulum
 extern "C" int FUN_100b3430(int index);                    // Npc_RiseWhenSeen
 extern "C" int FUN_10044b10(int index);
 extern "C" int FUN_100451c0(int index);
-extern "C" int FUN_100b3770(int index);
+#include "npc_perch.h"                                      // Npc_PerchOnNeighbour
 extern "C" int FUN_100b4300(int index);                    // Npc_RaiseAlarm
 extern "C" int FUN_100b4930(int index);                    // Npc_RideAlarm
 extern "C" int FUN_1007b870(int index);
@@ -138,7 +138,7 @@ extern "C" int FUN_100dfcf0(int index)
             FUN_100451c0(index);
             return 0;
         case 10:
-            FUN_100b3770(index);
+            Npc_PerchOnNeighbour(index);
             return 0;
         case 0xb:
             FUN_100b4300(index);

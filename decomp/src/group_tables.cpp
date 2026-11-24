@@ -37,9 +37,9 @@ extern "C" void FUN_10034fe0(void)
     {
         for (int i = 0; i < 11; i++)
         {
-            DAT_10255960[group][i] = 0;
+            DAT_10255960[group].slots[i] = 0;
             if (i == 9)
-                DAT_10255960[group][9] = -1;
+                DAT_10255960[group].picture = -1;
         }
     }
     for (int f = 0; f < 6; f++)

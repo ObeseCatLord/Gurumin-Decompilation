@@ -193,12 +193,12 @@ int AnimModel::IsClear(const Vec4 *offset)
     Vec4 hits[0x40];
     int hitOther = 0;
     int hitCount = 0;
-    int hitIds[0x40];
+    AnimModel *hitIds[0x40];
     for (int i = 0; i < 0x100; i++)
     {
         if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->hasCollision != 0)
         {
-            if (FUN_10193140(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther,
+            if (root->CollideModel(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther,
                              -1, 0, 0, 0, 0) != 0)
                 return 0;
         }
@@ -220,11 +220,11 @@ int AnimModel::IsClearAny(const Vec4 *offset)
     Vec4 hits[0x40];
     int hitOther = 0;
     int hitCount = 0;
-    int hitIds[0x40];
+    AnimModel *hitIds[0x40];
     for (int i = 0; i < 0x100; i++)
     {
         if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->hasCollision != 0 &&
-            FUN_10193140(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, 0,
+            root->CollideModel(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, 0,
                          0, 0, 0, 0) != 0)
             return 0;
     }
@@ -245,11 +245,11 @@ int AnimModel::IsClearFlagged(const Vec4 *offset)
     Vec4 hits[0x40];
     int hitOther = 0;
     int hitCount = 0;
-    int hitIds[0x40];
+    AnimModel *hitIds[0x40];
     for (int i = 0; i < 0x100; i++)
     {
         if (DAT_10faaa88[i] != 0 && root != DAT_10faaa88[i] && DAT_10faaa88[i]->hasCollision != 0 &&
-            FUN_10193140(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, -1,
+            root->CollideModel(&matrix, DAT_10faaa88[i], DAT_10ff19e8[i], probe, 1, &hitCount, hitIds, hits, &hitOther, -1,
                          0, 0, 0, 0x400) != 0)
             return 0;
     }

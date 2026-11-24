@@ -10,10 +10,10 @@
 #include "game.h"
 #include "char_vars.h"
 #include "map_vars.h"
+#include "mole_game.h"
 
 extern "C" void FUN_1007dab0(void);
 extern "C" void FUN_10053020(void);
-extern "C" void FUN_100524d0(void);
 extern "C" void FUN_1007f1e0(void);
 
 // 0x100bd960 (Map_UpdateSpecial). While the map timer runs, calls the map's own update (maps 0x15..0x18). When it
@@ -32,7 +32,7 @@ int Map_UpdateSpecial()
             FUN_10053020();
             break;
         case 0x17:
-            FUN_100524d0();
+            Map17_UpdateMoleGame();
             break;
         case 0x18:
             FUN_1007f1e0();

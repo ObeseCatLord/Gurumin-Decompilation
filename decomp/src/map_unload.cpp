@@ -95,9 +95,9 @@ extern "C" void FUN_10023d30(void)
     {
         for (int j = 0; j < 12; j++)
         {
-            DAT_10255960[i][j] = 0;
+            DAT_10255960[i].slots[j] = 0;
             if (j == 9)
-                DAT_10255960[i][9] = -1;
+                DAT_10255960[i].picture = -1;
         }
     }
     memset(DAT_103088d0, 0, sizeof(DAT_103088d0));

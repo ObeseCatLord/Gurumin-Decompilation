@@ -325,7 +325,7 @@ struct AnimModel
     int IsClearAny(const Vec4 *offset);                            // 0x101640b0: 0 when the move collides
     int IsClearOfMapLimited(const Vec4 *offset);                   // 0x101641b0
     int IsClearOfMap(const Vec4 *offset);                          // 0x101642c0
-    int LiftProbes(float *nearest, Vec4 *probes, int probeCount, int *hitIds, Vec4 *hits, int *hitOther, int unused1,
+    int LiftProbes(float *nearest, Vec4 *probes, int probeCount, AnimModel **hitIds, Vec4 *hits, int *hitOther, int unused1,
                    unsigned int flags, int unused2, int mode, int extra, int *outHit, int *outFlag);  // 0x101643c0
     int StepPath();                                                // 0x10175e80 (path_anim.cpp): follows track C
     int LoadModel(const char *path);                               // 0x1017aeb0 (texture_mgr.cpp)

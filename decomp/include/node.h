@@ -154,7 +154,7 @@ struct Node
     unsigned char m_1899;        // 0x1899: 30 after Init
     unsigned char m_189a;        // 0x189a: colour value (M_101946b0)
     unsigned char m_189b;        // 0x189b: colour value (M_10194730)
-    char m_189c;                 // 0x189c: colour value (M_10194630)
+    unsigned char m_189c;        // 0x189c: colour value (M_10194630)
 
     // Life cycle and loading
     Node();                                               // 0x1019ebc0: constructs the members, then Init (node_ctor.cpp)
@@ -326,6 +326,24 @@ struct Node
     int SphereHitsMesh(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, float *depth);
     int SpheresOverlap(const Vec4 *boundsA, const Vec4 *offsetA, const Vec4 *boundsB, const Vec4 *offsetB,
                        Vec4 *aToB, Vec4 *bToA);           // 0x10193060 (node_spheres.cpp)
+    // Overlap tests between two nodes' volumes, each moved by an offset (box_overlap.cpp). `this` is not used. Boxes are
+    // given as the pair of corners (Node::box), spheres as the bounds vector (Node::bounds). On overlap the vector
+    // between the volumes goes to `delta` and its negation to `negatedDelta`.
+    int BoxesOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *second, const Vec4 *secondOffset,
+                     Vec4 *delta, Vec4 *negatedDelta);          // 0x10191fd0
+    int BoxCylinderOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *second, const Vec4 *secondOffset,
+                           Vec4 *delta, Vec4 *negatedDelta);    // 0x10192200
+    int BoxSphereOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *sphere, const Vec4 *sphereOffset,
+                         Vec4 *delta, Vec4 *negatedDelta);      // 0x10192520
+    int CylindersOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *second, const Vec4 *secondOffset,
+                         Vec4 *delta, Vec4 *negatedDelta);      // 0x10192a00
+    int CylinderSphereOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *sphere, const Vec4 *sphereOffset,
+                              Vec4 *delta, Vec4 *negatedDelta); // 0x10192c90
+    // 0x10193140 (node_collide_model.cpp): tests this node's tree (moved by `matrix`) against the tree of `other`,
+    // one probe offset per call of the loop (`probes[*probeIndex]`); see the definition.
+    int CollideModel(Matrix4 *matrix, Node *other, Matrix4 *otherMatrix, Vec4 *probes, int probeCount, int *probeIndex,
+                     AnimModel **touchedModels, Vec4 *touchedPushes, int *touchedCount, int mode, int *mapHit, int resolve,
+                     int *hitMatrix, unsigned int mask);
     int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);  // 0x1019f210
     int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
                            Vec4 *closest);                // 0x10191ec0
@@ -337,10 +355,5 @@ struct Node
     int UpdateVisibleCells();                             // 0x10199be0 (visibility.cpp)
     int TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matrix4 *matrix);  // 0x10199cd0
 };
-
-// Collision test of a model (world matrix) against another model: 0x10193140 (stdcall, recursive over nodes).
-extern "C" int __stdcall FUN_10193140(Matrix4 *matrix, Node *other, Matrix4 *otherMatrix, Vec4 *probe, int count,
-                                      int *hitCount, int *hitIds, Vec4 *hits, int *hitOther, int mode, int *hit,
-                                      int extra, int *outHit, int flags);
 
 #endif

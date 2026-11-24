@@ -24,7 +24,6 @@ extern "C" int FUN_1013f880(void);                                          // t
 #define ATTACK_COMBO_FINISH_MAX 3          // the finishing attack runs three times in a row at most
 #define ATTACK_QUEUE_BLEND 0x1e
 #define ATTACK_LONG_FRAMES 0x2d            // attacks this long queue a long event
-#define FLOAT_ONE 0x3f800000               // 1.0f as stored in the integer-typed DAT_104c00ec/f0
 
 // Plays the shout of the player's face variant for the heavy attacks.
 static __forceinline void PlayHeavyVoice()
@@ -234,8 +233,8 @@ skipRestore:
         else
             DAT_10c6401c = DAT_10c6401c + 1;
     }
-    DAT_104c00ec = FLOAT_ONE;
-    DAT_104c00f0 = FLOAT_ONE;
+    DAT_104c00ec = 1.0f;
+    DAT_104c00f0 = 1.0f;
     DAT_10c67f30.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     DAT_102024c0 = -1;
     if (DAT_104bfe20 != 0 && DAT_102024ac > 0)

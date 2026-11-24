@@ -480,6 +480,92 @@ static __forceinline void CloseItemList(void)
 #define HELMET_KIND_BLUE 0x1c
 #define HELMET_KIND_WHITE 0x1d
 #define FocusPoint(index) ((Vec4 *)DAT_1032d5b8[index])   // the camera position as a Vec4 (the records are 16 bytes)
+// The greeting and talk block: the attack records' effects started while a swing plays (pseudo 5073+).
+#define DRILL_SCALE_1 1.5f           // effect scale of drill levels 1..3 (level 0 = 1.0)
+#define DRILL_SCALE_2 2.0f
+#define DRILL_SCALE_3 3.0f
+#define SWING_EARLY_FRAMES 0x18      // an attack swing's first frames start the held-item flash
+#define SWING_FLASH_INTERVAL 7
+#define ATTACK_AREA_SWORD_0 0x1c     // attack kinds whose effect is thrown along the nearest enemies
+#define ATTACK_AREA_SWORD_1 0x1d
+#define ATTACK_AREA_SWORD_2 0x1f
+#define ATTACK_AREA_SWORD_3 0x20
+#define ATTACK_AREA_BEAM 0x1a        // the attack record that DAT_108bb4b8 belongs to
+#define ITEM_KIND_SWORD_LONG 3       // ItemText::m_0074 values that hit every enemy in reach
+#define ITEM_KIND_SWORD 2
+#define SWORD_HIT_RANGE 2400.0f
+#define SWORD_EFFECT_RAISE 50.0f
+#define SWORD_EFFECT_MAX_HITS 4
+#define SWORD_EXTRA_RADIUS_MIN 200
+#define SWORD_EXTRA_RADIUS_SPREAD 400
+#define SWORD_EXTRA_RAISE 60.0f
+#define SWORD_EFFECT_OWNER 9999
+#define EFFECT_STRENGTH_DIVISOR_LARGE 1000.0f
+#define EFFECT_STRENGTH_DIVISOR 100.0f
+#define EFFECT_STRENGTH_THROWN 1.5f  // multiplier of the thrown (DAT_104c0173) strength
+#define LOADOUT_COSTUME_A 0xc        // costumes and helmet bits that scale the effect (same as the claws)
+#define LOADOUT_COSTUME_B 0xb
+#define LOADOUT_COSTUME_C 8
+#define LOADOUT_HELMET_STRONG 0x400
+#define LOADOUT_HELMET_MID 0x300
+#define LOADOUT_HELMET_HIGH 0x200
+#define LOADOUT_HELMET_LOW 0x100
+#define LOADOUT_SCALE_A 5.0f
+#define LOADOUT_SCALE_B 3.0f
+#define LOADOUT_SCALE_C 2.5f
+#define LOADOUT_SCALE_MID 1.7f
+#define LOADOUT_SCALE_HIGH 1.5f
+#define LOADOUT_SCALE_LOW 1.2f
+#define EFFECT_SETTING_AREA 5        // EffectOptions::settings[5]
+#define EFFECT_SETTING_FLAGS 4       // EffectOptions::settings[4]
+#define HELMET_THIRD_A 0x2c         // worn helmets that boost the third effect
+#define HELMET_THIRD_B 0x3d
+#define SWING_TURN_FRAMES 8          // the swing turns towards its target in the first frames
+#define TURN_NEAREST_START 4000000.0f // squared distance a turn target must beat
+#define SCOPE_EFFECT 35000
+#define BURST_EFFECT 34000
+#define BURST_EFFECT_POPON 0x84d1
+#define SOUND_STRONG_SWING 0x365
+#define SOUND_SWING_MODE 0x366
+#define SWING_PROBE_NEAR_Y (-38.0f)
+#define SWING_PROBE_NEAR_Z 20.0f
+#define SWING_PROBE_FAR_Y (-30.0f)
+#define SWING_PROBE_FAR_Z 80.0f
+#define SWING_CAMERA_FRAMES 0x12
+#define SWING_DROP_DIVISOR 4.0f
+#define SWING_FADE_STEP 0.1f
+#define SWING_TARGET_MIN_X (-50000.0f)
+#define SWING_AIM_LOWER 10.0f
+#define SWING_ARRIVE_DISTANCE 8.0f
+#define SWING_SHIFT_LIMIT 40.0f
+#define SWING_SAME_HEIGHT 30.0
+#define SWING_SAME_DISTANCE 30.0f
+#define ATTACK_EFFECT_OWNER 999      // owner of the attack record effects
+
+// Scales an attack effect by the worn costume and helmet (the same chain follows every attack effect).
+static __forceinline void ApplyLoadoutScale(float &value)
+{
+    if (DAT_10c655f0 == LOADOUT_COSTUME_A)
+        value = value * LOADOUT_SCALE_A;
+    else if (DAT_10c655f0 == LOADOUT_COSTUME_B)
+        value = value * LOADOUT_SCALE_B;
+    else if (DAT_10c655f0 == LOADOUT_COSTUME_C)
+        value = value * LOADOUT_SCALE_C;
+    else if ((DAT_104c02c8 & LOADOUT_HELMET_STRONG) == 0)
+    {
+        if ((DAT_104c02c8 & LOADOUT_HELMET_MID) == LOADOUT_HELMET_MID)
+            value = value * LOADOUT_SCALE_MID;
+        else if ((DAT_104c02c8 & LOADOUT_HELMET_HIGH) == 0)
+        {
+            if ((DAT_104c02c8 & LOADOUT_HELMET_LOW) != 0)
+                value = value * LOADOUT_SCALE_LOW;
+        }
+        else
+            value = value * LOADOUT_SCALE_HIGH;
+    }
+    else
+        value = value + value;
+}
 
 // The door models that play the swing effect when their animation starts.
 #define DoorSwingsEffect(model) ((model) == 0xe7 || (model) == 0xe8 || (model) == 0xcd || (model) == 0xce)
@@ -3326,7 +3412,559 @@ lockTargetStored:
                     }
                     DAT_10daaa80.colour.Set(lightR, lightG, lightB, 1.0f);
                 }
-                // STAGE 4c: the greeting and talk block, pseudo.c lines 5073-5864 (ends with the closing brace of the block opened above)
+                // The talk block: while an attack record plays, its effects and sounds start at their frames.
+                if (DAT_104bfdf0 == 0 && DAT_104c00e0 != 0)
+                {
+                    DAT_10db6ee8[0].m_02a1 = 1;
+                    int strongSwing = DAT_108a6a58[DAT_104c00e8].m_0040;
+                    float drillScale = 1.0f;
+                    if (DAT_10c64ad4 == 1)
+                        drillScale = DRILL_SCALE_1;
+                    if (DAT_10c64ad4 == 2)
+                        drillScale = DRILL_SCALE_2;
+                    if (DAT_10c64ad4 == 3)
+                        drillScale = DRILL_SCALE_3;
+                    // The first frames of a swing: a flash effect of the helmet in some areas.
+                    if (DAT_104c00f4 < SWING_EARLY_FRAMES)
+                    {
+                        Vec4 flashAt;
+                        flashAt.Fill(0.0f);
+                        if ((DAT_104c00e8 == 0x28 || DAT_104c00e8 == 0x14 || DAT_104c00e8 == 0x10 || DAT_104c00e8 == 0x19
+                             || DAT_104c00e8 == 0x16 || DAT_104c00e8 == 0x17)
+                            && DAT_104c00f4 % SWING_FLASH_INTERVAL == 0)
+                        {
+                            EffectOptions options;
+                            options.flags = 1;
+                            if (DAT_1088e6b0[DAT_10daabb8].helmetKind == HELMET_KIND_RED)
+                                DAT_10daaa80.Start(0x1f4, flashAt, -1, 1, &DAT_10836c98, 0, 0, &DAT_10db6ee8[0].matrix, &options,
+                                                   0);
+                            if (DAT_1088e6b0[DAT_10daabb8].helmetKind == HELMET_KIND_BLUE)
+                                DAT_10daaa80.Start(0x7da, flashAt, -1, 1, &DAT_10836c98, 0, 0, &DAT_10db6ee8[0].matrix, &options,
+                                                   0);
+                            if (DAT_1088e6b0[DAT_10daabb8].helmetKind == HELMET_KIND_WHITE)
+                                DAT_10daaa80.Start(0x14b4, flashAt, -1, 1, &DAT_10836c98, 0, 0, &DAT_10db6ee8[0].matrix, &options,
+                                                   0);
+                        }
+                    }
+                    // The attack's own effect, started at its frame.
+                    if (DAT_108a6a58[DAT_104c00e8].effect > 0)
+                    {
+                        int effectFrame = DAT_108a6a58[DAT_104c00e8].effectFrame;
+                        if (effectFrame >= 0 || -DAT_104c00f4 == effectFrame || -effectFrame < DAT_104c00f4)
+                        {
+                            if ((int)((float)effectFrame * DAT_104c00f0) != DAT_104c00f4)
+                                goto secondEffect;
+                        }
+                        EffectOptions options;
+                        if (DAT_104c00e8 == ATTACK_AREA_SWORD_0 || DAT_104c00e8 == ATTACK_AREA_SWORD_1
+                            || DAT_104c00e8 == ATTACK_AREA_SWORD_2 || DAT_104c00e8 == ATTACK_AREA_SWORD_3)
+                        {
+                            // Swords: the effect strikes every enemy within reach, then more around the player.
+                            int weaponKind = DAT_108f667c[DAT_10daabb8].m_0074;
+                            Vec4 strikeAt;
+                            Vec4 playerAt = DAT_10db6ee8[0].matrix.GetTranslation();
+                            int hits = 0;
+                            for (int slot = 1; slot <= 0x7b; slot++)
+                            {
+                                if (((DAT_1021f3c0[slot] == 'c' || DAT_1021f3c0[slot] == 3)
+                                     && DAT_10daaae8[slot].stats[STAT_HEALTH] > 0 && DAT_10daaae8[slot].m_0141 == 0)
+                                    || (DAT_1021f3c0[slot] == 'M' && weaponKind == ITEM_KIND_SWORD_LONG))
+                                {
+                                    if (DAT_10db6ee8[slot].matrix.GetTranslation().Distance(playerAt) < SWORD_HIT_RANGE)
+                                    {
+                                        strikeAt.Copy(DAT_10db6ee8[slot].matrix.GetTranslation());
+                                        strikeAt.z = strikeAt.z + SWORD_EFFECT_RAISE;
+                                        EffectOptions hit;
+                                        hit.m_0004 = (int)((float)-DAT_10daaae8[0].stats[STAT_EFFECT_PARAM] * DAT_10467508);
+                                        hit.m_0008 = (float)(DAT_108a6a58[DAT_104c00e8].strength * (DAT_102024c8 + 10) * 4)
+                                                     / EFFECT_STRENGTH_DIVISOR_LARGE;
+                                        ApplyLoadoutScale(hit.m_0008);
+                                        if (DAT_10c6566c != 0)
+                                        {
+                                            hit.m_0004 = 1;
+                                            hit.m_0008 = 1.0f;
+                                        }
+                                        hit.owner = SWORD_EFFECT_OWNER;
+                                        hit.m_0000 = 1;
+                                        hit.flags = 1;
+                                        hit.m_000e = (char)weaponKind;
+                                        hit.settings[EFFECT_SETTING_AREA] = 2;
+                                        DAT_10daaa80.Start(DAT_108a6a58[DAT_104c00e8].effect, strikeAt, -1, 0,
+                                                           &DAT_10db6ee8[slot].matrix, 0, 0, 0, &hit, 0);
+                                        if ((weaponKind == ITEM_KIND_SWORD_LONG || weaponKind == ITEM_KIND_SWORD)
+                                            && DAT_1021f3c0[slot] == 3 && DAT_10daaae8[slot].m_0141 == 0)
+                                        {
+                                            char stun = 0;
+                                            if (weaponKind == ITEM_KIND_SWORD)
+                                                stun = 0x28;
+                                            DAT_10315350[slot] = stun + 0x14;
+                                            if (DAT_10daaae8[slot].m_00a8 != 0)
+                                                DAT_10315350[DAT_10daaae8[slot].m_00a4] = stun + 0x14;
+                                            hits++;
+                                        }
+                                    }
+                                }
+                            }
+                            if (hits < SWORD_EFFECT_MAX_HITS)
+                            {
+                                for (int extra = 0; extra < SWORD_EFFECT_MAX_HITS - hits; extra++)
+                                {
+                                    float angle = (float)FUN_1013f880() / 100.0f;
+                                    int radius = FUN_1013f880();
+                                    DAT_10daa600[extra] = DAT_10db6ee8[0].matrix;
+                                    float reach = (float)(radius % SWORD_EXTRA_RADIUS_SPREAD + SWORD_EXTRA_RADIUS_MIN);
+                                    DAT_10daa600[extra].m[MATRIX_TRANSLATION_X] =
+                                        (float)cos(angle) * reach + DAT_10daa600[extra].m[MATRIX_TRANSLATION_X];
+                                    DAT_10daa600[extra].m[MATRIX_TRANSLATION_Y] =
+                                        (float)sin(angle) * reach + DAT_10daa600[extra].m[MATRIX_TRANSLATION_Y];
+                                    DAT_10daa600[extra].m[MATRIX_TRANSLATION_Z] =
+                                        DAT_10daa600[extra].m[MATRIX_TRANSLATION_Z] + SWORD_EXTRA_RAISE;
+                                    strikeAt.Copy(DAT_10daa600[extra].GetTranslation());
+                                    strikeAt.z = strikeAt.z + SWORD_EFFECT_RAISE;
+                                    EffectOptions extraHit;
+                                    extraHit.m_0004 = (int)((float)-DAT_10daaae8[0].stats[STAT_EFFECT_PARAM] * DAT_10467508);
+                                    extraHit.m_0008 = (float)(DAT_108a6a58[DAT_104c00e8].strength * (DAT_102024c8 + 10) * 4)
+                                                      / EFFECT_STRENGTH_DIVISOR_LARGE;
+                                    extraHit.flags = 1;
+                                    ApplyLoadoutScale(extraHit.m_0008);
+                                    if (DAT_10c6566c != 0)
+                                    {
+                                        extraHit.m_0004 = 1;
+                                        extraHit.m_0008 = 1.0f;
+                                    }
+                                    extraHit.m_000e = (char)weaponKind;
+                                    extraHit.owner = SWORD_EFFECT_OWNER;
+                                    extraHit.m_0000 = 1;
+                                    extraHit.settings[EFFECT_SETTING_AREA] = 2;
+                                    DAT_10daaa80.Start(DAT_108a6a58[DAT_104c00e8].effect, strikeAt, -1, 0, &DAT_10daa600[extra],
+                                                       0, 0, 0, &extraHit, 0);
+                                }
+                            }
+                        }
+                        else if (DAT_104c00e8 == ATTACK_AREA_BEAM)
+                        {
+                            options.m_0004 = (int)((float)-DAT_10daaae8[0].stats[STAT_EFFECT_PARAM] * DAT_10467508);
+                            options.m_0008 = (float)((DAT_102024c8 + 10) * DAT_108a6a58[ATTACK_AREA_BEAM].strength * 4)
+                                             / EFFECT_STRENGTH_DIVISOR_LARGE;
+                            ApplyLoadoutScale(options.m_0008);
+                            options.m_000e = DAT_108f667c[DAT_10daabb8].m_0074;
+                            options.owner = SWORD_EFFECT_OWNER;
+                            options.settings[EFFECT_SETTING_AREA] = 2;
+                            options.flags = 1;
+                            if (DAT_10c6566c != 0)
+                            {
+                                options.m_0004 = 1;
+                                options.m_0008 = 1.0f;
+                            }
+                            options.settings[0] = DAT_108a6a58[ATTACK_AREA_BEAM].settingA;
+                            options.settings[1] = DAT_108a6a58[ATTACK_AREA_BEAM].settingB;
+                            Vec4 beamAt;
+                            beamAt.Fill(0.0f);
+                            beamAt.z = SWORD_EFFECT_RAISE;
+                            DAT_10daaa80.Start(DAT_108a6a58[DAT_104c00e8].effect, beamAt, -1, 0, 0, 0, 0,
+                                               &DAT_10db6ee8[0].matrix, &options, 0);
+                        }
+                        else
+                        {
+                            if (DAT_104c0173 == 0)
+                            {
+                                options.m_0004 = DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                                options.m_0008 = (float)DAT_108a6a58[DAT_104c00e8].strength;
+                            }
+                            else
+                            {
+                                options.m_0004 = -DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                                options.m_0008 = (float)DAT_108a6a58[DAT_104c00e8].strength * EFFECT_STRENGTH_THROWN;
+                            }
+                            options.m_0008 = options.m_0008 / EFFECT_STRENGTH_DIVISOR;
+                            ApplyLoadoutScale(options.m_0008);
+                            options.m_0008 = options.m_0008 * drillScale;
+                            options.m_001c = 1;
+                            options.m_0000 = 1;
+                            unsigned char modeFlags = (DAT_10447dd0 != 0) << 1 | DAT_104c0118;
+                            if (DAT_104c00e8 == 0x25 || DAT_104c00e8 == 0x28)
+                                modeFlags = modeFlags | 4;
+                            if (DAT_104c00e8 == 0x13 || DAT_104c00e8 == 0x30)
+                            {
+                                modeFlags = modeFlags | 0x10;
+                                if (DAT_104c00e8 == 0x30)
+                                    modeFlags = modeFlags | 0x30;
+                            }
+                            options.settings[EFFECT_SETTING_FLAGS] = modeFlags | 8;
+                            int helmetKind = DAT_1088e6b0[DAT_10daabb8].helmetKind;
+                            options.m_000e = 5;
+                            if (helmetKind == HELMET_KIND_RED)
+                                options.m_000e = 1;
+                            if (helmetKind == HELMET_KIND_BLUE)
+                                options.m_000e = 3;
+                            if (helmetKind == HELMET_KIND_WHITE)
+                                options.m_000e = 2;
+                            options.settings[EFFECT_SETTING_AREA] = 1;
+                            options.flags = 1;
+                            if (DAT_10c6566c != 0)
+                            {
+                                options.m_0004 = 1;
+                                options.m_0008 = 1.0f;
+                            }
+                            options.settings[0] = DAT_108a6a58[DAT_104c00e8].settingA;
+                            options.settings[1] = DAT_108a6a58[DAT_104c00e8].settingB;
+                            options.owner = ATTACK_EFFECT_OWNER;
+                            Node *attachNode = DAT_10db6ee8[0].root->Find(DAT_108a6a58[DAT_104c00e8].name, 0);
+                            if (_strnicmp(DAT_108a6a58[DAT_104c00e8].name, "scop", 4) == 0)
+                                DAT_104c02ee = 1;
+                            Vec4 effectAt;
+                            effectAt.Fill(0.0f);
+                            if (attachNode == 0)
+                                DAT_10daaa80.Start(DAT_108a6a58[DAT_104c00e8].effect, effectAt, -1, 0, 0, 0, 0,
+                                                   &DAT_10db6ee8[0].matrix, &options, 0);
+                            else
+                                DAT_10daaa80.Start(DAT_108a6a58[DAT_104c00e8].effect, effectAt, -1, 0,
+                                                   &attachNode->worldMatrix, 0, 0, &DAT_10db6ee8[0].matrix, &options, 0);
+                        }
+                    }
+secondEffect:
+                    // The second effect (while DAT_104c0170 is set): started once, then the flag clears.
+                    if (DAT_104c0170 != 0)
+                    {
+                        if (DAT_108a6a58[DAT_104c00e8].effect2 > 0)
+                        {
+                            int effectFrame = DAT_108a6a58[DAT_104c00e8].effect2Frame;
+                            if (effectFrame != -1 || DAT_10db6ee8[0].m_238c == 0)
+                            {
+                                if ((int)((float)effectFrame * DAT_104c00f0) != DAT_104c00f4)
+                                    goto thirdEffect;
+                            }
+                            EffectOptions options;
+                            DAT_104c0170 = 0;
+                            if (DAT_104c0173 == 0)
+                            {
+                                options.m_0004 = DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                                options.m_0008 = (float)DAT_108a6a58[DAT_104c00e8].strength;
+                            }
+                            else
+                            {
+                                options.m_0004 = -DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                                options.m_0008 = (float)DAT_108a6a58[DAT_104c00e8].strength * EFFECT_STRENGTH_THROWN;
+                            }
+                            options.m_0008 = options.m_0008 / EFFECT_STRENGTH_DIVISOR;
+                            ApplyLoadoutScale(options.m_0008);
+                            options.m_0008 = options.m_0008 * drillScale;
+                            options.m_001c = 1;
+                            options.m_0000 = 1;
+                            options.owner = ATTACK_EFFECT_OWNER;
+                            options.flags = 1;
+                            options.settings[EFFECT_SETTING_FLAGS] = (DAT_10447dd0 != 0) << 1 | DAT_104c0118;
+                            int helmetKind = DAT_1088e6b0[DAT_10daabb8].helmetKind;
+                            options.m_000e = 5;
+                            if (helmetKind == HELMET_KIND_RED)
+                                options.m_000e = 1;
+                            if (helmetKind == HELMET_KIND_BLUE)
+                                options.m_000e = 3;
+                            if (helmetKind == HELMET_KIND_WHITE)
+                                options.m_000e = 2;
+                            options.settings[0] = DAT_108a6a58[DAT_104c00e8].settingA;
+                            options.settings[1] = DAT_108a6a58[DAT_104c00e8].settingB;
+                            options.settings[EFFECT_SETTING_AREA] = 0;
+                            Vec4 effectAt;
+                            effectAt.Fill(0.0f);
+                            DAT_10daaa80.Start(DAT_108a6a58[DAT_104c00e8].effect2, effectAt, -1, 0, 0, 0, 0,
+                                               &DAT_10db6ee8[0].matrix, &options, 0);
+                        }
+                    }
+thirdEffect:
+                    // The third effect, at its frame.
+                    if (DAT_108a6a58[DAT_104c00e8].effect3 > 0)
+                    {
+                        int effectFrame = DAT_108a6a58[DAT_104c00e8].effect3Frame;
+                        if (effectFrame >= 0 || -DAT_104c00f4 == effectFrame || -effectFrame < DAT_104c00f4)
+                        {
+                            if ((int)((float)effectFrame * DAT_104c00f0) != DAT_104c00f4)
+                                goto attackSounds;
+                        }
+                        EffectOptions options;
+                        if (DAT_104c0173 == 0)
+                        {
+                            options.m_0004 = DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                            options.m_0008 = (float)DAT_108a6a58[DAT_104c00e8].strength;
+                        }
+                        else
+                        {
+                            options.m_0004 = -DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                            options.m_0008 = (float)DAT_108a6a58[DAT_104c00e8].strength * EFFECT_STRENGTH_THROWN;
+                        }
+                        options.m_0008 = options.m_0008 / EFFECT_STRENGTH_DIVISOR;
+                        if (DAT_10daabb4 == HELMET_THIRD_A || DAT_10daabb4 == HELMET_THIRD_B)
+                            options.m_0008 = options.m_0008 * EFFECT_STRENGTH_THROWN;
+                        options.m_0008 = options.m_0008 * drillScale;
+                        options.m_001c = 1;
+                        options.m_0000 = 1;
+                        options.flags = 1;
+                        options.settings[EFFECT_SETTING_FLAGS] = (DAT_10447dd0 != 0) << 1 | DAT_104c0118;
+                        int helmetKind = DAT_1088e6b0[DAT_10daabb8].helmetKind;
+                        options.m_000e = 5;
+                        if (helmetKind == HELMET_KIND_RED)
+                            options.m_000e = 1;
+                        if (helmetKind == HELMET_KIND_BLUE)
+                            options.m_000e = 3;
+                        if (helmetKind == HELMET_KIND_WHITE)
+                            options.m_000e = 2;
+                        options.settings[0] = DAT_108a6a58[DAT_104c00e8].settingA;
+                        options.settings[1] = DAT_108a6a58[DAT_104c00e8].settingB;
+                        options.settings[EFFECT_SETTING_AREA] = 0;
+                        options.owner = ATTACK_EFFECT_OWNER;
+                        Vec4 effectAt;
+                        effectAt.Fill(0.0f);
+                        DAT_10daaa80.Start(DAT_108a6a58[DAT_104c00e8].effect3, effectAt, -1, 0, 0, 0, 0,
+                                           &DAT_10db6ee8[0].matrix, &options, 0);
+                    }
+attackSounds:
+                    // The attack's two sounds, at their frames.
+                    if (DAT_108a6a58[DAT_104c00e8].sound > 0)
+                    {
+                        if ((int)((float)DAT_108a6a58[DAT_104c00e8].soundFrame * DAT_104c00f0) == DAT_104c00f4)
+                        {
+                            Vec4 soundAt = DAT_10db9210.GetTranslation();
+                            FUN_1003ad20(DAT_108a6a58[DAT_104c00e8].sound, &soundAt, 1.0f);
+                        }
+                    }
+                    if (DAT_108a6a58[DAT_104c00e8].sound2 > 0)
+                    {
+                        if ((int)((float)DAT_108a6a58[DAT_104c00e8].sound2Frame * DAT_104c00f0) == DAT_104c00f4)
+                        {
+                            Vec4 soundAt = DAT_10db9210.GetTranslation();
+                            FUN_1003ad20(DAT_108a6a58[DAT_104c00e8].sound2, &soundAt, 1.0f);
+                        }
+                    }
+                    // Early in a swing in some areas: turn away from the target (the nearest one of the character slots
+                    // LOCK_FIRST_MODEL.. when the locked one is gone).
+                    if (DAT_104c00f4 < SWING_TURN_FRAMES && steerX == 0.0f && steerY == 0.0f
+                        && (DAT_104c00e8 == 0x16 || DAT_104c00e8 == 0x17 || DAT_104c00e8 == 0x19))
+                    {
+                        int turnTarget = DAT_102024ac;
+                        if (turnTarget < 1)
+                        {
+                            float nearestDistance = TURN_NEAREST_START;
+                            int nearest = -1;
+                            for (int slot = LOCK_FIRST_MODEL; slot < DOOR_FIRST_MODEL; slot++)
+                            {
+                                if (DAT_104bfe30 == 0 && (DAT_1021f3c0[slot] == 'c' || DAT_1021f3c0[slot] == 3)
+                                    && DAT_10daaae8[slot].stats[STAT_BUSY] == 0 && DAT_10daaae8[slot].stats[STAT_HEALTH] > 0
+                                    && DAT_10daaae8[slot].m_0141 == 0)
+                                {
+                                    float distance = DAT_1020e338[slot]->GetTranslation().DistanceSquared(ahead);
+                                    if (distance < nearestDistance)
+                                    {
+                                        nearest = slot;
+                                        nearestDistance = distance;
+                                    }
+                                }
+                            }
+                            if (nearest < 1)
+                            {
+                                nearest = -1;
+                                for (int slot = LOCK_FIRST_MODEL; slot < DOOR_FIRST_MODEL; slot++)
+                                {
+                                    if (DAT_104bfe30 == 0 && (DAT_1021f3c0[slot] == 'c' || DAT_1021f3c0[slot] == 3)
+                                        && DAT_10daaae8[slot].stats[STAT_HEALTH] > 0 && DAT_10daaae8[slot].m_0141 == 0)
+                                    {
+                                        float distance = DAT_1020e338[slot]->GetTranslation().DistanceSquared(ahead);
+                                        if (distance < nearestDistance)
+                                        {
+                                            nearest = slot;
+                                            nearestDistance = distance;
+                                        }
+                                    }
+                                }
+                            }
+                            if (nearest >= 1)
+                                turnTarget = nearest;
+                        }
+                        if (DAT_104c00e8 != 0x2b && turnTarget > 0 && DAT_10daaae8[turnTarget].stats[STAT_HEALTH] > 0)
+                            DAT_10db6ee8[0].FaceAwayFrom(&DAT_10db6ee8[turnTarget]);
+                    }
+                    // Facing the point the camera looks at (not in the two areas that have their own).
+                    if (DAT_104c00e8 != 0x30 && DAT_104c00e8 != 0x2b && DAT_104bfe20 != 0 && steerX == 0.0f && steerY == 0.0f
+                        && DAT_102024c0 > 0 && DAT_10daaae8[DAT_102024c0].stats[STAT_HEALTH] > 0)
+                    {
+                        DAT_10db6ee8[0].FaceAway(DAT_108029a8);
+                        if (DAT_10447dd0 != 0)
+                            DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
+                    }
+                    if (DAT_104c00e8 != 0x18 && DAT_104c00f4 < 4)
+                        DAT_104c018c = DAT_10db6ee8[0].targetHeading;
+                    DAT_104c00f4 = DAT_104c00f4 + 1;
+                    // The swing's camera kick and body pose follow the record's key bank (frame * attack speed).
+                    {
+                        float kickStart;
+                        float kickEnd;
+                        float ignored;
+                        DAT_108a6a58[DAT_104c00e8].sample.Sample((int)((float)DAT_104c00f4 * DAT_104c00ec - 1.0f), &kickStart,
+                                                                 &ignored, &ignored, &ignored, 0);
+                        DAT_108a6a58[DAT_104c00e8].sample.Sample((int)((float)DAT_104c00f4 * DAT_104c00ec), &kickEnd, &ignored,
+                                                                 &ignored, &ignored, 0);
+                        if (DAT_104c00f4 == 1)
+                        {
+                            // The first frame: the scope's light effect, the idle flag and the settled pose.
+                            if (DAT_104c01e0 == 0 && DAT_104c00e8 != 0x2b
+                                && (DAT_104c02ee != 0 || _strnicmp(DAT_108a6a58[DAT_104c00e8].name, "scop", 4) == 0))
+                            {
+                                Node *scopePoint = DAT_10db6ee8[0].root->Find("scop-pt", 0);
+                                Node *charBase = DAT_10db6ee8[0].root->Find("charbase0", 0);
+                                Vec4 scopeAt;
+                                if (scopePoint != 0 && charBase != 0)
+                                {
+                                    DAT_10f66948.Copy(scopePoint->worldMatrix.GetTranslation());
+                                    EffectOptions options;
+                                    options.flags = 1;
+                                    options.owner = ATTACK_EFFECT_OWNER;
+                                    DAT_10daaa80.Start(SCOPE_EFFECT, scopeAt, -1, 0, &scopePoint->worldMatrix,
+                                                       (int)&charBase->worldMatrix, 0, 0, &options, 0);
+                                }
+                            }
+                            if (DAT_10db6ee8[0].m_238c == 0)
+                                DAT_104c0132 = 0;
+                            DAT_1046812c = DAT_10db6ee8[0].targetHeading;
+                            if (DAT_10db6ee8[0].mode != 1)
+                            {
+                                DAT_10db6ee8[0].mode = 1;
+                                DAT_10db6ee8[0].verticalSpeed = 0.0f;
+                                DAT_10db6ee8[0].m_237c = 1.0f;
+                            }
+                        }
+                        // The way the swing moves the player: shift (in the facing direction) and the two probe offsets.
+                        Vec4 playerPos = DAT_10db9210.GetTranslation();
+                        DAT_102199b0 = DAT_10db6ee8[0].targetHeading;
+                        Vec4 shift;
+                        shift.Fill(0.0f);
+                        shift.y = kickStart - kickEnd;
+                        shift.RotateZ(-DAT_10db6ee8[0].heading);
+                        shift.Copy(playerPos + shift);
+                        if ((shift.Distance(playerPos) < 1.0f && DAT_104c00e8 != 0x13) || DAT_104c00e8 == 0x31)
+                        {
+                            steerX = 0.0f;
+                            steerY = 0.0f;
+                        }
+                        Vec4 probeNear;
+                        probeNear.Fill(0.0f);
+                        probeNear.y = SWING_PROBE_NEAR_Y;
+                        probeNear.z = SWING_PROBE_NEAR_Z;
+                        probeNear.RotateZ(-DAT_10db6ee8[0].heading);
+                        Vec4 probeFar;
+                        probeFar.Fill(0.0f);
+                        probeFar.y = SWING_PROBE_FAR_Y;
+                        probeFar.z = SWING_PROBE_FAR_Z;
+                        probeFar.RotateZ(-DAT_10db6ee8[0].heading);
+                        if (DAT_104c00f4 == 1)
+                        {
+                            if (DAT_102024c0 < 1)
+                                DAT_104463f0 = 0.0f;
+                            else
+                                DAT_104463f0 = (DAT_108029a8.z - DAT_10db9210.GetTranslation().z) / SWING_DROP_DIVISOR;
+                        }
+                        shift.z = 0.0f;
+                        if (DAT_10447dd0 == 1 && DAT_104c00f4 < SWING_CAMERA_FRAMES)
+                            DAT_104c01a4 = 1;
+                        // A strong swing kicks the camera and starts the burst effect on its first frames.
+                        if (strongSwing == 1 && DAT_104c00f4 < SWING_CAMERA_FRAMES)
+                        {
+                            DAT_104c01a4 = 1;
+                            DAT_104c0171 = 7;
+                            DAT_104c0156 = 6;
+                            DAT_10db7c34 = 0.7f;
+                            Vec4 burstAt;
+                            burstAt.Fill(0.0f);
+                            Matrix4 burstMatrix = DAT_10db9210;
+                            burstMatrix.m[MATRIX_TRANSLATION_X] = DAT_10db6ee8[0].bipNode->worldMatrix.m[MATRIX_TRANSLATION_X];
+                            burstMatrix.m[MATRIX_TRANSLATION_Y] = DAT_10db6ee8[0].bipNode->worldMatrix.m[MATRIX_TRANSLATION_Y];
+                            burstMatrix.m[MATRIX_TRANSLATION_Z] = DAT_10db6ee8[0].bipNode->worldMatrix.m[MATRIX_TRANSLATION_Z];
+                            EffectOptions options;
+                            options.flags = 1;
+                            if (DAT_10c655f0 == 6)
+                                DAT_10daaa80.Start(BURST_EFFECT_POPON, burstAt, -1, 0, 0, 0, 0, &burstMatrix, &options, 0);
+                            else
+                                DAT_10daaa80.Start(BURST_EFFECT, burstAt, -1, 0, 0, 0, 0, &burstMatrix, &options, 0);
+                        }
+                        else if (DAT_10db7c34 < 1.0f)
+                            DAT_10db7c34 = DAT_10db7c34 + SWING_FADE_STEP;
+                        if (strongSwing == 1 && DAT_104c00f4 == 1)
+                        {
+                            Vec4 soundAt = DAT_10db9210.GetTranslation();
+                            FUN_1003ad20(SOUND_STRONG_SWING, &soundAt, 1.0f);
+                        }
+                        if (DAT_10447dd0 != 0)
+                        {
+                            if (DAT_104c00f4 == 1)
+                            {
+                                Vec4 soundAt = DAT_10db9210.GetTranslation();
+                                FUN_1003ad20(SOUND_SWING_MODE, &soundAt, 1.0f);
+                            }
+                            if (DAT_10447dd0 != 0)
+                            {
+                                if (DAT_10447dd0 != 2 && DAT_102024c0 > 0)
+                                {
+                                    DAT_10db6ee8[0].mode = 0;
+                                    DAT_10db6ee8[0].verticalSpeed = 0.0f;
+                                    DAT_10db6ee8[0].m_237c = 1.0f;
+                                }
+                                if (DAT_104c00f4 < SWING_CAMERA_FRAMES)
+                                {
+                                    Vec4 targetAt = DAT_1020e338[DAT_102024c0]->GetTranslation();
+                                    if (SWING_TARGET_MIN_X < targetAt.x
+                                        && (DAT_102239d0[DAT_102024c0] != 0 || DAT_10daaae8[DAT_102024c0].stats[STAT_HEALTH] > 0))
+                                        DAT_108029a8.Copy(targetAt);
+                                    float aimHeight = DAT_108029a8.z - SWING_AIM_LOWER;
+                                    shift.z = aimHeight - DAT_10db9210.GetTranslation().z;
+                                    shift.x = DAT_108029a8.x;
+                                    shift.y = DAT_108029a8.y;
+                                }
+                                if (DAT_10468128 == 0)
+                                {
+                                    if (DAT_10447dd0 != 2 && DAT_104c00f4 > 3
+                                        && DAT_10db9210.GetTranslation().Distance(DAT_108392c8) < SWING_ARRIVE_DISTANCE)
+                                        goto swingArrived;
+                                }
+                                else
+                                {
+swingArrived:
+                                    DAT_10db6ee8[0].mode = 1;
+                                    DAT_10db6ee8[0].verticalSpeed = 0.0f;
+                                    DAT_10db6ee8[0].m_237c = 1.0f;
+                                    DAT_10447dd0 = 2;
+                                    DAT_104c00e0 = 1;
+                                }
+                                DAT_108392c8.Copy(DAT_10db9210.GetTranslation());
+                                probeNear.z = 0.0f;
+                            }
+                        }
+                        if (shift.z > SWING_SHIFT_LIMIT)
+                            shift.z = SWING_SHIFT_LIMIT;
+                        else if (shift.z < -SWING_SHIFT_LIMIT)
+                            shift.z = -SWING_SHIFT_LIMIT;
+                        if (strongSwing != 2 && DAT_10db6ee8[0].IsClearAny(&probeNear) != 0)
+                        {
+                            if (DAT_102024c0 > 0 && shift.z == 0.0f && fabs(DAT_108029a8.z - DAT_10db9248) < SWING_SAME_HEIGHT
+                                && (DAT_10db9210.GetTranslation() - DAT_108029a8).Length2D() < SWING_SAME_DISTANCE)
+                                goto swingStepDone;
+                            if (DAT_10447dd0 != 2)
+                            {
+                                if (DAT_10db6ee8[0].m_229c == 0)
+                                    DAT_10db6ee8[0].MoveTowards(shift.x, shift.y, *(int *)&shift.z);
+                                FUN_1016b260(DAT_10db6ee8[0].m_23d8.x, DAT_10db6ee8[0].m_23d8.y);
+                            }
+                        }
+                    }
+swingStepDone:
+                    DAT_104c00e0 = DAT_104c00e0 - 1;
+                    if (DAT_104c00e0 == 0)
+                    {
+                        DAT_10db6ee8[0].targetHeading = DAT_102199b0;
+                        DAT_10db6ee8[0].mode = 1;
+                        if (DAT_10db6ee8[0].m_229c == 0)
+                            DAT_10db6ee8[0].verticalSpeed = 0.0f;
+                        DAT_10db6ee8[0].m_237c = 1.0f;
+                        DAT_10db7c34 = 1.0f;
+                    }
+                }
             }
             // STAGE 5: player input and its actions, last part (ends the block), pseudo.c lines 5865-6523
         }

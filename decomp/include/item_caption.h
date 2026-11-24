@@ -25,10 +25,15 @@ struct ItemText
 
     int useScript;                // 0x64: number of the script text run when the item is used (DAT_10c5e1c4)
 
-    char pad_0068[0x98];
+    char pad_0068[0xc];
+
+    int m_0074;                   // 0x74: weapon kind of the item (2 or 3 = swords)
+
+    char pad_0078[0x88];
 
     char modelPath[0x140];        // 0x100: the item's model file
 
 };
+typedef char ItemTextSizeCheck[sizeof(ItemText) == 0x240 ? 1 : -1];
 
 #endif

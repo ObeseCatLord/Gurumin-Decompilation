@@ -57,7 +57,7 @@ extern "C" EffectHold DAT_1020dcf8[EFFECT_HOLD_COUNT];
 extern "C" char DAT_1020e0f8[];                           // second banner text (empty = none)
 extern "C" int DAT_10210b28;
 extern "C" float DAT_10210b2c;
-extern "C" int DAT_102199b0;
+extern "C" float DAT_102199b0;
 extern "C" char DAT_10219bc0[];                           // the message shown
 extern "C" char DAT_1021a360;
 extern "C" Node *DAT_1021b548[0x20];                       // nodes attached to a parent (each removed from DAT_10467e20[i] on reset)
@@ -104,7 +104,7 @@ extern "C" int DAT_1042d918[0x10];
 extern "C" int DAT_1042d9e4;
 extern "C" int DAT_1042da68;                              // frames left
 extern "C" float DAT_1042e3f0[0x60][16][16];                 // copy of DAT_1049f200 made when the heights are built (0x100169c0)
-extern "C" int DAT_104463f0;
+extern "C" float DAT_104463f0;
 extern "C" int DAT_104463f8[0x80];                       // event slots: state
 extern "C" int DAT_10446ea8;
 extern "C" unsigned char DAT_104472b0[0x60];          // per ground object: dug-hole flag (below 2 = copied to DAT_104c00be)
@@ -120,7 +120,7 @@ extern "C" Node *DAT_10467e20[0x20];                       // the parent of each
 extern "C" char DAT_10467ea0[];                          // message subtext line (empty = none)
 extern "C" int DAT_10467f20;
 extern "C" int DAT_10468128;
-extern "C" int DAT_1046812c;
+extern "C" float DAT_1046812c;
 extern "C" int DAT_10468230[0x80];                       // event slots: second value
 extern "C" unsigned char DAT_10468430[0x60];          // per ground object: dig timer (1..29 = reset to 1 when dug)
 extern "C" int DAT_104684b0[115];
@@ -318,8 +318,8 @@ extern "C" char DAT_104c00d4;
 extern "C" char DAT_104c00d5;
 extern "C" int DAT_104c00d8;
 extern "C" int DAT_104c00dc;                              // play time
-extern "C" int DAT_104c00ec;
-extern "C" int DAT_104c00f0;
+extern "C" float DAT_104c00ec;
+extern "C" float DAT_104c00f0;                           // attack speed factor (1.0 while an attack plays, scales the effect frames)
 extern "C" int DAT_104c00f4;
 extern "C" int DAT_104c0108;
 extern "C" char DAT_104c010c;
@@ -358,7 +358,7 @@ extern "C" char DAT_104c0171;
 extern "C" char DAT_104c0172;
 extern "C" char DAT_104c0173;
 extern "C" int DAT_104c0180;
-extern "C" int DAT_104c018c;
+extern "C" float DAT_104c018c;
 extern "C" char DAT_104c0190;
 extern "C" int DAT_104c0194;
 extern "C" int DAT_104c019c;

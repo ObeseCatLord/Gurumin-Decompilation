@@ -65,4 +65,8 @@ extern "C" Vec4 DAT_10836dd8[10];            // the pad stick's last 10 directio
 extern "C" unsigned int DAT_1042dda8[30];    // the last 30 input codes (greetings, walking, action), newest last
 extern "C" void FUN_100114a0(void);          // 0x100114a0
 extern "C" Matrix4 DAT_10836c98;           // copy of the player's matrix, raised for the held item's effects
+extern "C" Matrix4 DAT_10daa600[4];            // the matrices the extra sword strikes are placed with
+extern "C" float DAT_10467508;               // scale of the player's effect parameter (EffectOptions::m_0004 of attack effects)
+extern "C" Vec4 DAT_108392c8;                 // where the swing last ended up
+extern "C" int FUN_1016b260(float x, float y);   // 0x1016b260
 #endif

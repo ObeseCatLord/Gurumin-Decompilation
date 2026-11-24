@@ -71,6 +71,8 @@
 
 #include "map_setup.h"
 
+#include "drill_claws.h"
+
 #include "field_update.h"
 
 #include "title_screen.h"
@@ -663,6 +665,149 @@ static __forceinline void StartDoorEffect(AnimModel *door)
     Matrix4 placement = door->matrix;
     DAT_10daaa80.Start(DOOR_SWING_EFFECT, origin, -1, 0, 0, 0, 0, &placement, 0, 0);
 }
+
+// Stage 6: the player's trail (ring of recent positions DAT_10802ad8, write index DAT_104c022c, phase DAT_104c0228).
+// Phase 0..TRAIL_PHASE_LIMIT counts ticks of safe walking; from TRAIL_REPLAY_BASE on the player is put back on the trail.
+#define TRAIL_MASK 0xf                  // ring index mask (PLAYER_TRAIL_LENGTH - 1)
+#define TRAIL_REPLAY_BASE 10000         // phase of the glide back after a drop; the phase is 10000 + ticks
+#define TRAIL_REPLAY_ARRIVE 10010       // the glide ends (turn to the side, the last motion)
+#define TRAIL_REPLAY_SWEEP_END 10015    // from here the glide only eases out
+#define TRAIL_RESUME_PHASE 0x14         // walking phase after the landing
+#define TRAIL_BLEND_STEPS 5             // blend weights run 0..5 in fifths
+#define TRAIL_FADE_START 20             // step where the first ease weight starts
+#define TRAIL_SWEEP_STEPS 15            // step where the second ease weight starts
+#define TRAIL_GLIDE_STEPS 15            // blends done at once when sliding back up to the trail
+#define TRAIL_GLIDE_NEAR 33.0f          // blended point closer than this to the focus keeps the older point
+#define TRAIL_FOCUS_DROP 110.0f         // the focus point is this far below the trail point
+#define TRAIL_SPOT_NEAR -10.0f          // collision radius (w) of the near spot probe
+#define TRAIL_SPOT_FAR -20.0f           // and of the far one
+#define TRAIL_MOTION_START 0x18         // motions of the glide
+#define TRAIL_MOTION_LAND 0x1a
+#define TRAIL_MOTION_END 7
+#define TRAIL_MOTION_TURN 99
+#define TRAIL_SIDE_OFFSET 1.57075f      // quarter turn from the heading to the probe direction
+#define TRAIL_SIDE_ANGLE 1.0471667f     // the side probes are turned by this angle (60 degrees)
+#define TRAIL_PROBE_REACH 20.0f         // wall probes sit this far ahead
+#define TRAIL_PROBE_LIFT 9.0f           // above the probe height
+#define TRAIL_PROBE_LOW 20.0f           // probe height on level ground
+#define TRAIL_PROBE_HIGH 50.0f          // and when well below the highest ground seen
+#define TRAIL_PROBE_MARGIN 8.0f
+#define TRAIL_LANDING_LIFT 5.0f         // height of the landing probe
+#define TRAIL_PHASE_LIMIT 500           // the walking phase stops counting here
+#define TRAIL_SLIDE_TICKS 8             // sliding back up is only tried this soon after a refill
+#define TRAIL_SLIDE_HOLD 4              // ticks the slide state lasts
+#define TRAIL_DROP_MIN 25.0f            // standing this far below the trail point starts a slide
+#define TRAIL_DROP_REACH 50.0f          // and horizontally closer than this
+#define TRAIL_DROP_FALL 90.0f           // dropping this far below the trail point starts the glide back
+
+// The ring entry written `back` steps before the write index `newest`.
+static __forceinline Vec4 &TrailBack(unsigned int newest, int back)
+{
+    return DAT_10802ad8[(newest - back) & TRAIL_MASK];
+}
+
+// Puts the player at a position: the model's own placement call and the matrix translation.
+static __forceinline void PlacePlayer(float x, float y, float z)
+{
+    DAT_10db6ee8[0].SetPosition(x, y, z);
+    DAT_10db6ee8[0].matrix._41 = x;
+    DAT_10db6ee8[0].matrix._42 = y;
+    DAT_10db6ee8[0].matrix._43 = z;
+}
+
+// out = base * (1 - weight / 5) + toward * (weight / 5)
+static __forceinline void BlendTrailPoint(Vec4 &out, const Vec4 &base, const Vec4 &toward, int weight)
+{
+    out.Copy(base * ((float)(TRAIL_BLEND_STEPS - weight) / 5.0f) + toward * ((float)weight / 5.0f));
+}
+
+// True when the player standing at the spot the probes describe would be stuck: the near probe is inside the map
+// and clear, but the player-sized probes (w = radius) are not.
+static __forceinline bool TrailSpotBlocked(Vec4 &probeA, Vec4 &probeB)
+{
+    if (!(DAT_10db6ee8[0].IsClearOfMapLimited(&probeA) && DAT_10db6ee8[0].IsClear(&probeA)))
+        return false;
+    probeA.w = TRAIL_SPOT_NEAR;
+    probeB.w = TRAIL_SPOT_FAR;
+    return !(DAT_10db6ee8[0].IsClearOfMapLimited(&probeA) && DAT_10db6ee8[0].IsClearFlagged(&probeA) &&
+             DAT_10db6ee8[0].IsClearOfMapLimited(&probeB) && DAT_10db6ee8[0].IsClearFlagged(&probeB));
+}
+
+// Probes for a wall ahead of the player in direction `angle` (a high and a low point). When the way is clear
+// but the map blocks the player-sized probes, refills the whole trail with the spot ahead and returns true.
+static __forceinline bool TrailBlockedAhead(Vec4 &probe, Vec4 &probeLow, double angle, float height)
+{
+    float lift = height + TRAIL_PROBE_LIFT;
+    probe.x = (float)cos(angle) * TRAIL_PROBE_REACH;
+    probe.y = (float)sin(angle) * TRAIL_PROBE_REACH;
+    probe.z = lift;
+    probeLow.Copy(probe);
+    if (!(DAT_10db6ee8[0].IsClearOfMapLimited(&probe) && DAT_10db6ee8[0].IsClear(&probe)))
+        return false;
+    probe.z = lift;
+    probeLow.Copy(probe);
+    probe.z = height - 1.0f;
+    probeLow.z = height - 11.0f;
+    if (DAT_10db6ee8[0].IsClearOfMap(&probe) && DAT_10db6ee8[0].IsClearFlagged(&probe) &&
+        DAT_10db6ee8[0].IsClearOfMap(&probeLow) && DAT_10db6ee8[0].IsClearFlagged(&probeLow))
+        return false;
+    probe.z = lift;
+    for (int step = PLAYER_TRAIL_LENGTH; step != 0; step--)
+    {
+        DAT_10802ad8[DAT_104c022c].Copy(DAT_10db6ee8[0].matrix.GetTranslation() + probe);
+        DAT_104c022c = DAT_104c022c + 1 & TRAIL_MASK;
+    }
+    return true;
+}
+
+// Stage 6: regeneration, forced walk, the pit area.
+#define REGEN_HEALTH_FAST_TICKS 0x78    // helmet regeneration periods (frames)
+#define REGEN_HEALTH_SLOW_TICKS 0x96
+#define REGEN_STAMINA_FAST_TICKS 10
+#define REGEN_STAMINA_SLOW_TICKS 0xf
+#define HELMET_REGEN_HEALTH_FAST 0x8000 // DAT_104c02c8 bits of the worn helmet
+#define HELMET_REGEN_HEALTH_SLOW 0x4000
+#define HELMET_REGEN_STAMINA_FAST 0x80000
+#define HELMET_REGEN_STAMINA_SLOW 0x40000
+#define HEALTH_FLASH_TICKS 8            // DAT_104c011d: how long the health gauge flashes after a gain
+#define HELD_ITEM_TIMER_LIMIT 1000      // DAT_104bfdf0 values from here are not countdowns
+#define STICK_FLICK 5.0f                // stick deflection that counts as a push
+#define STICK_FLICK_TICKS 20            // how long a push is remembered
+#define FORCED_RUN_SPEED 7.0            // forced stick values above this make the player run
+#define FORCED_WALK_SPEED_SCALE 2.5f    // motion speed scale of a forced walk
+#define PIT_ICE_BELOW 120.0f            // the frozen pit surface counts from this far below its floor height
+#define PIT_ICE_ABOVE 10.0f             // to this far above
+#define ACTION_GAUGE_MAX 0x1e           // DAT_104687b4 stops counting here
+#define PIT_FLOOR_MARGIN 60.0f          // player lower than this under the floor is in the pit
+#define PIT_STEP 25                     // and the margin grows by this per DAT_104bfe50
+#define ARM_SPEED_MAX 30.0f             // the arm node's speed scale range
+#define ARM_SPEED_STEP 2.0f
+
+// Stage 6: item pad, overlay shift, swimming, the pit water.
+#define ITEM_PAD_MAX 0xf                // DAT_104c0099: item pad counter range
+#define OVERLAY_SHIFT_MAX 8             // DAT_104bfe18: frames the overlay mode shifts the screen
+#define OVERLAY_SHIFT_DIVISOR 32        // shift in pixels = back-buffer size * frames / 32
+#define YOTSU_HIDE_MAX 0x1e             // DAT_104c0301 counts up to this while swimming
+#define YOTSU_HIDE_MIN 9                // and the "@yotsu" node is hidden from here
+#define YOTSU_NODE_FLAG 4               // Node::flags bit that shows it
+#define MOTION_SURFACE 0x81
+#define MOTION_PIT_SWIM 0x1b
+#define PIT_EXIT_SPEED 0.4f             // m_237c after leaving the pit
+#define PIT_SPLASH_MIN_SPEED 2.0f       // entering slower than this makes no splash
+#define PIT_SINK_TICKS 0x10             // ticks the player is pushed down after entering
+#define PIT_SINK_SPEED_SCALE 2.4f
+#define PIT_SPLASH_LIFT 20.0f
+#define PIT_SPLASH_REACH 50.0f
+#define PIT_SPLASH_EFFECT 0xab
+#define PIT_SPLASH_SOUND 0x370
+
+// Stage 6: gesture counters, carried-object pickup, timed event.
+#define GESTURE_LONG_TICKS 0xf          // DAT_104c0330 resets after this many ticks
+#define GESTURE_SHORT_TICKS 7           // DAT_104c0331 resets after this many
+#define PICKUP_FACING_DOT 0.3           // facing the carried object closer than this counts as looking at it
+#define PICKUP_FACING_TICKS 0xf         // ticks of looking before the pickup starts
+#define MOTION_PICKUP 0xf
+#define TIMED_EVENT_BASE 500
 
 // 0x1011d810 (the in-game frame). Mode 1 of the frame step. The first call resets the mode's globals (DAT_104bf8bc
 // was 0 until then). Each call computes how many engine ticks have passed since the last one (at most
@@ -4507,7 +4652,578 @@ releaseHold:
         }
 afterPlayerInput:
 
-        // STAGE 6: the player after the input, the camera and the world, pseudo.c lines 6525-7860
+        DrillClaws_Update();
+        if (DAT_104bfe6c == 0)
+        {
+            // Two offsets built and never read again (their constructors and Set calls stay in the original)
+            Vec4 backFar;
+            Vec4 backNear;
+            backFar.Set(0.0f, 0.0f, -30.0f, 0.0f);
+            backNear.Set(0.0f, 0.0f, -20.0f, 0.0f);
+            if (DAT_104c0068 == 0)
+            {
+                // Phase >= TRAIL_REPLAY_BASE: after a drop the player glides back along the ring of recent positions
+                if (DAT_104c0228 >= TRAIL_REPLAY_BASE)
+                {
+                    int step = DAT_104c0228 - TRAIL_REPLAY_BASE;
+                    unsigned int newest = DAT_104c022c;
+                    Vec4 *from = &TrailBack(newest, 4);
+                    Vec4 focus = *from;
+                    focus.z = focus.z - TRAIL_FOCUS_DROP;
+                    Vec4 blendA;
+                    Vec4 blendB;
+                    bool blocked = false;
+                    if (DAT_104c0228 == TRAIL_REPLAY_BASE)
+                        TrailBack(newest, 3).Copy(TrailBack(newest, 1));
+                    if (DAT_104c0228 < TRAIL_REPLAY_SWEEP_END)
+                    {
+                        int weightB = TRAIL_BLEND_STEPS;
+                        if (step < TRAIL_BLEND_STEPS + 1)
+                            weightB = step;
+                        int weightA = step;
+                        if (step > TRAIL_BLEND_STEPS - 1)
+                            weightA = TRAIL_BLEND_STEPS - 1;
+                        BlendTrailPoint(blendA, TrailBack(newest, 1), focus, weightA);
+                        BlendTrailPoint(blendB, TrailBack(newest, 1), focus, weightB);
+                        if ((focus - blendA).Length2D() < TRAIL_GLIDE_NEAR)
+                            blendA.Copy(TrailBack(newest, 3));
+                        TrailBack(newest, 3).Copy(blendA);
+                        TrailBack(newest, 5).Copy(blendB);
+                        if (DAT_104c0228 != TRAIL_REPLAY_ARRIVE)
+                            DAT_10db6ee8[0].FaceAway(*from);
+                    }
+                    else
+                    {
+                        int weightA = step - TRAIL_FADE_START;
+                        if (weightA > 0 && weightA > TRAIL_BLEND_STEPS)
+                            weightA = TRAIL_BLEND_STEPS;
+                        else
+                            weightA = weightA & ((weightA <= 0) - 1);
+                        int weightB = TRAIL_BLEND_STEPS;
+                        if (step - TRAIL_SWEEP_STEPS < TRAIL_BLEND_STEPS + 1)
+                            weightB = step - TRAIL_SWEEP_STEPS;
+                        BlendTrailPoint(blendA, TrailBack(newest, 3), *from, weightA);
+                        BlendTrailPoint(blendB, TrailBack(newest, 5), *from, weightB);
+                    }
+                    Vec4 probeA;
+                    Vec4 probeB;
+                    probeA.Fill(0.0f);
+                    probeB.Fill(0.0f);
+                    Vec4 savedPos = DAT_10db6ee8[0].matrix.GetTranslation();
+                    DAT_10db6ee8[0].matrix.SetTranslation(*from);
+                    if (TrailSpotBlocked(probeA, probeB))
+                        blocked = true;
+                    DAT_10db6ee8[0].matrix.SetTranslation(savedPos);
+                    PlacePlayer(blendA.x, blendA.y, blendB.z);
+                    if (DAT_104c0228 == TRAIL_REPLAY_BASE)
+                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(TRAIL_MOTION_START, 2, 5, 1.0f);
+                    if (DAT_104c0228 == TRAIL_REPLAY_BASE + 11)
+                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(TRAIL_MOTION_LAND, 2, 2, 1.0f);
+                    if (DAT_104c0228 == TRAIL_REPLAY_BASE + 22)
+                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(TRAIL_MOTION_END, 1, 5, 1.0f);
+                    if (DAT_104c0228 == TRAIL_REPLAY_ARRIVE)
+                    {
+                        if (DAT_104c023d != 0)
+                        {
+                            DAT_10db6ee8[0].PlayMotion(TRAIL_MOTION_TURN, 0, 5, 1.0f);
+                            DAT_10db6ee8[0].SnapHeadingToSide();
+                        }
+                        Vec4 probeC;
+                        probeC.Fill(0.0f);
+                        if (blocked && DAT_10db6ee8[0].IsClearOfMapLimited(&probeC) && DAT_10db6ee8[0].IsClear(&probeC))
+                            blocked = true;
+                        else
+                            blocked = false;
+                    }
+                    else
+                        DAT_104c0228 = DAT_104c0228 + 1;
+                    DAT_10db6ee8[0].m_238c = 1;
+                    if (DAT_104c0228 == TRAIL_REPLAY_BASE + 24)
+                    {
+                        blendB.Copy(*from);
+                        PlacePlayer(blendB.x, blendB.y, blendB.z);
+                        DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
+                        DAT_104687b0 = 1;
+                    }
+                    if (DAT_104c0228 == TRAIL_REPLAY_BASE + 25)
+                    {
+                        blendB.Copy(*from);
+                        PlacePlayer(blendB.x, blendB.y, blendB.z);
+                        DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
+                        DAT_104c009c = 0;
+                        DAT_10468128 = 0;
+                        Vec4 ahead;
+                        ahead.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].heading - TRAIL_SIDE_OFFSET) * TRAIL_PROBE_REACH;
+                        ahead.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].heading - TRAIL_SIDE_OFFSET) * TRAIL_PROBE_REACH;
+                        ahead.z = TRAIL_LANDING_LIFT;
+                        if (DAT_10db6ee8[0].IsClearOfMapLimited(&ahead) && DAT_10db6ee8[0].IsClear(&ahead))
+                        {
+                            blendB.Copy(*from + ahead);
+                            PlacePlayer(blendB.x, blendB.y, blendB.z);
+                        }
+                        DAT_104687b0 = 1;
+                        DAT_104c0228 = TRAIL_RESUME_PHASE;
+                    }
+                    if (!blocked)
+                    {
+                        DAT_10db6ee8[0].PlayMotion(2, 0, 5, 1.0f);
+                        ResetPlayerTrail();
+                    }
+                    goto trailDone;
+                }
+            }
+            else
+            {
+                DAT_104c022d = 0;
+                DAT_10db6ee8[0].m_006c = 0;
+                DAT_104c0228 = 0;
+            }
+            if (DAT_10db6ee8[0].m_238c == 0 || DAT_104687b0 == 0)
+            {
+                // On solid ground: probe for walls, keep the trail, fall back to it after a drop
+                if (DAT_104c00d0 == 0 && DAT_104bfe30 == 0 && DAT_104c0300 == 0 && DAT_104bfe50 == 0 && DAT_104bfe4c == 0 &&
+                    DAT_1032d69c != 0 && DAT_104c022d == 0)
+                {
+                    float height = TRAIL_PROBE_LOW;
+                    if ((DAT_1020d430 == 0 && DAT_10db6ee8[0].m_229c == 0) ||
+                        DAT_10db6ee8[0].matrix._43 < DAT_10802bd8.z - TRAIL_PROBE_MARGIN)
+                        height = TRAIL_PROBE_HIGH;
+                    Vec4 probe;
+                    Vec4 probeLow;
+                    bool refilled = false;
+                    if (TrailBlockedAhead(probe, probeLow, -DAT_10db6ee8[DAT_104bf8b4].heading - TRAIL_SIDE_OFFSET, height))
+                        refilled = true;
+                    else if (DAT_104c0228 != 0 &&
+                             TrailBlockedAhead(probe, probeLow,
+                                               TRAIL_SIDE_ANGLE - (DAT_10db6ee8[DAT_104bf8b4].heading + TRAIL_SIDE_OFFSET), height))
+                        refilled = true;
+                    else if (DAT_104c0228 != 0 &&
+                             TrailBlockedAhead(probe, probeLow,
+                                               (-DAT_10db6ee8[DAT_104bf8b4].heading - TRAIL_SIDE_OFFSET) - TRAIL_SIDE_ANGLE, height))
+                        refilled = true;
+                    if (refilled)
+                        DAT_104c0228 = 0;
+                    if (refilled || DAT_104c0228 < TRAIL_PHASE_LIMIT)
+                        DAT_104c0228 = DAT_104c0228 + 1;
+                    if (DAT_104c022d == 0)
+                    {
+                        // Standing clearly below the trail: slide back up to it
+                        if (DAT_104c0228 < TRAIL_SLIDE_TICKS)
+                        {
+                            if (DAT_10db6ee8[0].matrix._43 < TrailBack(DAT_104c022c, 2).z - TRAIL_DROP_MIN)
+                            {
+                                if ((TrailBack(DAT_104c022c, 2) - DAT_10db6ee8[0].matrix.GetTranslation()).Length2D() < TRAIL_DROP_REACH)
+                                {
+                                    unsigned int newest = DAT_104c022c;
+                                    Vec4 probeA;
+                                    Vec4 probeB;
+                                    probeA.Fill(0.0f);
+                                    probeB.Fill(0.0f);
+                                    Vec4 savedPos = DAT_10db6ee8[0].matrix.GetTranslation();
+                                    Vec4 *from = &TrailBack(newest, 4);
+                                    DAT_10db6ee8[0].matrix.SetTranslation(*from);
+                                    if (TrailSpotBlocked(probeA, probeB))
+                                    {
+                                        Vec4 focus = *from;
+                                        focus.z = focus.z - TRAIL_FOCUS_DROP;
+                                        Vec4 blendA;
+                                        Vec4 blendB;
+                                        TrailBack(newest, 3).Copy(savedPos);
+                                        for (int glide = 0; glide < TRAIL_GLIDE_STEPS; glide++)
+                                        {
+                                            int weightB = glide < TRAIL_BLEND_STEPS + 1 ? glide : TRAIL_BLEND_STEPS;
+                                            int weightA = glide < TRAIL_BLEND_STEPS ? glide : TRAIL_BLEND_STEPS - 1;
+                                            BlendTrailPoint(blendA, savedPos, focus, weightA);
+                                            BlendTrailPoint(blendB, savedPos, focus, weightB);
+                                            if ((focus - blendA).Length2D() < TRAIL_GLIDE_NEAR)
+                                                blendA.Copy(TrailBack(newest, 3));
+                                            TrailBack(newest, 3).Copy(blendA);
+                                            TrailBack(newest, 5).Copy(blendB);
+                                        }
+                                        DAT_10db6ee8[0].matrix._41 = blendA.x;
+                                        DAT_10db6ee8[0].matrix._43 = blendB.z;
+                                        DAT_10db6ee8[0].matrix._42 = blendA.y;
+                                        probeA.w = 0.0f;
+                                        if (DAT_10db6ee8[0].IsClearOfMapLimited(&probeA) && DAT_10db6ee8[0].IsClear(&probeA))
+                                        {
+                                            DAT_10db6ee8[0].matrix.SetTranslation(savedPos);
+                                            DAT_104c022d = TRAIL_SLIDE_HOLD;
+                                            DAT_10db6ee8[0].m_006c = 1;
+                                        }
+                                    }
+                                    DAT_10db6ee8[0].matrix.SetTranslation(savedPos);
+                                }
+                            }
+                        }
+                        else
+                            DAT_10db6ee8[0].m_006c = 0;
+                    }
+                    else
+                    {
+                        DAT_10db6ee8[0].m_006c = 1;
+                        if ((TrailBack(DAT_104c022c, 2) - DAT_10db6ee8[0].matrix.GetTranslation()).Length2D() > TRAIL_DROP_REACH ||
+                            DAT_104bfe50 != 0 || DAT_104c0300 != 0 || DAT_104bfe4c != 0 || DAT_104bfe30 != 0 || DAT_104c00d0 != 0)
+                        {
+                            DAT_104c022d = 0;
+                            DAT_10db6ee8[0].m_006c = 0;
+                            DAT_104c0228 = 0;
+                        }
+                        else if (DAT_10db6ee8[0].matrix._43 < TrailBack(DAT_104c022c, 2).z - TRAIL_DROP_FALL)
+                        {
+                            TrailBack(DAT_104c022c, 1).Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                            DAT_104c0228 = TRAIL_REPLAY_BASE;
+                            FUN_100114a0();
+                            DAT_104c022d = 0;
+                            if (DAT_104bfdc8 != 0)
+                            {
+                                DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
+                                DAT_10db6ee8[0].m_0075 = 0;
+                                DAT_104bfdc8 = 0;
+                                DAT_104bfdcc = 0;
+                                DAT_104c0090 = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Airborne or riding: the trail follows the player, one position per tick
+                if (DAT_104c0228 != 0)
+                {
+                    for (int step = PLAYER_TRAIL_LENGTH; step != 0; step--)
+                    {
+                        DAT_10802ad8[DAT_104c022c].Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                        DAT_104c022c = DAT_104c022c + 1 & TRAIL_MASK;
+                    }
+                }
+                DAT_104c0228 = 0;
+                DAT_10802ad8[DAT_104c022c].Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                DAT_104c022c = DAT_104c022c + 1 & TRAIL_MASK;
+                DAT_10db6ee8[0].m_006c = 0;
+                if (DAT_104c022d != 0)
+                    DAT_104c022d = DAT_104c022d - 1;
+            }
+        }
+trailDone:
+        // Helmet regeneration: health and stamina come back by themselves while nothing else is going on
+        if (DAT_1032d69c == 0 || DAT_104bfe1c != 0 || DAT_104c00d0 > 1 || FUN_1015d510() != 0 || DAT_104c0135 != 0 ||
+            DAT_104bfe78 != 0 || DAT_104bfe6c != 0 || DAT_104bfd08 != 0 || DAT_104bfd60 != 0 ||
+            DAT_10db6ee8[DAT_104bf8b4].M_1017b160() != 0)
+        {
+            DAT_1101d87c = 1;
+        }
+        else
+        {
+            unsigned int helmetSettings = DAT_104c02c8;
+            unsigned int frame = DAT_104bf890;
+            DAT_1101d87c = 0;
+            if (frame % REGEN_HEALTH_FAST_TICKS == 0 && (helmetSettings & HELMET_REGEN_HEALTH_FAST) != 0)
+            {
+                int health = DAT_10daaae8[0].stats[STAT_HEALTH] + 1;
+                if (DAT_10daaae8[0].stats[STAT_MAX_HEALTH] < health)
+                    health = DAT_10daaae8[0].stats[STAT_MAX_HEALTH];
+                DAT_104c011d = HEALTH_FLASH_TICKS;
+                DAT_10daaae8[0].stats[STAT_HEALTH] = health;
+                FUN_1000e750();
+            }
+            else if (steerX == 0.0f && steerY == 0.0f && frame % REGEN_HEALTH_SLOW_TICKS == 0 &&
+                     (helmetSettings & HELMET_REGEN_HEALTH_SLOW) != 0)
+            {
+                int health = DAT_10daaae8[0].stats[STAT_HEALTH] + 1;
+                if (DAT_10daaae8[0].stats[STAT_MAX_HEALTH] < health)
+                    health = DAT_10daaae8[0].stats[STAT_MAX_HEALTH];
+                if (DAT_10daaae8[0].stats[STAT_HEALTH] != health)
+                    DAT_104c011d = HEALTH_FLASH_TICKS;
+                DAT_10daaae8[0].stats[STAT_HEALTH] = health;
+                FUN_1000e750();
+            }
+            if ((frame % REGEN_STAMINA_FAST_TICKS == 0 && (helmetSettings & HELMET_REGEN_STAMINA_FAST) != 0) ||
+                (steerX == 0.0f && steerY == 0.0f && frame % REGEN_STAMINA_SLOW_TICKS == 0 &&
+                 (helmetSettings & HELMET_REGEN_STAMINA_SLOW) != 0))
+            {
+                DAT_10c64ad8 = DAT_10c64ad8 + 1;
+                FUN_1000e750();
+            }
+        }
+        DAT_10802bd8.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+        // Held-item timer: when it runs out the player goes back to the idle pose
+        if (DAT_104bfdf0 != 0 && DAT_104bfdf0 < HELD_ITEM_TIMER_LIMIT)
+        {
+            DAT_10db6ee8[0].motionFrame = DAT_10db6ee8[0].motionFrame + 1;
+            DAT_104bfdf0 = DAT_104bfdf0 - 1;
+            if (DAT_104bfdf0 == 0 && DAT_104c0319 == 0)
+            {
+                DAT_104c0319 = 0;
+                FUN_100121e0(0);
+                DAT_10db6ee8[0].m_0294 = 0;
+                DAT_10db6ee8[0].motionFrame = 0;
+                DAT_10db6ee8[0].PlayMotion(2, 0, 5, 1.0f);
+                FUN_1013faf0();
+            }
+        }
+        // How long ago the stick last pushed each way (counts down from 20)
+        if (steerX < -STICK_FLICK)
+            DAT_104c0158[0] = STICK_FLICK_TICKS;
+        if (STICK_FLICK < steerX)
+            DAT_104c0158[1] = STICK_FLICK_TICKS;
+        if (steerY < -STICK_FLICK)
+            DAT_104c0158[2] = STICK_FLICK_TICKS;
+        if (STICK_FLICK < steerY)
+            DAT_104c0158[3] = STICK_FLICK_TICKS;
+        if (DAT_104c0158[0] != 0)
+            DAT_104c0158[0] = DAT_104c0158[0] - 1;
+        if (DAT_104c0158[1] != 0)
+            DAT_104c0158[1] = DAT_104c0158[1] - 1;
+        if (DAT_104c0158[2] != 0)
+            DAT_104c0158[2] = DAT_104c0158[2] - 1;
+        if (DAT_104c0158[3] != 0)
+            DAT_104c0158[3] = DAT_104c0158[3] - 1;
+        DAT_10db6ee8[0].m_0d44 = 0;
+        // Forced walk (a script moves the player with DAT_102559f0 / DAT_1042d9e4)
+        if (DAT_104bfd0c != 0)
+        {
+            DAT_10db6ee8[0].motion->m_0008 = 1.0f;
+            if (DAT_104bfe6c == 0)
+            {
+                steerX = (float)DAT_102559f0;
+                steerY = (float)DAT_1042d9e4;
+                if (fabs((double)DAT_102559f0) > FORCED_RUN_SPEED || fabs((double)steerY) > FORCED_RUN_SPEED)
+                {
+                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(1, 0, 5, 1.0f);
+                    moveInput = 1;
+                }
+                else
+                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(0, 0, 5, 1.0f);
+                DAT_104bfd0c = DAT_104bfd0c - 1;
+                if (DAT_104bfd0c == 0)
+                {
+                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(2, 0, 5, 1.0f);
+                    DAT_104bfd10 = 0;
+                    steerX = 0.0f;
+                    steerY = 0.0f;
+                }
+            }
+            else
+                DAT_104bfd0c = 0;
+            DAT_102027ec = FORCED_WALK_SPEED_SCALE;
+            if (DAT_104c0024 > 0)
+            {
+                DAT_102027ec = FORCED_WALK_SPEED_SCALE;
+                DAT_10db6ee8[DAT_104bf8b4].Push(steerX, steerY, 0.0f);
+                steerX = 0.0f;
+                steerY = 0.0f;
+                moveInput = 0;
+                DAT_10db6ee8[0].motion->m_0008 = DAT_102027ec / FORCED_WALK_SPEED_SCALE;
+            }
+        }
+        DAT_10203430 = DAT_104bfe1c == 0;
+        // Frozen water over the pit: stepping onto the ice inside the pit area arms DAT_104c01d8
+        if (DAT_104c02dc != 0 && DAT_104bfe24 - PIT_ICE_BELOW < DAT_10db6ee8[0].matrix._43 &&
+            DAT_10db6ee8[0].matrix._43 < DAT_104bfe24 + PIT_ICE_ABOVE)
+        {
+            int y = (int)DAT_10db6ee8[0].matrix._42;
+            int x = (int)DAT_10db6ee8[0].matrix._41;
+            if (x >= (int)DAT_104d29e8.x && y >= (int)DAT_104d29e8.y && x <= (int)DAT_104d29f8.x && y <= (int)DAT_104d29f8.y)
+                DAT_104c01d8 = 3;
+        }
+        if (DAT_104687b4 < ACTION_GAUGE_MAX)
+            DAT_104687b4 = DAT_104687b4 + 1;
+        // Standing in the pit area (the pit's floor rises with DAT_104bfe50)
+        if (DAT_104bfe28 == 0)
+            DAT_104bfe50 = 0;
+        else
+        {
+            Vec4 playerPos;
+            playerPos.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+            if (DAT_104bfe24 - PIT_FLOOR_MARGIN + (float)(DAT_104bfe50 * PIT_STEP) <= playerPos.z || DAT_104c0228 >= TRAIL_REPLAY_BASE)
+                DAT_104bfe50 = 0;
+            else
+            {
+                int y = (int)playerPos.y;
+                int x = (int)playerPos.x;
+                if (x >= (int)DAT_104d29e8.x && y >= (int)DAT_104d29e8.y && x <= (int)DAT_104d29f8.x && y <= (int)DAT_104d29f8.y)
+                    DAT_104bfe50 = 1;
+                else
+                    DAT_104bfe50 = 0;
+            }
+        }
+        // The swimming arm's speed scale follows the pit state
+        if (DAT_10db6ee8[0].root != 0)
+        {
+            if ((DAT_104bfe50 != 0 || DAT_104c0300 != 0) && DAT_10db6ee8[0].root->children[1]->m_0298.y < ARM_SPEED_MAX)
+            {
+                DAT_10db6ee8[0].root->children[1]->m_0298.y = DAT_10db6ee8[0].root->children[1]->m_0298.y + ARM_SPEED_STEP;
+                if (ARM_SPEED_MAX < DAT_10db6ee8[0].root->children[1]->m_0298.y)
+                    DAT_10db6ee8[0].root->children[1]->m_0298.y = ARM_SPEED_MAX;
+            }
+            if (DAT_10db6ee8[0].root != 0 && DAT_104bfe50 == 0 && DAT_104c0300 == 0 &&
+                0.0f < DAT_10db6ee8[0].root->children[1]->m_0298.y)
+            {
+                DAT_10db6ee8[0].root->children[1]->m_0298.y = DAT_10db6ee8[0].root->children[1]->m_0298.y - ARM_SPEED_STEP;
+                if (DAT_10db6ee8[0].root->children[1]->m_0298.y < 0.0f)
+                    DAT_10db6ee8[0].root->children[1]->m_0298.y = 0.0f;
+            }
+        }
+        // STAGE 6c: the pit effects (DAT_104bfe28 != 0, every other frame), pseudo.c lines 7177-7337
+        // Item-menu pad state and the screen shift of the overlay mode
+        if (DAT_104c009a == 0)
+        {
+            if (DAT_104c0099 != 0)
+                DAT_104c0099 = DAT_104c0099 - 1;
+        }
+        else if (DAT_104c0099 < ITEM_PAD_MAX)
+            DAT_104c0099 = DAT_104c0099 + 1;
+        if (DAT_104bfe1c == 0)
+        {
+            if (0 < DAT_104bfe18)
+                DAT_104bfe18 = DAT_104bfe18 - 1;
+            DAT_10f654b4 = -(DAT_10202b24 * DAT_104bfe18 / OVERLAY_SHIFT_DIVISOR);
+            DAT_10f654b8 = -(DAT_10202b28 * DAT_104bfe18 / OVERLAY_SHIFT_DIVISOR);
+            if (DAT_104bfd74 == 4)
+                DAT_104c009a = 1;
+            else
+            {
+                DAT_104c009a = 0;
+                DAT_104c0099 = 0;
+            }
+        }
+        else
+        {
+            if (DAT_104bfe18 < OVERLAY_SHIFT_MAX)
+                DAT_104bfe18 = DAT_104bfe18 + 1;
+            DAT_10f654b4 = -(DAT_10202b24 * DAT_104bfe18 / OVERLAY_SHIFT_DIVISOR);
+            DAT_10f654b8 = -(DAT_10202b28 * DAT_104bfe18 / OVERLAY_SHIFT_DIVISOR);
+            FUN_1000d620(0, 0, 10);
+            DAT_104c009a = 1;
+        }
+        // Swimming in the water of the pit: the "@yotsu" node is hidden for a moment each time the player surfaces
+        if (DAT_104c0300 != 0 && DAT_104c0228 < TRAIL_REPLAY_BASE)
+        {
+            if (DAT_104c0301 < YOTSU_HIDE_MAX)
+                DAT_104c0301 = DAT_104c0301 + 1;
+            if (DAT_104c0301 > YOTSU_HIDE_MIN && DAT_104c0304 != 0)
+                DAT_104c0304->flags = DAT_104c0304->flags & ~YOTSU_NODE_FLAG;
+            if (DAT_104c0300 != 0 && (DAT_104c0300 = DAT_104c0300 - 1, DAT_104c0300 == 0))
+            {
+                DAT_10db6ee8[0].PlayMotion(MOTION_SURFACE, 1, 5, 1.0f);
+                DAT_104c0301 = 0;
+                if (DAT_104c0304 != 0)
+                    DAT_104c0304->flags = DAT_104c0304->flags | YOTSU_NODE_FLAG;
+            }
+        }
+        if (DAT_104bfe50 == 0 || DAT_104bfe78 != 0 || DAT_104c0228 > TRAIL_REPLAY_BASE - 1)
+        {
+            // Out of the pit
+            if (DAT_104c00e0 == 0 && DAT_10db6ee8[DAT_104bf8b4].mode == 2)
+                DAT_10db6ee8[DAT_104bf8b4].mode = 1;
+            if (DAT_104bfe4c != 0)
+            {
+                DAT_1021a360 = 0;
+                DAT_104687b0 = 1;
+                DAT_10db6ee8[0].m_237c = PIT_EXIT_SPEED;
+                DAT_104bfe4c = 0;
+                FUN_1000f360(0, 1);
+            }
+        }
+        else
+        {
+            // In the pit: the first tick splashes, then the player is pushed down by the fall speed
+            if (DAT_104bfe4c == 0)
+            {
+                if (DAT_10db6ee8[0].m_237c <= PIT_SPLASH_MIN_SPEED)
+                    DAT_104bfe54 = PIT_SINK_TICKS;
+                else
+                {
+                    Vec4 splash;
+                    splash.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                    splash.z = DAT_104bfe24 + PIT_SPLASH_LIFT;
+                    splash.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - TRAIL_SIDE_OFFSET) * PIT_SPLASH_REACH + splash.x;
+                    splash.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - TRAIL_SIDE_OFFSET) * PIT_SPLASH_REACH + splash.y;
+                    EffectOptions options;
+                    options.flags = 1;
+                    DAT_10daaa80.Start(PIT_SPLASH_EFFECT, splash, -1, -1, 0, 0, 0, 0, &options, 0);
+                    Vec4 soundAt = DAT_10db6ee8[0].matrix.GetTranslation();
+                    FUN_1003ad20(PIT_SPLASH_SOUND, &soundAt, 1.0f);
+                    DAT_104bfe58 = DAT_10db6ee8[0].m_237c * PIT_SINK_SPEED_SCALE;
+                    DAT_104bfe54 = 0;
+                }
+                if (DAT_104c00e0 != 0)
+                {
+                    DAT_104c00e0 = 0;
+                    DAT_10db6ee8[0].mode = 1;
+                }
+                DAT_10db6ee8[0].alpha = 1.0f;
+                FUN_1000f360(0, 1);
+                DAT_10db6ee8[0].PlayMotion(MOTION_PIT_SWIM, 0, 5, 1.0f);
+                DAT_104bfe4c = 1;
+            }
+            if (DAT_104bfe54 < PIT_SINK_TICKS)
+            {
+                DAT_104bfe54 = DAT_104bfe54 + 1;
+                DAT_10db6ee8[0].m_238c = 1;
+                DAT_10db6ee8[DAT_104bf8b4].Push(0.0f, 0.0f, -DAT_104bfe58);
+                DAT_10db6ee8[0].m_238c = 0;
+                if (DAT_104bfe58 < -1.0f)
+                    DAT_104bfe58 = DAT_104bfe58 + 1.0f;
+            }
+            if (DAT_10db6ee8[DAT_104bf8b4].m_229c == 0 && DAT_10db6ee8[DAT_104bf8b4].mode == 1)
+                DAT_10db6ee8[DAT_104bf8b4].mode = 2;
+            DAT_1021a360 = 0;
+        }
+        // STAGE 6d: the camera and the world (the look-at swing DAT_104c01e0), pseudo.c lines 7474-7808
+        // Hit-stop counters of the walking gesture (DAT_104c0330 / DAT_104c0331 run out and reset)
+        if (DAT_104c00e0 == 0 &&
+            ((DAT_104c0330 > 2 && (DAT_104c0330 = DAT_104c0330 + 1, DAT_104c0330 > GESTURE_LONG_TICKS)) ||
+             ((DAT_104c0330 == 1 || DAT_104c0330 == 2) && (DAT_104c0331 = DAT_104c0331 + 1, DAT_104c0331 > GESTURE_SHORT_TICKS))))
+        {
+            DAT_104c0330 = 0;
+            DAT_104c0331 = 0;
+        }
+        if (DAT_104bfd0c == 0 && (steerX != 0.0f || steerY != 0.0f))
+        {
+            if (DAT_1101de30 != 2)
+                DAT_1101de30 = 0;
+            DAT_104c0090 = 0;
+        }
+        if (DAT_1101de30 == 2)
+            DAT_1101de30 = 1;
+        // Walking toward a carried-object spot: after enough ticks of facing it the player picks it up
+        if (DAT_104bfdf0 == 0)
+        {
+            if (DAT_104c00e0 == 0 && DAT_1032d69c != 0 && DAT_104bfdd0 != 0 && DAT_104bfdc8 == 0 && steerX == 0.0f &&
+                steerY == 0.0f && DAT_10db6ee8[0].m_238c != 0 && DAT_104c0228 < TRAIL_REPLAY_BASE)
+            {
+                Vec4 toCarried = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation() - DAT_10db6ee8[0].matrix.GetTranslation();
+                toCarried.Normalized3();
+                Vec4 facing;
+                facing.x = 0.0f;
+                facing.y = -1.0f;
+                facing.z = 0.0f;
+                facing.RotateZ(-DAT_10db6ee8[0].targetHeading);
+                if (Vec3_Dot(&facing, &toCarried) > PICKUP_FACING_DOT)
+                    DAT_104c019c = DAT_104c019c + 1;
+                if (DAT_104c0090 == 0 && DAT_104c019c > PICKUP_FACING_TICKS && DAT_104c00e0 == 0)
+                {
+                    DAT_104bfea9 = 0;
+                    DAT_104bfdc8 = 2;
+                    DAT_104bfdcc = 10;
+                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_PICKUP, 0, 5, 1.0f);
+                }
+            }
+            else
+                DAT_104c019c = 0;
+        }
+        // Timed event: DAT_104c02e4 counts down in ticks; a multiple of 100 raises event (value / 100 + 500)
+        if (DAT_104c02e4 != 0 && DAT_104c0135 == 0 && DAT_104bfe1c == 0)
+        {
+            DAT_104c02e4 = DAT_104c02e4 - 1;
+            if ((int)DAT_104c02e4 % 100 == 0)
+            {
+                DAT_10874848.RegisterEvent((int)DAT_104c02e4 / 100 + TIMED_EVENT_BASE);
+                DAT_104c02e4 = 0;
+            }
+        }
         // STAGE 7: the events, the carried object and the model list, pseudo.c lines 7861-8944
 
         DAT_104c0098 = 0;

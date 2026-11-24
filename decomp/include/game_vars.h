@@ -231,7 +231,7 @@ extern "C" char DAT_104bfe48;
 extern "C" int DAT_104bfe4c;
 extern "C" int DAT_104bfe50;
 extern "C" int DAT_104bfe54;
-extern "C" int DAT_104bfe58;
+extern "C" float DAT_104bfe58;
 extern "C" int DAT_104bfe5c;
 extern "C" int DAT_104bfe60;
 extern "C" int DAT_104bfe64;

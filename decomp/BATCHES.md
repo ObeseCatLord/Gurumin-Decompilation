@@ -397,3 +397,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 333 | 32 | match | Sonnet subagents: AnimModel::Draw, Camera_Refresh matched; CollideModel as a Node member fixed IsClear/IsClearAny/IsClearFlagged; seven drafts; 845 matched, 844 under the rules, fuzzy 25.20% |
 | 334 | 33 | match | Sonnet subagents: Enemy_PulseAndCharge, Char_UpdateAttachSlots, Enemy_StalkAndBreathe, Enemy_StalkAndLunge, ModelBank_CompareDistance matched; 13 drafts; 849 matched, 848 under the rules, fuzzy 27.18% |
 | 335 | 34 | match | Sonnet subagents on QUEUE section 5: Menu_SaveLoad matched (inlined MessageWindow_SetTitle explains its alignment pads); 11 drafts; 850 matched, 849 under the rules, fuzzy 28.34% |
+| 336 | 35 | match | Sonnet subagents: Npc_HurlAtPlayer matched by a near-miss retry; Menu_DrawScene to 12 bytes; 4 drafts; 851 matched, 850 under the rules, fuzzy 29.05% |

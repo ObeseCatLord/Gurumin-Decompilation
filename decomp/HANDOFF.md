@@ -20,7 +20,7 @@ reading it, then `AGENTS.md`.
 | Fully linked | 0.00% of code (151 of 264 units complete) |
 | Matched | 19.21% of code, 857 of 1212 functions |
 | Matched under the rules | 19.17% of code, 856 of the 857 matched functions |
-| Fuzzy match | 36.89% |
+| Fuzzy match | 37.62% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -174,6 +174,9 @@ function) and node_world.cpp (0) still break rule 2.
   DrillClaws_Update 1008fea0, SoccerGame_UpdateCpuPlayer 10032240, Game::LoadMapData 10002440 (game.h pads split into
   typed tables; one *(MapFront *)this cast until Game/DAT_10874848 is split), Char_UpdateByKind 100f9670 (uses
   words[WORD_*] macros: name the CharState members before matching).
+- Batch 344: drafts Script_GameBuiltin 10138280 (frame 0x8f0 vs 0x81c), Menu_Main 10112140 (10 bytes over, frame right),
+  Enemy_SpitAndCharge 1006be40 (18 bytes short). FUN_100b4f00's register tie depends on the declaration count of
+  matrix4.h (NOTES); DirectionMatrix and Multiply now live there.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

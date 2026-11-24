@@ -405,3 +405,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 341 | 38 | match | Sonnet subagents: 4 near-miss retries, no match (permuter candidates); 856 matched, fuzzy 34.18% |
 | 342 | 38 | match | Sonnet subagents: Scene_DrawFrame matched; 4 drafts; union lesson; 857 matched, 856 under the rules, fuzzy 35.61% |
 | 343 | 38 | match | Sonnet subagents: 8 drafts of very large functions incl. the kind dispatcher and LoadMapData; 857 matched, fuzzy 36.89% |
+| 344 | 38 | match | Sonnet subagents: 3 drafts (Script_GameBuiltin, Menu_Main, Enemy_SpitAndCharge); matrix4.h tie fixed; 857 matched, fuzzy 37.62% |

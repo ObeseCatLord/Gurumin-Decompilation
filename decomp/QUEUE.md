@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (313)
+## 1. Walls to retry (316)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -207,10 +207,12 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10115cd0` 2163 — ItemDictionary_Update (item_dictionary.cpp, 2176 bytes, 119 off): only the prologue register choice differs (original loads the DAT_104bf8bc flag into eax after push eax with the constant 1 in ecx and later in ebp; ours loads the flag into ecx before push -1 with 1 in eax, so mov [x],eax is 1 byte shorter and a nop shifts the first loop); obtained[4] (frame 0x3c0), function-scope locals, x==0/!x/local flag, store orders and the fade ladder all tried. FUN_101603c0 is int* here but unsigned* in save_write.cpp (original sar)
 - [ ] `10137b10` 1889 — Game_FrameStep (frame_step.cpp, 1904 vs 1889 bytes; was named Screenshot_Capture): one register residue spreads through the function: the original keeps the constant 1 in ebx throughout and writes 100 as an immediate or through esi, ours puts 100 in ebx and 1 in edi; limit local vs direct stats compare, store order, reversed compare and a mode local tried
 - [ ] `10138280` 10107 — Script_GameBuiltin (script_game_builtin.cpp, 10992 vs 10107 bytes, draft; cases in the original's address order): frame 0x8f0 vs 0x81c (the char buffers do not share slots like the original's), Recover keeps the GetTranslation pointer in esi, PLAY_MOVIE post-loop block order, PLAY_MOVIE2 uses ebp as the zero register; the later cases (Custom, Ksk, Kabe, Type) not compared
+- [ ] `1013b700` 10376 — Game_Main (game_main.cpp, 10512 vs 10376 bytes, complete draft): frame 0xb40 vs 0xbb0, so the 256-byte path buffers (executableFolder, pathFileName, dataFolder, userName, appDllPath, userFolder, checkedPath, tableDll, demoName) need the original's scoping (original offsets 0x3d4/0x3f4/0x4bc/0x5c0/0x6c0/0x7c4); the original loads ecx = DAT_10836c70 / DAT_10804bf8 before FUN_10161970, FUN_1013eeb0, FUN_1013eed0 and FUN_101649c0 (methods with `this` unused, defined as extern "C" free functions in engine_1013e/engine_base/mmv_texreg); text_fields.cpp declares FUN_1013dfc0 with the wrong parameters
 - [ ] `1013e260` 428 — UserFolder_FindNt: identical apart from block placement (the original puts the strcpy(base) branch out of line after the fsetup.dll loop and jumps back; ours keeps it before the loop); if/else orders and the combined test tried
 - [ ] `1013e4f0` 431 — GameWindow::WindowProc (the base RenderWindow::WindowProc 0x1013e450 is DefWindowProc): an inline base WindowProc called from each case duplicates the tails like the original but cl 13.00 then propagates message constants and does not cache window/wParam in ebx/edi; has a WM_KEYDOWN case whose body reduces to the default (switch splits at 0x10e like the original); the original duplicates the DefWindowProc tail into each breaking case, ours shares one
 - [ ] `1013e790` 561 — Names_Expand (/Od unit src_od/names_od.cpp): code identical, only the stack slot of `p` differs (the original puts it below found/matches/best); function-scope declaration orders tried
 - [ ] `1013e9d0` 689 — Screenshot_ReadBackBuffer: identical except the row address in the 32-bit and 16-bit loops (original loads y then multiplies by the pitch, ours loads the pitch first); operand orders and index form tried
+- [ ] `1013fbb0` 10920 — TextureManager::OnResetDevice (Render_OnResetDevice, render_on_reset.cpp, 10928 vs 10920 bytes, ~7 real diffs): all 69 shader sites match; the gamma-ramp prologue loads DAT_10f6551c into ecx with an early lea edx,[ecx+0x7f] (ours eax, later); the memory total DAT_10f0ff80 in both crossfade texture loops is load/add/store (mov ecx,[total]; mov esi,[i]; add ecx,eax; mov [total],ecx) where ours emits add [total],eax (+=, x=x+y, y+x, temporaries tried); loop pads follow
 - [ ] `10142790` 846 — Input::Update (input_poll.cpp): two bytes off; after the force-feedback EnumDevices the original compares the result with the zero register (cmp eax, ebx), cl 13.00 here test eax, eax; result locals and other spellings tried (a local changes the whole register allocation)
 - [ ] `10142b20` 519 — Joystick_IsButtonDown (__stdcall): same cases and code; the tail-merged axis tests are placed differently (the original keeps the full low-x test in the default-layout switch and jumps to it from the mapped cases, ours the other way round)
 - [ ] `10142dd0` 741 — Keyboard_IsButtonDown: same returns; in the original the default layout (map 0) of buttons 0, 2, 5, 7 and 10-13 shares the return blocks of the fixed maps 0x12, 1, 0x13, 2 and 0x14-0x17 and the blocks are laid out in another order; the plain nested switch here gives each its own block
@@ -307,6 +309,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101a1640` 3132 — Node::Query (node_sphere_query.cpp, 3216 vs 3132 bytes): sphere test body as SphereHitsMesh plus CastSegment2-style pre-checks and the static/child walks; the compiler hoists a zero constant into ebp (xor ebp,ebp, cmp mem,ebp) where the original keeps the name argument in ebp from the start and uses test reg,reg (also changes the prologue); the zero register appears only with both the static and child loops. Tried a char cell local, shared cell, branch order, one result variable, hoisted locals, dropping the static exclude test
 - [ ] `101a3000` 6726 — Node::ApplyCommandText (node_commands.cpp; throw() drops the EH frame the Matrix4 temporaries would add): all instructions identical, 15 bytes off = two spill slots [esp+0x14]/[esp+0x18] swapped (the original shares frames, the setanitb/setaniset loop counters and the iklim degrees in 0x14, the byte-offset induction variable and setanitb mode in 0x18); function-scope frames/degrees, declaration order, const/long tried. Node::NextToken (obj_symbols row) is the same address as text_token.cpp's extern "C" FUN_1019b280
 - [ ] `101a4a60` 2157 — Node::ScanChunks (model_scan_chunks.cpp, 30 diff lines): only the two plug allocations (PLUG, PLU2): the original loads the size, pops the Mem_Alloc arguments and pushes the Read arguments before storing plugs[g] (mov [esi],eax just before the Read call), ours stores first; the debug name "c->m_plugdata[g]" suggests an allocation macro on a local c; a data local, assignment inside the arguments, a size copy and reading plugs[g] back tried
+- [ ] `101a58a0` 10762 — Node::ParseChunks (It3_ParseChunks, model_parse_chunks.cpp, 10800 vs 10762 bytes): code matches through KAN3; the frame is 8 bytes larger (0x3134 vs 0x312c: nodeIndex at esp+0x18 in the original, 0x28 in ours), which shifts every stack offset; LIGT/LIG2 fogColour.w load hoisted; esi/edi swapped in the plug loops; MAT2 lacks the quality restore of the shared helper. Untried: the exact per-chunk local set, a goto skip tail, no `found` in MANI/MAN2
 - [ ] `101a82d0` 1153 — Node::BuildMesh (node_mesh_build.cpp, rule-clean): everything matches (aligned frame, the unrolled table loop, the strength-reduced triangle loop) except the operand order of the VertexPack addresses: the original writes [index*0x74 + packs], ours [packs + index*0x74] (5 places) and the register of the third vertex index load (ecx, ours esi). The first vertex now matches (index kept in `vertex`, no Vertex pointer). Tried: (list + packs)->, i + packs, char-pointer offsets in either order, unsigned/short/long/const/register indices, unsigned tables, table lookups inline, a pack pointer (caches packs), an inline PackAt(packs, i) helper, a fresh material local, indices through a row pointer (loses the strength reduction). cl seems to put a reloaded member pointer as base and a parameter as index; the original treats packs like a parameter.
 - [ ] `101a8e60` 2060 — Node::Collide (node_mesh_hits.cpp, rule-clean): body after the region prologue is SegmentHitsMesh's matched code. Original: both kind arms load the cell into bl (the register caching DAT_11b04514) and share the tail test bl,bl/mov ecx,6/je; both CDL arms cmp memory; the switched-off jump shares the tag-fail restore (mov ebp then mov edi). Ours: one arm of each pair cmp memory, the other loads, so tails do not merge. Tried (2026-11-23): local cell var (gets dl, list moves to edi), local initialised from DAT_11b04514, join-test after both arms (the compiler tail-duplicates it), inline CellState helper, bool cast, ternary on the list. The 'CDL region table' DAT_11affdd8 was DAT_11afffe8 - 0x210 (folded '0' digits): fixed.
 - [ ] `101a9670` 2574 — Node::RayCast (node_ray_cast.cpp, 2608 vs 2574 bytes): body identical to CastSegment past the pre-checks. Pre-check wall (all three casts) is register assignment, not a missing helper: the original keeps flag, cell byte and first name char in one bl in every arm, so cl merges the arm tails ("test bl; mov ecx,6; je skip; cmp al,0xfd"); ours spreads them over dl/ecx/ebx and duplicates. Tried: local flag copy, one shared char local (2592), ternary table (2528, wrong order), int/unsigned cell, static-inline helper (not inlined), goto merge (2576, not kept). The static loop also differs (node->flags via edx/eax; ours keeps excludedFlags in ebx)
@@ -340,11 +343,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (34)
+## 5. Very large functions (over 3000 bytes) (31)
 
-- [ ] `1013b700` 10376 bytes Game_Startup (loops 19, calls 357)
-- [ ] `101a58a0` 10762 bytes It3_ParseChunks (loops 77, calls 309)
-- [ ] `1013fbb0` 10920 bytes Render_OnResetDevice (float, loops 73, calls 396)
 - [ ] `10089a10` 11265 bytes Script_CompileCall (loops 99, calls 123)
 - [ ] `10086380` 11823 bytes (float, loops 13, calls 272)
 - [ ] `10068f70` 11973 bytes (float, loops 10, calls 270)
@@ -382,7 +382,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (18 files)
+## 7. Comment pass (19 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
@@ -394,6 +394,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/drifter.cpp`: 1 of 2 functions without a comment
 - [ ] `src/drill_claws.cpp`: 1 of 2 functions without a comment
 - [ ] `src/enemy_pod_lobber.cpp`: 1 of 2 functions without a comment
+- [ ] `src/game_main.cpp`: 2 of 8 functions without a comment
 - [ ] `src/homing_shots.cpp`: 1 of 2 functions without a comment
 - [ ] `src/laser_zone.cpp`: 1 of 6 functions without a comment
 - [ ] `src/node_probe_collide.cpp`: 1 of 2 functions without a comment

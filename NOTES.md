@@ -578,3 +578,4 @@ with a later block temporary. Char_HikariRide: eight real &next references would
 original had there is not found yet.
 
 - Anonymous unions added to Node (m_1884) or AnimModel (m_0280) changed the code of unrelated matched functions (Node::WeldVertices, FUN_100b4f00 in char_move.cpp): give a reused field one plain typed member (rename it) or split a pad into typed members instead of wrapping it in a union in these classes. Adding an #include to char_equipment.cpp also changes FUN_100615f0 (20 -> 349 diffs), so that file keeps local declarations.
+- FUN_100b4f00 (char_move.cpp) is a fragile ebx/ebp register tie: the number of declarations in matrix4.h tips it (one extra member or free declaration loses the match, two restore it). When a new Matrix4 member breaks it, also move a genuinely shared declaration into matrix4.h (batch 344 moved DirectionMatrix and Multiply there), never a dummy or duplicate.

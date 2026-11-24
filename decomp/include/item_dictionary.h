@@ -3,6 +3,8 @@
 #ifndef GURUMIN_ITEM_DICTIONARY_H
 #define GURUMIN_ITEM_DICTIONARY_H
 
+#include "menu_main.h"
+
 // One 0xc0-byte record of the item table at DAT_1088e650 (the same table as DAT_1088e6b0 and DAT_1088e670, seen
 // from 0x60 and 0x20 bytes earlier).
 struct ItemRecord
@@ -43,8 +45,6 @@ extern "C" int FUN_101603c0(const char *name, int record, int *value);
 extern "C" void FUN_1003a9d0(void);
 // 0x1015f4e0 (TextInput_Update): per-frame text input update.
 extern "C" int FUN_1015f4e0(void);
-// 0x10112140 (Menu_Main): the main menu, shop, sound configuration and name entry.
-extern "C" int FUN_10112140(void);
 // 0x1000cdf0 (Messages_Update, message_fades.cpp): fades the message boxes.
 extern "C" int FUN_1000cdf0(void);
 

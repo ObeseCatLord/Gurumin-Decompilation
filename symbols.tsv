@@ -87,6 +87,7 @@ address	name	evidence
 10065450	TutorialBook_Update	per-frame tutorial book mode: turn/close/open states, stick or mouse turns, draws the book from the overlay camera (tutorial_update.cpp)
 10065bf0	Enemy_WanderHopAndSpit	kind-4 hopping spitter of the dispatcher 0x100f9670: turns to the player, hops at it, spits a fan of effect 600 when the player is near and in sight, wakes same-kind neighbours (enemy_hop_spit.cpp, draft)
 100675d0	Enemy_PounceAndBreathe	kind-7 enemy of the dispatcher 0x100f9670: wanders, notices the player, wakes same-kind slots, whirls and leaps, roars, chases, pounces (effects 0x688/0x655) or breathes fire from the mouth node (effects 0x3707/0x456) (enemy_pounce_breath.cpp, draft)
+1006be40	Enemy_SpitAndCharge	per-kind enemy behaviour: wanders, reacts to damage, approaches, spits a fan of effect 0x258 and charges at the player (enemy_spit_charge.cpp, draft)
 1006e150	Enemy_CastAndTeleport	behaviour 0xc caster: keeps 700-800 units from the player, checks sight every 10 frames, casts a 75-frame spell (bolt effect 0x673, charge 0x66d), then fades out, slides to a random visible spot around the player and fades in (enemy_cast_teleport.cpp, matched)
 1006f490	Enemy_HoverAndShoot	flying enemy (kind 0x54): hovers 75 above the ground, steers a smoothed course round the player with banking motions, fires effect 0x3e9 when aligned within 1500 units, then holds course for 30 frames (enemy_hover_shooter.cpp, draft)
 10070200	Enemy_PodLobber	pod-lobbing plant enemy: ripens six pod nodes (Dummy06..11), lobs them at the player or bursts them all; steps the thrown pods (DAT_10868838) with gravity, floor and wall probes (enemy_pod_lobber.cpp, draft)
@@ -132,8 +133,10 @@ address	name	evidence
 100fc4a0	Map_SetupByNumber	loads the map numbered N (map table entry, two .it3 models with ice nodes, marker nodes, camera points, lights), optionally moves the player and camera to a named marker node, runs Scene_Reset; load request 1 of Game_Startup, sibling of Map_SetupFromEntry (map_setup_field.cpp, draft)
 100fda40	Map_SetupFromEntry	sets up the map of map-table entry N for Game_Startup load request 2: clears per-map globals, loads the entry's two .it3 models (ice nodes on water), collects marker nodes (fannel, ksk, fish, firelight, jumps), places characters, runs Scene_Reset (map_setup_entry.cpp, draft)
 100fedd0	Script_SystemCommand	scene/system script command dispatcher (ids 0x9c40..0x186a0): counts flag bits, spawns shaga effects, toggles levers, reloads the player model, observer and camera points, flood/drain light morph via Regions_StartLightMorph; called from 0x101011b0 (script_system_command.cpp, draft)
+10112140	Menu_Main	main/title menu update: name entry, title menu, sound and volume pages, difficulty list, debug map list, shop commands, save and continue lists, starting a loaded save (menu_main.cpp, draft)
 10114950	TitleScreen_Update	title screen (game mode 0): loads tit*/menu3/6/7 textures, per-tick world, Menu_Main, music and fade, flickering logo pieces, waits for a key or click, draws background, logo and menu frame (title_screen.cpp, matched)
 10115cd0	ItemDictionary_Update	game mode 5: item dictionary window (qsort by level flag, ??? for unobtained items, mouse-spun preview, closes on Esc/key/right click) (item_dictionary.cpp, draft)
+10138280	Script_GameBuiltin	handler of the game's script built-ins (Message, Recover, Wait, movies, Look, reload character, ksk fireworks, wallpaper, Type, custom helmet ...), registered through RegisterBuiltin (script_game_builtin.cpp, draft)
 1013f070	Render_Command	renderer command switch: blend mode, texture address/filter, alpha test, cull, depth, fog, clears, begin/end scene (render_command.cpp)
 10143180	Input::ReadControls	joystick (DirectInput or joyGetPosEx) + keyboard through the button mappings: 0 = button mask, 1/2 = x/y axis -128..127 (input_controls.cpp, draft)
 101446f0	TextureObject_DrawBlurred	four-tap blurred full-screen quad (texture_bind.cpp)
@@ -157,11 +160,9 @@ address	name	evidence
 10037850	ListBank::InitLibrary	resets the parser and registers the library built-ins sin ... strcmp (matched, decomp/src/listbank.cpp)
 10005a70	Script_LibraryBuiltin	handler for the library built-ins
 1013ad90	Script_RegisterGameBuiltins	sets up the game parser and registers the 93 game built-ins (matched, decomp/src/listbank.cpp)
-10138280	Script_GameBuiltin	handler switch for the game built-ins
 100ed9b0	Script_CompileStatement	errors for goto/for/while/switch/return in scripts
 10089a10	Script_CompileCall	argument count/type/reference checks
 1003aef0	Bgm_Play	streams bgm\<name>.de2 and checks its header, anti-tamper noise on failure (decomp/src/bgm_play.cpp)
-10112140	Menu_Main	main menu, shop, sound config, name entry, gdata%02d.sav
 10137b10	Game_FrameStep	per-frame step: messages, max-health clamp, noise-table quit check, mode update, pacing/present, clipboard capture saved as capture%05d.jpg with the shape.dat stamp (frame_step.cpp, draft)
 100144c0	Ability_GetDescription	copies the effect text of the highest-priority ability bit and returns the bit (matched, decomp/src/ability_text.cpp)
 1013dfb0	GuruMain	DLL export called by game.exe

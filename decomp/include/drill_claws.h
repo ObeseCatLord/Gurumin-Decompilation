@@ -106,9 +106,7 @@
 #define CLAW_HELMET_200 0x200
 #define CLAW_HELMET_100 0x100
 
-// 0x101b1360: translation matrix of (x, y, z); 0x101b1f30: the matrix that turns the z axis into `direction`.
-Matrix4 TranslationMatrix(float x, float y, float z);
-Matrix4 DirectionMatrix(Vec4 direction);
+// TranslationMatrix (0x101b1360) and DirectionMatrix (0x101b1f30) are declared in matrix4.h.
 
 extern "C" Vec4 DAT_10f08d0c;   // the point the claws circle in the free phase, and the previous position of their target
 

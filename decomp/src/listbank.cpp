@@ -984,7 +984,7 @@ int ListBank::Evaluate(const char *expression, char type)
     return 1;
 }
 
-extern "C" int FUN_10005a70(ListBank *bank, int id);   // Script_LibraryBuiltin: runs the library built-ins
+extern "C" void FUN_10005a70(int id, ScriptArgument *args, ListBank *bank);   // Script_LibraryBuiltin: runs the library built-ins
 
 // 0x10037850 (Script_InitLibrary). Resets the parser (no text, no blocks, no names, no keywords, empty groups;
 // results go to the scratch value at 0x2240c) and registers the library built-ins sin ... strcmp (ids 0x2774 to
@@ -1041,9 +1041,10 @@ int ListBank::InitLibrary()
 #include "char_vars.h"
 #include "game_vars.h"
 #include "script_vars.h"
+#include "script_game_builtin.h"
 
 extern "C" void FUN_10017f20(int code, int value);      // the game's parser message callback
-extern "C" int FUN_10138280(ListBank *bank, int id);    // Script_GameBuiltin: runs the game built-ins
+// Script_GameBuiltin: script_game_builtin.h (0x10138280)
 
 // 0x1013ad90 (Script_RegisterGameBuiltins). Sets up the game's script parser: the library built-ins, the keyword
 // "ch" for the script flags (ch[n]), the message callback and the 93 game built-ins (ids 11000 to 0x2fbe); the names
@@ -1056,99 +1057,99 @@ extern "C" void FUN_1013ad90(void)
     strcpy(DAT_104687b8.m_36334[0], DAT_101dc1fc);
     DAT_104687b8.failed = 0;
     DAT_104687b8.callback = FUN_10017f20;
-    DAT_104687b8.RegisterBuiltin("int Message(int,string,string,string,string)", 11000, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int ShopStart()", 0x2b5c, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int ShopItem(int)", 0x2b5d, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int ShopEnd()", 0x2b5e, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int ShopEnd2()", 0x2b62, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SelStart(int)", 0x2b5f, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SelText(string,int)", 0x2b60, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SelEnd()", 0x2b61, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Wait(int)", 0x2ee3, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int WaitD(int)", 0x2ee4, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int WaitC(int)", 0x32ca, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int LoadMap(int)", 0x3264, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int CharPos(int,int,int,int)", 0x3265, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int MapEnable(int)", 0x3266, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Lock()", 0x3267, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Unlock()", 0x3268, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Walk(int,int,int)", 0x3269, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Black(int,int,int)", 0x326a, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Look(int,int)", 0x326b, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int BGM(int)", 0x326c, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SE(int)", 0x3200, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Event(int)", 0x326d, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Visible(int,int)", 0x326e, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int MapEvent(int)", 0x326f, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int WMessage(string,string)", 0x3270, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Scop(int)", 0x3271, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int PlayMovie(string,int)", 0x3272, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int CrossFade()", 0x3273, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Kaifuku()", 0x3274, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int RCharEffect(int,int)", 0x3275, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Blur(int,int,int)", 0x3276, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int MMV(string)", 0x3277, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Soubi(int)", 0x3278, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int StatusUp(int)", 0x3279, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Camera(int,int,int,int)", 0x327a, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SetRoll(int,int)", 0x327b, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int GetItem(int)", 0x327c, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Walk2(int,int,int,int)", 0x3282, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Mes(string)", 0x3283, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Menu(int)", 0x3284, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SetMapColor(int,float,float,float)", 0x3285, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int PostScr(int)", 0x3286, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int LockCommand(int)", 0x3287, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int GetMP()", 0x328a, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SaveMap()", 0x328b, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int RestoreMap()", 0x328c, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int LVUP(int)", 0x328d, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SetSavePos()", 0x328e, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int ResetFade()", 0x3291, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int GetGP()", 0x3292, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SetGP(int)", 0x3293, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int KaguTest(int,int)", 0x3296, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int KaguTest2(int,int,string)", 0x3297, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int White(int,int,int)", 0x3298, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int YukaKesi(int,int)", 0x3299, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int REffect(int,int,int,int)", 0x329a, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SendEvent(int)", 0x329b, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int LiftEnable(int)", 0x329c, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Lift2C(int)", 0x329e, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Door2C(int)", 0x329f, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int TekiStop(int)", 0x32a0, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int GetCharPos(int,int&,int&,int&)", 0x32a1, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int LiftEnable2(int,int)", 0x32a2, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Getbt15(int)", 0x32a3, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Scop2(int,int,string)", 0x32a4, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SaveCamera()", 0x32a5, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int RestoreCamera()", 0x32a6, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Miss()", 0x32a7, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Reset()", 0x32a8, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SetSavePos2(int,int,int,int)", 0x32a9, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int GAMEOVER(int)", 0x32be, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Recover(int,int,float,float,float)", 0x2ee0, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Special(int)", 0x329d, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Wait2(int)", 0x32c8, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Takara2C(int)", 0x32c9, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Demo(string)", 0x332c, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int LoadMapB(int)", 0x332d, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("string StageName(int)", 0x332e, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("string StageMMV(int)", 0x332f, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int ReloadChar()", 0x3330, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int PlayMMV3(string,int)", 0x3336, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int PlayAVI(string,int)", 0x3337, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Fill(int,float)", 0x3338, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Custom()", 0x3339, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("string Custom2(int)", 0x333a, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Custom3(int)", 0x333b, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Ksk(int)", 0x333c, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int SetWaku(int)", 0x333d, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Kabe(string)", 0x333e, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int Mouse(int)", 0x333f, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int PlayMovie2(string,int)", 0x3340, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("string Type(int)", 0x3341, FUN_10138280);
-    DAT_104687b8.RegisterBuiltin("int GetCf(int)", 0x2fbe, FUN_10138280);
+    DAT_104687b8.RegisterBuiltin("int Message(int,string,string,string,string)", 11000, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int ShopStart()", 0x2b5c, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int ShopItem(int)", 0x2b5d, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int ShopEnd()", 0x2b5e, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int ShopEnd2()", 0x2b62, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SelStart(int)", 0x2b5f, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SelText(string,int)", 0x2b60, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SelEnd()", 0x2b61, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Wait(int)", 0x2ee3, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int WaitD(int)", 0x2ee4, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int WaitC(int)", 0x32ca, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int LoadMap(int)", 0x3264, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int CharPos(int,int,int,int)", 0x3265, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int MapEnable(int)", 0x3266, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Lock()", 0x3267, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Unlock()", 0x3268, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Walk(int,int,int)", 0x3269, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Black(int,int,int)", 0x326a, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Look(int,int)", 0x326b, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int BGM(int)", 0x326c, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SE(int)", 0x3200, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Event(int)", 0x326d, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Visible(int,int)", 0x326e, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int MapEvent(int)", 0x326f, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int WMessage(string,string)", 0x3270, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Scop(int)", 0x3271, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int PlayMovie(string,int)", 0x3272, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int CrossFade()", 0x3273, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Kaifuku()", 0x3274, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int RCharEffect(int,int)", 0x3275, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Blur(int,int,int)", 0x3276, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int MMV(string)", 0x3277, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Soubi(int)", 0x3278, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int StatusUp(int)", 0x3279, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Camera(int,int,int,int)", 0x327a, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SetRoll(int,int)", 0x327b, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int GetItem(int)", 0x327c, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Walk2(int,int,int,int)", 0x3282, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Mes(string)", 0x3283, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Menu(int)", 0x3284, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SetMapColor(int,float,float,float)", 0x3285, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int PostScr(int)", 0x3286, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int LockCommand(int)", 0x3287, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int GetMP()", 0x328a, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SaveMap()", 0x328b, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int RestoreMap()", 0x328c, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int LVUP(int)", 0x328d, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SetSavePos()", 0x328e, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int ResetFade()", 0x3291, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int GetGP()", 0x3292, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SetGP(int)", 0x3293, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int KaguTest(int,int)", 0x3296, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int KaguTest2(int,int,string)", 0x3297, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int White(int,int,int)", 0x3298, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int YukaKesi(int,int)", 0x3299, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int REffect(int,int,int,int)", 0x329a, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SendEvent(int)", 0x329b, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int LiftEnable(int)", 0x329c, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Lift2C(int)", 0x329e, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Door2C(int)", 0x329f, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int TekiStop(int)", 0x32a0, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int GetCharPos(int,int&,int&,int&)", 0x32a1, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int LiftEnable2(int,int)", 0x32a2, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Getbt15(int)", 0x32a3, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Scop2(int,int,string)", 0x32a4, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SaveCamera()", 0x32a5, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int RestoreCamera()", 0x32a6, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Miss()", 0x32a7, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Reset()", 0x32a8, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SetSavePos2(int,int,int,int)", 0x32a9, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int GAMEOVER(int)", 0x32be, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Recover(int,int,float,float,float)", 0x2ee0, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Special(int)", 0x329d, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Wait2(int)", 0x32c8, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Takara2C(int)", 0x32c9, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Demo(string)", 0x332c, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int LoadMapB(int)", 0x332d, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("string StageName(int)", 0x332e, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("string StageMMV(int)", 0x332f, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int ReloadChar()", 0x3330, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int PlayMMV3(string,int)", 0x3336, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int PlayAVI(string,int)", 0x3337, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Fill(int,float)", 0x3338, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Custom()", 0x3339, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("string Custom2(int)", 0x333a, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Custom3(int)", 0x333b, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Ksk(int)", 0x333c, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int SetWaku(int)", 0x333d, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Kabe(string)", 0x333e, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int Mouse(int)", 0x333f, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int PlayMovie2(string,int)", 0x3340, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("string Type(int)", 0x3341, Script_GameBuiltin);
+    DAT_104687b8.RegisterBuiltin("int GetCf(int)", 0x2fbe, Script_GameBuiltin);
     DAT_104687b8.globalBuiltinCount = DAT_104687b8.builtinCount;
     DAT_1032d69c = 1;
 }

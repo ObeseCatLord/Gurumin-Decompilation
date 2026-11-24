@@ -56,6 +56,7 @@ struct Matrix4
     void Translate(float x, float y, float z);         // 0x101adec0: adds (x, y, z) to the translation row
 
     Matrix4 operator*(const Matrix4 &other);           // 0x101b0670: matrix product
+    float M_101b0a80();                                // 0x101b0a80: heading of the matrix (atan2 of its transformed x axis)
 };
 
 Matrix4 RotationZ(float angle);   // 0x101b1b40: turn of `angle` about z
@@ -63,6 +64,8 @@ Matrix4 RotationX(float angle);   // 0x101b1ad0: turn of `angle` about x
 Matrix4 RotationY(float angle);   // 0x101b1bb0: turn of `angle` about y
 Matrix4 Scaling(float x, float y, float z);   // 0x101b13c0: scale by (x, y, z)
 Matrix4 TranslationMatrix(float x, float y, float z);   // 0x101b1360: move by (x, y, z)
+Matrix4 DirectionMatrix(Vec4 direction);               // 0x101b1f30: the matrix that turns the z axis into `direction`
+Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);   // 0x101b10f0: matrix product (free form)
 Matrix4 Transpose(const Matrix4 &matrix);   // 0x101b1090: rows and columns swapped
 
 // 0x101b1910: splits a matrix into its scale, rotation quaternion and translation.

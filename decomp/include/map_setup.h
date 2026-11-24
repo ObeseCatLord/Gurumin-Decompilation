@@ -29,8 +29,8 @@ extern "C" int DAT_1020d64c[4];
 extern "C" int DAT_1020b1e0[0x10];
 extern "C" int DAT_10219f78[0x10];
 extern "C" int DAT_104507e8[6];
-extern "C" int DAT_10467718[0x20];
-extern "C" int DAT_104678a0[0x20];
+extern "C" short DAT_10467718[0x40];
+extern "C" short DAT_104678a0[0x40];
 extern "C" int DAT_10c62ee0[0x1c1];
 extern "C" float DAT_102027ec;                        // 1.0 after a setup
 extern "C" int DAT_102027f8;                          // -1 after a setup

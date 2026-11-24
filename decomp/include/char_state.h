@@ -82,6 +82,7 @@ struct CharState
                         int orbitForward;         // drifter.cpp (state 1): non-zero = the spin angles grow, else they shrink
                         // (route_follow.cpp uses `wait` for the frames left at a pause point)
                         int swoopStep;                    // enemy_hop_spit.cpp: 0 = turning left, 1 = turning right, 2 = hopping at the player, 3 = resting, 4 = spitting
+                        int gaitHold;                          // enemy_spit_charge.cpp: frames left of the recovery in gait state 2 and of the pause in gait state 1 (90 or 10 when it starts; the lift speed is released when it runs out)
                     };
                     union                         // 0x08
                     {
@@ -122,6 +123,7 @@ struct CharState
                         int sightBlocked;         // enemy_shy_ghost.cpp: 1 = a wall blocks the line to the player (looked up every 15th frame)
                         int rayLength0;           // rolling_tire.cpp: length of ray 0 (outermost left, whole units, -1 = not cast yet)
                         int debrisMarker;          // dodge_debris.cpp: marker slot (0x5c..0x7b) whose position the piece takes over and whose death destroys it
+                        int resetSpare;                        // enemy_spit_charge.cpp: cleared by the reaction reset, otherwise unused
                     };
                     union                         // 0x0c
                     {
@@ -176,6 +178,7 @@ struct CharState
                         int rayLength1;           // rolling_tire.cpp: length of ray 1
                         int debrisShown;           // dodge_debris.cpp: 1 while the piece's node is shown
                         int updating;                     // enemy_hop_spit.cpp: 1 while its update runs (the others of its kind do not wake it then)
+                        int gaitFrames;                        // enemy_spit_charge.cpp: frames counted in gait state 0 (a stride is 0x9b frames) and in gait state 1
                     };
                     union                         // 0x10
                     {
@@ -216,6 +219,7 @@ struct CharState
                         int rayLength2;           // rolling_tire.cpp: length of ray 2 (straight ahead)
                         int debrisPartnerA;        // dodge_debris.cpp: slot of the first piece this one is linked to (0 = none)
                         int groundHeight;                 // enemy_hop_spit.cpp: height of the ground (or of the pit floor) below it, whole units
+                        int actionStep;                        // enemy_spit_charge.cpp: 0 = wanders, 1 = reacts, 2 = approaches, 3 = spits, 4 = charges, 5 = idles, 6 = turns away from a wall
                     };
                     union                         // 0x14
                     {
@@ -259,6 +263,7 @@ struct CharState
                         int alerted;              // enemy_shy_ghost.cpp: 1 once it has shown itself to the player
                         int rayLength3;           // rolling_tire.cpp: length of ray 3
                         int debrisPartnerB;        // dodge_debris.cpp: slot of the second piece this one is linked to (0 = none)
+                        int actionFrames;                      // enemy_spit_charge.cpp: frames counted in the current action step
                     };
                     union                         // 0x18
                     {
@@ -291,6 +296,7 @@ struct CharState
                         int hoverBase;            // enemy_hover_strike.cpp: height of the ground below it (or of the player, plus 75, where it has none)
                         int rayLength4;           // rolling_tire.cpp: length of ray 4 (outermost right)
                         int probeFrames;                  // enemy_hop_spit.cpp: frames since the last sight probe (every 10th; 30 puts it on the ground)
+                        int healthSeen;                        // enemy_spit_charge.cpp: the health it last saw (a change makes it react; -1 forces a reaction)
                     };
                     union                         // 0x1c
                     {
@@ -317,6 +323,7 @@ struct CharState
                         int airFrames;            // enemy_chase_hop.cpp: frames airborne (the hop eases with it), 0 once it lands
                         int turnDirection;        // rolling_tire.cpp: 0 = straight on, 1 / 2 = veering one way / the other
                         int obstacleDistance;             // enemy_hop_spit.cpp: distance to the obstacle the last probe found ahead (-1 = none)
+                        int turnsRight;                        // enemy_spit_charge.cpp: 1 = it turns right at a wall or ledge, 0 = left (picked at random)
                     };
                     union                         // 0x20
                     {
@@ -342,6 +349,7 @@ struct CharState
                         int hurtFrames;           // enemy_shy_ghost.cpp: frames since it was hit (counted up to 46, then it sinks away; counted down while not hit)
                         int driveFrames;          // rolling_tire.cpp: frames driven in the current heading (negative after a bounce)
                         int obstacleAhead;                // enemy_hop_spit.cpp: 1 when the last probe found an obstacle ahead
+                        int alertFrames;                       // enemy_spit_charge.cpp: frames it stays alert after seeing the player (600, counted down)
                     };
                     union                         // 0x24
                     {
@@ -359,6 +367,7 @@ struct CharState
                         int specialPhase;          // partner_skill.cpp: step of the partner skill (0 = ready, 1 = starts, then counts up; 1000 and above = the long one of slot 7)
                         int bumpCooldown;         // rolling_tire.cpp: frames left (10 after a bounce) in which it may not pick a new veer
                         int shadowHeight;                 // enemy_hop_spit.cpp: height of its shadow, kept between the ground lookups
+                        int attackActive;                      // enemy_spit_charge.cpp: 1 while the spit or charge motion overrides the gait motion
                     };
                     union                         // 0x28
                     {
@@ -384,6 +393,7 @@ struct CharState
                         int retreatFrames;        // breath_enemy.cpp: frames left of a failed retreat (state 5 ends when it runs out)
                         int wallAhead;            // rolling_tire.cpp: 1 = the 500-unit look-ahead hit the world
                         int attackCooldown;               // enemy_hop_spit.cpp: frames before it may start to spit again
+                        int gaitMotion;                        // enemy_spit_charge.cpp: motion picked by the gait state (1 = starting, 2 = striding, 3 = ending, 0 = by action)
                     };
                     union                         // 0x2c
                     {
@@ -401,6 +411,7 @@ struct CharState
                         int zoneEffect;            // area_zone.cpp: effect started at one frame of the cycle (0 = none)
                         int specialMark;           // partner_skill.cpp: set to 75 (0x4b) when the skill of slot 6 or 7 starts
                         int rayPlayerGap0;        // rolling_tire.cpp: distance of the player to ray 0 (whole units)
+                        int approachFrames;                    // enemy_spit_charge.cpp: frames spent approaching the player (action step 2)
                     };
                     union                         // 0x30
                     {
@@ -416,6 +427,7 @@ struct CharState
                                                   // having been carried by a rider (15 after one lands on it)
                         int specialPause;          // partner_skill.cpp (slot 7): frames to wait before it picks an enemy
                         int rayPlayerGap1;        // rolling_tire.cpp: the same for ray 1
+                        int retaliates;                        // enemy_spit_charge.cpp: 1 when its kind spits back (and so reacts to a hit with the spit step)
                     };
                     union                         // 0x34
                     {
@@ -433,6 +445,7 @@ struct CharState
                                                   // the position history in LastPosition
                         int specialResume;         // partner_skill.cpp (slot 7): the step to continue from after the long skill
                         int rayPlayerGap2;        // rolling_tire.cpp: the same for ray 2
+                        int modeLocked;                        // enemy_spit_charge.cpp: 1 = the model stays in mode 1 (set once it hops over a ledge)
                     };
                 };
                 int values[13];                   // the same variables by index (enemy_ai.cpp, enemy_moves.cpp,
@@ -449,6 +462,7 @@ struct CharState
                 int buttonLiftOff;                // hikari_button.cpp: non-zero = the button light is switched off (blue, held still)
                 int rayPlayerGap3;                // rolling_tire.cpp: the same for ray 3 (overlays sawPlayer)
                 int groundRetries;                // enemy_hop_spit.cpp: times it was lifted because no ground was found below it (stops at 21)
+                int ledgeResult;                       // enemy_spit_charge.cpp: result of the last ledge probe (0 free, 2 = a ledge with a height)
             };
             union                                 // 0x3c
             {
@@ -458,6 +472,7 @@ struct CharState
                 int rayPlayerGap4;                // rolling_tire.cpp: the same for ray 4 (overlays behaviour)
                 int turnRate;                    // enemy_pounce_breath.cpp: heading change of the whirl in 1/100000 radians (a sign flag while it wanders; overlays behaviour)
                 int groundSetUp;                  // enemy_hop_spit.cpp: 1 once its first ground lookup is done (overlays behaviour; kind 4 is picked by the slot kind)
+                int ledgeHeight;                       // enemy_spit_charge.cpp: height the last ledge probe found (whole units)
             };
         };
         struct

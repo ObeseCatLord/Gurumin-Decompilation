@@ -67,6 +67,7 @@ struct DShowStream
     void M_10148910();                       // 0x10148910 (ToggleHolder::M_10148910 in texcache.cpp: same object)
     void M_10148920();                       // 0x10148920
     char M_10148930();                       // 0x10148930
+    void M_10148960();                       // 0x10148960 (ToggleHolder::Poll in texcache.cpp: same object)
     void M_1015c6a0(TextureObject *texture); // 0x1015c6a0 (VideoSurface::CopyTo in surface_copy.cpp: same object)
 };
 

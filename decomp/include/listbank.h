@@ -16,8 +16,18 @@ struct ScriptValue;
 // the position of the error in the script text.
 typedef void (*ParserCallback)(int code, int value);
 
-// A builtin script function: called with the parser and the builtin's id.
-typedef int (*BuiltinHandler)(ListBank *bank, int id);
+// One argument of a builtin call: the evaluator passes a pointer to the argument's value (an int or a float), or the
+// text itself for a string argument. The array of arguments has one entry per declared parameter.
+union ScriptArgument
+{
+    int *i;
+    float *f;
+    char *text;
+};
+
+// A builtin script function: called with the builtin's id, its arguments and the parser (the result of the call
+// is stored in bank->result, see resultType).
+typedef void (*BuiltinHandler)(int id, ScriptArgument *args, ListBank *bank);
 
 // Number of nesting levels (variable groups) and of entries per level.
 #define LISTBANK_GROUP_COUNT 8
@@ -63,7 +73,11 @@ union ScriptFunction
 
 struct ListBank
 {
-    int *result;              // 0x00: where the last evaluated expression left its value (resultBuffer)
+    union
+    {
+        int *result;          // 0x00: where the last evaluated expression left its value (resultBuffer)
+        char *resultText;     // 0x00: the same when the value is text
+    };
     char resultType;          // 0x04: type of *result: 0 = int, 1 = float, 2 = quoted text
     char pad_0005[3];
     ParserCallback callback;  // 0x08: message callback (may be 0)

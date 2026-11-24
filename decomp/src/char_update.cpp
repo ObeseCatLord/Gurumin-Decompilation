@@ -47,11 +47,11 @@
 #include "claw_enemy.h"
 #include "char_hikari.h"
 #include "weapon_fetch.h"
+#include "spit_charge_enemy.h"
 #include "char_update.h"
 
 // Behaviours without a header yet.
 extern "C" int FUN_10068f70(int index, int variant);
-extern "C" int FUN_1006be40(int index);
 extern "C" int FUN_10071ee0(int index);
 extern "C" int FUN_100e2080(int index);   // Enemy_UpdateAI_A
 extern "C" int FUN_100e2110(int index);   // Enemy_UpdateAI_B
@@ -645,7 +645,7 @@ int Char_UpdateByKind(int index)
         MapCursor_Walk(index);
         break;
     case 10:
-        FUN_1006be40(index);
+        Enemy_SpitAndCharge(index);
         break;
     case 0xb:
         Char_Drifter(index);

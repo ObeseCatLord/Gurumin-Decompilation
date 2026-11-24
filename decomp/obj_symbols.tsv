@@ -652,3 +652,5 @@ _Enemy_IsBusy	100e1c40
 ?SoccerGame_UpdateCpuPlayer@@YAHHHHHH@Z	10032240
 ?LoadMapData@Game@@QAEHPBDP6AX0H@Z@Z	10002440
 ?Char_UpdateByKind@@YAHH@Z	100f9670
+?Enemy_SpitAndCharge@@YAHH@Z	1006be40
+?Script_GameBuiltin@@YAXHPATScriptArgument@@PAUListBank@@@Z	10138280

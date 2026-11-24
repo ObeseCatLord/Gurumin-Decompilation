@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 46.8055,
+  "fuzzy_match_percent": 47.3156,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 462,
+  "total_units": 463,
   "complete_units": 186,
   "matched_rules_code": "344871",
   "matched_rules_code_percent": 20.0482,
@@ -13167,7 +13167,7 @@
   {
    "name": "app/map_enter_reset",
    "measures": {
-    "fuzzy_match_percent": 95.8022,
+    "fuzzy_match_percent": 95.4291,
     "total_code": "1069",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -13192,14 +13192,14 @@
     {
      "name": ".text",
      "size": "1069",
-     "fuzzy_match_percent": 95.8022
+     "fuzzy_match_percent": 95.4291
     }
    ],
    "functions": [
     {
      "name": "_FUN_10023900",
      "size": "1069",
-     "fuzzy_match_percent": 95.8022,
+     "fuzzy_match_percent": 95.4291,
      "metadata": {
       "virtual_address": "268581120"
      }
@@ -14580,6 +14580,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/mesh_draw.cpp"
+   }
+  },
+  {
+   "name": "app/mesh_draw_lit",
+   "measures": {
+    "fuzzy_match_percent": 20.3365,
+    "total_code": "43163",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "43163",
+     "fuzzy_match_percent": 20.3365
+    }
+   ],
+   "functions": [
+    {
+     "name": "?DrawLit@MeshData@@QAEHPAUMatrix4@@PBU2@HPBXPAUVec4@@3@Z",
+     "size": "43163",
+     "fuzzy_match_percent": 20.3365,
+     "metadata": {
+      "virtual_address": "269818784"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/mesh_draw_lit.cpp"
    }
   },
   {
@@ -27112,13 +27158,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "232524",
+    "total_code": "189361",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 16,
+    "total_functions": 15,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -27135,7 +27181,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "232524",
+     "size": "189361",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -27218,14 +27264,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269604880"
-     }
-    },
-    {
-     "name": "FUN_10151ba0",
-     "size": "43163",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269818784"
      }
     },
     {

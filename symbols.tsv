@@ -1208,3 +1208,4 @@ address	name	evidence
 100360f0	ListBank::ReadToken	matched decompiled source (decomp/obj_symbols.tsv)
 1017c5f0	ModelBank::LightForRoot	matched decompiled source (decomp/obj_symbols.tsv)
 10164c10	ModelBank::LightDirection	matched decompiled source (decomp/obj_symbols.tsv)
+10151ba0	MeshData::DrawLit	draws the mesh with the lit shaders: mode picks shader, constants and stage states; packs merged/culled; outline, overlay and rainbow modes draw again (mesh_draw_lit.cpp, draft)

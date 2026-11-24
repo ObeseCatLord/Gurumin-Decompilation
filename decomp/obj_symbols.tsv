@@ -685,3 +685,4 @@ _Enemy_IsBusy	100e1c40
 ?DrawRecord@EffectManager@@QAEHHABUMatrix4@@PBU2@H@Z	10189530
 ?Prince_Update@@YAHH@Z	100edea0
 ?Bs002_Update@@YAHH@Z	10104640
+?DrawLit@MeshData@@QAEHPAUMatrix4@@PBU2@HPBXPAUVec4@@3@Z	10151ba0

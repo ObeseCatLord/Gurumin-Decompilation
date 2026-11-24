@@ -15,6 +15,7 @@ struct DodgeObjectState
     {
         int kind;        // 0x00: DODGE_KIND_*
         int footballKick;   // map 0x18: how the human's kick turned out (DAT_1020c2f0)
+        int galaxyFade;     // neo_galaxy_update.cpp: frames of the fade-out once the Neo Galaxy fight is over
     };
     int reserved;        // 0x04: cleared at set-up, not used afterwards
     int driftX;          // 0x08: kinds 9..12: x step per frame before scaling (4..12)

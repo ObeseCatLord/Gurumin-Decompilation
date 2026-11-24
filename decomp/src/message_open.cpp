@@ -9,9 +9,9 @@
 #include "game_vars.h"
 
 #include "char_vars.h"
+#include "name_paths.h"
 
 extern "C" int FUN_1003ad20(int sound, const void *position, float volume);
-extern "C" int FUN_1013e790(char *out, const char *text);     // Names_Expand
 extern "C" int FUN_1000c020(char *out, const char *text);     // Text_Substitute
 
 // 0x10056260 (Message_Open). Opens message box `slot` with the lines `line1` to `line4` (0 = empty) spoken by

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "model_misc.h"
+#include "world_renderer.h"
 #include "mesh_ref.h"
 
 
@@ -39,11 +40,11 @@ int ModelObject::M_10164090(int a, int b)
     return 0;
 }
 
-// Counts the m_3870 timer down to 0.
-void ModelObject::M_101687c0()
+// 0x101687c0. Counts the caption timer down to 0.
+void WorldRenderer::TickCaption()
 {
-    if (m_3870 != 0)
-        m_3870--;
+    if (captionVisible != 0)
+        captionVisible--;
 }
 
 // Resets the rotation limits to +-45 degrees (0.785375 rad) on all three axes.
@@ -63,9 +64,9 @@ void ViewLimits::M_10166870()
 // changes are flagged while applied, see SceneOwner::PlayMotion).
 int CharacterBank::M_10166910(int slot, int character, int value)
 {
-    m_eac58[slot] = character;
+    modelAlias[slot] = character;
     characters[character].m_0265 = 1;
-    m_eae58[slot] = value;
+    modelPartner[slot] = value;
     return 1;
 }
 

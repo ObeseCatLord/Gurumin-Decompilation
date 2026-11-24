@@ -74,7 +74,7 @@
 ?Query@CollisionWorld@@QAEHPAUMatrix4@@PAUVec4@@H1PAHHH@Z	101a1640
 ?Collision_ProbePoint@@YAHMMMM@Z	1000ff80
 ?AdvanceFrame@WorldRenderer@@QAEHXZ	10189080
-?M_1017cc90@WorldRenderer@@QAEHH@Z	1017cc90
+?RunScriptFrames@WorldRenderer@@QAEHH@Z	1017cc90
 ?Rebuild@Node@@QAEHXZ	101ac1a0
 ?M_10191870@Node@@QAEHPAPAU1@PAH@Z	10191870
 ?M_10191770@Node@@QAEHXZ	10191770
@@ -678,3 +678,7 @@ _Enemy_IsBusy	100e1c40
 ?Bs001_Update@@YAHH@Z	1010c650
 ?Bs005_Update@@YAHH@Z	100cc2a0
 ?Enemy_UpdateFighter@@YAHH@Z	100bdad0
+?GetMessageField@WorldRenderer@@QAEHHHPAD@Z	101672c0
+?TickCaption@WorldRenderer@@QAEXXZ	101687c0
+?Bs004_Update@@YAHH@Z	100c39c0
+?NeoGalaxy_Update@@YAHH@Z	100e7280

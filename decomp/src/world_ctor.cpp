@@ -27,11 +27,11 @@ WorldRenderer::WorldRenderer()
     }
     for (int i = 0; i < 0x20; i++)
     {
-        m_e7c38[i][0] = 0;
+        faceTextureNames[i][0] = 0;
         pictureKind[i] = 0;
         textures[i] = -1;
-        m_05bac[i] = 0;
-        m_4f668[i][0] = 0;
+        lipActive[i] = 0;
+        nodeFiles[i][0] = 0;
     }
 }
 
@@ -46,15 +46,15 @@ extern "C" int FUN_101615d0(char *data, int size, const char *name, int sum, uns
 // state are not used. Returns 1.
 int WorldRenderer::Bind(AnimModel *models, void *mapRoot, int *state, WorldCallback callback, void *data)
 {
-    m_00040 = -1;
-    m_00976 = 0;
+    bgm = -1;
+    transitionsOff = 0;
     m_00975 = 0;
     for (int i = 0; i < 0x20; i++)
     {
         m_eb058[i] = -1;
         sprintf(characterNames[i], "\x83\x4c\x83\x83\x83\x89%d", i);
     }
-    m_0097c = 0;
+    effectLevel = 0;
     DAT_1101de34 = 0;
     m_00974 = 0;
     fadeOnTop = 1;
@@ -67,39 +67,39 @@ int WorldRenderer::Bind(AnimModel *models, void *mapRoot, int *state, WorldCallb
         m_028c0[i] = -9999;
     }
     m_03860 = -9999;
-    m_0398c = 0;
+    moviePicture = 0;
     for (int i = 0; i < 0x20; i++)
     {
         for (int j = 0; j < 0x10; j++)
-            m_039ac[i][j][0] = 0;
-        m_e7c38[i][0] = 0;
+            lipNames[i][j][0] = 0;
+        faceTextureNames[i][0] = 0;
         pictureKind[i] = 0;
         textures[i] = -1;
-        m_05bac[i] = 0;
-        m_4f668[i][0] = 0;
+        lipActive[i] = 0;
+        nodeFiles[i][0] = 0;
     }
     for (int i = 0; i < 0x20; i++)
     {
-        m_05bac[i] = 0;
-        m_3a0e8[i] = 0;
-        m_3a268[i] = 0;
-        m_3a3e8[i] = 0;
-        m_3a1e8[i] = 0;
-        m_3a368[i] = 0;
-        m_3a4e8[i] = 0;
-        m_39c68[i] = 0;
-        m_39de8[i] = 1.0f;
-        m_39f68[i] = 1.0f;
-        m_39d68[i] = 0;
-        m_39ee8[i] = 0;
-        m_3a068[i] = 0;
+        lipActive[i] = 0;
+        nodeAngleX[i] = 0;
+        nodeAngleY[i] = 0;
+        nodeAngleZ[i] = 0;
+        nodeAngleXFrames[i] = 0;
+        nodeAngleYFrames[i] = 0;
+        nodeAngleZFrames[i] = 0;
+        nodeA[i] = 0;
+        nodeScale[i] = 1.0f;
+        nodeT[i] = 1.0f;
+        nodeAFrames[i] = 0;
+        nodeScaleFrames[i] = 0;
+        nodeTFrames[i] = 0;
         textures[i] = -1;
-        m_4f668[i][0] = 0;
+        nodeFiles[i][0] = 0;
     }
-    m_1410c8 = 0;
+    movieActive = 0;
     notifyPending = 0;
-    m_039a8 = -1;
-    m_03868 = 900;
+    lastScriptFrame = -1;
+    frameLimit = 900;
     font = (FontRenderer *)data;
     captionVisible = 0;
     fadeTarget = 0;
@@ -107,19 +107,19 @@ int WorldRenderer::Bind(AnimModel *models, void *mapRoot, int *state, WorldCallb
     StartFade(0, 0, 0);
     this->callback = callback;
     this->models = models;
-    m_03864 = 0;
+    eventsMuted = 0;
     for (int i = 0; i < 0x60; i++)
     {
-        m_eae58[i] = -1;
-        m_eac58[i] = -1;
-        m_e8c38[i][0] = 0;
-        m_e9c58[i][0] = 0;
+        modelPartner[i] = -1;
+        modelAlias[i] = -1;
+        costumeNames[i][0] = 0;
+        modelFileNames[i][0] = 0;
     }
-    m_e9c38[0] = 0;
+    mapModelName[0] = 0;
     for (int i = 0; i < 0x20; i++)
     {
-        m_05dac[i] = 0;
-        m_05cac[i] = 0;
+        modelAlphaFrames[i] = 0;
+        modelAlphaStep[i] = 0;
     }
     return 1;
 }
@@ -131,15 +131,15 @@ int WorldRenderer::Bind(AnimModel *models, void *mapRoot, int *state, WorldCallb
 // else 1 (also when there is no file).
 int WorldRenderer::LoadCharacter(const char *path)
 {
-    m_00040 = -1;
-    m_00976 = 0;
+    bgm = -1;
+    transitionsOff = 0;
     m_00975 = 0;
     for (int i = 0; i < 0x20; i++)
     {
         m_eb058[i] = -1;
         sprintf(characterNames[i], "\x83\x4c\x83\x83\x83\x89%d", i);
     }
-    m_0097c = 0;
+    effectLevel = 0;
     DAT_1101de34 = 0;
     m_00974 = 0;
     fadeOnTop = 1;
@@ -152,52 +152,52 @@ int WorldRenderer::LoadCharacter(const char *path)
         m_028c0[i] = -9999;
     }
     m_03860 = -9999;
-    m_0398c = 0;
+    moviePicture = 0;
     if (callback != 0)
         callback(9999, 0);
-    m_039a8 = -1;
-    m_1410c8 = 0;
+    lastScriptFrame = -1;
+    movieActive = 0;
     notifyPending = 0;
-    m_03980 = 0;
-    m_03984 = 0;
-    m_03988 = 0;
+    postStrength = 0;
+    postStep = 0;
+    postFrames = 0;
     frame = 0;
-    m_05e40[0].Clear();
-    m_05e40[1].Clear();
-    m_05e40[2].Clear();
-    m_05e40[3].Clear();
-    m_08850 = 0;
-    m_08854 = 0;
-    m_08858 = 0;
-    m_0885c = 0;
+    levelKeys[0].Clear();
+    levelKeys[1].Clear();
+    levelKeys[2].Clear();
+    levelKeys[3].Clear();
+    levelKeyStart[0] = 0;
+    levelKeyStart[1] = 0;
+    levelKeyStart[2] = 0;
+    levelKeyStart[3] = 0;
     for (int i = 0; i < 0x20; i++)
     {
         for (int j = 0; j < 0x10; j++)
-            m_039ac[i][j][0] = 0;
-        m_e7c38[i][0] = 0;
-        m_05bac[i] = 0;
-        m_3a0e8[i] = 0;
-        m_3a268[i] = 0;
-        m_3a3e8[i] = 0;
-        m_3a1e8[i] = 0;
-        m_3a368[i] = 0;
-        m_3a4e8[i] = 0;
-        m_39c68[i] = 0;
-        m_39de8[i] = 1.0f;
-        m_39f68[i] = 1.0f;
-        m_39d68[i] = 0;
-        m_39ee8[i] = 0;
-        m_3a068[i] = 0;
+            lipNames[i][j][0] = 0;
+        faceTextureNames[i][0] = 0;
+        lipActive[i] = 0;
+        nodeAngleX[i] = 0;
+        nodeAngleY[i] = 0;
+        nodeAngleZ[i] = 0;
+        nodeAngleXFrames[i] = 0;
+        nodeAngleYFrames[i] = 0;
+        nodeAngleZFrames[i] = 0;
+        nodeA[i] = 0;
+        nodeScale[i] = 1.0f;
+        nodeT[i] = 1.0f;
+        nodeAFrames[i] = 0;
+        nodeScaleFrames[i] = 0;
+        nodeTFrames[i] = 0;
         textures[i] = -1;
         pictureKind[i] = 0;
-        m_4f668[i][0] = 0;
+        nodeFiles[i][0] = 0;
     }
     for (int i = 0; i < 0x80; i++)
     {
-        m_e6e38[i] = 0;
-        m_e7038[i] = 0;
-        m_00444[i] = 0;
-        m_00644[i] = 0;
+        scaleMode[i] = 0;
+        scaleValue[i] = 0;
+        scaleStep[i] = 0;
+        scaleFrames[i] = 0;
     }
     int model;
     for (model = 0; model < 0x60; model++)
@@ -207,32 +207,32 @@ int WorldRenderer::LoadCharacter(const char *path)
             m_00844[model] = models[model].important;
             m_008c4[model] = models[model].m_0267;
         }
-        m_eae58[model] = -1;
-        m_eac58[model] = -1;
-        m_e8c38[model][0] = 0;
-        m_e9c58[model][0] = 0;
+        modelPartner[model] = -1;
+        modelAlias[model] = -1;
+        costumeNames[model][0] = 0;
+        modelFileNames[model][0] = 0;
     }
-    m_e9c38[model] = 0;
+    mapModelName[model] = 0;
     for (int i = 0; i < 0x20; i++)
     {
-        m_3a568[i].Clear();
-        m_05dac[i] = 0;
-        m_05cac[i] = 0;
+        nodePositionKeys[i].Clear();
+        modelAlphaFrames[i] = 0;
+        modelAlphaStep[i] = 0;
     }
     for (int i = 0; i < 0xc; i++)
-        m_eb358[i].Clear();
-    m_00944[0][0] = 0;
-    m_00944[1][0] = 0;
-    m_00944[2][0] = 0;
-    m_00944[0][1] = 0;
-    m_00944[1][1] = 0;
-    m_00944[2][1] = 0;
-    m_00944[0][2] = 0;
-    m_00944[1][2] = 0;
-    m_00944[2][2] = 0;
-    m_00944[0][3] = 0;
-    m_00944[1][3] = 0;
-    m_00944[2][3] = 0;
+        motionKeys[i].Clear();
+    levelValue[0] = 0;
+    levelFrames[0] = 0;
+    levelStep[0] = 0;
+    levelValue[1] = 0;
+    levelFrames[1] = 0;
+    levelStep[1] = 0;
+    levelValue[2] = 0;
+    levelFrames[2] = 0;
+    levelStep[2] = 0;
+    levelValue[3] = 0;
+    levelFrames[3] = 0;
+    levelStep[3] = 0;
     enabled = 0;
     GameFile file;
     messageCount = 0;

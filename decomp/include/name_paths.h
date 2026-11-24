@@ -11,4 +11,6 @@
 extern "C" char DAT_10f0ec60[][NAME_PATH_SIZE];   // the registered names (slot = FUN_1013e6f0's index)
 extern "C" char DAT_10f0d548[][NAME_PATH_SIZE];   // the path that replaces each name
 
+extern "C" int FUN_1013e790(char *out, const char *text);     // Names_Expand
+
 #endif

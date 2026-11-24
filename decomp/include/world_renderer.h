@@ -40,35 +40,37 @@ enum PictureBlend
 struct WorldRenderer
 {
     Matrix4 m_00000;
-    int m_00040;
+    int bgm;                                         // 0x40: background music number of the scene (BGM command)
     char characterNames[0x20][0x20];                 // 0x44: "chara%d" (in Japanese) until a character is loaded
-    int m_00444[0x80];
-    int m_00644[0x80];
+    float scaleStep[0x80];                           // 0x444: per frame change of scaleValue
+    int scaleFrames[0x80];                           // 0x644: frames left of the scale change
     char m_00844[0x80];                              // 0x844: `important` of each model record
     char m_008c4[0x80];                              // 0x8c4: m_0267 of each model record
-    int m_00944[3][4];
+    float levelValue[4];                             // 0x944: the four level values (ROL/RGL)
+    int levelFrames[4];                              // 0x954: frames left of each level change
+    float levelStep[4];                              // 0x964: per frame change of levelValue
     char m_00974;                                    // 0x974: set for costume 6
     char m_00975;                                    // 0x975: non-zero = no screen fade
-    char m_00976;
+    char transitionsOff;                             // 0x976: non-zero = the CFD command starts no screen transition
     char pad_00977[0x1];
     int fadeOnTop;                                   // 0x978: 1 = the fade is drawn below the cinema bars
-    int m_0097c;
+    int effectLevel;                                 // 0x97c: 0..3, selected by GGQ (which level key bank applies)
     int m_00980[1000];
     int m_01920[1000];
     int m_028c0[1000];
     int m_03860;
-    int m_03864;
-    int m_03868;
+    int eventsMuted;                                 // 0x3864: non-zero = script events are not sent to the host
+    int frameLimit;                                  // 0x3868: number of frames of the scene (LEG), 900 by default
     FontRenderer *font;                              // 0x386c: the text renderer (captions)
     int captionVisible;                              // 0x3870: 1 = the caption is drawn
     int captionSize;                                 // 0x3874: font size in percent, less 25
     int captionX;                                    // 0x3878: left of the caption, -1 = centred
     int captionY;                                    // 0x387c: baseline of the caption
     char caption[0x100];                             // 0x3880: caption text; a literal backslash-n splits two lines, an opening bracket starts the speech
-    int m_03980;
-    int m_03984;
-    int m_03988;
-    char m_0398c;
+    float postStrength;                              // 0x3980: strength of the post effect (PIA)
+    float postStep;                                  // 0x3984: per frame change of postStrength
+    int postFrames;                                  // 0x3988: frames left of the change
+    char moviePicture;                               // 0x398c: picture slot that shows the playing movie
     char pad_0398d[0x3];
     int fadeColour;                                  // 0x3990: colour of the full-screen fade
     float fadeStep;                                  // 0x3994: added to fadeAmount each frame
@@ -76,45 +78,48 @@ struct WorldRenderer
     float fadeTarget;
     float fadeAmount;                                // 0x39a0: fade strength in percent (0 = off)
     int fadeMode;
-    int m_039a8;
-    char m_039ac[0x20][0x10][0x10];
-    char pad_059ac[0x200];
-    char m_05bac[0x20];
-    char pad_05bcc[0xe0];
-    int m_05cac[0x20];
-    char pad_05d2c[0x80];
-    int m_05dac[0x20];
-    char pad_05e2c[0x4];
-    Vec4 m_05e30;
-    KeyBank m_05e40[4];
-    int m_08850;
-    int m_08854;
-    int m_08858;
-    int m_0885c;
+    int lastScriptFrame;                             // 0x39a8: frame the lip text was last advanced for
+    char lipNames[0x20][0x10][0x10];                 // 0x39ac: the 16 texture names of each character's lip animation
+    char lipWeights[0x20][0x10];                     // 0x59ac: frames each lip texture is shown for
+    char lipActive[0x20];                            // 0x5bac: 1 while the lip animation of the character runs
+    char lipRepeat[0x20];                            // 0x5bcc: repeats left
+    short lipDuration[0x20];                         // 0x5bec: frames of one pass
+    char lipCountdown[0x20];                         // 0x5c2c: frames left of the current lip texture
+    char lipIndex[0x20];                             // 0x5c4c: current lip texture
+    short lipPause[0x20];                            // 0x5c6c: frames to wait before the first texture is applied
+    float modelAlphaStep[0x20];                      // 0x5cac: per frame change of the model's alpha (CTR)
+    float modelAlphaTarget[0x20];                    // 0x5d2c: alpha the model ends at
+    int modelAlphaFrames[0x20];                      // 0x5dac: frames left of the alpha change
+    char levelKeyHit;                                // 0x5e2c: set when a level key bank was sampled this call
+    char pad_05e2d[0x3];
+    Vec4 levelKey;                                   // 0x5e30: value sampled from the level key bank
+    KeyBank levelKeys[4];                            // 0x5e40: key bank of each effect level (AFK/AFQ)
+    int levelKeyStart[4];                            // 0x8850: frame the keys of each bank start at
     AnimModel *models;                               // 0x8860: the map's model records (the character table)
     char pad_08864[0x4];
     Node nodes[0x20];                                // 0x8868: map model nodes
-    float m_39c68[0x20];
-    float m_39ce8[0x20];
-    float m_39d68[0x20];
-    float m_39de8[0x20];
-    float m_39e68[0x20];
-    float m_39ee8[0x20];
-    float m_39f68[0x20];
-    float m_39fe8[0x20];
-    float m_3a068[0x20];
-    float m_3a0e8[0x20];
-    float m_3a168[0x20];
-    float m_3a1e8[0x20];
-    float m_3a268[0x20];
-    float m_3a2e8[0x20];
-    float m_3a368[0x20];
-    float m_3a3e8[0x20];
-    float m_3a468[0x20];
-    float m_3a4e8[0x20];
-    KeyBank m_3a568[0x20];
-    char pad_4f5e8[0x80];
-    char m_4f668[0x20][0x20];
+    // Per node tweens: value, per frame step and frames left, for each of the 0x20 map nodes.
+    float nodeA[0x20];                               // 0x39c68: ORA (the frame handed to the proximity pass)
+    float nodeAStep[0x20];
+    int nodeAFrames[0x20];
+    float nodeScale[0x20];                           // 0x39de8: ORS (1.0 by default)
+    float nodeScaleStep[0x20];
+    int nodeScaleFrames[0x20];
+    float nodeT[0x20];                               // 0x39f68: ORT (1.0 by default)
+    float nodeTStep[0x20];
+    int nodeTFrames[0x20];
+    float nodeAngleX[0x20];                          // 0x3a0e8: ORX (radians)
+    float nodeAngleXStep[0x20];
+    int nodeAngleXFrames[0x20];
+    float nodeAngleY[0x20];                          // 0x3a268: ORY
+    float nodeAngleYStep[0x20];
+    int nodeAngleYFrames[0x20];
+    float nodeAngleZ[0x20];                          // 0x3a3e8: ORZ
+    float nodeAngleZStep[0x20];
+    int nodeAngleZFrames[0x20];
+    KeyBank nodePositionKeys[0x20];                  // 0x3a568: position keys of each node (AOP)
+    int nodePositionStart[0x20];                     // 0x4f5e8: frame the position keys of the node were cleared at
+    char nodeFiles[0x20][0x20];                      // 0x4f668: model file loaded under each node (LDO)
     char loaded;                                     // 0x4fa68: 1 while a map is loaded
     char pad_4fa69[3];
     WorldCallback callback;                          // 0x4fa6c: host notification callback
@@ -127,21 +132,22 @@ struct WorldRenderer
     int enabled;                                     // 0xe6e2c: frame updates on
     int frame;                                       // 0xe6e30: current world frame
     int lastFrame;                                   // 0xe6e34: frame the draw lists were last built for
-    int m_e6e38[0x80];
-    int m_e7038[0x80];
-    char pad_e7238[0x200];
-    Vec4 m_e7438[0x80];
-    char m_e7c38[0x20][0x20];
+    int scaleMode[0x80];                             // 0xe6e38: -1 = the model's heading follows its path (SRM "PATH")
+    float scaleValue[0x80];                          // 0xe7038: heading of each model in degrees (SRS)
+    int pathStart[0x80];                             // 0xe7238: frame the model's path keys start at
+    Vec4 previousPosition[0x80];                     // 0xe7438: position of each model at the last frame (heading follows the path)
+    char faceTextureNames[0x20][0x20];               // 0xe7c38: face texture name of each model (FCC)
     char pad_e8038[0xc00];
-    char m_e8c38[0x80][0x20];
-    char m_e9c38[0x20];
-    char m_e9c58[0x60][0x20];
+    char costumeNames[0x80][0x20];                   // 0xe8c38: costume name of each model (VIC)
+    char mapModelName[0x20];                         // 0xe9c38: map model name (LMP)
+    char modelFileNames[0x60][0x20];                 // 0xe9c58: model file loaded for each model (LMU/LMT)
     char pad_ea858[0x400];
-    int m_eac58[0x80];
-    int m_eae58[0x80];
+    int modelAlias[0x80];                            // 0xeac58: model that stands for the slot (-1 = itself)
+    int modelPartner[0x80];                          // 0xeae58: second model that mirrors the slot (-1 = none)
     short m_eb058[0x20];
-    char pad_eb098[0x2c0];
-    KeyBank m_eb358[0x80];
+    char pad_eb098[0xc0];
+    int motionStart[0x80];                           // 0xeb158: frame the motion keys of the model start at
+    KeyBank motionKeys[0x80];                        // 0xeb358: motion key bank of each model
     Vec4 targets[0x80];                              // 0x13f558: target of each model's state
     char active[0x80];                               // 0x13fd58: 1 while the model's state runs
     char barsFull;                                   // 0x13fdd8: non-zero = show the cinema bars fully at once
@@ -150,27 +156,30 @@ struct WorldRenderer
     // The 0x20 pictures (2D images placed by the scripts, drawn by DrawPictures 0x10167440): a picture shows a
     // texture slot (`textures`) or, for a non-zero kind, the copy of the screen (`screenTexture`).
     float pictureAlpha[0x20];                        // 0x13fe5c: opacity of each picture
-    char pad_13fedc[0x100];
+    float pictureAlphaStep[PICTURE_COUNT];           // 0x13fedc: per frame change of pictureAlpha
+    int pictureAlphaFrames[PICTURE_COUNT];           // 0x13ff5c: frames left of the alpha change
     Vec4 pictureUVs[0x20];                           // 0x13ffdc: texture rectangle u0, v0, u1, v1 (kind 0)
-    Vec4 m_1401dc[0x20];
-    char pad_1403dc[0x80];
+    Vec4 pictureUVStep[PICTURE_COUNT];               // 0x1401dc: per frame change of pictureUVs
+    int pictureUVFrames[PICTURE_COUNT];              // 0x1403dc
     float pictureAngle[0x20];                        // 0x14045c: rotation of each picture
-    char pad_1404dc[0x100];
+    float pictureAngleStep[PICTURE_COUNT];           // 0x1404dc
+    int pictureAngleFrames[PICTURE_COUNT];           // 0x14055c
     float pictureGrey[0x20];                         // 0x1405dc: grey level of the specular colour (0..1)
-    char pad_14065c[0x100];
+    float pictureGreyStep[PICTURE_COUNT];            // 0x14065c
+    int pictureGreyFrames[PICTURE_COUNT];            // 0x1406dc
     Vec4 picturePositions[0x20];                     // 0x14075c: centre (640x480 screen, or world when in-world)
-    Vec4 m_14095c[0x20];
-    char pad_140b5c[0x80];
+    Vec4 picturePositionStep[PICTURE_COUNT];         // 0x14095c
+    int picturePositionFrames[PICTURE_COUNT];        // 0x140b5c
     Vec4 pictureSizes[0x20];                         // 0x140bdc: width (x) and height (y) on the 640x480 screen
-    Vec4 m_140ddc[0x20];
-    char pad_140fdc[0x80];
+    Vec4 pictureSizeStep[PICTURE_COUNT];             // 0x140ddc
+    int pictureSizeFrames[PICTURE_COUNT];            // 0x140fdc
     char pictureInWorld[0x20];                       // 0x14105c: non-zero = placed in the world (not drawn here)
     char pictureBlend[0x20];                         // 0x14107c: PictureBlend
     char pictureKind[0x20];                          // 0x14109c: PictureKind
     int screenTexture;                               // 0x1410bc: texture slot holding the copy of the screen
     int screenWidth;                                 // 0x1410c0: width of the screen copy in texels
     int screenHeight;                                // 0x1410c4: height of the screen copy in texels
-    int m_1410c8;
+    int movieActive;                                 // 0x1410c8: 1 while a movie (kind 1) plays on a picture
     int notifyPending;                               // 0x1410cc: a 0x5e0 notification must be sent on release
     WorldRenderer();
     int Bind(AnimModel *models, void *mapRoot, int *state, WorldCallback callback, void *data);  // 0x1017c9c0
@@ -178,8 +187,10 @@ struct WorldRenderer
     int M_10166910(int slot, int character, int value);                                        // 0x10166910 (CharacterBank::M_10166910 in model_misc.cpp)
     int StartFade(int mode, int target, int frames);
     void TickFade();
+    void TickCaption();                      // 0x101687c0 (model_misc.cpp)
     int SetModelState(int index, int mode);  // 0x10166f20 (world_model_state.cpp)
-    int M_1017cc90(int flags);               // builds the world for a frame (world_frame.cpp)
+    int GetMessageField(int line, int field, char *out);  // 0x101672c0 (text_fields.cpp)
+    int RunScriptFrames(int silent);         // 0x1017cc90 (world_script.cpp): runs the scene script up to the current frame and animates the world
     int AdvanceFrame();
     int Release();
     int Seek(int target);                    // 0x10189000

@@ -109,7 +109,7 @@ extern "C" int FUN_10034e80(int index, const Vec4 *offset, int range);
 extern "C" int FUN_1005f640(int slot);                        // Switch_TurnOff
 extern "C" int FUN_100627d0(int index);                       // Enemy_Defeat
 #include "bs003.h"
-extern "C" int FUN_100e7280(int index);
+#include "neo_galaxy.h"
 extern "C" int FUN_100165e0(int mode);                        // Player_SetHeadTracking
 extern "C" int FUN_1016a8d0(void);                            // Camera_SetMode2
 extern "C" int FUN_1016a8e0(void);                            // Camera_SetModeFollow
@@ -132,7 +132,6 @@ int Kind43_UpdateShots();
 int FUN_100404e0(int index, int mount, int clothes, int head, int weapon, int skipKindSelect, int alternative);
 int FUN_100615f0(int index, int scatter, int bothHands);
 int Enemy_PodLobber(int index);
-extern "C" int FUN_100e7280(int index);
 
 static inline float Atan2(float y, float x)
 {
@@ -1243,7 +1242,7 @@ int Scene_Frame()
         if (DAT_10daaae8[index].kind == 0x32 && DAT_104bfe6c == 0 && DAT_104bfe1c == 0 && DAT_104bfdf0 == 0 &&
             DAT_104bfe78 == 0 && DAT_104c0135 == 0 && DAT_104c0094 == 0 && model.matrix.translation.x > -20000.0f &&
             (DAT_10210d30[index] == 0 || DAT_1021f9c0[index] == 0))
-            FUN_100e7280(index);
+            NeoGalaxy_Update(index);
     }
 
     // The crowd weights: a person keeps a level (0..1, DAT_102199b8 phase) while it is one of the nearest in its group.

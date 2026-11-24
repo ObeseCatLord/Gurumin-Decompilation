@@ -77,10 +77,10 @@ extern "C" int FUN_1002a340(int index);   // Char_RunScript
 extern "C" int FUN_100d2110(int index);
 extern "C" int FUN_100d24a0(int index);
 #include "enemy_fighter.h"
-extern "C" int FUN_100c39c0(int index);
+#include "bs004.h"
 #include "bs005.h"
 extern "C" int FUN_100edea0(int index);
-extern "C" int FUN_100e7280(int index);
+#include "neo_galaxy.h"
 extern "C" int FUN_100dfcf0(int index);   // Char_RunBehaviour
 extern "C" int FUN_100bcb30(int index);   // Enemy_UpdateBehaviour
 extern "C" int FUN_1009e2d0(int index);
@@ -490,7 +490,7 @@ int Char_UpdateByKind(int index)
             FUN_100347d0(index);
             break;
         case 0x46:
-            FUN_100c39c0(index);
+            Bs004_Update(index);
             break;
         case 0x3f:
             Bs005_Update(index);
@@ -835,11 +835,11 @@ int Char_UpdateByKind(int index)
         FUN_100edea0(index);
         break;
     case 0x46:
-        FUN_100c39c0(index);
+        Bs004_Update(index);
         break;
     case 0x32:
         if (index < ENEMY_SLOT_FIRST)
-            FUN_100e7280(index);
+            NeoGalaxy_Update(index);
         break;
     case 0x62:
         FUN_100dfcf0(index);

@@ -16,12 +16,11 @@ struct ModelObject
     char pad_22f0[0x2c];
     int m_231c;
     char pad_2320[0x1550];
-    int m_3870;
+    int pad_3870;
 
     int M_10162f20(int value);
     int M_10163e70(int value);
     int M_10164090(int a, int b);
-    void M_101687c0();
 };
 struct ViewLimits
 {
@@ -59,8 +58,8 @@ struct CharacterBank
     char pad_0000[0x8860];
     CharacterInfo *characters;
     char pad_8864[0xe23f4];
-    int m_eac58[0x80];
-    int m_eae58[0x80];
+    int modelAlias[0x80];
+    int modelPartner[0x80];
     int M_10166910(int slot, int character, int value);
 };
 

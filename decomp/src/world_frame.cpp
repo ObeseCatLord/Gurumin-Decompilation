@@ -1,5 +1,5 @@
 // The world object (global instance at 0x10c68000): the current map's models, textures and draw lists.
-// M_1017cc90 (29,886 bytes, the largest function in APP.dll) builds the world for a frame.
+// RunScriptFrames (world_script.cpp) runs the scene script and animates the world for a frame.
 
 #include "world_renderer.h"
 
@@ -7,14 +7,14 @@ extern "C" void FUN_10143e00(int left, int top, int right, int bottom, int colou
 
 #include "camera_vars.h"
 
-// Once per frame while enabled: rebuilds the world draw lists (M_1017cc90) when the frame changed since the last
+// Once per frame while enabled: rebuilds the world draw lists (RunScriptFrames) when the frame changed since the last
 // call, publishes the frame number to four globals read by the renderers and increments it.
 int WorldRenderer::AdvanceFrame()
 {
     if (enabled != 0)
     {
         if (frame != lastFrame)
-            M_1017cc90(0);
+            RunScriptFrames(0);
         lastFrame = frame;
         DAT_1101de08 = frame;
         DAT_1101de0c = frame;
@@ -31,7 +31,7 @@ extern "C" int FUN_10174c70(int slot, int force);  // releases one reference to 
 // model nodes, and marks the world as not loaded. Returns 0.
 int WorldRenderer::Release()
 {
-    m_1410c8 = 0;
+    movieActive = 0;
     if (notifyPending != 0)
     {
         notifyPending = 0;
@@ -64,7 +64,7 @@ int WorldRenderer::Seek(int target)
         {
             frame = f;
             lastFrame = f - 1;
-            M_1017cc90(1);
+            RunScriptFrames(1);
             f++;
         } while (f <= target);
         enabled = 1;
@@ -75,7 +75,7 @@ int WorldRenderer::Seek(int target)
     {
         lastFrame = f - 1;
         frame = f;
-        M_1017cc90(1);
+        RunScriptFrames(1);
     }
     enabled = 1;
     return 0;

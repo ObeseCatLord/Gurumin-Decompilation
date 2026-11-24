@@ -3,19 +3,19 @@
 #include <windows.h>
 #include <string.h>
 
-#include "csv_table.h"
+#include "world_renderer.h"
 
-// Copies field number `field` (0-based, separated by commas or line ends) of line `line` into `out`.
+// 0x101672c0. Copies field number `field` (0-based, separated by commas or line ends) of line `line` into `out`.
 // Returns 1, or -1 when the line has fewer fields.
-int CsvTable::M_101672c0(int line, int field, char *out)
+int WorldRenderer::GetMessageField(int line, int field, char *out)
 {
     char buffer[128];
     int length = 0;
     int count = 0;
-    int size = strlen(lines[line]) + 2;
+    int size = strlen(messages[line]) + 2;
     for (int i = 0; i < size; i++)
     {
-        char c = lines[line][i];
+        char c = messages[line][i];
         if (c == 0 || c == '\n' || c == '\r' || c == ',')
         {
             if (count == field)

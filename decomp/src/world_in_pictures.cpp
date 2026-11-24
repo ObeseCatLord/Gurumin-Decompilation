@@ -45,7 +45,7 @@ void WorldRenderer::DrawWorldPictures(const Matrix4 *view, const Matrix4 *camera
         Vec4 colour;
         Vec4 addColour;
         addColour.Set(0.0f, 0.0f, 0.0f, 0.0f);
-        colour.Set(1.0f, 1.0f, 1.0f, m_39f68[i]);
+        colour.Set(1.0f, 1.0f, 1.0f, nodeT[i]);
         if (nodes[i].matrix._41 > MODEL_PARKED_X)
             nodes[i].QueueDraw(&identity, view, 0, 0xffffffff, &colour, &addColour);
     }

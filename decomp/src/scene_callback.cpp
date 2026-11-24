@@ -486,11 +486,11 @@ int Scene_HostCallback(int code, int *args)
                 {
                     if (args[0] == CALLBACK_FLAG_OUTLINE_SLOT)
                     {
-                        if (args[1] == 0 || DAT_10c68000.m_eac58[args[1]] == -1)
+                        if (args[1] == 0 || DAT_10c68000.modelAlias[args[1]] == -1)
                             DAT_104c02c5 = 0;
                         else
                         {
-                            DAT_104c02c5 = (unsigned char)DAT_10c68000.m_eac58[args[1]];
+                            DAT_104c02c5 = (unsigned char)DAT_10c68000.modelAlias[args[1]];
                             DAT_104c02c7 = CALLBACK_OUTLINE_FULL;
                         }
                     }

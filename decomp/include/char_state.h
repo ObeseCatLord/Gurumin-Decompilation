@@ -109,6 +109,28 @@ struct Bs005State
     int motionLayer;              // 0x3c: layer of the playing motion
 };
 
+// The BS_004 boss (bs004_update.cpp): the moss root creature that follows a path of nodes, then hovers, dives and
+// breathes fire. Words that the ending scene reuses: `hits` is its "motion started" flag, `hitLevel` its timer.
+struct Bs004State
+{
+    int state;                    // 0x00: 0 = rises and hovers, 1 = follows the path, 2..19 = moves and attacks, 100 = picks the next
+    int frames;                   // 0x04: frames in the current state (1000 and 2000 mark later parts of states 15 and 17)
+    int motion;                   // 0x08: motion the state wants to play (-1 = none)
+    int setUp;                    // 0x0c: 1 once the boss loaded its models and nodes
+    int playingMotion;            // 0x10: motion that was started last (-1 = none)
+    int pathPoint;                // 0x14: index of the path point it flies to
+    int previousPoint;            // 0x18: the point before
+    int lastState;                // 0x1c: the state picked last
+    int minionsDown;              // 0x20: minions that were defeated so far
+    int minionsAlive;             // 0x24: minions still standing
+    int hits;                     // 0x28: hits taken since the last reaction (the ending: 1 once its motion started)
+    int hitLevel;                 // 0x2c: DAT_102550e0 of this frame (the ending: frames since it began, from -30)
+    int motionLayer;              // 0x30: layer of the playing motion
+    int motionFrame;              // 0x34: frame of the playing motion (-1 while blending)
+    int requested;                // 0x38: state requested by the end of state 12 (1 = state 1, 2 = state 10)
+    int paused;                   // 0x3c: 1 while the game is paused
+};
+
 struct CharState
 {
     union
@@ -606,6 +628,7 @@ struct CharState
         Bs001Aux bs001Aux;                        // bs001_update.cpp: the slot after the boss
         Bs001Fade bs001Fade;                      // bs001_update.cpp: two slots after the boss
         Bs005State bs005;                         // bs005_update.cpp: the stone golem boss
+        Bs004State bs004;                         // bs004_update.cpp: the moss root boss
         int words[0x10];                          // the whole block by index (resets and copies)
         Shove shoves[4];                          // char_shove.cpp: the slot's scripted shoves
     };

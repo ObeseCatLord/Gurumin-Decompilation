@@ -37,10 +37,20 @@
 #define POST_STRENGTH_MAX 1.0f
 #define NODE_PROXIMITY_FLOOR -10000.0f
 
-static inline bool IsCommand(const char *line, char a, char b, char c)
-{
-    return line[0] == a && line[1] == b && line[2] == c;
-}
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+// Field `n` of the script line being run (field 0 is the command), read into `field`.
+#define FIELD_TEXT(n) (GetMessageField(line, (n), field), field)
+#define FIELD_INT(n) atol(FIELD_TEXT(n))
+#define FIELD_FLOAT(n) atof(FIELD_TEXT(n))
+#define FIELD_INTO(n, buffer) GetMessageField(line, (n), buffer)
+// Whether the last field read ends in the literal `extension` (case-insensitive).
+#define FIELD_ENDS_WITH(extension) (_strnicmp(field + strlen(field) - (sizeof(extension) - 1), extension, sizeof(extension) - 1) == 0)
+#define FIELD_SKIP(n) FIELD_INTO(n, field)
+
+// Whether the script line being run is the three letter command a b c.
+#define IS_COMMAND(a, b, c) (messages[line][0] == (a) && messages[line][1] == (b) && messages[line][2] == (c))
 
 // Starts a change of `value` to `target` over `frames` frames (at once when fewer than 2).
 static inline void StartChange(float &value, float &step, int &framesLeft, float target, long frames)
@@ -109,14 +119,6 @@ static int SameName(const char *a, const char *b)
     return strcmp(a, b) == 0;
 }
 
-// Whether `name` ends in `extension` (case-insensitive).
-static int HasExtension(const char *name, const char *extension)
-{
-    int length = strlen(name);
-    int extensionLength = strlen(extension);
-    return length >= extensionLength && _stricmp(name + length - extensionLength, extension) == 0;
-}
-
 static inline float Atan2(float y, float x)
 {
     return (float)atan2(y, x);
@@ -129,14 +131,19 @@ static inline float Atan2(float y, float x)
 // and no motions are started. Returns 1.
 int WorldRenderer::RunScriptFrames(int silent)
 {
-    bool skipping = false;
+    char field[0x100];
+    char newName[0x100];
+    char fileName[0x100];
+    char parentName[0x100];
+    char removeName[0x100];
+    int skipping = 0;
     levelKeyHit = 0;
     if (silent == 0 && callback != 0)
     {
         int pastFirstSecond = lastFrame > 30;
         if (callback(WORLD_EVENT_QUERY_JUMP, (int)&pastFirstSecond) != 0)
         {
-            skipping = true;
+            skipping = 1;
             frame = frameLimit - 1;
         }
     }
@@ -166,30 +173,29 @@ int WorldRenderer::RunScriptFrames(int silent)
         {
             if (current != messageIds[line])
                 continue;
-            const char *command = messages[line];
-            if (IsCommand(command, COMMAND_BLANK, COMMAND_BLANK, COMMAND_BLANK))
+            if (IS_COMMAND(COMMAND_BLANK, COMMAND_BLANK, COMMAND_BLANK))
                 continue;
-            ScriptFields args(this, line);
-            if (IsCommand(command, 'G', 'G', 'Q'))
+            if (IS_COMMAND('G', 'G', 'Q'))
             {
-                effectLevel = ClampLevel(args.Int());
+                FIELD_SKIP(1);
+                effectLevel = MIN(LEVEL_COUNT - 1, MAX(0, atol(field)));
                 DAT_1101de34 = effectLevel;
             }
-            else if (IsCommand(command, 'N', 'A', 'M'))
+            else if (IS_COMMAND('N', 'A', 'M'))
             {
-                long n = args.Int();
-                int character = n > 0x1f ? 0x1f : (n < 0 ? 0 : n);
-                strcpy(characterNames[character], args.Text());
+                FIELD_SKIP(1);
+                int character = MIN(0x1f, MAX(0, atol(field)));
+                strcpy(characterNames[character], FIELD_TEXT(2));
             }
-            else if (IsCommand(command, 'C', 'O', 'T'))
+            else if (IS_COMMAND('C', 'O', 'T'))
             {
-                DAT_10203420 = (float)args.Float();
+                DAT_10203420 = (float)FIELD_FLOAT(1);
             }
-            else if (IsCommand(command, 'P', 'I', 'A'))
+            else if (IS_COMMAND('P', 'I', 'A'))
             {
-                long mode = args.Int();
-                float strength = (float)args.Float();
-                long frames = args.Int();
+                long mode = FIELD_INT(1);
+                float strength = (float)FIELD_FLOAT(2);
+                long frames = FIELD_INT(3);
                 DAT_10f654f8 = mode;
                 if (frames < 2)
                 {
@@ -204,51 +210,114 @@ int WorldRenderer::RunScriptFrames(int silent)
                     postStep = (strength - postStrength) / (float)frames;
                 }
             }
-            else if (IsCommand(command, 'O', 'R', 'Z'))
+            else if (IS_COMMAND('O', 'R', 'Z'))
             {
-                long n = args.Int();
-                float angle = DegreesToRadians(args.Float());
-                StartChange(nodeAngleZ[n], nodeAngleZStep[n], nodeAngleZFrames[n], angle, args.Int());
+                long n = FIELD_INT(1);
+                float angle = DegreesToRadians(FIELD_FLOAT(2));
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    nodeAngleZ[n] = angle;
+                    nodeAngleZStep[n] = 0;
+                    nodeAngleZFrames[n] = 0;
+                }
+                else
+                {
+                    nodeAngleZFrames[n] = frames;
+                    nodeAngleZStep[n] = (angle - nodeAngleZ[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'O', 'R', 'A'))
+            else if (IS_COMMAND('O', 'R', 'A'))
             {
-                long n = args.Int();
-                float value = (float)args.Float();
-                StartChange(nodeA[n], nodeAStep[n], nodeAFrames[n], value, args.Int());
+                long n = FIELD_INT(1);
+                float value = (float)FIELD_FLOAT(2);
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    nodeA[n] = value;
+                    nodeAStep[n] = 0;
+                    nodeAFrames[n] = 0;
+                }
+                else
+                {
+                    nodeAFrames[n] = frames;
+                    nodeAStep[n] = (value - nodeA[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'O', 'R', 'T'))
+            else if (IS_COMMAND('O', 'R', 'T'))
             {
-                long n = args.Int();
-                float value = (float)args.Float();
-                StartChange(nodeT[n], nodeTStep[n], nodeTFrames[n], value, args.Int());
+                long n = FIELD_INT(1);
+                float value = (float)FIELD_FLOAT(2);
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    nodeT[n] = value;
+                    nodeTStep[n] = 0;
+                    nodeTFrames[n] = 0;
+                }
+                else
+                {
+                    nodeTFrames[n] = frames;
+                    nodeTStep[n] = (value - nodeT[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'O', 'R', 'S'))
+            else if (IS_COMMAND('O', 'R', 'S'))
             {
-                long n = args.Int();
-                float value = (float)args.Float();
-                StartChange(nodeScale[n], nodeScaleStep[n], nodeScaleFrames[n], value, args.Int());
+                long n = FIELD_INT(1);
+                float value = (float)FIELD_FLOAT(2);
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    nodeScale[n] = value;
+                    nodeScaleStep[n] = 0;
+                    nodeScaleFrames[n] = 0;
+                }
+                else
+                {
+                    nodeScaleFrames[n] = frames;
+                    nodeScaleStep[n] = (value - nodeScale[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'O', 'R', 'Y'))
+            else if (IS_COMMAND('O', 'R', 'Y'))
             {
-                long n = args.Int();
-                float angle = DegreesToRadians(args.Float());
-                StartChange(nodeAngleY[n], nodeAngleYStep[n], nodeAngleYFrames[n], angle, args.Int());
+                long n = FIELD_INT(1);
+                float angle = DegreesToRadians(FIELD_FLOAT(2));
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    nodeAngleY[n] = angle;
+                    nodeAngleYStep[n] = 0;
+                    nodeAngleYFrames[n] = 0;
+                }
+                else
+                {
+                    nodeAngleYFrames[n] = frames;
+                    nodeAngleYStep[n] = (angle - nodeAngleY[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'O', 'R', 'X'))
+            else if (IS_COMMAND('O', 'R', 'X'))
             {
-                long n = args.Int();
-                float angle = DegreesToRadians(args.Float());
-                StartChange(nodeAngleX[n], nodeAngleXStep[n], nodeAngleXFrames[n], angle, args.Int());
+                long n = FIELD_INT(1);
+                float angle = DegreesToRadians(FIELD_FLOAT(2));
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    nodeAngleX[n] = angle;
+                    nodeAngleXStep[n] = 0;
+                    nodeAngleXFrames[n] = 0;
+                }
+                else
+                {
+                    nodeAngleXFrames[n] = frames;
+                    nodeAngleXStep[n] = (angle - nodeAngleX[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'A', 'L', 'N'))
+            else if (IS_COMMAND('A', 'L', 'N'))
             {
-                int model = ModelOf(this, args.Int());
-                char newName[0x100];
-                char parentName[0x100];
-                char fileName[0x100];
-                strcpy(newName, args.Text());
-                strcpy(parentName, args.Text());
-                strcpy(fileName, args.Text());
+                int model = ModelOf(this, FIELD_INT(1));
+                FIELD_INTO(2, newName);
+                FIELD_INTO(3, parentName);
+                FIELD_INTO(4, fileName);
                 Node *root = models[model].root;
                 if (root->Find(newName, 0) == 0)
                 {
@@ -263,50 +332,51 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'D', 'E', 'N'))
+            else if (IS_COMMAND('D', 'E', 'N'))
             {
-                int model = ModelOf(this, args.Int());
-                Node *node = models[model].root->Find(args.Text(), 0);
+                int model = ModelOf(this, FIELD_INT(1));
+                FIELD_INTO(2, removeName);
+                Node *node = models[model].root->Find(removeName, 0);
                 if (node != 0)
                     node->parent->RemoveChild(node, 0);
             }
-            else if (IsCommand(command, 'A', 'O', 'P'))
+            else if (IS_COMMAND('A', 'O', 'P'))
             {
-                long n = args.Int();
-                long keyFrame = args.Int();
-                long x = args.Int();
-                long y = args.Int();
-                long z = args.Int();
+                long n = FIELD_INT(1);
+                long keyFrame = FIELD_INT(2);
+                long x = FIELD_INT(3);
+                long y = FIELD_INT(4);
+                long z = FIELD_INT(5);
                 nodePositionKeys[n].Set(keyFrame, (float)x, (float)y, (float)z, 0);
             }
-            else if (IsCommand(command, 'S', 'P', 'L'))
+            else if (IS_COMMAND('S', 'P', 'L'))
             {
-                long n = args.Int();
-                args.Text();
+                long n = FIELD_INT(1);
+                FIELD_TEXT(2);
                 pictureKind[n] = PICTURE_TEXTURE;
                 int movieCode = 0;
-                if (HasExtension(args.text, "mmv"))
+                if (FIELD_ENDS_WITH("mmv"))
                 {
                     pictureKind[n] = PICTURE_SCREEN;
                     movieActive = 1;
                     moviePicture = n;
                     movieCode = WORLD_EVENT_MOVIE_AVI;
                 }
-                else if (HasExtension(args.text, "mv3"))
+                else if (FIELD_ENDS_WITH("mv3"))
                 {
                     pictureKind[n] = PICTURE_SCREEN_FLIPPED;
                     moviePicture = n;
                     notifyPending = 1;
                     movieCode = WORLD_EVENT_MOVIE_MV3;
                 }
-                else if (HasExtension(args.text, ".mpg") || HasExtension(args.text, "mpeg"))
+                else if (FIELD_ENDS_WITH(".mpg") || FIELD_ENDS_WITH("mpeg"))
                 {
                     pictureKind[n] = PICTURE_SCREEN_EXACT;
                     moviePicture = n;
                     notifyPending = 2;
                     movieCode = WORLD_EVENT_MOVIE_MPEG;
                 }
-                else if (HasExtension(args.text, "avi"))
+                else if (FIELD_ENDS_WITH("avi"))
                 {
                     pictureKind[n] = PICTURE_SCREEN_EXACT;
                     notifyPending = 2;
@@ -315,11 +385,11 @@ int WorldRenderer::RunScriptFrames(int silent)
                 }
                 else
                 {
-                    textures[n] = FUN_10174ce0(FUN_1013f8a0(args.text, 0), 0, 0);
+                    textures[n] = FUN_10174ce0(FUN_1013f8a0(field, 0), 0, 0);
                 }
                 if (movieCode != 0)
                 {
-                    unsigned int size = callback(movieCode, (int)args.text);
+                    unsigned int size = callback(movieCode, (int)field);
                     screenHeight = size & 0x3ff;
                     screenWidth = (size >> 10) & 0x3ff;
                     screenTexture = (size >> 20) & 0x3ff;
@@ -342,20 +412,20 @@ int WorldRenderer::RunScriptFrames(int silent)
                 pictureSizeStep[n].Fill(0);
                 pictureSizeFrames[n] = 0;
             }
-            else if (IsCommand(command, 'S', 'P', 'M'))
+            else if (IS_COMMAND('S', 'P', 'M'))
             {
-                long n = args.Int();
-                pictureBlend[n] = (char)args.Int();
+                long n = FIELD_INT(1);
+                pictureBlend[n] = (char)FIELD_INT(2);
             }
-            else if (IsCommand(command, 'S', 'U', 'V'))
+            else if (IS_COMMAND('S', 'U', 'V'))
             {
-                long n = args.Int();
+                long n = FIELD_INT(1);
                 Vec4 target;
-                target.x = (float)args.Float();
-                target.y = (float)args.Float();
-                target.z = (float)args.Float();
-                target.w = (float)args.Float();
-                long frames = args.Int();
+                target.x = (float)FIELD_FLOAT(2);
+                target.y = (float)FIELD_FLOAT(3);
+                target.z = (float)FIELD_FLOAT(4);
+                target.w = (float)FIELD_FLOAT(5);
+                long frames = FIELD_INT(6);
                 if (frames < 2)
                 {
                     pictureUVs[n].Copy(target);
@@ -372,31 +442,64 @@ int WorldRenderer::RunScriptFrames(int silent)
                     pictureUVStep[n].w = (target.w - pictureUVs[n].w) / count;
                 }
             }
-            else if (IsCommand(command, 'S', 'R', 'O'))
+            else if (IS_COMMAND('S', 'R', 'O'))
             {
-                long n = args.Int();
-                float value = (float)args.Float();
-                StartChange(pictureAngle[n], pictureAngleStep[n], pictureAngleFrames[n], value, args.Int());
+                long n = FIELD_INT(1);
+                float value = (float)FIELD_FLOAT(2);
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    pictureAngle[n] = value;
+                    pictureAngleStep[n] = 0;
+                    pictureAngleFrames[n] = 0;
+                }
+                else
+                {
+                    pictureAngleFrames[n] = frames;
+                    pictureAngleStep[n] = (value - pictureAngle[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'S', 'S', 'P'))
+            else if (IS_COMMAND('S', 'S', 'P'))
             {
-                long n = args.Int();
-                float value = (float)args.Float();
-                StartChange(pictureGrey[n], pictureGreyStep[n], pictureGreyFrames[n], value, args.Int());
+                long n = FIELD_INT(1);
+                float value = (float)FIELD_FLOAT(2);
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    pictureGrey[n] = value;
+                    pictureGreyStep[n] = 0;
+                    pictureGreyFrames[n] = 0;
+                }
+                else
+                {
+                    pictureGreyFrames[n] = frames;
+                    pictureGreyStep[n] = (value - pictureGrey[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'S', 'P', 'T'))
+            else if (IS_COMMAND('S', 'P', 'T'))
             {
-                long n = args.Int();
-                float value = (float)args.Float();
-                StartChange(pictureAlpha[n], pictureAlphaStep[n], pictureAlphaFrames[n], value, args.Int());
+                long n = FIELD_INT(1);
+                float value = (float)FIELD_FLOAT(2);
+                long frames = FIELD_INT(3);
+                if (frames < 2)
+                {
+                    pictureAlpha[n] = value;
+                    pictureAlphaStep[n] = 0;
+                    pictureAlphaFrames[n] = 0;
+                }
+                else
+                {
+                    pictureAlphaFrames[n] = frames;
+                    pictureAlphaStep[n] = (value - pictureAlpha[n]) / (float)frames;
+                }
             }
-            else if (IsCommand(command, 'S', 'P', 'S'))
+            else if (IS_COMMAND('S', 'P', 'S'))
             {
-                long n = args.Int();
+                long n = FIELD_INT(1);
                 Vec4 target;
-                target.x = (float)args.Float();
-                target.y = (float)args.Float();
-                long frames = args.Int();
+                target.x = (float)FIELD_FLOAT(2);
+                target.y = (float)FIELD_FLOAT(3);
+                long frames = FIELD_INT(4);
                 if (frames < 2)
                 {
                     pictureSizes[n].Copy(target);
@@ -410,15 +513,15 @@ int WorldRenderer::RunScriptFrames(int silent)
                     pictureSizeStep[n].y = (target.y - pictureSizes[n].y) / (float)frames;
                 }
             }
-            else if (IsCommand(command, 'S', 'P', '2') || IsCommand(command, 'S', 'P', '3'))
+            else if (IS_COMMAND('S', 'P', '2') || IS_COMMAND('S', 'P', '3'))
             {
-                char inWorld = command[2] == '3';
-                long n = args.Int();
+                char inWorld = messages[line][2] == '3';
+                long n = FIELD_INT(1);
                 Vec4 target;
-                target.x = (float)args.Float();
-                target.y = (float)args.Float();
-                target.z = (float)args.Float();
-                long frames = args.Int();
+                target.x = (float)FIELD_FLOAT(2);
+                target.y = (float)FIELD_FLOAT(3);
+                target.z = (float)FIELD_FLOAT(4);
+                long frames = FIELD_INT(5);
                 if (frames < 2)
                 {
                     picturePositions[n].Copy(target);
@@ -435,34 +538,34 @@ int WorldRenderer::RunScriptFrames(int silent)
                 }
                 pictureInWorld[n] = inWorld;
             }
-            else if (IsCommand(command, 'N', 'P', 'G'))
+            else if (IS_COMMAND('N', 'P', 'G'))
             {
-                args.Skip();
-                args.Text();
+                FIELD_SKIP(1);
+                FIELD_TEXT(2);
                 if (eventsMuted == 0)
-                    callback(WORLD_EVENT_NPG, (int)args.text);
+                    callback(WORLD_EVENT_NPG, (int)field);
             }
-            else if (IsCommand(command, 'E', 'S', 'P'))
+            else if (IS_COMMAND('E', 'S', 'P'))
             {
-                int value = args.Int();
+                int value = FIELD_INT(1);
                 if (eventsMuted == 0)
                     callback(WORLD_EVENT_ESP, (int)&value);
             }
-            else if (IsCommand(command, 'R', 'O', 'P'))
+            else if (IS_COMMAND('R', 'O', 'P'))
             {
-                long n = args.Int();
+                long n = FIELD_INT(1);
                 nodePositionKeys[n].Clear();
                 nodePositionStart[n] = current;
             }
-            else if (IsCommand(command, 'L', 'D', 'O'))
+            else if (IS_COMMAND('L', 'D', 'O'))
             {
-                long n = args.Int();
-                args.Text();
-                if (_stricmp(nodeFiles[n], args.text) != 0)
+                long n = FIELD_INT(1);
+                FIELD_TEXT(2);
+                if (_stricmp(nodeFiles[n], field) != 0)
                 {
-                    strcpy(nodeFiles[n], args.text);
+                    strcpy(nodeFiles[n], field);
                     nodes[n].Release();
-                    nodes[n].Load(FUN_1013f8a0(args.text, 0), 0, 0, 0);
+                    nodes[n].Load(FUN_1013f8a0(field, 0), 0, 0, 0);
                     nodes[n].BuildMesh(1, 0);
                     nodeAngleX[n] = 0;
                     nodeAngleXStep[n] = 0;
@@ -475,54 +578,54 @@ int WorldRenderer::RunScriptFrames(int silent)
                     nodeAngleZFrames[n] = 0;
                 }
             }
-            else if (IsCommand(command, 'L', 'O', 'P'))
+            else if (IS_COMMAND('L', 'O', 'P'))
             {
                 frame = -1;
             }
-            else if (IsCommand(command, 'D', 'N', 'D'))
+            else if (IS_COMMAND('D', 'N', 'D'))
             {
-                callback(WORLD_EVENT_DND, (int)args.Text());
+                callback(WORLD_EVENT_DND, (int)FIELD_TEXT(1));
             }
-            else if (IsCommand(command, 'S', 'E', 'F'))
+            else if (IS_COMMAND('S', 'E', 'F'))
             {
                 int event[5];
-                event[1] = args.Int();
-                event[2] = args.Int();
-                event[3] = args.Int();
-                event[4] = args.Int();
-                event[0] = (int)args.Text();
+                event[1] = FIELD_INT(1);
+                event[2] = FIELD_INT(2);
+                event[3] = FIELD_INT(3);
+                event[4] = FIELD_INT(4);
+                event[0] = (int)FIELD_TEXT(5);
                 if (eventsMuted == 0 && !skipping)
                     callback(WORLD_EVENT_SOUND_EFFECT, (int)event);
             }
-            else if (IsCommand(command, 'S', 'P', 'E'))
+            else if (IS_COMMAND('S', 'P', 'E'))
             {
                 int event[2];
-                event[0] = args.Int();
-                event[1] = args.Int();
+                event[0] = FIELD_INT(1);
+                event[1] = FIELD_INT(2);
                 if (eventsMuted == 0)
                     callback(WORLD_EVENT_PLAY_EFFECT, (int)event);
             }
-            else if (IsCommand(command, 'S', 'P', 'K'))
+            else if (IS_COMMAND('S', 'P', 'K'))
             {
                 int event[2];
-                event[0] = args.Int();
-                event[1] = args.Int();
+                event[0] = FIELD_INT(1);
+                event[1] = FIELD_INT(2);
                 if (eventsMuted == 0)
                     callback(WORLD_EVENT_PLAY_SKILL, (int)event);
             }
-            else if (IsCommand(command, 'C', 'S', '2'))
+            else if (IS_COMMAND('C', 'S', '2'))
             {
                 int event[3];
-                event[2] = args.Int();
-                event[0] = args.Int();
-                event[1] = args.Int();
+                event[2] = FIELD_INT(1);
+                event[0] = FIELD_INT(2);
+                event[1] = FIELD_INT(3);
                 if (DAT_1101d870 == 0)
                 {
                     if (event[1] >= 0 && modelAlias[event[1]] >= 0)
                         event[1] = modelAlias[event[1]];
-                    if (event[0] == 0 || args.text[0] == '0')
+                    if (event[0] == 0 || field[0] == '0')
                     {
-                        event[0] = (int)args.Text();
+                        event[0] = (int)FIELD_TEXT(4);
                         if (eventsMuted == 0 && !skipping)
                             callback(WORLD_EVENT_VOICE_TEXT, (int)event);
                     }
@@ -530,50 +633,50 @@ int WorldRenderer::RunScriptFrames(int silent)
                         callback(WORLD_EVENT_VOICE, (int)event);
                 }
             }
-            else if (IsCommand(command, 'C', 'S', '3'))
+            else if (IS_COMMAND('C', 'S', '3'))
             {
                 int event[3];
-                event[2] = args.Int();
-                event[0] = args.Int();
-                event[1] = args.Int();
+                event[2] = FIELD_INT(1);
+                event[0] = FIELD_INT(2);
+                event[1] = FIELD_INT(3);
                 if (event[1] >= 0 && modelAlias[event[1]] >= 0)
                     event[1] = modelAlias[event[1]];
-                if (event[0] == 0 || args.text[0] == '0')
+                if (event[0] == 0 || field[0] == '0')
                 {
-                    event[0] = (int)args.Text();
+                    event[0] = (int)FIELD_TEXT(4);
                     if (eventsMuted == 0 && !skipping)
                         callback(WORLD_EVENT_VOICE_TEXT, (int)event);
                 }
                 else if (eventsMuted == 0 && !skipping)
                     callback(WORLD_EVENT_VOICE, (int)event);
             }
-            else if (IsCommand(command, 'C', 'S', '4'))
+            else if (IS_COMMAND('C', 'S', '4'))
             {
                 int event[6];
-                event[2] = args.Int();
-                event[0] = args.Int();
-                event[3] = args.Int();
-                event[4] = args.Int();
-                event[5] = args.Int();
-                if (event[0] == 0 || args.text[0] == '0')
+                event[2] = FIELD_INT(1);
+                event[0] = FIELD_INT(2);
+                event[3] = FIELD_INT(3);
+                event[4] = FIELD_INT(4);
+                event[5] = FIELD_INT(5);
+                if (event[0] == 0 || field[0] == '0')
                 {
-                    event[0] = (int)args.Text();
+                    event[0] = (int)FIELD_TEXT(6);
                     if (eventsMuted == 0 && !skipping)
                         callback(WORLD_EVENT_VOICE_ALT_TEXT, (int)event);
                 }
                 else if (eventsMuted == 0 && !skipping)
                     callback(WORLD_EVENT_VOICE_ALT, (int)event);
             }
-            else if (IsCommand(command, 'C', 'S', 'E'))
+            else if (IS_COMMAND('C', 'S', 'E'))
             {
                 int event[3];
-                event[0] = args.Int();
-                event[1] = args.Int();
+                event[0] = FIELD_INT(1);
+                event[1] = FIELD_INT(2);
                 event[2] = 0x32;
                 if (event[1] < 0)
                 {
-                    long voice = args.Int();
-                    if (voice == 0 || args.text[0] == '0')
+                    long voice = FIELD_INT(3);
+                    if (voice == 0 || field[0] == '0')
                     {
                         if (eventsMuted == 0 && !skipping)
                             callback(WORLD_EVENT_VOICE_STOP, (int)event);
@@ -585,9 +688,9 @@ int WorldRenderer::RunScriptFrames(int silent)
                 {
                     if (modelAlias[event[1]] >= 0)
                         event[1] = modelAlias[event[1]];
-                    if (event[0] == 0 || args.text[0] == '0')
+                    if (event[0] == 0 || field[0] == '0')
                     {
-                        event[0] = (int)args.Text();
+                        event[0] = (int)FIELD_TEXT(3);
                         if (eventsMuted == 0 && !skipping)
                             callback(WORLD_EVENT_VOICE_TEXT, (int)event);
                     }
@@ -595,55 +698,55 @@ int WorldRenderer::RunScriptFrames(int silent)
                         callback(WORLD_EVENT_VOICE, (int)event);
                 }
             }
-            else if (IsCommand(command, 'T', 'R', 'E'))
+            else if (IS_COMMAND('T', 'R', 'E'))
             {
                 int event[3];
-                event[1] = args.Int();
+                event[1] = FIELD_INT(1);
                 if (modelAlias[event[1]] >= 0)
                     event[1] = modelAlias[event[1]];
-                event[0] = args.Int();
-                event[2] = (int)args.Text();
+                event[0] = FIELD_INT(2);
+                event[2] = (int)FIELD_TEXT(3);
                 callback(WORLD_EVENT_TRIGGER_PREPARE, (int)event);
                 if (eventsMuted == 0 && !skipping)
                     callback(WORLD_EVENT_TRIGGER, (int)event);
             }
-            else if (IsCommand(command, 'R', 'E', 'F'))
+            else if (IS_COMMAND('R', 'E', 'F'))
             {
                 int event[6];
-                event[1] = args.Int();
-                event[2] = args.Int();
-                event[3] = args.Int();
-                event[0] = args.Int();
+                event[1] = FIELD_INT(1);
+                event[2] = FIELD_INT(2);
+                event[3] = FIELD_INT(3);
+                event[0] = FIELD_INT(4);
                 event[4] = 0;
                 event[5] = 0;
                 callback(WORLD_EVENT_REF_PREPARE, (int)event);
                 if (eventsMuted == 0 && !skipping)
                     callback(WORLD_EVENT_REF, (int)event);
             }
-            else if (IsCommand(command, 'R', 'E', '2'))
+            else if (IS_COMMAND('R', 'E', '2'))
             {
                 int event[6];
-                event[1] = args.Int();
-                event[2] = args.Int();
-                event[3] = args.Int();
-                event[0] = args.Int();
-                event[5] = args.Int();
+                event[1] = FIELD_INT(1);
+                event[2] = FIELD_INT(2);
+                event[3] = FIELD_INT(3);
+                event[0] = FIELD_INT(4);
+                event[5] = FIELD_INT(5);
                 event[4] = 1;
                 callback(WORLD_EVENT_REF_PREPARE, (int)event);
                 if (eventsMuted == 0 && !skipping)
                     callback(WORLD_EVENT_REF, (int)event);
             }
-            else if (IsCommand(command, 'B', 'G', 'M'))
+            else if (IS_COMMAND('B', 'G', 'M'))
             {
-                int music = args.Int();
+                int music = FIELD_INT(1);
                 if (!skipping && eventsMuted == 0)
                     callback(WORLD_EVENT_BGM, (int)&music);
                 bgm = music;
             }
-            else if (IsCommand(command, 'P', 'S', 'E'))
+            else if (IS_COMMAND('P', 'S', 'E'))
             {
-                int voice = args.Int();
-                if (voice == 0 || args.text[0] == '0')
+                int voice = FIELD_INT(1);
+                if (voice == 0 || field[0] == '0')
                 {
                     if (eventsMuted == 0 && !skipping)
                         callback(WORLD_EVENT_VOICE_STOP, (int)&voice);
@@ -651,37 +754,37 @@ int WorldRenderer::RunScriptFrames(int silent)
                 else if (eventsMuted == 0 && !skipping)
                     callback(WORLD_EVENT_VOICE_STOP_MODEL, (int)&voice);
             }
-            else if (IsCommand(command, 'M', 'P', 'A'))
+            else if (IS_COMMAND('M', 'P', 'A'))
             {
-                args.Skip();
-                args.Text();
-                callback(WORLD_EVENT_MAP_ARGS, (int)args.text);
+                FIELD_SKIP(1);
+                FIELD_TEXT(2);
+                callback(WORLD_EVENT_MAP_ARGS, (int)field);
             }
-            else if (IsCommand(command, 'C', 'F', 'D'))
+            else if (IS_COMMAND('C', 'F', 'D'))
             {
-                long mode = args.Int();
+                long mode = FIELD_INT(1);
                 if (transitionsOff == 0)
                     FUN_1015c9e0(mode);
             }
-            else if (IsCommand(command, 'F', 'C', 'S'))
+            else if (IS_COMMAND('F', 'C', 'S'))
             {
-                long character = args.Int();
-                long entry = args.Int();
-                long weight = args.Int();
+                long character = FIELD_INT(1);
+                long entry = FIELD_INT(2);
+                long weight = FIELD_INT(3);
                 lipWeights[character][entry] = weight < 2 ? 1 : (char)weight;
-                args.Text();
+                FIELD_TEXT(4);
                 if (character == 0 && m_00974 != 0)
                 {
-                    args.text[2] = '1';
-                    args.text[3] = '4';
+                    field[2] = '1';
+                    field[3] = '4';
                 }
-                strcpy(lipNames[character][entry], args.text);
+                strcpy(lipNames[character][entry], field);
                 lipRepeat[character] = LipRepeatCount(this, character);
             }
-            else if (IsCommand(command, 'F', 'L', '2'))
+            else if (IS_COMMAND('F', 'L', '2'))
             {
-                long character = args.Int();
-                lipDuration[character] = ParseLipDuration(args.Text());
+                long character = FIELD_INT(1);
+                lipDuration[character] = ParseLipDuration(FIELD_TEXT(2));
                 lipCountdown[character] = 0;
                 lipActive[character] = 1;
                 lipIndex[character] = 0;
@@ -705,15 +808,15 @@ int WorldRenderer::RunScriptFrames(int silent)
                     lipPause[character] = 0;
                 }
             }
-            else if (IsCommand(command, 'F', 'S', 'T'))
+            else if (IS_COMMAND('F', 'S', 'T'))
             {
-                long character = args.Int();
-                lipPause[character] = args.Int();
+                long character = FIELD_INT(1);
+                lipPause[character] = FIELD_INT(2);
             }
-            else if (IsCommand(command, 'F', 'C', 'L'))
+            else if (IS_COMMAND('F', 'C', 'L'))
             {
-                long character = args.Int();
-                lipDuration[character] = ParseLipDuration(args.Text());
+                long character = FIELD_INT(1);
+                lipDuration[character] = ParseLipDuration(FIELD_TEXT(2));
                 lipCountdown[character] = 0;
                 lipActive[character] = 1;
                 lipIndex[character] = 0;
@@ -721,65 +824,65 @@ int WorldRenderer::RunScriptFrames(int silent)
                     lipNames[character][e][0] = 0;
                 lipPause[character] = 0;
             }
-            else if (IsCommand(command, 'S', 'R', 'S'))
+            else if (IS_COMMAND('S', 'R', 'S'))
             {
-                int model = ModelOf(this, args.Int());
-                long value = args.Int();
-                long frames = args.Int();
+                int model = ModelOf(this, FIELD_INT(1));
+                long value = FIELD_INT(2);
+                long frames = FIELD_INT(3);
                 if (frames < 1)
                     frames = 1;
                 scaleFrames[model] = frames;
                 scaleStep[model] = ((float)value - scaleValue[model]) / (float)frames;
             }
-            else if (IsCommand(command, 'L', 'E', 'G'))
+            else if (IS_COMMAND('L', 'E', 'G'))
             {
-                frameLimit = args.Int();
+                frameLimit = FIELD_INT(1);
             }
-            else if (IsCommand(command, 'Z', 'I', 'M'))
+            else if (IS_COMMAND('Z', 'I', 'M'))
             {
-                args.Text();
-                FUN_1013e790(caption, args.text);
+                FIELD_TEXT(1);
+                FUN_1013e790(caption, field);
                 callback(WORLD_EVENT_CAPTION, (int)caption);
-                args.Text();
-                if (strrchr(args.text, '.') != 0)
-                    captionVisible = (int)(atof(args.text) * SCRIPT_FRAME_RATE);
+                FIELD_TEXT(2);
+                if (strrchr(field, '.') != 0)
+                    captionVisible = (int)(atof(field) * SCRIPT_FRAME_RATE);
                 else
-                    captionVisible = atol(args.text) + 5;
-                captionX = args.Int();
-                captionY = args.Int();
-                captionSize = args.Int();
+                    captionVisible = atol(field) + 5;
+                captionX = FIELD_INT(3);
+                captionY = FIELD_INT(4);
+                captionSize = FIELD_INT(5);
             }
-            else if (IsCommand(command, 'E', 'T', 'Q'))
+            else if (IS_COMMAND('E', 'T', 'Q'))
             {
-                args.Skip();
+                FIELD_SKIP(1);
                 if (eventsMuted == 0)
-                    FUN_1016b1e0(0, args.text);
+                    FUN_1016b1e0(0, field);
             }
-            else if (IsCommand(command, 'E', 'G', 'Q'))
+            else if (IS_COMMAND('E', 'G', 'Q'))
             {
-                long index = args.Int();
-                args.Text();
+                long index = FIELD_INT(1);
+                FIELD_TEXT(2);
                 if (eventsMuted == 0)
-                    FUN_1016b1e0(index, args.text);
+                    FUN_1016b1e0(index, field);
             }
-            else if (IsCommand(command, 'B', 'L', 'S'))
+            else if (IS_COMMAND('B', 'L', 'S'))
             {
-                unsigned long red = args.Int();
-                unsigned long green = args.Int();
-                unsigned long blue = args.Int();
+                unsigned long red = FIELD_INT(1);
+                unsigned long green = FIELD_INT(2);
+                unsigned long blue = FIELD_INT(3);
                 fadeColour = (red << 8 | green) << 8 | blue;
             }
-            else if (IsCommand(command, 'B', 'L', 'K'))
+            else if (IS_COMMAND('B', 'L', 'K'))
             {
-                long target = args.Int();
-                long frames = args.Int();
+                long target = FIELD_INT(1);
+                long frames = FIELD_INT(2);
                 StartFade(0, target, frames);
             }
-            else if (IsCommand(command, 'C', 'T', 'R'))
+            else if (IS_COMMAND('C', 'T', 'R'))
             {
-                long n = args.Int();
-                float target = (float)args.Float();
-                long frames = args.Int();
+                long n = FIELD_INT(1);
+                float target = (float)FIELD_FLOAT(2);
+                long frames = FIELD_INT(3);
                 int model = ModelOf(this, n);
                 modelAlphaFrames[n] = frames;
                 if (frames < 1)
@@ -794,7 +897,7 @@ int WorldRenderer::RunScriptFrames(int silent)
                 }
                 modelAlphaTarget[n] = target;
             }
-            else if (IsCommand(command, 'E', 'N', 'D'))
+            else if (IS_COMMAND('E', 'N', 'D'))
             {
                 if (bgm != -1 && eventsMuted == 0)
                     callback(WORLD_EVENT_BGM, (int)&bgm);
@@ -842,22 +945,22 @@ int WorldRenderer::RunScriptFrames(int silent)
                     loaded = 0;
                 }
             }
-            else if (IsCommand(command, 'F', 'C', 'C'))
+            else if (IS_COMMAND('F', 'C', 'C'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
-                    args.Text();
+                    long n = FIELD_INT(1);
+                    FIELD_TEXT(2);
                     if (eventsMuted == 0 && !skipping)
                     {
                         if (n == 0 && m_00974 != 0)
                         {
-                            args.text[2] = '1';
-                            args.text[3] = '4';
+                            field[2] = '1';
+                            field[3] = '4';
                         }
-                        if (strcmp(faceTextureNames[n], args.text) != 0)
+                        if (strcmp(faceTextureNames[n], field) != 0)
                         {
-                            int texture = FUN_10174ce0(FUN_1013f8a0(args.text, 0), 0, 0);
+                            int texture = FUN_10174ce0(FUN_1013f8a0(field, 0), 0, 0);
                             if (texture > 0)
                             {
                                 models[n].M_10161a20(texture);
@@ -866,14 +969,14 @@ int WorldRenderer::RunScriptFrames(int silent)
                             }
                         }
                     }
-                    strcpy(faceTextureNames[n], args.text);
+                    strcpy(faceTextureNames[n], field);
                 }
             }
-            else if (IsCommand(command, 'V', 'I', 'C'))
+            else if (IS_COMMAND('V', 'I', 'C'))
             {
-                long n = args.Int();
-                args.Text();
-                if (strcmp(costumeNames[n], args.text) == 0)
+                long n = FIELD_INT(1);
+                FIELD_TEXT(2);
+                if (strcmp(costumeNames[n], field) == 0)
                 {
                     int model = ModelOf(this, n);
                     faceTextureNames[n][0] = 0;
@@ -889,8 +992,8 @@ int WorldRenderer::RunScriptFrames(int silent)
                 }
                 else
                 {
-                    callback(n, (int)args.text);
-                    strcpy(costumeNames[n], args.text);
+                    callback(n, (int)field);
+                    strcpy(costumeNames[n], field);
                     faceTextureNames[n][0] = 0;
                     lipActive[n] = 0;
                     int model = ModelOf(this, n);
@@ -906,16 +1009,16 @@ int WorldRenderer::RunScriptFrames(int silent)
                     m_eb058[n] = -1;
                 }
             }
-            else if (IsCommand(command, 'L', 'M', 'U'))
+            else if (IS_COMMAND('L', 'M', 'U'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
-                    args.Text();
+                    long n = FIELD_INT(1);
+                    FIELD_TEXT(2);
                     int model = ModelOf(this, n);
                     m_eb058[n] = -1;
                     char fileName[0x100];
-                    sprintf(fileName, "up%s", args.text);
+                    sprintf(fileName, "up%s", field);
                     if (strcmp(modelFileNames[model], fileName) != 0)
                     {
                         models[model].root->PreScanFile(FUN_1013f8a0(fileName, 0), 0);
@@ -923,85 +1026,85 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'L', 'M', 'T'))
+            else if (IS_COMMAND('L', 'M', 'T'))
             {
                 if (!skipping && models != 0)
                 {
-                    long n = args.Int();
-                    args.Text();
+                    long n = FIELD_INT(1);
+                    FIELD_TEXT(2);
                     m_eb058[n] = -1;
                     int model = ModelOf(this, n);
-                    if (strcmp(modelFileNames[model], args.text) != 0)
+                    if (strcmp(modelFileNames[model], field) != 0)
                     {
                         models[model].m_0294 = 0;
                         models[model].M_10161be0(0, 0);
                         models[model].M_10161f60(0, 0);
-                        models[model].LoadModel(FUN_1013f8a0(args.text, 0));
+                        models[model].LoadModel(FUN_1013f8a0(field, 0));
                         if (modelPartner[n] >= 0)
-                            models[modelPartner[n]].LoadModel(FUN_1013f8a0(args.text, 0));
-                        strcpy(modelFileNames[model], args.text);
+                            models[modelPartner[n]].LoadModel(FUN_1013f8a0(field, 0));
+                        strcpy(modelFileNames[model], field);
                     }
                 }
             }
-            else if (IsCommand(command, 'S', 'A', 'N'))
+            else if (IS_COMMAND('S', 'A', 'N'))
             {
                 if (!skipping && models != 0)
                 {
-                    long n = args.Int();
-                    long motion = args.Int();
-                    long speed = args.Int();
-                    long a = args.Int();
-                    long b = args.Int();
+                    long n = FIELD_INT(1);
+                    long motion = FIELD_INT(2);
+                    long speed = FIELD_INT(3);
+                    long a = FIELD_INT(4);
+                    long b = FIELD_INT(5);
                     models[n].SetPlayback(motion, speed, a, b, -1, 0);
                     if (modelPartner[n] >= 0)
                         models[modelPartner[n]].SetPlayback(motion, speed, a, b, -1, 0);
                 }
             }
-            else if (IsCommand(command, 'S', 'A', 'E'))
+            else if (IS_COMMAND('S', 'A', 'E'))
             {
                 if (!skipping && models != 0)
                 {
-                    long n = args.Int();
-                    long motion = args.Int();
-                    long speed = args.Int();
-                    long a = args.Int();
-                    long b = args.Int();
-                    long c = args.Int();
-                    long d = args.Int();
+                    long n = FIELD_INT(1);
+                    long motion = FIELD_INT(2);
+                    long speed = FIELD_INT(3);
+                    long a = FIELD_INT(4);
+                    long b = FIELD_INT(5);
+                    long c = FIELD_INT(6);
+                    long d = FIELD_INT(7);
                     models[n].SetPlayback(motion, speed, a, b, c, d);
                     if (modelPartner[n] >= 0)
                         models[modelPartner[n]].SetPlayback(motion, speed, a, b, c, d);
                 }
             }
-            else if (IsCommand(command, 'R', 'I', 'K'))
+            else if (IS_COMMAND('R', 'I', 'K'))
             {
                 if (models != 0 && silent == 0)
                 {
-                    long n = args.Int();
+                    long n = FIELD_INT(1);
                     models[n].UpdateCollision();
                     if (modelPartner[n] >= 0)
                         models[modelPartner[n]].UpdateCollision();
                 }
             }
-            else if (IsCommand(command, 'C', 'S', 'D'))
+            else if (IS_COMMAND('C', 'S', 'D'))
             {
                 if (models != 0 && silent == 0)
                 {
-                    long n = args.Int();
+                    long n = FIELD_INT(1);
                     int model = ModelOf(this, n);
-                    long value = args.Int();
+                    long value = FIELD_INT(2);
                     models[model].m_17e8 = value == 0;
                     if (modelPartner[n] >= 0)
                         models[model].m_17e8 = value == 0;
                 }
             }
-            else if (IsCommand(command, 'A', 'C', 'G'))
+            else if (IS_COMMAND('A', 'C', 'G'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
-                    long motion = args.Int();
-                    long frames = args.Int();
+                    long n = FIELD_INT(1);
+                    long motion = FIELD_INT(2);
+                    long frames = FIELD_INT(3);
                     m_eb058[n] = motion;
                     if (silent == 0)
                     {
@@ -1016,14 +1119,14 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'A', 'C', 'E'))
+            else if (IS_COMMAND('A', 'C', 'E'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
-                    long motion = args.Int();
-                    long frames = args.Int();
-                    float speed = (float)args.Float();
+                    long n = FIELD_INT(1);
+                    long motion = FIELD_INT(2);
+                    long frames = FIELD_INT(3);
+                    float speed = (float)FIELD_FLOAT(4);
                     m_eb058[n] = (short)motion;
                     if (silent == 0)
                     {
@@ -1038,31 +1141,31 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'L', 'M', 'P'))
+            else if (IS_COMMAND('L', 'M', 'P'))
             {
-                args.Text();
-                if (strcmp(mapModelName, args.text) != 0)
+                FIELD_TEXT(1);
+                if (strcmp(mapModelName, field) != 0)
                 {
-                    strcpy(mapModelName, args.text);
-                    callback(WORLD_EVENT_COSTUME, (int)args.text);
+                    strcpy(mapModelName, field);
+                    callback(WORLD_EVENT_COSTUME, (int)field);
                     for (int c = 0; c < 0x80; c++)
                         costumeNames[c][0] = 0;
                 }
             }
-            else if (IsCommand(command, 'R', 'F', 'K'))
+            else if (IS_COMMAND('R', 'F', 'K'))
             {
                 levelKeys[0].Clear();
             }
-            else if (IsCommand(command, 'R', 'F', 'Q'))
+            else if (IS_COMMAND('R', 'F', 'Q'))
             {
-                long n = args.Int();
+                long n = FIELD_INT(1);
                 levelKeys[n].Clear();
             }
-            else if (IsCommand(command, 'R', 'L', 'K'))
+            else if (IS_COMMAND('R', 'L', 'K'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
+                    long n = FIELD_INT(1);
                     int model = ModelOf(this, n);
                     motionKeys[model].Clear();
                     SetModelState(model, 1);
@@ -1075,58 +1178,58 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'R', 'L', 'S'))
+            else if (IS_COMMAND('R', 'L', 'S'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
+                    long n = FIELD_INT(1);
                     SetModelState(ModelOf(this, n), -5);
                     if (modelPartner[n] >= 0)
                         SetModelState(modelPartner[n], -5);
                 }
             }
-            else if (IsCommand(command, 'A', 'F', 'K'))
+            else if (IS_COMMAND('A', 'F', 'K'))
             {
                 if (models != 0)
                 {
-                    long keyFrame = args.Int();
-                    long a = args.Int();
-                    long b = args.Int();
-                    long c = args.Int();
+                    long keyFrame = FIELD_INT(1);
+                    long a = FIELD_INT(2);
+                    long b = FIELD_INT(3);
+                    long c = FIELD_INT(4);
                     levelKeys[0].Set(keyFrame, (float)a, (float)b, (float)c, 0);
                     if (keyFrame == 0)
                         levelKeyStart[0] = current;
                 }
             }
-            else if (IsCommand(command, 'A', 'F', 'Q'))
+            else if (IS_COMMAND('A', 'F', 'Q'))
             {
                 if (models != 0)
                 {
-                    int level = args.Int();
+                    int level = FIELD_INT(1);
                     if (level < 0)
                         level = 0;
                     if (level > 2)
                         level = 3;
-                    long keyFrame = args.Int();
-                    long a = args.Int();
-                    long b = args.Int();
-                    long c = args.Int();
-                    long flag = args.Int();
+                    long keyFrame = FIELD_INT(2);
+                    long a = FIELD_INT(3);
+                    long b = FIELD_INT(4);
+                    long c = FIELD_INT(5);
+                    long flag = FIELD_INT(6);
                     int key = levelKeys[level].Set(keyFrame, (float)a, (float)b, (float)c, 0);
                     levelKeys[level].flags[key] = (char)flag;
                     if (keyFrame == 0)
                         levelKeyStart[level] = current;
                 }
             }
-            else if (IsCommand(command, 'A', 'L', 'K'))
+            else if (IS_COMMAND('A', 'L', 'K'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
-                    long keyFrame = args.Int();
-                    float a = (float)args.Int();
-                    long b = args.Int();
-                    long c = args.Int();
+                    long n = FIELD_INT(1);
+                    long keyFrame = FIELD_INT(2);
+                    float a = (float)FIELD_INT(3);
+                    long b = FIELD_INT(4);
+                    long c = FIELD_INT(5);
                     int model = ModelOf(this, n);
                     motionKeys[model].Set(keyFrame, a, (float)b, (float)c, 0);
                     if (keyFrame == 0)
@@ -1139,11 +1242,11 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'R', 'P', 'K') || IsCommand(command, 'R', 'P', '2'))
+            else if (IS_COMMAND('R', 'P', 'K') || IS_COMMAND('R', 'P', '2'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
+                    long n = FIELD_INT(1);
                     int model = ModelOf(this, n);
                     pathStart[model] = current;
                     models[model].M_10161a60();
@@ -1154,15 +1257,15 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'A', 'P', 'K'))
+            else if (IS_COMMAND('A', 'P', 'K'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
-                    long keyFrame = args.Int();
-                    float a = (float)args.Int();
-                    long b = args.Int();
-                    long c = args.Int();
+                    long n = FIELD_INT(1);
+                    long keyFrame = FIELD_INT(2);
+                    float a = (float)FIELD_INT(3);
+                    long b = FIELD_INT(4);
+                    long c = FIELD_INT(5);
                     int model = ModelOf(this, n);
                     models[model].M_10161af0(keyFrame, a, (float)b, (float)c);
                     models[model].M_10161b40(1, 0);
@@ -1177,16 +1280,16 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'A', 'P', '2'))
+            else if (IS_COMMAND('A', 'P', '2'))
             {
                 if (models != 0)
                 {
-                    long n = args.Int();
-                    long keyFrame = args.Int();
-                    float a = (float)args.Int();
-                    long b = args.Int();
-                    long c = args.Int();
-                    long flag = args.Int();
+                    long n = FIELD_INT(1);
+                    long keyFrame = FIELD_INT(2);
+                    float a = (float)FIELD_INT(3);
+                    long b = FIELD_INT(4);
+                    long c = FIELD_INT(5);
+                    long flag = FIELD_INT(6);
                     int model = ModelOf(this, n);
                     models[model].M_10161a90(keyFrame, (float)b, a, (float)c, (char)flag);
                     models[model].M_10161b40(1, 0);
@@ -1201,68 +1304,88 @@ int WorldRenderer::RunScriptFrames(int silent)
                     }
                 }
             }
-            else if (IsCommand(command, 'R', 'C', 'M') || IsCommand(command, 'R', 'C', 'A'))
+            else if (IS_COMMAND('R', 'C', 'M'))
             {
                 DAT_1101ddf4 = 1;
                 DAT_1101ddf8[0] = 1;
                 CameraScriptFrame(0) = 0;
-                if (command[2] == 'M')
-                    DAT_118e6ce8[0].Clear();
-                else
-                    DAT_111322b8[0].Clear();
+                DAT_118e6ce8[0].Clear();
             }
-            else if (IsCommand(command, 'R', 'G', 'M') || IsCommand(command, 'R', 'G', 'A'))
+            else if (IS_COMMAND('R', 'C', 'A'))
             {
-                int slot = ClampLevel(args.Int());
+                DAT_1101ddf4 = 1;
+                DAT_1101ddf8[0] = 1;
+                CameraScriptFrame(0) = 0;
+                DAT_111322b8[0].Clear();
+            }
+            else if (IS_COMMAND('R', 'G', 'M'))
+            {
+                FIELD_SKIP(1);
+                int slot = MIN(LEVEL_COUNT - 1, MAX(0, atol(field)));
                 DAT_1101ddf4 = 1;
                 DAT_1101ddf8[slot] = 1;
                 CameraScriptFrame(slot) = 0;
-                if (command[2] == 'M')
-                    DAT_118e6ce8[slot].Clear();
-                else
-                    DAT_111322b8[slot].Clear();
+                DAT_118e6ce8[slot].Clear();
             }
-            else if (IsCommand(command, 'R', 'M', '2') || IsCommand(command, 'R', 'A', '2'))
+            else if (IS_COMMAND('R', 'G', 'A'))
+            {
+                FIELD_SKIP(1);
+                int slot = MIN(LEVEL_COUNT - 1, MAX(0, atol(field)));
+                DAT_1101ddf4 = 1;
+                DAT_1101ddf8[slot] = 1;
+                CameraScriptFrame(slot) = 0;
+                DAT_111322b8[slot].Clear();
+            }
+            else if (IS_COMMAND('R', 'M', '2'))
             {
                 DAT_1101ddf4 = 1;
                 DAT_1101ddf8[0] = 2;
                 CameraScriptFrame(0) = 0;
-                if (command[1] == 'M')
-                {
-                    DAT_118e6ce8[0].Clear();
-                    CameraScriptExponent(0) = (float)args.Float();
-                }
-                else
-                {
-                    DAT_111322b8[0].Clear();
-                    DAT_10203464[0] = (float)args.Float();
-                }
+                DAT_118e6ce8[0].Clear();
+                CameraScriptExponent(0) = (float)FIELD_FLOAT(1);
             }
-            else if (IsCommand(command, 'R', 'M', 'T') || IsCommand(command, 'R', 'A', 'T'))
+            else if (IS_COMMAND('R', 'A', '2'))
             {
-                int slot = ClampLevel(args.Int());
+                DAT_1101ddf4 = 1;
+                DAT_1101ddf8[0] = 2;
+                CameraScriptFrame(0) = 0;
+                DAT_111322b8[0].Clear();
+                DAT_10203464[0] = (float)FIELD_FLOAT(1);
+            }
+            else if (IS_COMMAND('R', 'M', 'T'))
+            {
+                long slot = FIELD_INT(1);
+                if (slot < 0)
+                    slot = 0;
+                if (slot > LEVEL_COUNT - 1)
+                    slot = LEVEL_COUNT - 1;
                 DAT_1101ddf4 = 1;
                 DAT_1101ddf8[slot] = 2;
                 CameraScriptFrame(slot) = 0;
-                if (command[1] == 'M')
-                {
-                    DAT_118e6ce8[slot].Clear();
-                    CameraScriptExponent(slot) = (float)args.Float();
-                }
-                else
-                {
-                    DAT_111322b8[slot].Clear();
-                    DAT_10203464[slot] = (float)args.Float();
-                }
+                DAT_118e6ce8[slot].Clear();
+                CameraScriptExponent(slot) = (float)FIELD_FLOAT(2);
             }
-            else if (IsCommand(command, 'S', 'R', 'M'))
+            else if (IS_COMMAND('R', 'A', 'T'))
             {
-                long n = args.Int();
-                long value = args.Int();
+                long slot = FIELD_INT(1);
+                if (slot < 0)
+                    slot = 0;
+                if (slot > LEVEL_COUNT - 1)
+                    slot = LEVEL_COUNT - 1;
+                DAT_1101ddf4 = 1;
+                DAT_1101ddf8[slot] = 2;
+                CameraScriptFrame(slot) = 0;
+                DAT_111322b8[slot].Clear();
+                DAT_10203464[slot] = (float)FIELD_FLOAT(2);
+            }
+            else if (IS_COMMAND('S', 'R', 'M'))
+            {
+                long n = FIELD_INT(1);
+                long value = FIELD_INT(2);
                 int model = ModelOf(this, n);
                 scaleStep[model] = 0;
                 scaleFrames[model] = 0;
-                if (strncmp(args.text, "PATH", 4) == 0)
+                if (strncmp(field, "PATH", 4) == 0)
                 {
                     scaleMode[model] = -1;
                 }
@@ -1272,37 +1395,56 @@ int WorldRenderer::RunScriptFrames(int silent)
                     scaleValue[model] = (float)value;
                 }
             }
-            else if (IsCommand(command, 'A', 'C', 'M') || IsCommand(command, 'A', 'C', 'A'))
+            else if (IS_COMMAND('A', 'C', 'M'))
             {
                 DAT_1101ddf4 = 1;
-                long keyFrame = args.Int();
-                long a = args.Int();
-                long b = args.Int();
-                long c = args.Int();
-                if (command[2] == 'M')
-                    DAT_118e6ce8[0].Set(keyFrame + current, (float)a, (float)b, (float)c, 0);
-                else
-                    DAT_111322b8[0].Set(keyFrame + current, (float)a, (float)b, (float)c, 0);
+                long keyFrame = FIELD_INT(1);
+                long a = FIELD_INT(2);
+                long b = FIELD_INT(3);
+                long c = FIELD_INT(4);
+                DAT_118e6ce8[0].Set(keyFrame + current, (float)a, (float)b, (float)c, 0);
             }
-            else if (IsCommand(command, 'A', 'G', 'M') || IsCommand(command, 'A', 'G', 'A'))
+            else if (IS_COMMAND('A', 'C', 'A'))
             {
                 DAT_1101ddf4 = 1;
-                int slot = ClampLevel(args.Int());
-                long keyFrame = args.Int();
-                long a = args.Int();
-                long b = args.Int();
-                long c = args.Int();
-                long flag = args.Int();
-                KeyBank &bank = command[2] == 'M' ? DAT_118e6ce8[slot] : DAT_111322b8[slot];
-                int key = bank.Set(keyFrame + current, (float)a, (float)b, (float)c, 0);
-                bank.flags[key] = (char)flag;
+                long keyFrame = FIELD_INT(1);
+                long a = FIELD_INT(2);
+                long b = FIELD_INT(3);
+                long c = FIELD_INT(4);
+                DAT_111322b8[0].Set(keyFrame + current, (float)a, (float)b, (float)c, 0);
             }
-            else if (IsCommand(command, 'R', 'O', 'L'))
+            else if (IS_COMMAND('A', 'G', 'M'))
+            {
+                DAT_1101ddf4 = 1;
+                FIELD_SKIP(1);
+                int slot = MIN(LEVEL_COUNT - 1, MAX(atol(field), 0));
+                long keyFrame = FIELD_INT(2);
+                long a = FIELD_INT(3);
+                long b = FIELD_INT(4);
+                long c = FIELD_INT(5);
+                long flag = FIELD_INT(6);
+                int key = DAT_118e6ce8[slot].Set(keyFrame + current, (float)a, (float)b, (float)c, 0);
+                DAT_118e6ce8[slot].flags[key] = (char)flag;
+            }
+            else if (IS_COMMAND('A', 'G', 'A'))
+            {
+                DAT_1101ddf4 = 1;
+                FIELD_SKIP(1);
+                int slot = MIN(LEVEL_COUNT - 1, MAX(atol(field), 0));
+                long keyFrame = FIELD_INT(2);
+                long a = FIELD_INT(3);
+                long b = FIELD_INT(4);
+                long c = FIELD_INT(5);
+                long flag = FIELD_INT(6);
+                int key = DAT_111322b8[slot].Set(keyFrame + current, (float)a, (float)b, (float)c, 0);
+                DAT_111322b8[slot].flags[key] = (char)flag;
+            }
+            else if (IS_COMMAND('R', 'O', 'L'))
             {
                 if (DAT_1101ddf4 == 0)
                     DAT_1101ddf4 = 1;
-                long value = args.Int();
-                long frames = args.Int();
+                long value = FIELD_INT(1);
+                long frames = FIELD_INT(2);
                 if (frames < 1)
                 {
                     levelStep[0] = 0;
@@ -1315,13 +1457,13 @@ int WorldRenderer::RunScriptFrames(int silent)
                     levelStep[0] = ((float)value - levelValue[0]) / (float)frames;
                 }
             }
-            else if (IsCommand(command, 'R', 'G', 'L'))
+            else if (IS_COMMAND('R', 'G', 'L'))
             {
                 if (DAT_1101ddf4 == 0)
                     DAT_1101ddf4 = 1;
-                int slot = ClampLevel(args.Int());
-                long value = args.Int();
-                long frames = args.Int();
+                int slot = ClampLevel(FIELD_INT(1));
+                long value = FIELD_INT(2);
+                long frames = FIELD_INT(3);
                 if (frames < 1)
                 {
                     levelStep[slot] = 0;

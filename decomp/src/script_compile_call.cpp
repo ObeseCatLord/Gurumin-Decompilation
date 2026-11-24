@@ -63,13 +63,14 @@ static __forceinline void SetLeftOperand(ListBank *bank, char type, const Script
 }
 
 // Evaluates the left token, then the right one, and leaves them as the operands of the nesting level.
-static __forceinline void SetBothOperands(ListBank *bank, char *left, char *right)
+static __forceinline void SetBothOperands(ListBank *bank, char *left, char *right, ScriptValue *leftValue,
+                                          char *leftType)
 {
     bank->CompileCall(left, 0);
-    ScriptValue leftValue = *(ScriptValue *)bank->result;
-    char leftType = bank->resultType;
+    *leftValue = *(ScriptValue *)bank->result;
+    *leftType = bank->resultType;
     bank->CompileCall(right, 0);
-    SetLeftOperand(bank, leftType, &leftValue);
+    SetLeftOperand(bank, *leftType, leftValue);
     bank->operandTypes[LEFT_SLOT(bank) + 1] = bank->resultType;
     bank->operands[LEFT_SLOT(bank) + 1] = *(ScriptValue *)bank->result;
 }
@@ -92,7 +93,7 @@ static __forceinline void DropTokens(short *order, int at, int count)
 // (assignments store it into the left variable; the comma only drops its right operand). The scan then starts
 // again at 0. Returns 1 when the operator was reduced.
 static __forceinline int ReduceBinary(ListBank *bank, TokenTable tokens, short *order, int *i, int *n, char c1, char c2,
-                                      int how)
+                                      int how, ScriptValue *leftValue, char *leftType)
 {
     int at = *i;
     if (at + 1 < *n && TokenAt(tokens, order, at - 1)[TOKEN_IS_OPERATOR] == 0 &&
@@ -104,7 +105,7 @@ static __forceinline int ReduceBinary(ListBank *bank, TokenTable tokens, short *
         char *op = TokenAt(tokens, order, at);
         if (how == REDUCE_VALUE)
         {
-            SetBothOperands(bank, left, right);
+            SetBothOperands(bank, left, right, leftValue, leftType);
             bank->ApplyOperator(op);
             bank->M_10004950(left, bank->result, bank->resultType);
         }
@@ -115,7 +116,7 @@ static __forceinline int ReduceBinary(ListBank *bank, TokenTable tokens, short *
         }
         else if (how == REDUCE_COMPOUND)
         {
-            SetBothOperands(bank, left, right);
+            SetBothOperands(bank, left, right, leftValue, leftType);
             bank->ApplyOperator(op);
             bank->AssignValue(left, (ScriptValue *)bank->result, bank->resultType);
         }
@@ -179,446 +180,452 @@ static __forceinline int ReportErrorExpanded(ListBank *bank, const char *message
 int ListBank::CompileCall(const char *text, int asReference)
 {
     char tokens[TOKEN_SLOTS][TOKEN_SIZE];
-    short order[TOKEN_SLOTS];
-    int n = 0;
-    int i;
-    char *source = (char *)text;
-    char *token = tokens[0];
-    int count = 0;
-    while (ReadToken(&source, token) != 0)
+    char *name;
+    ScriptValue leftValue;
+    char leftType;
     {
-        if (count >= TOKEN_SCAN_LIMIT)
-            break;
-        if (token[0] != ' ' && token[0] != '\t' && token[0] != '\n' && token[0] != '\r')
+        short order[TOKEN_SLOTS];
+        int n = 0;
+        int i;
+        char *source = (char *)text;
+        char *token = tokens[0];
+        while (ReadToken(&source, token) != 0)
         {
-            order[count] = (short)count;
-            count++;
-            token += TOKEN_SIZE;
+            if (n >= TOKEN_SCAN_LIMIT)
+                break;
+            if (token[0] != ' ' && token[0] != '\t' && token[0] != '\n' && token[0] != '\r')
+            {
+                order[n] = (short)n;
+                n++;
+                token += TOKEN_SIZE;
+            }
         }
-    }
-    n = count;
-    while (failed == 0)
-    {
-        if (n == 0)
-        {
-            resultType = EMPTY_RESULT_TYPE;
-            return 0;
-        }
-        for (i = 0; i < n; i++)
+        for (;;)
         {
             if (failed != 0)
                 return 0;
-            char *group = TokenAt(tokens, order, i);
-            if (group[0] == '(')
+            if (n == 0)
             {
-                if (asReference != 0)
-                {
-                    ReportError(REFERENCE_NEEDS_VARIABLE_TEXT);
-                    self->resultType = 0;
-                    *self->result = 0;
+                resultType = EMPTY_RESULT_TYPE;
+                return 0;
+            }
+            for (i = 0; i < n; i++)
+            {
+                if (failed != 0)
                     return 0;
-                }
-                group[0] = ' ';
-                if (group[strlen(group) - 1] != ')')
+                char *group = TokenAt(tokens, order, i);
+                if (group[0] == '(')
                 {
-                    ReportError(NO_MATCHING_BRACKET_TEXT);
-                    strcpy(group, "0");
+                    if (asReference != 0)
+                    {
+                        ReportError(REFERENCE_NEEDS_VARIABLE_TEXT);
+                        self->resultType = 0;
+                        *self->result = 0;
+                        return 0;
+                    }
+                    group[0] = ' ';
+                    if (group[strlen(group) - 1] != ')')
+                    {
+                        ReportError(NO_MATCHING_BRACKET_TEXT);
+                        strcpy(group, "0");
+                    }
+                    else
+                    {
+                        group[strlen(group) - 1] = 0;
+                        CompileCall(group, 0);
+                        M_10004950(group, result, resultType);
+                    }
                 }
-                else
+            }
+            if (n == 1)
+            {
+                name = TokenAt(tokens, order, 0);
+                break;
+            }
+            if (asReference != 0)
+            {
+                ReportErrorExpanded(this, REFERENCE_NEEDS_VARIABLE_TEXT);
+                self->resultType = 0;
+                *self->result = 0;
+                return 0;
+            }
+            i = 0;
+            while (i < n)
+            {
+                if (failed != 0)
+                    return 0;
+                if (i > 0 && TokenAt(tokens, order, i - 1)[TOKEN_IS_OPERATOR] == 0)
                 {
-                    group[strlen(group) - 1] = 0;
-                    CompileCall(group, 0);
-                    M_10004950(group, result, resultType);
+                    char *operand = TokenAt(tokens, order, i - 1);
+                    char *op = TokenAt(tokens, order, i);
+                    if (op[0] == '+' && op[1] == '+')
+                    {
+                        CompileCall(operand, 0);
+                        SetLeftOperand(this, resultType, (ScriptValue *)result);
+                        ApplyOperator("t+");
+                        AssignValue(operand, (ScriptValue *)result, resultType);
+                        if (failed == 0)
+                            DropTokens(order, i, 1);
+                        n--;
+                        i = 0;
+                        continue;
+                    }
+                    if (op[0] == '-' && op[1] == '-')
+                    {
+                        CompileCall(operand, 0);
+                        SetLeftOperand(this, resultType, (ScriptValue *)result);
+                        ApplyOperator("t-");
+                        AssignValue(operand, (ScriptValue *)result, resultType);
+                        if (failed == 0)
+                            DropTokens(order, i, 1);
+                        n--;
+                        i = 0;
+                        continue;
+                    }
                 }
+                if (ReducePrefix(this, tokens, order, &i, &n, '!', "t!") || ReducePrefix(this, tokens, order, &i, &n, '-', "tm") ||
+                    ReducePrefix(this, tokens, order, &i, &n, '+', "tp"))
+                    continue;
+                i++;
+            }
+            i = 0;
+            while (i < n - 1)
+            {
+                if (failed != 0)
+                    return 0;
+                if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '*', 0, REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '/', 0, REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '%', 0, REDUCE_VALUE, &leftValue, &leftType)))
+                    continue;
+                i++;
+            }
+            i = 0;
+            while (i < n - 1)
+            {
+                if (failed != 0)
+                    return 0;
+                if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '+', 0, REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '-', 0, REDUCE_VALUE, &leftValue, &leftType)))
+                    continue;
+                i++;
+            }
+            i = 0;
+            while (i < n - 1)
+            {
+                if (failed != 0)
+                    return 0;
+                if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '<', 0, REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '>', 0, REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '>', '=', REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '<', '=', REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '=', '=', REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '!', '=', REDUCE_VALUE, &leftValue, &leftType)))
+                    continue;
+                i++;
+            }
+            i = 0;
+            while (i < n - 1)
+            {
+                if (failed != 0)
+                    return 0;
+                if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '&', '&', REDUCE_VALUE, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '|', '|', REDUCE_VALUE, &leftValue, &leftType)))
+                    continue;
+                i++;
+            }
+            i = 0;
+            while (i < n - 1)
+            {
+                if (failed != 0)
+                    return 0;
+                if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '=', 0, REDUCE_ASSIGN, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '+', '=', REDUCE_COMPOUND, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '-', '=', REDUCE_COMPOUND, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '*', '=', REDUCE_COMPOUND, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '/', '=', REDUCE_COMPOUND, &leftValue, &leftType) ||
+                              ReduceBinary(this, tokens, order, &i, &n, '%', '=', REDUCE_COMPOUND, &leftValue, &leftType)))
+                    continue;
+                i++;
+            }
+            i = 0;
+            while (i < n - 1)
+            {
+                if (failed != 0)
+                    return 0;
+                if (i > 0 && ReduceBinary(this, tokens, order, &i, &n, ',', 0, REDUCE_COMMA, &leftValue, &leftType))
+                    continue;
+                i++;
+            }
+            if (n > 1)
+            {
+                ReportErrorExpanded(this, INTERNAL_BUG_TEXT);
+                self->resultType = 0;
+                *self->result = 0;
+                return 0;
             }
         }
-        if (n == 1)
+    }
+    {
+        while (*name == '(')
         {
-            char *name = TokenAt(tokens, order, 0);
-            while (*name == '(')
+            name++;
+            name[strlen(name) - 1] = 0;
+        }
+        int selected = 0;
+        int sameCount = 0;
+        int m = 0;
+        char word[LISTBANK_TEXT_SIZE];
+        ReadWord(&name, word);
+        int found[0x80];
+        int matches = FindAll(word, found);
+        if (matches != 0)
+        {
+            if (asReference != 0)
             {
-                name++;
-                name[strlen(name) - 1] = 0;
+                ReportError(REFERENCE_NO_FUNCTION_TEXT);
+                self->resultType = 0;
+                *self->result = 0;
+                return 0;
             }
-            char word[LISTBANK_TEXT_SIZE];
-            ReadWord(&name, word);
-            int found[0x80];
-            int matches = FindAll(word, found);
-            if (matches != 0)
+            char arguments[LISTBANK_TEXT_SIZE];
+            strcpy(arguments, name);
+            char *argumentCursor = arguments;
+            if (arguments[0] != '(')
             {
-                if (asReference != 0)
-                {
-                    ReportError(REFERENCE_NO_FUNCTION_TEXT);
-                    self->resultType = 0;
-                    *self->result = 0;
+                ReportError(NO_MATCHING_BRACKET_TEXT);
+                self->resultType = 0;
+                *self->result = 0;
+                return 0;
+            }
+            arguments[0] = ' ';
+            if (arguments[strlen(arguments) - 1] != ')')
+            {
+                ReportError(NO_MATCHING_BRACKET_TEXT);
+                self->resultType = 0;
+                *self->result = 0;
+                return 0;
+            }
+            arguments[strlen(arguments) - 1] = 0;
+            char argumentTypes[ARGUMENT_LIMIT];
+            ScriptArgument argumentList[ARGUMENT_LIMIT];
+            ScriptValue argumentValues[ARGUMENT_LIMIT];
+            char argumentTexts[ARGUMENT_LIMIT][TOKEN_SIZE];
+            int argumentCount;
+            for (argumentCount = 0; argumentCount < ARGUMENT_LIMIT; argumentCount++)
+            {
+                if (failed != 0)
                     return 0;
-                }
-                char arguments[LISTBANK_TEXT_SIZE];
-                strcpy(arguments, name);
-                char *argumentCursor = arguments;
-                if (arguments[0] != '(')
+                ReadArgument(&argumentCursor, argumentTexts[argumentCount]);
+                if (argumentTexts[argumentCount][0] == 0)
+                    break;
+                CompileCall(argumentTexts[argumentCount], 0);
+                argumentValues[argumentCount] = *(ScriptValue *)result;
+                argumentList[argumentCount].text = argumentValues[argumentCount].text;
+                argumentTypes[argumentCount] = resultType;
+            }
+            for (; m < matches; m++)
+            {
+                int candidate = found[m];
+                if (builtinParamCounts[candidate] == argumentCount)
                 {
-                    ReportError(NO_MATCHING_BRACKET_TEXT);
-                    self->resultType = 0;
-                    *self->result = 0;
-                    return 0;
-                }
-                arguments[0] = ' ';
-                if (arguments[strlen(arguments) - 1] != ')')
-                {
-                    ReportError(NO_MATCHING_BRACKET_TEXT);
-                    self->resultType = 0;
-                    *self->result = 0;
-                    return 0;
-                }
-                arguments[strlen(arguments) - 1] = 0;
-                char argumentTypes[ARGUMENT_LIMIT];
-                ScriptArgument argumentList[ARGUMENT_LIMIT];
-                ScriptValue argumentValues[ARGUMENT_LIMIT];
-                char argumentTexts[ARGUMENT_LIMIT][TOKEN_SIZE];
-                int argumentCount = 0;
-                for (int k = 0; k < ARGUMENT_LIMIT; k++)
-                {
-                    if (failed != 0)
-                        return 0;
-                    ReadArgument(&argumentCursor, argumentTexts[k]);
-                    if (argumentTexts[k][0] == 0)
+                    sameCount = 1;
+                    selected = candidate;
+                    int typesFit = 0;
+                    for (int a = 0; a < argumentCount; a++)
+                    {
+                        if (argumentTypes[a] == builtinParamTypes[candidate][a] % BY_REFERENCE_TYPE)
+                            typesFit++;
+                    }
+                    if (typesFit == argumentCount)
                         break;
-                    CompileCall(argumentTexts[k], 0);
-                    argumentValues[k] = *(ScriptValue *)result;
-                    argumentList[k].text = argumentValues[k].text;
-                    argumentTypes[k] = resultType;
-                    argumentCount++;
                 }
-                int selected = 0;
-                int sameCount = 0;
-                int m;
-                for (m = 0; m < matches; m++)
+            }
+            if (m == matches)
+            {
+                if (sameCount != 0)
+                    ReportError(ARGUMENT_TYPE_TEXT);
+                else
+                    ReportError(ARGUMENT_COUNT_TEXT);
+                return 0;
+            }
+            if (builtinIds[selected] == SCRIPT_FUNCTION_ID)
+            {
+                depth++;
+                if (builtinParamTypes[selected][0] != PARAMETER_END)
                 {
-                    int candidate = found[m];
-                    if (builtinParamCounts[candidate] == argumentCount)
+                    char *parameterType = builtinParamTypes[selected];
+                    char *parameterName = builtinParamNames[selected][0];
+                    ScriptArgument *argument = argumentList;
+                    char *argumentText = argumentTexts[0];
+                    do
                     {
-                        sameCount = 1;
-                        selected = candidate;
-                        int typesFit = 0;
-                        for (int a = 0; a < argumentCount; a++)
-                        {
-                            if (argumentTypes[a] == builtinParamTypes[candidate][a] % BY_REFERENCE_TYPE)
-                                typesFit++;
-                        }
-                        if (typesFit == argumentCount)
-                            break;
-                    }
-                }
-                if (m == matches)
-                {
-                    if (sameCount != 0)
-                        ReportError(ARGUMENT_TYPE_TEXT);
-                    else
-                        ReportError(ARGUMENT_COUNT_TEXT);
-                    return 0;
-                }
-                if (builtinIds[selected] == SCRIPT_FUNCTION_ID)
-                {
-                    depth++;
-                    if (builtinParamTypes[selected][0] != PARAMETER_END)
-                    {
-                        char *parameterType = builtinParamTypes[selected];
-                        char *parameterName = builtinParamNames[selected][0];
-                        ScriptArgument *argument = argumentList;
-                        char *argumentText = argumentTexts[0];
-                        do
-                        {
-                            if (failed != 0)
-                                return 0;
-                            if (*parameterType >= BY_REFERENCE_TYPE)
-                            {
-                                CompileCall(argumentText, 1);
-                                if (failed != 0)
-                                    return 0;
-                                int index = self->result[REFERENCE_INDEX];
-                                int group = self->result[REFERENCE_GROUP];
-                                int element = self->result[REFERENCE_ELEMENT];
-                                char type = variableTypes[group][index];
-                                if (type == 0)
-                                    M_100046d0(parameterName, depth, (int)(values[group][index].ints + element), 0);
-                                else if (type == 1)
-                                    M_100046d0(parameterName, depth, (int)(values[group][index].floats + element), 1);
-                                else if (type == 2)
-                                    M_100046d0(parameterName, depth, (int)values[group][index].texts[element], 2);
-                            }
-                            else
-                            {
-                                DeclareVariable(parameterName, depth, *parameterType);
-                                AssignValue(parameterName, (ScriptValue *)argument->text, *parameterType);
-                            }
-                            parameterName += 0x10;
-                            argumentText += TOKEN_SIZE;
-                            argument++;
-                            parameterType++;
-                        } while (*parameterType != PARAMETER_END);
-                    }
-                    cursor[depth] = builtinHandlers[selected].body;
-                    flow = 0;
-                    RunStatements(builtinReturnTypes[selected], 0);
-                    flow = 0;
-                    M_10004680(depth + 1);
-                    return 0;
-                }
-                if (builtinHandlers[selected].handler == 0)
-                    return 0;
-                for (int a = 0; a < builtinParamCounts[selected]; a++)
-                {
-                    if (builtinParamTypes[selected][a] % BY_REFERENCE_TYPE == SCRIPT_TYPE_TEXT)
-                    {
-                        strcpy((char *)found, argumentValues[a].text + 1);
-                        ((char *)found)[strlen((char *)found) - 1] = 0;
-                        strcpy(argumentValues[a].text, (char *)found);
-                    }
-                    if (builtinParamTypes[selected][a] >= BY_REFERENCE_TYPE)
-                    {
-                        CompileCall(argumentTexts[a], 1);
                         if (failed != 0)
                             return 0;
-                    }
-                }
-                builtinHandlers[selected].handler(builtinIds[selected], argumentList, this);
-                for (int a = 0; a < builtinParamCounts[selected]; a++)
-                {
-                    char type = builtinParamTypes[selected][a];
-                    if (type >= BY_REFERENCE_TYPE)
-                    {
-                        if (type % BY_REFERENCE_TYPE == SCRIPT_TYPE_TEXT)
+                        if (*parameterType >= BY_REFERENCE_TYPE)
                         {
-                            sprintf((char *)found, "\"%s\"", argumentList[a].text);
-                            AssignValue(argumentTexts[a], (ScriptValue *)found, builtinParamTypes[selected][a] % BY_REFERENCE_TYPE);
+                            CompileCall(argumentText, 1);
+                            if (failed != 0)
+                                return 0;
+                            int index = self->result[REFERENCE_INDEX];
+                            int group = self->result[REFERENCE_GROUP];
+                            int element = self->result[REFERENCE_ELEMENT];
+                            char type = variableTypes[group][index];
+                            if (type == 0)
+                                M_100046d0(parameterName, depth, (int)(values[group][index].ints + element), 0);
+                            else if (type == 1)
+                                M_100046d0(parameterName, depth, (int)(values[group][index].floats + element), 1);
+                            else if (type == 2)
+                                M_100046d0(parameterName, depth, (int)values[group][index].texts[element], 2);
                         }
                         else
-                            AssignValue(argumentTexts[a], (ScriptValue *)argumentList[a].text, type % BY_REFERENCE_TYPE);
+                        {
+                            DeclareVariable(parameterName, depth, *parameterType);
+                            AssignValue(parameterName, (ScriptValue *)argument->text, *parameterType);
+                        }
+                        parameterName += 0x10;
+                        argumentText += TOKEN_SIZE;
+                        argument++;
+                        parameterType++;
+                    } while (*parameterType != PARAMETER_END);
+                }
+                cursor[depth] = builtinHandlers[selected].body;
+                flow = 0;
+                RunStatements(builtinReturnTypes[selected], 0);
+                flow = 0;
+                M_10004680(depth + 1);
+                return 0;
+            }
+            if (builtinHandlers[selected].handler == 0)
+                return 0;
+            for (int a = 0; a < builtinParamCounts[selected]; a++)
+            {
+                if (builtinParamTypes[selected][a] % BY_REFERENCE_TYPE == SCRIPT_TYPE_TEXT)
+                {
+                    strcpy((char *)found, argumentValues[a].text + 1);
+                    ((char *)found)[strlen((char *)found) - 1] = 0;
+                    strcpy(argumentValues[a].text, (char *)found);
+                }
+                if (builtinParamTypes[selected][a] >= BY_REFERENCE_TYPE)
+                {
+                    CompileCall(argumentTexts[a], 1);
+                    if (failed != 0)
+                        return 0;
+                }
+            }
+            builtinHandlers[selected].handler(builtinIds[selected], argumentList, this);
+            for (int a = 0; a < builtinParamCounts[selected]; a++)
+            {
+                char type = builtinParamTypes[selected][a];
+                if (type >= BY_REFERENCE_TYPE)
+                {
+                    if (type % BY_REFERENCE_TYPE == SCRIPT_TYPE_TEXT)
+                    {
+                        sprintf((char *)found, "\"%s\"", argumentList[a].text);
+                        AssignValue(argumentTexts[a], (ScriptValue *)found, builtinParamTypes[selected][a] % BY_REFERENCE_TYPE);
                     }
+                    else
+                        AssignValue(argumentTexts[a], (ScriptValue *)argumentList[a].text, type % BY_REFERENCE_TYPE);
                 }
-                return 0;
             }
-            int keyword;
-            if (M_100048f0(word, &keyword) != 0)
-            {
-                int element;
-                FirstIndexValue(word, &element);
-                char type = m_367b4[keyword];
-                if (type == 0)
-                    self->resultType = type;
-                else if (type == 1)
-                    self->resultType = type;
-                else
-                    return 0;
-                *self->result = m_36734[keyword][element];
-                return 0;
-            }
-            int index;
-            int group;
+            return 0;
+        }
+        int keyword;
+        if (M_100048f0(word, &keyword) != 0)
+        {
             int element;
-            if (FindVariable(word, &index, &group, &element) != 0)
+            FirstIndexValue(word, &element);
+            char type = m_367b4[keyword];
+            if (type == 0)
+                self->resultType = type;
+            else if (type == 1)
+                self->resultType = type;
+            else
+                return 0;
+            *self->result = m_36734[keyword][element];
+            return 0;
+        }
+        int index;
+        int group;
+        int element;
+        if (FindVariable(word, &index, &group, &element) != 0)
+        {
+            if (asReference != 0)
             {
-                if (asReference != 0)
-                {
-                    self->result[REFERENCE_INDEX] = index;
-                    self->result[REFERENCE_GROUP] = group;
-                    self->result[REFERENCE_ELEMENT] = element;
-                    return 0;
-                }
-                char type = variableTypes[group][index];
-                if (type == 0)
-                {
-                    self->resultType = 0;
-                    *self->result = values[group][index].ints[element];
-                }
-                else if (type == 1)
-                {
-                    self->resultType = 1;
-                    *self->result = *(int *)(values[group][index].floats + element);
-                }
-                else if (type == 2)
-                {
-                    self->resultType = 2;
-                    strcpy((char *)self->result, values[group][index].texts[element]);
-                }
+                self->result[REFERENCE_INDEX] = index;
+                self->result[REFERENCE_GROUP] = group;
+                self->result[REFERENCE_ELEMENT] = element;
                 return 0;
             }
-            int intValue;
-            float floatValue;
-            if (M_10004a30(word, &intValue) != 0)
+            char type = variableTypes[group][index];
+            if (type == 0)
             {
-                if (asReference != 0)
-                {
-                    ReportError(REFERENCE_NO_CONSTANT_TEXT);
-                    self->resultType = 0;
-                    *self->result = 0;
-                    return 0;
-                }
-                if (failed != 0)
-                    return 0;
                 self->resultType = 0;
-                *self->result = intValue;
-                return 0;
+                *self->result = values[group][index].ints[element];
             }
-            if (M_10004aa0(word, &floatValue) != 0)
+            else if (type == 1)
             {
-                if (asReference != 0)
-                {
-                    ReportError(REFERENCE_NO_CONSTANT_TEXT);
-                    self->resultType = 0;
-                    *self->result = 0;
-                    return 0;
-                }
-                if (failed != 0)
-                    return 0;
                 self->resultType = 1;
-                *(float *)self->result = floatValue;
-                return 0;
+                *self->result = *(int *)(values[group][index].floats + element);
             }
-            if (word[0] == '"' && word[strlen(word) - 1] == '"')
+            else if (type == 2)
             {
-                if (asReference != 0)
-                {
-                    ReportError(REFERENCE_NO_CONSTANT_TEXT);
-                    self->resultType = 0;
-                    *self->result = 0;
-                    return 0;
-                }
-                if (failed != 0)
-                    return 0;
                 self->resultType = 2;
-                strcpy((char *)self->result, word);
-                return 0;
+                strcpy((char *)self->result, values[group][index].texts[element]);
             }
-            if (failed != 0)
-                return 0;
-            ReportError(UNDEFINED_IDENTIFIER_TEXT);
-            self->resultType = 0;
-            *self->result = 0;
             return 0;
         }
-        if (asReference != 0)
+        int intValue;
+        float floatValue;
+        if (M_10004a30(word, &intValue) != 0)
         {
-            ReportErrorExpanded(this, REFERENCE_NEEDS_VARIABLE_TEXT);
-            self->resultType = 0;
-            *self->result = 0;
-            return 0;
-        }
-        i = 0;
-        while (i < n)
-        {
-            if (failed != 0)
-                return 0;
-            if (i > 0 && TokenAt(tokens, order, i - 1)[TOKEN_IS_OPERATOR] == 0)
+            if (asReference != 0)
             {
-                char *operand = TokenAt(tokens, order, i - 1);
-                char *op = TokenAt(tokens, order, i);
-                if (op[0] == '+' && op[1] == '+')
-                {
-                    CompileCall(operand, 0);
-                    SetLeftOperand(this, resultType, (ScriptValue *)result);
-                    ApplyOperator("t+");
-                    AssignValue(operand, (ScriptValue *)result, resultType);
-                    if (failed == 0)
-                        DropTokens(order, i, 1);
-                    n--;
-                    i = 0;
-                    continue;
-                }
-                if (op[0] == '-' && op[1] == '-')
-                {
-                    CompileCall(operand, 0);
-                    SetLeftOperand(this, resultType, (ScriptValue *)result);
-                    ApplyOperator("t-");
-                    AssignValue(operand, (ScriptValue *)result, resultType);
-                    if (failed == 0)
-                        DropTokens(order, i, 1);
-                    n--;
-                    i = 0;
-                    continue;
-                }
+                ReportError(REFERENCE_NO_CONSTANT_TEXT);
+                self->resultType = 0;
+                *self->result = 0;
+                return 0;
             }
-            if (ReducePrefix(this, tokens, order, &i, &n, '!', "t!") || ReducePrefix(this, tokens, order, &i, &n, '-', "tm") ||
-                ReducePrefix(this, tokens, order, &i, &n, '+', "tp"))
-                continue;
-            i++;
-        }
-        i = 0;
-        while (i < n - 1)
-        {
             if (failed != 0)
                 return 0;
-            if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '*', 0, REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '/', 0, REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '%', 0, REDUCE_VALUE)))
-                continue;
-            i++;
-        }
-        i = 0;
-        while (i < n - 1)
-        {
-            if (failed != 0)
-                return 0;
-            if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '+', 0, REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '-', 0, REDUCE_VALUE)))
-                continue;
-            i++;
-        }
-        i = 0;
-        while (i < n - 1)
-        {
-            if (failed != 0)
-                return 0;
-            if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '<', 0, REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '>', 0, REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '>', '=', REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '<', '=', REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '=', '=', REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '!', '=', REDUCE_VALUE)))
-                continue;
-            i++;
-        }
-        i = 0;
-        while (i < n - 1)
-        {
-            if (failed != 0)
-                return 0;
-            if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '&', '&', REDUCE_VALUE) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '|', '|', REDUCE_VALUE)))
-                continue;
-            i++;
-        }
-        i = 0;
-        while (i < n - 1)
-        {
-            if (failed != 0)
-                return 0;
-            if (i > 0 && (ReduceBinary(this, tokens, order, &i, &n, '=', 0, REDUCE_ASSIGN) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '+', '=', REDUCE_COMPOUND) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '-', '=', REDUCE_COMPOUND) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '*', '=', REDUCE_COMPOUND) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '/', '=', REDUCE_COMPOUND) ||
-                          ReduceBinary(this, tokens, order, &i, &n, '%', '=', REDUCE_COMPOUND)))
-                continue;
-            i++;
-        }
-        i = 0;
-        while (i < n - 1)
-        {
-            if (failed != 0)
-                return 0;
-            if (i > 0 && ReduceBinary(this, tokens, order, &i, &n, ',', 0, REDUCE_COMMA))
-                continue;
-            i++;
-        }
-        if (n > 1)
-        {
-            ReportErrorExpanded(this, INTERNAL_BUG_TEXT);
             self->resultType = 0;
-            *self->result = 0;
+            *self->result = intValue;
             return 0;
         }
+        if (M_10004aa0(word, &floatValue) != 0)
+        {
+            if (asReference != 0)
+            {
+                ReportError(REFERENCE_NO_CONSTANT_TEXT);
+                self->resultType = 0;
+                *self->result = 0;
+                return 0;
+            }
+            if (failed != 0)
+                return 0;
+            self->resultType = 1;
+            *(float *)self->result = floatValue;
+            return 0;
+        }
+        if (word[0] == '"' && word[strlen(word) - 1] == '"')
+        {
+            if (asReference != 0)
+            {
+                ReportError(REFERENCE_NO_CONSTANT_TEXT);
+                self->resultType = 0;
+                *self->result = 0;
+                return 0;
+            }
+            if (failed != 0)
+                return 0;
+            self->resultType = 2;
+            strcpy((char *)self->result, word);
+            return 0;
+        }
+        if (failed != 0)
+            return 0;
+        ReportError(UNDEFINED_IDENTIFIER_TEXT);
+        self->resultType = 0;
+        *self->result = 0;
+        return 0;
     }
-    return 0;
 }

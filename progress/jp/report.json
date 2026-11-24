@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 42.4126,
+  "fuzzy_match_percent": 42.7772,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 450,
+  "total_units": 451,
   "complete_units": 186,
   "matched_rules_code": "344871",
   "matched_rules_code_percent": 20.0482,
@@ -10024,6 +10024,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/font_metrics.cpp"
+   }
+  },
+  {
+   "name": "app/football_game",
+   "measures": {
+    "fuzzy_match_percent": 32.4513,
+    "total_code": "19328",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "19328",
+     "fuzzy_match_percent": 32.4513
+    }
+   ],
+   "functions": [
+    {
+     "name": "?Map18_UpdateFootballGame@@YAHXZ",
+     "size": "19328",
+     "fuzzy_match_percent": 32.4513,
+     "metadata": {
+      "virtual_address": "268956128"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/football_game.cpp"
    }
   },
   {
@@ -26560,13 +26606,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "543863",
+    "total_code": "524535",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 28,
+    "total_functions": 27,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -26583,7 +26629,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "543863",
+     "size": "524535",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -26634,14 +26680,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268761271"
-     }
-    },
-    {
-     "name": "FUN_1007f1e0",
-     "size": "19328",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268956128"
      }
     },
     {

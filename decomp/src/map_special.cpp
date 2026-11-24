@@ -14,7 +14,7 @@
 #include "mole_game.h"
 #include "target_race.h"
 
-extern "C" void FUN_1007f1e0(void);
+#include "football_game.h"
 
 // 0x100bd960 (Map_UpdateSpecial). While the map timer runs, calls the map's own update (maps 0x15..0x18). When it
 // reaches 0 event 0x1bc is raised; afterwards the timer keeps counting down, and on map 0x18 effect 0x76d is started
@@ -35,7 +35,7 @@ int Map_UpdateSpecial()
             Map17_UpdateMoleGame();
             break;
         case 0x18:
-            FUN_1007f1e0();
+            Map18_UpdateFootballGame();
             break;
         }
     }

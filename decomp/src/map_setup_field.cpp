@@ -47,7 +47,7 @@ extern "C" int FUN_100135b0(void);
 extern "C" int FUN_10023900(void);                // Map_ResetOnEnter
 extern "C" int FUN_100fb7b0(void);                // Scene_Reset
 extern "C" int FUN_10057c40(int holder, Node *light, int kind);
-extern "C" void FUN_10058790(GameTrigger *trigger);
+#include "map_trigger_setup.h"
 extern "C" int FUN_1013f880(void);                // the game's random number
 extern "C" int FUN_1013faf0(void);                // FrameTimer_ResetNext2
 extern "C" int FUN_101619a0(void);
@@ -693,7 +693,7 @@ int FUN_100fc4a0(int map, const char *startMarker, int heightOffset)
         DAT_10860cec[i].frame = 0;
         DAT_10860cec[i].targetFrame = 0;
     }
-    DAT_10874848.ForEachActiveTrigger(FUN_10058790);
+    DAT_10874848.ForEachActiveTrigger(Map_SetUpTrigger);
     for (i = 0; i < CHARACTER_MODEL_COUNT; i++)
     {
         DAT_10db6ee8[i].SetDropCollider(DAT_10255f08);

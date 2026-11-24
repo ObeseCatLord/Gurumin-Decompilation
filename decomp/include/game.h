@@ -238,8 +238,8 @@ struct Game : Object
         return m_3ee694[index];
     }
     int IsQueuedEventReady();
-    int RunQueuedEvents(void (*callback)(GameTrigger *trigger));
-    int ForEachActiveTrigger(void (*callback)(GameTrigger *trigger));
+    int RunQueuedEvents(int (*callback)(GameTrigger *trigger));
+    int ForEachActiveTrigger(int (*callback)(GameTrigger *trigger));
     int RaiseKskonEvents(int argument);
     int RaiseTalkEvents(int argument);
     int RaiseOpenEvents(int argument);

@@ -91,7 +91,7 @@ extern "C" void FUN_1003b6e0(int index, int variant);                          /
 extern "C" unsigned int FUN_100144c0(unsigned int flags, char *text);          // Ability_GetDescription
 extern "C" int FUN_10017a60(const void *first, const void *second);            // compares two item numbers
 extern "C" int FUN_100fc4a0(int map, const char *startMarker, int heightOffset);   // Map_SetupByNumber
-extern "C" void FUN_101008e0(GameTrigger *trigger);                            // queued event callback
+extern "C" int FUN_101008e0(GameTrigger *trigger);                            // queued event callback
 
 // Adds item `itemNumber` to the equipment list when the player has it, it has a name and is a helmet (type 1).
 #define LIST_HELMET(itemNumber) \

@@ -47,7 +47,8 @@ struct NodeExtra
 // draw_list.cpp and node_draw.cpp upload the skin matrices).
 struct NodeSkin
 {
-    char pad_0000[0x80];
+    Matrix4 skinMatrix;                                // 0x00: the node's matrix for skinning (the pass sets it from chainMatrix)
+    Matrix4 chainMatrix;                               // 0x40: the node's matrix relative to the skin root, carried down the skin pass
     Node *bone;                                        // 0x80: the bone node, 0 when it is the node itself or missing
     char boneName[SKIN_NAME_SIZE];                     // 0x84: name of the node this one is bound to
     Matrix4 inverseBone;                               // 0xc4: inverse of the bone's world matrix
@@ -73,17 +74,21 @@ struct NodeSkin
 // when the node tracks a target (head_look.cpp, world_model_state.cpp).
 struct NodeSaved
 {
-    char pad_0000[0x20];
+    Vec4 vec0;                // 0x00: IK: the goal point (hip node) or the node's world position (collision node); tracking: ramp counters in y
+    Vec4 vec10;               // 0x10: IK node: the simulated point chasing the tip; collision node: the previous world position
     int state;                // 0x20: SAVED_*
     Matrix4 matrix;           // 0x24: the saved matrix
-    char pad_0064[0x14];
+    char pad_0064[4];
+    Vec4 angle;               // 0x68: tracking: current angles (x/y/z) and ramp counter in z; IK: bone lengths (x, y); collision node: velocity
     Vec3 limitMin;            // 0x78: lowest rotation per axis (radians)
     int pad_0084;
     Vec3 limitMax;            // 0x88: highest rotation per axis
     int pad_0094;
     Node *linkedNodes[8];     // 0x98: nodes of the same group linked to this one (Node::M_10191990)
     int m_00b8;
-    char pad_00bc[0x20];
+    int m_00bc;               // 0xbc: 10000 after the first update of an IK node
+    int m_00c0;               // 0xc0: 10000 likewise
+    char pad_00c4[0x18];
 
     void M_10166870();
 };

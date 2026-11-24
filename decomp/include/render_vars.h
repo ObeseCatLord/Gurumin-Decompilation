@@ -13,6 +13,7 @@
 struct IUnknownLike;   // com_min.h
 struct MeshData;   // mesh.h
 struct Node;   // node.h
+struct Channel;   // node_channel.h
 
 struct TextureObject;   // texture_object.h
 struct TextureRef;   // texture_ref.h
@@ -199,7 +200,12 @@ extern "C" int DAT_11b044dc;
 extern "C" int DAT_11b044e0;
 extern "C" int DAT_11b044e4;
 extern "C" int DAT_11b044e8;
-extern "C" int DAT_11b044ec;                              // non-zero = the plugs do not give the frame
+// Called for an animation plug of a node when DAT_11b044ec is set, in place of the plug's own sampling: the node, the
+// plug's type and channel, the arguments of the update pass (parent matrix, view, billboard matrix) and two results: the
+// transform the plug gives (slots 8 to 11) and the flag that it gave one (or, for slots 6 and 7, the frame).
+typedef void (*PlugCallback)(Node *node, int plugType, Channel *plug, float *parent, Matrix4 *view, Matrix4 *billboard,
+                             Matrix4 *transform, int *result);
+extern "C" PlugCallback DAT_11b044ec;                     // when set, the plugs do not give the frame: this is called instead
 extern "C" int DAT_11b044f4;
 extern "C" int DAT_11b044f8;                              // motion frame of the current pass (set by StartProximityPass, used by M_10194f40); the value the frame-giving plugs are sampled at
 extern "C" int DAT_11b04500;

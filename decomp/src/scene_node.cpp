@@ -114,7 +114,7 @@ int Node::StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *referenc
 {
     M_101944d0();
     DAT_11b044f8 = frame;
-    M_10194f40(position, matrix, reference, frame, b, 0);
+    UpdateWorldWithIk(position, matrix, reference, frame, b, 0);
     return 1;
 }
 

@@ -211,7 +211,7 @@ _Vec3_Dot	101ac200
 ?ReleaseSavedStates@Node@@QAEHXZ	10194510
 ?SetLayer@Playback@@QAEHHHHHHH@Z	1016a100
 ?TestScriptFlag@Game@@QAEHH@Z	100022b0
-?ForEachActiveTrigger@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z	100552f0
+?ForEachActiveTrigger@Game@@QAEHP6AHPAUGameTrigger@@@Z@Z	100552f0
 ?RaiseGameOverEvents@Game@@QAEHXZ	10054a60
 ?AddChild@Node@@QAEPAU1@PBDH@Z	101abc30
 ?Reset@EffectManager@@QAEHXZ	10184170
@@ -379,7 +379,7 @@ _sqrtf	10002010
 ?M_1015cac0@StateArrays@@QAEHMH@Z	1015cac0
 ?FindLabel@ListBank@@QAEHPBDPADPAPAD@Z	10055aa0
 ?SkipStatement@ListBank@@QAEHPAPAD@Z	10055ca0
-?RunQueuedEvents@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z	10055410
+?RunQueuedEvents@Game@@QAEHP6AHPAUGameTrigger@@@Z@Z	10055410
 ?DrawGlyph@FontRenderer@@QAEHPAGHHGGG@Z	101453e0
 ?DrawWindowMarks@Game@@QAEHH@Z	100092c0
 ?Map_SelectMovie@@YAHXZ	1001f270
@@ -670,3 +670,5 @@ _Enemy_IsBusy	100e1c40
 ?Scene_Frame@@YAHXZ	100f5a80
 ?NameEntry_Update@@YAHXZ	10116550
 ?Map_SetUpTrigger@@YAHPAUGameTrigger@@@Z	10058790
+
+?UpdateWorldWithIk@Node@@QAEHPAMPAUMatrix4@@1HHH@Z	10194f40

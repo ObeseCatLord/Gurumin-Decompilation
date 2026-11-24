@@ -251,25 +251,22 @@ int Map_SetUpTrigger(GameTrigger *trigger)
         if (trigger->values[2] > 0)
         {
             DAT_104678a0[trigger->values[0]] = (short)trigger->values[2];
-            if (DAT_10874848.TestScriptFlag(trigger->values[2]) != 0)
+            if (DAT_10874848.TestScriptFlag(trigger->values[2]) != 0 && DAT_1020af20[trigger->values[0]] != 0)
             {
                 int lever = trigger->values[0];
-                if (DAT_1020af20[lever] != 0)
+                char name[NAME_BUFFER_SIZE];
+                Vec4 position = DAT_1020af20[lever]->matrix.GetTranslation();
+                sprintf(name, "@ksk%02d", lever);
+                for (int i = 0; i < 6; i++)
                 {
-                    char name[NAME_BUFFER_SIZE];
-                    Vec4 position = DAT_1020af20[lever]->matrix.GetTranslation();
-                    sprintf(name, "@ksk%02d", lever);
-                    for (int i = 0; i < 6; i++)
-                    {
-                        Node *part = (Node *)DAT_10255f08->M_1019ed10(name, i);
-                        if (part == 0)
-                            break;
-                        part->SetFlags(NODE_FLAG_HIDDEN);
-                        part->ClearFlags(4);
-                    }
-                    DAT_1020af20[lever] = 0;
-                    DAT_1021fa40[lever] = 0;
+                    Node *part = (Node *)DAT_10255f08->M_1019ed10(name, i);
+                    if (part == 0)
+                        break;
+                    part->SetFlags(NODE_FLAG_HIDDEN);
+                    part->ClearFlags(4);
                 }
+                DAT_1020af20[lever] = 0;
+                DAT_1021fa40[lever] = 0;
             }
         }
     }
@@ -377,7 +374,7 @@ int Map_SetUpTrigger(GameTrigger *trigger)
             gimmick.m_000c = -1;
             gimmick.type = GIMMICK_TYPE_CHEST;
             gimmick.id = trigger->values[3];
-            ArmScriptFlag(trigger->values[3], trigger->values[1], trigger->values[2]);
+            ArmScriptFlag(gimmick.id, trigger->values[1], trigger->values[2]);
             strcpy(gimmick.motionOn, trigger->labels[4]);
             strcpy(gimmick.motionOff, trigger->labels[5]);
         }

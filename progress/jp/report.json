@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 42.1895,
+  "fuzzy_match_percent": 42.4126,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 449,
+  "total_units": 450,
   "complete_units": 186,
   "matched_rules_code": "344871",
   "matched_rules_code_percent": 20.0482,
@@ -1151,7 +1151,7 @@
      }
     },
     {
-     "name": "?ForEachActiveTrigger@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z",
+     "name": "?ForEachActiveTrigger@Game@@QAEHP6AHPAUGameTrigger@@@Z@Z",
      "size": "285",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -1239,7 +1239,7 @@
      }
     },
     {
-     "name": "?RunQueuedEvents@Game@@QAEHP6AXPAUGameTrigger@@@Z@Z",
+     "name": "?RunQueuedEvents@Game@@QAEHP6AHPAUGameTrigger@@@Z@Z",
      "size": "638",
      "fuzzy_match_percent": 100.0,
      "metadata": {
@@ -9697,7 +9697,7 @@
   {
    "name": "app/field_item_menu_draw",
    "measures": {
-    "fuzzy_match_percent": 36.8523,
+    "fuzzy_match_percent": 36.8631,
     "total_code": "8384",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -9722,14 +9722,14 @@
     {
      "name": ".text",
      "size": "8384",
-     "fuzzy_match_percent": 36.8523
+     "fuzzy_match_percent": 36.8631
     }
    ],
    "functions": [
     {
      "name": "?FieldItemMenu_Draw@@YAHXZ",
      "size": "8384",
-     "fuzzy_match_percent": 36.8523,
+     "fuzzy_match_percent": 36.8631,
      "metadata": {
       "virtual_address": "268682608"
      }
@@ -13359,7 +13359,7 @@
   {
    "name": "app/map_trigger_setup",
    "measures": {
-    "fuzzy_match_percent": 30.0852,
+    "fuzzy_match_percent": 35.2992,
     "total_code": "15026",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -13384,14 +13384,14 @@
     {
      "name": ".text",
      "size": "15026",
-     "fuzzy_match_percent": 30.0852
+     "fuzzy_match_percent": 35.2992
     }
    ],
    "functions": [
     {
      "name": "?Map_SetUpTrigger@@YAHPAUGameTrigger@@@Z",
      "size": "15026",
-     "fuzzy_match_percent": 30.0852,
+     "fuzzy_match_percent": 35.2992,
      "metadata": {
       "virtual_address": "268797840"
      }
@@ -17302,6 +17302,52 @@
    "metadata": {
     "complete": false,
     "source_path": "decomp/src/node_world.cpp"
+   }
+  },
+  {
+   "name": "app/node_world_ik",
+   "measures": {
+    "fuzzy_match_percent": 17.6639,
+    "total_code": "17287",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "17287",
+     "fuzzy_match_percent": 17.6639
+    }
+   ],
+   "functions": [
+    {
+     "name": "?UpdateWorldWithIk@Node@@QAEHPAMPAUMatrix4@@1HHH@Z",
+     "size": "17287",
+     "fuzzy_match_percent": 17.6639,
+     "metadata": {
+      "virtual_address": "270094144"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/node_world_ik.cpp"
    }
   },
   {
@@ -26514,13 +26560,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "561150",
+    "total_code": "543863",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 29,
+    "total_functions": 28,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -26537,7 +26583,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "561150",
+     "size": "543863",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -26756,14 +26802,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "270046512"
-     }
-    },
-    {
-     "name": "FUN_10194f40",
-     "size": "17287",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "270094144"
      }
     },
     {

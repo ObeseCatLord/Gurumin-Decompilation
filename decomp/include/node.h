@@ -351,7 +351,12 @@ struct Node
     int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);  // 0x1019f210
     int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
                            Vec4 *closest);                // 0x10191ec0
-    int M_10194f40(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b, int depth);  // 0x10194f40
+    // 0x10194f40 (node_world_ik.cpp). The update pass of a model tree: samples the plugs, runs the IK states of the node
+    // (flags 0x1000 chasing node, 0x2000/0x40000/0x80000 two-bone limb, 0x4000 collision sphere, 0x400000 target
+    // tracking), sets the world matrix from `parentWorld` and recurses; `skinParent` (a Matrix4 pointer, 0 = the normal
+    // pass) selects the skin pass of a skinned node; `forceChildren` lets a bone-less skinned node reach its children.
+    int UpdateWorldWithIk(float *parentWorld, Matrix4 *view, Matrix4 *billboard, int frame, int skinParent,
+                          int forceChildren);
     int StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b);     // 0x101a2370
     // 0x1019f340 (node_probe_collide.cpp): tests probe spheres against the meshes of `node` and its children; see the
     // definition.

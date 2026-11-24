@@ -206,6 +206,7 @@ address	name	evidence
 10192c90	Node::CylinderSphereOverlap	upright cylinder in a moved box against a moved sphere (open, decomp/src/box_overlap.cpp)
 10193140	Node::CollideModel	tests this node tree (placed by matrix plus a probe offset) against the tree under other: box/sphere/cylinder volumes, contact classes, callback DAT_11b044fc, optional push-out and retest (node_collide_model.cpp, draft)
 10193d10	Node_ShadeWaveCopy	wave-shaped normals and colours for a child copy (node_shade.cpp, draft)
+10194f40	Node::UpdateWorldWithIk	per-frame recursive node update: samples the animation plugs, runs the IK states (two-bone limb by circle intersection, damped chase node with collision spheres, target tracking), sets the world matrix, builds the skin matrices and recurses into the children (node_world_ik.cpp, draft)
 1019a6b0	Node::QueueDrawFading	QueueDraw with collision regions fading in and out over 30 frames (node_queue_fading.cpp, draft)
 1019c8d0	Node::SplitIntoCells	splits the node mesh into 100x100x80 cells per pack by triangle centre, one new vertex pack per occupied cell (the DAT_11b04500 branch of BuildMesh) (node_mesh_cells.cpp, draft)
 1019f340	Node::CollideProbesWithMesh	probe-sphere collision against the triangle meshes of a node tree (the multi-probe recursive form of SphereHitsMesh): touches are pushed out, counted or reported as a map hit (node_probe_collide.cpp, draft)

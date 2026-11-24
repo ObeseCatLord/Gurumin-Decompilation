@@ -150,7 +150,7 @@ int Game::ReadWordInLine()
 
 // Calls `callback` for every event trigger whose map is the current one (or 9999 = any) and whose four script
 // flags all pass. Returns 0.
-int Game::ForEachActiveTrigger(void (*callback)(GameTrigger *trigger))
+int Game::ForEachActiveTrigger(int (*callback)(GameTrigger *trigger))
 {
     for (int i = 0; i < triggerCount; i++)
     {
@@ -425,7 +425,7 @@ int Game::IsQueuedEventReady()
 // queued ids into runningEvents (so events queued while these run are told apart, see RegisterEvent) and clears
 // the queue, then calls `callback` for every queued trigger of one of the taken events on the current map (or
 // 9999 = any) whose four script flags pass. Returns 1 when a trigger ran, else 0.
-int Game::RunQueuedEvents(void (*callback)(GameTrigger *trigger))
+int Game::RunQueuedEvents(int (*callback)(GameTrigger *trigger))
 {
     int ids[0x100];
     int count = 0;

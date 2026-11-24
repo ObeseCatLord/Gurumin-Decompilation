@@ -24,4 +24,16 @@ extern "C" void FUN_10189080(void);              // 0x10189080: runs once per ti
 extern "C" void FUN_1013fa10(int index, int frames, float z, float y, float x, float w);   // 0x1013fa10 (colour_fades.cpp)
 extern "C" int __cdecl FUN_1000c2f0(const void *first, const void *second);   // 0x1000c2f0: compares two model indices (qsort order of the model update)
 
+extern "C" int DAT_104c024c;                 // swing power: level * 10 + sub-step (0 = at rest)
+extern "C" int DAT_104c0250;                 // swing power saved at the end of a beat
+extern "C" int DAT_104c0254;                 // frame the swing's current rhythm started at
+extern "C" int DAT_104c0258;                 // frame the swing was last started at
+
+extern "C" float DAT_10314eb8;               // strength of the scene shove (grows while the player is pushed)
+extern "C" Vec4 DAT_10868828;                // direction of the last scene shove
+extern "C" int DAT_1030c274;                 // index of the respawn point in DAT_10daa400
+extern "C" int FUN_1000f360(int index, int frame);       // 0x1000f360 (face_anim.cpp): face change of a character
+extern "C" int FUN_10016500(int index, const char *path, int start, int end, int once);   // 0x10016500 (char_motion.cpp): plays a motion file
+extern "C" int FUN_10011aa0(int id, int value);          // 0x10011aa0 (event_slots.cpp)
+
 #endif

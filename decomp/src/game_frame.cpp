@@ -97,6 +97,20 @@
 
 #include "shaga.h"
 
+#include "texture_manager.h"
+
+#include "name_entry.h"
+
+#include "doppler_loops.h"
+
+#include "scene_command_ids.h"
+
+#include "texture_load.h"
+
+#include "mesh_lit_vars.h"
+
+#include "map_trigger_setup.h"
+
 #include "game_frame.h"
 
 // Hidden-part loop, light shafts: DAT_10f65848 holds SHAFT_COUNT shafts (x, y offsets and w opacity).
@@ -135,6 +149,57 @@
 #define FISH_COURSE_KEEP 0.8f
 #define FISH_COURSE_STEER 0.2f
 #define FISH_PI 3.1415f
+// The swing (DAT_104c0240): seats within SWING_REACH of the player (2D), beat of SWING_BEAT frames in two halves.
+#define SWING_MIN_HEIGHT 5.0f
+#define SWING_REACH 150.0f
+#define SWING_START_POWER 13
+#define SWING_LEVEL_STEP 10
+#define SWING_BEAT 0x60
+#define SWING_HALF_BEAT 0x30
+#define SWING_SAVE_POWER_BEAT 0x28
+// The player's scene state DAT_104c00d0: ranges and the steps inside them.
+#define SCENE_TIMELINE_LIMIT 0xc9       // 2..200: timeline counting down from SCENE_TIMELINE_START to 1
+#define SCENE_BLANK_LIMIT 1000          // 201..999 do nothing
+#define SCENE_SPARK_LIMIT 2000          // 1000..1999: spark effect at the player
+#define SCENE_HAND_LIMIT 5000           // 2000..4999: the left hand glows
+#define SCENE_DAMAGE_LIMIT 0x2711       // 5000..10000: damage state; 10001..19999 do nothing
+#define SCENE_SHOVE_WAIT 20000          // waits for the player to stand still, then becomes SCENE_SHOVE
+#define SCENE_SHOVE 0x4e21              // the player is shoved aside
+#define SCENE_SWAN_WAIT 30000           // starts the swan ride, then becomes SCENE_SWAN
+#define SCENE_SWAN 0x7531
+#define SCENE_TIMELINE_START 200
+#define SCENE_TIMELINE_EFFECT 0xaa
+#define SCENE_TIMELINE_VOICE 0x74
+#define SCENE_TIMELINE_SHADE 0x6e
+#define SCENE_TIMELINE_RELEASE 0xc6
+#define SCENE_SPARK_START 0x3ec
+#define SCENE_SPARK_END 0x41b
+#define SCENE_SPARK_FINISH 1000
+#define SCENE_HAND_START 0x7e3
+#define SCENE_HAND_END 0x806
+#define SCENE_HAND_FINISH 2000
+#define SCENE_DAMAGE_TICK 0x13a6
+#define SCENE_DAMAGE_RECOVER 0x13c4
+#define SCENE_DAMAGE_END 0x13a0
+// The second player model (a double of the player, shown unless the costume has three pointers).
+#define SCENE_DOUBLE_MODEL 124
+#define SCENE_HIDDEN_X -200000.0f
+#define COSTUME_THREE_POINTERS 6
+// Face bits of the worn helmet (DAT_104c02c8) that scale the effect strength, and the damage bits.
+#define HELMET_FACE_400 0x400
+#define HELMET_FACE_300 0x300
+#define HELMET_FACE_200 0x200
+#define HELMET_FACE_100 0x100
+#define HELMET_NO_DAMAGE 0x8000000
+#define HELMET_HALF_DAMAGE 0x4000000
+// The shove: four directions of length SHOVE_SIDE sideways and SHOVE_DOWN down.
+#define SHOVE_SIDE 10.0f
+#define SHOVE_DOWN -5.0f
+// The swan ride: frames before it ends, the player's heading offset to the swan and the sound period.
+#define SWAN_RIDE_FRAMES 200
+#define SWAN_HEADING_OFFSET 1.57075f
+#define SWAN_SOUND_PERIOD 0xf
+#define PLAYER_TRAIL_LENGTH 16
 // Most engine ticks run in one frame; a longer backlog (or a halted engine) runs a single tick.
 #define MAX_CATCH_UP_TICKS 20
 // Menu windows closed when a queued event interrupts the open overlay mode.
@@ -164,6 +229,64 @@
 #define BGM_VOLUME_FULL 100
 // The sun's lens flare is only added when DAT_10467798 is above this.
 #define LENS_FLARE_MIN_COUNT 2
+
+// Closes the event overlay mode if it is open (windows, caption, book model and its textures). The scene states
+// run this code at the top of each timeline.
+static __forceinline void CloseEventOverlay(void)
+{
+    int slot;
+    if (DAT_104bfe1c != 0)
+    {
+        DAT_1030c54c = 0;
+        DAT_104bfd78 = 0;
+        DAT_104b7200.CloseWindow(WINDOW_ID_SAVE_MENU);
+        DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+        DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+        DAT_1020e0f8[0] = 0;
+        FUN_1000cb30("");
+        FUN_1000cb90("");
+        DAT_104bf8d4 = 1;
+        if (DAT_104c03c8 != 0)
+        {
+            DAT_104c03dc = 0;
+            DAT_104c03c8->Release();
+            DAT_11b1ba40(DAT_104c03c8);
+            DAT_104c03c8 = 0;
+            DAT_104c03cc = 0;
+            DAT_104c03d0 = 0;
+            DAT_104c03d4 = 0;
+            DAT_104c03d8 = 0;
+            DAT_104c03e0 = 0;
+            DAT_104c03e4 = 0;
+            for (slot = 0; slot < OVERLAY_TEXTURE_SLOT_COUNT; slot++)
+            {
+                if (DAT_1030b870[slot] > -1)
+                {
+                    FUN_10174c70(DAT_1030b870[slot], 1);
+                    DAT_1030b870[slot] = -1;
+                }
+            }
+        }
+        DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+        DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+        memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+        DAT_1020e0f8[0] = 0;
+        DAT_104bfe1c = 0;
+    }
+}
+
+// Fills the ring of recent player positions with the current one.
+static __forceinline void ResetPlayerTrail(void)
+{
+    DAT_104c0228 = 0;
+    DAT_104c022c = 0;
+    DAT_104c022d = 0;
+    for (int step = PLAYER_TRAIL_LENGTH; step != 0; step--)
+    {
+        DAT_10802ad8[DAT_104c022c].Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+        DAT_104c022c = DAT_104c022c + 1 & 0xf;
+    }
+}
 
 // 0x1011d810 (the in-game frame). Mode 1 of the frame step. The first call resets the mode's globals (DAT_104bf8bc
 // was 0 until then). Each call computes how many engine ticks have passed since the last one (at most
@@ -744,7 +867,522 @@ extern "C" int FUN_1011d810(void)
             }
         }
 
-        // STAGE 1b: the swarm box (DAT_104c0240), the scene states (DAT_104c00d0 > 1), doors, digging, message slots, movie and game over, pseudo.c lines 2120-2927
+        // The swing ("@BurankoRoot", seats "@b1" and "@b2"): the player standing within reach of a seat pumps it. The
+        // power DAT_104c024c is level * 10 + a sub-step; the swing plays the motion "00d".."80d" of its level, and a
+        // push that fits the 0x60 frame rhythm (DAT_104c0254 = start frame) raises it, a late or early one lets it fade.
+        if (DAT_104c0240 != 0)
+        {
+            int swingFading = 0;
+            if (DAT_10db9274 != 0 && DAT_10db9248 > SWING_MIN_HEIGHT)
+            {
+                Vec4 playerPos = DAT_10db6ee8[0].matrix.GetTranslation();
+                Vec4 seatA = DAT_104c0244->worldMatrix.GetTranslation();
+                Vec4 seatB = DAT_104c0248->worldMatrix.GetTranslation();
+                if ((seatA - playerPos).Length2D() < SWING_REACH && DAT_104c024c == 0)
+                {
+                    DAT_104c0258 = DAT_104bf8a4;
+                    DAT_104c0254 = DAT_104bf8a4;
+                    DAT_104c0240->RestartColourPlugs("02d", DAT_104bf8a4);
+                    DAT_104c024c = DAT_104c024c + SWING_START_POWER;
+                    DAT_104c0250 = DAT_104c024c;
+                }
+                if ((seatB - playerPos).Length2D() < SWING_REACH && DAT_104c024c == 0)
+                {
+                    DAT_104c0258 = DAT_104bf8a4;
+                    DAT_104c0254 = DAT_104bf8a4 - SWING_HALF_BEAT;
+                    DAT_104c0240->RestartColourPlugs("02d", DAT_104c0254);
+                    DAT_104c024c = DAT_104c024c + SWING_START_POWER;
+                    DAT_104c0250 = DAT_104c024c;
+                }
+                if (((seatA - playerPos).Length2D() < SWING_REACH && DAT_104c024c != 0
+                     && (DAT_104bf8a4 - DAT_104c0254) % SWING_BEAT >= SWING_HALF_BEAT)
+                    || ((seatB - playerPos).Length2D() < SWING_REACH && DAT_104c024c != 0
+                        && (DAT_104bf8a4 - DAT_104c0254) % SWING_BEAT < SWING_HALF_BEAT))
+                {
+                    swingFading = 1;
+                    if (DAT_104c024c % 10 > 1 && DAT_104c024c % 10 != 9)
+                        DAT_104c024c = DAT_104c024c - 1;
+                }
+                else if (((seatA - playerPos).Length2D() < SWING_REACH && DAT_104c024c != 0
+                          && (DAT_104bf8a4 - DAT_104c0254) % SWING_BEAT < SWING_HALF_BEAT)
+                         || ((seatB - playerPos).Length2D() < SWING_REACH && DAT_104c024c != 0
+                             && (DAT_104bf8a4 - DAT_104c0254) % SWING_BEAT >= SWING_HALF_BEAT))
+                {
+                    if (DAT_104c024c % 10 < 9)
+                        DAT_104c024c = DAT_104c024c + 1;
+                }
+            }
+            if (DAT_104c024c != 0)
+            {
+                if (DAT_104bf890 % 5 == 0 && DAT_104c024c % 10 > 1)
+                    DAT_104c024c = DAT_104c024c - 1;
+                if (DAT_104c024c < SWING_LEVEL_STEP)
+                {
+                    DAT_104c0240->RestartColourPlugs("00d", DAT_104c0254);
+                    DAT_104c024c = 0;
+                }
+                unsigned int swingBeat = (DAT_104bf8a4 - DAT_104c0258) % SWING_HALF_BEAT;
+                if (swingBeat == SWING_SAVE_POWER_BEAT)
+                    DAT_104c0250 = DAT_104c024c;
+                int powerStep = DAT_104c0250 % 10;
+                if ((powerStep == 8 || powerStep == 9 || powerStep == 0 || powerStep == 1) && swingBeat == 0)
+                {
+                    if (swingFading == 0)
+                    {
+                        if (powerStep == 8)
+                            DAT_104c024c = DAT_104c0250 + 4;
+                        if (powerStep == 9)
+                            DAT_104c024c = DAT_104c0250 + 3;
+                    }
+                    else if (swingFading == 1)
+                    {
+                        if (powerStep == 8)
+                            DAT_104c024c = DAT_104c0250;
+                        if (powerStep == 9)
+                            DAT_104c024c = DAT_104c0250;
+                    }
+                    if (powerStep == 0)
+                    {
+                        DAT_104c024c = DAT_104c0250 - 3;
+                        if (DAT_104c024c < 0)
+                            DAT_104c024c = 0;
+                    }
+                    if (powerStep == 1)
+                    {
+                        DAT_104c024c = DAT_104c0250 - 4;
+                        if (DAT_104c024c < 0)
+                            DAT_104c024c = 0;
+                    }
+                    if (DAT_104c024c / 10 == 0)
+                        DAT_104c0240->RestartColourPlugs("00d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 1)
+                        DAT_104c0240->RestartColourPlugs("02d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 2)
+                        DAT_104c0240->RestartColourPlugs("04d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 3)
+                        DAT_104c0240->RestartColourPlugs("06d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 4)
+                        DAT_104c0240->RestartColourPlugs("10d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 5)
+                        DAT_104c0240->RestartColourPlugs("15d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 6)
+                        DAT_104c0240->RestartColourPlugs("20d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 7)
+                        DAT_104c0240->RestartColourPlugs("30d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 8)
+                        DAT_104c0240->RestartColourPlugs("40d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 9)
+                        DAT_104c0240->RestartColourPlugs("50d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 10)
+                        DAT_104c0240->RestartColourPlugs("60d", DAT_104c0254);
+                    if (DAT_104c024c / 10 == 11)
+                        DAT_104c0240->RestartColourPlugs("70d", DAT_104c0254);
+                    if (DAT_104c024c / 10 > 11)
+                        DAT_104c0240->RestartColourPlugs("80d", DAT_104c0254);
+                }
+            }
+        }
+        // The player's scene state DAT_104c00d0 (non-zero: the player cannot be pushed). 1 = ends when the counter
+        // DAT_104c00d4 is 0; the others count down through timelines (below SCENE_TIMELINE_LIMIT, 1000..1999,
+        // 2000..4999, 5000..10000) or run until they finish (SCENE_SHOVE_WAIT.., SCENE_SWAN_WAIT..).
+        if (DAT_104c01a0 != 0)
+            DAT_104c01a0 = DAT_104c01a0 - 1;
+        if (DAT_104c00d4 == 0 && DAT_104c00d0 == 1)
+            DAT_104c00d0 = 0;
+        else if (DAT_104c00d0 > 1)
+        {
+            if (DAT_104c00d0 < SCENE_SWAN_WAIT)
+            {
+                if (DAT_104c00d0 < SCENE_SHOVE_WAIT)
+                {
+                    if (DAT_104c00d0 < SCENE_DAMAGE_LIMIT)
+                    {
+                        if (DAT_104c00d0 < SCENE_HAND_LIMIT)
+                        {
+                            if (DAT_104c00d0 < SCENE_SPARK_LIMIT)
+                            {
+                                if (DAT_104c00d0 < SCENE_BLANK_LIMIT)
+                                {
+                                    if (DAT_104c00d0 < SCENE_TIMELINE_LIMIT)
+                                    {
+                                        // The timeline counts down from SCENE_TIMELINE_START to 1.
+                                        if (DAT_104c00d0 == SCENE_TIMELINE_START)
+                                        {
+                                            CloseEventOverlay();
+                                            DAT_10db6ee8[0].m_0240 = 0;
+                                            FUN_1003ad20(0x35e, 0, 1.0f);
+                                            Node *seat = (Node *)DAT_104c00d8;
+                                            if (DAT_104c00d8 != 0)
+                                                seat->RestartColourPlugs("ON", DAT_104bf8a4);
+                                            Vec4 effectAt;
+                                            effectAt.Fill(0.0f);
+                                            DAT_10daaa80.Start(0xfaa, effectAt, -1, 0, 0, 0, 0, &seat->worldMatrix, 0, 0);
+                                            DAT_10daaa80.Start(0x5015, effectAt, -1, 0, 0, 0, 10, &seat->worldMatrix, 0, 0);
+                                            DAT_10edbdd8.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                                            DAT_10db6ee8[0].m_0294 = 0;
+                                            DAT_10db6ee8[0].motionFrame = 0;
+                                            DAT_10db6ee8[0].UpdateFrame(&DAT_108392d8, 1, 0, 0, 0);
+                                            DAT_10db6ee8[0].PlayMotion(2, 0, 1, 1.0f);
+                                            if (DAT_10c655f0 != COSTUME_THREE_POINTERS)
+                                            {
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].LoadFile(FUN_1013f8a0("char02bn.it3", 0));
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].m_0294 = 0;
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].motionFrame = 0;
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].UpdateFrame(&DAT_108392d8, 1, 0, 0, 0);
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].matrix = DAT_10db6ee8[0].matrix;
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].heading = DAT_10db6ee8[0].heading;
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].targetHeading = DAT_10db6ee8[0].targetHeading;
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].m_17e8 = 1;
+                                                DAT_10804bf8.AddLitModel(&DAT_10db6ee8[SCENE_DOUBLE_MODEL]);
+                                                DAT_10db6ee8[0].root->M_10193cb0(0x21, 0x31);
+                                                DAT_10db6ee8[0].root->M_10193cb0(0x1f, 0x32);
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].root->M_10193cb0(0x21, 0x2f);
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].root->M_10193cb0(0x1f, 0x30);
+                                                FUN_1013faf0();
+                                            }
+                                            DAT_10edbdd8.z = DAT_10edbdd8.z + 40.0f;
+                                            DAT_10f65598 = DAT_10edbdd8.z - 60.0f;
+                                            DAT_10836c70.ResetFrameTimer();
+                                        }
+                                        if (DAT_104c00d0 == SCENE_TIMELINE_EFFECT)
+                                        {
+                                            FUN_1000f360(0, 3);
+                                            Node *seat = (Node *)DAT_104c00d8;
+                                            Vec4 effectAt;
+                                            effectAt.Fill(0.0f);
+                                            DAT_10daaa80.Start(0x5019, effectAt, -1, 0, 0, 0, 0, &seat->worldMatrix, 0, 0);
+                                        }
+                                        if (DAT_104c00d0 == SCENE_TIMELINE_VOICE)
+                                        {
+                                            Vec4 voiceAt = DAT_10db6ee8[0].matrix.GetTranslation();
+                                            int voice = FUN_1013f880();
+                                            if (DAT_104c0332 == 0)
+                                                FUN_1003ad20(voice % 3 + 0x8f, &voiceAt, 1.0f);
+                                            Node *seat = (Node *)DAT_104c00d8;
+                                            Vec4 effectAt;
+                                            effectAt.Fill(0.0f);
+                                            DAT_10daaa80.Start(0x5016, effectAt, -1, 0, 0, 0, 0, &seat->worldMatrix, 0, 0);
+                                            DAT_10daaae8[0].stats[STAT_HEALTH] = DAT_10daaae8[0].stats[STAT_MAX_HEALTH];
+                                            FUN_1000e750();
+                                        }
+                                        if (DAT_104c00d0 == SCENE_TIMELINE_SHADE)
+                                        {
+                                            DAT_10f65598 = DAT_10edbdd8.z - 60.0f;
+                                            DAT_10db6ee8[0].root->M_10193cb0(0x31, 0x2f);
+                                            DAT_10db6ee8[0].root->M_10193cb0(0x32, 0x30);
+                                            if (DAT_10c655f0 != COSTUME_THREE_POINTERS)
+                                            {
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].root->M_10193cb0(0x2f, 0x31);
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].root->M_10193cb0(0x30, 0x32);
+                                            }
+                                        }
+                                        DAT_10f65598 = DAT_10f65598 + 3.0f;
+                                        if (DAT_104c00d0 == SCENE_TIMELINE_RELEASE)
+                                        {
+                                            DAT_104c0074 = 0;
+                                            DAT_104bfdc8 = 0;
+                                            DAT_104bfdcc = 0;
+                                            DAT_104bfdd0 = 0;
+                                            DAT_104c0090 = 1;
+                                            FUN_10016500(0, "mt_refre.it3", 0, 200, 1);
+                                            if (DAT_10c655f0 != COSTUME_THREE_POINTERS)
+                                                FUN_10016500(SCENE_DOUBLE_MODEL, "mt_refre.it3", 0, 200, 1);
+                                            DAT_10836c70.ResetFrameTimer();
+                                        }
+                                        Vec4 playerAt = DAT_10db6ee8[0].matrix.GetTranslation();
+                                        playerAt.Copy(playerAt + (DAT_10edbdd8 - playerAt) * 0.1f);
+                                        DAT_10db6ee8[0].matrix.SetTranslation(playerAt);
+                                        if (DAT_10c655f0 != COSTUME_THREE_POINTERS)
+                                        {
+                                            DAT_10db6ee8[SCENE_DOUBLE_MODEL].matrix = DAT_10db6ee8[0].matrix;
+                                            DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
+                                            DAT_10db6ee8[SCENE_DOUBLE_MODEL].heading = DAT_10db6ee8[0].targetHeading;
+                                            DAT_10db6ee8[SCENE_DOUBLE_MODEL].targetHeading = DAT_10db6ee8[0].targetHeading;
+                                            DAT_10db6ee8[SCENE_DOUBLE_MODEL].m_0267 = 1;
+                                        }
+                                        DAT_104c00d0 = DAT_104c00d0 - 1;
+                                        if (DAT_104c00d0 == 1)
+                                        {
+                                            DAT_10db6ee8[0].m_0240 = 1;
+                                            DAT_10db6ee8[DAT_104c0030].motionFrame = 0;
+                                            DAT_10db6ee8[DAT_104c0030].M_10161b60();
+                                            FUN_100121e0(0);
+                                            DAT_10db6ee8[DAT_104c0030].m_0294 = 0;
+                                            DAT_10db6ee8[0].PlayMotion(2, 0, 5, 1.0f);
+                                            if (DAT_10c655f0 != COSTUME_THREE_POINTERS)
+                                            {
+                                                DAT_10db6ee8[0].root->M_10193cb0(0x2f, 0x21);
+                                                DAT_10db6ee8[0].root->M_10193cb0(0x30, 0x1f);
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].SetPosition(FISH_HIDDEN_X, 0.0f, 0.0f);
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].root->M_10193cb0(0x31, 0x21);
+                                                DAT_10db6ee8[SCENE_DOUBLE_MODEL].root->M_10193cb0(0x32, 0x1f);
+                                            }
+                                            FUN_1013faf0();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // 1000..1999: a spark effect at the player while the counter is in 1005..1049.
+                                    CloseEventOverlay();
+                                    if (DAT_104c00d0 < SCENE_SPARK_END && DAT_104c00d0 > SCENE_SPARK_START)
+                                    {
+                                        EffectOptions options;
+                                        int strength = DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                                        if ((DAT_104c02c8 & HELMET_FACE_400) != 0)
+                                            options.m_0004 = (int)((float)strength * 2.0f);
+                                        else if ((DAT_104c02c8 & HELMET_FACE_300) == HELMET_FACE_300)
+                                            options.m_0004 = (int)((float)strength * 1.7f);
+                                        else if ((DAT_104c02c8 & HELMET_FACE_200) != 0)
+                                            options.m_0004 = (int)((float)strength * 1.5f);
+                                        else if ((DAT_104c02c8 & HELMET_FACE_100) != 0)
+                                            options.m_0004 = (int)((float)strength * 1.2f);
+                                        else
+                                            options.m_0004 = strength;
+                                        options.m_0008 = 1.0f;
+                                        options.m_001c = 1;
+                                        options.m_0000 = 1;
+                                        options.settings[4] = 0;
+                                        options.m_000e = 5;
+                                        options.settings[5] = 1;
+                                        options.settings[0] = 0x19;
+                                        options.settings[1] = 0xc;
+                                        Vec4 effectAt;
+                                        effectAt.Fill(0.0f);
+                                        Matrix4 playerMatrix;
+                                        playerMatrix = DAT_10db6ee8[0].matrix;
+                                        DAT_10daaa80.Start(0x8ec8, effectAt, -1, 0, 0, 0, 0, &playerMatrix, &options, 0);
+                                    }
+                                    DAT_104c00d0 = DAT_104c00d0 - 1;
+                                    if (DAT_104c00d0 == SCENE_SPARK_FINISH)
+                                        DAT_104c00d0 = 0;
+                                }
+                            }
+                            else
+                            {
+                                // 2000..4999: the left hand glows while the counter is in 2020..2053.
+                                DAT_104c00d0 = DAT_104c00d0 - 1;
+                                CloseEventOverlay();
+                                if (DAT_104c00d0 < SCENE_HAND_END && DAT_104c00d0 > SCENE_HAND_START)
+                                {
+                                    DAT_1101de30 = 1;
+                                    DAT_1020344c = 0.6f;
+                                    Node *hand = DAT_10db6ee8[0].root->Find("Bip01 L Hand", 0);
+                                    Vec4 effectAt;
+                                    effectAt.Fill(0.0f);
+                                    Matrix4 handMatrix;
+                                    handMatrix = DAT_10db6ee8[0].matrix;
+                                    if (hand != 0)
+                                        handMatrix.SetTranslation(hand->worldMatrix.GetTranslation());
+                                    DAT_10daaa80.Start(0x8f02, effectAt, -1, 0, 0, 0, 0, &handMatrix, 0, 0);
+                                }
+                                if (DAT_104c00d0 == SCENE_HAND_FINISH)
+                                {
+                                    DAT_1020344c = 1.0f;
+                                    if (DAT_104c01b0 == 0)
+                                        FUN_10001b70((10 - DAT_102027d8) * 500);
+                                    DAT_104687b0 = 1;
+                                    DAT_104c00d0 = 0;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // 5000..10000: a damage state (the player takes damage every time the counter reaches
+                            // SCENE_DAMAGE_TICK) and its recovery.
+                            CloseEventOverlay();
+                            DAT_104c00d0 = DAT_104c00d0 - 1;
+                            if (DAT_104c00d0 == SCENE_DAMAGE_TICK)
+                            {
+                                DAT_104c00d0 = 0;
+                                unsigned int damage = 5;
+                                if (DAT_10c635f8 == 1)
+                                    damage = 2;
+                                else if (DAT_10c635f8 == 2)
+                                {
+                                    if (DAT_10c66cc0 == 1)
+                                        damage = 0x14;
+                                    else if (DAT_10c66cc0 == 0)
+                                        damage = 10;
+                                    else
+                                        damage = 0x32;
+                                }
+                                if ((DAT_104c02c8 & HELMET_NO_DAMAGE) == 0)
+                                {
+                                    if ((DAT_104c02c8 & HELMET_HALF_DAMAGE) != 0)
+                                        damage = damage / 2;
+                                }
+                                else
+                                {
+                                    FUN_10011aa0(0, 1);
+                                    damage = 0;
+                                }
+                                FUN_1005dbf0(damage);
+                                DAT_104c00d0 = SCENE_DAMAGE_TICK;
+                                if (DAT_10daaae8[0].stats[STAT_HEALTH] > 0)
+                                    FUN_1000da40(0, 0, 0x1e);
+                            }
+                            else
+                            {
+                                if (DAT_104c00d0 == SCENE_DAMAGE_RECOVER)
+                                {
+                                    DAT_104c0190 = 0;
+                                    DAT_104c0108 = 0;
+                                    DAT_104bfe70 = 0;
+                                    FUN_1000ec70(5, 1.0f, 1.0f, 1.0f, 1.0f);
+                                    ResetPlayerTrail();
+                                    DAT_104687b0 = 1;
+                                    DAT_10db9274 = 1;
+                                    DAT_10db6ee8[0].Teleport(DAT_10daa400[DAT_1030c274].x, DAT_10daa400[DAT_1030c274].y,
+                                                             DAT_10daa400[DAT_1030c274].z);
+                                    DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
+                                    FUN_1016a8e0();
+                                    DAT_11018734 = 1;
+                                    DAT_1101de30 = 1;
+                                }
+                                if (DAT_104c00d0 == SCENE_DAMAGE_END)
+                                    DAT_104c00d0 = 0;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // 20000..29999: the player is shoved aside: first wait until he stands still, then push him
+                    // along the first of four directions that is clear, with growing strength.
+                    if (DAT_104c00d0 == SCENE_SHOVE_WAIT)
+                    {
+                        if (DAT_10db6ee8[0].velocity.Length2D() >= 1.0f || DAT_10db9274 == 0)
+                            DAT_104c00d0 = 0;
+                        else
+                        {
+                            DAT_104c00d0 = SCENE_SHOVE;
+                            DAT_10314eb8 = 0.2f;
+                            DAT_10868828.Fill(0.0f);
+                            ResetPlayerTrail();
+                        }
+                    }
+                    if (DAT_104c00d0 == SCENE_SHOVE)
+                    {
+                        Vec4 shoveDirs[4];
+                        Vec4 shoveFrom;
+                        shoveDirs[0].Set(SHOVE_SIDE, 0.0f, SHOVE_DOWN, 0.0f);
+                        shoveDirs[1].Set(-SHOVE_SIDE, 0.0f, SHOVE_DOWN, 0.0f);
+                        shoveDirs[2].Set(0.0f, SHOVE_SIDE, SHOVE_DOWN, 0.0f);
+                        shoveDirs[3].Set(0.0f, -SHOVE_SIDE, SHOVE_DOWN, 0.0f);
+                        shoveFrom.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                        for (i = 0; i < 4; i++)
+                        {
+                            Vec4 shoveDir;
+                            shoveDir.Copy(shoveDirs[i]);
+                            shoveDirs[i].Copy(shoveDirs[i] * DAT_10314eb8);
+                            if (DAT_10db6ee8[0].IsClearOfMapLimited(&shoveDirs[i]) != 0)
+                            {
+                                DAT_10db6ee8[0].important = 1;
+                                DAT_10db6ee8[0].PlayMotion(0x67, 1, 8, 1.0f);
+                                DAT_10314eb8 = DAT_10314eb8 + 0.05;
+                                if (DAT_10314eb8 >= 4.0f)
+                                    DAT_10314eb8 = 4.0f;
+                                DAT_10868828.Copy(shoveDir);
+                                DAT_10db6ee8[0].Push(shoveDirs[i].x, shoveDirs[i].y, 0.0f);
+                                shoveFrom.Copy(shoveFrom + shoveDirs[i]);
+                                DAT_10db6ee8[0].FaceAway(shoveFrom);
+                                if (DAT_104bfe1c != 0)
+                                {
+                                    DAT_1030c54c = 0;
+                                    DAT_104bfd78 = 0;
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_SAVE_MENU);
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+                                    DAT_1020e0f8[0] = 0;
+                                    FUN_1000cb30("");
+                                    FUN_1000cb90("");
+                                    DAT_104bf8d4 = 1;
+                                    if (DAT_104c03c8 != 0)
+                                    {
+                                        DAT_104c03dc = 0;
+                                        DAT_104c03c8->Release();
+                                        DAT_11b1ba40(DAT_104c03c8);
+                                        DAT_104c03c8 = 0;
+                                        DAT_104c03cc = 0;
+                                        DAT_104c03d0 = 0;
+                                        DAT_104c03d4 = 0;
+                                        DAT_104c03d8 = 0;
+                                        DAT_104c03e0 = 0;
+                                        DAT_104c03e4 = 0;
+                                        for (i = 0; i < OVERLAY_TEXTURE_SLOT_COUNT; i++)
+                                        {
+                                            if (DAT_1030b870[i] > -1)
+                                            {
+                                                FUN_10174c70(DAT_1030b870[i], 1);
+                                                DAT_1030b870[i] = -1;
+                                            }
+                                        }
+                                    }
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+                                    DAT_1020e0f8[0] = 0;
+                                    DAT_104bfe1c = 0;
+                                    memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+                                }
+                                goto sceneStateDone;
+                            }
+                        }
+                        DAT_10314eb8 = DAT_10314eb8 - 0.2f;
+                        Vec4 shove;
+                        shove.Copy(DAT_10868828 * DAT_10314eb8);
+                        DAT_10db6ee8[0].Push(shove.x, shove.y, 0.0f);
+                        if (DAT_10314eb8 < 1.05)
+                        {
+                            DAT_104c00d0 = 0;
+                            DAT_10db6ee8[0].PlayMotion(2, 1, 8, 1.0f);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // From 30000: the swan ride. The player follows the swan node ("swanat") and turns with the swan.
+                CloseEventOverlay();
+                if (DAT_104c00d0 == SCENE_SWAN_WAIT)
+                {
+                    ResetPlayerTrail();
+                    DAT_10db6ee8[0].PlayMotion(0x68, 1, 8, 1.0f);
+                    DAT_104c00d0 = SCENE_SWAN;
+                    DAT_104c0260 = 0;
+                    if (DAT_104c025c == 1)
+                    {
+                        DAT_104c0268->RestartColourPlugs("A", DAT_104bf8a4);
+                        DAT_104c025c = 0;
+                    }
+                    else
+                    {
+                        DAT_104c0268->RestartColourPlugs("B", DAT_104bf8a4);
+                        DAT_104c025c = 1;
+                    }
+                }
+                DAT_10db6ee8[0].SetPosition(DAT_104c0264->worldMatrix._41, DAT_104c0264->worldMatrix._42,
+                                            DAT_104c0264->worldMatrix._43);
+                Matrix4 swanMatrix;
+                swanMatrix = DAT_104c0268->worldMatrix;
+                swanMatrix._41 = 0.0f;
+                swanMatrix._42 = 0.0f;
+                swanMatrix._43 = 0.0f;
+                float swanHeading = swanMatrix.M_101b0a80();
+                DAT_104c0260 = DAT_104c0260 + 1;
+                DAT_10db6ee8[0].targetHeading = swanHeading - SWAN_HEADING_OFFSET;
+                DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
+                if (DAT_104c0260 > SWAN_RIDE_FRAMES)
+                {
+                    DAT_104c025d = 0x1e;
+                    DAT_104c00d0 = 0;
+                    DAT_10db6ee8[0].PlayMotion(2, 1, 8, 1.0f);
+                }
+                if (DAT_104c0260 % SWAN_SOUND_PERIOD == 0)
+                    FUN_10065b10(0, 0x3b5, 0, 0);
+            }
+        }
+sceneStateDone:
         // STAGE 2: model sweeps, the player's mode counters and the event fades, pseudo.c lines 2929-3477
 
         if (DAT_104c00d0 < 2 && FUN_1015d510() == 0 && DAT_104c0334 == 0 && DAT_104bf890 > 4 && DAT_104c0135 == 0

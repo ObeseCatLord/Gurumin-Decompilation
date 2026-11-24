@@ -46,7 +46,7 @@ extern "C" char DAT_104c01f4;
 extern "C" char DAT_104c023d;
 extern "C" char DAT_104c025c;
 extern "C" char DAT_104c025d;
-extern "C" int DAT_104c0260;
+extern "C" unsigned int DAT_104c0260;
 extern "C" int DAT_104c02b8;
 extern "C" short DAT_104c02e4;
 extern "C" char DAT_104c02ed;

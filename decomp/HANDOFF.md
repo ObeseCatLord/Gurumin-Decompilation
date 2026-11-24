@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 15.68% of code, 838 of 1212 functions |
-| Matched under the rules | 15.64% of code, 837 of the 838 matched functions |
-| Fuzzy match | 23.31% |
+| Matched | 15.99% of code, 840 of 1212 functions |
+| Matched under the rules | 15.96% of code, 839 of the 840 matched functions |
+| Fuzzy match | 24.18% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -105,6 +105,11 @@ function) and node_world.cpp (0) still break rule 2.
   (prologue register only, 119 bytes from one nop), Node::CastSegment2 (pre-check registers), Node::SphereHitsMesh
   (radius copy slot; Sphere() cast to clean up), Node::ScanChunks, StatusPanel text (pragma to review), Gimmick use,
   Npc_ShockByLink. DemoRecording now derives from InputState; Game::UpdateWindows declared.
+- Batch 332: Char_SwingPlatform 0x10025ce0, WorldRenderer::DrawCaption 0x101687e0 and DrawScreenOverlays 0x10184160
+  matched (texture_mgr.h's Animator was the WorldRenderer; caption fields typed). Drafts: Char_RollingBall (+2 bytes),
+  Regions_Build, Node::RayCast and Node::CastSegment (same bl pre-check wall as CastSegment2: register assignment,
+  no helper found), DrawLightKind22 (effect_trail.h), DrawWorldPictures (same residue as DrawPictures), MeshData::Draw.
+  Cleanup: TranslationMatrix/RotationY are declared per .cpp in about ten files (move to matrix4.h carefully).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

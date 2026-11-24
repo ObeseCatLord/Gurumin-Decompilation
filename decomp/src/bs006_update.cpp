@@ -14,6 +14,7 @@
 #include "char_state.h"
 #include "effect_manager.h"
 #include "texture_manager.h"
+#include "bs003.h"
 #include "bs006.h"
 #include "bgm_track.h"
 #include "companion_update.h"
@@ -100,6 +101,36 @@
 #define BS006_PIECE_ALIVE 70000                 // a piece with more health than this still counts as whole
 #define BS006_ROOM_TURN 0.5236f                 // state 0xb: the camera's side turn (30 degrees)
 #define BS006_EFFECT_OWNER_BASE 300             // effects the boss owns carry its index + 300
+#define BS006_TURN_QUICK 0.17453f               // furthest it turns towards the player in a frame (states 0xc, 0xcd, 0x12e)
+#define BS006_TURN_SLOW 0.00524f                // the same while it stands (states 0xc9, 0x12d, 0x12f, 0x130)
+#define BS006_TURN_WALK 0.06981f                // the same while it walks (state 0xd)
+#define BS006_ROAR_SHAKE_FRAME 0x355            // state 0xc: the motion frame the ground starts to shake
+#define BS006_ROAR_END_FRAME 0x35b              // state 0xc: the motion frame it ends at
+#define BS006_WALK_STOP_DISTANCE 350.0f         // state 0xd: it walks until the player is this near
+#define BS006_WALK_FACING_TURN 0.00121871f      // state 0xd: squared angle it may be off the player and still stand
+#define BS006_WALK_SHOT_PERIOD 20               // state 0xd: frames between the shots from its eye
+#define BS006_WALK_SHOT_TURN 1.096629f          // state 0xd: squared angle it must face the player within to shoot
+#define BS006_MOTION_WALK_STOP 0x21             // state 0xd: the motion that stops the walk
+#define BS006_EFFECT_WALK_BURST 0x606
+#define BS006_EFFECT_WALK_FLASH 0x608
+#define BS006_EFFECT_JAW_FLAME 0x3714           // state 0xca: the flames at the jaw
+#define BS006_EFFECT_FIRE_SHOT 0x7ba            // state 0xca: one flame of the fan
+#define BS006_FLAME_FLAG 0x1c7                  // script flag: 2 = the fan has five flames instead of three
+#define BS006_EFFECT_RAIN 0x36f3                // state 0xcc: the fire that rains from above
+#define BS006_EFFECT_KNEE_SHOT 0x36d6           // state 0x130: the shot from a knee pad
+#define BS006_KNEE_SWEEP 0.29671f               // state 0x130: how far the shot angle moves per step of the sweep
+#define BS006_PICK_NEAR 150.0f                  // state 100: the distances the table of attacks changes at
+#define BS006_PICK_MIDDLE 450.0f
+#define BS006_PICK_FAR 900.0f
+#define BS006_PICK_SIDE_TURN 1.09663f           // state 100: squared angle from which the player is to the side
+#define BS006_PICK_BEHIND_TURN 5.55163f         // state 100: squared angle from which the player is behind it
+#define BS006_PICK_TURN_AROUND 1.0966278f       // state 100: squared angle from which it turns round first
+
+// DAT_1042d918[BS006_BONE_*] as a node.
+static __forceinline Node *Bs006Bone(int which)
+{
+    return (Node *)DAT_1042d918[which];
+}
 
 // The lengths of the nodes' names the setup looks for, one per piece.
 #define BS006_NAME_SIZE 0x50
@@ -1520,50 +1551,787 @@ int Bs006_Update(int index)
     }
     else if (st.state == 0xc)
     {
-        // STAGE: state 0xc, pseudo.c lines 3148-3167
+        // The roar: it turns quickly towards the player and the ground shakes at the end of the motion.
+        st.frames++;
+        motion = 0x1c;
+        if (st.frames == 1)
+            restart = 1;
+        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        FUN_1001bfb0(index, BS006_TURN_QUICK);
+        if (model.motionFrame == BS006_ROAR_SHAKE_FRAME)
+            st.impact = 2;
+        if (model.motionFrame == BS006_ROAR_END_FRAME)
+        {
+            st.state = BS006_STATE_PICK;
+            st.impact = 2;
+        }
     }
     else if (st.state == 0xd)
     {
-        // STAGE: state 0xd, pseudo.c lines 3168-3317
+        // The walk: it turns towards the player and steps at them. Every 20 frames, while it is not close enough
+        // and faces them, a shot from its eye lands at the player's feet.
+        st.frames++;
+        blendFrames = 15;
+        Vec4 reach;
+        float aimAngle = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        model.targetHeading = aimAngle;
+        float turn = aimAngle - model.heading;
+        while (turn > BS006_PI)
+            turn -= BS006_TWO_PI;
+        while (turn < -BS006_PI)
+            turn += BS006_TWO_PI;
+        reach.Copy(playerPos - ownPos);
+        FUN_1001bfb0(index, BS006_TURN_WALK);
+        if (BS006_WALK_STOP_DISTANCE <= reach.Length2D() || BS006_WALK_FACING_TURN <= turn * turn)
+        {
+            motion = 0;
+            if (st.frames % BS006_WALK_SHOT_PERIOD == 0)
+            {
+                Matrix4 pose;
+                Vec4 targetSpot;
+                Vec4 eyeSpot;
+                Vec4 line;
+                EffectOptions options;
+                targetSpot.Copy(DAT_10db9210.GetTranslation());
+                eyeSpot.Copy(Bs006Bone(BS006_BONE_EYE)->worldMatrix.GetTranslation());
+                line.Copy(targetSpot - eyeSpot);
+                if (targetSpot.z <= eyeSpot.z)
+                    pose = RotationX(-acosf(line.Length2D() / line.Length())) * RotationZ(atan2f(line.x, line.y) + BS006_PI);
+                else
+                    pose = RotationX(acosf(line.Length2D() / line.Length())) * RotationZ(atan2f(line.x, line.y) + BS006_PI);
+                pose.SetTranslation(eyeSpot);
+                options.m_0000 = 0;
+                options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+                float aim = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI - model.heading;
+                while (aim > BS006_PI)
+                    aim -= BS006_TWO_PI;
+                while (aim < -BS006_PI)
+                    aim += BS006_TWO_PI;
+                if (aim * aim < BS006_WALK_SHOT_TURN)
+                {
+                    int attach = FUN_10034f70(&DAT_10db9210, 0.0f, 0.0f, -DAT_10db9248, 1);
+                    float zero = 0.0f;
+                    line.Fill(zero);
+                    FUN_1001d8b0(index, BS006_EFFECT_WALK_BURST, line, -1, -1, &Bs006Bone(BS006_BONE_EYE)->worldMatrix,
+                                 (int)&DAT_10f08880[attach], 0, &pose, 0);
+                    targetSpot.z = 5.0f;
+                    FUN_1001d8b0(index, BS006_EFFECT_WALK_FLASH, targetSpot, -1, -1, 0, 0, 0, 0, &options);
+                    FUN_10065b10(index, 0x30d, 1, 0);
+                    FUN_10054550(0x30e, 0xf, &DAT_10f08880[attach].GetTranslation());
+                }
+            }
+            float zeroMove = 0.0f;
+            move.Fill(zeroMove);
+            move.y = -11.0f;
+            move.RotateZ(-model.heading);
+            moveMode = BS006_MOVE_STEP;
+            if ((move + ownPos).Length() > BS006_REACH_NEAR)
+            {
+                float zeroStop = 0.0f;
+                move.Fill(zeroStop);
+                if (model.motion->layer == BS006_MOTION_WALK_STOP || model.motion->nextLayer == BS006_MOTION_WALK_STOP ||
+                    model.motionFrame == 0x71)
+                    motion = BS006_MOTION_WALK_STOP;
+            }
+        }
+        else if (model.motionFrame == 0x71)
+            motion = 2;
+        if (model.motion->layer == BS006_MOTION_WALK_STOP && motion == 0)
+        {
+            if (model.motionFrame != 0x3dc)
+            {
+                motion = BS006_MOTION_WALK_STOP;
+                float zeroHold = 0.0f;
+                move.Fill(zeroHold);
+            }
+        }
+        else if (motion == BS006_MOTION_WALK_STOP)
+        {
+            float zeroHold = 0.0f;
+            move.Fill(zeroHold);
+        }
+        if ((st.frames > 0x5a && FUN_1013f880() % 5000 < st.frames * 10) || motion == 2)
+        {
+            if (model.motionFrame == 0x42 || model.motionFrame == 3 || model.motionFrame == 0x3dc)
+                st.state = BS006_STATE_PICK;
+        }
     }
     else if (st.state == 0xe)
     {
-        // STAGE: state 0xe, pseudo.c lines 3318-3326
+        // A short rest.
+        st.frames++;
+        motion = 2;
+        if (st.frames > 0x78)
+            st.state = BS006_STATE_PICK;
     }
     else if (st.state == 0xc9)
     {
-        // STAGE: state 0xc9, pseudo.c lines 3327-3349
+        // The wait before a fire attack: it stands facing the player until a random roll (more likely the longer it
+        // waits) ends the state at the end of the motion.
+        motion = 5;
+        if (st.frames == 0)
+            st.frames = 1;
+        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        FUN_1001bfb0(index, BS006_TURN_SLOW);
+        if (DAT_102550e0[index] != 0)
+            st.frames = 10;
+        if (model.motionFrame == 0xb2)
+        {
+            int waited = st.frames;
+            if (FUN_1013f880() % 100 < waited * 10)
+                st.state = BS006_STATE_PICK;
+            else
+                st.frames = waited + 1;
+        }
     }
     else if (st.state == 0xca)
     {
-        // STAGE: state 0xca, pseudo.c lines 3350-3484
+        // The fire attack: a ring of flames at the jaw, a wait, then the dragon breathes fire in a fan (frame 0xb6
+        // of the breath motion), holds the pose and ends at motion frame 199.
+        st.frames++;
+        if (st.frames < 1000)
+        {
+            if (st.frames == 1)
+            {
+                if (Bs006Node(index, BS006_NODE_JAW) != 0)
+                {
+                    Matrix4 pose;
+                    EffectOptions options;
+                    Vec4 spot;
+                    pose.SetIdentity();
+                    spot.y = -150.0f;
+                    spot.z = -100.0f;
+                    spot.RotateZ(-model.heading);
+                    spot.Copy(spot + Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation());
+                    pose = RotationX(model.heading);
+                    pose.SetTranslation(spot);
+                    float zero = 0.0f;
+                    spot.Fill(zero);
+                    options.flags |= 2;
+                    for (int flame = 15; flame != 0; flame--)
+                        FUN_1001d8b0(index, BS006_EFFECT_JAW_FLAME, spot, -1, -1, 0, 0, 0, &pose, &options);
+                }
+            }
+            else if (st.frames == 0x19)
+                st.frames = 1000;
+        }
+        else if (st.frames < 2000)
+        {
+            motion = 6;
+            if (model.motionFrame == 0xb6 && Bs006Node(index, BS006_NODE_JAW) != 0)
+            {
+                Matrix4 pose;
+                Matrix4 fan;
+                EffectOptions options;
+                Vec4 spot;
+                options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+                options.m_0008 = 1.3f;
+                fan = RotationX(-BS006_QUARTER_TURN);
+                int flames;
+                float angle;
+                if (DAT_10874848.TestScriptFlag(BS006_FLAME_FLAG) == 2)
+                {
+                    flames = 5;
+                    angle = model.heading - 0.69813f;
+                }
+                else
+                {
+                    flames = 3;
+                    angle = model.heading - 0.5236f;
+                }
+                for (int flame = flames; flame > 0; flame--)
+                {
+                    pose = fan * RotationZ(angle);
+                    pose.SetTranslation(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation());
+                    pose._43 = pose._43 - 100.0f;
+                    FUN_1001d8b0(index, BS006_EFFECT_FIRE_SHOT, spot, -1, -1, 0, 0, 0, &pose, &options);
+                    if (flames == 5)
+                        angle = angle + 0.34907f;
+                    else
+                        angle = angle + 0.5236f;
+                }
+                FUN_10065b10(index, 0x30b, 1, 0);
+            }
+            if (model.motionFrame == 0xb8)
+                st.frames = 2000;
+        }
+        else if (st.frames < 3000)
+        {
+            motion = 7;
+            if (model.motionFrame == 0xbd)
+            {
+                st.frames = 3000;
+                motion = 9;
+                blendFrames = 0;
+            }
+        }
+        else if (st.frames < 4000)
+        {
+            motion = 9;
+            if (model.motionFrame == 199)
+                st.state = BS006_STATE_PICK;
+        }
     }
     // STAGE: state 0xcb, pseudo.c lines 4558-4610
     else if (st.state == 0xcc)
     {
-        // STAGE: state 0xcc, pseudo.c lines 3487-3864
+        // The scream: the screen darkens while it roars and fire rains from above, then it spits rings and sparks
+        // from the jaw and hands while it backs away towards the middle.
+        st.frames++;
+        motion = 5;
+        if (st.frames == 0x2d)
+        {
+            motion = 10;
+            restart = 1;
+            st.frames = 1000;
+            FUN_10065b10(index, 0x298, 1, 0);
+        }
+        if (st.frames < 1000)
+        {
+            if (st.frames > 0x2d)
+                motion = 10;
+            if (DAT_104c0380 % 3 == 0)
+            {
+                Matrix4 pose;
+                Vec4 spot;
+                EffectOptions options;
+                pose.SetIdentity();
+                spot.z = 300.0f;
+                spot.y = (float)(FUN_1013f880() % 600) - 300.0f;
+                spot.RotateZ(-model.heading);
+                spot.Copy(spot + ownPos);
+                pose.SetIdentity();
+                pose.SetTranslation(spot);
+                float zero = 0.0f;
+                spot.Fill(zero);
+                options.flags |= 2;
+                FUN_1001d8b0(index, BS006_EFFECT_RAIN, spot, -1, -1, 0, 0, 0, &pose, &options);
+            }
+            if (st.frames == 1)
+                FUN_10065b10(index, 0x297, 1, 0);
+            unsigned char shade = (unsigned char)((float)st.frames / 45.0f * 100.0f);
+            if (DAT_104c02c7 < shade)
+                DAT_104c02c7 = shade;
+        }
+        else if (st.frames < 2000)
+        {
+            motion = 10;
+            if (model.motionFrame > 199 && model.motionFrame < 0xe1 && DAT_104c0380 % 3 == 0)
+            {
+                Matrix4 pose;
+                Vec4 spot;
+                EffectOptions options;
+                pose.SetIdentity();
+                spot.z = 300.0f;
+                spot.y = (float)(FUN_1013f880() % 600) - 300.0f;
+                spot.RotateZ(-model.heading);
+                spot.Copy(spot + ownPos);
+                pose.SetIdentity();
+                pose.SetTranslation(spot);
+                float zero = 0.0f;
+                spot.Fill(zero);
+                options.flags |= 2;
+                FUN_1001d8b0(index, BS006_EFFECT_RAIN, spot, -1, -1, 0, 0, 0, &pose, &options);
+            }
+            if (Bs006Node(index, BS006_NODE_JAW) != 0 && Bs006Node(index, BS006_NODE_RIGHT_FINGER) != 0 &&
+                Bs006Node(index, BS006_NODE_LEFT_FINGER) != 0)
+            {
+                if (model.motionFrame > 0xce && model.motionFrame < 0xe1)
+                {
+                    Vec4 dir;
+                    Matrix4 pose;
+                    EffectOptions options;
+                    options.flags |= 2;
+                    options.m_0000 = 0;
+                    options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+                    options.m_000e = 5;
+                    options.m_0008 = 1.85f;
+                    if ((DAT_104c0380 & 1) != 0)
+                    {
+                        // The jaw: a ring and two sparks along its motion since the last frame.
+                        dir.Copy(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation() -
+                                 DAT_10802bf8[index + 1].position);
+                        float yaw = atan2f(dir.x, dir.y) + BS006_PI;
+                        float pitch = acosf(dir.Length2D() / dir.Length());
+                        dir.Copy(dir.Normalized3() * 100.0f);
+                        if (dir.z < 0.0f)
+                            pitch = pitch * -1.0f;
+                        pose = RotationX(pitch) * RotationZ(yaw);
+                        pose.SetTranslation(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation() + dir);
+                        float zeroJaw = 0.0f;
+                        dir.Fill(zeroJaw);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_RING, dir, -1, -1, 0, 0, 0, &pose, &options);
+                        pose = RotationX(BS006_QUARTER_TURN) * pose;
+                        pose.SetTranslation(pose.GetTranslation() - dir * 0.5f);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, dir, -1, -1, 0, 0, 0, &pose, &options);
+                        pose.SetTranslation(pose.GetTranslation() - dir);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, dir, -1, -1, 0, 0, 0, &pose, &options);
+
+                        // The right hand (its ring sits at the jaw like the first).
+                        dir.Copy(Bs006Node(index, BS006_NODE_RIGHT_FINGER)->worldMatrix.GetTranslation() -
+                                 DAT_10802bf8[index + 1].step);
+                        yaw = atan2f(dir.x, dir.y) + BS006_PI;
+                        pitch = acosf(dir.Length2D() / dir.Length());
+                        dir.Copy(dir.Normalized3() * 100.0f);
+                        if (dir.z < 0.0f)
+                            pitch = pitch * -1.0f;
+                        pose = RotationX(pitch) * RotationZ(yaw);
+                        pose.SetTranslation(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation() + dir);
+                        float zeroRight = 0.0f;
+                        dir.Fill(zeroRight);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_RING, dir, -1, -1, 0, 0, 0, &pose, &options);
+                        pose = RotationX(BS006_QUARTER_TURN) * pose;
+                        pose.SetTranslation(pose.GetTranslation() - dir * 0.5f);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, dir, -1, -1, 0, 0, 0, &pose, &options);
+                        pose.SetTranslation(pose.GetTranslation() - dir);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, dir, -1, -1, 0, 0, 0, &pose, &options);
+
+                        // The left hand.
+                        dir.Copy(Bs006Node(index, BS006_NODE_LEFT_FINGER)->worldMatrix.GetTranslation() -
+                                 DAT_10802bf8[index + 1].history2);
+                        yaw = atan2f(dir.x, dir.y) + BS006_PI;
+                        pitch = acosf(dir.Length2D() / dir.Length());
+                        dir.Copy(dir.Normalized3() * 100.0f);
+                        if (dir.z < 0.0f)
+                            pitch = pitch * -1.0f;
+                        pose = RotationX(pitch) * RotationZ(yaw);
+                        pose.SetTranslation(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation() + dir);
+                        float zeroLeft = 0.0f;
+                        dir.Fill(zeroLeft);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_RING, dir, -1, -1, 0, 0, 0, &pose, &options);
+                        pose = RotationX(BS006_QUARTER_TURN) * pose;
+                        pose.SetTranslation(pose.GetTranslation() - dir * 0.5f);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, dir, -1, -1, 0, 0, 0, &pose, &options);
+                        pose.SetTranslation(pose.GetTranslation() - dir);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, dir, -1, -1, 0, 0, 0, &pose, &options);
+                    }
+
+                    // A flash on the jaw, both hands and the middle of the dragon.
+                    pose.SetIdentity();
+                    pose.SetTranslation(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation());
+                    FUN_1001d8b0(index, BS006_EFFECT_SHOCK_FLASH, dir, -1, -1, 0, 0, 0, &pose, &options);
+                    pose.SetTranslation(Bs006Node(index, BS006_NODE_RIGHT_FINGER)->worldMatrix.GetTranslation());
+                    FUN_1001d8b0(index, BS006_EFFECT_SHOCK_FLASH, dir, -1, -1, 0, 0, 0, &pose, &options);
+                    pose.SetTranslation(Bs006Node(index, BS006_NODE_LEFT_FINGER)->worldMatrix.GetTranslation());
+                    FUN_1001d8b0(index, BS006_EFFECT_SHOCK_FLASH, dir, -1, -1, 0, 0, 0, &pose, &options);
+                    pose.SetTranslation(ownPos);
+                    FUN_1001d8b0(index, BS006_EFFECT_SHOCK_FLASH, dir, -1, -1, 0, 0, 0, &pose, &options);
+                }
+                DAT_10802bf8[index + 1].position.Copy(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation());
+                DAT_10802bf8[index + 1].step.Copy(Bs006Node(index, BS006_NODE_RIGHT_FINGER)->worldMatrix.GetTranslation());
+                DAT_10802bf8[index + 1].history2.Copy(Bs006Node(index, BS006_NODE_LEFT_FINGER)->worldMatrix.GetTranslation());
+            }
+
+            // The dragon backs away: it turns to the player while the motion is between frames 0xca and 0xcd and
+            // then follows its own heading; during the scream it is pulled half way to the vector it kept.
+            float zeroStep = 0.0f;
+            move.Fill(zeroStep);
+            move.y = -150.0f;
+            move.RotateZ(-model.heading);
+            if (model.motionFrame < 0xcd && model.motionFrame > 0xca)
+            {
+                model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                FUN_1001bfb0(index, BS006_RISE_TURN);
+            }
+            else
+                model.targetHeading = model.heading;
+            if (model.motionFrame > 0xcd && model.motionFrame < 0xe1)
+            {
+                model.targetHeading = atan2f(move.x, move.y) + BS006_PI;
+                move.z = -0.5f;
+                if (model.motionFrame <= 0xd6)
+                    move.z = 0.5f;
+                move.Copy(move * 0.5f + DAT_10802bf8[index].position * 0.5f);
+                DAT_10802bf8[index].position.Copy(move);
+                move.Copy(move + ownPos);
+                if (move.Length2D() > BS006_REACH_NEAR)
+                {
+                    float height = move.z;
+                    move.z = 0.0f;
+                    move.Copy(move.Normalized3() * BS006_REACH_NEAR);
+                    move.z = height;
+                }
+                moveMode = BS006_MOVE_PLACE;
+            }
+            else
+            {
+                float zeroLast = 0.0f;
+                DAT_10802bf8[index].position.Fill(zeroLast);
+            }
+            if (model.motionFrame == 0xcd)
+                st.impact = 0;
+            if (model.motionFrame == 0xef)
+            {
+                st.state = BS006_STATE_PICK;
+                st.impact = 0;
+            }
+        }
     }
     // STAGE: state 0xcd, pseudo.c lines 4541-4557
     else if (st.state == 0x12d)
     {
-        // STAGE: state 0x12d, pseudo.c lines 3867-3883
+        // The long stand: it faces the player (turning slowly) until a roll that grows with the wait ends the state.
+        st.frames++;
+        motion = 0x1d;
+        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        FUN_1001bfb0(index, BS006_TURN_SLOW);
+        if (DAT_102550e0[index] != 0)
+            st.frames = 10000;
+        if (st.frames > 0x5a && FUN_1013f880() % 10000 < st.frames)
+            st.state = BS006_STATE_PICK;
     }
     else if (st.state == 0x12e)
     {
-        // STAGE: state 0x12e, pseudo.c lines 3884-3901
+        // The turn: it swings quickly towards the player; the ground shake stops at the end of the motion.
+        st.frames++;
+        motion = 0x1e;
+        if (st.frames == 1)
+        {
+            restart = 1;
+            blendFrames = 10;
+        }
+        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        FUN_1001bfb0(index, BS006_TURN_QUICK);
+        if (model.motionFrame == 0x395)
+            st.impact = 0;
+        if (model.motionFrame == 0x3a1)
+        {
+            st.state = BS006_STATE_PICK;
+            st.impact = 0;
+        }
     }
     // STAGE: state 0x12f, pseudo.c lines 4428-4540
     else if (st.state == 0x130)
     {
-        // STAGE: state 0x130, pseudo.c lines 3903-4018
+        // The knee shots: it stands facing the player; every 7 frames after the first 30 a shot leaves each knee pad
+        // (the first one on the left, then the right), the angle sweeping with the frame count.
+        st.frames++;
+        motion = 0x1d;
+        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        FUN_1001bfb0(index, BS006_TURN_SLOW);
+        if (st.frames > 0x3c)
+            st.state = BS006_STATE_PICK;
+        if (st.frames > 0x1e && st.frames % 7 == 0)
+        {
+            Matrix4 pose;
+            Vec4 spot;
+            EffectOptions options;
+            spot.Copy(ownPos);
+            pose.SetIdentity();
+            if (Bs006Node(index, BS006_NODE_LEFT_KNEEPAD_NULL) != 0)
+            {
+                spot.Copy(Bs006Node(index, BS006_NODE_LEFT_KNEEPAD_NULL)->worldMatrix.GetTranslation());
+                pose = RotationZ((float)(8 - st.frames / 7) * -BS006_KNEE_SWEEP) *
+                       Bs006Node(index, BS006_NODE_LEFT_KNEEPAD_NULL)->parent->worldMatrix;
+            }
+            pose.SetTranslation(spot);
+            float zeroLeft = 0.0f;
+            spot.Fill(zeroLeft);
+            spot.y = 100.0f;
+            FUN_1001c510(&spot, &pose);
+            pose.SetTranslation(spot);
+            float zeroLeftB = 0.0f;
+            spot.Fill(zeroLeftB);
+            options.m_0000 = 0;
+            options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+            options.m_0008 = 1.3f;
+            options.owner = index + BS006_EFFECT_OWNER_BASE;
+            float zeroLeftC = 0.0f;
+            spot.Fill(zeroLeftC);
+            int shotChar;
+            int shotSlot;
+            if (FUN_1001c410(1, &pose, &shotChar, &shotSlot, -50.0f, 25.0f, 0.0f, 0.0f) != 0)
+                FUN_1001d8b0(index, BS006_EFFECT_KNEE_SHOT, spot, -1, -1, &DAT_10868838[shotChar][shotSlot], 0, 0, &pose,
+                             &options);
+            if (Bs006Node(index, BS006_NODE_RIGHT_KNEEPAD_NULL) != 0)
+            {
+                spot.Copy(Bs006Node(index, BS006_NODE_RIGHT_KNEEPAD_NULL)->worldMatrix.GetTranslation());
+                pose = RotationZ((float)(8 - st.frames / 7) * BS006_KNEE_SWEEP) *
+                       Bs006Node(index, BS006_NODE_RIGHT_KNEEPAD_NULL)->parent->worldMatrix;
+            }
+            pose.SetTranslation(spot);
+            float zeroRight = 0.0f;
+            spot.Fill(zeroRight);
+            spot.y = 100.0f;
+            FUN_1001c510(&spot, &pose);
+            pose.SetTranslation(spot);
+            float zeroRightB = 0.0f;
+            spot.Fill(zeroRightB);
+            options.m_0000 = 0;
+            options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+            options.m_0008 = 1.3f;
+            options.owner = index + BS006_EFFECT_OWNER_BASE;
+            float zeroRightC = 0.0f;
+            spot.Fill(zeroRightC);
+            if (FUN_1001c410(1, &pose, &shotChar, &shotSlot, -50.0f, 25.0f, 0.0f, 0.0f) != 0)
+                FUN_1001d8b0(index, BS006_EFFECT_KNEE_SHOT, spot, -1, -1, &DAT_10868838[shotChar][shotSlot], 0, 0, &pose,
+                             &options);
+            FUN_10065b10(index, 0x29f, 1, 0);
+        }
     }
     else if (st.state == BS006_STATE_PICK)
     {
-        // STAGE: state 100 (pick), pseudo.c lines 4033-4427
+        // The weighted pick of the next state: by the distance to the player, the angle it has to turn and how much
+        // health is left (below half it chooses among more attacks). st.impact selects the table (0 = the fight,
+        // 1 = after a fire attack, 2 = after a standing attack).
+        if (DAT_1020b430[index + BS006_FIRST_PIECE_SLOT].bs006Piece.phase != 2)
+        {
+            motion = 2;
+            st.lastState = 0;
+        }
+        else
+        {
+            Vec4 toPlayer;
+            toPlayer.Copy(playerPos - ownPos);
+            float turn = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI - model.heading;
+            while (turn > BS006_PI)
+                turn -= BS006_TWO_PI;
+            while (turn < -BS006_PI)
+                turn += BS006_TWO_PI;
+            if (st.impact == 0)
+            {
+                int roll;
+                if (BS006_PICK_NEAR <= distance2D)
+                {
+                    if (BS006_PICK_MIDDLE <= distance2D)
+                    {
+                        int health = slot.stats[STAT_HEALTH];
+                        float turnSquared = turn * turn;
+                        if (BS006_PICK_FAR <= distance2D)
+                        {
+                            if (BS006_PICK_SIDE_TURN <= turnSquared)
+                            {
+                                if (turnSquared <= BS006_PICK_BEHIND_TURN)
+                                {
+                                    if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                        roll = FUN_1013f880() % 6;
+                                    else
+                                        roll = FUN_1013f880() % 4;
+                                    switch (roll)
+                                    {
+                                    case 0: st.state = 3; break;
+                                    case 1: st.state = 10; break;
+                                    case 2: st.state = 1; break;
+                                    case 3: st.state = 0xd; break;
+                                    case 4: st.state = 0xb; break;
+                                    case 5: st.state = 7; break;
+                                    }
+                                }
+                                else
+                                {
+                                    if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                        roll = FUN_1013f880() % 5;
+                                    else
+                                        roll = FUN_1013f880() % 4;
+                                    switch (roll)
+                                    {
+                                    case 0: st.state = 3; break;
+                                    case 1: st.state = 10; break;
+                                    case 2: st.state = 1; break;
+                                    case 3: st.state = 0xd; break;
+                                    case 4: st.state = 0xb; break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                    roll = FUN_1013f880() % 9;
+                                else
+                                    roll = FUN_1013f880() % 6;
+                                switch (roll)
+                                {
+                                case 0: st.state = 3; break;
+                                case 1: st.state = 4; break;
+                                case 2: st.state = 0xc; break;
+                                case 3: st.state = 10; break;
+                                case 4: st.state = 1; break;
+                                case 5: st.state = 5; break;
+                                case 6: st.state = 9; break;
+                                case 7: st.state = 0xb; break;
+                                case 8: st.state = 7; break;
+                                }
+                            }
+                        }
+                        else if (BS006_PICK_SIDE_TURN <= turnSquared)
+                        {
+                            if (turnSquared <= BS006_PICK_BEHIND_TURN)
+                            {
+                                if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                    roll = FUN_1013f880() % 6;
+                                else
+                                    roll = FUN_1013f880() % 4;
+                                switch (roll)
+                                {
+                                case 0: st.state = 3; break;
+                                case 1: st.state = 1; break;
+                                case 2: st.state = 0xd; break;
+                                case 3: st.state = 10; break;
+                                case 4: st.state = 0xb; break;
+                                case 5: st.state = 7; break;
+                                }
+                            }
+                            else
+                            {
+                                if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                    roll = FUN_1013f880() % 5;
+                                else
+                                    roll = FUN_1013f880() % 4;
+                                switch (roll)
+                                {
+                                case 0: st.state = 3; break;
+                                case 1: st.state = 1; break;
+                                case 2: st.state = 0xd; break;
+                                case 3: st.state = 10; break;
+                                case 4: st.state = 0xb; break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                roll = FUN_1013f880() % 10;
+                            else
+                                roll = FUN_1013f880() % 7;
+                            switch (roll)
+                            {
+                            case 0: st.state = 3; break;
+                            case 1: st.state = 5; break;
+                            case 2: st.state = 4; break;
+                            case 3: st.state = 0xc; break;
+                            case 4: st.state = 10; break;
+                            case 5: st.state = 0xd; break;
+                            case 6: st.state = 1; break;
+                            case 7: st.state = 9; break;
+                            case 8: st.state = 0xb; break;
+                            case 9: st.state = 7; break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        float turnSquared = turn * turn;
+                        int health = slot.stats[STAT_HEALTH];
+                        if (BS006_PICK_SIDE_TURN <= turnSquared)
+                        {
+                            if (turnSquared <= BS006_PICK_BEHIND_TURN)
+                            {
+                                if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                    roll = FUN_1013f880() % 6;
+                                else
+                                    roll = FUN_1013f880() % 5;
+                                switch (roll)
+                                {
+                                case 0: st.state = 3; break;
+                                case 1: st.state = 2; break;
+                                case 2: st.state = 1; break;
+                                case 3: st.state = 0xc; break;
+                                case 4: st.state = 10; break;
+                                case 5: st.state = 0xb; break;
+                                }
+                            }
+                            else
+                            {
+                                if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                    roll = FUN_1013f880() % 6;
+                                else
+                                    roll = FUN_1013f880() % 5;
+                                switch (roll)
+                                {
+                                case 0: st.state = 3; break;
+                                case 1: st.state = 8; break;
+                                case 2: st.state = 2; break;
+                                case 3: st.state = 1; break;
+                                case 4: st.state = 10; break;
+                                case 5: st.state = 0xb; break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (health < slot.stats[STAT_MAX_HEALTH] / 2)
+                                roll = FUN_1013f880() % 8;
+                            else
+                                roll = FUN_1013f880() % 5;
+                            switch (roll)
+                            {
+                            case 0: st.state = 3; break;
+                            case 1: st.state = 6; break;
+                            case 2: st.state = 2; break;
+                            case 3: st.state = 1; break;
+                            case 4: st.state = 10; break;
+                            case 5: st.state = 9; break;
+                            case 6: st.state = 7; break;
+                            case 7: st.state = 0xb; break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 2)
+                        roll = FUN_1013f880() % 8;
+                    else
+                        roll = FUN_1013f880() % 6;
+                    switch (roll)
+                    {
+                    case 0: st.state = 3; break;
+                    case 1: st.state = 4; break;
+                    case 2: st.state = 0xc; break;
+                    case 3: st.state = 1; break;
+                    case 4: st.state = 10; break;
+                    case 5: st.state = 2; break;
+                    case 6: st.state = 0xb; break;
+                    case 7: st.state = 7; break;
+                    }
+                }
+                if (st.attackPhase == 0 && slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 2)
+                {
+                    st.state = 0xb;
+                    st.attackPhase = 1;
+                }
+                else if (st.attackPhase == 2 && slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 4)
+                {
+                    st.state = 0xb;
+                    st.attackPhase = 3;
+                }
+            }
+            else if (st.impact == 1)
+            {
+                switch (st.lastState)
+                {
+                case 4:
+                case 0xc9:
+                case 0xca:
+                case 0xcb:
+                    st.state = FUN_1013f880() % 5 + 0xc9;
+                }
+                if (BS006_PICK_TURN_AROUND < turn * turn)
+                    st.state = 0xcd;
+            }
+            else if (st.impact == 2)
+            {
+                int last = st.lastState;
+                if (last == 0x12f || last == 0xc || last == 0x12d || last == 0x130)
+                    st.state = FUN_1013f880() % 4 + 0x12d;
+                if (BS006_PICK_TURN_AROUND < turn * turn)
+                    st.state = 0x12e;
+            }
+            st.frames = 0;
+            if (st.queuedMotion > -1)
+            {
+                st.state = st.queuedMotion;
+                st.queuedMotion = -1;
+            }
+        }
     }
     else if (st.state == BS006_STATE_PLAY_QUEUED)
     {
-        // STAGE: state 0x65, pseudo.c lines 4020-4030
+        // Plays the motion whose number is in the state's frame word (restarted unless it is already playing).
+        if (model.motion->blending == 0 && model.motion->layer != st.frames)
+            model.PlayMotion(st.frames, 1, 5, 1.0f);
+        else
+            model.PlayMotion(st.frames, 0, 5, 1.0f);
     }
 
     // The common tail: remember the state, move the boss, play the motion, and the effects of the stomps.

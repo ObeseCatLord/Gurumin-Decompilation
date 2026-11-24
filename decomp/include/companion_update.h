@@ -4,6 +4,7 @@
 #define GURUMIN_COMPANION_UPDATE_H
 
 struct Matrix4;
+struct Vec4;
 
 // 0x100b0250, 0x100b0880, 0x100b0f00 (C++ linkage: the originals have an EH frame for their matrices): keep
 // companion 0, 1 or 2 of character `index` (slot index + 2 + k) in range and run its revival.
@@ -25,5 +26,8 @@ extern "C" int FUN_1001c410(int value, const Matrix4 *matrix, int *outChar, int 
 
 // 0x1001c4c0 (app_0012.cpp): clears the state of every kind-0x58 shot whose state lies in [low, high].
 extern "C" int FUN_1001c4c0(int low, int high);
+
+// 0x1001c510 (attach_slots.cpp, Point_Transform): transforms `point` by `matrix` in place.
+extern "C" int FUN_1001c510(Vec4 *point, Matrix4 *matrix);
 
 #endif

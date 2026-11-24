@@ -399,3 +399,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 335 | 34 | match | Sonnet subagents on QUEUE section 5: Menu_SaveLoad matched (inlined MessageWindow_SetTitle explains its alignment pads); 11 drafts; 850 matched, 849 under the rules, fuzzy 28.34% |
 | 336 | 35 | match | Sonnet subagents: Npc_HurlAtPlayer matched by a near-miss retry; Menu_DrawScene to 12 bytes; 4 drafts; 851 matched, 850 under the rules, fuzzy 29.05% |
 | 337 | 36 | match | Sonnet subagents: Shaga_Update matched; Npc_HoverCarrier matched by a near-miss retry; 6 drafts, 2 retries closer; 853 matched, 852 under the rules, fuzzy 30.44% |
+| 338 | 37 | match | Sonnet subagents: Enemy_CastAndTeleport, TitleScreen_Update, Partner_SpecialSkill matched; 7 drafts; 856 matched, 855 under the rules, fuzzy 32.34% |

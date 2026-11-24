@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 17.94% of code, 853 of 1212 functions |
-| Matched under the rules | 17.90% of code, 852 of the 853 matched functions |
-| Fuzzy match | 30.44% |
+| Matched | 18.81% of code, 856 of 1212 functions |
+| Matched under the rules | 18.77% of code, 855 of the 856 matched functions |
+| Fuzzy match | 32.34% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -143,6 +143,14 @@ function) and node_world.cpp (0) still break rule 2.
   10092af0 (8 bytes, zero stores in the slot reset). Enemy_StalkAndDashSlash down to 10 lines, Char_RouteFlier to 1832.
   Loose ends: scene_start.cpp passes FUN_10092af0 (WorldCallback should be (int, int *)); frame_step.cpp declares
   Game_LoadData separately from FUN_100cb0c0.
+- Batch 338: Enemy_CastAndTeleport 1006e150, TitleScreen_Update 10114950 and Partner_SpecialSkill 10078060 matched.
+  Drafts: FieldItemMenu_Update 100ba2a0 (0/1 register roles swapped, gotos), Map_SetupFromEntry 100fda40,
+  Enemy_HoverAndCallStrike 100ade30 (end clamp tail merge), Player_UpdateFrame 1004d960 (15 bytes), Enemy_ShyGhost
+  10075350, Enemy_RoamAndSpit 10084e80, Enemy_RollingTire 100a4440 (sret temporaries share the hit slot);
+  Map16_UpdateDodgeGame closer. include/shadow_ground.h holds the shared inlined Char_PlaceOnGround body.
+  Tidy-up list (matched but worth a reader pass): TitleScreen_Update keeps seven unused Matrix4 locals spareA..G and
+  Partner_SpecialSkill/Enemy_CastAndTeleport unused Vec4 locals (the original constructs them); Enemy_RollingTire uses
+  do { ... break; } while (0).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

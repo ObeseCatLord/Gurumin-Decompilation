@@ -673,3 +673,5 @@ _Enemy_IsBusy	100e1c40
 
 ?UpdateWorldWithIk@Node@@QAEHPAMPAUMatrix4@@1HHH@Z	10194f40
 ?Map18_UpdateFootballGame@@YAHXZ	1007f1e0
+?Bs003_Update@@YAHH@Z	100e25f0
+?Script_SceneCommand@@YAHHH@Z	1009e380

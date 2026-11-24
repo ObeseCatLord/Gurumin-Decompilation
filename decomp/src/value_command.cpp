@@ -64,7 +64,7 @@ extern "C" int FUN_1000e750(void);                                         // An
 extern "C" int FUN_1000e810(void);                                         // AntiTamper_StoreArrays
 extern "C" long FUN_10001b70(long volume);                                 // SoundArc_Message227
 extern "C" int FUN_1013f880(void);                                         // Random
-extern "C" int FUN_1009e380(int id, int value);                            // the scene commands from 30000 on
+#include "scene_command_ids.h"
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);         // Path_Data
 extern "C" float FUN_10001f80(float y, float x);                           // atan2f
 
@@ -161,7 +161,7 @@ int Script_ValueCommand(int id, int value)
         Script_SystemCommand(id, value);
     if (id > 29999)
     {
-        FUN_1009e380(id, value);
+        Script_SceneCommand(id, value);
         return 0;
     }
     Vec4 pointA;

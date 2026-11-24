@@ -108,7 +108,7 @@ extern "C" int FUN_100ba040(void);                            // Npc_PlayGreetin
 extern "C" int FUN_10034e80(int index, const Vec4 *offset, int range);
 extern "C" int FUN_1005f640(int slot);                        // Switch_TurnOff
 extern "C" int FUN_100627d0(int index);                       // Enemy_Defeat
-extern "C" int FUN_100e25f0(int index);
+#include "bs003.h"
 extern "C" int FUN_100e7280(int index);
 extern "C" int FUN_100165e0(int mode);                        // Player_SetHeadTracking
 extern "C" int FUN_1016a8d0(void);                            // Camera_SetMode2
@@ -1238,7 +1238,7 @@ int Scene_Frame()
                 DAT_104c0390->Init();
                 DAT_104c0390->LoadIt3(FUN_1013f8a0("tokatyu.it3", 0), 0, 0);
             }
-            FUN_100e25f0(index);
+            Bs003_Update(index);
         }
         if (DAT_10daaae8[index].kind == 0x32 && DAT_104bfe6c == 0 && DAT_104bfe1c == 0 && DAT_104bfdf0 == 0 &&
             DAT_104bfe78 == 0 && DAT_104c0135 == 0 && DAT_104c0094 == 0 && model.matrix.translation.x > -20000.0f &&

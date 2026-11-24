@@ -63,6 +63,7 @@ struct CharState
                 {
                     union                         // 0x04
                     {
+                        int bossFrame;              // bs003_update.cpp: frame of the boss's animation (the cut-scenes run it up to 0x1644, fights count it as the playing frame)
                         int podFrames;              // enemy_pod_lobber.cpp: frames since the state began (state 2 counts the lob step 1..30, state 3 up to 99)
                         int lookTarget;           // scene_frame.cpp (slot 0): the character the one named by `state` turns to look at
                         int flierMode;            // route_flier.cpp: 0 = waiting for a route, 1 = flying, 2 = vanishing
@@ -91,6 +92,7 @@ struct CharState
                     };
                     union                         // 0x08
                     {
+                        int bossPose;               // bs003_update.cpp: 0 = standing, 1/2 = turning left/right, 3 = claw swipe, 4 = tail swipe (the pose picks the motion)
                         int podGrowth;              // enemy_pod_lobber.cpp: 0 = hidden, 1..29 fading in or out, 150 = fully there
                         int lookActive;           // scene_frame.cpp (slot 0): non-zero = the character `state` keeps turning towards `lookTarget`
                         int flierRoute;           // route_flier.cpp: the map record whose route it flies (record 5 flies the other way)
@@ -138,6 +140,7 @@ struct CharState
                     };
                     union                         // 0x0c
                     {
+                        int bossBreathHeld;         // bs003_update.cpp: non-zero = the breath attack is not started on its key frame
                         int podHideFrames;          // enemy_pod_lobber.cpp: frames left of the flicker that hides the model (level 9 only)
                         int flierFrames;          // route_flier.cpp: frames left of the vanishing (counted down from 5)
                         int noticed;              // enemy_pounce_breath.cpp: 1 once it noticed the player (or was hit)
@@ -197,6 +200,7 @@ struct CharState
                     };
                     union                         // 0x10
                     {
+                        int bossFlameOn;            // bs003_update.cpp: 1 while the flame breath burns (toggled on its key frames)
                         int podMotion;              // enemy_pod_lobber.cpp: motion the model plays (0 idle, 1 lobbing, 2 growing, 4 lobbing)
                         int action;               // char_move.cpp: marker to run to (Npc_RunToMarker), alarm
                                                   // raised (Npc_RideAlarm), attacks left to chain
@@ -242,6 +246,7 @@ struct CharState
                     };
                     union                         // 0x14
                     {
+                        int bossRockFrames;         // bs003_update.cpp: frames left of the thrown-rock fall (counts down from 180)
                         int podRipeness;            // enemy_pod_lobber.cpp: frames counted while it idles; raises the chance a pod starts growing
                         int flierGround;          // route_flier.cpp: height of the ground under it in whole units (-5000 = none)
                         int seenHealth;           // enemy_pounce_breath.cpp: the health it last saw (a change wakes it)
@@ -288,6 +293,7 @@ struct CharState
                     };
                     union                         // 0x18
                     {
+                        int bossBeamSlot;           // bs003_update.cpp: the attachment slot (DAT_10f08880) the laser beam follows, -1 = none
                         int flierReady;           // route_flier.cpp: 1 once its wing node was found
                         int previousState;        // enemy_stalk_claw.cpp: the behaviour step of the last frame (the claw steps 3 and 4 blend from step 3 or 4)
                         int nodesFound;           // enemy_pounce_breath.cpp: 1 once its spine and mouth nodes were looked up
@@ -492,6 +498,7 @@ struct CharState
             };
             union                                 // 0x38
             {
+                int bossBlastTimer;               // bs003_update.cpp: frame counter of the burst effects in the later fight phases (restarts at 300)
                 int sawPlayer;                    // 1 once the character saw the player (or was told to react)
                 int leapAngle;           // enemy_pounce_breath.cpp: start heading of the whirl in 1/100000 radians
                 int volleyTimer;           // enemy_chase_lunge.cpp: frames since its last spit

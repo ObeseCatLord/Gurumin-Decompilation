@@ -55,7 +55,7 @@ extern "C" int DAT_104c0368;                              // that voice (-5000..
 extern "C" int DAT_104c036c;                              // 1 once a scripted character was registered
 extern "C" int DAT_104c0370;
 extern "C" int DAT_104c0374;                              // the character whose voice event was started (char_script.cpp)
-extern "C" int DAT_104c038c;
+extern "C" float DAT_104c038c;
 extern "C" Node *DAT_104c0390;                            // the model of the map's held object
 extern "C" char *DAT_104c0394;                            // one byte per marker: 1 = no ground below it
 extern "C" short DAT_104c0398;

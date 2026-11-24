@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (332)
+## 1. Walls to retry (334)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -171,6 +171,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1009a690` 2703 — Enemy_StrafeAndShoot (enemy_strafe.cpp, rule-clean; twin 10099040 matched from the same source shape): 1 byte longer. ebx and edi are swapped all through (ours: index in edi, the model offset index*0x249c in ebx; the original and 10099040: index in ebx), and in the chase step the far/mid tails are merged the other way round (the original keeps the walk branch's copy of the heading/stuck tail and the run branch's `action = 0` block). Tried: early return vs nested if in the attack step (the attack step's own m_238c check + return is needed: 2688 -> 2704 bytes, 1756 -> 426 diffs), switch (worse), the end check in every step (worse), stuck-check spellings (`>=` / separate increment: much worse), a local copy of the index.
 - [ ] `1009c070` 4229 — Enemy_FlyAndStrafe (enemy_strafe.cpp): everything after the two height clamps matches up to frame offsets. Each clamp in the original keeps a copy of the unclamped value in ecx, compares a temporary copy against -5 and writes the value back at the second test of 5; the clamp is a double-evaluated max(min(x, 5), -5) with 5 > x as the first test. Our spellings (macros either way round, explicit ternaries, a new local, inline functions, double or int literals) never make that temporary, so the code is 24 bytes short and self / the matrix pointer sit 4 / 8 bytes lower in the frame
 - [ ] `1009d490` 2368 — Enemy_ChaseAndSlash (enemy_slash.cpp, rule-clean): frame, zero register (ebx) and the effect block match; 64 bytes short. Left: the cross-jumping of the side-step states 6-8. The original keeps state 6 whole, merges 8 into 7 from the heading fadd and 7 into 6 from the `< 200` check; ours merges 6 and 7 from RotateZ and keeps 8 whole. Store order of the stuck reset makes no difference (the compiler canonicalises it); the || form vs two ready blocks changes which pairs merge (two ready blocks in state 6 stop all merging, 2576 bytes). Key finds: the two stores before the Vec4 declarations, and the effect block reaching the model through a local `AnimModel *model` (with `&DAT_10db6ee8[index].matrix` the matrix address is CSEd with the top and takes ebx from the zero register).
+- [ ] `1009e380` 21807 — Script_SceneCommand (scene_command_ids.cpp, 18656 vs 21807 bytes): complete draft of all 129 ids as sequential ifs (an else-if chain hits MSVC 7's nesting limit); ~3 KB short: approximate cases 0x756a/0x756c/0x757c/0x7560/0x7571/0x7572/0x7574/0x7593/0x75a7/0x75af (empty)/0x75b1; this-targets and some Vec4 copies guessed; enum names placed by position (check); 0x10001fd0 (floorf in math_float.cpp) used as an absolute value here: settle its name
 - [ ] `100a4440` 5381 — Enemy_RollingTire (rolling_tire.cpp, kind update of 0x100f9670, EH, 5456 vs 5381 bytes): structure and compares match; frame 0x2a0 vs 0x28c because the original's operator+/operator- sret temporaries share the probe hit Vec4's slot (ours gives them their own), which also moves the esi=10 constant hoist and the esi=index<<4 chain base. Rule check: the state-1 veer uses do { ... else break; } while (0)
 - [ ] `100a5960` 4331 — Enemy_PerchAndSwoop (enemy_perch_swoop.cpp, behaviour 10, 4331 bytes, 56 bytes differ): all stack displacements: the original keeps Vec4 move at esp+0x1c and float distance at 0x2c, ours distance at 0x1c and move at 0x20 (the 0.75/0.5 const float& temporaries reuse distance's slot; everything else identical). Tried 24 declaration orders of motion/loop/move/moveFlag, distance declared first or late, const, a one-element array
 - [ ] `100a6a50` 1792 — Enemy_AimedShots (enemy_barrage.cpp, rule-clean): 13 bytes, all stack slots: the original keeps dy and motion at esp+0x28, dx, the atan2 temporary and turn at 0x10, and spills index<<6 at 0x4c and index*0x249c at 0x50; ours has each pair the other way round. Reusing dx for the turn (dx = targetHeading - heading; dx = (float)fabs(dx); motion tested on dx) fixes the spills and dx/dy and leaves 5 bytes (the atan2 temporary and motion swapped); tried a named angle, top-of-function declarations, an if for motion (flips the registers), a switch on state.
@@ -205,6 +206,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e2440` 139 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
+- [ ] `100e25f0` 19570 — Bs003_Update (bs003_update.cpp, 14640 vs 19570 bytes, EH frame): complete compiling draft, not iterated; 5 KB short: the original repeats the node-pose/facing block in states 0/1 and the main pass (the draft shares helpers); breath/beam vectors, sound positions and the final follow-vector SetPosition guessed from Ghidra; companion record at index-1 (Ghidra bases one record before the tables)
 - [ ] `100ed9b0` 1258 — ListBank::CompileStatement (listbank.cpp, 1264 vs 1258 bytes): all but the int/float/string tail matches; the original puts the string-test jne to the call block, then the shared error block, the float declare and the call block last, without cross-jumping the int/float DeclareFromText tails; every spelling gives call-first (1264) or merged declares (1248)
 - [ ] `100f5a80` 14960 — Scene_Frame (scene_frame.cpp, 14000 vs 14960 bytes): rule-clean complete draft; the original has one more 16-byte Vec4 local (frame 0x228 vs 0x218) so all stack slots shift, the DAT_10c64f78 setter does not thread the bank/gauge test, the scripted-walk block layout is unverified, and the people loop, camera chain and tail are not yet compared
 - [ ] `100f9670` 7639 — Char_UpdateByKind (char_update.cpp, 8176 vs 7639 bytes, draft): esi/edi swapped (model vs slot offset), the pause globals DAT_104bfe1c/DAT_104c0135 and the greeting counter are cached in registers in the original, the quaternion temporaries sit elsewhere, the case bodies of the big kind switch are laid out differently, goto rememberMotion; tidy-up before any match: the kind steps use words[WORD_*] index macros instead of named CharState members (typed-members rule)
@@ -359,10 +361,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (14)
+## 5. Very large functions (over 3000 bytes) (12)
 
-- [ ] `100e25f0` 19570 bytes (float, loops 15, calls 587)
-- [ ] `1009e380` 21807 bytes (float, loops 53, calls 602)
 - [ ] `1010c650` 23098 bytes (float, loops 21, calls 525)
 - [ ] `100cc2a0` 23305 bytes (float, loops 20, calls 534)
 - [ ] `100bdad0` 24177 bytes (float, loops 28, calls 536)
@@ -381,12 +381,13 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (22 files)
+## 7. Comment pass (24 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
 - [ ] `src/bgm_update.cpp`: 2 of 3 functions without a comment
+- [ ] `src/bs003_update.cpp`: 3 of 12 functions without a comment
 - [ ] `src/camera_chase.cpp`: 1 of 2 functions without a comment
 - [ ] `src/camera_shift_orbit.cpp`: 1 of 2 functions without a comment, no header
 - [ ] `src/camera_update.cpp`: 1 of 8 functions without a comment
@@ -405,6 +406,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/player_path_walk.cpp`: 1 of 2 functions without a comment
 - [ ] `src/route_carrier.cpp`: 0 of 2 functions without a comment, no header
 - [ ] `src/route_follow.cpp`: 0 of 0 functions without a comment, no header
+- [ ] `src/scene_command_ids.cpp`: 1 of 3 functions without a comment
 - [ ] `src/scene_frame.cpp`: 2 of 8 functions without a comment
 - [ ] `src/shaga_update.cpp`: 1 of 6 functions without a comment
 - [ ] `src/swing_platform.cpp`: 2 of 3 functions without a comment

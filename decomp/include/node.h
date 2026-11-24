@@ -282,8 +282,8 @@ struct Node
                    const Vec4 *lightPosition, int texture, float scale, int size, float casterSize,
                    AnimModel *model, float alpha);
     // 0x101a24e0: draws the subtree into shadow texture slot `texture`, seen from the light (shadow_texture.cpp).
-    int RenderShadowTexture(const Matrix4 *parent, int a2, int a3, const Vec4 *casterPosition,
-                            const Vec4 *lightPosition, int texture, float casterSize, float a8, float a9);
+    int RenderShadowTexture(const Matrix4 *parent, const Matrix4 *sceneView, int a3, const Vec4 *casterPosition,
+                            const Vec4 *lightPosition, int texture, float casterSize, int tileX, int tileY);
 
     // Collision
     // 0x101a8e60: tests the segment `from`-`to` against this subtree's triangles (nodes whose flags share a bit
@@ -303,7 +303,7 @@ struct Node
     int SegmentHitsBox(Vec4 *from, Vec4 *to);
     // 0x101a82d0: builds the mesh from a triangle list, one vertex pack per material (node_mesh_build.cpp).
     int BuildMesh(struct Vertex *vertices, int *indices, int count);
-    int M_1019c8d0();                                     // 0x1019c8d0: run by BuildMesh when DAT_11b04500 is set
+    int SplitIntoCells();                                 // 0x1019c8d0: BuildMesh runs it when DAT_11b04500 is set (node_mesh_cells.cpp)
     VertexPack *AllocPackHeaders(int count);              // 0x1019c320 (scene_node.cpp)
     IndexList *AllocIndexLists(int count);                // 0x1019c360 (scene_node.cpp)
     // 0x101a9670: casts the segment against the nodes called `name` (0 = all) whose kind and mask match; writes

@@ -30,13 +30,13 @@ Matrix4 LookAtMatrix(Vec4 eye, Vec4 target, const Vec4 *up, float roll);     // 
 // Node::drawMode while the caster is drawn into its shadow texture (flat, in the shadow colour).
 #define NODE_DRAW_MODE_SHADOW 0x10
 
-// 0x101a24e0 (Node::RenderShadowTexture). Called by ModelBank::DrawShadowsInto (0x10165240) for each of the first ten
+// 0x101a24e0 (Node::RenderShadowTexture). Called by ModelBank::PrepareFrame (0x10165240) for each of the first ten
 // shadow casters. Makes texture slot `texture` the render target (returns 0 and clears DAT_10203434, "shadows drawn",
 // when that fails), clears it to white and draws this node tree under `parent` as seen from a camera
 // SHADOW_CAMERA_DISTANCE units from `casterPosition` towards `lightPosition`, looking back at the caster. The camera's
-// framing depends on `casterSize`. `a2`, `a3`, `a8` and `a9` are not used. Returns 1.
-int Node::RenderShadowTexture(const Matrix4 *parent, int a2, int a3, const Vec4 *casterPosition,
-                              const Vec4 *lightPosition, int texture, float casterSize, float a8, float a9)
+// framing depends on `casterSize`. `sceneView`, `a3`, `tileX` and `tileY` (the shadow's tile in the shadow atlas) are not used. Returns 1.
+int Node::RenderShadowTexture(const Matrix4 *parent, const Matrix4 *sceneView, int a3, const Vec4 *casterPosition,
+                              const Vec4 *lightPosition, int texture, float casterSize, int tileX, int tileY)
 {
     if (!DAT_118d0ba8[texture].UpdateImage(0)) {
         DAT_10203434 = 0;

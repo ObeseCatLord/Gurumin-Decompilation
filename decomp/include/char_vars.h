@@ -57,7 +57,7 @@ extern "C" char DAT_104c0094;                             // non-zero = only a f
 extern "C" int DAT_104c00c8;
 extern "C" char DAT_104c00cc;                             // 2 = the extra life was used up this hit
 extern "C" int DAT_104c00d0;                              // when non-zero, the player (character 0) cannot be pushed
-extern "C" int DAT_104c00e0;                              // non-zero = greetings are on
+extern "C" unsigned int DAT_104c00e0;                              // non-zero = greetings are on
 extern "C" int DAT_104c00e8;                              // the map area (greetings in areas 0x10, 0x14-0x19 and 0x28)
 extern "C" Node *DAT_104c00f8;                            // non-zero = keep the offsets up to date; the player's "scop-pt" node (0 = none)
 extern "C" Node *DAT_104c00fc;                            // the player's "charbase0" node

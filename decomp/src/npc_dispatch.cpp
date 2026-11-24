@@ -54,14 +54,14 @@ int FUN_10048b70(int index);                               // Char_SwingDoor
 int FUN_100b5c30(int index);                               // Npc_TurnWhenSeen
 extern "C" int FUN_10048e90(int index);                    // Enemy_DropIn
 extern "C" int FUN_100b6290(int index);                    // Npc_RunToMarker
-extern "C" int FUN_100b6740(int index);
+#include "npc_hurl.h"                                       // Npc_HurlAtPlayer
 extern "C" int FUN_10049240(int index);                    // Enemy_DropInWhenNear
 extern "C" int FUN_1001b880(int index);                    // Npc_TalkFacingSimple
 int FUN_100b7360(int index);                               // Npc_GreetWhenFaced
 extern "C" int FUN_100b7b10(int index);
 extern "C" int FUN_10045ed0(int index);                    // Npc_ApproachPlayer
 int FUN_100b5f80(int index);                               // Npc_AlertWhenSeen
-extern "C" int FUN_100b84a0(int index);
+#include "npc_tricks.h"                                      // Npc_PerformTricks
 int FUN_100b9150(int index);   // C++ linkage: the original has an EH frame
 extern "C" int FUN_100b9930(int index);                    // Enemy_DragToPit
 
@@ -219,7 +219,7 @@ extern "C" int FUN_100dfcf0(int index)
             FUN_100b6290(index);
             return 0;
         case 0x26:
-            FUN_100b6740(index);
+            Npc_HurlAtPlayer(index);
             return 0;
         case 0x27:
             FUN_10049240(index);
@@ -240,7 +240,7 @@ extern "C" int FUN_100dfcf0(int index)
             FUN_100b5f80(index);
             return 0;
         case 0x2d:
-            FUN_100b84a0(index);
+            Npc_PerformTricks(index);
             return 0;
         case 0x2e:
             FUN_100b9150(index);

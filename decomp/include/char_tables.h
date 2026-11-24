@@ -9,6 +9,7 @@
 #define CHAR_SLOT_COUNT 0x80
 #endif
 
+#include "attack_start.h"
 #include "face_set.h"
 #include "kind_counter.h"
 #include "matrix4.h"
@@ -53,7 +54,7 @@ extern "C" int DAT_10253a58[CHAR_SLOT_COUNT];
 extern "C" int DAT_10253c58[CHAR_SLOT_COUNT];
 extern "C" unsigned char DAT_10253e98[CHAR_SLOT_COUNT];   // frames of protection left after a lava or trap hit (lava_hazard.cpp)
 extern "C" char DAT_10254090[CHAR_SLOT_COUNT];
-extern "C" int DAT_10254110[CHAR_SLOT_COUNT];
+extern "C" ActionEvent DAT_10254110[ACTION_EVENT_COUNT];  // queue of upcoming attack events (attack_start.h)
 extern "C" int DAT_10254390[CHAR_SLOT_COUNT];             // greeting countdown per character (10000 = greet now)
 extern "C" int DAT_10254598[CHAR_SLOT_COUNT];
 extern "C" short DAT_10254838[CHAR_SLOT_COUNT];           // per-object switch state; 1000 is added while it is held

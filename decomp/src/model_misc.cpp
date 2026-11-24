@@ -139,7 +139,7 @@ void NodeExtra::Init()
 // Sorts `count` keys into ascending order (bubble sort) and applies every swap to the parallel arrays `a` and `b`
 // (either may be 0) and `c`. Used to sort draw lists by depth. Returns 1. Not byte-identical yet: the original keeps
 // count - 1 in a local of its own without unrolling the loop (see open.tsv).
-extern "C" int FUN_10165020(float *keys, int *a, int *b, int *c, int count)
+extern "C" int FUN_10165020(float *keys, float *a, float *b, int *c, int count)
 {
     int swapped;
     do
@@ -154,13 +154,13 @@ extern "C" int FUN_10165020(float *keys, int *a, int *b, int *c, int count)
                 keys[i + 1] = key;
                 if (a != 0)
                 {
-                    int t = a[i];
+                    float t = a[i];
                     a[i] = a[i + 1];
                     a[i + 1] = t;
                 }
                 if (b != 0)
                 {
-                    int t = b[i];
+                    float t = b[i];
                     b[i] = b[i + 1];
                     b[i + 1] = t;
                 }

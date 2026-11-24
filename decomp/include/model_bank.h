@@ -69,9 +69,15 @@ struct ModelBank
     int DrawLensFlares();
     int DrawShadows(Node *scene, const Matrix4 *parent, const Matrix4 *view, int a3);
     int DrawShadowsInto(Node *scene, const Matrix4 *parent, const Matrix4 *view, int a3);
+    // 0x10165240: per frame, collects the lens flares and the lit models in view, gives each one its three nearest
+    // lights and its shadow caster entries, and draws the shadow textures.
+    int PrepareFrame(Node *scene, const Matrix4 *view, int a3, int renderShadowTextures);
 };
 
 // The model bank.
 extern "C" ModelBank DAT_10804bf8;
+
+// Per lit model entry: its squared distance to the camera target (the sort key of PrepareFrame).
+extern "C" float DAT_10fa6bb8[0x80];
 
 #endif

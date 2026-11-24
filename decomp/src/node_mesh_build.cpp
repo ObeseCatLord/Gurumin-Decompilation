@@ -22,7 +22,7 @@
 // Releases the old mesh and sphere lists, gives the node one blank material when it has none, then makes one
 // vertex pack and index list per material used, copies each triangle's vertices into its material's pack (the
 // index list just counts up) and creates a new MeshData. Then applies the material colours (unless m_1894 is set),
-// runs M_1019c8d0 when DAT_11b04500 is set, welds the vertices, sorts the packs and computes the bounds.
+// runs SplitIntoCells when DAT_11b04500 is set, welds the vertices, sorts the packs and computes the bounds.
 // Returns 1, or 0 for an empty list.
 int Node::BuildMesh(Vertex *vertices, int *indices, int count)
 {
@@ -125,7 +125,7 @@ int Node::BuildMesh(Vertex *vertices, int *indices, int count)
     if (m_1894 == 0)
         ApplyMaterialColours();
     if (DAT_11b04500 != 0)
-        M_1019c8d0();
+        SplitIntoCells();
     WeldVertices();
     SortPacks();
     ComputeBounds();

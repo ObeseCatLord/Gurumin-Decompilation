@@ -101,7 +101,7 @@ int Game::SetWindowCursor(int id, int value)
 }
 
 // Sets four layout values of menu `id` (window rectangle).
-int Game::SetWindowLayout(int id, int a, int b, int c, int d)
+int Game::SetWindowLayout(int id, int a, int b, int *c, int d)
 {
     int slot = FindSlot(id);
     if (slot != 3)
@@ -115,7 +115,7 @@ int Game::SetWindowLayout(int id, int a, int b, int c, int d)
 }
 
 // Sets three more layout values of menu `id`.
-int Game::SetWindowLayout2(int id, int a, int b, int c)
+int Game::SetWindowLayout2(int id, int a, int b, int *c)
 {
     int slot = FindSlot(id);
     if (slot != 3)

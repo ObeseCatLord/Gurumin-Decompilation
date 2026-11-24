@@ -24,7 +24,7 @@
 // text, colour and alpha; a miss picks a random slot and renders the text there, with the bitmap font when one is
 // loaded or otherwise with the Windows font (white background becomes transparent, the rest opaque). Every draw
 // marks its slot as the newest and ages the rest. Returns the width of the text in pixels at `scale`.
-int FontRenderer::DrawText(int x, int y, const char *text, int colour, int a, float alpha, float scale)
+int FontRenderer::DrawText(int x, int y, const char *text, int colour, float depth, float alpha, float scale)
 {
     y += (int)(scale * TEXT_SHADOW_SCALE);
     unsigned short *font = glyphs;
@@ -69,7 +69,7 @@ int FontRenderer::DrawText(int x, int y, const char *text, int colour, int a, fl
         float textHeight = (float)heights[slot];
         DAT_118d0ba8[textures[slot]].DrawTinted(
             x, y, (int)(textWidth * scale + (float)x), (int)(textHeight * scale + (float)y), 0, 0,
-            textWidth / TEXT_TEXTURE_WIDTH, textHeight / TEXT_TEXTURE_HEIGHT, a, alpha, 0, 0);
+            textWidth / TEXT_TEXTURE_WIDTH, textHeight / TEXT_TEXTURE_HEIGHT, depth, alpha, 0, 0);
         recency[slot] = TEXT_TEXTURE_COUNT;
         for (int other = 0; other < TEXT_TEXTURE_COUNT; other++)
         {
@@ -101,7 +101,7 @@ int FontRenderer::DrawText(int x, int y, const char *text, int colour, int a, fl
             x, y, (int)(textWidth * scale + (float)x), (int)(textHeight * scale + (float)y),
             TEXEL_CENTRE / TEXT_TEXTURE_WIDTH, TEXEL_CENTRE / TEXT_TEXTURE_HEIGHT,
             (textWidth - TEXEL_CENTRE) / TEXT_TEXTURE_WIDTH, (textHeight - TEXEL_CENTRE) / TEXT_TEXTURE_HEIGHT,
-            a, alpha, 0, 0);
+            depth, alpha, 0, 0);
         recency[slot] = TEXT_TEXTURE_COUNT;
         for (int other = 0; other < TEXT_TEXTURE_COUNT; other++)
         {

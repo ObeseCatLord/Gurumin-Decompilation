@@ -23,5 +23,6 @@ extern "C" CharLink DAT_1049f0c8[CHAR_LINK_COUNT];   // the links
 extern "C" int DAT_1021b928[CHAR_LINK_COUNT];        // frames until each link's next round of effects
 
 int Char_DrawLinks();                                // 0x1001bb20 (char_links.cpp)
+extern "C" int FUN_100fb7b0(void);                // 0x100fb7b0 (Scene_Reset, scene_reset.cpp): fills the table in
 
 #endif

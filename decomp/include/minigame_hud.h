@@ -11,6 +11,7 @@ extern "C" int DAT_10c65060;   // the mini game score
 extern "C" int FUN_10161920(const char *name);   // 0x10161920: texture slot holding `name`, or -1
 
 extern "C" int FUN_100301a0(void);   // 0x100301a0
+extern "C" int FUN_1002f520(void);   // 0x1002f520 (map 0x17 variant with the seconds timer)
 extern "C" int FUN_100308e0(void);   // 0x100308e0 (map 0x15 variant with two scores)
 
 #endif

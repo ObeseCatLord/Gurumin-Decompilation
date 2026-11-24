@@ -197,12 +197,6 @@ int Game::MoveCursor()
 }
 
 
-// Scroll marks, Shift-JIS: filled while `frame` is at most 5, outlined after that (they blink).
-#define MARK_UP "\x81\xa3"              // ▲
-#define MARK_UP_OUTLINE "\x81\xa2"      // △
-#define MARK_DOWN "\x81\xa5"            // ▼
-#define MARK_DOWN_OUTLINE "\x81\xa4"    // ▽
-
 // 0x100092c0. Draws the marks of the three menu windows, last window first: for list windows an up mark when the
 // list is scrolled, a down mark when an item follows the visible ones, and the cursor on the chosen item of the
 // active window; for grid windows (m_0158) only the cursor at its column and row. Returns 0.

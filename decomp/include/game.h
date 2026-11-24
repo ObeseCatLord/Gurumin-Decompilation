@@ -26,6 +26,12 @@ struct GameMenuItems
     int *entries[0x82];
 };
 
+// Scroll marks of the window lists, Shift-JIS: filled while the blink frame is at most 5, outlined after that.
+#define MARK_UP "£"              // filled up triangle
+#define MARK_UP_OUTLINE "¢"      // outlined up triangle
+#define MARK_DOWN "¥"            // filled down triangle
+#define MARK_DOWN_OUTLINE "¤"    // outlined down triangle
+
 // Map table entry (0xe8 bytes): map number, four script-flag conditions and the map's names.
 struct GameNamedEntry
 {
@@ -78,7 +84,8 @@ struct Game : Object
     int m_00ec[3];
     int m_00f8[3];
     int m_0104;                 // 0x104: set to 10 when a window opens
-    int pad_0108[2];
+    int pad_0108;
+    int m_010c;                 // 0x10c: part of the open window under the cursor (0 = list, 1 = previous page tab, 2 = next page tab)
     int m_0110[3];              // 0x110: 1 while the window slot is open
     int m_011c[3];
     int m_0128[3];
@@ -90,10 +97,10 @@ struct Game : Object
     int m_0170[3];              // 0x170: column of the cursor in grid windows
     int m_017c[3];              // 0x17c: row of the cursor in grid windows
     int m_0188[3];
-    int m_0194[3];
+    int *m_0194[3];             // 0x194: the page number a window shows (zero-based)
     int m_01a0[3];
     int m_01ac[3];
-    int m_01b8[3];
+    int *m_01b8[3];             // 0x1b8: value drawn at (m_01c4, m_01d0) in the window
     int m_01c4[3];
     int m_01d0[3];
     char m_01dc[0x258];
@@ -117,7 +124,7 @@ struct Game : Object
     int m_7648;
     int m_764c;
     int m_7650;
-    int m_7654[3];
+    void (*m_7654[3])(int cursor, char *caption);   // 0x7654: per-window callback writing the caption of the entry under the cursor
     void (*m_7660)(int);
     FontRenderer *textRenderer;   // 0x7664: draws the window marks (set by LoadMenuTextures)
     float m_7668[3];            // 0x7668: per-window fade
@@ -187,7 +194,7 @@ struct Game : Object
     int ReadWordInLine();
     int IsAnyWindowBusy();
     void CloseAllWindows();
-    int SetWindowCallbackValue(int id, int value);
+    int SetWindowCallbackValue(int id, void (*callback)(int cursor, char *caption));
     int ConfirmWindow(int id);
     int SetWindowScroll(int id, int value);
     int SetWindowLastItem(int id, int count);
@@ -201,13 +208,13 @@ struct Game : Object
     int DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade);  // fade: passed to DrawTinted, unused there
     int DrawCursor(int x, int y, float fade, int frame);
     int DrawWindowMarks(int frame);
-    int DrawWindows(int size);  // 0x100094e0
+    int DrawWindows(int frame);  // 0x100094e0 (game_draw_windows.cpp)
     int DrawDebugText(const char *text, int x, int y);
     int FindConstant(const char *name);
     int CloseWindow(int id);
     int SetWindowCursor(int id, int value);
-    int SetWindowLayout(int id, int a, int b, int c, int d);
-    int SetWindowLayout2(int id, int a, int b, int c);
+    int SetWindowLayout(int id, int a, int b, int *c, int d);
+    int SetWindowLayout2(int id, int a, int b, int *c);
     int OpenWindow(int id, int x, int y, int width, int height);  // 0x100084b0
     int SetWindowResult(int id, int *result);
     int AddValueEntry(int id, const char *label, int value);                    // 0x1000b060

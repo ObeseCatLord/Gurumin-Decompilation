@@ -237,8 +237,8 @@ _Vec3_Dot	101ac200
 ?InTriangle@Vec4@@QAEHABU1@00@Z	101aeee0
 ?Slerp@@YA?AUVec4@@ABU1@0M@Z	101aeae0
 ?QuatFromMatrix@@YA?AUVec4@@ABUMatrix4@@@Z	101ae2a0
-?DrawOutlined@FontRenderer@@QAEHHHPBDHHMM@Z	101508d0
-?DrawOutlinedIn@FontRenderer@@QAEHHHPBDHHMMH@Z	101509b0
+?DrawOutlined@FontRenderer@@QAEHHHPBDHMMM@Z	101508d0
+?DrawOutlinedIn@FontRenderer@@QAEHHHPBDHMMMH@Z	101509b0
 ?Root@Node@@QAEPAU1@XZ	101992f0
 ?SetUniqueName@Node@@QAEHPBD@Z	101a52d0
 ?RemoveOwnedBy@EffectManager@@QAEHH@Z	101883b0
@@ -308,7 +308,7 @@ _TestDat_Load	1000beb0
 ?SetScriptFlag@Game@@QAEHHH@Z	10002300
 ?IsAnyWindowBusy@Game@@QAEHXZ	10007ee0
 ?CloseAllWindows@Game@@QAEXXZ	100082e0
-?SetWindowCallbackValue@Game@@QAEHHH@Z	10008390
+?SetWindowCallbackValue@Game@@QAEHHP6AXHPAD@Z@Z	10008390
 ?ConfirmWindow@Game@@QAEHH@Z	10008460
 ?SetWindowScroll@Game@@QAEHHH@Z	10008770
 ?SetWindowLastItem@Game@@QAEHHH@Z	100087b0
@@ -316,8 +316,8 @@ _TestDat_Load	1000beb0
 ?FindConstant@Game@@QAEHPBD@Z	10002060
 ?CloseWindow@Game@@QAEHH@Z	100083e0
 ?SetWindowCursor@Game@@QAEHHH@Z	10008650
-?SetWindowLayout@Game@@QAEHHHHHH@Z	100086b0
-?SetWindowLayout2@Game@@QAEHHHHH@Z	10008710
+?SetWindowLayout@Game@@QAEHHHHPAHH@Z	100086b0
+?SetWindowLayout2@Game@@QAEHHHHPAH@Z	10008710
 ?DrawPanel@Game@@QAEHHHHHMM@Z	100087f0
 ?DrawPanelAlt@Game@@QAEHHHHHMM@Z	10008880
 ?DrawCursor@Game@@QAEHHHMH@Z	10008fa0
@@ -491,7 +491,7 @@ _FUN_101426d0@8	101426d0
 ?LoadFile@AnimModel@@QAEHPBD@Z	1017b9b0
 ?SegmentHitsMesh@Node@@QAEHPAUVec4@@0@Z	101a8780
 ?IntersectTriangle@Node@@QAEHPBUVec4@@0PAU2@10PAM22000@Z	1019dca0
-?RenderShadowTexture@Node@@QAEHPBUMatrix4@@HHPBUVec4@@1HMMM@Z	101a24e0
+?RenderShadowTexture@Node@@QAEHPBUMatrix4@@0HPBUVec4@@1HMHH@Z	101a24e0
 ?DrawShadow@Node@@QAEHPBUMatrix4@@0HPBUVec4@@1HMHMPAUAnimModel@@M@Z	101a29e0
 ?QueueDraw@Node@@QAEHPBUMatrix4@@0PBXIPBUVec4@@2@Z	10199e20
 ?SegmentHitsBox@Node@@QAEHPAUVec4@@0@Z	101ab3e0
@@ -541,7 +541,7 @@ _Enemy_IsBusy	100e1c40
 ?ReadControls@Input@@QAEHH@Z	10143180
 ?IsJoystickButtonDown@Input@@QAEHHPBUJoyState@@@Z	10142b20
 ?IsKeyboardButtonDown@Input@@QAEHHPBE@Z	10142dd0
-?DrawTextA@FontRenderer@@QAEHHHPBDHHMM@Z	101501f0
+?DrawTextA@FontRenderer@@QAEHHHPBDHMMM@Z	101501f0
 ?TutorialBook_Update@@YAHXZ	10065450
 ?Char_SpiritUpdate@@YAHH@Z	1002a740
 ?Sample@KeyTrack@@QAEHMPAM000H@Z	101b0240
@@ -584,3 +584,15 @@ _Enemy_IsBusy	100e1c40
 ?CylindersOverlap@Node@@QAEHPBUVec4@@000PAU2@1@Z	10192a00
 ?Npc_PerchOnNeighbour@@YAHH@Z	100b3770
 ?Camera_Refresh@@YAHXZ	10015960
+?Enemy_PulseAndCharge@@YAHH@Z	100a3900
+?PrepareFrame@ModelBank@@QAEHPAUNode@@PBUMatrix4@@HH@Z	10165240
+?DrawWindows@Game@@QAEHH@Z	100094e0
+?Npc_HurlAtPlayer@@YAHH@Z	100b6740
+?Query@Node@@QAEHPAUMatrix4@@PAUVec4@@M1PAMPBD3@Z	101a1640
+?Char_UpdateAttachSlots@@YAHH@Z	1001c670
+?Enemy_StalkAndBreathe@@YAHH@Z	100ac440
+?SplitIntoCells@Node@@QAEHXZ	1019c8d0
+?Npc_PerformTricks@@YAHH@Z	100b84a0
+?Enemy_StalkAndLunge@@YAHH@Z	100ad0f0
+?Char_Drifter@@YAHH@Z	10024f80
+?Enemy_HoverAndShoot@@YAHH@Z	1006f490

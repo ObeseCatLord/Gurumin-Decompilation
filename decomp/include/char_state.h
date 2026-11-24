@@ -52,6 +52,8 @@ struct CharState
                         int shockFrames;          // npc_link_shock.cpp: 0 = standing, 1..60 = frames shaking (counted up)
                         int ballFrame;            // rolling_ball.cpp: 0 = not set up, 1 = waiting, then the frame count of the roll
                         int zoneRampStep;          // area_zone.cpp: how much the push grows each frame the player is inside
+                        int driftSignX;           // drifter.cpp (state 0): non-zero = the x step is added, else subtracted
+                        int orbitForward;         // drifter.cpp (state 1): non-zero = the spin angles grow, else they shrink
                         // (route_follow.cpp uses `wait` for the frames left at a pause point)
                     };
                     union                         // 0x08
@@ -80,7 +82,11 @@ struct CharState
                         int ballTimer;            // rolling_ball.cpp: frames counted in state 3000
                   int swingReady;           // swing_platform.cpp: 1 once the platform was set up
                         int holdFrames;           // mole_game.cpp: frames to wait before the next step (counted down; 5 after a hit)
+                        int squashStep;           // pulse_charger.cpp: 0 = not squashed, 1..6 = step of the squash after a hit
+                        int hoverReady;            // enemy_hover_shooter.cpp: 1 once the hoverer was set down above the ground
                         int zoneRampMax;           // area_zone.cpp: the push stops growing at this strength
+                        int driftSignY;           // drifter.cpp (state 0): non-zero = the y step is added, else subtracted
+                        int orbitCentreX;         // drifter.cpp (state 1): x of the centre the character circles (whole units)
                     };
                     union                         // 0x0c
                     {
@@ -118,6 +124,12 @@ struct CharState
                   int hoverLimits;          // npc_hover_carrier.cpp: talk % 100 = bits that tie it to its home position (1/2 x/y pinned to home, 4/8 x/y kept from passing home upwards, 16/32 x/y kept from passing home downwards)
                         int holeIndex;            // mole_game.cpp: the hole ("@p1".. "@p9" = 0..8) the mole heads for or dives into
                         int zoneRamp;              // area_zone.cpp: the push strength now (1/100 of the force)
+                        int calmed;               // pulse_charger.cpp: 1 after a charge ended (it does not turn on the player until hit)
+                        int hopTimer;             // enemy_chase_hop.cpp: frames left of the hop push (counted down, each frame speeds the motion up)
+                        int hoverMotion;           // enemy_hover_shooter.cpp: motion to play (2 / 4 = banking, 7 = flying)
+                        int hurlReactDigit;       // npc_hurl.cpp: talk % 10, a ready thrower throws with a chance of 2 * this + 2 percent per frame
+                        int driftSignZ;           // drifter.cpp (state 0): non-zero = the z step is added, else subtracted
+                        int orbitCentreY;         // drifter.cpp (state 1): y of the centre the character circles (whole units)
                     };
                     union                         // 0x10
                     {
@@ -125,6 +137,7 @@ struct CharState
                                                   // raised (Npc_RideAlarm), attacks left to chain
                                                   // (Enemy_ShoveAndBlast)
                         int running;              // enemy_chase.cpp: 1 = running (faster) after the player was far
+                        int strafeMode;           // breath_enemy.cpp: 0 = circles left, 1 = right, 2 = holds, 3 and 4 = also hold
                         int swingingBack;         // enemy_pendulum.cpp: 1 while swinging back
                         int nextPoint;            // route_carrier.cpp: the route point headed for
                         int downMode;             // companion_update.cpp (companion slot): 0 = active,
@@ -143,6 +156,10 @@ struct CharState
                         int lift;                 // mole_game.cpp: upward kick after a hit (0x30), 3 less each step it moves
                         int zoneType;              // area_zone.cpp: 0..4 push, 5 / 7 / 8 camera setting, 6 = other zone
                         int perchMode;            // npc_perch.cpp: talk % 100 (0 = copies the neighbour's heading, 1 and 2 = turn to the player and spit, 3 = carried)
+                        int trailFrames;          // pulse_charger.cpp: frames left of the trail effect it leaves
+                        int phaseFrames;          // enemy_chase_hop.cpp: frames counted in the following step (3)
+                        int hurlRetryDigit;       // npc_hurl.cpp: (talk / 10) % 10, after a throw the next one starts when a roll of 100 reaches (this + 1) * 3
+                        int driftStarted;         // drifter.cpp: 1 once the drift or orbit was set up
                     };
                     union                         // 0x14
                     {
@@ -171,6 +188,12 @@ struct CharState
                         int panicked;             // mole_game.cpp: 1 after a hit (the mole runs faster), 0 once it came up again
                         int zoneValue;             // area_zone.cpp: camera value (types 5 and 8) or 1 = the push also tests the height
                         int shotCount;            // npc_perch.cpp: spits so far in the current round (a mode 3 rider sets its neighbour's to 1)
+                        int ageFrames;            // pulse_charger.cpp: frames lived (counted every frame it acts)
+                        int stalledFrames;        // enemy_chase_hop.cpp: frames spent not getting closer to the player
+                        int hurlReach;            // npc_hurl.cpp: (talk / 100) % 10, throwing range in hundreds of units
+                        int shotAligned;           // enemy_hover_shooter.cpp: 1 = the bearing to the player is close enough to fire
+                        int stalled;              // breath_enemy.cpp: 1 = the last step was blocked (no ground or a wall ahead)
+                        int orbitCentreZ;         // drifter.cpp (state 1): z of the centre the character circles (whole units)
                     };
                     union                         // 0x18
                     {
@@ -190,6 +213,9 @@ struct CharState
                   int swingMirror;          // swing_platform.cpp: non-zero = the swing turns the other way round
                         int motionSaved;          // mole_game.cpp: 1 while the motion below is put back after a hit (1 while it dives)
                         int zoneActive;            // area_zone.cpp: 1 while the player is inside and the zone acts
+                        int hurlAiming;           // npc_hurl.cpp: 1 while the thrower holds the missile and aims (its charge effect shows)
+                        int shotMirrored;          // enemy_hover_shooter.cpp: non-zero = the bearings are mirrored
+                        int airborne;             // enemy_chase_hop.cpp: 1 = no ground within 25 units below (the enemy hops or falls), 0 = on the ground
                     };
                     union                         // 0x1c
                     {
@@ -206,6 +232,9 @@ struct CharState
                         int linkIndex;            // npc_link_shock.cpp: the link (DAT_1049f0c8) the character stands at, -1 = none
                         int savedLayer;           // mole_game.cpp: motion layer playing at the end of the last frame (-1 while blending)
                         int zoneFrame;             // area_zone.cpp: frame of the zone's cycle
+                        int hurlHit;              // npc_hurl.cpp: 1 once the thrower was hit (it stops waiting and acts at once)
+                        int motionFrameSaved;      // enemy_hover_shooter.cpp: motion frame kept while it flies (motion 7)
+                        int airFrames;            // enemy_chase_hop.cpp: frames airborne (the hop eases with it), 0 once it lands
                     };
                     union                         // 0x20
                     {
@@ -221,6 +250,8 @@ struct CharState
                   int playerGround;         // npc_hover_carrier.cpp: height of the ground under the player
                         int savedFrame;           // mole_game.cpp: motion frame at the end of the last frame
                         int zonePeriod;            // area_zone.cpp: frames in the cycle
+                        int floorHeight;           // enemy_hover_shooter.cpp: height of the ground under the spawn point
+                        int hurlWound;            // npc_hurl.cpp: 1 once the wind-up motion reached its held pose (0x1b)
                     };
                     union                         // 0x24
                     {
@@ -229,6 +260,9 @@ struct CharState
                         int sinkLimit;            // map_cursor_walk.cpp: set to -40 while the character is not sinking
                         int restFrames;           // enemy_strafe.cpp (Enemy_HopAndStrafe): frames standing still
                                                   // in the idle motion
+                        int hurlCarryHeight;      // npc_hurl.cpp: height the carried character is held at (set by the carrier)
+                        int shotDelayMax;          // enemy_hover_shooter.cpp: frames after which a shot is certain (150)
+                        int sparkCooldown;        // npc_tricks.cpp: frames before the next spark effect (counted down from 10)
                     };
                     union                         // 0x28
                     {
@@ -246,6 +280,9 @@ struct CharState
                         int lastHealth;           // map_cursor_walk.cpp: the health of the slot, copied every frame
                         int zoneActiveTo;          // area_zone.cpp: last frame of the cycle in which the zone acts
                   int swingMaxAngle;        // swing_platform.cpp: largest swing angle seen over ground
+                        int hurlCarried;          // npc_hurl.cpp: non-zero = the thrower is carried (moved to the node [8] position)
+                        int shotDelayMin;          // enemy_hover_shooter.cpp: frames before a shot may come (30)
+                        int retreatFrames;        // breath_enemy.cpp: frames left of a failed retreat (state 5 ends when it runs out)
                     };
                     union                         // 0x2c
                     {
@@ -256,6 +293,7 @@ struct CharState
                         int hopFrame;             // enemy_strafe.cpp (Enemy_HopAndStrafe): frame of the hop
                                                   // under way (0 = not hopping)
                   int swingMinAngle;        // swing_platform.cpp: smallest swing angle seen over ground
+                        int shotTimer;             // enemy_hover_shooter.cpp: frames since the last shot
                         int zoneEffect;            // area_zone.cpp: effect started at one frame of the cycle (0 = none)
                     };
                     union                         // 0x30
@@ -264,6 +302,7 @@ struct CharState
                         int zoneEffectFrame;       // area_zone.cpp: the frame of the cycle that starts the effect
                         int markerPhase;          // marker_rider.cpp: 0 = new, 1 = riding (flags set), 2 = vanishing
                         int arrivalHold;          // map_cursor.cpp: frames left in which the cursor counts as
+                        int frozenFrames;          // enemy_hover_shooter.cpp: frames its course stays frozen after a shot
                         int hikariScanned;        // char_hikari.cpp: 1 once the character to carry along was looked up
                                                   // having been carried by a rider (15 after one lands on it)
                     };
@@ -275,6 +314,7 @@ struct CharState
                         int arrivalAction;        // npc_patrol.cpp: action of the last route point reached
                         int hopHistory;           // enemy_strafe.cpp (Enemy_HopAndStrafe): HopHistory state of
                         int hikariFollower;       // char_hikari.cpp: slot of the character carried along with the light (0 = none)
+                        int hoverHeight;           // enemy_hover_shooter.cpp: height it hovers at (-200000 = not set yet)
                         int gateStarted;          // npc_gate_carrier.cpp: 2 once the carrier was set up on its route
                                                   // the position history in LastPosition
                     };

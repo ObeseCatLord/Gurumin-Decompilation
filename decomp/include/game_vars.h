@@ -387,7 +387,7 @@ extern "C" char DAT_104c022e;
 extern "C" unsigned char DAT_104c0232;
 extern "C" int DAT_104c0234;
 extern "C" char DAT_104c023c;
-extern "C" char DAT_104c023e;
+extern "C" unsigned char DAT_104c023e;
 extern "C" int DAT_104c0270[0x10];                        // anti-tamper noise table
 extern "C" int DAT_104c02b0;                              // number of groups read
 extern "C" char DAT_104c02e6;
@@ -407,7 +407,7 @@ extern "C" int DAT_104c0310;
 extern "C" char DAT_104c0318;
 extern "C" float DAT_104c031c;                            // spinner angle
 extern "C" float DAT_104c0320;                            // loading progress in percent
-extern "C" char DAT_104c0330;
+extern "C" unsigned char DAT_104c0330;
 extern "C" char DAT_104c0331;
 extern "C" int DAT_104c0334;
 extern "C" int DAT_104c0344;

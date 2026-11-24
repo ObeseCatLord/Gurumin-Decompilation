@@ -579,3 +579,8 @@ original had there is not found yet.
 
 - Anonymous unions added to Node (m_1884) or AnimModel (m_0280) changed the code of unrelated matched functions (Node::WeldVertices, FUN_100b4f00 in char_move.cpp): give a reused field one plain typed member (rename it) or split a pad into typed members instead of wrapping it in a union in these classes. Adding an #include to char_equipment.cpp also changes FUN_100615f0 (20 -> 349 diffs), so that file keeps local declarations.
 - FUN_100b4f00 (char_move.cpp) is a fragile ebx/ebp register tie: the number of declarations in matrix4.h tips it (one extra member or free declaration loses the match, two restore it). When a new Matrix4 member breaks it, also move a genuinely shared declaration into matrix4.h (batch 344 moved DirectionMatrix and Multiply there), never a dummy or duplicate.
+
+- Effect lights: DAT_118e99f8 has EFFECT_LIGHT_COUNT (0x80) manager lights plus two ribbon lights (0x80, 0x81) that
+  EffectManager::DrawRecord builds; Init/Reset clear only the first 0x80 (rep stosd 0x80280 dwords), so they spell the size
+  as sizeof(EffectLight) * EFFECT_LIGHT_COUNT. The old globals DAT_11aea3f8/DAT_11aeabfc are light 0x80 fields
+  (pointCount, points[RIBBON_JITTER_BASE + i]). Resizing a shared array changes every sizeof() of it in matched code.

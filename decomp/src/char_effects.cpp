@@ -31,7 +31,7 @@ int EffectManager::Reset()
     int offsets[6];
     DAT_1101c804.SetBuffer(DAT_10fc6a90, 0x400);
     m_0050 = 0;
-    memset(DAT_118e99f8, 0, sizeof(DAT_118e99f8));
+    memset(DAT_118e99f8, 0, sizeof(EffectLight) * EFFECT_LIGHT_COUNT);   // the ribbon lights after them stay
     memset(DAT_1115cfe8, 0, EFFECT_RECORD_COUNT * sizeof(EffectRecord));
     memset(DAT_11134cc8, 0, EFFECT_SPRITE_COUNT * sizeof(EffectSprite));
     memset(DAT_118a8888, 0, EFFECT_SPRITE_COUNT * sizeof(EffectSprite));
@@ -232,7 +232,7 @@ int EffectManager::Init()
     DAT_1101c804.SetBuffer(DAT_10fc6a90, 0x400);
     M_1016fab0();
     m_0050 = 0;
-    memset(DAT_118e99f8, 0, sizeof(DAT_118e99f8));
+    memset(DAT_118e99f8, 0, sizeof(EffectLight) * EFFECT_LIGHT_COUNT);   // the ribbon lights after them stay
     memset(DAT_1115cfe8, 0, EFFECT_RECORD_COUNT * sizeof(EffectRecord));
     memset(DAT_1101de68, 0, sizeof(DAT_1101de68));
     memset(DAT_11134cc8, 0, EFFECT_SPRITE_COUNT * sizeof(EffectSprite));

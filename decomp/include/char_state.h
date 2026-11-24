@@ -131,6 +131,50 @@ struct Bs004State
     int paused;                   // 0x3c: 1 while the game is paused
 };
 
+// The BS_002 boss (bs002_update.cpp, kind 105): a big beast that circles the player on a ring and strikes from it. Words of
+// its own slot; the words before the record (0x1020b3f0, Bs002Extra) and the ending flag in the record before it are
+// described in bs002.h.
+struct Bs002State
+{
+    int state;                    // 0x00: 0 = set up, 1/2 = circle to the left/right, 3 = lunge ring, 4 = ring walk, 5..0xf = attacks, 100 = pick the next one
+    int frames;                   // 0x04: frames in the state (1000 and 2000 mark later parts of state 10)
+    int motion;                   // 0x08: motion started last (-1 = none)
+    int lastState;                // 0x0c: the state before the pick
+    int direction;                // 0x10: way round the ring (+1 or -1)
+    int angle;                    // 0x14: angle on the ring in 1/1000 radians
+    int height;                   // 0x18: height above the pit floor it stands at (follows targetHeight)
+    int targetHeight;             // 0x1c: height it climbs or drops to
+    int radiusBoost;              // 0x20: growth of the ring radius while it circles
+    int riseSpeed;                // 0x24: how fast `height` follows `targetHeight` (at least 100)
+    int hits;                     // 0x28: the ending: 1 once its motion started
+    int mode;                     // 0x2c: height mode of the frame (0 free, 1..3); the ending: frames since it began, from -30
+    int markedTarget;             // 0x30: character slot the target mark follows (-1 = none)
+    int lunging;                  // 0x34: 1 while a lunge swing is armed
+    int motionFrame;              // 0x38: frame of the playing motion (-1 while blending)
+    int motionLayer;              // 0x3c: layer of the playing motion
+};
+
+// The prince (prince_update.cpp, kind 0x43): the fighter with the swappable weapon (O_100..O_103) and the gatling gun.
+struct Kind43State
+{
+    int state;                    // 0x00: 0 = set up, 1..16 = moves, 100 = picks the next one
+    int frames;                   // 0x04: frames in the current state (1000, 2000, 3000 mark later parts)
+    int healing;                  // 0x08: 1 while the prince regains health (30 a frame up to the maximum)
+    int weapon;                   // 0x0c: weapon held: 0 = bare, 1 = O_101, 2 = O_102, 3 = O_103
+    int lastState;                // 0x10: the state picked last
+    int wobble;                   // 0x14: 1 or 3 while the height wobbles, 2 = steady
+    int counter;                  // 0x18: general counter of the state (shot count, chances)
+    int heightPhase;              // 0x1c: direction * 1000 + height step (0x19 rises, 0x401 falls)
+    int pad_0020;                 // 0x20
+    int lastHeight;               // 0x24: height of the last frame (whole units), 0xffffd8f0 while it flies
+    int attackMotion;             // 0x28: motion of the attack the state plays
+    int engaged;                  // 0x2c: 1 once a state took hold of the prince
+    int hurt;                     // 0x30: 1 for a frame after it was hit
+    int age;                      // 0x34: frames since it started (the ending counts it from -30)
+    int syncedFlag;               // 0x38: DAT_10315350 of the slot (the ending: 1 once started)
+    int voiceCooldown;            // 0x3c: frames before the prince speaks again (shared with the other bosses)
+};
+
 struct CharState
 {
     union
@@ -629,6 +673,8 @@ struct CharState
         Bs001Fade bs001Fade;                      // bs001_update.cpp: two slots after the boss
         Bs005State bs005;                         // bs005_update.cpp: the stone golem boss
         Bs004State bs004;                         // bs004_update.cpp: the moss root boss
+        Kind43State kind43;                       // prince_update.cpp: the prince
+        Bs002State bs002;                         // bs002_update.cpp: the BS_002 boss
         int words[0x10];                          // the whole block by index (resets and copies)
         Shove shoves[4];                          // char_shove.cpp: the slot's scripted shoves
     };

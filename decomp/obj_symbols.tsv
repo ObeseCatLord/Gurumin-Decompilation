@@ -682,3 +682,6 @@ _Enemy_IsBusy	100e1c40
 ?TickCaption@WorldRenderer@@QAEXXZ	101687c0
 ?Bs004_Update@@YAHH@Z	100c39c0
 ?NeoGalaxy_Update@@YAHH@Z	100e7280
+?DrawRecord@EffectManager@@QAEHHABUMatrix4@@PBU2@H@Z	10189530
+?Prince_Update@@YAHH@Z	100edea0
+?Bs002_Update@@YAHH@Z	10104640

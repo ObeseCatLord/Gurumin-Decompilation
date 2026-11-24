@@ -188,8 +188,8 @@ int EffectManager::Step(int record, int list)
         return 0;
     rec.part = (char)(rec.m_001c & 1);
     int part = rec.part;
-    rec.pad_018f[0] = 0;
-    rec.pad_018f[1] = 0;
+    rec.spriteLeft[0] = 0;
+    rec.spriteLeft[1] = 0;
 
     if (rec.m_0010 == -1)
     {
@@ -461,8 +461,8 @@ int EffectManager::Step(int record, int list)
 
     if (def.kind == EFFECT_KIND_RIBBON_8 || def.kind == EFFECT_KIND_RIBBON_9)
     {
-        DAT_11aea3f8 = def.lightFrames;
-        if (DAT_11aea3f8 > 2)
+        DAT_118e99f8[EFFECT_LIGHT_RIBBON].pointCount = def.lightFrames;
+        if (DAT_118e99f8[EFFECT_LIGHT_RIBBON].pointCount > 2)
         {
             Vec4 base;
             Vec4 offset;
@@ -471,10 +471,10 @@ int EffectManager::Step(int record, int list)
             offset.Copy(rec.partPositions[part]);
             offset.Copy(offset - base);
             offsetCopy.Copy(offset);
-            for (int i = 0; i < DAT_11aea3f8; i++)
-                DAT_11aeabfc[i + 1].Set(RandomJitter(), RandomJitter(), RandomJitter(), 0.0f);
-            DAT_11aeabfc[1].Fill(0.0f);
-            DAT_11aeabfc[DAT_11aea3f8].Fill(0.0f);
+            for (int i = 0; i < DAT_118e99f8[EFFECT_LIGHT_RIBBON].pointCount; i++)
+                DAT_118e99f8[EFFECT_LIGHT_RIBBON].points[RIBBON_JITTER_BASE + i + 1].Set(RandomJitter(), RandomJitter(), RandomJitter(), 0.0f);
+            DAT_118e99f8[EFFECT_LIGHT_RIBBON].points[RIBBON_JITTER_BASE + 1].Fill(0.0f);
+            DAT_118e99f8[EFFECT_LIGHT_RIBBON].points[RIBBON_JITTER_BASE + DAT_118e99f8[EFFECT_LIGHT_RIBBON].pointCount].Fill(0.0f);
         }
         if ((def.spawnKind == EFFECT_SPAWN_ATTACHED || def.spawnKind == EFFECT_SPAWN_ATTACHED_POSITION) &&
             rec.parent != EFFECT_NONE)

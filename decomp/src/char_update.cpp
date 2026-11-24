@@ -79,7 +79,7 @@ extern "C" int FUN_100d24a0(int index);
 #include "enemy_fighter.h"
 #include "bs004.h"
 #include "bs005.h"
-extern "C" int FUN_100edea0(int index);
+#include "prince.h"
 #include "neo_galaxy.h"
 extern "C" int FUN_100dfcf0(int index);   // Char_RunBehaviour
 extern "C" int FUN_100bcb30(int index);   // Enemy_UpdateBehaviour
@@ -832,7 +832,7 @@ int Char_UpdateByKind(int index)
         Enemy_UpdateFighter(index);
         break;
     case 0x43:
-        FUN_100edea0(index);
+        Prince_Update(index);
         break;
     case 0x46:
         Bs004_Update(index);

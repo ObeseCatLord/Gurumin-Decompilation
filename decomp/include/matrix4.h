@@ -75,5 +75,6 @@ Vec4 QuatMultiply(const Vec4 &a, const Vec4 &b);   // 0x101aec90: product of two
 Matrix4 RotationMatrix(const Vec4 &quaternion);   // 0x101b08c0: rotation block from a quaternion (x, y, z, w)
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
+Vec4 TransformCoord(const Vec4 &point, const Matrix4 &matrix);   // 0x101adf40: through `matrix`, w = the divisor
 
 #endif

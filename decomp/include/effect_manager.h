@@ -21,6 +21,11 @@
 #define EFFECT_RECORD_COUNT 0x348
 #define EFFECT_SPRITE_COUNT 0x348
 #define EFFECT_LIGHT_COUNT 0x80
+// The two lights after the manager's own that DrawRecord builds its ribbons in (kinds 8/9 and 0x17). The ribbon
+// of kinds 8/9 keeps its jitter offsets in the second half of its points (entry RIBBON_JITTER_BASE + i, i >= 1).
+#define EFFECT_LIGHT_RIBBON 0x80
+#define EFFECT_LIGHT_STREAK 0x81
+#define RIBBON_JITTER_BASE 0x7f
 // A free definition, record or sprite has id (or type) -1; -1 also ends a record list.
 #define EFFECT_NONE (-1)
 // EffectDef::kind values EffectManager::DrawLight tells apart (1 and 0x12 are sprites). Kinds 7, 9, 0x16 and 0x17
@@ -58,6 +63,7 @@ struct EffectOptions
     union                                            // 0x10
     {
         int m_0010;
+        float angle;                                 // 0x10: roll of the quad kinds 5, 0xb and 0x13 (a record reads it as a float)
         struct
         {
             char m_0010_0;
@@ -155,7 +161,9 @@ struct EffectDef
     int lightFrames;                                 // 0x80: how long its light lasts (fades out over lightFrames + 10)
     char pad_0084[0x4];
     int fullAlphaB;                                  // 0x88: sprite table B: non-zero = starts at full alpha (else half)
-    char pad_008c[0xc];
+    int spawnWorldSprite;                            // 0x8c: non-zero = also leaves a sprite in table A
+    int worldSpriteLifetime;                         // 0x90: frames that sprite lives
+    char pad_0094[4];
     int fullAlphaA;                                  // 0x98: the same for sprite table A
     char pad_009c[0x5c];
     int fixedList;                                   // 0xf8: non-zero = always started in the definition's list
@@ -212,7 +220,8 @@ struct EffectRecord
     int m_0188;                                      // 0x188: the caller's value (the address of a Matrix4 to aim at)
     short m_018c;                                    // 0x18c: running child effects
     char part;                                       // 0x18e: 0 or 1, the part whose position decides visibility
-    char pad_018f[3];
+    char spriteLeft[2];                              // 0x18f: 1 once the effect left a sprite in table A / table B
+    char pad_0191;
     short light;                                     // 0x192: entry of DAT_118e99f8 it uses, 0 = none
     EffectOptions options;                           // 0x194: the start options (options.owner = starting character)
     int *pause;                                      // 0x1d8: paused while it points to a non-zero value
@@ -238,7 +247,8 @@ struct EffectSprite
     char pad_00a4[0x18];
     short lifetime;                                  // 0xbc: frames the record lives
     short age;                                       // 0xbe: frames it has lived
-    int pad_00c0;
+    char list;                                       // 0xc0: effect list of the record that left it
+    char pad_00c1[3];
 };
 
 // Number of points a light's trail can hold, and of vertices of the trail strip DAT_110187c0 (two per point).
@@ -281,9 +291,8 @@ extern "C" EffectDef DAT_1101dfdc[EFFECT_DEFINITION_COUNT];      // effect defin
 extern "C" EffectRecord DAT_1115cfe8[EFFECT_RECORD_COUNT];       // running effects
 extern "C" EffectSprite DAT_11134cc8[EFFECT_SPRITE_COUNT];       // sprite table A: sprites placed in the world
 extern "C" EffectSprite DAT_118a8888[EFFECT_SPRITE_COUNT];       // sprite table B: sprites placed on the screen
-extern "C" EffectLight DAT_118e99f8[EFFECT_LIGHT_COUNT];         // effect lights
-extern "C" int DAT_11aea3f8;                                     // points of the ribbon being built for kinds 8 and 9
-extern "C" Vec4 DAT_11aeabfc[EFFECT_LIGHT_POINT_COUNT];          // its jitter offsets (entries 1 to DAT_11aea3f8)
+// effect lights; the two after the last are the ribbons EffectManager::DrawRecord builds for kinds 8/9 and 0x17
+extern "C" EffectLight DAT_118e99f8[EFFECT_LIGHT_COUNT + 2];
 extern "C" ScreenVertex DAT_110187c0[EFFECT_TRAIL_VERTEX_COUNT];  // vertices of the trail strip being drawn
 extern "C" int DAT_1101d820[EFFECT_LIST_COUNT];                  // first record of each effect list
 extern "C" int DAT_11018604[EFFECT_LIST_COUNT];                  // last record of each effect list

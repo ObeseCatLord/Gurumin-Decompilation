@@ -1,6 +1,7 @@
 // Anti-tamper guard copies (EN build). JP twin: anti_tamper.cpp.
 #include "anti_tamper.h"
 #include "char.h"
+#include "game_vars.h"
 
 // The guard copy of a value for `slot`: the inverted value plus the slot's step.
 #define GUARD_VALUE(slot, value) (~(value) + (slot) * GUARD_SLOT_STEP)
@@ -20,5 +21,16 @@ extern "C" int AntiTamper_StoreValues(void)
     g_guardCopies[7] = GUARD_VALUE(7, g_guardedValue7);
     g_guardCopies[8] = GUARD_VALUE(8, g_guardedValue8);
     g_guardCopies[9] = GUARD_VALUE(9, g_guardedValue9);
+    return 0;
+}
+
+// AntiTamper_StoreArrays: refreshes the guard copies of the stock of every item (slots 10..89) and of the 15 extra
+// values (slots 100..114). Returns 0. Called after every inventory change.
+extern "C" int AntiTamper_StoreArrays(void)
+{
+    for (int i = 0; i < GUARD_ITEM_COUNT; i++)
+        g_guardCopies[GUARD_ITEM_FIRST_SLOT + i] = ~g_itemStock[i] + GUARD_STOCK_BASE + i * GUARD_SLOT_STEP;
+    for (int i = 0; i < GUARD_EXTRA_COUNT; i++)
+        g_guardCopies[GUARD_EXTRA_FIRST_SLOT + i] = ~g_guardedExtras[i] + GUARD_EXTRA_BASE + i * GUARD_EXTRA_STEP;
     return 0;
 }

@@ -5,13 +5,15 @@ Re-run after each batch (finished items drop out). Per function: `python tools/p
 the JP twin's matched source, the EN callees with their JP names and the EN disassembly (`--brief` makes a
 subagent brief). Low-confidence map rows: check the twin before porting.
 
-## 1. Walls to retry (16)
+## 1. Walls to retry (18)
 
 - [ ] `005ec6d0` — ListBank::ReadToken: stack-slot assignment (original puts inQuotes in the parameter slot); 313 diffs
 - [ ] `00639500` — ListBank::SkipStatement: register allocation (original keeps text in ebx, parens in memory); declaration orders tried; 541 diffs
 - [ ] `0063fc10` — Sound_PlayEffect: EN hoists cvtps2pd of the volume to the top; 507 vs 519 bytes
 - [ ] `00643b20` — ListBank::DeclareFunction: 21 diffs; first source copy should reuse the parameter slot, one cmp scheduled earlier
 - [ ] `0064bd10` — Camera_ItemStand: 889 bytes, same length; store scheduling in the sparkle-matrix block (shot-point ints interleaved with matrix stores, z re-read); ~6 spellings
+- [ ] `006d5dd0` — Npc_WaitFacingAway: 633 vs 649 bytes, register allocation differs from the prologue
+- [ ] `006d68b0` — Npc_Idle: same length, only the push esi position (original pushes inside the state==1 branch)
 - [ ] `0074a050` — Node::MoveToParent: 6 bytes off; operand order of the inline strcpy at the two insertion sites and the edi load order
 - [ ] `00775320` — View_ContainsPoint: 6 bytes off, one subss placement in the behind-camera branch
 - [ ] `00779300` — Vec4::RotateY: 9 bytes off, xmm2/xmm3 numbering only (RotateX matches with the same form)
@@ -24,7 +26,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007ad3b0` — ImeCandidates_WidestWidth: 54 bytes off; VS2013 rotates the loop (test before the loop) in every spelling, the original tests at the top; five spellings tried (for, while, for(;;)+break, min four ways)
 - [ ] `007c5750` — SoundArc_PlayStream: 8 diffs; EN stores the command (0x65) before the stream value in every spelling
 
-## 2. JP twin matched: port the JP source (252 functions, 260402 bytes)
+## 2. JP twin matched: port the JP source (246 functions, 257903 bytes)
 
 - [ ] `0071dd90` 16 bytes <- APP.dll `10184160` WorldRenderer::DrawScreenOverlays [decomp/src/world_caption.cpp] (high 0.90)
 - [ ] `006e2110` 53 bytes <- APP.dll `10001fb0` cosf [decomp/src/enemy_flock_diver.cpp] (medium 0.35)
@@ -94,7 +96,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0073ede0` 298 bytes <- APP.dll `1016f900` EffectDefs_Allocate [decomp/src/effect_defs.cpp] (high 0.79)
 - [ ] `00740ea0` 311 bytes <- APP.dll `10169e40` MeshInstance::FreeImage [decomp/src/mesh_cache.cpp] (high 0.89)
 - [ ] `007419a0` 314 bytes <- APP.dll `10169660` NodeExtra::Init [decomp/src/model_misc.cpp] (medium 0.52)
-- [ ] `007a2050` 315 bytes <- APP.dll `1015c850` Frame_PumpAndRecover [decomp/src/render_shutdown.cpp] (high 0.86)
 - [ ] `007584f0` 316 bytes <- APP.dll `101abe30` Node::LoadIt3 [decomp/src/model_prescan.cpp] (high 0.61)
 - [ ] `00734ce0` 318 bytes <- APP.dll `10184170` EffectManager::Reset [decomp/src/char_effects.cpp] (medium 0.52)
 - [ ] `00740c40` 325 bytes <- APP.dll `10162c50` AnimModel::Unload [decomp/src/anim_unload.cpp] (high 0.94)
@@ -106,11 +107,8 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005f4f60` 335 bytes <- APP.dll `10021070` Region_IsVisible [decomp/src/region_view.cpp] (high 0.75)
 - [ ] `00631480` 335 bytes <- APP.dll `10018100` Map_FindRegionAt [decomp/src/map_regions.cpp] (high 0.74)
 - [ ] `005a7080` 337 bytes <- APP.dll `1001a840` Char_ClampStatus [decomp/src/char_status.cpp] (high 0.90)
-- [ ] `007a4360` 337 bytes <- APP.dll `10145a50` MeshData::UploadBones [decomp/src/mesh_release.cpp] (high 0.90)
 - [ ] `00790d10` 339 bytes <- APP.dll `101509b0` TextRenderer::DrawOutlinedIn [decomp/src/text_outline.cpp] (medium 0.52)
 - [ ] `005c2800` 340 bytes <- APP.dll `10024ac0` Collision_AverageNormals [decomp/src/collide_normals.cpp] (high 0.71)
-- [ ] `006d68b0` 343 bytes <- APP.dll `100b5ae0` Npc_Idle [decomp/src/char_move.cpp] (high 0.74)
-- [ ] `005f4700` 353 bytes <- APP.dll `1000e810` AntiTamper_StoreArrays [decomp/src/anti_tamper.cpp] (high 0.82)
 - [ ] `0064bb90` 369 bytes <- APP.dll `1001af10` Shaga_PushOut [decomp/src/shaga_pushout.cpp] (high 0.90)
 - [ ] `006e0600` 369 bytes <- APP.dll `1001c510` Point_Transform [decomp/src/point_transform.cpp] (high 0.90)
 - [ ] `007bebb0` 380 bytes <- APP.dll `101602d0` File_Checksum [decomp/src/file_check.cpp] (medium 0.50)
@@ -129,7 +127,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0063aeb0` 483 bytes <- APP.dll `1002ee70` Char_UpdateShoves [decomp/src/char_shove.cpp] (high 0.82)
 - [ ] `005a5500` 488 bytes <- APP.dll `1003aef0` Bgm_Play [decomp/src/bgm_play.cpp] (medium 0.57)
 - [ ] `005f50b0` 496 bytes <- APP.dll `100541f0` Enemy_Destroy [decomp/src/enemy_destroy.cpp] (high 0.99)
-- [ ] `0070a440` 502 bytes <- APP.dll `1017c570` ModelBank::Add [decomp/src/model_bank.cpp] (high 0.71)
 - [ ] `005cc8c0` 505 bytes <- APP.dll `1000cc30` Hud_DrawNameBanners [decomp/src/name_banners.cpp] (high 0.94)
 - [ ] `005ac530` 515 bytes <- APP.dll `10058500` Switch_UpdateEffects [decomp/src/switch_effects.cpp] (high 0.62)
 - [ ] `00602f70` 516 bytes <- APP.dll `1000fb80` Loading_Tick [decomp/src/loading_tick.cpp] (high 1.00)
@@ -152,7 +149,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005cc3b0` 634 bytes <- APP.dll `10012d90` Number_DrawRightAligned [decomp/src/hud_digits.cpp] (medium 0.47)
 - [ ] `005cc630` 642 bytes <- APP.dll `10012990` Number_Draw [decomp/src/hud_digits.cpp] (medium 0.49)
 - [ ] `007a8f90` 648 bytes <- APP.dll `10160a90` MmvPlayer::Open [decomp/src/mmv_texreg.cpp] (medium 0.55)
-- [ ] `006d5dd0` 649 bytes <- APP.dll `10045c30` Npc_WaitFacingAway [decomp/src/char_move.cpp] (high 0.89)
 - [ ] `00754e20` 650 bytes <- APP.dll `10192a00` Node::CylindersOverlap [decomp/src/box_overlap.cpp] (high 0.66)
 - [ ] `005cc110` 660 bytes <- APP.dll `100131b0` Number_DrawBack [decomp/src/hud_digits.cpp] (medium 0.48)
 - [ ] `006df520` 662 bytes <- APP.dll `1001d920` Carry_StackOnObject [decomp/src/carry_stack.cpp] (high 0.96)
@@ -279,7 +275,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007ab210` 7222 bytes <- APP.dll `1015d520` Text_ToFullWidth [decomp/src/text_fullwidth.cpp] (high 0.65)
 - [ ] `005d3360` 7715 bytes <- APP.dll `10038c10` Scene_DrawFrame [decomp/src/scene_draw.cpp] (high 0.85)
 
-## 3. JP twin not matched yet (483 functions, 1488310 bytes)
+## 3. JP twin not matched yet (482 functions, 1487913 bytes)
 
 - [ ] `006eab60` 10 bytes <- sound3d.dll `1004be9d`  (medium 0.35)
 - [ ] `007af3b0` 23 bytes <- sound3d.dll `100595ec`  (low 0.19)
@@ -434,7 +430,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0071c5b0` 385 bytes <- APP.dll `10175c90` Texture_CreateFromPixels (high 0.90)
 - [ ] `007a4bf0` 390 bytes <- APP.dll `10143870` TextureObject::BeginRenderTo (medium 0.59)
 - [ ] `0071add0` 395 bytes <- APP.dll `1016a2e0` Playback::Play (high 0.84)
-- [ ] `0070a2b0` 397 bytes <- APP.dll `10164af0` ModelBank::AddLitModel (high 0.85)
 - [ ] `007be4f0` 398 bytes <- SoundArc.dll `0040f79d` ___crtGetLocaleInfoA (low 0.34)
 - [ ] `0071c410` 402 bytes <- APP.dll `10169c60` TextureObject::Create (high 0.92)
 - [ ] `0079fe00` 402 bytes <- sound3d.dll `10018aac`  (medium 0.39)
@@ -765,7 +760,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006883a0` 51470 bytes <- APP.dll `100d24a0` Bs006_Update (medium 0.60)
 - [ ] `0060cb10` 113582 bytes <- APP.dll `1011d810`  (high 0.72)
 
-## 4. EN-only (no JP twin found) (868 functions, 244647 bytes)
+## 4. EN-only (no JP twin found) (867 functions, 244591 bytes)
 
 - [ ] `006e6210` 6 bytes (launcher (EN-only config dialog))
 - [ ] `006e6220` 6 bytes (launcher (EN-only config dialog))
@@ -1061,7 +1056,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005a9e00` 55 bytes (unknown)
 - [ ] `006ea780` 55 bytes (launcher (EN-only config dialog))
 - [ ] `007a24d0` 55 bytes (unknown)
-- [ ] `00740bb0` 56 bytes (unknown)
 - [ ] `00777670` 56 bytes (unknown)
 - [ ] `007aab30` 56 bytes (unknown)
 - [ ] `005a24d0` 57 bytes (unknown)

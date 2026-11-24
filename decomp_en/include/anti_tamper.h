@@ -16,7 +16,19 @@ extern "C" int g_guardedValue7;                    // EN 0x01334880 (JP DAT_10c6
 extern "C" int g_guardedValue8;                    // EN 0x013333a0 (JP DAT_10c635f8): guarded value, slot 8
 extern "C" int g_guardedValue9;                    // EN 0x01335398 (JP DAT_10c655f0): guarded value, slot 9 (the game mode)
 
+// Guarded extras: 15 values whose copies are slots 100..114, and the offsets of the two guard formulas.
+const int GUARD_ITEM_FIRST_SLOT = 10;  // slot of item 0
+const int GUARD_ITEM_COUNT = 0x50;    // items guarded
+const int GUARD_EXTRA_COUNT = 15;
+const int GUARD_EXTRA_FIRST_SLOT = 100;
+const int GUARD_STOCK_BASE = 0x14;
+const int GUARD_EXTRA_BASE = 6500;
+const int GUARD_EXTRA_STEP = 2;
+extern "C" int g_guardedExtras[GUARD_EXTRA_COUNT];  // EN 0x01335eec (JP DAT_10c66144): guarded extra values
+
 // Refreshes the guard copies of the ten single values. EN 0x5f4650.
 extern "C" int AntiTamper_StoreValues(void);
+// Refreshes the guard copies of the item stock and the extra values. Returns 0. EN 0x5f4700.
+extern "C" int AntiTamper_StoreArrays(void);
 
 #endif

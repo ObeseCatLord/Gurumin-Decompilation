@@ -467,3 +467,9 @@ _Textures_ReleaseGenerated	00740bb0
 ?AddLitModel@ModelBank@@QAEHPAUAnimModel@@@Z	0070a2b0
 ?Add@ModelBank@@QAEHPAUNode@@PBUVec4@@@Z	0070a440
 ?UploadBones@SlotTable@@QAEXPAUMatrix4@@H0H@Z	007a4360
+_Npc_WaitFacingAway	006d5dd0
+# misc (batch 8)
+_AntiTamper_StoreArrays	005f4700
+_Regions_CollideRay	00635010
+_Enemy_TurnToPlayer	005bf520
+_Char_ProbeSideLedge	005c24a0

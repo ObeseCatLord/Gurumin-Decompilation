@@ -29,6 +29,7 @@ const int CHARSTATE_CAMERA_FRAMES = 2;
 // CharState::values indices an idle NPC uses: frames to wait before it may speak again, and its talk line (key script * 100 + line).
 const int CHARSTATE_NPC_WAIT = 0;
 const int CHARSTATE_NPC_TALK = 1;
+const int CHARSTATE_NPC_RANGE = 2;       // distance at which a waiting NPC reacts to the player
 // Characters in the party table (g_partyCharacters).
 const int PARTY_SIZE = 5;
 // Number of entries of the group table.
@@ -98,7 +99,7 @@ struct CharState
     int state;                // 0x00: behaviour step (0 = not started yet)
     int values[13];           // 0x04: behaviour variables (the AI pickers use values[0] and values[1])
     int sawPlayer;            // 0x38: 1 once the character saw the player (or was told to react)
-    int m_003c;               // 0x3c: not used by EN code yet
+    int behaviour;            // 0x3c: behaviour number the character switches to (set with state 2)
 };
 
 // The model file of a model number.

@@ -39,7 +39,7 @@ extern "C" Vec4 g_fadeStep;                       // EN 0x013374a8 (JP DAT_10daa
 extern "C" Vec4 g_fadeTarget;                     // EN 0x015e9ac8 (JP DAT_10c67f60): colour the fade ends on
 
 // Recomputes the anti-tamper copies of the guarded values. EN 0x5f4700 (JP 0x1000e810).
-extern "C" void AntiTamper_StoreArrays(void);
+extern "C" int AntiTamper_StoreArrays(void);
 
 // Takes *amount of item *index. EN 0x609f10.
 extern "C" int Inventory_Remove(const int *index, int *amount);

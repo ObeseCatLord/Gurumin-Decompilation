@@ -16,11 +16,11 @@ const int MODEL_BANK_LIT_COUNT = 0x80;
 const int MODEL_BANK_LIGHT_VECTORS = 22;
 // AnimModel::collisionLimit of a bank model that never times out.
 const int MODEL_BANK_NO_TIMEOUT = 99999;
-// Lens flare points: entries of the brightness table, and of the screen position table (up to the end of the bank).
+// Lens flare points: entries of the brightness table, and of the screen position table .
 const int MODEL_BANK_FLARE_COUNT = 0x20;
-const int MODEL_BANK_SCREEN_COUNT = 0x10;
+const int MODEL_BANK_SCREEN_COUNT = 0x20;
 // Bytes of a ModelBank.
-const int MODEL_BANK_BYTES = 0x31624;
+const int MODEL_BANK_BYTES = 0x31724;   // (was 0x31624: the constructor at EN 0x70a120 constructs 0x20 flare vectors from 0x31524)
 
 struct ModelBank
 {

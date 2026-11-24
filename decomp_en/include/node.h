@@ -302,6 +302,8 @@ struct Node
     int Query(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, float *depth, const char *name, const char *excludeName);
     // EN 0x761d30 (JP 0x101a9670): casts the segment `from` to `to` against this node's meshes (tag filter, mask); fills `hit`, and `t` (may be 0) with the hit fraction.
     int CastSegment(const char *tag, unsigned int mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
+    // EN 0x7609a0 (JP 0x101aaa20): casts the ray from `from` to `to` against this node's meshes (tag filter, flags, mask); fills `hit`, and `t` (may be 0). Returns 1 on a hit.
+    int CastRay(const char *tag, int flags, unsigned int mask, Vec4 *to, Vec4 *from, Vec4 *hit, float *t);
     int BindLinks(Node *root, Node **list, int *count);   // EN 0x76d770 (JP 0x1019eeb0): links nodes and bones under `root`
     Node *AddChild(const char *childName, int position);  // EN 0x74ebb0 (JP 0x101abc30): creates a child at `position` (appended when negative or past the end)
     int SetupSkins(Node *root);            // EN 0x76dbe0 (JP 0x101ab9d0)

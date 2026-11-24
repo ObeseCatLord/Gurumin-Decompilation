@@ -4,6 +4,8 @@
 #include "char.h"
 #include "dialogs.h"
 #include "engine.h"
+#include <math.h>
+#include <string.h>
 
 // Character_SetMove: sets the movement impulse of character `index` from (x, y, z): half of it in the walking mode
 // unless the idle motion is active, otherwise 0.7 of it, raised to 1.4 while the character is nearly standing still
@@ -67,6 +69,60 @@ extern "C" int Npc_Idle(int index)
                            NPC_PROMPT_FRAMES);
             g_charState[index].values[CHARSTATE_NPC_WAIT] = NPC_TALK_GAP_FRAMES;
         }
+    }
+    return 0;
+}
+
+// Npc_WaitFacingAway: a character that waits with its back to the player: on the first frame it starts idle motion 2
+// and takes its reaction distance from the talk id (line * 10). Then it keeps turning so that it faces away from the
+// player (idle motion 2 once it is within about one degree, else motion 0). When the player comes closer than that
+// distance (or the character was told to react, and has a script number) its state is reset to behaviour 0xf with
+// talk id 999 and it starts walking away (16 units along its facing). Returns 0. Called by the NPC update.
+extern "C" int Npc_WaitFacingAway(int index)
+{
+    float distance = (g_characterModels[0].matrix.GetTranslation() - g_characterModels[index].matrix.GetTranslation()).Length2D();
+    CharState *state = &g_charState[index];
+    if (g_charState[index].state == NPC_STATE_START)
+    {
+        g_charState[index].state = NPC_STATE_IDLE;
+        g_characterModels[index].mode = 0;
+        g_charState[index].values[CHARSTATE_NPC_RANGE] =
+            g_charState[index].values[CHARSTATE_NPC_TALK] % NPC_TALK_SCRIPT_SCALE * NPC_RANGE_PER_LINE;
+        g_characterModels[index].PlayMotion(NPC_IDLE_MOTION, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        return 0;
+    }
+    {
+        float turn = g_characterModels[index].heading - g_characterModels[index].targetHeading;
+        while (turn > ANGLE_HALF_TURN)
+            turn -= 6.283f;  // a full turn in radians as the game rounds it
+        while (turn < -ANGLE_HALF_TURN)
+            turn += 6.283f;
+        float squared = turn * turn;
+        if (squared < TURN_SQUARED_LIMIT)
+            g_characterModels[index].PlayMotion(NPC_IDLE_MOTION, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        else
+            g_characterModels[index].PlayMotion(NPC_WALK_IDLE_MOTION, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+    }
+    g_characterModels[index].targetHeading =
+        (float)atan2(g_characterModels[0].matrix.m[MATRIX_TRANSLATION_X] - g_characterModels[index].matrix.m[MATRIX_TRANSLATION_X],
+                     g_characterModels[0].matrix.m[MATRIX_TRANSLATION_Y] - g_characterModels[index].matrix.m[MATRIX_TRANSLATION_Y]) +
+        ANGLE_HALF_TURN;
+    if (distance < (float)g_charState[index].values[CHARSTATE_NPC_RANGE] ||
+        (g_charState[index].sawPlayer != 0 && g_charState[index].values[CHARSTATE_NPC_TALK] / NPC_TALK_SCRIPT_SCALE != 0))
+    {
+        memset(state, 0, sizeof(CharState));
+        g_charState[index].state = NPC_STATE_WALK_AWAY;
+        g_charState[index].values[CHARSTATE_NPC_WAIT] = NPC_WALK_AWAY_WAIT;
+        g_charState[index].values[CHARSTATE_NPC_TALK] = NPC_WALK_AWAY_TALK;
+        g_charState[index].behaviour = NPC_WALK_AWAY_BEHAVIOUR;
+        g_charToldToReact[index] = 0;
+        g_characterModels[index].mode = MODEL_MODE_WALKING;
+        Vec4 step;
+        step.y = NPC_WALK_AWAY_STEP;
+        step.RotateZ(-g_characterModels[index].heading);
+        Character_SetMove(index, step.x, step.y, 0);
+        g_characterModels[index].velocity.Copy(step);
+        g_characterModels[index].AddMotionSpeed(NPC_WALK_AWAY_SPEED);
     }
     return 0;
 }

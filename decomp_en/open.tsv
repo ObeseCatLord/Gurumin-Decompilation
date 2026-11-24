@@ -15,3 +15,5 @@ address	status	reason
 0063fc10	open	Sound_PlayEffect: EN hoists cvtps2pd of the volume to the top; 507 vs 519 bytes
 007a3be0	open	FontSet::Release: scheduling (fonts[0] loaded before the DeleteObject pointer; ends with lea eax,[edi+1])
 007c5750	open	SoundArc_PlayStream: 8 diffs; EN stores the command (0x65) before the stream value in every spelling
+006d68b0	open	Npc_Idle: same length, only the push esi position (original pushes inside the state==1 branch)
+006d5dd0	open	Npc_WaitFacingAway: 633 vs 649 bytes, register allocation differs from the prologue

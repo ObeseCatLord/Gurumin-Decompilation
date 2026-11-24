@@ -36,6 +36,20 @@ const int NPC_STATE_IDLE = 1;
 extern "C" int Character_PlaySound(int index, int sound, int always, int optional);
 // Keeps NPC `index` standing in idle motion and lets it speak now and then. EN 0x6d68b0 (JP 0x100b5ae0).
 extern "C" int Npc_Idle(int index);
+// Waiting NPC that keeps its back to the player: the reaction range is the talk line times this; it turns until within
+// TURN_SQUARED_LIMIT (squared radians, about one degree) of facing away; once the player is nearer than its range it
+// starts walking away (state 2, behaviour 0xf) 16 units per frame along its facing.
+const int NPC_RANGE_PER_LINE = 10;
+const float TURN_SQUARED_LIMIT = 0.000304503f;
+const int NPC_WALK_AWAY_WAIT = 0x1d;
+const int NPC_WALK_AWAY_TALK = 999;
+const int NPC_WALK_AWAY_BEHAVIOUR = 0xf;
+const int NPC_STATE_WALK_AWAY = 2;
+const int NPC_WALK_IDLE_MOTION = 0;
+const float NPC_WALK_AWAY_STEP = -16.0f;
+const float NPC_WALK_AWAY_SPEED = 20.0f;
+// Keeps NPC `index` with its back to the player until the player comes near. EN 0x6d5dd0 (JP 0x10045c30).
+extern "C" int Npc_WaitFacingAway(int index);
 // Sets the movement impulse of character `index` from (x, y, z). EN 0x5b98a0 (JP 0x100241e0).
 extern "C" int Character_SetMove(int index, float x, float y, float z);
 

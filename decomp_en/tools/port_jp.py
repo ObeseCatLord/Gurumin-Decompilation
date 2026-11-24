@@ -43,7 +43,8 @@ def source_name(mangled):
 def cut_function(path, name):
     """the comment block and body of the definition of `name` in a source file"""
     lines = open(path, encoding="cp932", errors="replace").read().splitlines()
-    pat = re.compile(r"^[A-Za-z_].*\b%s\s*\(" % re.escape(name))
+    pattern = name if name.startswith("\\w") else re.escape(name)
+    pat = re.compile(r"^[A-Za-z_].*\b%s\s*\(" % pattern)
     for i, line in enumerate(lines):
         if pat.match(line) and not line.rstrip().endswith(";"):
             start = i
@@ -65,7 +66,8 @@ def jp_source(row):
         text = cut_function(path, source_name(sym))
         if text:
             return path, text
-    return path, None
+    text = cut_function(path, r"\w*" + row["jp_address"].lower())
+    return path, text
 
 
 def disassembly(address):

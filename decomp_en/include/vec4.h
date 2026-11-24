@@ -1,0 +1,71 @@
+// EN declaration of the engine's 4D vector (16 bytes) and 4x4 matrix (64 bytes). Only the members EN code has used so
+// far are declared; the JP declarations are decomp/include/vec4.h and matrix4.h (same layouts, different compiler).
+// This is the one declaration of Vec4 and Matrix4 in decomp_en: include this header, never redeclare them.
+#ifndef GURUMIN_EN_VEC4_H
+#define GURUMIN_EN_VEC4_H
+
+struct Box2;
+struct Matrix4;
+
+struct Vec4
+{
+    float x;  // x component
+    float y;  // y component
+    float z;  // z component
+    float w;  // w component: 1 for points, 0 for directions; ignored by most helpers
+
+    Vec4();                                          // EN 0x76f0c0: zero (JP 0x101ac990)
+    Vec4(float x, float y, float z, float w);        // EN 0x76f090 (JP 0x101ac9a0)
+    void Set(float x, float y, float z, float w);    // EN 0x779af0 (JP 0x101ac9c0)
+    void Copy(const Vec4 &source);                   // EN 0x76f1d0 (JP 0x101acc20)
+    void Fill(const float &value);                   // EN 0x76f1b0 (JP 0x101acc40): sets all four components
+    float LengthSquared3();                          // EN 0x773490 (JP 0x101ac6a0): squared length of x/y/z
+    float Length();                                  // EN 0x7732d0 (JP 0x101ac4e0): length of x/y/z
+    float Length2D();                                // EN 0x773660 (JP 0x101ac500): length of x/y
+    float Distance2D(Vec4 other);                    // EN 0x773610 (JP x/y distance)
+    float DistanceSquared(const Vec4 &other);        // EN 0x773440 (JP 0x101ac650)
+    float Distance(const Vec4 &other);               // EN 0x773270 (JP 0x101ac590)
+    float DistanceZWeighted(const Vec4 &other);      // EN 0x7736f0 (JP 0x101ac5f0)
+    int InRect(const Box2 *box);                     // EN 0x7749d0 (JP 0x101ac7c0): inside the box's x/y rectangle
+    int InBox(const Box2 *box);                      // EN 0x774a10 (JP 0x101ac6e0)
+    void RotateZ(float angle);                       // EN 0x779400 (JP 0x101ac300)
+
+    Vec4 operator+(const Vec4 &other) const;         // EN 0x76f720 (JP 0x101ac9e0)
+    Vec4 operator-(const Vec4 &other) const;         // EN 0x76f6d0 (JP 0x101aca40)
+    Vec4 operator*(const Vec4 &other) const;         // EN 0x76f680: component-wise
+    Vec4 Divided(const float &divisor);              // EN 0x76f7c0 (JP 0x101acb60)
+};
+
+// Dot product of the x/y/z parts of two vectors (EN 0x773750, JP 0x101ac200).
+extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b);
+
+// Cross product a x b (EN 0x772250); the result's w stays 0.
+Vec4 Cross(const Vec4 &a, const Vec4 &b);
+
+// Axis-aligned box given by its minimum and maximum corners.
+struct Box2
+{
+    Vec4 min;  // corner with the smallest x/y/z
+    Vec4 max;  // corner with the largest x/y/z
+};
+
+// Indices into Matrix4::m of the translation row.
+enum Matrix4Element
+{
+    MATRIX_TRANSLATION_X = 12,  // m[12]: x of the translation row
+    MATRIX_TRANSLATION_Y = 13,  // m[13]: y of the translation row
+    MATRIX_TRANSLATION_Z = 14,  // m[14]: z of the translation row
+    MATRIX_ELEMENT_COUNT = 16   // 4 rows of 4 floats
+};
+
+struct Matrix4
+{
+    float m[MATRIX_ELEMENT_COUNT];  // row-major, row vectors on the left; m[12..14] = translation
+
+    Matrix4();                                      // EN 0x76efc0 (JP 0x101ae770): zeroes most elements
+    Vec4 GetTranslation();                          // EN 0x773ef0 (JP 0x101ade80)
+    void SetTranslation(Vec4 position);             // EN 0x77a170 (JP 0x101adef0)
+    void Translate(float x, float y, float z);      // EN 0x776ed0 (JP 0x101adec0)
+};
+
+#endif

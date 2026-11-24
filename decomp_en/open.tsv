@@ -1,1 +1,2 @@
 address	status	reason
+00779400	open	Vec4::RotateZ: 17 bytes off; y*cos is scheduled before x*sin so the products land in swapped xmm registers; six spellings tried (JP form, operand flips, cos/sin locals in both orders)

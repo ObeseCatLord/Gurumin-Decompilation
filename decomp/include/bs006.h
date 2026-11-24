@@ -51,6 +51,10 @@ __forceinline Node *&Bs006Node(int index, int which)
 #define BS006_BONE_TAIL_ROOT 2
 #define BS006_BONE_EYE 15
 
+// The two character slots whose kind (DAT_1021f3c0) goes negative while they are hurt (the slam shakes less then).
+extern "C" int DAT_1020c3b4;
+extern "C" int DAT_1020c3b8;
+
 // 0x100d24a0 (Bs006_Update; C++ linkage: the original has an EH frame for its matrices and effect options). One frame
 // of the boss in slot `index`: the defeat scene once the game is over (DAT_10210d30), otherwise the fight: its states,
 // the reaction to hits, the movement and the effects. Returns 0 (1 while the defeat scene runs).

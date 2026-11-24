@@ -54,7 +54,7 @@ extern "C" int FUN_10020f60(void);                     // collide_regions
 extern "C" int FUN_10020560();                         // Regions_Build
 extern "C" int FUN_100114a0(void);
 extern "C" int FUN_10137b10(void);                     // Screenshot_Capture
-extern "C" int FUN_101011b0(int id, int value);        // sets a script value
+#include "value_command.h"
 extern "C" int FUN_10188fb0(void);                     // Texture_ReloadMissing
 extern "C" int FUN_1015fea0(const char *path, int index, unsigned int value);   // SystemSav_WriteRecord
 int FUN_100425f0(const Vec4 *position, const char *model, int radius, float heading, float force);   // Shaga_Create
@@ -708,7 +708,7 @@ int Script_SystemCommand(int command, int argument)
                     FUN_10174c70(texture, 1);
             }
         }
-        FUN_101011b0(SYSCMD_RELOAD_PLAYER_MODEL, 0);
+        Script_ValueCommand(SYSCMD_RELOAD_PLAYER_MODEL, 0);
         for (int flag = 0xe0e; flag < 0xf3c; flag++)
             DAT_10874848.SetScriptFlag(flag, 0);
         for (int flag = 0xb10; flag < 0xb30; flag++)

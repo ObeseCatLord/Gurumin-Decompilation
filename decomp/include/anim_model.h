@@ -254,7 +254,9 @@ struct AnimModel
     Node *swapNode1;          // 0x2300: nodes whose materials M_10161a20 swaps (0 = none)
     Node *swapNode2;          // 0x2304
     Node *collider;           // 0x2308: the map collision this model moves against
-    char pad_230c[0xc];
+    char pad_230c[4];
+    Node *eyeNode;            // 0x2310: node whose animation places the event camera's eye (0 = none)
+    Node *targetNode;         // 0x2314: node whose animation places the event camera's target (0 = none)
     float colliderReach;      // 0x2318: 0.578 * the bounding radius of the collision node (CloneModel)
     union
     {
@@ -310,7 +312,7 @@ struct AnimModel
     char pad_2488[4];
     int nextSlotId;           // 0x248c: id of the next slot's character (read as DAT_10db6ee8[i - 1].nextSlotId)
     int pad_2490;
-    int m_2494;               // 0x2494: cleared by LoadModel
+    float m_2494;             // 0x2494: cleared by LoadModel; the height the event camera adds to its eye and target
     int mode;                 // 0x2498: 0 = the game may move the character, 1 = normal (set by the scene start for
                               //         the player), 2 = over the pit area
 

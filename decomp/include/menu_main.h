@@ -51,7 +51,7 @@ extern "C" int DAT_104c02d0;      // the helmet picked to be upgraded
 extern "C" long FUN_10001b70(long volume);          // 0x10001b70 (SoundArc_Message227, app_0002.cpp): the music attenuation
 extern "C" int FUN_1000ed70(const char *text, const char *subtext, int frames);   // 0x1000ed70: opens the message window
 extern "C" int FUN_10012130(int *item, int *count);  // 0x10012130 (Inventory_Add)
-extern "C" int FUN_101011b0(int id, int value);      // 0x101011b0: sets a script value
+#include "value_command.h"
 extern "C" int FUN_1015d500(int value);              // 0x1015d500 (ime.cpp): starts the text input
 extern "C" int FUN_1015f310(char *text);             // 0x1015f310 (ime.cpp): starts the name entry with `text`
 

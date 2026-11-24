@@ -20,7 +20,7 @@
 Matrix4 LookAtMatrix(Vec4 eye, Vec4 target, const Vec4 *up, float roll);     // 0x101b1c20
 Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);                 // 0x101b10f0
 
-extern "C" int FUN_1016c3e0(Vec4 *eye, Vec4 *target);   // the game camera's eye and target for this frame
+#include "camera_update.h"
 extern "C" int FUN_100017c0(float volume, float x, float y, float z, float dx, float dy, float dz, float ux, float uy,
                             float uz);
 
@@ -35,7 +35,7 @@ extern "C" int FUN_100017c0(float volume, float x, float y, float z, float dx, f
 // 0x10015960 (Camera_Refresh). Rebuilds DAT_10836330 (the camera matrix) and DAT_108392d8/DAT_10836cd8 (its
 // view-projections). While a UI animation node plays (DAT_104c01e0 = 1 and at least 8 frames in, or -1 and at least 8
 // before the end) the eye and target are placed relative to the node's frame matrix, one step (8 frames) behind or
-// ahead; otherwise FUN_1016c3e0 gives them and, in mode DAT_104bfe6c, the roll comes from the roll table. Then it
+// ahead; otherwise Camera_Update gives them and, in mode DAT_104bfe6c, the roll comes from the roll table. Then it
 // publishes eye, target, the sound target, the player's position and its height + 50, and the sound listener (volume 1,
 // looking at the target, unless DAT_104c01b0 is set). Returns 0.
 int Camera_Refresh(void)
@@ -98,7 +98,7 @@ int Camera_Refresh(void)
     }
     else
     {
-        FUN_1016c3e0(&eye, &target);
+        Camera_Update(&eye, &target);
         if (DAT_104bfe6c != 0)
             DAT_10836330 = LookAtMatrix(eye, target, &up, DAT_10c68944[DAT_10c6897c] * CAMERA_ROLL_PI / 180.0f);
         else

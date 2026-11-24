@@ -34,7 +34,7 @@
 #include "engine_memory.h"
 #include "scene_reset.h"
 
-extern "C" int FUN_101011b0(int id, int value);
+#include "value_command.h"
 #include "char_equip_models.h"
 extern "C" int FUN_1001b5b0(int index);
 extern "C" int FUN_1016b230(const char *text);
@@ -214,7 +214,7 @@ extern "C" int FUN_100fb7b0(void)
     memset(DAT_102199b8, 0, sizeof(DAT_102199b8));
     if (DAT_10c62ed0 == MAP_FACE_PLAYER)
     {
-        FUN_101011b0(0x27d9, 0);
+        Script_ValueCommand(0x27d9, 0);
         Vec4 player;
         Vec4 other;
         player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());

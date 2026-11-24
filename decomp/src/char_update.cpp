@@ -52,7 +52,7 @@
 
 // Behaviours without a header yet.
 #include "leap_climb_enemy.h"
-extern "C" int FUN_10071ee0(int index);
+#include "wisp_caster_enemy.h"
 extern "C" int FUN_100e2080(int index);   // Enemy_UpdateAI_A
 extern "C" int FUN_100e2110(int index);   // Enemy_UpdateAI_B
 extern "C" int FUN_100e2440(int index);   // Enemy_UpdateAI_C
@@ -663,7 +663,7 @@ int Char_UpdateByKind(int index)
         Enemy_PodLobber(index);
         break;
     case 0x10:
-        FUN_10071ee0(index);
+        Enemy_WispCaster(index);
         break;
     case 0x11:
         Enemy_ShyGhost(index);

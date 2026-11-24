@@ -250,10 +250,10 @@ static __forceinline void StartDemoMap()
         DAT_104bfd50 = 1;
         DAT_1020d9e0.M_10001550();
         DAT_1065cb28.M_1013edb0();
-        FUN_101011b0(0x271b, 10);
+        Script_ValueCommand(0x271b, 10);
         DAT_10c6356c = 0;
-        FUN_101011b0(0x2774, 0);
-        FUN_101011b0(0x1869f, 0);
+        Script_ValueCommand(0x2774, 0);
+        Script_ValueCommand(0x1869f, 0);
         DAT_10c63518 = 0;
     }
     else

@@ -72,7 +72,7 @@ extern "C" int FUN_10016580(const char *name);                                 /
 extern "C" int FUN_10017aa0(int id);                                           // Enemy_FindByKind
 extern "C" int FUN_10017ad0(int id);                                           // Enemy_FindById
 extern "C" int FUN_10017bb0(int id);
-extern "C" int FUN_101011b0(int id, int value);
+#include "value_command.h"
 extern "C" int FUN_1013faf0(void);                                             // FrameTimer_ResetNext2
 extern "C" int FUN_1013fb10(int active, int target, int frames);
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);             // builds the data path of `name`
@@ -555,7 +555,7 @@ void Script_GameBuiltin(int id, ScriptArgument *args, ListBank *bank)
         FUN_1000e750();
         break;
     case GAME_BUILTIN_KAGU_TEST:
-        FUN_101011b0(*args[0].i, *args[1].i);
+        Script_ValueCommand(*args[0].i, *args[1].i);
         break;
     case GAME_BUILTIN_KAGU_TEST2:
         Scene_RunCommand(*args[0].i, *args[1].i, args[2].text);

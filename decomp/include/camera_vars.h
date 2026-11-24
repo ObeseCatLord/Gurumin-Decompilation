@@ -71,7 +71,7 @@ extern "C" int DAT_10ff2ff4;
 extern "C" int DAT_11018624;                              // effect timer
 extern "C" int DAT_11018628[];                            // 1 = has a second target
 extern "C" int DAT_11018728;
-extern "C" int DAT_1101872c;
+extern "C" float DAT_1101872c;                            // speed of the path-follow camera eye
 extern "C" int DAT_11018730;                              // effect mode
 extern "C" int DAT_11018734;
 extern "C" int DAT_11018738;
@@ -107,7 +107,7 @@ extern "C" int DAT_1101de08;
 extern "C" int DAT_1101de0c;
 extern "C" int DAT_1101de10;
 extern "C" int DAT_1101de14;
-extern "C" int DAT_1101de18;
+extern "C" float DAT_1101de18;                            // pitch the free camera lifts its eye by (radians, 0 = none)
 extern "C" int DAT_1101de1c;
 extern "C" int DAT_1101de20;
 extern "C" int DAT_1101de24;

@@ -44,7 +44,7 @@ extern "C" int FUN_10012780(int mode, int index);                           // C
 extern "C" int FUN_10017aa0(int id);                                        // Enemy_FindByKind
 extern "C" int FUN_1005f530(int slot);                                      // Switch_TurnOn
 extern "C" int FUN_1005f640(int slot);                                      // Switch_TurnOff
-extern "C" int FUN_101011b0(int id, int value);                             // sets a script value
+#include "value_command.h"
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);   // Sound_PlayEffect
 extern "C" int FUN_1003ac20(const char *name, const Vec4 *position, float volume);   // Sound_PlayWav
 extern "C" int FUN_1003a7d0(const char *path, float x, float y, float z, int start, float ox, float oy, float oz);  // EffectModel_Place
@@ -481,7 +481,7 @@ int Scene_HostCallback(int code, int *args)
                     }
                 }
                 else if (code == SCENE_CB_RUN_VALUE_COMMAND)
-                    FUN_101011b0(args[0], args[1]);
+                    Script_ValueCommand(args[0], args[1]);
                 else if (code == SCENE_CB_SET_GAME_FLAG)
                 {
                     if (args[0] == CALLBACK_FLAG_OUTLINE_SLOT)
@@ -520,11 +520,11 @@ int Scene_HostCallback(int code, int *args)
                         FUN_10012510(1, 0);
                         DAT_10c6356c = 0;
                         DAT_10c63570 = CALLBACK_FAR_REGISTER;
-                        FUN_101011b0(CALLBACK_VALUE_HIDE_NODE, 0);
-                        FUN_101011b0(CALLBACK_VALUE_COUNT_NODES, 0);
-                        FUN_101011b0(CALLBACK_VALUE_NODE_GROUP, CALLBACK_GROUP_BELOW);
-                        FUN_101011b0(CALLBACK_VALUE_4E2B, 100);
-                        FUN_101011b0(CALLBACK_VALUE_4E2C, 1);
+                        Script_ValueCommand(CALLBACK_VALUE_HIDE_NODE, 0);
+                        Script_ValueCommand(CALLBACK_VALUE_COUNT_NODES, 0);
+                        Script_ValueCommand(CALLBACK_VALUE_NODE_GROUP, CALLBACK_GROUP_BELOW);
+                        Script_ValueCommand(CALLBACK_VALUE_4E2B, 100);
+                        Script_ValueCommand(CALLBACK_VALUE_4E2C, 1);
                     }
                     if (args[0] == CALLBACK_FLAG_FADE_ON_TOP)
                         DAT_10c68000.fadeOnTop = args[1];

@@ -719,9 +719,9 @@ extern "C" int FUN_10112140(void)
         DAT_1101de30 = 1;
         DAT_11018734 = 1;
         DAT_10c6356c = 0;
-        FUN_101011b0(0x271b, 10);
-        FUN_101011b0(0x2774, 0);
-        FUN_101011b0(99999, 0);
+        Script_ValueCommand(0x271b, 10);
+        Script_ValueCommand(0x2774, 0);
+        Script_ValueCommand(99999, 0);
         DAT_10c63518 = 0;
         DAT_1030c560 = 0;
         FUN_100106a0();
@@ -1046,7 +1046,7 @@ extern "C" int FUN_10112140(void)
         DAT_104c0308 = 1;
         return 0;
     }
-    FUN_101011b0(0x1868b, 0);
+    Script_ValueCommand(0x1868b, 0);
     if (DAT_10c62ed0 == MAP_TITLE || (DAT_10c62ed0 != 2 && DAT_10c62ed0 != 3 && DAT_10c62ed0 != 4 && DAT_10c62ed0 != 5 && DAT_10c62ed0 != 0xc &&
         DAT_10c62ed0 != DEBUG_MAP_SECOND))
     {
@@ -1062,9 +1062,9 @@ extern "C" int FUN_10112140(void)
         DAT_1020d9e0.M_10001550();
         DAT_1065cb28.M_1013edb0();
         DAT_10c6356c = 0;
-        FUN_101011b0(0x271b, 10);
-        FUN_101011b0(0x2774, 0);
-        FUN_101011b0(99999, 0);
+        Script_ValueCommand(0x271b, 10);
+        Script_ValueCommand(0x2774, 0);
+        Script_ValueCommand(99999, 0);
         DAT_10c63518 = 0;
         return 0;
     }

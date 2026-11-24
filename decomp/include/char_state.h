@@ -85,6 +85,7 @@ struct CharState
                         int gaitHold;                          // enemy_spit_charge.cpp: frames left of the recovery in gait state 2 and of the pause in gait state 1 (90 or 10 when it starts; the lift speed is released when it runs out)
                         int flockFrames;                       // enemy_flock_diver.cpp: frames in the current step (moves are timed from it; 1000s and 2000s mark the later stages of a step)
                         int leapFrames;                                      // enemy_leap_climb.cpp: frames in the current state (a step of the leap counts them up)
+                        int wispFrames;            // enemy_wisp_caster.cpp: frames in the current state (state 3 counts the lunge, state 6 the ritual, state 7 the summon)
                         int zoneStepFrames;            // zone_roamer.cpp: frames in the current step of the zone walk (stand-still counter of the fade steps)
                     };
                     union                         // 0x08
@@ -117,6 +118,7 @@ struct CharState
                         int ballTimer;            // rolling_ball.cpp: frames counted in state 3000
                   int swingReady;           // swing_platform.cpp: 1 once the platform was set up
                         int holdFrames;           // mole_game.cpp: frames to wait before the next step (counted down; 5 after a hit)
+                        int reactFrames;          // enemy_wisp_caster.cpp: 0 = not set up yet, 1 = ready, 0x1f = just woke or was hit (counted down to 1)
                         int squashStep;           // pulse_charger.cpp: 0 = not squashed, 1..6 = step of the squash after a hit
                         int hoverReady;            // enemy_hover_shooter.cpp: 1 once the hoverer was set down above the ground
                         int zoneRampMax;           // area_zone.cpp: the push stops growing at this strength
@@ -147,6 +149,7 @@ struct CharState
                         int marker;               // npc_ride.cpp: the marker character ridden behind
                         int push;                 // npc_wheel.cpp: push strength (speed = push / 4 - 20)
                         int route;                // route_carrier.cpp: the route walked
+                        int revealed;             // enemy_wisp_caster.cpp: 1 once it was hit and showed itself (the flash model started)
                         int registered;           // char_script.cpp: 1 once the position is in the camera list
                         int attackTimer;          // kind4a_turret.cpp: frames left of the attack
                         int stopDistance;         // npc_approach.cpp
@@ -197,6 +200,7 @@ struct CharState
                                                   // raised (Npc_RideAlarm), attacks left to chain
                                                   // (Enemy_ShoveAndBlast)
                         int running;              // enemy_chase.cpp: 1 = running (faster) after the player was far
+                        int weaponShowDelay;      // enemy_wisp_caster.cpp: frames before its weapon node is shown after it revealed itself
                         int overPit;               // enemy_chase_lunge.cpp: 1 = it was over the pit area (mode 2) and keeps falling
                         int strafeMode;           // breath_enemy.cpp: 0 = circles left, 1 = right, 2 = holds, 3 and 4 = also hold
                         int swingingBack;         // enemy_pendulum.cpp: 1 while swinging back
@@ -377,6 +381,7 @@ struct CharState
                         int hiddenFrames;          // enemy_chase_lunge.cpp: frames it is held out of play (colours blanked, no shadow), counted down
                         int rivalSkipTarget;      // target_race.cpp (rival): the target it gave up on (not picked again at once)
                         int m_0024;
+                        int stepCount;            // enemy_wisp_caster.cpp: dashes in a row (state 2), frames of the charge (state 5), puffs (state 3)
                         int zoneActiveFrom;        // area_zone.cpp: first frame of the cycle in which the zone acts
                         int sinkLimit;            // map_cursor_walk.cpp: set to -40 while the character is not sinking
                         int restFrames;           // enemy_strafe.cpp (Enemy_HopAndStrafe): frames standing still
@@ -393,6 +398,7 @@ struct CharState
                     };
                     union                         // 0x28
                     {
+                        int sprayFrames;          // enemy_wisp_caster.cpp: frames of the dash spray (state 2) and of the blast (state 5)
                         int flierStillFrames;     // route_flier.cpp: frames it moved less than 10 units (it vanishes after 30)
                         int sightFrames;          // enemy_pounce_breath.cpp: 300 while the way to the player is free, counted down
                         int walkerSetUp;           // enemy_chase_lunge.cpp: -1 once its head and spine nodes were looked up
@@ -425,6 +431,7 @@ struct CharState
                         int probeDelay;          // enemy_pounce_breath.cpp: frames to the next sight probe (10 after one)
                         int farewellFrames;       // partner_follow.cpp: frames left of the farewell message (60 at the start; it leaves at 1)
                         int dazeFrames;            // enemy_chase_lunge.cpp: frames it stands dazed facing the player (sparkle effect every second frame), counted down
+                        int savedEffectParam;     // enemy_wisp_caster.cpp: CharSlot::stats[STAT_EFFECT_PARAM] when it was set up
                         int cursorNode;           // map_cursor_walk.cpp: the route node the character heads for
                         int headingTo;            // route_step.cpp: heading (degrees) at the route's last point
                         int vanishFrames;         // marker_rider.cpp: frames left of the vanishing once the marker fell
@@ -445,6 +452,7 @@ struct CharState
                         int m_0030;
                         int probeResult;         // enemy_pounce_breath.cpp: result of the last sight probe (0 free, 2 = a step with a height)
                         int colourStep;            // enemy_chase_lunge.cpp: 0 = normal, 1 = colours blanked while hidden, 2 = identification colours restored
+                        int wispsActive;          // enemy_wisp_caster.cpp: 1 while one of its two wisps burns
                         int zoneEffectFrame;       // area_zone.cpp: the frame of the cycle that starts the effect
                         int markerPhase;          // marker_rider.cpp: 0 = new, 1 = riding (flags set), 2 = vanishing
                         int arrivalHold;          // map_cursor.cpp: frames left in which the cursor counts as
@@ -473,6 +481,7 @@ struct CharState
                                                   // the position history in LastPosition
                         int specialResume;         // partner_skill.cpp (slot 7): the step to continue from after the long skill
                         int rayPlayerGap2;        // rolling_tire.cpp: the same for ray 2
+                        int savedMotion;          // enemy_wisp_caster.cpp: motion layer playing at the end of the last frame (restored after a hit)
                         int modeLocked;                        // enemy_spit_charge.cpp: 1 = the model stays in mode 1 (set once it hops over a ledge)
                     };
                 };
@@ -491,6 +500,7 @@ struct CharState
                 int rayPlayerGap3;                // rolling_tire.cpp: the same for ray 3 (overlays sawPlayer)
                 int groundRetries;                // enemy_hop_spit.cpp: times it was lifted because no ground was found below it (stops at 21)
                 int ledgeResult;                       // enemy_spit_charge.cpp: result of the last ledge probe (0 free, 2 = a ledge with a height)
+                int savedMotionFrame;     // enemy_wisp_caster.cpp: frame of that motion (-1 while it was blending)
                 int headingHold;               // zone_roamer.cpp: frames the turn target is held at the saved heading
             };
             union                                 // 0x3c
@@ -501,6 +511,7 @@ struct CharState
                 int rayPlayerGap4;                // rolling_tire.cpp: the same for ray 4 (overlays behaviour)
                 int turnRate;                    // enemy_pounce_breath.cpp: heading change of the whirl in 1/100000 radians (a sign flag while it wanders; overlays behaviour)
                 int groundSetUp;                  // enemy_hop_spit.cpp: 1 once its first ground lookup is done (overlays behaviour; kind 4 is picked by the slot kind)
+                int shielded;             // enemy_wisp_caster.cpp: 1 while the state is not interrupted by a hit (cleared every frame)
                 int ledgeHeight;                       // enemy_spit_charge.cpp: height the last ledge probe found (whole units)
             };
         };

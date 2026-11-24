@@ -19,7 +19,7 @@
 
 extern "C" int FUN_1013fb10(int active, int target, int frames);
 extern "C" int FUN_1000e810(void);
-extern "C" int FUN_101011b0(int id, int value);
+#include "value_command.h"
 
 // 0x10023900 (Map_ResetOnEnter). Moves the map timer (flag 0x44c) on by the time since flag 0x44a, counts a new map
 // in flag 0x448 (0-11), clears the state of character slots 58-123 (and their slot field 0xbc to -1), the held
@@ -114,7 +114,7 @@ extern "C" int FUN_10023900(void)
         DAT_10c62edc[0x6d8] = 2;
         DAT_10c62edc[0x85e] = 1;
     }
-    FUN_101011b0(0x27da, 0);
+    Script_ValueCommand(0x27da, 0);
     DAT_10c62edc[0x9ed] = DAT_103150c0[0x17] != 0;
     DAT_10c62edc[0x9f0] = DAT_103150c0[0x18] != 0;
     DAT_10c62edc[0x9ef] = DAT_103150c0[0x1a] != 0;

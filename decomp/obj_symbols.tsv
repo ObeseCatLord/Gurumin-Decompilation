@@ -662,3 +662,6 @@ _Enemy_IsBusy	100e1c40
 ?Enemy_LeapAndClimb@@YAHHH@Z	10068f70
 ?Npc_RoamZones@@YAHH@Z	10049ec0
 ?Step@EffectManager@@QAEHHH@Z	10184440
+?Camera_Update@@YAHPAUVec4@@0@Z	1016c3e0
+?Enemy_WispCaster@@YAHH@Z	10071ee0
+?Script_ValueCommand@@YAHHH@Z	101011b0

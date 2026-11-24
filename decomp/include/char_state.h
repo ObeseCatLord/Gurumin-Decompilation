@@ -40,6 +40,75 @@ struct SoccerState
     int pad_003c;
 };
 
+// The BS_001 boss (bs001_update.cpp) keeps its state in its own slot (Bs001State) and uses the two slots after it:
+// Bs001Aux (the next slot's state: action bookkeeping and the knock-back of its partner) and Bs001Fade (the slot
+// after that: the fade out and fade in counters).
+struct Bs001State
+{
+    int state;                    // 0x00: action (0..0x12 = the moves, 100 = pick the next one)
+    int frame;                    // 0x04: frames spent in the action
+    int homeX;                    // 0x08: position the cut-scene put the boss at (whole units; state 9 saves and restores it)
+    int homeY;                    // 0x0c
+    int homeZ;                    // 0x10
+    int motion;                   // 0x14: motion to play (-1 = keep)
+    int shownMotion;              // 0x18: motion shown last frame
+    int motionFrames;             // 0x1c: frames the shown motion has run
+    int idle;                     // 0x20: always cleared at the start of the frame
+    int initialised;              // 0x24: 1 once the models and nodes were set up
+    int hitRecover;               // 0x28: frames left before the boss reacts to a hit again
+    int defeatTimer;              // 0x2c: frames of the defeat sequence
+    int finished;                 // 0x30: 1 for a frame after an action ended
+    int phase;                    // 0x34: 0 = healthy, 1 = hurt (below half health), 2 = enraged
+    int hurtLevel;                // 0x38: grows by 10 per hit and decays
+    int cutsceneHeld;             // 0x3c: 1 while a cut-scene or message holds the game
+};
+
+struct Bs001Aux
+{
+    int lastState;                // 0x00: the previous action
+    int m_0004;                   // 0x04
+    int attackCount;              // 0x08: moves chosen since the last rest
+    int streak;                   // 0x0c: moves in a row that raise the chance of a stagger
+    int partnerCooldown;          // 0x10: frames until the next hit counts (200 after a fall)
+    int knockZ;                   // 0x14: knock-back of the partner (hundredths)
+    int knockX;                   // 0x18
+    int knockY;                   // 0x1c
+    int knockActive;              // 0x20: 1 while the partner is thrown
+    int waitFrames;               // 0x24: rests left before the next big attack
+    int voiceCooldown;            // 0x28: kind 100's voice cooldown (enemy_voice.cpp)
+    int m_002c[3];
+    int lastHitLevel;             // 0x38: the hit level handled last
+    int advancePartner;           // 0x3c: 1 = the partner's motion is stepped once more
+};
+
+struct Bs001Fade
+{
+    int fadeOut;                  // 0x00: frames of the fade out (1..30)
+    int fadeIn;                   // 0x04: frames of the fade in (1..30)
+};
+
+// The stone golem boss of the dodge game (bs005_update.cpp, kind 0x3f): its state words by name. Words 8..15 are also the
+// voice cooldowns of the neighbouring boss kinds (the golem's own is `voiceCooldown`).
+struct Bs005State
+{
+    int state;                    // 0x00: 0 = set up, 1 = pieces woken, 2 = rests, 3..15 = attacks and turns, 100 = picks the next one
+    int frames;                   // 0x04: frames in the current state (1000 and 2000 mark the second part of some states)
+    int variant;                  // 0x08: random 0/1 (or 0..13) picked when the state starts
+    int calmFrames;               // 0x0c: frames since the golem last picked an attack (counts while it is not held)
+    int attacking;                // 0x10: 1 while an attack state runs
+    int cameraHidden;             // 0x14: 1 while the camera nodes "CAboss" are hidden (the ending uses it as the motion)
+    int savedStat4;               // 0x18: CharSlot::stats[4] before state 9 raised it
+    int lastHealth;               // 0x1c: health at the end of the last frame
+    int endingSetUp;              // 0x20: ending: 1 once the ending scene was set up
+    int voiceCooldown;            // 0x24: frames before the golem speaks again (see Bs005_SayLine)
+    int endingMotionStarted;      // 0x28: ending: 1 once its motion was started
+    int endingTimer;              // 0x2c: ending: frames since it began (starts at -30)
+    int healthMark;               // 0x30: health when the last attack was picked or the calm counter was reset
+    int hitLevel;                 // 0x34: DAT_102550e0 of the last frame
+    int motionFrame;              // 0x38: frame of the playing motion (-1 while blending)
+    int motionLayer;              // 0x3c: layer of the playing motion
+};
+
 struct CharState
 {
     union
@@ -533,6 +602,10 @@ struct CharState
             int laserPattern[12];             // laser_zone.cpp: per beam pair: 0 = free, else flag * 10000 + speed * 100 + type
         };
         SoccerState soccer;                       // soccer_ai.cpp: a football CPU player
+        Bs001State bs001;                         // bs001_update.cpp: the BS_001 boss
+        Bs001Aux bs001Aux;                        // bs001_update.cpp: the slot after the boss
+        Bs001Fade bs001Fade;                      // bs001_update.cpp: two slots after the boss
+        Bs005State bs005;                         // bs005_update.cpp: the stone golem boss
         int words[0x10];                          // the whole block by index (resets and copies)
         Shove shoves[4];                          // char_shove.cpp: the slot's scripted shoves
     };

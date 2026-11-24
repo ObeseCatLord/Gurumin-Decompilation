@@ -675,3 +675,6 @@ _Enemy_IsBusy	100e1c40
 ?Map18_UpdateFootballGame@@YAHXZ	1007f1e0
 ?Bs003_Update@@YAHH@Z	100e25f0
 ?Script_SceneCommand@@YAHHH@Z	1009e380
+?Bs001_Update@@YAHH@Z	1010c650
+?Bs005_Update@@YAHH@Z	100cc2a0
+?Enemy_UpdateFighter@@YAHH@Z	100bdad0

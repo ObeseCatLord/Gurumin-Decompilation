@@ -16,7 +16,7 @@
 #include "enemy_chase_lunge.h"
 #include "claw_enemy.h"
 
-extern "C" int FUN_1010c650(int index);
+#include "bs001.h"
 extern "C" int FUN_10011f80(int index);
 extern "C" int FUN_10104640(int index);
 extern "C" int FUN_100d24a0(int index);
@@ -41,7 +41,7 @@ extern "C" int FUN_101148b0(int index)
         switch (DAT_10daaae8[index].kind)
         {
         case 100:
-            FUN_1010c650(index);
+            Bs001_Update(index);
             return 0;
         case 101:
             FUN_10011f80(index);

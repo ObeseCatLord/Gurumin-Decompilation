@@ -76,9 +76,9 @@ extern "C" int FUN_1002ee70(int index);   // Char_UpdateShoves
 extern "C" int FUN_1002a340(int index);   // Char_RunScript
 extern "C" int FUN_100d2110(int index);
 extern "C" int FUN_100d24a0(int index);
-extern "C" int FUN_100bdad0(int index);
+#include "enemy_fighter.h"
 extern "C" int FUN_100c39c0(int index);
-extern "C" int FUN_100cc2a0(int index);
+#include "bs005.h"
 extern "C" int FUN_100edea0(int index);
 extern "C" int FUN_100e7280(int index);
 extern "C" int FUN_100dfcf0(int index);   // Char_RunBehaviour
@@ -484,7 +484,7 @@ int Char_UpdateByKind(int index)
             DAT_1020b430[index].state++;
             break;
         case 0x2d:
-            FUN_100bdad0(index);
+            Enemy_UpdateFighter(index);
             break;
         case -0x2d:
             FUN_100347d0(index);
@@ -493,7 +493,7 @@ int Char_UpdateByKind(int index)
             FUN_100c39c0(index);
             break;
         case 0x3f:
-            FUN_100cc2a0(index);
+            Bs005_Update(index);
             break;
         }
     rememberMotion:
@@ -798,7 +798,7 @@ int Char_UpdateByKind(int index)
         break;
     }
     case 0x3f:
-        FUN_100cc2a0(index);
+        Bs005_Update(index);
         break;
     case 0x16:
     case 0x40:
@@ -829,7 +829,7 @@ int Char_UpdateByKind(int index)
         FUN_10026730(index);
         break;
     case 0x2d:
-        FUN_100bdad0(index);
+        Enemy_UpdateFighter(index);
         break;
     case 0x43:
         FUN_100edea0(index);

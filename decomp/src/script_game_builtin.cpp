@@ -57,7 +57,7 @@ extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);    /
 extern "C" int FUN_1003a880(const char *path, float x, float y, float z, int start, float ox, float oy, float oz,
                             const Vec4 &colour);
 extern "C" int FUN_1000dd90(float x, float y, float z, int type);              // Debris_Spawn
-extern "C" void FUN_1003bc60(int x, int y);                                    // Ground_Dig
+extern "C" void FUN_1003bc60(int x, int y, int mode, int radius);                                    // Ground_Dig
 extern "C" int FUN_1016afa0(int mode, int r, int g, int b);
 extern "C" int FUN_1016b230(const char *text);
 extern "C" int FUN_10012130(int *item, int *count);                            // Inventory_Add
@@ -566,7 +566,7 @@ void Script_GameBuiltin(int id, ScriptArgument *args, ListBank *bank)
     case GAME_BUILTIN_ERASE_FLOOR:
         for (int x = GAME_BUILTIN_DIG_START; x < GAME_BUILTIN_DIG_END; x += GAME_BUILTIN_DIG_STEP)
             for (int y = GAME_BUILTIN_DIG_START; y < GAME_BUILTIN_DIG_END; y += GAME_BUILTIN_DIG_STEP)
-                FUN_1003bc60(*args[0].i + x, *args[1].i + y);
+                FUN_1003bc60(*args[0].i + x, *args[1].i + y, 0, 0x3e8);
         break;
     case GAME_BUILTIN_REFFECT:
         {

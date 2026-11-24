@@ -179,7 +179,7 @@ extern "C" int DAT_104bfd50;
 extern "C" unsigned int DAT_104bfd5c;                     // frames spent waiting for a key (message windows)
 extern "C" int DAT_104bfd60;
 extern "C" int DAT_104bfd64;
-extern "C" int DAT_104bfd68;
+extern "C" float DAT_104bfd68;
 extern "C" int DAT_104bfd6c;
 extern "C" char DAT_104bfd70;
 extern "C" char DAT_104bfd71;

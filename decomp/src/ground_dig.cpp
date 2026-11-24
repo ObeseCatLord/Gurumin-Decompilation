@@ -58,7 +58,7 @@ extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);  // 
 // sample under the point reaches the depth of the object's treasure marker, the treasure is found: sound, +100 stamina,
 // nearby effect requests are cancelled and the object is hidden. A dig effect plays at the player and 32 pieces of
 // dirt are thrown, coloured with the object's first texture. Does nothing when no ground object exists.
-extern "C" void FUN_1003bc60(int x, int y)
+extern "C" void FUN_1003bc60(int x, int y, int mode, int radius)
 {
     Vec4 player;
     Vec4 position;

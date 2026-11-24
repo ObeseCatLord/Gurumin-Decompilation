@@ -36,4 +36,19 @@ extern "C" int FUN_1000f360(int index, int frame);       // 0x1000f360 (face_ani
 extern "C" int FUN_10016500(int index, const char *path, int start, int end, int once);   // 0x10016500 (char_motion.cpp): plays a motion file
 extern "C" int FUN_10011aa0(int id, int value);          // 0x10011aa0 (event_slots.cpp)
 
+extern "C" void FUN_1000ed20(void);              // 0x1000ed20 (app_0009.cpp)
+extern "C" void FUN_1003a6c0(void);              // 0x1003a6c0 (scene_start.cpp)
+extern "C" int FUN_1000f320(void);               // 0x1000f320 (app_0009.cpp)
+extern "C" void FUN_100f5a80(void);              // 0x100f5a80: the scene frame (camera modes, characters)
+extern "C" int FUN_10058500(void);               // 0x10058500 (switch_effects.cpp)
+int FUN_100564d0(void);                          // 0x100564d0 (debris_update.cpp)
+extern "C" int FUN_1000d670(void);               // 0x1000d670 (app_0008.cpp)
+extern "C" int FUN_1000f490(void);               // 0x1000f490 (app_0009.cpp)
+extern "C" int FUN_1000ec10(void);               // 0x1000ec10 (app_0009.cpp)
+extern "C" int FUN_1003a940(void);               // 0x1003a940
+extern "C" int FUN_1000dab0(int id, int value, int frames, int mode);   // 0x1000dab0 (volume_fade.cpp)
+extern "C" int FUN_10011fb0(int frozen);         // 0x10011fb0 (Water_SetFrozen)
+
+extern "C" int FUN_101b25a0(int a);              // 0x101b25a0: decodes the next frame of the movie library
+
 #endif

@@ -111,6 +111,22 @@
 
 #include "map_trigger_setup.h"
 
+#include "tutorial_book.h"
+
+#include "ground_height.h"
+
+#include "ground_mesh.h"
+
+#include "scene_callback.h"
+
+#include "texture_object.h"
+
+#include "mmv_player.h"
+
+#include "dshow_stream.h"
+
+#include "char_hikari.h"
+
 #include "game_frame.h"
 
 // Hidden-part loop, light shafts: DAT_10f65848 holds SHAFT_COUNT shafts (x, y offsets and w opacity).
@@ -288,6 +304,62 @@ static __forceinline void ResetPlayerTrail(void)
     }
 }
 
+// Doors (switch models of kind 0x13/0x14, models DOOR_FIRST_MODEL to DOOR_END_MODEL - 1): animation frames of
+// DAT_1020b128 that start a motion of the door's node tree.
+#define DOOR_FIRST_MODEL 0x5c
+#define DOOR_END_MODEL 0x7c
+#define DOOR_FRAME_START 1
+#define DOOR_FRAME_SETTLE 0x19
+#define DOOR_FRAME_OPENED 0x1f
+#define DOOR_FRAME_OPEN_LOOP 0x37
+#define DOOR_FRAME_CLOSING 0x3d
+#define DOOR_FRAME_CLOSE_SETTLE 0x55
+#define DOOR_FRAME_CLOSED 0x5b
+#define DOOR_FRAME_END 0x73
+#define DOOR_SWING_EFFECT 0xfbe
+// Message fade steps.
+#define MESSAGE_FADE_MAX 0xf
+#define MESSAGE_SLIDE_FULL 0x1e
+// Dig (DAT_104bfd60): frames of a short dig; a long dig (DAT_104bfd64) lasts DIG_LONG_FRAMES per level.
+#define DIG_LONG_FRAMES 600
+#define DIG_START_FRAME 9
+#define DIG_END_FRAME 0xc
+#define DIG_DONE_FRAME 0x14
+#define DIG_ANGLE_OFFSET 1.57075f
+#define DIG_HEADING (-DAT_10db6ee8[DAT_104bf8b4].targetHeading - DIG_ANGLE_OFFSET)
+#define DIG_REACH 40.0
+#define DIG_RADIUS_SHORT 0x78
+#define DIG_RADIUS_LONG 0x32
+#define DIG_SHADE_OFFSET 30.0
+#define DIG_SHADE_SIZE 150.0
+// Event markers: projected to the 640x480 screen; they live EVENT_MARKER_FRAMES frames.
+#define EVENT_MARKER_COUNT 0x80
+#define EVENT_MARKER_FRAMES 0x1f
+#define MARKER_HEAD_LIFT 25.0f
+#define MARKER_OFFSCREEN_X -50000.0f
+#define SCREEN_HALF_WIDTH 320.0f
+#define SCREEN_HALF_HEIGHT 240.0f
+#define SCREEN_HEIGHT 480.0f
+// Game over (DAT_104bfe78 counts its frames).
+#define GAME_OVER_FADE_FRAME 0x32
+#define GAME_OVER_SOUND_FRAME 0x3c
+#define GAME_OVER_END_FRAME 0x83
+#define GAME_OVER_END_FRAME2 0x78
+#define GAME_OVER_SKIP_FRAME 0x3a
+#define GAME_OVER_RESTART_FRAME 0x8c
+
+// The door models that play the swing effect when their animation starts.
+#define DoorSwingsEffect(model) ((model) == 0xe7 || (model) == 0xe8 || (model) == 0xcd || (model) == 0xce)
+
+// Starts the door swing effect at the origin of the door's own matrix.
+static __forceinline void StartDoorEffect(AnimModel *door)
+{
+    Vec4 origin;
+    origin.Fill(0.0f);
+    Matrix4 placement = door->matrix;
+    DAT_10daaa80.Start(DOOR_SWING_EFFECT, origin, -1, 0, 0, 0, 0, &placement, 0, 0);
+}
+
 // 0x1011d810 (the in-game frame). Mode 1 of the frame step. The first call resets the mode's globals (DAT_104bf8bc
 // was 0 until then). Each call computes how many engine ticks have passed since the last one (at most
 // MAX_CATCH_UP_TICKS, otherwise one); every tick polls the input (and records or replays it), runs the main menu and
@@ -298,6 +370,17 @@ extern "C" int FUN_1011d810(void)
     int ticks;
     int tick;
     int inputActive;
+    char mouseLeft;
+    char mouseRight;
+    char mouseMiddle;
+    char mouseExtra;
+    int mouseWheel;
+    int mousePos[2];
+    float inputStrength;
+    char gameOverButton;
+    char gameOverPadA;
+    char gameOverPadB;
+    int gameOverPos[2];
     int stepForced;
     int engineTick;
     int windowBusy;
@@ -1383,7 +1466,432 @@ extern "C" int FUN_1011d810(void)
             }
         }
 sceneStateDone:
-        // STAGE 2: model sweeps, the player's mode counters and the event fades, pseudo.c lines 2929-3477
+        // Caption scroll timer: counts up every fifth frame and wraps after the scroll range.
+        if (DAT_104bf890 % 5 == 0)
+        {
+            DAT_104c02cc++;
+            if (DAT_104c02cd + 10 < DAT_104c02cc)
+                DAT_104c02cc = 0;
+        }
+        DAT_104c00d5 = DAT_104c00d4;
+        if (DAT_104c00d4 != 0)
+            DAT_104c00d4--;
+
+        // Doors (switch models of kind 0x13/0x14): the animation frame in DAT_1020b128 triggers the motions.
+        AnimModel *door = &DAT_10db6ee8[DOOR_FIRST_MODEL];
+        for (int doorSlot = DOOR_FIRST_MODEL; door < &DAT_10db6ee8[DOOR_END_MODEL]; doorSlot++, door++)
+        {
+            if (DAT_1021f3c0[doorSlot] != 0x13 && DAT_1021f3c0[doorSlot] != 0x14)
+                continue;
+            if (DAT_1020b128[doorSlot] == DOOR_FRAME_START)
+            {
+                Vec4 facing;
+                Vec4 toPlayer;
+                facing.Set(0.0f, 1.0f, 0.0f, 0.0f);
+                facing.RotateZ(3.1415f - door->targetHeading);
+                toPlayer.Copy(DAT_10db6ee8[0].matrix.GetTranslation() - door->matrix.GetTranslation());
+                toPlayer.Normalized3();
+                float side = Vec3_Dot(&facing, &toPlayer);
+                if (DoorSwingsEffect(door->m_0284))
+                    StartDoorEffect(door);
+                if (side <= 0.0f)
+                {
+                    DAT_1021b3c8[doorSlot] = 1;
+                    door->root->RestartColourPlugs("OPEN1", DAT_104bf8a4);
+                }
+                else
+                {
+                    DAT_1021b3c8[doorSlot] = 0;
+                    door->root->RestartColourPlugs("OPEN0", DAT_104bf8a4);
+                }
+            }
+            if (DAT_1020b128[doorSlot] == DOOR_FRAME_SETTLE)
+                DAT_1020b128[doorSlot] = 0;
+            if (DAT_1020b128[doorSlot] == DOOR_FRAME_OPENED)
+            {
+                if (DoorSwingsEffect(door->m_0284))
+                    StartDoorEffect(door);
+                door->root->RestartColourPlugs("OPEN0", DAT_104bf8a4);
+            }
+            if (DAT_1020b128[doorSlot] == DOOR_FRAME_OPEN_LOOP)
+            {
+                DAT_1020b128[doorSlot] = 0;
+                door->root->RestartColourPlugs("OPEN", DAT_104bf8a4);
+            }
+            if (DAT_1020b128[doorSlot] == DOOR_FRAME_CLOSING)
+            {
+                door->root->RestartColourPlugs(DAT_1021b3c8[doorSlot] == 0 ? "CLOSE0" : "CLOSE1", DAT_104bf8a4);
+                if (DoorSwingsEffect(door->m_0284))
+                    StartDoorEffect(door);
+            }
+            if (DAT_1020b128[doorSlot] == DOOR_FRAME_CLOSE_SETTLE)
+                DAT_1020b128[doorSlot] = 0;
+            if (DAT_1020b128[doorSlot] == DOOR_FRAME_CLOSED)
+            {
+                door->root->RestartColourPlugs("CLOSE0", DAT_104bf8a4);
+                if (door->m_0284 == 0xcd || door->m_0284 == 0xce)
+                    StartDoorEffect(door);
+            }
+            if (DAT_1020b128[doorSlot] == DOOR_FRAME_END)
+            {
+                DAT_1020b128[doorSlot] = 0;
+                door->root->RestartColourPlugs("CLOSE", DAT_104bf8a4);
+            }
+            if (DAT_1020b128[doorSlot] != 0)
+                DAT_1020b128[doorSlot]++;
+        }
+
+        // Per-tick updates of the effects, windows, messages, fades and the other systems.
+        DAT_10daaa80.Update((DAT_104bfe1c == 0 && DAT_104c0135 == 0) ? 0 : 1,
+                            (tick == ticks - 1 || DAT_1065cb90 != 0) ? 1 : 0, ~DAT_104bf890 & 1);
+        if (DAT_104bf8d4 != 0)
+            FUN_1000cbe0();
+        FUN_1000ed20();
+        FUN_1003a6c0();
+        FUN_1000f320();
+        FUN_100f5a80();
+        TutorialBook_Update();
+        FUN_10058500();
+        if (DAT_104bfe1c == 0)
+        {
+            FUN_100564d0();
+            FUN_1000d670();
+            FUN_1015f4e0();
+        }
+        FUN_1000f490();
+        FUN_1003a9d0();
+        if (DAT_104bfd28 != 0)
+            FUN_1000ec10();
+        FUN_1000cdf0();
+        if (DAT_104bf8c8 != 0)
+            FUN_1000ee60();
+        if (DAT_104bff00 == 0)
+        {
+            if (DAT_104bff0c > 0)
+                DAT_104bff0c--;
+        }
+        else if (DAT_104bff0c < MESSAGE_FADE_MAX)
+            DAT_104bff0c++;
+        FUN_1003a940();
+        FUN_1005c680();
+        if (DAT_104bfd78 != 0)
+        {
+            if (DAT_104bfd7c == 1 && (DAT_104bfd78 += 2, DAT_104bfd78 > MESSAGE_SLIDE_FULL - 1))
+            {
+                DAT_104bfd78 = MESSAGE_SLIDE_FULL;
+                DAT_104bfd7c = 0;
+            }
+            else if (DAT_104bfd78 == 0 || DAT_104bfd7c != 2 || (DAT_104bfd78 -= 2, DAT_104bfd78 > 0))
+                ;
+            else
+            {
+                DAT_104bfd78 = 0;
+                DAT_104bfd7c = 0;
+            }
+        }
+        DAT_104bf88c = DAT_104bf88c + DAT_10202348;
+        if (DAT_104bf88c == 10 || DAT_104bf88c == 0)
+            DAT_10202348 = -DAT_10202348;
+        DAT_1020234c = 0.5f;
+        if (DAT_104c00bd != 0 && (DAT_104c00bd++, DAT_104c00bd > 0x3b))
+            DAT_104c00bd = 0;
+
+        // Dig: DAT_104bfd60 counts the frames of the dig (long when DAT_104bfd64 is set); it digs the ground in
+        // front of the player once and then waits for the end.
+        if (DAT_104bfd60 != 0)
+        {
+            int digStart = DAT_104bfd64 * DIG_LONG_FRAMES + DIG_START_FRAME;
+            if (DAT_104bfd60 < digStart && DAT_104bfd64 != 0 && DAT_10db9274 != 0)
+            {
+                DAT_10db6ee8[0].verticalSpeed = DAT_104bfd68;
+                DAT_104bfd60 = digStart;
+            }
+            if (DAT_10db6ee8[0].verticalSpeed < DAT_104bfd68)
+                DAT_104bfd68 = DAT_10db6ee8[0].verticalSpeed;
+            if (DAT_104bfd60 == digStart)
+            {
+                DAT_104bfd60++;
+                Vec4 digger = DAT_10db6ee8[0].matrix.GetTranslation();
+                DAT_104bfdb0 = 0;
+                FUN_1003ad20(0x35f, &DAT_10db6ee8[0].matrix.GetTranslation(), 1.0f);
+                int digRadius = DAT_104bfd64 == 0 ? DIG_RADIUS_SHORT : DIG_RADIUS_LONG;
+                FUN_1003bc60((int)(cos(DIG_HEADING) * DIG_REACH + (digger.x - DAT_10edbd38.x * 2.0f)),
+                             (int)(sin(DIG_HEADING) * DIG_REACH + (digger.y - DAT_10edbd38.y * 2.0f)), 1, digRadius);
+                if (DAT_104bfd64 != 0)
+                    DAT_104bfd60 = DAT_104bfd64 * DIG_LONG_FRAMES + DIG_END_FRAME;
+            }
+            if (DAT_104bfd60 == DAT_104bfd64 * DIG_LONG_FRAMES + DIG_END_FRAME)
+            {
+                DAT_104c0091 = 8;
+                Vec4 digger = DAT_10db6ee8[0].matrix.GetTranslation();
+                IntRect area;
+                area.left = (int)(cos(DIG_HEADING) * DIG_SHADE_OFFSET + (digger.x - DAT_10edbd38.x * 2.0f) - DIG_SHADE_SIZE);
+                area.top = (int)(sin(DIG_HEADING) * DIG_SHADE_OFFSET + (digger.y - DAT_10edbd38.y * 2.0f) - DIG_SHADE_SIZE);
+                area.right = (int)(cos(DIG_HEADING) * DIG_SHADE_OFFSET + (digger.x - DAT_10edbd38.x * 2.0f) + DIG_SHADE_SIZE);
+                area.bottom = (int)(sin(DIG_HEADING) * DIG_SHADE_OFFSET + (digger.y - DAT_10edbd38.y * 2.0f) + DIG_SHADE_SIZE);
+                FUN_10016ec0(&area, -1, 1);
+            }
+            if (DAT_104bfd60 == DAT_104bfd64 * DIG_LONG_FRAMES + DIG_DONE_FRAME)
+                DAT_104bfd60 = 0;
+            else if (DAT_104bfd60 != 0)
+                DAT_104bfd60++;
+        }
+
+        // Event markers (DAT_1020d660): age them and project their world position to the 640x480 screen.
+        for (int marker = 0; marker < EVENT_MARKER_COUNT; marker++)
+        {
+            if (DAT_1020d660[marker] == 0)
+                continue;
+            if (DAT_104463f8[marker] < EVENT_MARKER_FRAMES)
+                DAT_104463f8[marker]++;
+            else
+                DAT_1020d660[marker] = 0;
+            Vec4 markerAt;
+            int markerY;
+            if (DAT_1021f640[marker] == 3)
+            {
+                if (DAT_104463f8[marker] < 2)
+                {
+                    markerAt.Copy(DAT_10db6ee8[0].headNode->worldMatrix.GetTranslation());
+                    markerAt.z += MARKER_HEAD_LIFT;
+                    markerAt.Copy(Project(markerAt, DAT_108392d8));
+                    DAT_10253c58[marker] = (int)((markerAt.x + 1.0f) * SCREEN_HALF_WIDTH);
+                    DAT_10256218[marker] = (int)(SCREEN_HEIGHT - (markerAt.y + 1.0f) * SCREEN_HALF_HEIGHT);
+                }
+                markerY = DAT_10256218[marker] - 2;
+            }
+            else
+            {
+                int target = DAT_10447fd8[marker];
+                if (DAT_1021f3c0[target] == 3)
+                {
+                    markerAt.Copy(DAT_1020e338[target]->GetTranslation());
+                    if (markerAt.x <= MARKER_OFFSCREEN_X)
+                        continue;
+                }
+                else if (DAT_10db6ee8[target].root == 0)
+                    markerAt.Copy(DAT_10db6ee8[target].matrix.GetTranslation());
+                else
+                    markerAt.Copy(DAT_10db6ee8[target].root->worldMatrix.GetTranslation());
+                markerAt.Copy(Project(markerAt, DAT_108392d8));
+                DAT_10253c58[marker] = (int)((markerAt.x + 1.0f) * SCREEN_HALF_WIDTH);
+                markerY = (int)(SCREEN_HEIGHT - (markerAt.y + 1.0f) * SCREEN_HALF_HEIGHT);
+            }
+            DAT_10256218[marker] = markerY;
+        }
+
+        // Movies: DAT_104bfe6c 3 = DirectShow movie, 2 = movie library frames; DAT_104bfe70 = the game over movie.
+        if (DAT_104bfe6c == 3)
+        {
+            if (DAT_10836e98.M_10148930() == 0)
+            {
+                DAT_10836e98.M_10148960();
+                DAT_10836e98.M_1015c6a0(&DAT_118d0ba8[DAT_10202478]);
+            }
+            else
+            {
+                DAT_10836e98.M_10148920();
+                DAT_10836e98.Close();
+                DAT_104bfe6c = 0;
+            }
+        }
+        if (DAT_104bfe6c == 2 && (DAT_104bf890 & 1) != 0)
+        {
+            if (tick == ticks - 1 || tick == ticks - 2)
+            {
+                if (FUN_101b25a0(0) == 0)
+                    DAT_104bfe6c = 0;
+                else
+                    DAT_118d0ba8[0].Write16(0, 0, DAT_11b1bb58, DAT_11b1bb64, DAT_11b1bb58 * 2, DAT_11b1bb54);
+            }
+            else if (FUN_101b25a0(2) == 0)
+                DAT_104bfe6c = 0;
+        }
+        if (DAT_104bfe70 != 0)
+        {
+            if ((DAT_104bfe70 & 1) == 0)
+                DAT_10f08ab0.M_10161050();
+            DAT_10f08ab0.DrawToTexture(&DAT_118d0ba8[DAT_10202478]);
+            DAT_104bfe70++;
+            if (DAT_10f08ab0.m_004b == 0)
+                DAT_104bfe70 = 0;
+        }
+
+        // Game over: the player fell out of the world (or the game over movie is running).
+        if (DAT_104bfe6c == 0)
+        {
+            if (DAT_1032d69c != 1 || -3450.0f <= DAT_10db9248 || DAT_104bfe78 != 0)
+            {
+                if (DAT_104bfe78 < GAME_OVER_END_FRAME)
+                {
+                    if (DAT_104bfe78 != 0)
+                        goto gameOverStep;
+                }
+                else
+                    DAT_104bfe78 = 0;
+                goto waterThaw;
+            }
+            DAT_10f08ab0.Open(FUN_1013f8a0("gameover.mmv", 0));
+            DAT_10f08ab0.DrawToTexture(&DAT_118d0ba8[DAT_10202478]);
+            FUN_1003ad20(0x335, &DAT_10db6ee8[0].matrix.GetTranslation(), 1.0f);
+            DAT_10f08ab0.state = MMV_PLAYING;
+            DAT_10f08ab0.loop = 0;
+            FUN_1000da40(0, 100, 0x28);
+            DAT_10db6ee8[0].PlayMotion(0x84, 1, 5, 1.0f);
+            DAT_104bfe78 = 1;
+            if (DAT_104bfe6c == 0)
+            {
+gameOverStep:
+                DAT_104bfe70 = 0;
+                gameOverButton = 0;
+                gameOverPadA = 0;
+                gameOverPadB = 0;
+                if (DAT_104bfe78 == 2)
+                {
+                    FUN_1013fa10(0, 10, 1.0f, 1.0f, 1.0f, 1.0f);
+                    FUN_1013fa10(1, 10, 0.0f, 0.0f, 0.0f, 1.0f);
+                    FUN_1000ec70(10, 1.0f, 1.0f, 1.0f, 1.0f);
+                }
+                if (DAT_104bfe78 == GAME_OVER_FADE_FRAME)
+                {
+                    if (DAT_104bf8e8 < 100.0f)
+                        FUN_1000da40(0, 100, 0x14);
+                    goto gameOverCount;
+                }
+                if (DAT_104bfe78 == GAME_OVER_SOUND_FRAME)
+                {
+                    if (DAT_104c0332 != 0)
+                        goto gameOverCount;
+                    FUN_1003ad20((DAT_104c033a + 10) * 0xf, 0, 0.8f);
+                }
+                if (DAT_104bfe78 < GAME_OVER_END_FRAME2)
+                {
+gameOverCount:
+                    DAT_104bfe78++;
+                }
+                if ((DAT_104bfe78 & 1) == 0)
+                    DAT_10f08ab0.M_10161050();
+                DAT_10f08ab0.DrawToTexture(&DAT_118d0ba8[DAT_10202478]);
+                DAT_1020d9e0.M_10001450();
+                DAT_1020d9e0.M_10001110(gameOverPos, &gameOverButton, &gameOverPadA, &gameOverPadB, 0, 0);
+                if (DAT_104bfe78 > GAME_OVER_SKIP_FRAME && (DAT_1065cb30 != 0 || gameOverButton == 2))
+                {
+                    // Skipped: back to the map's start point with fresh health.
+                    int gameOvers;
+                    FUN_1000da40(0, 0, 0x1e);
+                    if (DAT_104c01e0 != 0)
+                    {
+                        DAT_11018734 = 1;
+                        DAT_1101de30 = 1;
+                    }
+                    DAT_104c01e0 = 0;
+                    DAT_104c0190 = 0;
+                    DAT_104c0108 = 0;
+                    FUN_1000ec70(5, 1.0f, 1.0f, 1.0f, 1.0f);
+                    ResetPlayerTrail();
+                    DAT_10c62ed0 = DAT_1030b660;
+                    DAT_10db6ee8[0].Teleport(DAT_108029b8.x, DAT_108029b8.y, DAT_108029b8.z);
+                    DAT_10db9364 = DAT_108029b8.w;
+                    DAT_10db9368 = (int)DAT_108029b8.w;
+                    DAT_104bfe4c = 0;
+                    DAT_104bfe50 = 0;
+                    DAT_104c00b0 = 0;
+                    DAT_102024bc = -1;
+                    DAT_104bfe30 = 0;
+                    DAT_10db6ee8[0].PlayMotion(5, 1, 0, 1.0f);
+                    DAT_10db6ee8[0].PlayMotion(2, 1, 0, 1.0f);
+                    DAT_104686b0[PLAYER_SLOT] = 0;
+                    DAT_10db7c34 = 1.0f;
+                    DAT_10db9380 = 1;
+                    DAT_104bfeb0 = 0;
+                    DAT_104bfeb4 = 0;
+                    FUN_1013fb10(0, 0, 0);
+                    gameOvers = DAT_10c64000;
+                    DAT_104c0128 = 0;
+                    DAT_10253e98[PLAYER_SLOT] = 0;
+                    if (DAT_10c635f8 == 0)
+                        DAT_10daaaec = DAT_10daaaf0 / 2;
+                    else if (DAT_10c635f8 == 1)
+                        DAT_10daaaec = DAT_10daaaf0;
+                    else
+                    {
+                        int divisor;
+                        if (DAT_10c635f8 != 2)
+                            goto gameOverResetDone;
+                        if (DAT_10c66cc0 == 1)
+                            divisor = DAT_10c64000 + 3;
+                        else
+                        {
+                            divisor = DAT_10c64000 * 2 + 4;
+                            if (DAT_10c66cc0 == 0)
+                                divisor = DAT_10c64000 + 2;
+                        }
+                        DAT_10daaaec = DAT_10daaaf0 / divisor;
+                        if (DAT_10daaaec < 1)
+                            DAT_10daaaec = 1;
+                    }
+                    FUN_1000e750();
+gameOverResetDone:
+                    DAT_1021cff8 = 1;
+                    DAT_103086a8 = 0;
+                    DAT_1030c900 = 0;
+                    DAT_1042de20 = DAT_1030b660;
+                    DAT_104bfe78 = GAME_OVER_RESTART_FRAME;
+                    DAT_10c62ed0 = DAT_1030b660;
+                    DAT_10c635ec = 1;
+                    DAT_10c64000 = gameOvers + 1;
+                    DAT_10db6ee8[0].m_0075 = 0;
+                    DAT_11018734 = 1;
+                    DAT_1101de30 = 1;
+                    return 0;
+                }
+                goto gameOverAfter;
+            }
+        }
+        else
+        {
+gameOverAfter:
+            if (DAT_104bfe78 == 0)
+            {
+waterThaw:
+                // The frozen water thaws when its timer runs out.
+                if (DAT_104c02dc != 0 && DAT_104c02e7 != 0 && (DAT_104c02e7--, DAT_104c02e7 < 2))
+                {
+                    FUN_1000dab0(0, 100, 0, 0xff5050);
+                    FUN_10011fb0(0);
+                    FUN_1000dab0(0, 0, 0xf, 0xff5050);
+                    DAT_104c02dc = 0;
+                    DAT_104c02e7 = 0x1e;
+                }
+            }
+        }
+        if (DAT_104bfe20 == 0)
+            DAT_104c00b2 = 0;
+        else if (DAT_104c00b2 < 0x32)
+            DAT_104c00b2++;
+
+        // Input of this tick: mouse state, the Enter key and the caption timers.
+        mouseLeft = 0;
+        mouseRight = 0;
+        mouseMiddle = 0;
+        mouseExtra = 0;
+        mouseWheel = 0;
+        DAT_1020d9e0.M_10001450();
+        mousePos[0] = 0;
+        mousePos[1] = 0;
+        if (DAT_1065cb98 == 0)
+            DAT_1020d9e0.M_10001110(mousePos, &mouseLeft, &mouseRight, &mouseMiddle, &mouseWheel, &mouseExtra);
+        if (DAT_104c030a != 0 && ((GetKeyState(VK_RETURN) & 0xf000) != 0 || mouseLeft == 2) && DAT_10f6811c > 5)
+            DAT_104c030c = DAT_104bf890;
+        if (DAT_104c0148 != 0)
+            DAT_104c0148--;
+        DAT_104c022e = 0;
+        inputStrength = 0.0f;
+        if ((DAT_104bfe6c == 2 || DAT_104bfe6c == 3) && (DAT_104bfeb4 != 0 || (DAT_104c0230 & 3) != 0)
+            && (mouseLeft == 2 || DAT_1065cb30 != 0))
+            DAT_104bfe6c = 0;
+        if (DAT_104c0334 != 0)
+            DAT_104c0334--;
 
         if (DAT_104c00d0 < 2 && FUN_1015d510() == 0 && DAT_104c0334 == 0 && DAT_104bf890 > 4 && DAT_104c0135 == 0
             && DAT_104bfe78 == 0 && DAT_104bfe6c == 0 && DAT_104bfd08 == 0 && DAT_104bfd60 == 0

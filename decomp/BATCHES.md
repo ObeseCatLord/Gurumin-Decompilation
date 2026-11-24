@@ -401,3 +401,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 337 | 36 | match | Sonnet subagents: Shaga_Update matched; Npc_HoverCarrier matched by a near-miss retry; 6 drafts, 2 retries closer; 853 matched, 852 under the rules, fuzzy 30.44% |
 | 338 | 37 | match | Sonnet subagents: Enemy_CastAndTeleport, TitleScreen_Update, Partner_SpecialSkill matched; 7 drafts; 856 matched, 855 under the rules, fuzzy 32.34% |
 | 339 | 38 | match | Sonnet subagents: 3 drafts (Enemy_StalkAndStrike, Map_SetupByNumber, Char_LaserZone); 856 matched, 855 under the rules, fuzzy 33.02% |
+| 340 | 38 | match | Sonnet subagents: 9 drafts of very large functions, no new match; 856 matched, 855 under the rules, fuzzy 34.18% |

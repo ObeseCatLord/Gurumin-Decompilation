@@ -20,7 +20,7 @@ reading it, then `AGENTS.md`.
 | Fully linked | 0.00% of code (151 of 264 units complete) |
 | Matched | 18.81% of code, 856 of 1212 functions |
 | Matched under the rules | 18.77% of code, 855 of the 856 matched functions |
-| Fuzzy match | 33.02% |
+| Fuzzy match | 34.18% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -155,6 +155,12 @@ function) and node_world.cpp (0) still break rule 2.
   100fc4a0 (map_setup_field.cpp; Game::FindMapEntry trailing params are int*, scene_callback.cpp declares it C++),
   Char_LaserZone 1002d4e0 (laser_zone.cpp, one CSE'd pattern read; char_state.h gained the laser union members).
   Map_SetupFromEntry may wrongly search sakana01 instead of sakana%02d.
+- Batch 340: nine drafts of section-5 functions, no new match: Texture_LoadBmp 10173550 (backward goto gives an ebp frame),
+  Regions_StartLightMorph 10062e70 (uses a float bit-pun for the tint.w test: review), Map15_UpdateTargetRace 1007dab0
+  (~8 lines), Enemy_ChaseLungeAndSpit 10076790, Partner_Follow 100e0320, Enemy_PounceAndBreathe 100675d0 (+12 bytes),
+  Node::CollideProbesWithMesh 1019f340 (same length, layout), DodgeGame_UpdateGolemPiece 1005fc00, Enemy_WanderHopAndSpit
+  10065bf0. char_state.h gained many union members (add-only). Very large functions rarely match first time: alternate
+  with near-miss retries (1007dab0, 100675d0, 1002d4e0, 100a9240 are the closest).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

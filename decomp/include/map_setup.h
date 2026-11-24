@@ -37,7 +37,7 @@ extern "C" int DAT_102027f8;                          // -1 after a setup
 extern "C" int DAT_10c64fbc;                          // cleared on a map setup by number (0x100fc4a0)
 extern "C" int DAT_1021a368;
 extern "C" int DAT_10256210;
-extern "C" int DAT_1042d958;
+extern "C" int DAT_1042d958[0x20];                   // per fish: the swim frame it shows (read through the node's frameSource)
 extern "C" int DAT_104bf87c;
 extern "C" int DAT_1032d678;
 extern "C" int DAT_104c0144;

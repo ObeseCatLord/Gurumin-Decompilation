@@ -228,7 +228,7 @@ int FUN_100fda40(int map)
     DAT_10b314c0 = 0;
     DAT_10db6ee8[0].important = 1;
     DAT_10210f38[0] = 0;
-    DAT_1042d958 = 0;
+    DAT_1042d958[0] = 0;
     DAT_104c0260 = 0;
     DAT_104c0264 = 0;
     DAT_104c0268 = 0;

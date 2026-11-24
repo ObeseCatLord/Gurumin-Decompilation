@@ -3,6 +3,8 @@
 // effects, the camera); the scene is prepared and drawn once at the end. Written in stages: the markers
 // "// STAGE n" below stand for code that is not reconstructed yet (pseudo.c is the Ghidra pseudocode, see STAGES.md).
 
+#include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
@@ -89,8 +91,50 @@
 
 #include "script_vars.h"
 
+#include "hop_spit_enemy.h"
+
+#include "node_collision_vars.h"
+
+#include "shaga.h"
+
 #include "game_frame.h"
 
+// Hidden-part loop, light shafts: DAT_10f65848 holds SHAFT_COUNT shafts (x, y offsets and w opacity).
+#define SHAFT_COUNT 2
+#define SHAFT_LIMIT 2500.0f
+#define SHAFT_FADE 0.05f
+#define SHAFT_SPEED 20.0f
+#define SHAFT_RESTART 0x5dc
+// Effect holds that start an effect with a fire flag.
+#define HOLD_VALUE_FIRE_A 0x10
+#define HOLD_VALUE_FIRE_B 0x50
+// Frames the HUD stays shown after one of its triggers.
+#define HUD_HOLD_FRAMES 0x96
+// Rain effect in the weather box (mode 2).
+#define RAIN_EFFECT 0x82dc
+// Levers ("@kskNN+") and their parts.
+#define KSK_COUNT 0x40
+#define KSK_PARTS 6
+// Fish (DAT_10210f38): FISH_MAX swim, the other nodes up to FISH_NODE_COUNT are hidden far away.
+#define FISH_MAX 8
+#define FISH_NODE_COUNT 0x20
+#define FISH_HIDDEN_X -200000.0f
+#define FISH_START_Y 2000.0f
+#define FISH_DEPTH_MIN 260
+#define FISH_DEPTH_MAX 400
+#define FISH_FLEE_START 250.0f
+#define FISH_FLEE_END 400.0f
+#define FISH_ARRIVE_DISTANCE 10.0f
+#define FISH_SWIM_SPEED 5.0f
+#define FISH_FLEE_SPEED 10.0f
+#define FISH_WAVE_FRAMES 40
+#define FISH_RADIUS 20.0f
+#define FISH_TURN_TRIES 10
+#define FISH_TURN_SMALL 0.785375f
+#define FISH_TURN_LARGE 1.57075f
+#define FISH_COURSE_KEEP 0.8f
+#define FISH_COURSE_STEER 0.2f
+#define FISH_PI 3.1415f
 // Most engine ticks run in one frame; a longer backlog (or a halted engine) runs a single tick.
 #define MAX_CATCH_UP_TICKS 20
 // Menu windows closed when a queued event interrupts the open overlay mode.
@@ -376,7 +420,331 @@ extern "C" int FUN_1011d810(void)
         }
         Camera_Refresh();
 
-        // STAGE 1: per-tick timers, the overlay and book state, pseudo.c lines 1635-2927
+        // The alpha-pass nodes of the listed parts are hidden while the camera sees the player through their mesh.
+        for (i = 0; i < DAT_1032d868; i++)
+        {
+            if (DAT_1049ef90[i]->SegmentHitsMesh(&DAT_118e69e8, &DAT_118e6cb8) == 0)
+            {
+                DAT_102550c0[i]->ClearFlags(NODE_FLAG_HIDDEN);
+                DAT_1020aefc[i]->ClearFlags(NODE_FLAG_HIDDEN);
+            }
+            else
+            {
+                DAT_102550c0[i]->SetFlags(NODE_FLAG_HIDDEN);
+                DAT_1020aefc[i]->SetFlags(NODE_FLAG_HIDDEN);
+            }
+        }
+        DAT_10f65548 = 0;
+        DAT_10f6554c = 0;
+
+        // The two light shafts slide across the screen and fade in and out.
+        for (i = 0; i < SHAFT_COUNT; i++)
+        {
+            Vec4 &shaft = DAT_10f65848[i];
+            if (shaft.x > SHAFT_LIMIT || shaft.y > SHAFT_LIMIT)
+            {
+                shaft.w = shaft.w - SHAFT_FADE;
+                if (shaft.w <= 0.0f)
+                {
+                    shaft.w = 0.0f;
+                    shaft.x = (float)(-FUN_1013f880() % 1000 - SHAFT_RESTART);
+                    shaft.y = (float)(-FUN_1013f880() % 1000 - SHAFT_RESTART);
+                }
+            }
+            else
+            {
+                shaft.x = shaft.x + SHAFT_SPEED;
+                shaft.y = shaft.y + SHAFT_SPEED;
+                shaft.w = shaft.w + SHAFT_FADE;
+                if (shaft.w >= 1.0f)
+                    shaft.w = 1.0f;
+            }
+        }
+        DAT_10f65368 = (float)sin((double)((float)DAT_104bf890 * 0.1f)) * 0.3f;
+        if (DAT_104c0232 != 0)
+            DAT_104c0232 = DAT_104c0232 - 1;
+        if (DAT_104c0233 != 0)
+            DAT_104c0233 = DAT_104c0233 - 1;
+
+        // The effects the map keeps requesting start when their wait is over.
+        if (DAT_104bfe1c == 0 && DAT_104c0135 == 0 && DAT_1020b22c > 0)
+        {
+            for (i = 0; i < DAT_1020b22c; i++)
+            {
+                EffectHold &hold = DAT_1020dcf8[i];
+                hold.age = hold.age + 1;
+                if (hold.m_0010 < hold.age)
+                {
+                    EffectOptions options;
+                    options.m_0004 = hold.value;
+                    options.settings[2] = (char)hold.m_001c;
+                    if (options.m_0004 == HOLD_VALUE_FIRE_A || options.m_0004 == HOLD_VALUE_FIRE_B)
+                        options.m_000e = 6;
+                    options.m_0000 = 0;
+                    hold.age = 0;
+                    Vec4 where;
+                    where.x = (float)hold.position[0];
+                    where.y = (float)hold.position[1];
+                    where.z = (float)hold.position[2];
+                    where.w = 0.0f;
+                    DAT_10daaa80.Start(hold.effect, where, -1, -1, 0, 0, 0, 0, &options, 0);
+                }
+            }
+        }
+        if (DAT_104c0128 > 0)
+        {
+            DAT_104c0128 = DAT_104c0128 - 1;
+            if (DAT_104c0128 == 0 || DAT_104bfe6c != 0)
+            {
+                DAT_104c0128 = 0;
+                Bgm_Play(DAT_104c012c, 0);
+            }
+        }
+
+        // The HUD counters count down.
+        if (DAT_104c0119 != 0)
+            DAT_104c0119 = DAT_104c0119 - 1;
+        if (DAT_104c011e != 0)
+            DAT_104c011e = DAT_104c011e - 1;
+        if (DAT_104c011f != 0)
+            DAT_104c011f = DAT_104c011f - 1;
+        if (DAT_104c011d != 0)
+            DAT_104c011d = DAT_104c011d - 1;
+        if (DAT_104c011a != 0)
+            DAT_104c011a = DAT_104c011a - 1;
+        if (DAT_104c011c != 0)
+            DAT_104c011c = DAT_104c011c - 1;
+        if (DAT_104c011b != 0)
+        {
+            DAT_104c011b = DAT_104c011b - 1;
+            if (DAT_104c011b == 0)
+                DAT_104c0114 = 0;
+        }
+        if (DAT_104c0108 > 10 || DAT_104c00e0 != 0 || DAT_102024c4 != 0 || DAT_102024ac > 0)
+            DAT_104c0124 = HUD_HOLD_FRAMES;
+        if (DAT_104bfe6c == 0)
+        {
+            if (DAT_104c0124 > 0)
+                DAT_104c0124 = DAT_104c0124 - 1;
+        }
+        else
+            DAT_104c0124 = 0;
+        DAT_10daaae8[0].stats[STAT_EFFECT_PARAM] = 10;
+        DAT_10daaae8[0].stats[STAT_VALUE_4] = 5;
+
+        // Rain falls inside the weather box of the map: effects in mode 2, falling drops otherwise.
+        if (DAT_104c0224 != 0 && DAT_1083631c.x < DAT_10db6ee8[0].matrix._41 && DAT_1083631c.y < DAT_10db6ee8[0].matrix._42
+            && DAT_10db6ee8[0].matrix._41 < DAT_1083631c.z && DAT_10db6ee8[0].matrix._42 < DAT_1083631c.w)
+        {
+            if (DAT_104c0224 == 2)
+            {
+                if ((DAT_104bf890 & 1) == 0)
+                {
+                    Vec4 spawn = DAT_118e6cb8;
+                    spawn.x = (float)(FUN_1013f880() % 2000 - 1000) + spawn.x;
+                    spawn.y = (float)(FUN_1013f880() % 2000 - 1000) + spawn.y;
+                    spawn.z = spawn.z - 200.0f;
+                    EffectOptions options;
+                    options.flags = 1;
+                    DAT_10daaa80.Start(RAIN_EFFECT, spawn, -1, 0, 0, 0, 0, 0, &options, 0);
+                }
+            }
+            else
+            {
+                i = 2;
+                do
+                {
+                    Vec4 drop = DAT_118e6cb8;
+                    drop.x = (float)(FUN_1013f880() % 0xa28 - 0x514) + drop.x;
+                    drop.y = (float)(FUN_1013f880() % 0xa28 - 0x514) + drop.y;
+                    drop.z = (float)(400 - FUN_1013f880() % 0x32) + drop.z;
+                    FUN_1000c5c0(drop);
+                    i = i - 1;
+                } while (i != 0);
+            }
+        }
+        FUN_1000c390();
+
+        // The levers count down their pulse and press their parts when it ends.
+        for (i = 0; i < KSK_COUNT; i++)
+        {
+            if (DAT_10219970[i] != 0)
+                DAT_10219970[i] = DAT_10219970[i] - 1;
+            if (DAT_10467718[i] != 0)
+            {
+                DAT_10467718[i] = DAT_10467718[i] - 1;
+                if (DAT_10467718[i] == 0)
+                {
+                    char kskName[0x40];
+                    sprintf(kskName, "@ksk%02d+", i);
+                    for (modelPos = 0; modelPos < KSK_PARTS; modelPos++)
+                    {
+                        Node *kskPart = (Node *)DAT_10255f08->M_1019ed10(kskName, modelPos);
+                        if (kskPart == 0)
+                            break;
+                        if (kskPart->name[strlen(kskPart->name) - 1] != '0')
+                            kskPart->M_10191d90();
+                    }
+                }
+            }
+        }
+
+        // The fish swim: they keep their distance from the player and turn away from walls.
+        if (DAT_10210f38[0] != 0)
+        {
+            int fish;
+            int dirTry;
+            for (i = FISH_MAX; i < FISH_NODE_COUNT; i++)
+            {
+                Vec4 away;
+                away.Set(FISH_HIDDEN_X, 0.0f, 0.0f, 0.0f);
+                DAT_10210f38[i]->matrix.SetTranslation(away);
+            }
+            for (fish = 0; fish < FISH_MAX; fish++)
+            {
+                Vec4 swim;
+                swim.Fill(0.0f);
+                int swimming = 0;
+                int fleeing = 0;
+                DAT_1042d958[fish] = DAT_1042d958[fish] % FISH_WAVE_FRAMES;
+                Vec4 pos = DAT_10210f38[fish]->matrix.GetTranslation();
+                if (DAT_1021a1c0[fish] == 0)
+                {
+                    DAT_1021a1c0[fish] = 1;
+                    pos.Set((float)(FUN_1013f880() % 0x5dc), 0.0f, (float)(-FISH_DEPTH_MIN - FUN_1013f880() % 0x3c), 0.0f);
+                    pos.RotateZ((float)FUN_1013f880() / 100.0f);
+                    pos.y = pos.y + FISH_START_Y;
+                    DAT_10210f38[fish]->frameSource = &DAT_1042d958[fish];
+                    DAT_10210f38[fish]->matrix.SetTranslation(pos);
+                    DAT_10868618[fish].Set(0.0f, 1.0f, 0.0f, 0.0f);
+                }
+                Vec4 playerPos = DAT_10db6ee8[0].matrix.GetTranslation();
+                if ((playerPos - pos).Length() < FISH_FLEE_START)
+                    DAT_1021a1c0[fish] = 3;
+                if (DAT_1021a1c0[fish] == 1)
+                {
+                    if (FUN_1013f880() % 1000 < 10)
+                    {
+                        DAT_1021a1c0[fish] = 2;
+                        DAT_10daa880[fish].Set((float)(FUN_1013f880() % 200), 0.0f, 0.0f, 0.0f);
+                        DAT_10daa880[fish].RotateZ((float)FUN_1013f880() / 100.0f);
+                        DAT_10daa880[fish].RotateX((float)FUN_1013f880() / 100.0f);
+                        DAT_10daa880[fish].Copy(pos + DAT_10daa880[fish]);
+                        if (DAT_10daa880[fish].z > -FISH_DEPTH_MIN)
+                            DAT_10daa880[fish].z = -FISH_DEPTH_MIN;
+                        if (DAT_10daa880[fish].z < -FISH_DEPTH_MAX)
+                            DAT_10daa880[fish].z = -FISH_DEPTH_MAX;
+                    }
+                    swim.x = (float)sin((double)((float)(fish * DAT_104bf890) / 100.0f));
+                    swim.y = (float)sin((double)((float)(fish * DAT_104bf890 + 0x96) / 100.0f));
+                    swim.z = (float)cos((double)((float)(fish * DAT_104bf890 + 0x122) / 100.0f));
+                    swimming = 0;
+                }
+                if (DAT_1021a1c0[fish] == 2)
+                {
+                    swim.Copy(DAT_10daa880[fish] - pos);
+                    if (swim.Length() < FISH_ARRIVE_DISTANCE)
+                        DAT_1021a1c0[fish] = 1;
+                    swim.Normalized3();
+                    swim.Copy(swim * FISH_SWIM_SPEED);
+                    DAT_1042d958[fish] = DAT_1042d958[fish] + 1;
+                    if (DAT_1042d958[fish] > FISH_WAVE_FRAMES - 1)
+                        DAT_1042d958[fish] = DAT_1042d958[fish] - FISH_WAVE_FRAMES;
+                    swimming = 1;
+                }
+                if (DAT_1021a1c0[fish] == 3)
+                {
+                    if ((playerPos - pos).Length() > FISH_FLEE_END)
+                        DAT_1021a1c0[fish] = 1;
+                    swim.Copy(pos - playerPos);
+                    swim.z = swim.z * 0.1f;
+                    swim.Normalized3();
+                    swim.Copy(swim * FISH_FLEE_SPEED);
+                    DAT_1042d958[fish] = DAT_1042d958[fish] + 1;
+                    if (DAT_1042d958[fish] > FISH_WAVE_FRAMES - 1)
+                        DAT_1042d958[fish] = DAT_1042d958[fish] - FISH_WAVE_FRAMES;
+                    fleeing = 1;
+                    swimming = 1;
+                }
+                DAT_1042d958[fish] = DAT_1042d958[fish] + 1;
+                if (DAT_1042d958[fish] > FISH_WAVE_FRAMES - 1)
+                    DAT_1042d958[fish] = DAT_1042d958[fish] - FISH_WAVE_FRAMES;
+                Matrix4 swimSpace;
+                swimSpace.SetIdentity();
+                Vec4 turn;
+                Vec4 hitNormal;
+                Vec4 newPos;
+                float hitDepth;
+
+                // The swim direction is tried straight, then turned by 45 and 90 degrees about each axis, until the
+                // fish has room (inside the depth range and clear of the map).
+                for (dirTry = 0; dirTry <= FISH_TURN_TRIES; dirTry++)
+                {
+                    turn.Copy(swim);
+                    if (dirTry == 1)
+                        turn.RotateZ(FISH_TURN_SMALL);
+                    else if (dirTry == 2)
+                        turn.RotateZ(-FISH_TURN_SMALL);
+                    else if (dirTry == 3)
+                    {
+                        turn.RotateX(FISH_TURN_SMALL);
+                        turn.RotateY(FISH_TURN_SMALL);
+                    }
+                    else if (dirTry == 4)
+                    {
+                        turn.RotateX(-FISH_TURN_SMALL);
+                        turn.RotateY(-FISH_TURN_SMALL);
+                    }
+                    else if (dirTry == 5)
+                        turn.RotateZ(FISH_TURN_LARGE);
+                    else if (dirTry == 6)
+                        turn.RotateZ(-FISH_TURN_LARGE);
+                    else if (dirTry == 7)
+                        turn.RotateX(FISH_TURN_LARGE);
+                    else if (dirTry == 8)
+                        turn.RotateX(-FISH_TURN_LARGE);
+                    else if (dirTry == 9)
+                        turn.RotateY(FISH_TURN_LARGE);
+                    else if (dirTry == 10)
+                        turn.RotateY(-FISH_TURN_LARGE);
+                    newPos.Copy(pos + turn);
+                    if (newPos.z > -FISH_DEPTH_MIN || newPos.z < -FISH_DEPTH_MAX
+                        || DAT_10255f08->Query(&swimSpace, &newPos, FISH_RADIUS, &hitNormal, &hitDepth, 0, 0) != 0)
+                        continue;
+                    if (swimming != 0)
+                    {
+                        turn.Normalized3();
+                        DAT_10868618[fish].Copy(DAT_10868618[fish] * FISH_COURSE_KEEP + turn * FISH_COURSE_STEER);
+                        DAT_10868618[fish].Normalized3();
+                        turn.Copy(DAT_10868618[fish]);
+                        float yaw = (float)(atan2(-turn.x, -turn.y) + FISH_PI);
+                        turn.RotateZ(yaw);
+                        float pitch = (float)(atan2(-turn.z, -turn.y) + FISH_PI);
+                        DAT_10210f38[fish]->matrix = RotationX(pitch) * RotationZ(yaw + FISH_PI);
+                    }
+                    DAT_10210f38[fish]->matrix.SetTranslation(newPos);
+                    break;
+                }
+                if (swimming == 0)
+                {
+                    turn.Normalized3();
+                    DAT_10868618[fish].z = DAT_10868618[fish].z * 0.8f;
+                    DAT_10868618[fish].Normalized3();
+                    turn.Copy(DAT_10868618[fish]);
+                    float yaw = (float)(atan2(-turn.x, -turn.y) + FISH_PI);
+                    turn.RotateZ(yaw);
+                    float pitch = (float)(atan2(-turn.z, -turn.y) + FISH_PI);
+                    newPos.Copy(DAT_10210f38[fish]->matrix.GetTranslation());
+                    DAT_10210f38[fish]->matrix = RotationX(pitch) * RotationZ(yaw + FISH_PI);
+                    DAT_10210f38[fish]->matrix.SetTranslation(newPos);
+                }
+                if (dirTry != 0 && DAT_1021a1c0[fish] == 2)
+                    DAT_1021a1c0[fish] = 1;
+                DAT_1042d958[fish] = DAT_1042d958[fish] + fleeing * FISH_WAVE_FRAMES;
+            }
+        }
+
+        // STAGE 1b: the swarm box (DAT_104c0240), the scene states (DAT_104c00d0 > 1), doors, digging, message slots, movie and game over, pseudo.c lines 2120-2927
         // STAGE 2: model sweeps, the player's mode counters and the event fades, pseudo.c lines 2929-3477
 
         if (DAT_104c00d0 < 2 && FUN_1015d510() == 0 && DAT_104c0334 == 0 && DAT_104bf890 > 4 && DAT_104c0135 == 0

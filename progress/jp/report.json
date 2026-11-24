@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 51.0875,
+  "fuzzy_match_percent": 50.2972,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -10627,7 +10627,7 @@
   {
    "name": "app/game_frame",
    "measures": {
-    "fuzzy_match_percent": 49.0327,
+    "fuzzy_match_percent": 36.3472,
     "total_code": "107161",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -10652,14 +10652,14 @@
     {
      "name": ".text",
      "size": "107161",
-     "fuzzy_match_percent": 49.0327
+     "fuzzy_match_percent": 36.3472
     }
    ],
    "functions": [
     {
      "name": "_FUN_1011d810",
      "size": "107161",
-     "fuzzy_match_percent": 49.0327,
+     "fuzzy_match_percent": 36.3472,
      "metadata": {
       "virtual_address": "269604880"
      }

@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 50.1609,
+  "fuzzy_match_percent": 50.1283,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -4249,7 +4249,7 @@
   {
    "name": "app/char_equipment",
    "measures": {
-    "fuzzy_match_percent": 92.1538,
+    "fuzzy_match_percent": 98.0,
     "total_code": "4264",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -4274,14 +4274,14 @@
     {
      "name": ".text",
      "size": "4264",
-     "fuzzy_match_percent": 92.1538
+     "fuzzy_match_percent": 98.0
     }
    ],
    "functions": [
     {
      "name": "?FUN_100615f0@@YAHHHH@Z",
      "size": "4264",
-     "fuzzy_match_percent": 92.1538,
+     "fuzzy_match_percent": 98.0,
      "metadata": {
       "virtual_address": "268834288"
      }
@@ -10627,7 +10627,7 @@
   {
    "name": "app/game_frame",
    "measures": {
-    "fuzzy_match_percent": 34.1575,
+    "fuzzy_match_percent": 33.3972,
     "total_code": "107161",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -10652,14 +10652,14 @@
     {
      "name": ".text",
      "size": "107161",
-     "fuzzy_match_percent": 34.1575
+     "fuzzy_match_percent": 33.3972
     }
    ],
    "functions": [
     {
      "name": "_FUN_1011d810",
      "size": "107161",
-     "fuzzy_match_percent": 34.1575,
+     "fuzzy_match_percent": 33.3972,
      "metadata": {
       "virtual_address": "269604880"
      }
@@ -25681,7 +25681,7 @@
   {
    "name": "app/value_command",
    "measures": {
-    "fuzzy_match_percent": 31.9363,
+    "fuzzy_match_percent": 31.9729,
     "total_code": "13173",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -25706,14 +25706,14 @@
     {
      "name": ".text",
      "size": "13173",
-     "fuzzy_match_percent": 31.9363
+     "fuzzy_match_percent": 31.9729
     }
    ],
    "functions": [
     {
      "name": "?Script_ValueCommand@@YAHHH@Z",
      "size": "13173",
-     "fuzzy_match_percent": 31.9363,
+     "fuzzy_match_percent": 31.9729,
      "metadata": {
       "virtual_address": "269488560"
      }

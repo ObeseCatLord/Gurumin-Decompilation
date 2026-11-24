@@ -69,4 +69,8 @@ extern "C" Matrix4 DAT_10daa600[4];            // the matrices the extra sword s
 extern "C" float DAT_10467508;               // scale of the player's effect parameter (EffectOptions::m_0004 of attack effects)
 extern "C" Vec4 DAT_108392c8;                 // where the swing last ended up
 extern "C" int FUN_1016b260(float x, float y);   // 0x1016b260
+extern "C" Vec4 DAT_10867e08;                // the last position of the helmet pointer light
+extern "C" int FUN_10011520(int unused, int *lockedFlag, int *resetRequest, int input1, int input2, int input3, int restart);   // 0x10011520 (action_select.cpp): the attack the selector picks
+extern "C" float FUN_101ac810(float a, float b);   // 0x101ac810: difference of two angles (each wrapped to +-3.1415, the shorter way round)
+extern "C" void FUN_1005ecb0(int arg);   // 0x1005ecb0 (gimmick_use.cpp)
 #endif

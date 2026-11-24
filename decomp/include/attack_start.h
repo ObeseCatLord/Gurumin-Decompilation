@@ -55,6 +55,6 @@ extern "C" int DAT_10c64018;                           // attacks started by the
 extern "C" int DAT_10c6401c;                           // attacks started while DAT_10447dd0 is set (the other mode)
 
 // 0x1005ce80 (Player_StartAttack), attack_start.cpp.
-extern "C" int FUN_1005ce80(int attack, int target, char flag);
+extern "C" int FUN_1005ce80(int attack, char charged, int target, char flag);
 
 #endif

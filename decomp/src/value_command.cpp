@@ -968,7 +968,7 @@ int Script_ValueCommand(int id, int value)
     }
     else if (id == VALUE_PLAYER_ATTACK)
     {
-        FUN_1005ce80(value, 0, 0);
+        FUN_1005ce80(value, 0, 0, 0);
     }
     else if (id == VALUE_GREETINGS)
     {
@@ -1086,7 +1086,7 @@ int Script_ValueCommand(int id, int value)
         }
         DAT_1049ef8c = 1;
         DAT_104bfe20 = 1;
-        FUN_1005ce80(value, 0, 0);
+        FUN_1005ce80(value, 0, 0, 0);
     }
     else if (id == VALUE_CHAR_FACE_POINT)
     {

@@ -133,7 +133,7 @@ static __forceinline void PlayLightVoice()
     }
 }
 
-// 0x1005ce80 (Player_StartAttack). Starts attack kind `attack` (the table DAT_108a6a58; `target` is the value the
+// 0x1005ce80 (Player_StartAttack). Starts attack kind `attack` (the table DAT_108a6a58; `charged` is the held-button state (the selector reads it from the caller), `target` is the value the
 // caller attaches and `flag` is kept in DAT_104c0118). Returns 0 and changes nothing when the request is refused:
 // the finishing attack 0x2b after it ran three times, a negative kind in the other mode (DAT_10447dd0 or
 // DAT_1049ef8c) or while DAT_104c0128 is set (with greetings on and no cutscene a negative kind instead queues an
@@ -141,7 +141,7 @@ static __forceinline void PlayLightVoice()
 // (back to 0 when the chain's motion row ends), resets the attack state, plays the attack motion, sets the
 // greeting counter DAT_104c00e0 from the motion's length, queues the attack event, computes the stamina scale
 // DAT_103088b4 and plays the attack voice. Returns 1.
-extern "C" int FUN_1005ce80(int attack, int target, char flag)
+extern "C" int FUN_1005ce80(int attack, char charged, int target, char flag)
 {
     int heavy = 0;
     if (attack == 0x10 || attack == 0x14 || attack == 0x28 || attack == 0x19 || attack == 0x17 || attack == 0x16)

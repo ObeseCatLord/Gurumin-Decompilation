@@ -86,6 +86,8 @@
 #include "player_frame.h"
 
 #include "action_select_vars.h"
+#include "football_state.h"
+#include "target_race.h"
 
 #include "game_main.h"
 
@@ -541,6 +543,89 @@ static __forceinline void CloseItemList(void)
 #define SWING_SAME_HEIGHT 30.0
 #define SWING_SAME_DISTANCE 30.0f
 #define ATTACK_EFFECT_OWNER 999      // owner of the attack record effects
+
+#define POINTER_EFFECT_DEFAULT 0x8534   // light effect of a helmet pointer node by ItemInfo::helmetKind
+#define POINTER_EFFECT_RED 0x8598
+#define POINTER_EFFECT_BLUE 0x85fc
+#define POINTER_EFFECT_WHITE 0x8660
+#define POINTER_SIX_DEFAULT 0x8536      // the same for the three-pointer costume
+#define POINTER_SIX_RED 0x859a
+#define ACTION_EVENT_PAST 0x78          // attack events older than this many ticks are dropped
+#define ACTION_EVENT_AHEAD 0x1e0        // and those further ahead than this
+#define CHAIN_GREETINGS_MAX 0x11        // a chain state is kept while the swing has at most this many frames left
+#define ATTACK_STATE_LIMIT 10000        // DAT_104c0228: at or above it no attack is chosen
+#define ATTACK_STATE_RESUME 0x271a      // the value at which the player stands up again
+#define ATTACK_GREETINGS_MAX 0x14       // a held press only counts while the swing has fewer frames left
+#define FADE_HOLD_LIMIT 0x44            // DAT_104c0108 frames after which the colour fade is cleared
+#define LOW_HEALTH_INTERVAL 0x1e        // frames between the low health warnings
+
+// The light effect of the three-pointer costume's first pointer, by the helmet kind.
+static __forceinline int PointerEffectForCostumeSix(void)
+{
+    int helmetKind = DAT_1088e6b0[DAT_10daabb8].helmetKind;
+    if (helmetKind == HELMET_KIND_RED)
+        return POINTER_SIX_RED;
+    if (helmetKind == HELMET_KIND_BLUE)
+        return POINTER_EFFECT_BLUE;
+    if (helmetKind == HELMET_KIND_WHITE)
+        return POINTER_EFFECT_WHITE;
+    return POINTER_SIX_DEFAULT;
+}
+
+// The light effect of the other two pointer nodes of the three-pointer costume (the same sequence as the first).
+static __forceinline void StartExtraPointerEffect(Node *pointer, Vec4 &pointAt)
+{
+    pointAt.Copy(pointer->worldMatrix.GetTranslation());
+    DAT_10836c74.Copy(DAT_10867e08);
+    DAT_10867e08.Copy(pointAt);
+    EffectOptions options;
+    options.flags = 1;
+    options.owner = ATTACK_EFFECT_OWNER;
+    DAT_10daaa80.Start(PointerEffectForCostumeSix(), pointAt, -1, 0, 0, 0, 0, 0, &options, 0);
+}
+
+#define FLASH_LEVELS 6                  // DAT_10467798: levels of the flash tint (it starts at this value)
+#define FLASH_EFFECT 0x3347
+#define SPOT_COUNT 4                    // the stair spots of map SPOT_MAP the charged release can snap to
+#define SPOT_MAP 0x136
+#define SPOT_REACH 120.0f               // how close the player must be to a spot
+#define SPOT_TURN 0.8                   // and how closely it must face its direction
+#define CHARGE_MIN_FRAMES 10            // DAT_104c0108: frames from which a charge counts
+#define CHARGE_LONG_FRAMES 0x46         // the long charge (second effect, release attack 0x30)
+#define CHARGE_MAX_FRAMES 0x8c
+#define CHARGE_SOUND_A 0x44
+#define CHARGE_SOUND_B 0x8a
+#define SOUND_CHARGE_STEP 0x116
+#define SOUND_CHARGE_PEAK 0x367
+#define CHARGE_EFFECT_A 0x8237          // the charge effect by stage of the counter, and its ring effect
+#define CHARGE_EFFECT_B 0x8235
+#define CHARGE_EFFECT_C 0x8236
+#define CHARGE_RING_A 0x80f2
+#define CHARGE_RING_B 33000
+#define CHARGE_RING_C 0x80fc
+#define GLOW_EFFECT_0 0x650             // the drill glow by drill level, and the one every level adds
+#define GLOW_EFFECT_1 0x8ef8
+#define GLOW_EFFECT_2 0x8ef9
+#define GLOW_EFFECT_3 0x8efa
+#define GLOW_EFFECT_BASE 36000
+#define CARRY_PULL_FRAMES 6             // DAT_104bfdc8 counts up to this while the carried object is pulled in
+#define TALK_TARGET_KEEP 10000          // DAT_104bf888 at or above: slot + this is a kept target
+#define TALK_FIRST_OBJECT 100           // DAT_104bf888 from here: object record + this
+
+// The player is placed on a stair spot (position and heading) after a charge, and the arrival starts.
+static __forceinline void ArriveAtSpot(const Vec4 &spot, int mapSpot)
+{
+    DAT_10db9210.SetTranslation(spot);
+    DAT_10db6ee8[0].heading = spot.w;
+    DAT_10db6ee8[0].targetHeading = spot.w;
+    DAT_104c0108 = 0;
+    DAT_104c0190 = 0;
+    DAT_1049ef8c = 0;
+    FUN_1005ce80(0x13, 0, 0, 0);
+    FUN_1015c9e0(0xf);
+    DAT_104c02e4 = mapSpot;
+    FUN_1016b230("565656565656565656565656565656565656565656");
+}
 
 // Scales an attack effect by the worn costume and helmet (the same chain follows every attack effect).
 static __forceinline void ApplyLoadoutScale(float &value)
@@ -3966,9 +4051,461 @@ swingStepDone:
                     }
                 }
             }
-            // STAGE 5: player input and its actions, last part (ends the block), pseudo.c lines 5865-6523
+            // The scope: while an attack record plays, a light effect follows each pointer node of the helmet.
+            if (DAT_104c01e0 == 0 && DAT_104c00f8 != 0)
+            {
+                Vec4 pointAt;
+                pointAt.Copy(DAT_104c00f8->worldMatrix.GetTranslation());
+                DAT_10836c74.Copy(DAT_10867e08);
+                DAT_10867e08.Copy(pointAt);
+                EffectOptions options;
+                options.flags = 1;
+                options.owner = ATTACK_EFFECT_OWNER;
+                if (DAT_10c655f0 == COSTUME_THREE_POINTERS)
+                {
+                    DAT_10daaa80.Start(PointerEffectForCostumeSix(), pointAt, -1, 0, 0, 0, 0, 0, &options, 0);
+                    if (DAT_104c0100 != 0)
+                        StartExtraPointerEffect(DAT_104c0100, pointAt);
+                    if (DAT_104c0104 != 0)
+                        StartExtraPointerEffect(DAT_104c0104, pointAt);
+                }
+                else
+                {
+                    int helmetKind = DAT_1088e6b0[DAT_10daabb8].helmetKind;
+                    int effect = POINTER_EFFECT_DEFAULT;
+                    if (helmetKind == HELMET_KIND_RED)
+                        effect = POINTER_EFFECT_RED;
+                    else if (helmetKind == HELMET_KIND_BLUE)
+                        effect = POINTER_EFFECT_BLUE;
+                    else if (helmetKind == HELMET_KIND_WHITE)
+                        effect = POINTER_EFFECT_WHITE;
+                    DAT_10daaa80.Start(effect, pointAt, -1, 0, 0, 0, 0, 0, &options, 0);
+                }
+                DAT_10f66948.Copy(DAT_104c00f8->worldMatrix.GetTranslation());
+            }
+            greetings = DAT_104c00e0;
+            if (DAT_10db6ee8[0].m_238c != 0 && DAT_104c00e0 < 2)
+                DAT_104c0132 = 1;
+            if (DAT_104c00e0 == 0 || (DAT_1101d898 = 1, DAT_102024ac < 1))
+                DAT_1101d898 = 0;
+            if (DAT_104c00e0 == 0)
+            {
+                if (DAT_102024c4 != 0 && (DAT_102024c4 = DAT_102024c4 - 1, DAT_102024c4 == 0))
+                    DAT_10447dd0 = 0;
+                DAT_104c015c = 0;
+            }
+            if (DAT_104c0171 != 0)
+                DAT_104c0171 = DAT_104c0171 - 1;
+            if (DAT_104c0156 > -10)
+                DAT_104c0156 = DAT_104c0156 - 1;
+            // Attack events that are too old or too far ahead are dropped from the queue.
+            for (int event = 0; event < ACTION_EVENT_COUNT; event++)
+            {
+                if (DAT_10254110[event].key <= DAT_1032d6a0 - ACTION_EVENT_PAST || DAT_1032d6a0 + ACTION_EVENT_AHEAD <= DAT_10254110[event].key)
+                    DAT_10254110[event].key = -1;
+            }
+            // The attack chain state (0 none, 1 first attack of a chain, 2 the attack that follows a locked one).
+            if (DAT_104c01ec == 0 || greetings > CHAIN_GREETINGS_MAX)
+            {
+                if (greetings == 0)
+                    DAT_104c01f8 = 0;
+            }
+            else if (greetings != 0)
+            {
+                if (DAT_104c0164 == DAT_104c0160)
+                {
+                    if (DAT_104c01ec == 3)
+                        DAT_104c01f8 = 2;
+                    else
+                        DAT_104c01f8 = 1;
+                }
+                else if (DAT_104c01ec == 2 && DAT_104c0164 - 1 == DAT_104c0160)
+                    DAT_104c01f8 = 2;
+            }
+            else
+                DAT_104c01f8 = 0;
+            // The attack state counter reaches its resume value: the player stands up again and the position trail is refilled.
+            if (DAT_104c0228 > ATTACK_STATE_LIMIT - 1 && DAT_104bfe1c == 0 && mouseMiddle == 2 && DAT_104c0228 == ATTACK_STATE_RESUME)
+            {
+                DAT_10db6ee8[0].PlayMotion(2, 0, 5, 1.0f);
+                DAT_104c0228 = 0;
+                for (int step = PLAYER_TRAIL_LENGTH; step != 0; step--)
+                {
+                    DAT_10802ad8[DAT_104c022c].Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                    DAT_104c022c = DAT_104c022c + 1 & 0xf;
+                }
+                greetings = DAT_104c00e0;
+            }
+            if (DAT_104bfe30 != 0 && mouseMiddle != 0)
+            {
+                DAT_104bfe30 = 0;
+                DAT_10db6ee8[DAT_104bf8b4].mode = 1;
+                DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
+                greetings = DAT_104c00e0;
+            }
+            if (DAT_104c0133 != 0)
+                DAT_104c0133 = DAT_104c0133 - 1;
+            // The attack buttons: a held press (the charge) is tracked in DAT_104c0168/016c/0194.
+            bool attackAllowed = DAT_104c0228 < ATTACK_STATE_LIMIT && DAT_1032d69c != 0 && greetings != 0
+                                 && DAT_104c0133 == 0 && greetings < ATTACK_GREETINGS_MAX && DAT_104bfdc8 == 0
+                                 && controlsEnabled != 0 && DAT_104c0068 != 1 && DAT_104bfdf0 == 0
+                                 && DAT_10db6ee8[0].m_2288 < 3 && DAT_104bfe1c == 0 && DAT_104bfd74 == 2
+                                 && DAT_104bfe30 == 0 && DAT_104c0300 == 0 && DAT_104bfe4c == 0 && DAT_104bfd60 == 0
+                                 && DAT_104c00f8 != 0 && mouseMiddle == 2;
+            if (attackAllowed)
+            {
+                DAT_104c0168 = 1;
+                DAT_104c016c = DAT_1065cb3f != 0 || mouseRight != 0;
+                DAT_104c016c |= mouseMiddle != 0 && (DAT_1065cb3f != 0 || mouseRight != 0);
+            }
+            else if (DAT_104c0168 != 0)
+                DAT_104c016c |= mouseMiddle != 0 && (DAT_1065cb3f != 0 || mouseRight != 0);
+            bool chargeRunning;
+            if (DAT_104c0228 < ATTACK_STATE_LIMIT && DAT_1032d69c != 0)
+            {
+                chargeRunning = true;
+                if (DAT_104c0194 == 0)
+                {
+                    if (DAT_104c0133 != 0 || DAT_104c00e0 > 3 || DAT_104bfdc8 != 0 || controlsEnabled == 0 || DAT_104c0068 == 1
+                        || DAT_104bfdf0 != 0 || DAT_10db6ee8[0].m_2288 > 2 || DAT_104bfe1c != 0 || DAT_104bfd74 != 2
+                        || DAT_104bfe30 != 0 || DAT_104c0300 != 0 || DAT_104bfe4c != 0 || DAT_104bfd60 != 0
+                        || DAT_104c00f8 == 0
+                        || (DAT_104c0168 == 0 && mouseMiddle != 2 && (mouseMiddle == 0 || (DAT_1065cb31 == 0 && mouseRight != 2))))
+                        chargeRunning = false;
+                    else
+                    {
+                        DAT_104c0194 = 1;
+                        if (DAT_10468128 > 8)
+                            DAT_10468128 = 7;
+                    }
+                }
+            }
+            else
+                chargeRunning = DAT_104c0194 != 0;
+            if (chargeRunning)
+            {
+                DAT_104c0194 = DAT_104c0194 + 1;
+                DAT_104c0168 = 1;
+                DAT_104c016c |= mouseMiddle != 0 && (DAT_1065cb3f != 0 || mouseRight != 0);
+            }
+            if (DAT_104c023e != 0 && DAT_104c023e < 10)
+                DAT_104c023e = DAT_104c023e + 1;
+            // The button is released (or the press ended): choose the attack and start it.
+            if (DAT_104c0228 < ATTACK_STATE_LIMIT
+                && (DAT_104c022e != 0 || DAT_104c0194 > 3 || (DAT_104c023e != 0 && DAT_104c023e < 3)) && DAT_104c01e8 == 0)
+            {
+                DAT_104c0194 = 0;
+                int attackTarget = 0;
+                int charged = mouseMiddle != 0 && (DAT_1065cb3f != 0 || mouseRight != 0);
+                if (DAT_104c0168 != 0)
+                    charged = DAT_104c016c;
+                int chargedAtRelease = charged;
+                DAT_104c016c = 0;
+                int heldInput = (DAT_1065cb3f != 0 && DAT_1065cb31 == 0) || mouseRight == 1;
+                int attack = FUN_10011520(0, &charged, &attackTarget, (int)DAT_10210b2c, (int)DAT_1030c990, heldInput,
+                                          DAT_104c022e);
+                if ((DAT_10db6ee8[DAT_104bf8b4].m_2288 != 5 || DAT_104bfdf0 != 0 || DAT_104bfe1c != 0) && attack >= 0)
+                    FUN_1005ce80(attack, chargedAtRelease, attackTarget, 0);
+                if (DAT_104c00e0 != 0 || DAT_104c0300 != 0 || DAT_104bfe4c != 0 || DAT_104bfe30 != 0 || DAT_104bfe1c != 0
+                    || DAT_104c0068 != 0 || DAT_104c01e0 != 0)
+                {
+                    DAT_104c0190 = 0;
+                    if (DAT_104c0108 > FADE_HOLD_LIMIT)
+                        FUN_1000ec70(5, 1.0f, 1.0f, 1.0f, 1.0f);
+                    DAT_104c0108 = 0;
+                }
+            }
+            if (DAT_104c02b4 != 0)
+                DAT_104c02b4 = DAT_104c02b4 - 1;
+            if (DAT_10daaaec < DAT_10daaaf0 / 4 && DAT_104bf890 % LOW_HEALTH_INTERVAL == 0)
+                FUN_1000d620(0, 0xb, 0x1e);
+            if (DAT_104c0190 != 0
+                && (DAT_104c00e0 != 0 || DAT_104c0300 != 0 || DAT_104bfe4c != 0 || DAT_104bfe30 != 0 || DAT_104bfe1c != 0))
+            {
+                DAT_104c0190 = 0;
+                if (DAT_104c0108 > FADE_HOLD_LIMIT)
+                    FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
+                DAT_104c0108 = 0;
+            }
+            // The helmet's special moves (the stair spots, the charged flash): free controls needed.
+            if (DAT_104c0228 < ATTACK_STATE_LIMIT && DAT_1032d69c != 0 && controlsEnabled != 0 && DAT_104bfe1c == 0
+                && DAT_104bfdf0 == 0 && DAT_104bfdc8 == 0 && DAT_104c0300 == 0 && DAT_104bfe4c == 0 && DAT_104c00f8 != 0
+                && DAT_104c0068 == 0 && DAT_104c01e0 == 0)
+            {
+                // The flash of a finished charge: a ring effect, then the screen tint fades back to white.
+                if (DAT_10467798 != 0)
+                {
+                    if (DAT_10467798 == FLASH_LEVELS)
+                    {
+                        EffectOptions options;
+                        options.m_0004 = -DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                        options.m_0008 = (float)DAT_108a6a58[DAT_104c00e8].strength * 1.5f / 100.0f;
+                        ApplyLoadoutScale(options.m_0008);
+                        options.m_001c = 1;
+                        options.m_0000 = 1;
+                        options.settings[EFFECT_SETTING_FLAGS] = 1;
+                        options.m_000e = 5;
+                        options.settings[EFFECT_SETTING_AREA] = 0;
+                        options.owner = ATTACK_EFFECT_OWNER;
+                        DAT_10daaa80.Start(FLASH_EFFECT, DAT_10864ce8, -1, 0, 0, 0, 0, 0, &options, 0);
+                        DAT_10467798 = 0;
+                    }
+                    Vec4 tint;
+                    Vec4 white;
+                    tint.Set(0.3f, 0.4f, 0.4f, 1.0f);
+                    white.Set(1.0f, 1.0f, 1.0f, 1.0f);
+                    int level = DAT_10467798;
+                    if (level > FLASH_LEVELS - 1)
+                        level = FLASH_LEVELS;
+                    tint.Copy(white - (white - tint) * ((float)level / (float)FLASH_LEVELS));
+                    FUN_1000ec70(5, tint.x, tint.y, tint.z, 1.0f);
+                    if (DAT_1021a368 == 0 || (DAT_1021a368 = DAT_1021a368 - 1, DAT_1021a368 == 0))
+                        DAT_10467798 = DAT_10467798 - 1;
+                    if (DAT_10467798 == 0)
+                        FUN_1000ec70(10, 1.0f, 1.0f, 1.0f, 1.0f);
+                }
+                if (mouseMiddle == 0 && DAT_1065cb3e == 0)
+                {
+                    // No button held: the charge counter DAT_104c0108 is released. Near one of the four spots the
+                    // player is placed on it, otherwise the release attack starts.
+                    DAT_104c0190 = 0;
+                    Vec4 spots[SPOT_COUNT + 1];
+                    spots[SPOT_COUNT].Copy(DAT_10db9210.GetTranslation());
+                    spots[0].Set(1773.0f, 720.0f, 38.0f, 3.85f);
+                    spots[1].Set(1763.0f, -720.0f, 38.0f, 5.479f);
+                    spots[2].Set(327.0f, -720.0f, 38.0f, 0.76f);
+                    spots[3].Set(327.0f, 720.0f, 38.0f, 2.36f);
+                    int pathFree = DAT_10db9274;
+                    if (DAT_10db9274 == 0)
+                    {
+                        Vec4 probe;
+                        probe.Set(0.0f, 0.0f, -30.0f, 0.0f);
+                        pathFree = DAT_10db6ee8[DAT_104bf8b4].IsClearOfMap(&probe) == 0;
+                        if (pathFree == 0)
+                        {
+                            probe.Set(0.0f, 0.0f, -20.0f, 0.0f);
+                            pathFree = DAT_10db6ee8[DAT_104bf8b4].IsClear(&probe) == 0;
+                        }
+                    }
+                    if (DAT_104c0108 < CHARGE_MIN_FRAMES)
+                        goto chargeRetreat;
+                    if (pathFree == 0)
+                    {
+                        FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
+                        DAT_104c0108 = CHARGE_MIN_FRAMES - 1;
+                        DAT_104c0190 = 0;
+                    }
+                    else
+                    {
+                        if (DAT_10c62ed0 == SPOT_MAP && spots[0].Distance(spots[SPOT_COUNT]) < SPOT_REACH
+                            && FUN_101ac810(spots[0].w, DAT_10db6ee8[0].heading) < SPOT_TURN)
+                            ArriveAtSpot(spots[0], 2);
+                        else if (DAT_10c62ed0 == SPOT_MAP && spots[1].Distance(spots[SPOT_COUNT]) < SPOT_REACH
+                                 && FUN_101ac810(spots[1].w, DAT_10db6ee8[0].heading) < SPOT_TURN)
+                            ArriveAtSpot(spots[1], 0x66);
+                        else if (DAT_10c62ed0 == SPOT_MAP && spots[2].Distance(spots[SPOT_COUNT]) < SPOT_REACH
+                                 && FUN_101ac810(spots[2].w, DAT_10db6ee8[0].heading) < SPOT_TURN)
+                            ArriveAtSpot(spots[2], 0xca);
+                        else if (DAT_10c62ed0 == SPOT_MAP && spots[3].Distance(spots[SPOT_COUNT]) < SPOT_REACH
+                                 && FUN_101ac810(spots[3].w, DAT_10db6ee8[0].heading) < SPOT_TURN)
+                            ArriveAtSpot(spots[3], 0x12e);
+                        else
+                        {
+chargeRetreat:
+                            if (DAT_104c0108 < CHARGE_LONG_FRAMES)
+                            {
+                                if (DAT_104c0108 < CHARGE_MIN_FRAMES)
+                                    DAT_104c0108 = DAT_104c0108 - 4;
+                                else
+                                {
+                                    DAT_104c0108 = 0;
+                                    DAT_104c0190 = 0;
+                                    DAT_1049ef8c = 0;
+                                    FUN_1005ce80(0x13, 0, 0, 0);
+                                }
+                            }
+                            else
+                            {
+                                DAT_104c0108 = 0;
+                                DAT_104c0190 = 0;
+                                DAT_1049ef8c = 0;
+                                FUN_1005ce80(0x30, 0, 0, 0);
+                            }
+                        }
+                        if (DAT_104c0108 > CHARGE_MAX_FRAMES)
+                            DAT_104c0108 = CHARGE_MAX_FRAMES;
+                        else if (DAT_104c0108 < 0)
+                            DAT_104c0108 = 0;
+                    }
+                }
+                else
+                {
+                    // A button is held: the counter grows (the charge), with sounds at two frames.
+                    if (DAT_104c0108 >= CHARGE_MIN_FRAMES && DAT_104bf890 % CHARGE_MIN_FRAMES == 0)
+                    {
+                        Vec4 stepAt = DAT_10db9210.GetTranslation();
+                        FUN_1003ad20(SOUND_CHARGE_STEP, &stepAt, 1.0f);
+                    }
+                    if (DAT_104c0108 == CHARGE_SOUND_A)
+                        FUN_1003ad20(SOUND_CHARGE_PEAK, 0, 1.0f);
+                    if (DAT_104c0108 == CHARGE_SOUND_B)
+                        FUN_1003ad20(SOUND_CHARGE_PEAK, 0, 1.0f);
+                    if (DAT_104c00e0 == 0)
+                    {
+                        if (DAT_104c0108 < CHARGE_LONG_FRAMES || (DAT_104bf890 & 1) != 0)
+                            DAT_104c0108 = DAT_104c0108 + 1;
+                        if (DAT_104c0108 > CHARGE_LONG_FRAMES)
+                            DAT_104c0108 = CHARGE_LONG_FRAMES;
+                        if (DAT_104c0108 >= CHARGE_MIN_FRAMES && DAT_104c0190 == 0)
+                            DAT_104c0190 = 1;
+                    }
+                    else
+                    {
+                        DAT_104c0190 = 0;
+                        if (DAT_104c0108 > FADE_HOLD_LIMIT)
+                            FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
+                        DAT_104c0108 = 0;
+                    }
+                    if (DAT_104c0108 > CHARGE_MAX_FRAMES)
+                        DAT_104c0108 = CHARGE_MAX_FRAMES;
+                    else if (DAT_104c0108 < 0)
+                        DAT_104c0108 = 0;
+                }
+            }
+            // The charge effects follow the counter while it runs.
+            if (DAT_104c0108 > CHARGE_MIN_FRAMES)
+            {
+                Vec4 chargeAt;
+                chargeAt.Copy(DAT_10db9210.GetTranslation());
+                if (DAT_104c00f8 != 0)
+                {
+                    EffectOptions options;
+                    options.owner = ATTACK_EFFECT_OWNER;
+                    options.flags = 1;
+                    int ringEffect;
+                    if (DAT_104c0108 < CHARGE_LONG_FRAMES)
+                    {
+                        DAT_10daaa80.Start(CHARGE_EFFECT_A, chargeAt, -1, 0, &DAT_104c00f8->worldMatrix,
+                                           (int)&DAT_10db9210, 0, 0, &options, 0);
+                        ringEffect = CHARGE_RING_A;
+                    }
+                    else if (DAT_104c0108 < CHARGE_MAX_FRAMES)
+                    {
+                        DAT_10daaa80.Start(CHARGE_EFFECT_B, chargeAt, -1, 0, &DAT_104c00f8->worldMatrix,
+                                           (int)&DAT_10db9210, 0, 0, &options, 0);
+                        ringEffect = CHARGE_RING_B;
+                    }
+                    else
+                    {
+                        DAT_10daaa80.Start(CHARGE_EFFECT_C, chargeAt, -1, 0, &DAT_104c00f8->worldMatrix,
+                                           (int)&DAT_10db9210, 0, 0, &options, 0);
+                        ringEffect = CHARGE_RING_C;
+                    }
+                    DAT_10daaa80.Start(ringEffect, chargeAt, -1, 0, &DAT_104c00f8->worldMatrix, (int)&DAT_10db9210, 0, 0,
+                                       &options, 0);
+                }
+            }
+            // While a swing plays, the helmet's drill glow follows the "charbase0" node.
+            if (DAT_104c00e0 != 0 && DAT_104c00fc != 0 && DAT_104c02ee != 0)
+            {
+                Vec4 glowAt;
+                glowAt.Fill(0.0f);
+                EffectOptions options;
+                options.flags = 1;
+                options.owner = ATTACK_EFFECT_OWNER;
+                if (DAT_104c00e8 != 0x2b && DAT_10c6566c == 0 && DAT_10c655f0 != COSTUME_THREE_POINTERS)
+                {
+                    int drillEffect = 0;
+                    if (DAT_10c64ad4 == 0)
+                        drillEffect = GLOW_EFFECT_0;
+                    else if (DAT_10c64ad4 == 1)
+                        drillEffect = GLOW_EFFECT_1;
+                    else if (DAT_10c64ad4 == 2)
+                        drillEffect = GLOW_EFFECT_2;
+                    else if (DAT_10c64ad4 == 3)
+                        drillEffect = GLOW_EFFECT_3;
+                    if (drillEffect != 0)
+                        DAT_10daaa80.Start(drillEffect, glowAt, -1, 0, 0, 0, 0, &DAT_104c00fc->worldMatrix, &options, 0);
+                }
+                DAT_10daaa80.Start(GLOW_EFFECT_BASE, glowAt, -1, 0, 0, 0, 0, &DAT_104c00fc->worldMatrix, &options, 0);
+            }
+            // The carried object is pulled to the player for a few frames, then the player turns to face it.
+            if (DAT_104bfdc8 > 1)
+            {
+                Vec4 playerAt;
+                Vec4 carriedAt;
+                Vec4 pull;
+                playerAt.Copy(DAT_10db9210.GetTranslation());
+                carriedAt.Copy(DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation());
+                pull.Copy((carriedAt - playerAt) * 0.06f);
+                DAT_10db6ee8[0].Push(pull.x, pull.y, pull.z);
+                DAT_104bfdc8 = DAT_104bfdc8 + 1;
+                if (DAT_104bfdc8 == CARRY_PULL_FRAMES)
+                {
+                    DAT_104bfdc8 = 1;
+                    carriedAt.Copy(carriedAt - playerAt);
+                    carriedAt.Copy(Vec3_Normalized(&carriedAt));
+                    carriedAt.Copy(carriedAt * 6.0f);
+                    float faceAngle = (float)atan2(carriedAt.x, carriedAt.y);
+                    DAT_104bfddc = 0;
+                    DAT_10db6ee8[0].targetHeading = faceAngle + 3.1415f;
+                }
+            }
+            if (DAT_104bfdc8 == 0)
+            {
+releaseHold:
+                if (DAT_1032d69c == 0)
+                    goto afterPlayerInput;
+            }
+            else if (DAT_1065cb3f != 0 || mouseRight != 0 || mouseMiddle != 0 || DAT_1065cb3e != 0 || DAT_1032d69c == 0)
+            {
+                if (DAT_104bfdcc == 0)
+                {
+                    DAT_104c0090 = 1;
+                    DAT_104bfdc8 = 0;
+                }
+                else
+                    DAT_104c0074 = 1;
+                goto releaseHold;
+            }
+            // The talk key: starts the dialogue of the object in front of the player.
+            if (DAT_104c00e0 == 0 && DAT_1020d430 == 0 && DAT_10468128 == 0 && DAT_104bfd74 == 4
+                && ((DAT_104c00ac != 0 && DAT_104c00b7 == 0) || DAT_104bf888 != 0 || DAT_104c00bc != 0 || DAT_104bfdd0 != 0)
+                && mouseMiddle == 2)
+            {
+                if (DAT_104bf888 < TALK_TARGET_KEEP)
+                {
+                    if (DAT_104bf888 < TALK_FIRST_OBJECT)
+                    {
+                        if (DAT_104bf888 == 0)
+                        {
+                            if (DAT_104c00bc != 0 && (DAT_104bfd64 = 0, DAT_104bfd60 == 0) && DAT_104bfe30 == 0
+                                && DAT_10db9274 != 0)
+                            {
+                                DAT_104bfd68 = 0.0f;
+                                DAT_10db9210.GetTranslation();
+                                DAT_10db6ee8[DAT_104bf8b4].PlayMotion(0xc, 0, 5, 1.0f);
+                                DAT_104bfd60 = 1;
+                            }
+                        }
+                        else
+                            FUN_1005ecb0(0);
+                    }
+                    else
+                    {
+                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(2, 0, 5, 1.0f);
+                        DAT_10874848.RegisterEvent(DAT_10860df0[DAT_104bf888 - TALK_FIRST_OBJECT].id);
+                    }
+                }
+                else
+                {
+                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(2, 0, 5, 1.0f);
+                    DAT_10874848.RaiseTalkEvents(DAT_104bf888 - TALK_TARGET_KEEP);
+                    rand();
+                }
+            }
         }
-        // The block above is left by a goto at pseudo line 6480 (label LAB_1012984b, next line).
+afterPlayerInput:
 
         // STAGE 6: the player after the input, the camera and the world, pseudo.c lines 6525-7860
         // STAGE 7: the events, the carried object and the model list, pseudo.c lines 7861-8944

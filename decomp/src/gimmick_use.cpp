@@ -38,8 +38,8 @@ extern "C" int FUN_1013f880(void);
 // plug motion, sets (or clears) its script flag and raises the LEVERON/LEVEROFF events. A chest opens: its script
 // variable holds the packed item and count; the item is added to the inventory, a message tells what was found (or
 // that the chest is empty, or that no more fit) and the player reacts with a voice line. Invalid slots show an error
-// message.
-extern "C" void FUN_1005ecb0(void)
+// message. The caller passes 0, which is never read.
+extern "C" void FUN_1005ecb0(int unused)
 {
     char name[64];
     char message[128];

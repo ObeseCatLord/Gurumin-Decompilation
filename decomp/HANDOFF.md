@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 17.11% of code, 849 of 1212 functions |
-| Matched under the rules | 17.07% of code, 848 of the 849 matched functions |
-| Fuzzy match | 27.18% |
+| Matched | 17.32% of code, 850 of 1212 functions |
+| Matched under the rules | 17.28% of code, 849 of the 850 matched functions |
+| Fuzzy match | 28.34% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -123,6 +123,12 @@ function) and node_world.cpp (0) still break rule 2.
   the residues): Ground_BuildMesh, ModelBank::PrepareFrame, Game::DrawWindows, Scene_Reset, Npc_HurlAtPlayer (6 bytes),
   Node::Query, MapMinigame_DrawTimerHud, Enemy_ChaseAndHop, Npc_PerformTricks, Node::SplitIntoCells, Char_Drifter
   (wrap loop keeps st0), Player_StartAttack, Enemy_HoverAndShoot (frame 0x184 vs 0x174).
+- Batch 335 (QUEUE section 5, very large functions): Menu_SaveLoad 0x10064630 matched once its two alignment pads
+  were traced to MessageWindow_SetTitle(0) inlined (include/message_window.h; NOTES has the lesson). Drafts: Menu_DrawScene
+  10022830 (14 bytes), Map_PlaceCharacters 1005def0, Texture_LoadIti 10174ce0, EffectManager::DrawLightKind7/23
+  101713f0/10170580 (same ebp/ebx residue as DrawLight), Char_HikariButtonRide 10079470, AnimModel::UpdateFrame 1017a010,
+  ListBank::ApplyOperator 10004b10, Game::UpdateWindows 1000a0b0, Scene_RunCommand 10083eb0. Watch new obj_symbols
+  rows: a repeated pointer parameter mangles as a back-reference (PAH0, not PAHPAH).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the
@@ -142,8 +148,8 @@ function) and node_world.cpp (0) still break rule 2.
   100ade30, 100af1b0 are unstarted.
 
 ## Next steps
-1. The trail renderer family 101713f0/10170580/10187520: type the effect definition (0x3d8) and trail point list
-   (0x4014) tables first, then the functions in a new rule-clean file.
+1. The trail renderer family 101713f0/10170580/10187520 is drafted (effect_trail_draw.cpp, effect_light.cpp): one shared
+   residue (this in ebp, frame 12 bytes smaller in the original); try the per-branch drawCount fix in DrawLight too.
 2. The large Enemy_UpdateBehaviour kinds (start with the smallest of 100a5960/100a9240/100aa820/100ade30/100af1b0;
    enemy_barrage.cpp shows the shared shapes: Vec4 player/self, atan2 facing, EffectOptions + Matrix4 temporaries).
 3. Near-misses with a genuinely new idea: the stack-slot swaps of 100a7150/100a6a50 (maybe a permuter run),

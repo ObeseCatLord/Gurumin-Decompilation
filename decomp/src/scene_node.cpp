@@ -35,7 +35,7 @@ extern "C" int FUN_10169970(MeshData *mesh);     // MeshCache_AddRef
 
 struct IndexList;
 
-Matrix4 InverseMatrix(const Matrix4 &matrix);      // 0x101b0d40 (node_bones.cpp)
+#include "matrix_transform.h"
 
 #include "node.h"
 

@@ -59,6 +59,7 @@ address	name	evidence
 100460d0	Npc_ShockByLink	behaviour 0x17: a character near a link line is shocked (shaken around its home, sparks every 5th frame) until the link goes or the player comes close (npc_link_shock.cpp, draft)
 10048050	Npc_HoverCarrier	behaviour 0x21: hovers beside the player carrying the character index + talk/100, bouncing off obstacles with a random turn (npc_hover_carrier.cpp, matched)
 10049b00	Map_RoutePosition	point at fraction t of a map record route (map_route.cpp)
+10049ec0	Npc_RoamZones	per-frame wander of the party NPCs in slots 0xd/0xf/0x3a through the zone graph of maps 2,3,4,5,0xc (rest zones, door fade between maps, gate nodes opened while talked to) (zone_roamer.cpp, draft)
 1004cf20	ClearMarkers_Create	builds the ClearORoot marker models (clear_markers.cpp, draft)
 1004d4b0	Regions_Update	per-frame map region visibility and point morphs (region_view.cpp, draft)
 1004d960	Player_UpdateFrame	per-frame player update: motion layer choice, footstep sound and dust, map-movie camera, heading easing and matrix rebuild, crowd check, helmet node, guide character 16 marker pointer and beam effects (player_frame.cpp, draft)
@@ -87,6 +88,7 @@ address	name	evidence
 10065450	TutorialBook_Update	per-frame tutorial book mode: turn/close/open states, stick or mouse turns, draws the book from the overlay camera (tutorial_update.cpp)
 10065bf0	Enemy_WanderHopAndSpit	kind-4 hopping spitter of the dispatcher 0x100f9670: turns to the player, hops at it, spits a fan of effect 600 when the player is near and in sight, wakes same-kind neighbours (enemy_hop_spit.cpp, draft)
 100675d0	Enemy_PounceAndBreathe	kind-7 enemy of the dispatcher 0x100f9670: wanders, notices the player, wakes same-kind slots, whirls and leaps, roars, chases, pounces (effects 0x688/0x655) or breathes fire from the mouth node (effects 0x3707/0x456) (enemy_pounce_breath.cpp, draft)
+10068f70	Enemy_LeapAndClimb	per-kind enemy that strolls, turns, leaps at the player and climbs ledges in 12 states, spitting a fan of effect 600 (0x68c for variant 1, which also reacts to hits) (enemy_leap_climb.cpp, draft)
 1006be40	Enemy_SpitAndCharge	per-kind enemy behaviour: wanders, reacts to damage, approaches, spits a fan of effect 0x258 and charges at the player (enemy_spit_charge.cpp, draft)
 1006e150	Enemy_CastAndTeleport	behaviour 0xc caster: keeps 700-800 units from the player, checks sight every 10 frames, casts a 75-frame spell (bolt effect 0x673, charge 0x66d), then fades out, slides to a random visible spot around the player and fades in (enemy_cast_teleport.cpp, matched)
 1006f490	Enemy_HoverAndShoot	flying enemy (kind 0x54): hovers 75 above the ground, steers a smoothed course round the player with banking motions, fires effect 0x3e9 when aligned within 1500 units, then holds course for 30 frames (enemy_hover_shooter.cpp, draft)
@@ -103,7 +105,9 @@ address	name	evidence
 1007dab0	Map15_UpdateTargetRace	per-frame update of the map 0x15 target race mini game: the player and two rivals (slots 0x3a/0x3b) destroy 50 targets dropped into the arena (slots 0x5c..0x7b), rivals pounce and can be stunned (target_race.cpp, draft)
 10083eb0	Scene_RunCommand	scene-command dispatcher over 38 ids: status-panel text, picture load/release, message windows, node flags and groups, effect starts at nodes or models, camera follow, node position into DAT_10c6356c/70/74 (scene_command.cpp, draft)
 10084e80	Enemy_RoamAndSpit	roaming ghost enemy (behaviour of 0x100f9670): follows the player's recorded path, steers around other roamers, turns to the player within 400 and spits effect 600 at him (enemy_roam_spit.cpp, draft)
+10086380	Enemy_FlockDiver	kind 0x2c: five fliers (slots 0x3c..0x40) circle the arena, rise from the pit, swoop at the player with trails and follow each other in chains; slots 0x3a/0x3b hold the director's pattern, round, formation and clock (enemy_flock_diver.cpp, draft)
 10089210	ListBank::RunStatements	script interpreter statement runner: blocks, return/break/continue, switch/case/default, while, for, if/else; converts the result to the wanted type (script_run.cpp, draft)
+10089a10	ListBank::CompileCall	Script_CompileCall: script expression compiler/evaluator: tokenizes, strips brackets recursively, dispatches function calls (script or builtin), variables and constants, and reduces by operator precedence (script_compile_call.cpp, draft)
 1008fea0	DrillClaws_Update	per-frame update of the four drill claws ("@tume01" nodes at drill level 3 with a full gauge): aura effect, target picking, per-claw state machine (orbit, sweep, rise, hold, launch, burst) or docking on the player's claw node (drill_claws.cpp, draft)
 10092af0	Scene_HostCallback	world host callback (WorldRenderer::Bind): codes 1..99 select or create a character slot by .it3 name; sounds, effects, MMV/movie/DirectShow control, map load 100, skip 0x29a, flags 0x28e (scene_callback.cpp, draft)
 100a3900	Enemy_PulseAndCharge	kind 0x42: pulses (squash), wanders and stops at walls, faces the player and charges for 40 frames once hit, leaving effect 0x7c0 (enemy_pulse_charge.cpp, matched)
@@ -163,7 +167,6 @@ address	name	evidence
 10005a70	Script_LibraryBuiltin	handler for the library built-ins
 1013ad90	Script_RegisterGameBuiltins	sets up the game parser and registers the 93 game built-ins (matched, decomp/src/listbank.cpp)
 100ed9b0	Script_CompileStatement	errors for goto/for/while/switch/return in scripts
-10089a10	Script_CompileCall	argument count/type/reference checks
 1003aef0	Bgm_Play	streams bgm\<name>.de2 and checks its header, anti-tamper noise on failure (decomp/src/bgm_play.cpp)
 10137b10	Game_FrameStep	per-frame step: messages, max-health clamp, noise-table quit check, mode update, pacing/present, clipboard capture saved as capture%05d.jpg with the shape.dat stamp (frame_step.cpp, draft)
 100144c0	Ability_GetDescription	copies the effect text of the highest-priority ability bit and returns the bit (matched, decomp/src/ability_text.cpp)
@@ -185,6 +188,7 @@ address	name	evidence
 10174ce0	Texture_LoadIti	loads a texture into a free slot from <folder>\<path>.iti, ./<path>.itp or ./data/<path>.itp: ITP 999/1000 pixel conversion, packed ITI formats or the decoder path, optional half-size (texture_load_iti.cpp, draft)
 1017a010	AnimModel::UpdateFrame	per-frame model update: motion advance, shadow fade, footsteps, colour wobble, view test, heading ease, summed move with collision (M_10175f20), node tree refresh (anim_model_step.cpp, draft)
 10184160	WorldRenderer::DrawScreenOverlays	draws the caption, then the overlay (world_caption.cpp, matched)
+10184440	EffectManager::Step	advances one effect record per frame: start delay, spawn placement, movement/steering/spin, ribbon and light points, host hit test, events, child effects, end of life (effect_step.cpp, draft)
 101886d0	EffectManager::LoadDefinitions	loads the effect definition file (version 20000/22000) into free slots, textures and per-slot definitions (effect_definition_loader.cpp)
 10191fd0	Node::BoxesOverlap	overlap test of two offset boxes with optional centre deltas (matched, decomp/src/box_overlap.cpp)
 10192200	Node::BoxCylinderOverlap	box against the upright cylinder inscribed in a second box (matched, decomp/src/box_overlap.cpp)

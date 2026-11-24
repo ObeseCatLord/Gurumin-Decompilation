@@ -74,12 +74,64 @@ struct EffectOptions
                                                      // An array: locals of this type get a /GS cookie
                                                      // (npc_frozen.cpp, char_move.cpp, switch_effects.cpp)
     int owner;                                       // 0x2c: owner (character index + 100), 0 = none
-    int m_0030;
-    int m_0034;
-    int m_0038;
+    Vec4 *m_0030;                                    // 0x30: where a hook writes a direction (Step's steering)
+    const Vec4 *m_0034;                              // 0x34: first end of the box a hook tests
+    const Vec4 *m_0038;                              // 0x38: second end of the box
     int m_003c;
     int m_0040;
     EffectOptions() throw();                         // 0x101668b0 (model_state.cpp); callers know it cannot throw
+};
+
+// Where an effect moves to (EffectDef::m_0114, 16 bytes each); EffectManager::Step reads the first two. `type`:
+// 1 follows the owner matrix, 2 follows the target matrix, 3 and 4 steer towards them (`value` / 100 of the turn
+// per frame), 5 steers towards a direction the host gives, 6 sets the height.
+#define EFFECT_TARGET_FOLLOW_OWNER 1
+#define EFFECT_TARGET_FOLLOW_TARGET 2
+#define EFFECT_TARGET_STEER_OWNER 3
+#define EFFECT_TARGET_STEER_TARGET 4
+#define EFFECT_TARGET_STEER_HOST 5
+#define EFFECT_TARGET_SET_HEIGHT 6
+struct EffectTarget
+{
+    int type;
+    int value;
+    int pad_0008[2];
+};
+
+// An event of an effect (EffectDef::m_0174, 16 bytes each). `type` 1: ends the effect when its hit test hit;
+// 3 and 4: ends it inside the visible area above (3) or below (4) a height; 5, 6, 7 and 11: at `frame` ask the host
+// for a screen effect with `value`; 8: ends it when its parent has ended; 10: ends it when the host refuses
+// `frame` at its position; 9 is only tested by the hit handling.
+#define EFFECT_TRIGGER_HIT_ENDS 1
+#define EFFECT_TRIGGER_AREA_ABOVE_ENDS 3
+#define EFFECT_TRIGGER_AREA_BELOW_ENDS 4
+#define EFFECT_TRIGGER_SCREEN_FLASH 5
+#define EFFECT_TRIGGER_SCREEN_TINT 6
+#define EFFECT_TRIGGER_SCREEN_FADE 7
+#define EFFECT_TRIGGER_PARENT_ENDS 8
+#define EFFECT_TRIGGER_HIT_FLAG 9
+#define EFFECT_TRIGGER_HOST_ENDS 10
+#define EFFECT_TRIGGER_SCREEN_SHAKE 11
+struct EffectTrigger
+{
+    int type;
+    int frame;
+    int value;
+    int pad_000c;
+};
+
+// A child effect an effect starts (EffectDef::m_01b4, 16 bytes each): `count` effects `effect` at `frame`. `type`:
+// 1 when it ends, 2 when its hit test hits, 3 every `frame` frames, 4 at `frame`.
+#define EFFECT_CHILD_AT_END 1
+#define EFFECT_CHILD_ON_HIT 2
+#define EFFECT_CHILD_EVERY 3
+#define EFFECT_CHILD_AT_FRAME 4
+struct EffectChild
+{
+    int type;
+    int frame;
+    int effect;
+    int count;
 };
 
 // An effect definition (0x3d8 bytes; EFFECT_DEFINITION_COUNT of them at DAT_1101dfdc), one per effect type the
@@ -89,12 +141,12 @@ struct EffectDef
 {
     int id;                                          // 0x00: script id, EFFECT_NONE = free
     int kind;                                        // 0x04: 1 and 0x12 are sprites; 6, 7, 0x11 and 0x16 have lights
-    int m_0008;                                      // 0x08
+    int m_0008;                                      // 0x08: non-zero = the effect is parked (Step does nothing)
     int m_000c;                                      // 0x0c
     int m_0010;                                      // 0x10
     int m_0014;                                      // 0x14
-    char m_0018[0x40];                               // 0x18
-    char m_0058[0x10];                               // 0x58
+    int m_0018[16];                                  // 0x18: [0] non-zero = hit test with the host hook, [2], [4] its options
+    int m_0058[4];                                   // 0x58: random turn of the direction: interval, then x/y/z amount
     int m_0068;                                      // 0x68: first of 0x10 bytes read from the definition file
     int depthTest;                                   // 0x6c: non-zero = drawn with render state 9 on
     char pad_0070[0x8];
@@ -109,14 +161,14 @@ struct EffectDef
     int fixedList;                                   // 0xf8: non-zero = always started in the definition's list
     int texture;                                     // 0xfc: texture slot, -1 = not looked up yet (-1 after Init)
     int blend;                                       // 0x100: sprite blend mode 0-6
-    char m_0104[0x10];                               // 0x104
-    char m_0114[0x40];                               // 0x114
+    int m_0104[4];                                   // 0x104: [0], [1] position track used (and added), [2], [3] the same for the turn track
+    EffectTarget m_0114[4];                          // 0x114: where the effect moves (Step reads the first two)
     int m_0154;
     char pad_0158[0xc];
-    int m_0164;                                      // 0x164: 50 for a new definition
+    int m_0164;                                      // 0x164: frames the effect lives (50 for a new definition)
     char pad_0168[0xc];
-    char m_0174[0x40];                               // 0x174
-    char m_01b4[0x40];                               // 0x1b4
+    EffectTrigger m_0174[4];                         // 0x174: events at a frame or when something happens
+    EffectChild m_01b4[4];                           // 0x1b4: effects it starts
     int spawnKind;                                   // 0x1f4: 2 and 4 are effects whose Start returns 1
     char trackFlags[7];                              // 0x1f8: one byte after each of tracks 3 to 9 in the file
     char name[0x20];                                 // 0x1ff: display name
@@ -125,9 +177,9 @@ struct EffectDef
     char flat;                                       // 0x260: sprite table A: drawn at depth 0
     char m_0261;                                     // 0x261
     char pad_0262[2];
-    char m_0264[8][0x10];                            // 0x264
+    Vec4 m_0264[8];                                  // 0x264: spawn offset, direction, turn ranges, accelerations (see Step)
     KeyTrack tracks[12];                             // 0x2e4
-    int m_03d4;                                      // 0x3d4
+    float m_03d4;                                    // 0x3d4: random spread of the start position
 };
 
 // A running effect (0x1dc bytes; EFFECT_RECORD_COUNT of them at DAT_1115cfe8), linked into one of the
@@ -139,22 +191,26 @@ struct EffectRecord
     int next;                                        // 0x04: next record of its list, -1 = last
     int id;                                          // 0x08: effect definition, EFFECT_NONE = free
     int parent;                                      // 0x0c: record this effect is attached to, -1 = none
-    int m_0010;                                      // 0x10: -1 at the start
+    int m_0010;                                      // 0x10: frames it has run (-1 before its first update)
     int frame;                                       // 0x14: start frame (the definition's plus the caller's offset)
-    int m_0018;
-    int m_001c;
+    int m_0018;                                      // 0x18: latest frame at which a child effect starts
+    int m_001c;                                      // 0x1c: frames it has been updated
     int serial;                                      // 0x20: value of the start counter when it started
     Vec4 partPositions[2];                           // 0x24: positions of its two parts, indexed by `part`
-    char pad_0044[0x50];
-    Vec4 velocity;                                   // 0x94
-    char pad_00a4[0x10];
+    Vec4 origin;                                     // 0x44: where it started (the parent's position for kinds 2 and 4)
+    Vec4 direction;                                  // 0x54: the start direction
+    Vec4 step;                                       // 0x64: moved by every frame (turned and steered)
+    Vec4 acceleration;                               // 0x74: adds to localVelocity every frame
+    Vec4 localVelocity;                              // 0x84: adds to the local offset every frame
+    Vec4 velocity;                                   // 0x94: rotation angles, advanced every frame
+    Vec4 spin;                                       // 0xa4: second rotation, advanced every frame
     Vec4 position;                                   // 0xb4
-    char pad_00c4[0x40];
+    Matrix4 worldMatrix;                             // 0xc4: the matrix the effect is drawn with
     Matrix4 matrix;                                  // 0x104: the caller's matrix, identity without one
-    char pad_0144[0x40];
+    Matrix4 startMatrix;                             // 0x144: the matrix at the start (its parent's for kinds 2 and 4)
     const Matrix4 *matrixOwner;                      // 0x184: matrix it follows, 0 = none
-    int m_0188;                                      // 0x188: the caller's value
-    short m_018c;
+    int m_0188;                                      // 0x188: the caller's value (the address of a Matrix4 to aim at)
+    short m_018c;                                    // 0x18c: running child effects
     char part;                                       // 0x18e: 0 or 1, the part whose position decides visibility
     char pad_018f[3];
     short light;                                     // 0x192: entry of DAT_118e99f8 it uses, 0 = none
@@ -200,7 +256,7 @@ struct EffectLight
         int pointCount;                              // 0x00: points of the trail so far (3 are needed to draw it)
     };
     int type;                                        // 0x04: effect definition (DAT_1101dfdc) the light belongs to
-    int pad_0008;
+    int lastFrame;                                   // 0x08: effect frame of the point added last (-1 = none)
     int frame;                                       // 0x0c: frames since the light started (0 = not counting)
     float fade;                                      // 0x10: 1 at the start, falling to 0
     Vec4 points[EFFECT_LIGHT_POINT_COUNT];           // 0x14: world position of each point
@@ -209,11 +265,25 @@ struct EffectLight
     Vec4 specular[EFFECT_LIGHT_POINT_COUNT];         // 0x3014: second colour r, g, b of each point
 };
 
+// Callbacks of the host that EffectManager::Step calls (slots 0, 1, 3 and 4 of DAT_1101de40, game_load_data.h).
+// Slot 0 tests the effect's hit box (-1 = blocked), slot 1 asks for a screen effect (`command` 0 flash, 1 fade,
+// 2 tint, 4 shake), slot 3 aims the effect at a direction it writes through options->m_0030 (> 0 = it did) and
+// slot 4 tells whether the position is still wanted (0 = not).
+typedef int (*EffectHitHook)(float x, float y, float z, float size, EffectOptions *options);
+typedef int (*EffectScreenHook)(float command, float a, float b, float c, float d);
+typedef int (*EffectWantedHook)(float x, float y, float z, float value, float unused);
+#define EFFECT_HOST_HIT_TEST 0
+#define EFFECT_HOST_SCREEN 1
+#define EFFECT_HOST_AIM 3
+#define EFFECT_HOST_WANTED 4
+
 extern "C" EffectDef DAT_1101dfdc[EFFECT_DEFINITION_COUNT];      // effect definitions
 extern "C" EffectRecord DAT_1115cfe8[EFFECT_RECORD_COUNT];       // running effects
 extern "C" EffectSprite DAT_11134cc8[EFFECT_SPRITE_COUNT];       // sprite table A: sprites placed in the world
 extern "C" EffectSprite DAT_118a8888[EFFECT_SPRITE_COUNT];       // sprite table B: sprites placed on the screen
 extern "C" EffectLight DAT_118e99f8[EFFECT_LIGHT_COUNT];         // effect lights
+extern "C" int DAT_11aea3f8;                                     // points of the ribbon being built for kinds 8 and 9
+extern "C" Vec4 DAT_11aeabfc[EFFECT_LIGHT_POINT_COUNT];          // its jitter offsets (entries 1 to DAT_11aea3f8)
 extern "C" ScreenVertex DAT_110187c0[EFFECT_TRAIL_VERTEX_COUNT];  // vertices of the trail strip being drawn
 extern "C" int DAT_1101d820[EFFECT_LIST_COUNT];                  // first record of each effect list
 extern "C" int DAT_11018604[EFFECT_LIST_COUNT];                  // last record of each effect list
@@ -239,7 +309,10 @@ struct EffectManager
     int RemoveOwnedBy(int owner);                    // 0x101883b0
     int RemoveChildren(int parent);                  // 0x10172260
     int RemoveOfType(int type);                      // 0x10188490
-    void Step(int record, int list);                 // 0x10184440: advances one effect
+    // 0x10184440 (effect_step.cpp): advances effect record `record` of list `list` by one frame: counts down its
+    // start delay, moves it, runs its events, starts its child effects and feeds its light. Returns 1 while the
+    // record is still waiting to start, 0 otherwise.
+    int Step(int record, int list);
     int Update(int restricted, int includeHidden, int ignorePause);  // 0x10188580
     void LoadDefinition(int definition);             // 0x1016fa40
     // 0x10172350 (effect_start.cpp): starts the effect with script id `effect` at `position`. `owner` is the matrix

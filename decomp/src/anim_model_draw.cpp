@@ -13,7 +13,7 @@
 #include "render_vars.h"
 
 Matrix4 IdentityMatrix();                    // 0x101b0ba0
-Matrix4 InverseMatrix(const Matrix4 &matrix);  // 0x101b0d40
+#include "matrix_transform.h"
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);  // 0x101ae060
 
 #define DRAW_NORMAL 0                  // Draw's `flags`: the plain draw

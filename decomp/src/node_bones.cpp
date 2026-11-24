@@ -11,7 +11,7 @@ struct Node;
 
 #include "node.h"
 
-Matrix4 InverseMatrix(const Matrix4 &matrix);   // 0x101b0d40
+#include "matrix_transform.h"
 
 // 0x10199380 (Node::FindBone). Searches this subtree for the node `id` (a node address), accumulating world matrices:
 // this node's matrix for `frame` (a negative frame -1-n picks override matrix n, at most 15; animated nodes sample

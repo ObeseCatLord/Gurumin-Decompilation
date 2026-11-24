@@ -16,7 +16,7 @@
 #include "render_vars.h"
 #include "sound_vars.h"
 
-Matrix4 InverseMatrix(const Matrix4 &matrix);                                // 0x101b0d40
+#include "matrix_transform.h"
 Matrix4 LookAtMatrix(Vec4 eye, Vec4 target, const Vec4 *up, float roll);     // 0x101b1c20
 Matrix4 Multiply(const Matrix4 &left, const Matrix4 &right);                 // 0x101b10f0
 

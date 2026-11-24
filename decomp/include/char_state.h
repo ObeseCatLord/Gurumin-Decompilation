@@ -83,6 +83,9 @@ struct CharState
                         // (route_follow.cpp uses `wait` for the frames left at a pause point)
                         int swoopStep;                    // enemy_hop_spit.cpp: 0 = turning left, 1 = turning right, 2 = hopping at the player, 3 = resting, 4 = spitting
                         int gaitHold;                          // enemy_spit_charge.cpp: frames left of the recovery in gait state 2 and of the pause in gait state 1 (90 or 10 when it starts; the lift speed is released when it runs out)
+                        int flockFrames;                       // enemy_flock_diver.cpp: frames in the current step (moves are timed from it; 1000s and 2000s mark the later stages of a step)
+                        int leapFrames;                                      // enemy_leap_climb.cpp: frames in the current state (a step of the leap counts them up)
+                        int zoneStepFrames;            // zone_roamer.cpp: frames in the current step of the zone walk (stand-still counter of the fade steps)
                     };
                     union                         // 0x08
                     {
@@ -124,6 +127,10 @@ struct CharState
                         int rayLength0;           // rolling_tire.cpp: length of ray 0 (outermost left, whole units, -1 = not cast yet)
                         int debrisMarker;          // dodge_debris.cpp: marker slot (0x5c..0x7b) whose position the piece takes over and whose death destroys it
                         int resetSpare;                        // enemy_spit_charge.cpp: cleared by the reaction reset, otherwise unused
+                        int flockPattern;                      // enemy_flock_diver.cpp (slot 0x3a): attack pattern 1..7 the flock follows when it is idle
+                        int flockMotion;                       // enemy_flock_diver.cpp: motion last played (-1 at the start)
+                        int lyingDown;                                       // enemy_leap_climb.cpp: 1 while it lies on the ground after a fall (state 11), 0 once it gets up
+                        int nextZone;                  // zone_roamer.cpp: zone it heads for (script flag base + 0)
                     };
                     union                         // 0x0c
                     {
@@ -179,6 +186,9 @@ struct CharState
                         int debrisShown;           // dodge_debris.cpp: 1 while the piece's node is shown
                         int updating;                     // enemy_hop_spit.cpp: 1 while its update runs (the others of its kind do not wake it then)
                         int gaitFrames;                        // enemy_spit_charge.cpp: frames counted in gait state 0 (a stride is 0x9b frames) and in gait state 1
+                        int flockSide;                         // enemy_flock_diver.cpp: 0 = circles one way, non-zero = the other (a follower copies the previous slot)
+                        int hoverPattern;                                    // enemy_leap_climb.cpp: bob pattern of the vertical move in states 0 to 4 (0 = rising, 1 = hovering, 2 = sinking, 3 = pit, 4 = held)
+                        int currentZone;               // zone_roamer.cpp: zone it is in (script flag base + 1)
                     };
                     union                         // 0x10
                     {
@@ -220,6 +230,9 @@ struct CharState
                         int debrisPartnerA;        // dodge_debris.cpp: slot of the first piece this one is linked to (0 = none)
                         int groundHeight;                 // enemy_hop_spit.cpp: height of the ground (or of the pit floor) below it, whole units
                         int actionStep;                        // enemy_spit_charge.cpp: 0 = wanders, 1 = reacts, 2 = approaches, 3 = spits, 4 = charges, 5 = idles, 6 = turns away from a wall
+                        int flockRound;                        // enemy_flock_diver.cpp (slot 0x3a): round of the flock, 2 and above = the later attack steps
+                        int veerFrames;                                      // enemy_leap_climb.cpp: frames left of a veer (positive = turns one way, negative = the other; counts towards 0)
+                        int setupMap;                  // zone_roamer.cpp: map (DAT_10c62ed0) the roamer was set up on
                     };
                     union                         // 0x14
                     {
@@ -264,6 +277,8 @@ struct CharState
                         int rayLength3;           // rolling_tire.cpp: length of ray 3
                         int debrisPartnerB;        // dodge_debris.cpp: slot of the second piece this one is linked to (0 = none)
                         int actionFrames;                      // enemy_spit_charge.cpp: frames counted in the current action step
+                        int flockClock;                        // enemy_flock_diver.cpp (slot 0x3b): clock of the formation in thousandths of a radian
+                        int walkMode;                  // zone_roamer.cpp: step inside the state: 0 = to the zone it is in, 1 = to the next zone, 2 = at the door, -1 = going straight
                     };
                     union                         // 0x18
                     {
@@ -297,6 +312,7 @@ struct CharState
                         int rayLength4;           // rolling_tire.cpp: length of ray 4 (outermost right)
                         int probeFrames;                  // enemy_hop_spit.cpp: frames since the last sight probe (every 10th; 30 puts it on the ground)
                         int healthSeen;                        // enemy_spit_charge.cpp: the health it last saw (a change makes it react; -1 forces a reaction)
+                        int blockedLast;               // zone_roamer.cpp: 1 = the last step was blocked (it keeps its heading)
                     };
                     union                         // 0x1c
                     {
@@ -324,6 +340,8 @@ struct CharState
                         int turnDirection;        // rolling_tire.cpp: 0 = straight on, 1 / 2 = veering one way / the other
                         int obstacleDistance;             // enemy_hop_spit.cpp: distance to the obstacle the last probe found ahead (-1 = none)
                         int turnsRight;                        // enemy_spit_charge.cpp: 1 = it turns right at a wall or ledge, 0 = left (picked at random)
+                        int sweepSkipped;                                    // enemy_leap_climb.cpp: 1 = the spit sweep of state 7 is skipped once (cleared when it was skipped)
+                        int crowdFrames;               // zone_roamer.cpp: frames the character stands blocked (9 once set up)
                     };
                     union                         // 0x20
                     {
@@ -350,6 +368,8 @@ struct CharState
                         int driveFrames;          // rolling_tire.cpp: frames driven in the current heading (negative after a bounce)
                         int obstacleAhead;                // enemy_hop_spit.cpp: 1 when the last probe found an obstacle ahead
                         int alertFrames;                       // enemy_spit_charge.cpp: frames it stays alert after seeing the player (600, counted down)
+                        int dustDone;                                        // enemy_leap_climb.cpp: 1 once the dust effect of the landing was started
+                        int talkWait;                  // zone_roamer.cpp: frames left of a voice motion, -1 = start one
                     };
                     union                         // 0x24
                     {
@@ -368,6 +388,8 @@ struct CharState
                         int bumpCooldown;         // rolling_tire.cpp: frames left (10 after a bounce) in which it may not pick a new veer
                         int shadowHeight;                 // enemy_hop_spit.cpp: height of its shadow, kept between the ground lookups
                         int attackActive;                      // enemy_spit_charge.cpp: 1 while the spit or charge motion overrides the gait motion
+                        int floorKnown;                                      // enemy_leap_climb.cpp: 1 once the height of the floor below it was found
+                        int nearFrames;                // zone_roamer.cpp: frames spent hardly moving
                     };
                     union                         // 0x28
                     {
@@ -394,6 +416,8 @@ struct CharState
                         int wallAhead;            // rolling_tire.cpp: 1 = the 500-unit look-ahead hit the world
                         int attackCooldown;               // enemy_hop_spit.cpp: frames before it may start to spit again
                         int gaitMotion;                        // enemy_spit_charge.cpp: motion picked by the gait state (1 = starting, 2 = striding, 3 = ending, 0 = by action)
+                        int floorHeight;                                     // enemy_leap_climb.cpp: height of the floor below it (whole units)
+                        int setupStep;                 // zone_roamer.cpp: 0, 1 while it sets itself up, 2 once set up
                     };
                     union                         // 0x2c
                     {
@@ -412,6 +436,8 @@ struct CharState
                         int specialMark;           // partner_skill.cpp: set to 75 (0x4b) when the skill of slot 6 or 7 starts
                         int rayPlayerGap0;        // rolling_tire.cpp: distance of the player to ray 0 (whole units)
                         int approachFrames;                    // enemy_spit_charge.cpp: frames spent approaching the player (action step 2)
+                        int turningAround;                                   // enemy_leap_climb.cpp: 1 while it turns round after a blocked leap (the sight check waits)
+                        int previousZone;              // zone_roamer.cpp: zone it came from (script flag base + 2)
                     };
                     union                         // 0x30
                     {
@@ -428,6 +454,8 @@ struct CharState
                         int specialPause;          // partner_skill.cpp (slot 7): frames to wait before it picks an enemy
                         int rayPlayerGap1;        // rolling_tire.cpp: the same for ray 1
                         int retaliates;                        // enemy_spit_charge.cpp: 1 when its kind spits back (and so reacts to a hit with the spit step)
+                        int hitReacted;                                      // enemy_leap_climb.cpp: 1 after the variant that reacts to hits was hit
+                        int gatesOpen;                 // zone_roamer.cpp: 1 while the doors of the map are open for a talk
                     };
                     union                         // 0x34
                     {
@@ -463,6 +491,7 @@ struct CharState
                 int rayPlayerGap3;                // rolling_tire.cpp: the same for ray 3 (overlays sawPlayer)
                 int groundRetries;                // enemy_hop_spit.cpp: times it was lifted because no ground was found below it (stops at 21)
                 int ledgeResult;                       // enemy_spit_charge.cpp: result of the last ledge probe (0 free, 2 = a ledge with a height)
+                int headingHold;               // zone_roamer.cpp: frames the turn target is held at the saved heading
             };
             union                                 // 0x3c
             {

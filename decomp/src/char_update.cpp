@@ -51,7 +51,7 @@
 #include "char_update.h"
 
 // Behaviours without a header yet.
-extern "C" int FUN_10068f70(int index, int variant);
+#include "leap_climb_enemy.h"
 extern "C" int FUN_10071ee0(int index);
 extern "C" int FUN_100e2080(int index);   // Enemy_UpdateAI_A
 extern "C" int FUN_100e2110(int index);   // Enemy_UpdateAI_B
@@ -68,8 +68,8 @@ extern "C" int FUN_10034c80(int index);   // Char_StartDefeat
 extern "C" int FUN_10079470(int index, int halfSpeed);
 extern "C" int FUN_1007b870(int index);   // Npc_GatedRouteCarrier
 extern "C" int FUN_10026730(int index);   // Watcher_Update
-extern "C" int FUN_10086380(int index);
-extern "C" int FUN_10049ec0(int index);
+#include "flock_diver.h"
+#include "zone_roamer.h"
 extern "C" int FUN_10051e20(int index);
 extern "C" int FUN_1001c210(int index);   // Npc_TalkFacing
 extern "C" int FUN_1002ee70(int index);   // Char_UpdateShoves
@@ -636,7 +636,7 @@ int Char_UpdateByKind(int index)
         Enemy_WanderHopAndSpit(index);
         break;
     case 5:
-        FUN_10068f70(index, 0);
+        Enemy_LeapAndClimb(index, 0);
         break;
     case 7:
         Enemy_PounceAndBreathe(index);
@@ -654,7 +654,7 @@ int Char_UpdateByKind(int index)
         Enemy_CastAndTeleport(index);
         break;
     case 0xd:
-        FUN_10068f70(index, 1);
+        Enemy_LeapAndClimb(index, 1);
         break;
     case 0xe:
         Char_SwingPlatform(index);
@@ -734,7 +734,7 @@ int Char_UpdateByKind(int index)
         Enemy_RoamAndSpit(index);
         break;
     case 0x2c:
-        FUN_10086380(index);
+        Enemy_FlockDiver(index);
         break;
     case 0x54:
         Enemy_HoverAndShoot(index);
@@ -762,7 +762,7 @@ int Char_UpdateByKind(int index)
         break;
     case 0x3c:
     {
-        FUN_10049ec0(index);
+        Npc_RoamZones(index);
         Vec4 otherPosition;
         Vec4 selfPosition;
         Vec4 spare;

@@ -35,6 +35,7 @@ struct Vec4
     void RotateY(float angle);                                 // 0x101ac3a0
     void RotateZ(float angle);                                 // 0x101ac300
     void RotateAxis(const Vec4 &axis, float angle);            // 0x101b1290: turns about `axis`
+    void RotateByDirection(const Vec4 &direction);             // 0x101aed50: turns by the angles that `direction` makes
     void Transform(const Matrix4 &matrix);                     // multiplies by `matrix` in place
     void Mirror(const Vec4 &normal);                           // reflects about the plane with `normal`
     void Normalize();                                          // normalises x/y/z in place

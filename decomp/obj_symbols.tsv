@@ -657,3 +657,8 @@ _Enemy_IsBusy	100e1c40
 ?ParseChunks@Node@@QAEHPAUGameFile@@HHHI@Z	101a58a0
 ?OnResetDevice@TextureManager@@QAEHXZ	1013fbb0
 ?Game_Main@@YAHPAUHINSTANCE__@@PBD0@Z	1013b700
+?CompileCall@ListBank@@QAEHPBDH@Z	10089a10
+?Enemy_FlockDiver@@YAHH@Z	10086380
+?Enemy_LeapAndClimb@@YAHHH@Z	10068f70
+?Npc_RoamZones@@YAHH@Z	10049ec0
+?Step@EffectManager@@QAEHHH@Z	10184440

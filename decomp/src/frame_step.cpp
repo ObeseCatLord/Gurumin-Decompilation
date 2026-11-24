@@ -49,7 +49,7 @@
 extern "C" int FUN_1000e750(void);
 extern "C" int Game_LoadData(void);
 int TitleScreen_Update();                    // 0x10114950 (title_screen.cpp)
-extern "C" void FUN_1011d810(void);
+#include "game_frame.h"
 #include "name_entry.h"
 #include "field_update.h"
 extern "C" int FUN_1013f070(int command, int value, int extra);

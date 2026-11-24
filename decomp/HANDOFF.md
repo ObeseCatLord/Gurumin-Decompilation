@@ -20,7 +20,7 @@ reading it, then `AGENTS.md`.
 | Fully linked | 0.00% of code (151 of 264 units complete) |
 | Matched | 19.21% of code, 857 of 1212 functions |
 | Matched under the rules | 19.17% of code, 856 of the 857 matched functions |
-| Fuzzy match | 39.24% |
+| Fuzzy match | 39.97% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -183,6 +183,8 @@ function) and node_world.cpp (0) still break rule 2.
 - Batch 346: drafts ListBank::CompileCall 10089a10, Enemy_FlockDiver 10086380 (49 bytes over), Enemy_LeapAndClimb
   10068f70 (regalloc: zero in esi, variant in memory), Npc_RoamZones 10049ec0 (party NPC zone wander; frame 0x18 short),
   EffectManager::Step 10184440 (asm-only transcription, 1 KB short); InverseMatrix declared once in matrix_transform.h.
+- Batch 347: drafts Script_ValueCommand 101011b0 (value_command.h; 2 KB short, entry Vec4/Matrix4 locals omitted),
+  Enemy_WispCaster 10071ee0 (kind 0x10), Camera_Update 1016c3e0 (5 KB short; wall-search loop approximate).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (321)
+## 1. Walls to retry (324)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -146,6 +146,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1006be40` 8962 — Enemy_SpitAndCharge (enemy_spit_charge.cpp, 8944 vs 8962 bytes): frame 4 bytes smaller (the original spills an extra AnimModel pointer at [esp+0x28] and its angle temp shares the range slot), turnError store/reload, zero-register sharing, shadow-cast hit/miss layout and wake-loop compare order; range reuse, a model pointer and a single-statement fabs tried. #pragma inline_depth(0) keeps the math.h float wrappers as calls
 - [ ] `1006f490` 3422 — Enemy_HoverAndShoot (enemy_hover_shooter.cpp, 3440 vs 3422 bytes): frame 0x184 vs 0x174: the init-block Vec4 spare gets its own slot (the original shares 0x9c with a main-path temp, and the early GetTranslation temp shares start's 0x44); the 2nd shotMirrored test is mov eax/cmp eax in the original. Tried 2-var/3-var/ctor-order variants; moving the 25-unit wrap loops after the steering if-chain fixed the block layout
 - [ ] `10070200` 7360 — Enemy_PodLobber (enemy_pod_lobber.cpp, kind update of 0x100f5a80/0x100f9670, 7120 vs 7360 bytes): all states transcribed, structure matches; register allocation: the original keeps &model.matrix in esi across GetTranslation/Start, addresses the pod words as index*0x10+k with its own register and has a [esp+0x1c] zero temp; frame 0x1ec vs 0x1e0; loop pads before the pod, partner and growing loops; function-level state/model references and Matrix4& self did not help
+- [ ] `10071ee0` 13408 — Enemy_WispCaster (enemy_wisp_caster.cpp, 12640 vs 13408 bytes): complete draft following the asm, not iterated for bytes; effectPos.Fill targets and the ac9e0/acb00 evaluation order partly guessed; the original shares the dash-end and charge-burst blocks by gotos; options.owner in the state-6 ritual shot unresolved
 - [ ] `10075350` 5154 — Enemy_ShyGhost (enemy_shy_ghost.cpp, kind 0x11, 5184 vs 5154 bytes): code matches statement for statement; stack-slot colouring differs (the original overlays the state 5-8 fade temporaries on distance's slot 0x1c, keeps idx*0x24 at 0x30 and a store/reload copy of the atan2 result into bearing) and holds zero in edi for states 1-2 (ours ecx and immediates); declaration order and Atan2-helper variants did not move it
 - [ ] `10076790` 6351 — Enemy_ChaseLungeAndSpit (enemy_chase_lunge.cpp, 6224 vs 6351 bytes, ~31 blocks): three clear/blocked chase locals kept in memory by the original; lunge copy 2 cross-jumps into copy 1 the other way; halt and hidden/daze blocks laid out differently; daze GetTranslation order and rep movsd placement. FUN_10024c40 is declared there with const Vec4 & against collide_query.cpp's const Vec4 *
 - [ ] `10079470` 3839 — Char_HikariButtonRide (hikari_button.cpp, 3824 vs 3839 bytes): slot lives in edi and the zero register in ebx where the original swaps them; the original's "hikariPoint and targetPoint = row, or 0" tail keeps immediate-0 stores plus a reload (ours merges into one xor), and its speed divide (5.625 or 11.25) is laid out half-speed path first with the speed loaded before the branch; tried if/else, ternary divisor, scale variable, != vs ==, forceinline helper vs macro
@@ -207,6 +208,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100fc4a0` 5485 — Map_SetupByNumber (map_setup_field.cpp, 5504 vs 5485 bytes): (1) DAT_104c02dc byte store hoisted via al instead of an immediate after DAT_1101de30 (any statement order); (2) model loop (i in esi, imul model address, record pointer as loop limit) differs in register/induction choice; (3) DAT_1021b3c0 read as a dword for the +0x80/+0x100 sum but movsx word for the index (type probably wider than short); (4) title[0] cached in bl for the S/U/I tests (a local char went to the stack); (5) fish == 0 test is test eax,eax instead of cmp eax,ebp. Sibling Map_SetupFromEntry may search sakana01 instead of sakana%02d and orders the water-block stores differently
 - [ ] `100fda40` 4958 — Map_SetupFromEntry (map_setup_entry.cpp, 4976 vs 4958 bytes): (1) the DAT_10254110 fill loop is a signed pointer loop (jl) in the original (ours jb, or a zero-based counter); (2) the DAT_104c02dc byte store is hoisted via al instead of an immediate after DAT_104c02b8; (3) the DAT_10edbe0c clear loop has an extra pad/edi; (4) model loop induction variables/stack slots and the mp_609/env2 strcpy + Texture_LoadIti address scheduling differ, then register drift. Node callbacks 0x1000c720/0x1000c620 installed with function-pointer casts (0x1000c720 is declared differently in character_draw.cpp)
 - [ ] `100fedd0` 6739 — Script_SystemCommand (script_system_command.cpp, 6736 vs 6739 bytes, first-pass draft): the flag-count loops use a down-counter plus strength-reduced &flags[i]/&flags[-i] pointers and a dead up-counter (ours one index); the 0x9c42 slot loops use a byte offset and an 8x unrolled 32-slot test; each reload block keeps its own Matrix4 (frame 0x124 vs our 0xf0); DAT_104c0230 is accessed as a 16-bit word (needs a byte/word overlay in ui_vars.h); Tracker::M_10001010 duplicates Obj::M_10001010
+- [ ] `101011b0` 13173 — Script_ValueCommand (value_command.cpp, 10928 vs 13173 bytes): first draft, logic complete but not shaped; the original's frame keeps three Vec4 and a Matrix4 constructed at entry (omitted); TestScriptFlag is an out-of-line call with ecx=0x10874848 (ours inlines Game::TestScriptFlag); 13-byte text lines staged through a stack buffer; per-slot statement pairs unrolled; FUN_1005ce80 called with 3 args (header) where the original pushes 4
 - [ ] `10112140` 10038 — Menu_Main (menu_main.cpp, 10048 vs 10038 bytes): structure and frame (0x200) match through the difficulty and save-list blocks; residue: hoisted esi=0x218/ebp=1 constants at the top, the c7e0/c7e4 goto-shaped join into the load-list build, the shop mode-3 chain (a redundant ==3 re-test in the original), map-start tail order, final close sequence; Game::FindSlot stays out of line, so a file-local forceinline FindWindowSlot repeats its loop
 - [ ] `10115cd0` 2163 — ItemDictionary_Update (item_dictionary.cpp, 2176 bytes, 119 off): only the prologue register choice differs (original loads the DAT_104bf8bc flag into eax after push eax with the constant 1 in ecx and later in ebp; ours loads the flag into ecx before push -1 with 1 in eax, so mov [x],eax is 1 byte shorter and a nop shifts the first loop); obtained[4] (frame 0x3c0), function-scope locals, x==0/!x/local flag, store orders and the fade ladder all tried. FUN_101603c0 is int* here but unsigned* in save_write.cpp (original sar)
 - [ ] `10137b10` 1889 — Game_FrameStep (frame_step.cpp, 1904 vs 1889 bytes; was named Screenshot_Capture): one register residue spreads through the function: the original keeps the constant 1 in ebx throughout and writes 100 as an immediate or through esi, ours puts 100 in ebx and 1 in edi; limit local vs direct stats compare, store order, reversed compare and a mode local tried
@@ -277,6 +279,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1016b400` 695 — Camera_TurnInput: same arithmetic; the original stores the blend weight a second time (integer copy into the slot of the converted frame count) and swaps the two argument loads at the end; frame-count, compound and copy-variable forms tried
 - [ ] `1016b6c0` 1833 — Camera_TrackPathFrame (camera_path_track.cpp, 1824 vs 1833 bytes): logic complete, the state-0 scan loop matches; the original frame is 4 bytes larger (state spilled at [0x1c], previousPath at [0x30], constant 1 kept in ebx), the later loops use other registers and Sample loads the frame before the track address; hoisted path = 0, a KeyTrack pointer, hoisted distance and state/startPath orders tried
 - [ ] `1016c300` 61 — control-flow layout of a three-way flag test differs (two source shapes tried)
+- [ ] `1016c3e0` 13569 — Camera_Update (camera_update.cpp, 8336 vs 13569 bytes): full draft from decompilation, not matched; the free-camera wall-search loop and its retry step are approximate, the original's clear-eye arrays and two unused locals are not reproduced, duplicated shake loops are shared helpers here; CameraScriptFrame/Exponent index scalar globals DAT_1101de08/DAT_10203454 as arrays (should become real arrays)
 - [ ] `1016fb80` 2545 — EffectManager::DrawLightKind22 (effect_light_kind22.cpp, 2608 vs 2592 bytes, two crossed twisting ribbons; TRAIL_* constants in effect_trail.h, effect_light.cpp still has its own copies): register allocation cascades (original keeps index*0x4014 in edi and the pass/ctor-loop counters in ebx, ours swaps); the pass loop is rotated with a padded head where the original jumps into the middle; frame 0x1f4 vs 0x1f8 and the original spills first in two slots ([esp+0x18] and [esp+0x5c]: maybe two variables). Tried: ternary vs if/else depth-write arg, for vs while(true), separate loop index (closer), inline vs local type
 - [ ] `10170580` 3679 — EffectManager::DrawLightKind23 (effect_trail_draw.cpp, 3712 vs 3679 bytes): same as 0x101713f0 with the frame-13 start and scale ((1-z)*0.99+0.01)*10; same register/frame residue (ebp vs ebx for this, frame 0x163c vs 0x1630)
 - [ ] `101713f0` 3674 — EffectManager::DrawLightKind7 (effect_trail_draw.cpp, 3712 vs 3674 bytes): logic complete (depth-scaled width: side*width, then *(1-z)*8); this lives in ebp in the original (ebx ours), frame 0x1630 vs 0x163c, the original reloads type*0x3d8 into esi after the loop and keeps 1.0 in edx not ebx; scratch.Copy(none) in the kind-0x11 loop may copy local_1578. Fixed: clamp 1.0f > x ? x : 1.0f, per-branch vertexCount plus shared drawCount (unmerged kind-0x11 blend chain). Tried switch, separate ifs, one-expression vs two-step scaling, local vs literal widen
@@ -348,11 +351,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (26)
+## 5. Very large functions (over 3000 bytes) (23)
 
-- [ ] `101011b0` 13173 bytes (float, loops 35, calls 271)
-- [ ] `10071ee0` 13408 bytes (float, loops 8, calls 325)
-- [ ] `1016c3e0` 13569 bytes (float, loops 18, calls 377)
 - [ ] `1011a060` 14244 bytes (float, loops 39, calls 354)
 - [ ] `1008c680` 14341 bytes (float, loops 12, calls 204)
 - [ ] `100f5a80` 14960 bytes (float, loops 32, calls 323)
@@ -382,7 +382,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (19 files)
+## 7. Comment pass (20 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
@@ -390,6 +390,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/bgm_update.cpp`: 2 of 3 functions without a comment
 - [ ] `src/camera_chase.cpp`: 1 of 2 functions without a comment
 - [ ] `src/camera_shift_orbit.cpp`: 1 of 2 functions without a comment, no header
+- [ ] `src/camera_update.cpp`: 1 of 8 functions without a comment
 - [ ] `src/doppler_loops.cpp`: 1 of 2 functions without a comment
 - [ ] `src/drifter.cpp`: 1 of 2 functions without a comment
 - [ ] `src/drill_claws.cpp`: 1 of 2 functions without a comment

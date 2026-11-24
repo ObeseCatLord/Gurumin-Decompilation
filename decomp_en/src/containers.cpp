@@ -193,8 +193,47 @@ void KeyTrack::Init()
     Reserve(KEY_TRACK_GROWTH);
     count = 0;
     frames[0] = 0;
-    float zero = 0;
-    values->Fill(zero);
+    Vec4 *firstValue = values;
+    firstValue->x = 0;
+    firstValue->y = 0;
+    firstValue->z = 0;
+    firstValue->w = 0;
+}
+
+// Inserts a key (x, y, z, w) at `frame` in frame order, in front of any key already at that frame, growing the arrays
+// when needed. Returns the index of the new key.
+int KeyTrack::Insert(int frame, float x, float y, float z, float w)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if (frames[i] == frame)
+            break;
+        if (frames[i] > frame)
+            break;
+    }
+    for (int j = count - 1; j >= i; j--)
+    {
+        frames[j + 1] = frames[j];
+        Vec4 *keyValues = values;
+        keyValues[j + 1].x = keyValues[j].x;
+        keyValues[j + 1].y = keyValues[j].y;
+        keyValues[j + 1].z = keyValues[j].z;
+        keyValues[j + 1].w = keyValues[j].w;
+        flags[j + 1] = flags[j];
+    }
+    if (count + KEY_TRACK_GROWTH > capacity)
+        Reserve(KEY_TRACK_GROWTH);
+    frames[i] = frame;
+    values[i].x = x;
+    values[i].y = y;
+    values[i].z = z;
+    values[i].w = w;
+    flags[i] = 0;
+    count++;
+    if (count + KEY_TRACK_GROWTH > capacity)
+        Reserve(KEY_TRACK_GROWTH);
+    return i;
 }
 
 // Sets the key at `frame` to (x, y, z, w): an existing key at that frame gets the new value (returns 1); otherwise a

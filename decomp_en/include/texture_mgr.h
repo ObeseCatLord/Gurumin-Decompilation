@@ -57,6 +57,23 @@ struct ScreenVertex
     float v;                    // 0x1c: texture coordinate v
 };
 
+// A transformed screen vertex with four texture coordinate pairs (0x38 bytes, FVF position + diffuse + specular +
+// four texture coordinate sets): what the multi-stage quad draws take.
+struct MultiTexVertex
+{
+    float x;                    // 0x00: screen x
+    float y;                    // 0x04: screen y
+    float z;                    // 0x08: depth
+    float rhw;                  // 0x0c: 1 (already transformed)
+    unsigned int diffuse;       // 0x10: diffuse colour, ARGB
+    unsigned int specular;      // 0x14: second colour
+    struct
+    {
+        float u;                // u of the texture coordinate set
+        float v;                // v of the texture coordinate set
+    } uv[4];                    // 0x18: texture coordinate sets 0 to 3
+};
+
 // A texture object (0x38 bytes) owning a Direct3D texture; only the members EN code has used are named.
 struct TextureObject
 {
@@ -98,7 +115,11 @@ struct TextureObject
     // The panel frame and fill draws (9-slice frame and background of a menu panel); the parameters are the rectangle,
     // depth, alpha, a textured flag and a border size.
     int DrawFrame(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);     // EN 0x797f30 (JP 0x1014d4e0 family)
+    // EN 0x78ce10: binds this texture to stages 0 to 3 and draws a quad covering the largest viewport size through
+    // the pixel shader (all four coordinate sets map the texture's whole square, half a texel in from each edge). Returns 0.
+    int DrawThroughShader();
     int DrawFrameAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);  // EN 0x7955c0
+    int DrawFrameAltStretched(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);  // EN 0x794c70 (JP 0x1014e5d0)
     int DrawFill(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);      // EN 0x798980 (JP 0x1014ce40)
     int DrawFillAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);   // EN 0x799230
     int Write16(int x, int y, int rowPixels, int rows, int pitch, const void *bits);  // EN 0x77d2e0 (JP 0x1014f060)

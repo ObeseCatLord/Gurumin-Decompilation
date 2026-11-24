@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "game_vars.h"
+#include "char.h"
+#include "scene_start.h"
 
 // Inventory_Remove: takes *amount of item *index. When there are not enough, takes all and returns 0 with
 // *amount = -taken; otherwise returns 1 and clears *amount. Refreshes the anti-tamper copies. Called through the
@@ -97,4 +99,30 @@ extern "C" void ColourFade_Start(int frames, float r, float g, float b, float a)
     g_fadeTarget.Set(r, g, b, a);
     g_fadeStep.Copy((g_fadeTarget - g_fadeColour) * (1.0f / (float)frames));
     g_fadeFramesLeft = frames;
+}
+
+// Scene_ResetBattleState: resets the battle and HUD state for a new scene and, when the attack overload counter
+// reached COMBO_FINISH_OVERLOAD or more, starts the white fade of the combo finish. (JP twin: app_0013.cpp; it lives
+// beside ColourFade_Start here because the compiler inlined the fade into it.) Called by Scene_Start.
+extern "C" int Scene_ResetBattleState(void)
+{
+    g_battleStateBc8860 = 0;
+    g_battleStateA207c7 = 0;
+    g_battleStateA150b4 = 0;
+    g_battleStateA14f7c = 0;
+    g_battleStateA14f80 = 0;
+    if (g_greetingFrames != 0)
+    {
+        g_characterModels[0].mode = 1;
+        g_characterModels[0].verticalSpeed = 0;
+        g_characterModels[0].m_237c = 1.0f;
+        g_characterModels[0].alpha = 1.0f;
+        g_greetingFrames = 0;
+        g_battleStateA1513c = 0;
+    }
+    g_battleStateA14f87 = 0;
+    if (g_attackOverload >= COMBO_FINISH_OVERLOAD)
+        ColourFade_Start(COMBO_FINISH_FADE_FRAMES, 1.0f, 1.0f, 1.0f, 1.0f);
+    g_attackOverload = 0;
+    return 0;
 }

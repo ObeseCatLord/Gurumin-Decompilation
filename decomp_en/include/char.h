@@ -138,10 +138,21 @@ extern "C" int g_charSavedStat4[CHAR_SLOT_COUNT];           // EN 0x0091ed70 (JP
 const int CHAR_KIND_PACKED = 0x62;
 // Unpacks CharRecord::packedParameter of character `index` into its state (formation, behaviour). EN 0x6d1fb0 (JP 0x1001b5b0).
 extern "C" int Char_UnpackParameter(int index);
+// Advances character `index`'s pulse step and sets its pose node to the matching scale. EN 0x665a80 (JP 0x1001a390).
+extern "C" int Char_PulseScale(int index);
+// Plays the idle motion of character `index` and resets its state when the player comes close: see char_proximity.h.
 extern "C" const char g_partyCharacters[PARTY_SIZE];        // EN 0x00848850 (JP DAT_101d67f0): slots 0, 13, 15, 58, 20
 extern "C" Matrix4 g_characterNodeMatrices[CHAR_SLOT_COUNT][CHAR_NODE_MATRIX_COUNT];   // EN 0x015ad660 (JP DAT_10868838): saved node matrices of each character; [0][0] of character 0 is the matrix the item stand sparkle follows
 extern "C" int g_charEffectHandle[CHAR_SLOT_COUNT];        // EN 0x009e2078 (JP DAT_10219770): effect handle of each slot
+// Nodes attached to each character (index 0 is the pose / stand parent / wheel node). g_charNodes[0][0] is g_itemStandParent.
+const int CHAR_NODE_COUNT = 9;
+extern "C" Node *g_charNodes[CHAR_SLOT_COUNT][CHAR_NODE_COUNT];   // EN 0x009147e0 (JP DAT_1021bdf8): attached nodes of each character
 extern "C" AnimModel g_characterModels[CHAR_SLOT_COUNT];   // EN 0x01487ff0 (JP DAT_10db6ee8): the model of each slot
+extern "C" int g_alwaysPlaceOnGround;   // EN 0x00908388 (JP DAT_102022b8): non-zero = Char_PlaceOnGround always runs
+
+// Casts down from 1000 units back along the light direction of character `index` and moves its shadow matrix to the
+// ground point (or to the bottom of the world when nothing is hit). Runs when g_alwaysPlaceOnGround or `force` is set. Returns 0. EN 0x645770.
+extern "C" int Char_PlaceOnGround(int index, int force);
 extern "C" ModelPath g_modelPaths[];                       // EN 0x01201270 (JP DAT_10b314c8): the model file of each model number
 extern "C" int g_sceneTimer;                               // EN 0x009e33a0 (JP DAT_104c00d0): scene timer
 extern "C" int g_gameOverValue;                            // EN 0x00a150b8 (JP DAT_104c0198): value stored by the game-over start

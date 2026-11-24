@@ -17,6 +17,9 @@ struct GameFile
     ~GameFile();                         // EN 0x7a8910 (JP 0x101b2570): closes the file when it is still open
     FILE *Open(const char *path, const char *mode);   // EN 0x7a8ac0 (JP 0x101b2310): the stdio handle, 0 on failure
     void Close();                        // EN 0x7a8aa0 (JP 0x101b22f0)
+    int Seek(int offset, int origin);    // EN 0x7a8cb0: fseek on the open file
+    int Size();                          // EN 0x7a8cd0: current file position (the length after a seek to the end)
+    size_t Read(void *buffer, size_t size, size_t count);   // EN 0x7a8b20: fread from the open file
 };
 
 // Copies the file name of `path` without directory and extension into `out`. EN 0x7a8930 (JP 0x10161120).

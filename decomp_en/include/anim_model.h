@@ -13,12 +13,26 @@ struct Node;
 const int PLAYBACK_LAYER_COUNT = 0x90;
 // Layer number meaning "none" (Playback::layer, slot layers).
 const int PLAYBACK_NO_LAYER = -1;
+// A node animation needs more than this many frames to be played.
+const int PLAYBACK_MIN_FRAMES = 8;
+// Follow-up layers a layer lists in Playback::layerParams (the first entries; the rest stay unused).
+const int PLAYBACK_FOLLOWUP_COUNT = 8;
+// Marks an empty follow-up entry.
+const int PLAYBACK_NO_FOLLOWUP = -2;
 // Motion slots per layer.
 const int PLAYBACK_SLOT_COUNT = 16;
 // Bytes of a Playback block.
 const int PLAYBACK_SIZE = 0x7c84;
 // Playback::endState value when the playback has reached its end.
 const int PLAYBACK_END_REACHED = 1;
+// endState while the playback holds its last frame (Play ignores a request for the layer it came from).
+const int PLAYBACK_END_HELD = 2;
+// The pseudo layer a playback shows while it blends into another layer.
+const int PLAYBACK_BLEND_LAYER = 0x90;
+// Most frames a blend between two layers is stretched over, minus one.
+const int PLAYBACK_BLEND_MAX = 14;
+// Blends between layers started so far (counted by Playback::Play). EN 0x0162ef5c (JP DAT_110175f8).
+extern "C" int g_motionBlendCount;
 // Bytes of an AnimModel.
 const int ANIM_MODEL_SIZE = 0x249c;
 
@@ -122,16 +136,19 @@ struct Playback
     int m_076c[PLAYBACK_LAYER_COUNT];        // 0x076c: not yet named
     int m_09ac[PLAYBACK_LAYER_COUNT];        // 0x09ac: not yet named
     int endState;                      // 0x0bec: PLAYBACK_END_REACHED once the playback has reached its end
-    char m_0bf0[0x1070 - 0xbf0];       // 0x0bf0: not yet named
+    int layerDirection[PLAYBACK_LAYER_COUNT];   // 0x0bf0: 1 when the layer plays forwards (first <= last), -1 backwards
+    int m_0e30[PLAYBACK_LAYER_COUNT];           // 0x0e30: fifth SetLayer parameter of each layer
     int slotOffsetX[PLAYBACK_LAYER_COUNT][PLAYBACK_SLOT_COUNT];  // 0x1070: x offset per layer and slot
     int slotOffsetY[PLAYBACK_LAYER_COUNT][PLAYBACK_SLOT_COUNT];  // 0x3470: y offset per layer and slot
-    char m_5870[0x7c74 - 0x5870];      // 0x5870: not yet named
+    int layerParams[PLAYBACK_LAYER_COUNT][PLAYBACK_SLOT_COUNT];   // 0x5870: per layer 16 follow-up layers (-2 = none)
+    int frameCount;                    // 0x7c70: frame count of the bound node (0 when it has 8 frames or fewer)
     int blending;                      // 0x7c74: non-zero while blending into nextLayer
     int m_7c78;                        // 0x7c78: not yet named
     int nextLayer;                     // 0x7c7c: the layer being blended into
-    char m_7c80[PLAYBACK_SIZE - 0x7c80];  // 0x7c80: not yet named
+    Node *boundNode;                   // 0x7c80: the node tree this playback animates (BindNode)
 
     void Init();                                                       // EN 0x7412b0 (JP 0x10169f90)
+    int BindNode(Node *node);                                          // EN 0x71c0e0 (JP 0x1016a090): binds to a node tree and resets
     int BindModel(AnimModel *owner);                                   // EN 0x71c060 (JP 0x1016a020)
     int SetLayer(int layer, int a, int first, int last, int b, int c); // EN 0x7437e0 (JP 0x1016a100)
     int SetSlotOffset(int layer, int slot, int x, int y);              // EN 0x746490 (JP 0x1016a260)
@@ -170,7 +187,10 @@ struct AnimModel
         int switchNode;           // 0x270: node id of the switch this character works (switch characters only)
         int bankIndex;            // 0x270: a model-bank record's own index in the bank (bank models only)
     };
-    char m_0274[0x290 - 0x274];       // 0x274: not yet named
+    int burst;                        // 0x274: 1 once the balloon burst (balloon slots only)
+    int blastAngle;                   // 0x278: direction of the last blast on the balloon, in thousandths of a radian
+    int blastPush;                    // 0x27c: strength of the last blast push on the balloon
+    char m_0280[0x290 - 0x280];       // 0x280: not yet named
     float m_0290;            // 0x290: cleared when the model is placed
     int walkingRoute;             // 0x294: 1 while the character walks a route (cleared when the player gets a helmet)
     Playback *playback;           // 0x298: the motion playback state (allocated on first use)
@@ -192,11 +212,15 @@ struct AnimModel
     char pad_2289[3];
     Vec4 pushVector;              // 0x228c: queued push (x, y, z)
     int blendFrames;              // 0x229c: frames a motion change blends over (0 = unset, DEFAULT_BLEND_FRAMES is used)
-    char m_22a0[0x22ec - 0x22a0]; // 0x22a0: not yet named
+    int m_22a0;                   // 0x22a0: cleared when the model is unloaded
+    char m_22a4[0x22ac - 0x22a4]; // 0x22a4: not yet named
+    char m_22ac;                  // 0x22ac: cleared when the model is unloaded
+    char m_22ad[0x22ec - 0x22ad]; // 0x22ad: not yet named
     Node *root;                   // 0x22ec: the model's node tree (0 = free entry of the model bank)
     Node *loadedRoot;             // 0x22f0: the node tree the model file loaded (a bank model's root)
     Node *headNode;               // 0x22f4: the model's head node (0 = none)
-    char m_22f8[0x2300 - 0x22f8]; // 0x22f8: not yet named
+    Node *leftToeNode;            // 0x22f8: the model's left toe node (0 = none)
+    Node *rightToeNode;           // 0x22fc: the model's right toe node (0 = none)
     Node *swapNode1;              // 0x2300: first node of the material swap
     Node *swapNode2;              // 0x2304: second node of the material swap
     Node *collider;               // 0x2308: the map collision this model moves against (0 = none)
@@ -228,7 +252,8 @@ struct AnimModel
     Vec4 m_23e8;             // 0x23e8: cleared when the model is placed
     Vec4 m_23f8;             // 0x23f8: cleared when the model is placed
     Vec4 m_2408;             // 0x2408: cleared when the model is placed
-    char m_2418[0x2434 - 0x2418];       // 0x2418: not yet named
+    int m_2418;                         // 0x2418: cleared when the model is unloaded
+    char m_241c[0x2434 - 0x241c];       // 0x241c: not yet named
     Matrix4 shadowMatrix;    // 0x2434: matrix the shadow is drawn with (Teleport moves it with the model)
     char m_2474[0x247c - 0x2474];       // 0x2474: not yet named
     float heading;                // 0x247c: angle the character faces now
@@ -246,6 +271,8 @@ struct AnimModel
     int AddMotionKey(int frame, float value);                            // EN 0x70af70 (JP 0x10161b90)
     int SetPendingPush(float x, float y, float z, char flag);            // EN 0x73f940 (JP 0x101628b0)
     int StepPath();                                                      // EN 0x70bf40 (JP 0x10161c80): moves the model along track C one frame
+    int Unload();                                                        // EN 0x740c40 (JP 0x10162c50): frees the node tree and motion buffer and resets position and state, returns 1
+    int ResetState();                                                    // EN 0x7413f0 (JP 0x10161f80): resets the model's motion and pose state
     int ClearTrackC();                                                // EN 0x741bd0 (JP 0x10161a60)
     int ClearMotionKeys();                                               // EN 0x741c10 (JP 0x10161b60)
     int ClearTrackB();                                                   // EN 0x741fe0 (JP 0x10161f30)

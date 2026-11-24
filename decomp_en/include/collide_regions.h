@@ -31,4 +31,18 @@ extern "C" int Regions_CollideRay(Node *root, const char *tag, unsigned int mask
 // Tests every marker point against the world's "testatari" regions. Returns 0. EN 0x5c1340.
 extern "C" int Markers_TestRegions(void);
 
+// Returns the first "@CDL" region whose x/y rectangle contains `point` with a REGION_POINT_MARGIN margin on every side,
+// leaving out the regions named for eggs, crowds and fire; 0 when there is none or no world is loaded. EN 0x631480.
+extern "C" Node *Map_FindRegionAt(const Vec4 *point);
+
+// Node flag of the collision probe nodes (the same bit as the debug sphere shape) and the part of a probe's radius that
+// counts as its sphere.
+const unsigned int NODE_FLAG_PROBE = 0x400;
+const float PROBE_RADIUS_SCALE = 0.578f;
+
+// Tests every probe node below `node` (at its position plus its bounds centre plus `offset`) as a sphere against the world;
+// each hit's normal (left normalised in `normal`) is folded into the running average `average`, weighted by the number of
+// hits so far (`count`). Returns 0. EN 0x5c2800 (JP 0x10024ac0).
+extern "C" int Collision_AverageNormals(Node *node, const Vec4 *offset, Matrix4 *matrix, Vec4 *normal, Vec4 *average, int *count, float *depth);
+
 #endif

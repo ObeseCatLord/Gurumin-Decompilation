@@ -11,6 +11,10 @@ struct Plane
     float b;   // y coefficient of the normal
     float c;   // z coefficient of the normal
     float d;   // offset
+
+    // Intersects the line origin + t * direction with the plane and stores the point in `out`. Returns 0 (leaving
+    // `out` alone) when the line is parallel to the plane, else 1. EN 0x7775a0 (JP 0x101ad2c0).
+    int IntersectRay(Vec4 *out, const Vec4 *origin, const Vec4 *direction);
 };
 
 // The normal of the triangle (origin, a, b): the cross product of the edges a - origin and b - origin, not

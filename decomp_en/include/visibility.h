@@ -31,4 +31,7 @@ extern "C" char g_visibleCells[VIS_CELL_COUNT];     // EN 0x0217fb08 (JP DAT_11a
 // 1 when `pos` lies in a currently visible cell (or the map has no visibility data), else 0. EN 0x5a67a0.
 extern "C" int Vis_IsVisible(Vec4 pos);
 
+// 1 when character slot `index` stands in a currently visible cell (or the map has no visibility data). EN 0x5a68a0 (JP 0x10015710).
+extern "C" int Char_IsInVisibleCell(int index);
+
 #endif

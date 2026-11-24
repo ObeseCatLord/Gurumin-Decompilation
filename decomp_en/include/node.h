@@ -255,7 +255,7 @@ struct Node
     float fogFar;                  // 0x1890: distance it is full at
     int m_1894;                    // 0x1894: not used by EN code yet
     unsigned char element;         // 0x1898: NodeElement bits from the node name
-    char m_1899;                   // 0x1899: not used by EN code yet
+    unsigned char brightness;      // 0x1899: brightness of the region the node lies in (the fading nodes' alpha follows it)
     unsigned char colourA;         // 0x189a: colour value set by SetColourA on the shape-mode nodes
     unsigned char colourB;         // 0x189b: colour value set by SetColourB
     unsigned char colourC;         // 0x189c: colour value set by SetColourC
@@ -307,6 +307,8 @@ struct Node
     int Query(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, float *depth, const char *name, const char *excludeName);
     // EN 0x761d30 (JP 0x101a9670): casts the segment `from` to `to` against this node's meshes (tag filter, mask); fills `hit`, and `t` (may be 0) with the hit fraction.
     int CastSegment(const char *tag, unsigned int mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
+    // EN 0x761390 (JP 0x101aa080): same arguments and result as CastSegment (a second variant of the same search).
+    int CastSegment2(const char *tag, unsigned int mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
     // EN 0x7609a0 (JP 0x101aaa20): casts the ray from `from` to `to` against this node's meshes (tag filter, flags, mask); fills `hit`, and `t` (may be 0). Returns 1 on a hit.
     int CastRay(const char *tag, int flags, unsigned int mask, Vec4 *to, Vec4 *from, Vec4 *hit, float *t);
     // EN 0x750a50 (JP 0x10199e20): queues this node tree for drawing into `list` with `view`, the lights `lights`, pass mask `pass` (-1 = all), fade colour `fade` and `flag`.
@@ -324,6 +326,7 @@ struct Node
     int SpheresOverlap(const Vec4 *boundsA, const Vec4 *offsetA, const Vec4 *boundsB, const Vec4 *offsetB, Vec4 *aToB, Vec4 *bToA);
     // EN 0x75a770 (JP 0x1019f210): looks for nodes below this one whose bounding sphere overlaps the sphere of `radius` around `center`; hits are appended to `found` (when given). Returns 1 on a hit.
     int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);
+    int ResetVertexColours(float uvScale);  // EN 0x74f3c0 (JP 0x1019c3a0): every vertex white with its emissive colour cleared; a non-zero `uvScale` also lifts it and takes texture coordinates from x and y; returns 0
     int WeldVertices();                    // EN 0x75b920 (JP 0x1019e610): merges equal vertices in every pack
     int SortPacks();                       // EN 0x75bef0 (JP 0x1019c690): opaque packs first, then those with vertex alpha
     // EN 0x753820 (JP 0x10199380): searches this subtree for `bone`, accumulating world matrices (this node's matrix for `frame` times `parent`); the bone's matrix is stored in `work` and returned, 0 when the subtree does not hold it.

@@ -564,3 +564,61 @@ int ListBank::ReadToken(char **text, char *token)
     *text = p;
     return 1;
 }
+
+// Reads the next argument of a call into `word`, like ReadWord, but parentheses nest too: the argument
+// ends at a space, comma, ';' or the end of the text outside quotes, brackets and parentheses, or at the closing
+// parenthesis of the call (not copied). *text is moved past the character that ended it.
+int ListBank::ReadArgument(char **text, char *word)
+{
+    char *p = *text;
+    word[0] = 0;
+    int length = 0;
+    int inQuotes = 0;
+    int parens = 0;
+    int brackets = 0;
+    if (*p == 0)
+        return 0;
+    while (*p == ' ' || *p == ',' || *p == '\t' || *p == '\r' || *p == '\n' || *p == ';')
+        p++;
+    do
+    {
+        if (failed != 0)
+            return 0;
+        if (*p == '"')
+        {
+            if (inQuotes == 0)
+                inQuotes = 1;
+            else if (inQuotes == 1)
+                inQuotes = 0;
+        }
+        if (inQuotes == 0)
+        {
+            if (*p == '(')
+                parens++;
+            else if (*p == ')')
+                parens--;
+            if (parens < 0)
+            {
+                *text = p + 1;
+                return 1;
+            }
+            if (*p == '[')
+                brackets++;
+            else if (*p == ']')
+                brackets--;
+            if (parens == 0 && brackets == 0 && (*p == 0 || *p == ' ' || *p == ',' || *p == ';'))
+            {
+                *text = p + 1;
+                return 1;
+            }
+        }
+        word[length] = *p;
+        length++;
+        p++;
+        word[length] = 0;
+        word[length + 1] = 0;
+    } while (length < 0x100);
+    ReportError("\x8c^\x82\xaa\x88\xd9\x8f\xed\x82\xc5\x82\xb7\x81" "B");
+    *text = p;
+    return 1;
+}

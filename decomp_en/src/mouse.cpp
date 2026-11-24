@@ -46,7 +46,7 @@ int Mouse::GetState(MousePoint *outPosition, char *outLeft, char *outRight, char
 
 // Binds the tracker to `windowHandle` with cursor callback `callback` and user value `user`; clears the position.
 // Returns 0 when the window or callback is missing.
-int Mouse::Init(int windowHandle, int callback, int user)
+int Mouse::Init(int windowHandle, MouseCursorCallback callback, int user)
 {
     if (windowHandle == 0)
         return 0;

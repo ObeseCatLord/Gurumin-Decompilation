@@ -146,6 +146,10 @@ inline void Render_CloseScene()
 }
 
 extern "C" void Render_FillRect(int left, int top, int right, int bottom, int colour, float depth, float alpha);  // EN 0x792750: fills a rectangle of the 640x480 screen
+extern "C" int g_fadeColourKind3;                // EN 0x00b91950 (JP DAT_104c02e0): colour of screen fade kind 3
+extern "C" int g_irisTextureSlot;                // EN 0x00a152bc (JP DAT_104b7224): texture slot of the iris wipe
+// Draws the full-screen fade selected by the fade track/volume state (colour fade or iris wipe). EN 0x5defb0 (JP 0x1000dba0).
+extern "C" void Fade_Draw(void);
 extern "C" int Render_EndScene(void);            // EN 0x79f890 (JP 0x1013ed60): ends the open scene
 extern "C" int Render_BeginScene(void);          // EN 0x77c060 (JP 0x1013ed20): starts a new scene
 extern "C" int Render_SetSamplerState(unsigned long sampler, unsigned long type, unsigned long value);  // EN 0x7a4ef0 (JP 0x1013f000)

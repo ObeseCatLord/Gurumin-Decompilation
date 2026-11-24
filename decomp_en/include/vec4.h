@@ -40,7 +40,7 @@ struct Vec4
     Vec4 operator-(const Vec4 &other) const;         // EN 0x76f6d0 (JP 0x101aca40)
     Vec4 operator*(const Vec4 &other) const;         // EN 0x76f680: component-wise
     Vec4 operator*(const float &scale) const;        // EN 0x76f630: x/y/z times `scale`, w = 0
-    Vec4 Normalized3();                              // EN 0x777320 (JP 0x101af080): x/y/z scaled to length 1, returned (the vector itself is unchanged)
+    Vec4 Normalized3();                              // EN 0x777320 (JP 0x101af080): x/y/z scaled to length 1 in place and returned (w = 0); a zero vector stays and zero is returned
     Vec4 Divided(const float &divisor);              // EN 0x76f7c0 (JP 0x101acb60)
 };
 
@@ -91,7 +91,10 @@ Matrix4 Multiply(const Matrix4 &a, const Matrix4 &b);
 Matrix4 InverseMatrix(const Matrix4 &matrix);
 // The identity matrix by value (EN 0x774950, JP 0x101b0ba0).
 Matrix4 RotationY(float angle);   // EN 0x779290 (JP 0x101b1bb0): turn of `angle` radians about y
-Matrix4 IdentityMatrix();
+Matrix4 IdentityMatrix();   // EN 0x774950 (JP 0x101b0ba0)
+Matrix4 ZeroMatrix();   // EN 0x77ba80 (JP 0x101b0cd0): every element 0
+Matrix4 RotationX(float angle);   // EN 0x779190 (JP 0x101b1ad0): turn of `angle` radians about x
+Matrix4 RotationZ(float angle);   // EN 0x779390 (JP 0x101b1b40): turn of `angle` radians about z
 
 // Number of matrix products taken (incremented by Matrix4::operator*, reset by the frame code at EN 0x60c750).
 extern "C" int g_matrixProductCount;   // EN 0x0218ee80

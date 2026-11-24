@@ -18,6 +18,9 @@ struct TextureRef
 extern "C" int g_textureFileRefCount[TEXTURE_FILE_COUNT];                 // EN 0x01636f68 (JP DAT_10faae88)
 extern "C" char g_textureFileNames[TEXTURE_FILE_COUNT][FILE_NAME_SIZE];   // EN 0x0162ef68 (JP DAT_10ff65f8)
 
+// Bytes of video memory the engine counts for its textures (16 bit pixels with all mip levels). EN 0x0166d000 (JP DAT_1101d874).
+extern "C" int g_textureMemoryBytes;
+
 // Releases one reference to a shared texture file (freeing the name at 0). Returns the remaining count. EN 0x71cf00.
 extern "C" int TextureFile_Release(const TextureRef *texture);
 
@@ -51,6 +54,8 @@ extern "C" int ModelNames_SetJoined(int index, const char *folder, const char *n
 // Otherwise the name is stored in the first free entry (its reference count reset), that index goes to *freeSlot and
 // -1 is returned. A full table stops the game on purpose. EN 0x72c650 (JP 0x10169840).
 extern "C" int ModelNames_Find(const char *folder, const char *name, int *freeSlot);
+// Empties the whole model file table: every reference count and name. Returns 0. EN 0x734b20 (JP 0x10169720).
+extern "C" int ModelNames_ClearAll(void);
 // Adds a reference to the shared model file of `mesh` and returns the new count. EN 0x70b6b0 (JP 0x10169970).
 extern "C" int MeshCache_AddRef(const SlotTable *mesh);
 

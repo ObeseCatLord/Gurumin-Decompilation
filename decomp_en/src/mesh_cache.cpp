@@ -1,7 +1,9 @@
 // Shared texture files, model files and playback slot offsets (EN build). Ported from the matched JP source
 // decomp/src/mesh_cache.cpp.
 #include "anim_model.h"
+#include "engine_memory.h"
 #include "mesh_cache.h"
+#include "texture_mgr.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -109,4 +111,55 @@ extern "C" int MeshCache_AddRef(const SlotTable *mesh)
     int index = mesh->bufferSlot;
     g_modelFileRefCount[index]++;
     return g_modelFileRefCount[index];
+}
+
+// ModelNames_ClearAll: clears the model file table (every reference count and every name). Called once when the model
+// system starts.
+extern "C" int ModelNames_ClearAll(void)
+{
+    for (int i = 0; i < MODEL_FILE_COUNT; i++)
+        g_modelFileRefCount[i] = 0;
+    for (int i = 0; i < MODEL_FILE_COUNT; i++)
+        g_modelFileNames[i][0] = 0;
+    return 0;
+}
+
+// Divisors of the five mip levels below the source size that the texture memory counter covers.
+const int MIP_HALF = 2;
+const int MIP_QUARTER = 4;
+const int MIP_EIGHTH = 8;
+const int MIP_SIXTEENTH = 16;
+const int MIP_THIRTY_SECOND = 32;
+
+// Bytes per pixel of the counted textures.
+const int TEXTURE_BYTES_PER_PIXEL = 2;
+
+// sourceAlpha values that mark a generated alpha instead of holding a buffer.
+const int ALPHA_GENERATED_ONCE = 1;
+const int ALPHA_GENERATED_ALWAYS = 2;
+
+// TextureObject::Unload: takes the texture's mip levels off the texture memory counter, frees the kept source pixels and
+// alpha buffer (the generated-alpha markers are not buffers) and releases the Direct3D texture. Called when a texture
+// slot is unloaded.
+void TextureObject::Unload()
+{
+    g_textureMemoryBytes -= sourceWidth * sourceHeight * TEXTURE_BYTES_PER_PIXEL;
+    g_textureMemoryBytes -= (sourceWidth / MIP_HALF) * (sourceHeight / MIP_HALF) * TEXTURE_BYTES_PER_PIXEL;
+    g_textureMemoryBytes -= (sourceWidth / MIP_QUARTER) * (sourceHeight / MIP_QUARTER) * TEXTURE_BYTES_PER_PIXEL;
+    g_textureMemoryBytes -= (sourceWidth / MIP_EIGHTH) * (sourceHeight / MIP_EIGHTH) * TEXTURE_BYTES_PER_PIXEL;
+    g_textureMemoryBytes -= (sourceWidth / MIP_SIXTEENTH) * (sourceHeight / MIP_SIXTEENTH) * TEXTURE_BYTES_PER_PIXEL;
+    g_textureMemoryBytes -= (sourceWidth / MIP_THIRTY_SECOND) * (sourceHeight / MIP_THIRTY_SECOND) * TEXTURE_BYTES_PER_PIXEL;
+    if (sourceAlpha == ALPHA_GENERATED_ONCE)
+        sourceAlpha = 0;
+    if (sourceAlpha == ALPHA_GENERATED_ALWAYS)
+        sourceAlpha = 0;
+    if (sourcePixels != 0)
+        g_engineFree((void *)sourcePixels);
+    if (sourceAlpha != 0)
+        g_engineFree((void *)sourceAlpha);
+    sourceAlpha = 0;
+    sourcePixels = 0;
+    sourceWidth = 0;
+    sourceHeight = 0;
+    Release();
 }

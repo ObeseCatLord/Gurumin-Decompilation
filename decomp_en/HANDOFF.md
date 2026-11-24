@@ -34,8 +34,8 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-24, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 530 of 2,034 game functions (104,193 of 2,080,360 bytes, 5.01 %) |
-| Matched under the rules | 530 (AddQuad/SetBlend/UpdateImage rely on a temporary out-of-line macro, see State) |
+| Matched | 569 of 2,034 game functions (123,569 of 2,080,360 bytes, 5.94 %) |
+| Matched under the rules | 569 |
 | Queue | regenerate with gen_queue.py; open.tsv: ~40 near-misses |
 
 ## State
@@ -55,13 +55,14 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   commit on origin/master with a temporary index (`GIT_INDEX_FILE=tmp git read-tree origin/master`, `git diff --binary
   HEAD~1 HEAD | git apply --cached`, `git write-tree`, `git commit-tree -p origin/master`), push it, then `git reset
   --soft <new>` and `git reset <new> -- <paths the remote changed>`.
+- Workers must never `git stash`/reset/checkout (one did a stash/pop in batch 9; no loss). Rule is in worker_rules.
 - Push helper: scratchpad `push_onto_remote.sh` does the temporary-index rebuild above (recreate it if the scratchpad
   was cleared).
 - Batch 8 workers: render/UI, characters/scene nodes, misc new files; ADDITIVE header edits allowed for all, via the
   Edit tool (scripted bulk edits of shared headers were denied by the permission classifier).
-- **Temporary:** `TEXTURE_MGR_INLINE`/`TEXTURE_MGR_OUT_OF_LINE` in texture_mgr.h emits out-of-line copies of
-  AddQuad/SetBlend/UpdateImage; remove it once their real out-of-line caller (EN 0x71e010) is ported (batch 9 task).
-  Never add address-taking tables or data that only force COMDAT emission (one was removed from sound_file.cpp).
+- AddQuad/SetBlend out-of-line copies come from the effect-sprite callers (0x725440/0x725990); their only other
+  original caller is the 29 KB 0x71e010.
+- Never add address-taking tables or data that only force COMDAT emission (one was removed from sound_file.cpp).
 - Sound engine (0x7be000-0x7c6220, JP sound3d not matched) is ported from Ghidra + EN bytes: 67 matched in batch 8.
 - (old) Batch 7 ownership: game worker = node/anim/char/game headers and their sources; engine worker = vec4, containers,
   texture_mgr, render, slot_table, buffer_pool, engine, ime, world files; misc worker = only the new files it creates.

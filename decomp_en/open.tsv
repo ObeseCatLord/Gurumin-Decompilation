@@ -51,3 +51,18 @@ address	status	reason
 007bf740	open	OggReader::ReadHeaders: same calls and order; register allocation differs (original keeps this in esi, page in edi, stream in ebx and recomputes the member addresses in the loop; ours hoists the addresses into frame slots)
 007c0f50	open	OggReader::ReadPcm: logic ported (351 bytes of diff); original keeps the remaining count in ebx and the request size in edi (ours the reverse) and tests the stream position through different jumps
 007bf8c0	open	OggReader::OpenStream: same calls as ReadHeaders plus info init and DSP/block init; same register allocation wall as ReadHeaders (457 vs original size)
+00649c00	open	Object_SlowNearBlocker: 8 diffs, same length; the original loads distance into xmm0 and 400.0 into xmm1 before the first comiss (ours the reverse) and builds 0.05f in the distanceAfter stack slot; eight spellings tried (nested ifs, continue, local range, reordered tests, local slowdown)
+005e7b30	open	Steam_CloudFileExists: 4 bytes; original calls the interface slot as mov eax,[edx+N]; call eax, ours call [edx+N]
+00642ca0	open	Steam_UnlockAchievement: 4 bytes; same mov eax/jmp eax slot-call form
+005ec1e0	open	Steam_GetEnteredText: 6 bytes; same slot-call form
+0073ede0	open	EffectDefs_Allocate: 49 diffs, same length; all stores match but the scheduler places the first list-head vector store and the last recent-effect vector store differently around the m_0164 store (EN: recents, m_0164, list heads); loops and explicit stores, store order of the byte and struct fields all tried
+0076f810	open	KeyTrack::Insert: shift loop matches with a local values pointer, but the original keeps the frame argument in ebx and count in edx (lea ebx,[edx-1]); tried member-wise, Vec4 copy, local count, while loop
+00740c40	open	AnimModel::Unload: only the placement of mov ecx,esi vs the m_2418 store after the Matrix4 temp destructor differs; tried int/void ResetState, float field, store order, named temp matrix
+00631480	open	Map_FindRegionAt: only the xmm4/xmm5 choice for the margin constant vs point->x differs; tried comparison order, local order, for loop with continue, min/max macros
+0064bb90	open	Shaga_PushOut: only the esi/edi roles differ (original keeps index in esi, steps in edi); tried steps declaration spot, do-while vs for vs ++steps
+007a2790	open	FontRenderer::DrawStringToBuffer: 1559 vs 1224; original tail-merges the digit/punctuation branches, y kept in edx
+0078ce10	open	TextureObject::DrawThroughShader: 1187 vs 1279; original recomputes u - 1/512 for every store
+007a8ac0	open	GameFile::Open returns int 0/1 in EN but game_file.h declares FILE * (model_prescan.cpp depends on it); fix the type and its caller together
+007a8930	open	Path_GetBaseName: original clears the first 8 bytes with two dword stores (memset gives movq)
+00752190	open	Node::DrawShadow: 1453 vs 1456, casterSize register choice (movaps xmm0,xmm1 copy)
+005c0ca0	open	Party_BlocksMove: only the load of the 0.25 tolerance constant (before the andpd in the original, after it here) differs; tried comparison direction, local turn, AbsFloat helper, fabsf

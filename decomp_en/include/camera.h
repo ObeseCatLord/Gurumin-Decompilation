@@ -37,7 +37,7 @@ extern "C" Vec4 g_cameraTarget;             // EN 0x02200ee8 (JP DAT_10f668e8): 
 extern "C" int Camera_CollectPaths(int moveId, int moveIdAgain, int *pathCount);
 
 // Builds the view and projection matrices for a camera at `eye` looking at `target`. EN 0x759300 (JP 0x10194360).
-extern "C" int Camera_SetMatrices(const Vec4 *eye, const Vec4 *target, Matrix4 *view, Matrix4 *projection, float roll);
+int Camera_SetMatrices(const Vec4 *eye, const Vec4 *target, Matrix4 *view, Matrix4 *projection, float roll);
 
 // Positions the camera keeps in view (at most CAMERA_TRACKED_COUNT).
 const int CAMERA_TRACKED_COUNT = 0x30;

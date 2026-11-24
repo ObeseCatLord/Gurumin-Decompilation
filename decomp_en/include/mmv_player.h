@@ -5,6 +5,9 @@
 
 struct TextureObject;
 
+// MmvPlayer::state value of a movie that is loaded but not playing.
+const int MMV_STOPPED = 0;
+
 // A file the movie is streamed from.
 struct MovieFile
 {
@@ -25,15 +28,23 @@ struct MmvPlayer
     char pad_0015[3];
     MovieFile file;        // 0x18: the movie file
     void *m_003c;          // 0x3c: not yet named (non-zero while the file is open)
-    char m_0040[0x4a - 0x40];  // 0x40: width, height, movie type
+    short width;           // 0x40: movie width in pixels
+    short height;          // 0x42: movie height in pixels
+    char m_0044[0x4a - 0x44];  // 0x44: movie type
     char ownsFrame;        // 0x4a: 1 when `frame` was allocated by the player
     char playing;          // 0x4b: 1 while the player holds a movie
-    char m_004c[0x450 - 0x4c]; // 0x4c: state and palette
+    char state;            // 0x4c: playback state (MMV_STOPPED after Open)
+    char pad_004d;         // 0x4d: padding
+    unsigned short palette[0x100];        // 0x4e: first palette (RGB565)
+    unsigned short secondPalette[0x100];  // 0x24e: second palette (RGB565)
+    char m_044e[0x450 - 0x44e];           // 0x44e: not yet named
     char *memory;          // 0x450: whole movie in memory (when not streamed from the file)
     void *frame;           // 0x454: decoded 8-bit frame (palette indexes)
+    unsigned char *data;   // 0x458: start of the frame records inside `memory`
 
     void ReadFrame();                    // EN 0x7a9750: next frame of a looping movie
     void ReadFrameOnce();                // EN 0x7a9610: next frame of a movie that plays once
+    void DecodeFrameRle(int firstRecord);   // EN 0x7a8f20 (JP 0x10160a20): decodes the first frame record
     void Open(const char *path);         // EN 0x7a8f90 (JP 0x10160a90): opens the movie file
     // EN 0x7a8ec0 (JP 0x10160960): copies the current frame into `target` using the first palette, or the second one
     // when `secondPalette` is non-zero.

@@ -176,6 +176,9 @@ typedef char check_effect_light[sizeof(EffectLight) == 0x4014 ? 1 : -1];
 const int EFFECT_RECENT_COUNT = 32;
 extern "C" int g_recentEffectIds[EFFECT_RECENT_COUNT];   // EN 0x01674670 (JP DAT_110186a8): set to -1 by Init
 extern "C" char g_recentEffectNext;                      // EN 0x01664469 (JP DAT_1101de64): next entry of that cache
+// Takes the first free effect definition, names it "not set" and resets the lookup caches; returns its index or -1.
+// EN 0x73ede0 (JP 0x1016f900). Called by EffectManager::Init.
+extern "C" int EffectDefs_Allocate(void);
 // The bytes of the effect definition table as Init clears them: EFFECT_DEFINITION_COUNT * sizeof(EffectDef) bytes
 // starting 0x174 bytes before g_effectDefs (the same offset as in the JP build, DAT_1101de68).
 extern "C" char g_effectDefStorage[EFFECT_DEFINITION_COUNT * sizeof(EffectDef)];   // EN 0x01dd01e0

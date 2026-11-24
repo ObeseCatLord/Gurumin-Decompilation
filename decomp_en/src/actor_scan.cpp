@@ -116,7 +116,9 @@ extern "C" int Char_IsStandingOn(int lower, int upper, int maxHeight, int maxDis
     top.z = 0;
     bottom.z = 0;
     float distanceSquared = (top - bottom).LengthSquared3();
-    if (height < 0.0f || height > (float)maxHeight || distanceSquared > (float)maxDistanceSquared)
+    if (height < 0.0f || height > (float)maxHeight)
+        return 0;
+    if (distanceSquared > (float)maxDistanceSquared)
         return 0;
     return g_characterModels[upper].idleMotionEnabled != 0;
 }

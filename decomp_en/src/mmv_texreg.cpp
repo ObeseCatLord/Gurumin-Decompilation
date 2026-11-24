@@ -5,6 +5,7 @@
 #include "engine_memory.h"
 #include "mmv_player.h"
 #include "render.h"
+#include "texture_mgr.h"
 
 // Decodes the next frame (looping or one-shot variant depending on loop). Called once per frame while a movie plays.
 void MmvPlayer::DecodeNextFrame()
@@ -13,6 +14,27 @@ void MmvPlayer::DecodeNextFrame()
         ReadFrame();
     else
         ReadFrameOnce();
+}
+
+// MmvPlayer::DrawToTexture: copies the current frame, clipped to the size of `target`, into the texture through the
+// first palette, or through the second one when `secondPalette` is non-zero. Called every frame while a scene movie
+// plays.
+int MmvPlayer::DrawToTexture(const TextureObject *target, int useSecondPalette)
+{
+    if (frame != 0)
+    {
+        const unsigned short *colours = palette;
+        if (useSecondPalette != 0)
+            colours = secondPalette;
+        int h = height;
+        if (target->height < h)
+            h = target->height;
+        int w = width;
+        if (target->width < w)
+            w = target->width;
+        const_cast<TextureObject *>(target)->WritePaletted(0, 0, w, h, width, static_cast<const unsigned char *>(frame), colours);
+    }
+    return 1;
 }
 
 // Closes the movie file and frees its buffers.

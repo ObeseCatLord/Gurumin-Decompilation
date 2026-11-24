@@ -54,6 +54,15 @@ struct SlotTable
     // EN 0x7a4360 (JP 0x10145a50): uploads the skinning matrices: each of the `count` bone matrices (at most
     // MAX_SKIN_BONES) times `world`, transposed, goes to the vertex shader constants as three registers.
     void UploadBones(Matrix4 *bones, int count, Matrix4 *world, int unused);
+    // EN 0x799880 (JP 0x10151150): draws the mesh with `world` and `view` in drawing mode `mode`; the arguments after it
+    // describe the shadow projected onto it (matrix, centre, texture, scale and size), the light direction, the caster's
+    // size and the opacity.
+    int Draw(const Matrix4 *world, const Matrix4 *view, const Matrix4 *shadowMatrix, int mode, float shadowX,
+             float shadowY, float shadowZ, int shadowTexture, float shadowScale, int shadowSize,
+             const Vec4 *lightDirection, float modelSize, float alpha);
+    // EN 0x780150 (JP 0x10151ba0): draws the mesh with `world` and `view` in drawing mode `mode`, lit by `lights`;
+    // `paramsA` and `paramsB` are the node's two draw parameter vectors.
+    int DrawLit(const Matrix4 *world, const Matrix4 *view, int mode, const void *lights, const Vec4 *paramsA, const Vec4 *paramsB);
     int BuildBuffers(VertexPack *packs, IndexList *indexLists, int packCount, Material *materials, int flags);
 };
 

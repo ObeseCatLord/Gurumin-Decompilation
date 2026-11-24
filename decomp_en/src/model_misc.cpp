@@ -30,6 +30,29 @@ void NodeExtra::Clear()
     scaleOverride = 0;
 }
 
+// NodeExtra::Init: empties the five tracks and gives each its default key at frame 0 (translation 0, 0, 0; rotation
+// 0, 0, 0, 1; scale 1, 1, 1; colour 1, 1, 1, 1; extra 0, 0, 0, 0). Called when a node's extra block is allocated.
+void NodeExtra::Init()
+{
+    m_0070[0] = 0;
+    m_0070[1] = 0;
+    m_0070[2] = 0;
+    m_0070[3] = 0;
+    tracks[NODE_TRACK_TRANSLATION].Init();
+    tracks[NODE_TRACK_ROTATION].Init();
+    tracks[NODE_TRACK_SCALE].Init();
+    tracks[NODE_TRACK_COLOUR].Init();
+    tracks[NODE_TRACK_EXTRA].Init();
+    translationOverride = 0;
+    rotationOverride = 0;
+    scaleOverride = 0;
+    tracks[NODE_TRACK_TRANSLATION].Insert(0, 0, 0, 0, 0);
+    tracks[NODE_TRACK_ROTATION].Insert(0, 0, 0, 0, 1.0f);
+    tracks[NODE_TRACK_SCALE].Insert(0, 1.0f, 1.0f, 1.0f, 0);
+    tracks[NODE_TRACK_COLOUR].Insert(0, 1.0f, 1.0f, 1.0f, 1.0f);
+    tracks[NODE_TRACK_EXTRA].Insert(0, 0, 0, 0, 0);
+}
+
 // NodeSaved::Reset: resets the rotation limits to +-45 degrees on all three axes. Called when a saved-state block is
 // allocated (Node::AllocSaved).
 void NodeSaved::Reset()

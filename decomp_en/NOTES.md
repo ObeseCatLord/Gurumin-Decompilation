@@ -102,3 +102,16 @@ offsets); record such headers here. None so far: `Node` is declared again in EN 
   disassembly order. Separate early returns can matter where JP used one `||` test (`TexCache_Free`).
 - Name constants by their compare value: `SCRIPT_FLAG_LAST = 3999` with `>`, because `>= 4000` changes the
   immediate.
+
+## Launcher, Steam, sound engine (batches 8-10)
+- **The launcher needs MFC headers that are not installed:** `E:\Microsoft Visual Studio 12.0` is the Express
+  (WDExpress) edition without `VC\atlmfc`. The launcher's Falcom dialog classes (0x6e5d60-0x6f15af, OnInitDialog
+  0x6ebe60) need the VS2013 Feature Pack MFC headers (copy `VC\atlmfc` from VS2013 Professional/Community). Most
+  small launcher functions are MFC header inlines (message-map accessors, CWnd SendMessage wrappers, CString
+  refcounts) and count as library code.
+- Steam: no Steamworks SDK headers; `include/steam.h` declares only the interface slots used. Some slot calls compile
+  as `call [edx+N]` where the original has `mov eax,[edx+N]; call eax` (open.tsv).
+- Sound engine (JP sound3d unmatched) ported from Ghidra + EN bytes; MmioFile methods are header inlines whose
+  standalone copies appear once out-of-line callers exist (no forcing tables). The Ogg reader functions hit register
+  allocation walls (open.tsv).
+- Map labels in the sound area name MFC/CRT FID functions for EN game code (DeleteValues, __strupr, ...): ignore them.

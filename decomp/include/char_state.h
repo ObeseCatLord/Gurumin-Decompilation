@@ -175,6 +175,35 @@ struct Kind43State
     int voiceCooldown;            // 0x3c: frames before the prince speaks again (shared with the other bosses)
 };
 
+// The BS_006 boss (bs006_update.cpp, kind 107): the dragon with fifteen body pieces in the slots after it. Words of the
+// boss's own CharState record; its defeat timer lives in word 11 of the record after it (DAT_1020b49c, bs006.h).
+struct Bs006State
+{
+    int state;                    // 0x00: 0 = set up, 1..0xe, 0xc9..0xcd, 0x12d..0x130 = actions, 100 = pick the next one, 0x65 = play the queued motion
+    int frames;                   // 0x04: frames in the state (1000 and up mark the second half of some states)
+    int impact;                   // 0x08: 1 or 2 while a stomp or landing shakes the ground (starts effect 0x45d)
+    int maxHealth;                // 0x0c: health at the start of the fight (state 0 copies it from the slot)
+    int lastState;                // 0x10: the state before the pick (kept while the state is not 100)
+    int queuedMotion;             // 0x14: motion state 0x65 plays (-1 = none)
+    int focusValue;               // 0x18: the value DAT_1101dddc follows (0xe6, -200 after a hit that staggers it)
+    int lastHealth;               // 0x1c: health at the start of this frame (the damage taken is the difference)
+    int recoverFrames;            // 0x20: frames until focusValue returns to 0xe6
+    int attackPhase;              // 0x24: 0..3: how far the fight has gone (set by the hits it takes)
+    int pad_0028[6];              // 0x28..0x3f: not used
+};
+
+// The words of the BS_006 boss's piece slots (slots index + 2 + k, k = 0..14).
+struct Bs006Piece
+{
+    int phase;                    // 0x00: the hit flash counter: 1 = armed, 2 = the piece follows its node
+    int active;                   // 0x04: 1 for the first four pieces, 0 for the others
+    int pad_0008;                 // 0x08
+    int frame;                    // 0x0c: the frame the piece's node shows (Node::frameSource points here)
+    int pad_0010;                 // 0x10
+    int healthOverride;           // 0x14: non-zero = the health the boss counts for this piece (companion pieces)
+    int pad_0018[10];             // 0x18..0x3f: not used by the boss
+};
+
 struct CharState
 {
     union
@@ -675,6 +704,8 @@ struct CharState
         Bs004State bs004;                         // bs004_update.cpp: the moss root boss
         Kind43State kind43;                       // prince_update.cpp: the prince
         Bs002State bs002;                         // bs002_update.cpp: the BS_002 boss
+        Bs006State bs006;                         // bs006_update.cpp: the BS_006 boss
+        Bs006Piece bs006Piece;                    // bs006_update.cpp: a piece slot of the BS_006 boss
         int words[0x10];                          // the whole block by index (resets and copies)
         Shove shoves[4];                          // char_shove.cpp: the slot's scripted shoves
     };

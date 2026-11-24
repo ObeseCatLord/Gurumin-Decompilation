@@ -19,7 +19,7 @@
 #include "bs001.h"
 extern "C" int FUN_10011f80(int index);
 #include "bs002.h"
-extern "C" int FUN_100d24a0(int index);
+#include "bs006.h"
 extern "C" int FUN_1009d100(int index);
 extern "C" int FUN_10011dd0(int index);
 extern "C" int FUN_1009dfd0(int index);
@@ -50,7 +50,7 @@ extern "C" int FUN_101148b0(int index)
             Bs002_Update(index);
             return 0;
         case 107:
-            FUN_100d24a0(index);
+            Bs006_Update(index);
             return 0;
         }
     }

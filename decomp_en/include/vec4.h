@@ -25,14 +25,19 @@ struct Vec4
     float Distance2D(Vec4 other);                    // EN 0x773610 (JP x/y distance)
     float DistanceSquared(const Vec4 &other);        // EN 0x773440 (JP 0x101ac650)
     float Distance(const Vec4 &other);               // EN 0x773270 (JP 0x101ac590)
+    float DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b);  // EN 0x772cc0 (JP 0x101acd90): squared distance to the segment a-b
     float DistanceZWeighted(const Vec4 &other);      // EN 0x7736f0 (JP 0x101ac5f0)
     int InRect(const Box2 *box);                     // EN 0x7749d0 (JP 0x101ac7c0): inside the box's x/y rectangle
     int InBox(const Box2 *box);                      // EN 0x774a10 (JP 0x101ac6e0)
     void RotateZ(float angle);                       // EN 0x779400 (JP 0x101ac300)
+    void RotateX(float angle);                       // EN 0x779200 (JP 0x101ac440): rotates the y/z part about the x axis
+    void RotateY(float angle);                       // EN 0x779300 (JP 0x101ac3a0): rotates the x/z part about the y axis
+    int InBoxMargin(const Box2 *box, float margin);  // EN 0x774b10 (JP 0x101ac740): inside the box grown by `margin`
 
     Vec4 operator+(const Vec4 &other) const;         // EN 0x76f720 (JP 0x101ac9e0)
     Vec4 operator-(const Vec4 &other) const;         // EN 0x76f6d0 (JP 0x101aca40)
     Vec4 operator*(const Vec4 &other) const;         // EN 0x76f680: component-wise
+    Vec4 operator*(const float &scale) const;        // EN 0x76f630: x/y/z times `scale`, w = 0
     Vec4 Divided(const float &divisor);              // EN 0x76f7c0 (JP 0x101acb60)
 };
 
@@ -63,9 +68,33 @@ struct Matrix4
     float m[MATRIX_ELEMENT_COUNT];  // row-major, row vectors on the left; m[12..14] = translation
 
     Matrix4();                                      // EN 0x76efc0 (JP 0x101ae770): zeroes most elements
+    ~Matrix4();                                     // EN 0x76f0e0 (JP 0x1013eda0): empty, out of line; gives constructors of owners an unwind frame
     Vec4 GetTranslation();                          // EN 0x773ef0 (JP 0x101ade80)
     void SetTranslation(Vec4 position);             // EN 0x77a170 (JP 0x101adef0)
     void Translate(float x, float y, float z);      // EN 0x776ed0 (JP 0x101adec0)
+    void SetRotationZ(float angle);                 // EN 0x77a1a0 (JP 0x101ae710): rotation about the z axis in the upper-left 3x3
 };
+
+// Transforms `point` by `matrix` and divides x/y/z by the resulting w (perspective divide); the result's w is that w
+// (EN 0x77a4a0, JP 0x101ae060).
+Vec4 Project(const Vec4 &point, const Matrix4 &matrix);
+
+// Transforms the direction `v` by the rotation part of `matrix` (no translation); the result's w is 0
+// (EN 0x77a2a0, JP 0x101ae130).
+Vec4 TransformNormal(const Vec4 &v, const Matrix4 &matrix);
+
+// 1 when `point` transformed by the view-projection `matrix` lies inside the view volume in x and y, with the volume
+// widened by `margin` (EN 0x775320, JP 0x101ae4d0).
+extern "C" int View_ContainsPoint(const Vec4 *point, const Matrix4 *matrix, float margin);
+
+// Rotation quaternion (x, y, z = vector part, w = scalar part) of the rotation part of `matrix`
+// (EN 0x776990, JP 0x101ae2a0).
+Vec4 QuatFromMatrix(const Matrix4 &matrix);
+
+// Spherical interpolation between the rotation quaternions `a` and `b` by `t` (EN 0x777d20, JP 0x101aeae0).
+Vec4 Slerp(const Vec4 &a, const Vec4 &b, float t);
+
+// Snaps an angle in radians to the nearest multiple of `step` degrees, returned in radians (EN 0x7476a0, JP 0x1016c340).
+float SnapAngle(float radians, int step);
 
 #endif

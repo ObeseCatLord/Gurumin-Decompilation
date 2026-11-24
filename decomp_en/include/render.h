@@ -32,6 +32,50 @@ extern "C" int g_pooledSurfaceBytes[SURFACE_POOL_SIZE];          // EN 0x021fed0
 extern "C" int g_pooledSurfaceReserved[SURFACE_POOL_SIZE];       // EN 0x021fe508 (JP DAT_10f0cd40): reservation flag of each entry
 extern "C" int g_pooledBytesTotal;                               // EN 0x021fd75c (JP DAT_10f0ff80): bytes held by all pooled surfaces
 
+extern "C" int g_backBufferWidth;                                // EN 0x00908b14 (JP DAT_10202b34): back buffer width in pixels
+extern "C" int g_backBufferHeight;                               // EN 0x00908b18 (JP DAT_10202b38): back buffer height in pixels
+extern "C" int g_deviceBackBufferWidth;                          // EN 0x00908b0c (JP DAT_10202b24): back buffer width set at device creation
+extern "C" int g_deviceBackBufferHeight;                         // EN 0x00908b10 (JP DAT_10202b28): back buffer height set at device creation
+extern "C" int g_drawCallCount;                                  // EN 0x021fdd04: draw calls issued this frame
+
+// Inline copies of Render_SetRenderState, Render_SetTextureStageState and Render_UnbindTexture1: the original
+// inlines them into the texture drawing functions (the out-of-line versions are declared below).
+// Sets a render state unless the cache already holds that value.
+inline void RenderState_Set(D3DRENDERSTATETYPE state, unsigned long value)
+{
+    if (g_renderStateCache[state] != value)
+    {
+        unsigned long current;
+        g_d3dDevice->GetRenderState(state, &current);
+        if (current != value)
+            g_d3dDevice->SetRenderState(state, value);
+        g_renderStateCache[state] = value;
+    }
+}
+
+// Sets a texture stage state unless the cache already holds that value.
+inline void StageState_Set(unsigned long stage, D3DTEXTURESTAGESTATETYPE type, unsigned long value)
+{
+    if (g_textureStageStateCache[stage][type] != value)
+    {
+        unsigned long current;
+        g_d3dDevice->GetTextureStageState(stage, type, &current);
+        if (current != value)
+            g_d3dDevice->SetTextureStageState(stage, type, value);
+        g_textureStageStateCache[stage][type] = value;
+    }
+}
+
+// Unbinds texture stage 1 when something is bound there.
+inline void Stage1_Unbind()
+{
+    if (g_stage1Texture != TEXTURE_BINDING_UNKNOWN)
+    {
+        g_d3dDevice->SetTexture(1, 0);
+        g_stage1Texture = TEXTURE_BINDING_UNKNOWN;
+    }
+}
+
 // Ends the open Direct3D scene, if any (inline in the original: part of Render_Present and Render_PresentSimple).
 inline void Render_CloseScene()
 {

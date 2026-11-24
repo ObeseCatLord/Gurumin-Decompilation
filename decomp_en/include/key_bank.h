@@ -14,8 +14,10 @@ struct KeyBank
     char flags[KEY_BANK_SIZE];      // 0xa00: KEY_FLAG_* bits of each key
     int count;                      // 0xa80: keys in use
 
+    KeyBank();                                                   // EN 0x76ef50 (JP 0x101af420): an empty bank
     void Clear();                                                // EN 0x7785e0 (JP 0x101ad730): back to one zero key at frame 0
     int Set(int frame, float x, float y, float z, float w);      // EN 0x779690 (JP 0x101ad820): returns the key's index
+    int Insert(int frame, float x, float y, float z, float w);   // EN 0x76f900 (JP 0x101ad760): inserts a key, returns its index
 };
 
 #endif

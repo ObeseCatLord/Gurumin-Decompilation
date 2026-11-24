@@ -8,10 +8,10 @@
 // Rotation limit in radians (+-45 degrees as the game rounds it).
 const float ROTATION_LIMIT = 0.785375f;
 
-// AnimModel::SetValue231c: stores `value` in value231c. Returns 1.
-int AnimModel::SetValue231c(int value)
+// AnimModel::SetDropCollider: sets the collision node the model drops onto. Returns 1.
+int AnimModel::SetDropCollider(Node *node)
 {
-    value231c = value;
+    dropCollider = node;
     return 1;
 }
 

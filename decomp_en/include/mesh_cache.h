@@ -23,11 +23,20 @@ extern "C" int TextureFile_Release(const TextureRef *texture);
 
 #include "slot_table.h"
 
+struct VertexPack;
+struct IndexList;
+
 // Entries of the model file table.
 const int MODEL_FILE_COUNT = 0xc80;
 
 extern "C" int g_modelFileRefCount[MODEL_FILE_COUNT];                     // EN 0x01653f68 (JP DAT_10feb3e0)
 extern "C" char g_modelFileNames[MODEL_FILE_COUNT][FILE_NAME_SIZE];       // EN 0x0163af68 (JP DAT_10fada90)
+
+// Per model file: the vertex packs, index lists and pack count its nodes share (set while loading a model, cleared
+// by Node::ReleaseUniqueMeshData when the file has a single user).
+extern "C" int g_modelFilePackCount[MODEL_FILE_COUNT];                    // EN 0x01660768 (JP DAT_10fee5e0): packs (-1 = none)
+extern "C" VertexPack *g_modelFilePacks[MODEL_FILE_COUNT];                // EN 0x0165a368 (JP DAT_10ff2ff8)
+extern "C" IndexList *g_modelFileIndexLists[MODEL_FILE_COUNT];            // EN 0x0165d568 (JP DAT_10fe01d8)
 
 // Releases one reference to the shared model file a mesh was loaded from (freeing the name at 0). Returns the
 // remaining count. EN 0x71cf40.

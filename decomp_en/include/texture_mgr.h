@@ -4,7 +4,6 @@
 #ifndef GURUMIN_EN_TEXTURE_MGR_H
 #define GURUMIN_EN_TEXTURE_MGR_H
 
-struct ScreenVertex;   // transformed screen vertex (0x20 bytes)
 struct IDirect3DTexture9;
 struct IDirect3DBaseTexture9;
 struct IDirect3DSurface9;
@@ -19,6 +18,30 @@ const int BLEND_MODE_UNSET = -1;
 const int RENDER_BLEND_MODE = 0;
 // Vertices per triangle.
 const int TRIANGLE_VERTICES = 3;
+
+// A transformed screen vertex (0x20 bytes, FVF position + diffuse + specular + one texture coordinate): what
+// TextureObject::DrawStrip and TriangleBatch take.
+struct ScreenVertex
+{
+    float x;                    // 0x00: screen x in the 640x480 space
+    float y;                    // 0x04: screen y
+    float z;                    // 0x08: depth (0.9 to 1.0 is visible)
+    float rhw;                  // 0x0c: 1 (already transformed)
+    union                       // 0x10: diffuse colour, ARGB
+    {
+        unsigned int diffuse;
+        struct
+        {
+            unsigned char blue;
+            unsigned char green;
+            unsigned char red;
+            unsigned char alpha;    // set to 0 to hide a vertex that is off screen
+        };
+    };
+    unsigned int specular;      // 0x14: second colour (0x00RRGGBB)
+    float u;                    // 0x18: texture coordinate u
+    float v;                    // 0x1c: texture coordinate v
+};
 
 // A texture object (0x38 bytes) owning a Direct3D texture; only the members EN code has used are named.
 struct TextureObject
@@ -42,6 +65,16 @@ struct TextureObject
     int UpdateImage(int value);                             // EN 0x746550 (JP 0x10169f70): BeginRenderTo with the source size
     void Unload();                                          // EN 0x740ea0 (JP 0x10169e40): frees the kept image and the texture
     int DrawTriangles(const void *vertices, int triangles); // EN 0x77ee90 (JP 0x1014bb70)
+    int DrawStrip(ScreenVertex *vertices, int count);        // EN 0x77e360 (JP 0x1014ba20)
+    int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);  // EN 0x78a950 (JP 0x1014b750)
+    int DrawColoured(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
+                     float alpha, float angle, float red, float green, float blue);  // EN 0x78ed90 (JP 0x1014c960)
+    int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
+                 float alpha, float angle);                 // EN 0x7918b0 (JP 0x1014bc60)
+    int Write16(int x, int y, int rowPixels, int rows, int pitch, const void *bits);  // EN 0x77d2e0 (JP 0x1014f060)
+    int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);  // EN 0x77d030 (JP 0x1014ef20)
+    int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
+                      const unsigned short *palette);       // EN 0x77d1b0 (JP 0x1014f120)
 };
 
 // Vertices (three per triangle) collected during a frame and drawn with one texture and blend mode.

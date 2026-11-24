@@ -20,6 +20,62 @@ const int PLAYBACK_END_REACHED = 1;
 // Bytes of an AnimModel.
 const int ANIM_MODEL_SIZE = 0x249c;
 
+// Angles in radians as the game writes them (not the exact values of pi).
+const float ANGLE_FULL_TURN = 6.283f;
+const float ANGLE_HALF_TURN = 3.1415f;
+// Height above the model's position that markers and balloons are drawn at.
+const float ANIM_MARKER_HEIGHT = 50.0f;
+// The 640x480 screen the 2D layer is laid out on.
+const float ANIM_SCREEN_WIDTH = 640.0f;
+const float ANIM_SCREEN_HEIGHT = 480.0f;
+// Scales of the motion speed changes (AddMotionSpeed, PushMotionSpeed).
+const double MOTION_SPEED_SCALE = 0.961875;
+const float MOTION_SPEED_DAMPING = 0.9f;
+const float PUSH_SPEED_SCALE = 0.2f;
+// Blend frames a model gets when it has none, and the count below which a push still adds speed.
+const int DEFAULT_BLEND_FRAMES = 8;
+const int PUSH_BLEND_LIMIT = 16;
+// Highest vertical speed a model can get.
+const float MAX_VERTICAL_SPEED = 60.0f;
+// Limit of each axis of MoveTowards' step.
+const float MOVE_STEP_LIMIT = 40.0f;
+// Factors of Push: while a speed change is pending, when the model is nearly at rest, and otherwise.
+const float PUSH_MOVING_FACTOR = 0.7f;
+const float PUSH_AT_REST_FACTOR = 1.4f;
+const float PUSH_IDLE_FACTOR = 0.55f;
+// Snapping works in tenths of a unit; four candidate slots (three used).
+const float SNAP_UNITS_PER_WORLD_UNIT = 10.0f;
+const int SNAP_CANDIDATE_COUNT = 4;
+// Highest hold weight.
+const float HOLD_WEIGHT_MAX = 0.9f;
+
+// Entries of the model file table (one root node per loaded model file).
+const int MODEL_FILE_ENTRIES = 0x100;
+// Models and pushes one collision test can report.
+const int MODEL_TOUCH_LIMIT = 0x40;
+// CollideModel test mode: any model collision (-1).
+const int COLLIDE_ANY_MODE = -1;
+// CollideProbesWithMesh masks: the map collision kind, and every kind.
+const unsigned int MAP_COLLISION_KIND = 0x4000000;
+const unsigned int MAP_COLLISION_ANY = 0xffffffff;
+
+// Root node of each loaded model file (0 = free entry). EN 0x01663970 (JP DAT_10faaa88).
+extern "C" Node *g_modelFileRoots[MODEL_FILE_ENTRIES];
+// World matrix of each model file entry (the AnimModel::matrix of its model). EN 0x01663d70 (JP DAT_10ff19e8).
+extern "C" Matrix4 *g_modelFileMatrices[MODEL_FILE_ENTRIES];
+// Collision filter of the model-against-world test that runs now (a model's collisionFilter). EN 0x0217fb00 (JP DAT_11b002c0).
+extern "C" int g_collisionFilter;
+// 1 while a model-against-world test runs. EN 0x0217fafe (JP DAT_11b002c8).
+extern "C" char g_modelCollisionActive;
+
+// Values of AnimModel::holdState.
+enum HoldState
+{
+    HOLD_FREE = 0,      // not holding
+    HOLD_HOLDING = 1,   // holding on to a model
+    HOLD_RELEASED = 2   // let go, the weight fades out
+};
+
 // First frame of an empty channel: later than any real key, so the first key added becomes the start.
 const int CHANNEL_EMPTY_FIRST_FRAME = 10000;
 
@@ -55,12 +111,20 @@ struct Playback
 
 struct AnimModel
 {
-    char m_0000[0x265];           // 0x000: not yet named
+    char m_0000[0x70];            // 0x000: not yet named
+    int collisionFilter;          // 0x070: collision filter of the model's world tests (g_collisionFilter while they run)
+    char m_0074[0x84 - 0x74];     // 0x074: not yet named
+    unsigned char speedDivisor;   // 0x084: slows every motion of this model down (0 = no division)
+    char m_0085[0x248 - 0x85];    // 0x085: not yet named
+    float holdWeight;             // 0x248: blend weight while holding (at most HOLD_WEIGHT_MAX)
+    char m_024c[0x265 - 0x24c];   // 0x24c: not yet named
     char important;               // 0x265: set when a character is assigned to a slot (CharacterBank::Assign)
     char m_0266[0x298 - 0x266];   // 0x266: not yet named
     Playback *playback;           // 0x298: the motion playback state (allocated on first use)
     float speedScale;             // 0x29c: motion speed scale
-    char m_02a0[0x2ac - 0x2a0];   // 0x2a0: not yet named
+    char m_02a0[0x2a4 - 0x2a0];   // 0x2a0: not yet named
+    char holdState;               // 0x2a4: HoldState
+    char m_02a5[0x2ac - 0x2a5];   // 0x2a5: not yet named
     MotionChannels motion;        // 0x2ac: the motion channel (track A)
     char m_0d44[0xc];             // 0xd44: not yet named
     MotionChannels trackB;        // 0xd50: track B
@@ -72,16 +136,33 @@ struct AnimModel
     char pushFlag;                // 0x2288: flag of the queued push
     char pad_2289[3];
     Vec4 pushVector;              // 0x228c: queued push (x, y, z)
-    char m_229c[0x22ec - 0x229c]; // 0x229c: not yet named
+    int blendFrames;              // 0x229c: frames a motion change blends over (0 = unset, DEFAULT_BLEND_FRAMES is used)
+    char m_22a0[0x22ec - 0x22a0]; // 0x22a0: not yet named
     Node *root;                   // 0x22ec: the model's node tree (0 = free entry of the model bank)
     char m_22f0[0x2300 - 0x22f0]; // 0x22f0: not yet named
     Node *swapNode1;              // 0x2300: first node of the material swap
     Node *swapNode2;              // 0x2304: second node of the material swap
-    char m_2308[0x231c - 0x2308]; // 0x2308: not yet named
-    int value231c;                // 0x231c: set by SetValue231c
-    char m_2320[0x23d8 - 0x2320]; // 0x2320: not yet named
+    Node *collider;               // 0x2308: the map collision this model moves against (0 = none)
+    char m_230c[0x2318 - 0x230c]; // 0x230c: not yet named
+    float colliderReach;          // 0x2318: reach of the model's probes against the collider
+    Node *dropCollider;           // 0x231c: collision node the model drops onto (set by SetDropCollider)
+    char m_2320[0x2328 - 0x2320]; // 0x2320: not yet named
+    Matrix4 matrix;               // 0x2328: world matrix; the translation row (m[12..14]) is the position
+    char m_2368[0x236c - 0x2368]; // 0x2368: not yet named
+    float verticalSpeed;          // 0x236c: vertical speed (positive = rising)
+    char m_2370[0x2388 - 0x2370]; // 0x2370: not yet named
+    int speedChangeFrames;        // 0x2388: frames since the speed change (1 once one is pending)
+    int idleMotionEnabled;        // 0x238c: non-zero = the model plays its idle motion now and then (Char_RandomIdle)
+    int collisionLimit;           // 0x2390: limit of the map collision tests (99999 = none)
+    char m_2394[0x2398 - 0x2394]; // 0x2394: not yet named
+    Vec4 holdOffset;              // 0x2398: position relative to the held model
+    Vec4 move;                    // 0x23a8: movement impulse applied by the next update (Push)
+    Vec4 velocity;                // 0x23b8: current movement
+    char m_23c8[0x23d8 - 0x23c8]; // 0x23c8: not yet named
     Vec4 moveStep;                // 0x23d8: this frame's movement: x, y scaled by speedScale, z the vertical step
-    char m_23e8[ANIM_MODEL_SIZE - 0x23e8];  // 0x23e8: not yet named
+    char m_23e8[0x2480 - 0x23e8]; // 0x23e8: not yet named
+    float targetHeading;          // 0x2480: angle the character turns towards
+    char m_2484[ANIM_MODEL_SIZE - 0x2484];  // 0x2484: not yet named
 
     int SetTrackCOptions(int playing, int looping);                      // EN 0x743960 (JP 0x10161b40)
     int SetMotionOptions(int playing, int looping);                      // EN 0x745c00 (JP 0x10161be0)
@@ -93,9 +174,29 @@ struct AnimModel
     int ClearMotionKeys();                                               // EN 0x741c10 (JP 0x10161b60)
     int ClearTrackB();                                                   // EN 0x741fe0 (JP 0x10161f30)
     int ApplyMaterialSwap(int count);                                    // EN 0x71ac90 (JP 0x10161a20)
-    int SetValue231c(int value);                                         // EN 0x746bc0 (JP 0x10163e70)
+    int SnapHeadingToSide();                                             // EN 0x70b730 (JP 0x10162d50)
+    int FaceAway(const Vec4 &point);                                     // EN 0x739110 (JP 0x10162ea0)
+    int FaceAwayFrom(AnimModel *other);                                  // EN 0x7391a0 (JP 0x10162e00)
+    int ScreenPosition(int *x, int *y, const Matrix4 &viewProjection);   // EN 0x733100 (JP 0x10162f50)
+    int PushMotionSpeed(float speed);                                    // EN 0x73f7f0 (JP 0x10163000)
+    int MoveTowards(float x, float y, float z);                          // EN 0x73fac0 (JP 0x10162800)
+    int Push(float x, float y, float z);                                 // EN 0x73f9d0 (JP 0x101628f0)
+    int SnapHeight(float step, float offset);                            // EN 0x70bb00 (JP 0x10161e40)
+    int SnapPosition(float step, float offset);                          // EN 0x70b980 (JP 0x10161cb0)
+    int Hold(int on, float amount, AnimModel *other);                    // EN 0x7467c0 (JP 0x10163d60)
+    int HoldAtSpine(int on, float amount);                               // EN 0x7468c0 (JP 0x10163c70)
+    int SetDropCollider(Node *node);                                     // EN 0x746bc0 (JP 0x10163e70)
+    int IsClear(const Vec4 *offset);                                     // EN 0x71a790 (JP 0x10163e90)
+    int IsClearFlagged(const Vec4 *offset);                              // EN 0x71a880 (JP 0x10163f90)
+    int IsClearAny(const Vec4 *offset);                                  // EN 0x71a980 (JP 0x101640b0)
+    int IsClearOfMap(const Vec4 *offset);                                // EN 0x71aa70 (JP 0x101642c0)
+    int IsClearOfMapLimited(const Vec4 *offset);                         // EN 0x71ab70 (JP 0x101641b0)
     int SetMoveStep(float x, float y, float z);                          // EN 0x73f990 (JP model_params.cpp)
     int IsPlaybackAtEnd();                                               // EN 0x7356b0 (JP 0x1017b160)
+    int LoadModel(const char *path);                                     // EN 0x738f80 (JP 0x1017aeb0)
+    int AddMotionSpeed(float speed);                                     // EN 0x73f8a0 (JP 0x101630b0)
+    int SetPosition(float x, float y, float z);                          // EN 0x745c60 (JP 0x10162610)
+    void PlayMotion(int motion, int a, int b, float speed);              // EN 0x71af60 (JP 0x1017b0e0)
     int SetLayer(int layer, int a, int first, int last, int b, int c);   // EN 0x7438f0: Playback::SetLayer on the playback
 };
 

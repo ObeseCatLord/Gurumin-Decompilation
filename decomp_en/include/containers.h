@@ -15,6 +15,7 @@ struct KeyTrack
     int count;        // 0x10: keys in use
 
     int MarkAll();                 // EN 0x7765b0 (JP 0x101adb80): sets KEY_FLAG_MOTION on every key
+    void Reserve(int extra);       // EN 0x7754b0 (JP 0x101ada30): grows the three arrays by `extra` entries, keeping their contents
     int HasFrame(int frame);       // EN 0x7752e0 (JP 0x101adcb0): 1 when a key sits at `frame`
 };
 

@@ -96,3 +96,9 @@ offsets); record such headers here. None so far: `Node` is declared again in EN 
 - File-local `static` helpers survive when the JP twin had them (`IndexLists_Free` in `FreeExtraIndexLists`).
 - Node layout: the EN offsets of every field used so far equal the JP offsets (sizeof 0x18a0 from the effect-node
   pool stride); `decomp_en/include/node.h` carries the JP names.
+- JP `memset` of small arrays often compiles to calls in EN while the original has inline (sometimes `movdqu`
+  vectorised) stores: write the clear as a plain loop (`ModelBank::Reset`, `BufferPool_Clear`).
+- EN often reorders stores relative to the JP source (pointer before count, reset fields first); follow the EN
+  disassembly order. Separate early returns can matter where JP used one `||` test (`TexCache_Free`).
+- Name constants by their compare value: `SCRIPT_FLAG_LAST = 3999` with `>`, because `>= 4000` changes the
+  immediate.

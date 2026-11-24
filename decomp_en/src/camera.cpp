@@ -3,6 +3,7 @@
 
 #include "camera.h"
 #include "effect_nodes.h"
+#include "char.h"
 
 // Camera_SetMode2: switches the camera to control mode 2. Called through the script command table.
 extern "C" int Camera_SetMode2(void)
@@ -67,4 +68,14 @@ extern "C" int EffectNodes_ReleaseAll(void)
             g_effectNodes[i].Release();
     }
     return 0;
+}
+
+// Camera_AddTrackedPosition: adds the position of character `index` (the translation row of its world matrix) to the
+// list of positions the camera keeps in view. Called through the script command table.
+extern "C" int Camera_AddTrackedPosition(int index)
+{
+    g_trackedPositions[g_trackedCount] = &g_characterModels[index].matrix.m[MATRIX_TRANSLATION_X];
+    g_trackedFlags[g_trackedCount] = 0;
+    g_trackedCount++;
+    return 1;
 }

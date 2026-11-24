@@ -20,6 +20,14 @@ struct NodeExtra
     void Init();                   // EN 0x7419a0 (JP 0x10169660): empty tracks with their default keys
 };
 
+// Values of NodeSaved::state.
+enum NodeSavedState
+{
+    SAVED_EMPTY = 0,      // nothing saved
+    SAVED_HOLDING = 1,    // holds a saved matrix
+    SAVED_RETURNING = 2   // lets the tracked rotation return to rest, then ends
+};
+
 // A node's saved-state block (`Node::saved`): a saved matrix and the rotation limits used when the node tracks a target.
 struct NodeSaved
 {
@@ -37,13 +45,28 @@ struct NodeSaved
     void Reset();                  // EN 0x741950 (JP 0x10166870 ViewLimits::Reset): rotation limits back to +-45 degrees
 };
 
-// Offset of the bone count in a NodeSkin.
+// Limits of the NodeSkin arrays.
+const int SKIN_NAME_SIZE = 0x40;    // bone and link names
+const int SKIN_MAX_LINKS = 0x40;    // nodes a skinned node depends on
+const int SKIN_MAX_BONES = 0x44;    // bones by name
+// Offsets of the NodeSkin parts used so far.
+const int NODE_SKIN_LINKS_OFFSET = 0x1108;
 const int NODE_SKIN_BONE_COUNT_OFFSET = 0x5618;
 
 // A skinned node's skinning data (Node::skin): bones and skin matrices.
+struct Node;
+
 struct NodeSkin
 {
-    char m_0000[NODE_SKIN_BONE_COUNT_OFFSET];  // 0x0000: links, bones and matrices (not used by EN code yet)
+    char m_0000[0x84];                         // 0x0000: matrices and the bone node (not used by EN code yet)
+    char boneName[SKIN_NAME_SIZE];             // 0x0084: name of the node this one is bound to
+    char m_00c4[0x104 - 0xc4];                 // 0x00c4: inverse bone matrix (not used by EN code yet)
+    int isLink;                                // 0x0104: 1 when another skin links this node
+    char linkNames[SKIN_MAX_LINKS][SKIN_NAME_SIZE];  // 0x0108: names of the linked nodes
+    Node *links[SKIN_MAX_LINKS];               // 0x1108: nodes this skinned node depends on
+    char m_1208[0x1318 - 0x1208];              // 0x1208: the bones (not used by EN code yet)
+    char boneNames[SKIN_MAX_BONES][SKIN_NAME_SIZE];  // 0x1318: names of the bones
+    char m_2418[NODE_SKIN_BONE_COUNT_OFFSET - 0x2418];  // 0x2418: bone matrices (not used by EN code yet)
     int boneCount;                             // 0x5618: entries used in the bone arrays (0 = no skinning)
 };
 

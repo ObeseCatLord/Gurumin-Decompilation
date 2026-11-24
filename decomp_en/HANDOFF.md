@@ -34,36 +34,27 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-24, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 2 of 2,034 game functions (94 of 2,080,360 bytes, 0.00 %) |
-| Matched under the rules | 2 |
-| Queue | 655 with a matched JP twin, 486 mapped to an unmatched JP twin, 891 EN-only |
+| Matched | 151 of 2,034 game functions (9,231 of 2,080,360 bytes, 0.44 %) |
+| Matched under the rules | 151 |
+| Queue | 506 with a matched JP twin left in section 2; open.tsv: 2 |
 
 ## State
-- Pipeline ready and verified (batch 0): toolchain (`env.bat`, `build.bat`, `tools/run_cl.py` for the UTF-8 code
-  page), flags `/O2 /Oy- /GS- /EHsc` (NOTES "Compile flags"), classification (`classify.tsv`), JP->EN map
-  (`jp_en_map.tsv`, 1,143 of 2,034 mapped), queue, report and gate. `Node::Find` and `Map_RunFrameScript` match.
-- `ghidra/ApplyJpNames.java` (via `apply_jp_names.bat`) was verified in a read-only dry run (1,115 names); it has
-  not been applied to the saved EN Ghidra project yet. Applying it renames FUN_ functions in
-  `re/export/game_en_steam.exe/`; the tools do not depend on those names (classify keeps a fixed FID list).
-- `flag_tests/` holds the six flag-test functions (not built by build_all; they declare local types).
-
-## Efficiency over the JP workflow
-1. **Port before briefing:** `tools/port_jp.py --brief` assembles the brief mechanically (JP matched source, callee
-   names, disassembly); 657 EN functions have a matched JP twin, and both first ports matched unchanged.
-2. **Batch small ports:** for section-2 functions under ~150 bytes, give one subagent 5-10 functions that share a JP
-   source file (same EN file name), instead of one function per brief.
-3. **Proposed next tool:** `tools/port_file.py <jp file.cpp>` that copies a whole matched JP file into `src/`,
-   rewrites every JP address (function names, `obj_symbols` rows, globals) to its EN twin through `jp_en_map.tsv`,
-   builds it and keeps the functions that print MATCH; the rest become section-1 drafts. Most of section 2 could
-   then be cleared without a model in the loop, leaving models for the residues.
-4. **Headers grow by proof:** when an EN match uses a JP struct's fields at the JP offsets, move that JP header's
-   declarations into `include/` wholesale (record it in NOTES) instead of re-deriving fields one by one.
+- Pipeline verified; batches 1-4 matched Node (29+), Vec4/Matrix4/Box, containers, AnimModel channels, camera,
+  IME, engine/render (IDirect3DDevice9 vtable offsets), slot table, texcache, MMV, texture manager, mesh cache,
+  model bank, Game script flags and windows, mouse, config, buffer pool, colour fades, DShow, window proc.
+- Header ownership is per worker; headers live in `include/` (node.h, anim_model.h, vec4.h, texture_mgr.h,
+  render.h, slot_table.h, game.h, char.h, ...). Grep `include/` before declaring any type.
+- `port_jp.py` finds JP sources named `M_<address>` (fixed in batch 1).
+- Worker rules for briefs: scratchpad `worker_rules.txt` pattern (rules + tools + habits); give each worker
+  15-20 functions of one JP area plus the headers it owns. Resume a worker for 2-3 rounds, then start a fresh one
+  (contexts pass 250K tokens by round 4).
+- Not applied yet: `apply_jp_names.bat` (EN Ghidra names).
+- Blocked: `Game::~Game` 0x5a1150 needs a Node destructor (0x7496d0) and an EN Object base (0x76f0e0).
 
 ## Next steps
-1. Section 2 of `QUEUE.md` (JP twin matched), smallest first; start with the camera setters, Vec4/Matrix4 helpers and
-   Node methods (shared headers grow fastest there).
-2. Consider writing `tools/port_file.py` (efficiency item 3) before the large-function part of section 2.
-3. Apply the JP names to the EN Ghidra project (`apply_jp_names.bat`) when no other session is using it.
+1. Section 2 of `QUEUE.md` by JP file: scene_node (37 left), char_move (18), model_params (17, AnimModel),
+   app_0003/app_0010/actor_scan, model_bank, collide_query, char_effects/attach, then the larger files.
+2. Section 3 (JP twin unmatched) and 4 (EN-only) after section 2 thins out.
 
 ## Continuation prompt
 "Continue the Gurumin EN (Steam) matching decompilation. cd to the repository, read `decomp_en/HANDOFF.md`

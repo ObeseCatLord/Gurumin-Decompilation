@@ -35,4 +35,14 @@ extern "C" int Camera_CollectPaths(int moveId, int moveIdAgain, int *pathCount);
 // Builds the view and projection matrices for a camera at `eye` looking at `target`. EN 0x759300 (JP 0x10194360).
 extern "C" int Camera_SetMatrices(const Vec4 *eye, const Vec4 *target, Matrix4 *view, Matrix4 *projection, float roll);
 
+// Positions the camera keeps in view (at most CAMERA_TRACKED_COUNT).
+const int CAMERA_TRACKED_COUNT = 0x30;
+
+extern "C" float *g_trackedPositions[CAMERA_TRACKED_COUNT];   // EN 0x0091f2b0 (JP DAT_1032d5b8): translation rows kept in view
+extern "C" char g_trackedFlags[CAMERA_TRACKED_COUNT];         // EN 0x0091f410 (JP DAT_1021bbc0): a flag per tracked position
+extern "C" int g_trackedCount;                                // EN 0x0091e76c (JP DAT_1049f0f0): entries of the two lists
+
+// Adds character `index` position to the list of positions the camera keeps in view. Returns 1. EN 0x645730.
+extern "C" int Camera_AddTrackedPosition(int index);
+
 #endif

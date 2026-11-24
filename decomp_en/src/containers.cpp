@@ -30,17 +30,6 @@ int KeyTrack::HasFrame(int frame)
     return 0;
 }
 
-// Empties the bank, leaving one zero key at frame 0 as the default value.
-void KeyBank::Clear()
-{
-    count = 0;
-    frames[0] = 0;
-    values[0].x = 0;
-    values[0].y = 0;
-    values[0].z = 0;
-    values[0].w = 0;
-}
-
 // Reallocates the vertex buffer for `count` vertices. Returns 1.
 int VertexPack::SetVertexCount(int count)
 {

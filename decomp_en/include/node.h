@@ -15,15 +15,28 @@ struct IndexList;
 struct Channel;
 struct SlotTable;
 struct VertexPack;
+struct Material;
+struct TextureRef;
+struct VisData;
 struct AnimModel;
 
 // Node::flags bits whose meaning is known.
 enum NodeFlags
 {
+    NODE_FLAG_KEEP_MESH = 0x4,             // the node's mesh data is kept when a unique model file is released
+    NODE_FLAG_HIDDEN = 0x20,               // not drawn
+    NODE_FLAG_SHAPE_BOX = 0x200,           // debug pass: shown as its box
+    NODE_FLAG_SHAPE_SPHERE = 0x400,        // debug pass: shown as its bounding sphere
+    NODE_FLAG_SHAPE_SOLID_BOX = 0x800,     // debug pass: shown as its box, filled
+    NODE_FLAG_SPECIAL_PASSES = 0xf00,      // any of the 0x100 to 0x800 pass bits
+    NODE_FLAG_SPECIAL_SHAPES = 0x3e00,     // debug shape modes (0xe00) and the limb states (0x3000): excluded from the special pass
+    NODE_FLAG_LIMB_STATES = 0x3000,        // the limb states 0x1000 and 0x2000
     NODE_FLAG_CHASING = 0x1000,            // a chasing node (its simulated point follows the tip)
     NODE_FLAG_TWO_BONE_LIMB = 0x2000,      // a two-bone limb (saved matrix restored by RestoreState2000)
     NODE_FLAG_COLLISION_SPHERE = 0x4000,   // a collision sphere node
     NODE_FLAG_SKIP_SUBTREE = 0x8000,       // the subtree is not updated or drawn (also the "special pass" marker)
+    NODE_FLAG_TEMPORARY_A = 0x40000,       // temporary saved state: undone and freed by ReleaseSavedStates
+    NODE_FLAG_TEMPORARY_B = 0x80000,       // second temporary saved state
     NODE_FLAG_TARGET_TRACKING = 0x400000   // tracks a target (saved matrix restored by RestoreState400000)
 };
 
@@ -36,6 +49,10 @@ enum NodeLimits
     NODE_SIZE = 0x18a0          // sizeof(Node)
 };
 
+// Node::savedFlags bit that keeps a node's mesh data when its unique model file is released.
+const int NODE_SAVED_FLAG_SHARED = 4;
+// SetRenderModeExcept argument meaning "no exception".
+const int NODE_NO_RENDER_MODE = -1;
 // Node::drawMode value that is not applied to skinned nodes with bones (SetRenderMode).
 const int NODE_DRAW_MODE_SKIN_EXCLUDED = 8;
 // Plug type of a plug that gives the animation frame.
@@ -53,8 +70,79 @@ enum NodeElement
     NODE_ELEMENT_THUNDER = 2    // the node name starts with "thun"
 };
 
+// Material sizes: texture file names and material names share one size.
+const int MATERIAL_NAME_SIZE = 0x40;
+const int MATERIAL_TEXTURE_COUNT = 4;
+// Material::alpha of a blank material (no vertex alpha).
+const float MATERIAL_BLANK_ALPHA = 0.0f;
+// Material::m_0174 of a blank material.
+const float MATERIAL_BLANK_VALUE = 255.0f;
+
+// A mesh material (0x180 bytes).
+struct Material
+{
+    char name[MATERIAL_NAME_SIZE];                                  // 0x00: the material's name
+    char textures[MATERIAL_TEXTURE_COUNT][MATERIAL_NAME_SIZE];      // 0x40: texture file names (empty = none)
+    float colour[3];                                                // 0x140: r, g, b (1 = white)
+    int m_014c;                                                     // 0x14c: cleared in a blank material
+    int m_0150;                                                     // 0x150: cleared
+    int m_0154;                                                     // 0x154: cleared
+    int m_0158;                                                     // 0x158: not touched by SetBlank
+    int m_015c;                                                     // 0x15c: cleared
+    int m_0160;                                                     // 0x160: cleared
+    int m_0164;                                                     // 0x164: cleared
+    int m_0168;                                                     // 0x168: cleared
+    int m_016c;                                                     // 0x16c: cleared
+    int m_0170;                                                     // 0x170: cleared in a blank material
+    float m_0174;                                                   // 0x174: 255 for a blank material
+    float alpha;                                                    // 0x178: vertex alpha (0 for a blank material)
+    char edge[4];                                                   // 0x17c: edge flags, signed bytes
+
+    void SetBlank(float r, float g, float b, char edgeFlag);        // EN 0x779880 (JP: loop body of AllocMaterials)
+};
+
+// Number of nodes CreateChildCopies makes.
+const int NODE_CHILD_COPY_COUNT = 0x20;
+// Nodes the tracking collection of Rebuild can hold.
+const int NODE_TRACKED_MAX = 8;
+// Nodes the link collection of Rebuild can hold.
+const int NODE_LINKS_MAX = 16;
+// Characters of the scratch name buffers used when renaming.
+const int NODE_NAME_SCRATCH_SIZE = 256;
+// Name prefix lengths of special nodes: "CDL<nn>-" (collision region) and "OvF<n>-" (overlay).
+const int NODE_COLLISION_PREFIX_LENGTH = 6;
+const int NODE_OVERLAY_PREFIX_LENGTH = 7;
+// Node::kind values: kinds below NODE_KIND_REGION_LIMIT are collision regions, 0xfd an overlay, 0xff none.
+const unsigned char NODE_KIND_NONE = 0xff;
+const unsigned char NODE_KIND_PLAIN = 0xfe;   // a node of a map that is neither a collision region nor an overlay
+// Bytes of the collector's static node list.
+const int NODE_STATIC_LIST_SIZE = 0x800;
+const unsigned char NODE_KIND_OVERLAY = 0xfd;
+const unsigned char NODE_KIND_REGION_LIMIT = 0x40;
+// Regions a map root node can name (TagRegion).
+const int NODE_REGION_COUNT = 0x40;
+// Bounds radius factor of the collision test against a segment (CollectNearSegment).
+const float NODE_SEGMENT_RADIUS_FACTOR = 0.578f;
+
+// Poses a node keeps: the current one and the stored ones.
+const int NODE_POSE_COUNT = 16;
+// Characters of "charbase" compared by BlendFrames.
+const int NODE_CHARBASE_PREFIX_LENGTH = 8;
+// MatrixBlend modes: plain interpolation, and interpolation of the rotation (skeleton roots).
+const int BLEND_LINEAR = 0;
+const int BLEND_ROTATION = 1;
+// Non-zero while an important model changes motion (read by the blending and playback code). EN 0x0217fafc (JP DAT_11b04508).
+extern "C" char g_importantMotionChange;
+// out = a blended towards b by t (mode BLEND_ROTATION interpolates the rotation). EN 0x771830 (JP 0x101b1420).
+extern "C" Matrix4 *MatrixBlend(Matrix4 *out, Matrix4 a, Matrix4 b, int t, int mode);
+
 // Motion frame of the current update pass, set by StartProximityPass. EN 0x217faf0 (JP DAT_11b044f8).
 extern "C" int g_updatePassFrame;
+
+// The default object a node in the target-tracking state follows. EN 0x0218e670 (JP DAT_11b07118).
+extern "C" char g_defaultTargetObject[];
+// Non-zero = the segment tests also look at skinned nodes. EN 0x0217b8d4 (JP DAT_11b04510).
+extern "C" int g_testSkinnedNodes;
 
 struct Node
 {
@@ -62,14 +150,18 @@ struct Node
     char m_0040[0x64 - 0x40];      // 0x040: not used by EN code yet
     int packCount;                 // 0x064: vertex packs of the mesh (also the entries of triangleSpheres; -1 = none, see ReplaceMaterial)
     VertexPack *packs;             // 0x068: the mesh's vertex packs (0 = none)
-    char m_006c[0x70 - 0x6c];      // 0x06c: not used by EN code yet
+    IndexList *indexLists;         // 0x06c: one index list per pack
     IndexList *triangleSpheres;    // 0x070: one sphere list per pack (0 = none)
-    char m_0074[0x90 - 0x74];      // 0x074: not used by EN code yet
+    char m_0074[0x89 - 0x74];      // 0x074: not used by EN code yet
+    char isStatic;                 // 0x089: 1 once the node was collected as static scenery (or is the collector)
+    short staticCount;             // 0x08a: on the collector: entries of staticNodes
+    Node **staticNodes;            // 0x08c: on the collector: the collected nodes (room for NODE_STATIC_LIST_SIZE bytes)
     int materialCount;             // 0x090: entries of the material table
-    char m_0094[0x9c - 0x94];      // 0x094: not used by EN code yet
+    Material *materials;           // 0x094: the node's materials (materialCount entries)
+    void *targetObject;            // 0x098: the object a node in the target-tracking state follows (EnterTargetState)
     SlotTable *mesh;                // 0x09c: the built mesh buffers (0 = none)
     int drawMode;                  // 0x0a0: render mode of the node
-    char m_00a4[0xa8 - 0xa4];      // 0x0a4: not used by EN code yet
+    int built;                     // 0x0a4: 1 once BuildMesh has created the mesh buffers
     int hasCollision;              // 0x0a8: non-zero when the node has collision
     unsigned int flags;            // 0x0ac: NodeFlags
     char m_00b0[0xb8 - 0xb0];      // 0x0b0: not used by EN code yet
@@ -77,14 +169,26 @@ struct Node
     char m_00bc[0xc0 - 0xbc];      // 0x0bc: not used by EN code yet
     int plugType[NODE_PLUG_COUNT];     // 0x0c0: type of each animation plug (PLUG_TYPE_FRAME gives the frame)
     Channel *plugs[NODE_PLUG_COUNT];   // 0x100: the channel behind each plug
-    char m_0140[0x1c8 - 0x140];    // 0x140: not used by EN code yet
+    int plugTypeCopy[NODE_PLUG_COUNT]; // 0x140: plug types kept with the private plug data (CopyPlugData)
+    void *plugData[NODE_PLUG_COUNT];   // 0x180: private copies of the plug channels' data (CopyPlugData)
+    char m_01c0[0x1c8 - 0x1c0];    // 0x1c0: not used by EN code yet
     int frameCount;                // 0x1c8: frames in the mesh
     Matrix4 matrix;                // 0x1cc: the node's own matrix (relative to its parent)
-    char m_020c[0x294 - 0x20c];    // 0x20c: not used by EN code yet
+    Matrix4 inverseMatrix;         // 0x20c: inverse of `matrix`
+    Matrix4 worldMatrix;           // 0x24c: the node's matrix in world space
+    TextureRef *textureRef;        // 0x28c: shared texture reference (ReleaseTexture)
+    Matrix4 *frameMatrices;        // 0x290: the node's matrix for each animation frame (0 = use `matrix`)
     int frameMatrixCount;          // 0x294: entries of the per-frame matrices
     char m_0298[0x2a8 - 0x298];    // 0x298: not used by EN code yet
     NodeExtra *extra;              // 0x2a8: the node's animation tracks (allocated by AllocExtra)
-    char m_02ac[0x708 - 0x2ac];    // 0x2ac: not used by EN code yet
+    char m_02ac[0x2d0 - 0x2ac];    // 0x2ac: not used by EN code yet
+    unsigned char kind;            // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
+    char m_02d1[0x2d4 - 0x2d1];    // 0x2d1: not used by EN code yet
+    Matrix4 poses[NODE_POSE_COUNT];    // 0x2d4: the current pose ([0]) and the stored poses (frames -1 to -16)
+    Vec4 bounds;                   // 0x6d4: bounding sphere (centre relative to the node, radius in w)
+    Vec4 box[2];                   // 0x6e4: the mesh's box: [0] lower, [1] upper corner
+    char skinned;                  // 0x704: 1 = the node has skinning data (a bone node when it has none of its own mesh)
+    char m_0705[0x708 - 0x705];    // 0x705: not used by EN code yet
     NodeSkin *skin;                // 0x708: skinning data (0 = none)
     char m_070c[0x74c - 0x70c];    // 0x70c: not used by EN code yet
     Node *parent;                  // 0x74c: the parent node (0 = root)
@@ -95,9 +199,14 @@ struct Node
     unsigned char cycleIndex;      // 0x1858: cycling child index (1..childCount), advanced by CycleChild
     int savedDrawMode;             // 0x185c: render mode kept by SaveRenderMode
     int savedFlags;                // 0x1860: flags kept by SaveFlags
-    char m_1864[0x1898 - 0x1864];  // 0x1864: not used by EN code yet
+    VisData *visibilityCells;      // 0x1864: visibility cells and their boxes of a map root node (0 = none)
+    char m_1868[0x1898 - 0x1868];  // 0x1868: not used by EN code yet
     unsigned char element;         // 0x1898: NodeElement bits from the node name
-    char m_1899[NODE_SIZE - 0x1899];   // 0x1899: not used by EN code yet
+    char m_1899;                   // 0x1899: not used by EN code yet
+    unsigned char colourA;         // 0x189a: colour value set by SetColourA on the shape-mode nodes
+    unsigned char colourB;         // 0x189b: colour value set by SetColourB
+    unsigned char colourC;         // 0x189c: colour value set by SetColourC
+    char m_189d[NODE_SIZE - 0x189d];   // 0x189d: not used by EN code yet
 
     // Name lookups in the subtree (scene_node.cpp). `skip` counts down the matches still to pass over.
     Node *Find(const char *name, int index);                   // EN 0x7532c0 (JP 0x1019ece0)
@@ -107,6 +216,14 @@ struct Node
     Node *Find2(const char *name, int index);                          // EN 0x753740 (JP 0x1019ed10)
     Node *FindRecursiveStripped(const char *name, int *skip);          // EN 0x753590 (JP 0x10191aa0)
     Node *FindPrefixRecursiveStripped(const char *prefix, int *skip);  // EN 0x753660 (JP 0x10191b60)
+
+    Node *FindByFlags(unsigned int mask, int nth, int *counter);   // EN 0x753420 (JP 0x10191cc0)
+    int Rename(const char *newName, const char *oldName);          // EN 0x769fa0 (JP 0x1019ed40)
+    int SetUniqueName(const char *name);                           // EN 0x76b570 (JP 0x101a52d0)
+    void MakeNameUnique();                                         // EN 0x76d540 (JP 0x101a2290)
+    int TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matrix4 *matrix);  // EN 0x76a130 (JP 0x10199cd0)
+    int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
+                           Vec4 *closest);                         // EN 0x75a660 (JP 0x10191ec0)
 
     // Special passes (scene_node.cpp).
     int MarkSpecialPass();                 // EN 0x75a900 (JP 0x1019d600)
@@ -119,6 +236,42 @@ struct Node
     Node *GetLinkedRoot();                 // EN 0x754180 (JP 0x10199310)
     int GetLastFrame();                    // EN 0x754120 (JP 0x10199340)
 
+    // Loading and mesh data.
+    int Rebuild();                         // EN 0x76eb00 (JP 0x101ac1a0)
+    int BlendFrames(int from, int to, int t);   // EN 0x749e00 (JP 0x1019b630)
+    void CollectStatic(Node *collector);   // EN 0x75aa70 (JP 0x1019d750)
+    // EN 0x759ad0 (JP 0x10193140): tests this tree (moved by `matrix`) against the tree of `other`, one probe offset per call.
+    int CollideModel(Matrix4 *matrix, Node *other, Matrix4 *otherMatrix, Vec4 *probes, int probeCount, int *probeIndex,
+                     AnimModel **touchedModels, Vec4 *touchedPushes, int *touchedCount, int mode, int *mapHit, int resolve,
+                     int *hitMatrix, unsigned int mask);
+    // EN 0x74a530 (JP 0x1019f340): tests probe spheres against the meshes of `node` and its children.
+    int CollideProbesWithMesh(unsigned int mask, Matrix4 *world, Node *node, float reach, float *nearest, Vec4 *probes,
+                              int probeCount, int *probeIndex, Vec4 *hitPoint, Vec4 *hitNormal, unsigned int flags,
+                              int *hitFlag, int resolve, int *hitMatrix, int *skipped);
+    int BindLinks(Node *root, Node **list, int *count);   // EN 0x76d770 (JP 0x1019eeb0): links nodes and bones under `root`
+    int SetupSkins(Node *root);            // EN 0x76dbe0 (JP 0x101ab9d0)
+    int CopyBindPoses();                   // EN 0x76e130 (JP 0x10191770)
+    int CollectTrackingNodes(Node **list, int *count);    // EN 0x76ea90 (JP 0x10191920): nodes in state 0x4000 (up to 8)
+    int LinkToChasing(Node *const *nodes, int count);     // EN 0x76d6e0 (JP 0x10191990)
+    int StoreLinks(Node **list, int *count);              // EN 0x76eb70 (JP 0x10191870)
+    int BuildMesh(int recurse, int flags);                // EN 0x76d630 (JP 0x1019afa0)
+    int CopyPlugData();                    // EN 0x749900 (JP 0x1019bd10)
+    int SetMaterialValue(const char *material, int value);  // EN 0x74a400 (JP 0x1019e8c0)
+    void ReleaseTexture();                 // EN 0x769e30 (JP 0x10191210)
+    void ReleaseMesh();                    // EN 0x769eb0 (JP 0x101913f0)
+    void ReleaseUniqueMeshData();          // EN 0x7507e0 (JP 0x10191280)
+    int ReleaseTexturesExcept(Node **keep, int count);    // EN 0x750370 (JP 0x1019bca0)
+    void FreePackData(VertexPack *packs, int count);      // EN 0x750970 (JP 0x101911b0): frees the packs' vertex data
+    void FreeIndexListData(IndexList *lists, int count);  // EN 0x7509a0 (JP 0x101911e0): frees the index lists' data
+    void FreeSphereListData(IndexList *lists, int count); // EN 0x7509d0 (JP 0x101911e0 twin)
+
+    // Render modes and colours.
+    int SetRenderModeExcept(int value, int except1, int except2);  // EN 0x76d3a0 (JP 0x1019b0c0)
+    int SetColourA(unsigned char value, unsigned int mask);  // EN 0x76b030 (JP 0x101946b0)
+    int SetColourB(unsigned char value, unsigned int mask);  // EN 0x76afb0 (JP 0x10194730)
+    int SetColourC(char value, unsigned int mask);           // EN 0x76b180 (JP 0x10194630)
+    int EnterTargetState(void *target);    // EN 0x76b410 (JP 0x101948f0)
+
     // On-demand blocks.
     int AllocSaved();                      // EN 0x76b2f0 (JP 0x101947b0)
     int AllocExtra();                      // EN 0x76b530 (JP 0x101949d0)
@@ -126,6 +279,7 @@ struct Node
     int RestoreState1000();                // EN 0x750270 (JP 0x101947f0)
     int RestoreState2000();                // EN 0x7501a0 (JP 0x10194870)
     int RestoreState400000();              // EN 0x750210 (JP 0x10194830)
+    void RestoreSavedMatrix();             // inline helper of ReleaseSavedStates
     int ReleaseSavedStates();              // EN 0x76a5f0 (JP 0x10194510)
     int FreeExtraIndexLists();             // EN 0x750a00 (JP 0x101ab980)
     int BuildCollisionSpheres();           // EN 0x74fcf0 (JP 0x1019e120)

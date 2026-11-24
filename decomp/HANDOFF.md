@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 15.99% of code, 840 of 1212 functions |
-| Matched under the rules | 15.96% of code, 839 of the 840 matched functions |
-| Fuzzy match | 24.18% |
+| Matched | 16.37% of code, 845 of 1212 functions |
+| Matched under the rules | 16.34% of code, 844 of the 845 matched functions |
+| Fuzzy match | 25.20% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -110,6 +110,13 @@ function) and node_world.cpp (0) still break rule 2.
   Regions_Build, Node::RayCast and Node::CastSegment (same bl pre-check wall as CastSegment2: register assignment,
   no helper found), DrawLightKind22 (effect_trail.h), DrawWorldPictures (same residue as DrawPictures), MeshData::Draw.
   Cleanup: TranslationMatrix/RotationY are declared per .cpp in about ten files (move to matrix4.h carefully).
+- Batch 333: AnimModel::Draw 0x10163150 and Camera_Refresh 0x10015960 matched; Node::CollideModel 0x10193140 (draft,
+  prologue only) and the box overlaps became Node thiscall members, which made AnimModel::IsClear/IsClearAny/
+  IsClearFlagged match; Game::PointInRect is a method. Drafts: Npc_HoverCarrier (frame 0x84 vs 0x80),
+  TextWindows_Draw (text_window.h), Map17_UpdateMoleGame (20 bytes), Player_WalkAlongPath (has gotos),
+  Char_AreaZone, Npc_PerchOnNeighbour (4 bytes; seat.z += aligns every slot, so the tail seat needs ~2 more
+  references). Pending: Npc_RoamRoute 0x100b2900 is drafted but parked outside the tree (its char_state.h edit was
+  refused by the permission check; see the shared notes file npc_roam_route_pending.md).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

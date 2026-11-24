@@ -5,6 +5,7 @@
 #include "perch_swooper.h"
 #include "dash_slash_enemy.h"
 #include "enemy_hover_strike.h"
+#include "strike_enemy.h"
 #include "world.h"
 #include "anim_model.h"
 #include "char_state.h"
@@ -85,7 +86,6 @@ extern "C" int FUN_1009e2d0(int index)
 }
 
 // Enemy behaviour updaters selected by DAT_1020b230 (one value per character slot).
-extern "C" int FUN_100a9240(int index, int variant);
 extern "C" int FUN_100aa820(int index, int variant);
 extern "C" int FUN_10076790(int index, int variant);
 extern "C" int FUN_1001d2d0(int index);
@@ -97,10 +97,10 @@ extern "C" int FUN_100bcb30(int index)
     switch (DAT_1020b230[index])
     {
     case 1:
-        FUN_100a9240(index, 0);
+        Enemy_StalkAndStrike(index, 0);
         return 0;
     case 2:
-        FUN_100a9240(index, 1);
+        Enemy_StalkAndStrike(index, 1);
         return 0;
     case 3:
     case 5:

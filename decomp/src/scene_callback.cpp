@@ -48,7 +48,7 @@ extern "C" int FUN_101011b0(int id, int value);                             // s
 extern "C" int FUN_1003ad20(int sound, const Vec4 *position, float volume);   // Sound_PlayEffect
 extern "C" int FUN_1003ac20(const char *name, const Vec4 *position, float volume);   // Sound_PlayWav
 extern "C" int FUN_1003a7d0(const char *path, float x, float y, float z, int start, float ox, float oy, float oz);  // EffectModel_Place
-extern "C" int FUN_100fc4a0(int map, int a, int b);                         // the map setup
+int FUN_100fc4a0(int map, const char *startMarker, int heightOffset);       // Map_SetupByNumber
 extern "C" void FUN_101b2580(void);                                         // starts the movie library
 extern "C" void FUN_101b27d0(const char *path);                             // opens a movie file in it
 extern "C" int FUN_101b25a0(int a);                                         // decodes its next frame

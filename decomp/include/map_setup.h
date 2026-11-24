@@ -34,6 +34,7 @@ extern "C" int DAT_104678a0[0x20];
 extern "C" int DAT_10c62ee0[0x1c1];
 extern "C" float DAT_102027ec;                        // 1.0 after a setup
 extern "C" int DAT_102027f8;                          // -1 after a setup
+extern "C" int DAT_10c64fbc;                          // cleared on a map setup by number (0x100fc4a0)
 extern "C" int DAT_1021a368;
 extern "C" int DAT_10256210;
 extern "C" int DAT_1042d958;

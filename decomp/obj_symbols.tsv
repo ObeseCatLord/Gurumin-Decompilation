@@ -222,7 +222,7 @@ _Vec3_Dot	101ac200
 ?ReadFrameOnce@MmvPlayer@@QAEXXZ	10160f00
 ?CompileText@ListBank@@QAEHXZ	100f9520
 ?SkipBlock@ListBank@@QAEHPAPADPAHH@Z	10035a30
-?FindMapEntry@Game@@QAEHHPAD00HHHPAH@Z	10054610
+?FindMapEntry@Game@@QAEHHPAD00PAH111@Z	10054610
 ?AngleDifference@@YAMMM@Z	101ac810
 ?Mirror@Vec4@@QAEXABU1@@Z	101aed50
 ?DistanceToLine@Vec4@@QAEMABU1@0@Z	101af140
@@ -620,8 +620,11 @@ _Enemy_IsBusy	100e1c40
 ?Enemy_HoverAndCallStrike@@YAHHH@Z	100ade30
 ?TitleScreen_Update@@YAHXZ	10114950
 ?FUN_100fda40@@YAHH@Z	100fda40
+?FUN_100fc4a0@@YAHHPBDH@Z	100fc4a0
 ?Partner_SpecialSkill@@YAHHPAUVec4@@PAH0@Z	10078060
 ?Player_UpdateFrame@@YAHXZ	1004d960
 ?Enemy_ShyGhost@@YAHH@Z	10075350
 ?Enemy_RoamAndSpit@@YAHH@Z	10084e80
 ?Enemy_RollingTire@@YAHHD@Z	100a4440
+?Enemy_StalkAndStrike@@YAHHH@Z	100a9240
+?Char_LaserZone@@YAHH@Z	1002d4e0

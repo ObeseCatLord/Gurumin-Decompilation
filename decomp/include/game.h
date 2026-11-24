@@ -210,7 +210,7 @@ struct Game : Object
     int RegisterEvent(int id);  // 0x100020d0 (flag_list.cpp: FlagOwner::M_100020d0)
     int RaiseGameOverEvents();
     int MarkKilled(int id);
-    int FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value);
+    int FindMapEntry(int map, char *name, char *file, char *title, int *unused1, int *unused2, int *unused3, int *value);
     int SetScriptFlag(int index, int value);
     int ReadWord();
     int PointInRect(int x, int y, int left, int top, int right, int bottom);   // 0x10008430 (app_0003.cpp)

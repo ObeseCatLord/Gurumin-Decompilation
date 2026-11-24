@@ -217,9 +217,9 @@ int Game::MarkKilled(int id)
 }
 
 // Finds the map entry for `map` that applies now (its map is 9999 or the current map, and all four script flags
-// pass) and copies its name, file and title strings and its value out (the three unused arguments are ignored).
+// pass) and copies its name, file and title strings and its value out (the three unused output pointers are never written; callers pass the address of `value` for them).
 // Returns 1, or 0 when there is none.
-int Game::FindMapEntry(int map, char *name, char *file, char *title, int unused1, int unused2, int unused3, int *value)
+int Game::FindMapEntry(int map, char *name, char *file, char *title, int *unused1, int *unused2, int *unused3, int *value)
 {
     for (int i = 0; i < m_a4614; i++)
     {

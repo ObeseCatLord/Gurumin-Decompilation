@@ -39,6 +39,8 @@
 
 #include "area_zone.h"
 
+#include "laser_zone.h"
+
 #define ZONE_TYPE_PUSH_PIT 0
 #define ZONE_TYPE_PUSH_RESTRICTED 1
 #define ZONE_TYPE_PUSH_FREE 2
@@ -76,7 +78,7 @@ extern "C" int FUN_1007ad20(int index)
     float value;
     if (DAT_10210fc0[DAT_10db6ee8[index].zone].points[3].z == ZONE_TYPE_OTHER)
     {
-        FUN_1002d4e0(index);
+        Char_LaserZone(index);
         return 0;
     }
     if (DAT_1020b430[index].state == 0)

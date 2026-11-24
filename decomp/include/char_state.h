@@ -385,6 +385,14 @@ struct CharState
                 int rayPlayerGap4;                // rolling_tire.cpp: the same for ray 4 (overlays behaviour)
             };
         };
+        struct
+        {
+            int laserSetup;                   // laser_zone.cpp: 0 = beam nodes not looked up yet, 1 afterwards
+            int laserFrames;                  // laser_zone.cpp: frames the zone has run
+            int laserTimer;                   // laser_zone.cpp: frames since the last beam pair was started
+            int laserHits;                    // laser_zone.cpp: beam pairs that ended while the player stood in the box
+            int laserPattern[12];             // laser_zone.cpp: per beam pair: 0 = free, else flag * 10000 + speed * 100 + type
+        };
         int words[0x10];                          // the whole block by index (resets and copies)
         Shove shoves[4];                          // char_shove.cpp: the slot's scripted shoves
     };

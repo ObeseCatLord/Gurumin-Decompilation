@@ -5,7 +5,4 @@
 // 0x1007ad20 (Char_AreaZone, area_zone.cpp)
 extern "C" int FUN_1007ad20(int index);
 
-// 0x1002d4e0: the update of a zone character whose map record is of type 6.
-extern "C" int FUN_1002d4e0(int index);
-
 #endif

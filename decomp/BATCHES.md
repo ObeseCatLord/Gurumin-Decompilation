@@ -402,3 +402,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 338 | 37 | match | Sonnet subagents: Enemy_CastAndTeleport, TitleScreen_Update, Partner_SpecialSkill matched; 7 drafts; 856 matched, 855 under the rules, fuzzy 32.34% |
 | 339 | 38 | match | Sonnet subagents: 3 drafts (Enemy_StalkAndStrike, Map_SetupByNumber, Char_LaserZone); 856 matched, 855 under the rules, fuzzy 33.02% |
 | 340 | 38 | match | Sonnet subagents: 9 drafts of very large functions, no new match; 856 matched, 855 under the rules, fuzzy 34.18% |
+| 341 | 38 | match | Sonnet subagents: 4 near-miss retries, no match (permuter candidates); 856 matched, fuzzy 34.18% |

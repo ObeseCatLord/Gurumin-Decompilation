@@ -161,6 +161,10 @@ function) and node_world.cpp (0) still break rule 2.
   Node::CollideProbesWithMesh 1019f340 (same length, layout), DodgeGame_UpdateGolemPiece 1005fc00, Enemy_WanderHopAndSpit
   10065bf0. char_state.h gained many union members (add-only). Very large functions rarely match first time: alternate
   with near-miss retries (1007dab0, 100675d0, 1002d4e0, 100a9240 are the closest).
+- Batch 341: retries of 1002d4e0, 1007dab0, 100a9240 and 100675d0, no match. LaserZone's one site is a CSE/regalloc
+  decision (17 spellings identical); TargetRace's stun chain threads in ours (45 spellings); StalkAndStrike's dead variant
+  load comes only from an equal-arm if/else (fakematch); PounceAndBreathe got its real constants (45.5/34.5) but the esi
+  zero register remains. These four are permuter candidates rather than spelling retries.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

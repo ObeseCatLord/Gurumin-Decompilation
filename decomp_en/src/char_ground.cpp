@@ -33,7 +33,7 @@ extern "C" int Char_PlaceOnGround(int index, int force)
         direction.Normalized3();
         float distance = GROUND_CAST_REACH;
         from.Copy(from - direction * distance);
-        if (g_worldRoot != 0 && g_worldRoot->CastSegment2(0, MAP_COLLISION_KIND, &from, &top, &ground, 0) != 0)
+        if (g_mapRootNode != 0 && g_mapRootNode->CastSegment2(0, MAP_COLLISION_KIND, &from, &top, &ground, 0) != 0)
         {
             ground.x = from.x;
             ground.y = from.y;

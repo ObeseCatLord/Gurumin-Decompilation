@@ -5,31 +5,8 @@
 #include "game_file.h"
 #include "mmv_player.h"
 
-const int MMV_PALETTE_COLOURS = 0xff;             // palette entries stored in the file (the 256th is the transparent colour)
 const unsigned short MMV_TRANSPARENT_COLOUR = 0xfbff;   // palette entry 255 of both palettes
 const int MMV_FRAMES_OFFSET = 0x40a;              // offset of the first frame record in the file
-
-#pragma pack(push, 1)
-// The start of an MMV file: the size, the palette, the size of the first frame record and then the frame records.
-struct MmvPaletteEntry
-{
-    unsigned char blue;     // 0x00: blue component
-    unsigned char green;    // 0x01: green component
-    unsigned char red;      // 0x02: red component
-    unsigned char pad;      // 0x03: unused
-};
-
-struct MmvFileHeader
-{
-    char m_0000[2];                                    // 0x00: not yet named
-    unsigned short width;                              // 0x02: movie width in pixels
-    unsigned short height;                             // 0x04: movie height in pixels
-    MmvPaletteEntry palette[MMV_PALETTE_COLOURS];      // 0x06: palette of the movie
-    char m_0402[4];                                    // 0x402: not yet named
-    int firstFrameSize;                                // 0x406: size of the first frame record
-    unsigned char frames[1];                           // 0x40a: the frame records
-};
-#pragma pack(pop)
 
 // Loads movie `path` (looked for as .\bin\<base name>.MMV first) whole into memory: the size, the 255-colour palette
 // (as RGB565 for the first palette and a 4-bit-per-channel form for the second, colour 255 set to the transparent
@@ -44,7 +21,7 @@ void MmvPlayer::Open(const char *path)
     isOpen = 0;
     GameFile movie;
     Path_GetBaseName(base, path);
-    sprintf(fileName, ".\bin\%s.MMV", base);
+    sprintf(fileName, ".\\bin\\%s.MMV", base);
     FILE *opened = movie.Open(fileName, "rb");
     if (opened == 0)
     {

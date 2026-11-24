@@ -37,7 +37,7 @@ extern "C" void Scene_Start(const char *characterFile, int value)
     g_soundsMuted = 1;
     g_sceneStartPending = 1;
     g_sceneByte = 0;
-    g_world.Bind(g_characterModels, g_worldRoot, &g_sceneState, Scene_HostCallback, &g_textRenderer);
+    g_world.Bind(g_characterModels, g_mapRootNode, &g_sceneState, Scene_HostCallback, &g_textRenderer);
     g_lightScale = 1.0f;
     g_world.LoadCharacter(Path_Data(characterFile, PATH_FOLDER_DEFAULT));
     if (g_guardedValue9 == MODE_COSTUME_SIX)

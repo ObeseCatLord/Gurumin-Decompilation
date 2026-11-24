@@ -70,6 +70,7 @@ struct ModelBank
     int AddLitModel(AnimModel *model);           // EN 0x70a2b0 (JP 0x10164af0): adds `model` to the lit models with default light vectors
     int CollectLights(Node *root);              // EN 0x745b60 (JP 0x1017c610): rebuilds the light list from the "Omn" and "Spot" nodes below `root`
     const void *LightDirection(AnimModel *model, const Vec4 *eye, const Vec4 *target);   // EN 0x7311a0 (JP 0x10164c10): the lights that light `model` seen from `eye` towards `target`
+    const void *LightForRoot(Node *root, const Vec4 *eye, const Vec4 *target);   // EN 0x731600 (JP 0x1017c5f0): like LightDirection for the bank model whose node tree is `root`; any other root gets the lights of the last lit entry
     int AddFlarePoint(Vec4 position, const Matrix4 *viewProjection);   // EN 0x70ae10 (JP 0x10165140)
 };
 

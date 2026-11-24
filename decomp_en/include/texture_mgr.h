@@ -81,7 +81,7 @@ struct TextureObject
     IDirect3DSurface9 *surface;   // 0x04: surface of a render-target texture, may be 0
     int width;                    // 0x08: texture width in pixels
     int height;                   // 0x0c: texture height in pixels
-    int m_0010;                   // 0x10: not yet named
+    int target;                   // 0x10: 0 = system memory texture, 1 = R5G6B5 render target, 2 = A8R8G8B8 render target
     int poolIndex;                // 0x14: buffer pool index of the frames
     int m_0018;                   // 0x18: not yet named
     int poolSlot;                 // 0x1c: non-zero when the frames live in the buffer pool
@@ -95,6 +95,13 @@ struct TextureObject
     // Creates the texture from width x height pixels (RGB, or `alpha` as the alpha image or mode). Returns non-zero when it
     // was created. EN 0x71c410.
     int Create(int width, int height, const void *pixels, int alpha, int flags);
+    // EN 0x77d950 (JP 0x1014f1f0): (re)creates this texture at width x height and forgets it as a bound texture. `alpha` is 0
+    // (system memory R5G6B5 texture filled from the 24-bit `pixels`), UPLOAD_TARGET_565 or UPLOAD_TARGET_8888 (an empty
+    // render target) or a second 24-bit image whose first byte per pixel is the alpha of an A4R4G4B4 texture. Returns 0
+    // when Direct3D fails, else 1 (also without a device).
+    int Upload(int width, int height, unsigned char *pixels, const unsigned char *alpha);
+    // EN 0x7a5b00 (JP 0x10144ee0): halves a 24-bit image in place (each 2x2 block averaged). `this` is not used.
+    int HalveRgb24(unsigned char *pixels, int width, int height);
     int BindStage0();                                       // EN 0x7a58b0 (JP 0x1014b670): binds to stage 0 unless already bound
     int BindStage1();                                       // EN 0x7a5840 (JP 0x1014b6e0): binds to stage 1 unless already bound
     int BeginRenderTo(int width, int height, int offset);   // EN 0x7a4bf0 (JP 0x10143870)

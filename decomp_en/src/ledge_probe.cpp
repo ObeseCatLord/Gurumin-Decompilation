@@ -34,8 +34,8 @@ extern "C" int Char_ProbeSideLedge(int index, Vec4 *wall, Vec4 *ground, float *w
         top.w = g_characterModels[index].matrix.m[MATRIX_TRANSLATION_W];
         bottom.Copy(top);
         bottom.z -= LEDGE_GROUND_DEPTH;
-        if (g_worldRoot != 0)
-            g_worldRoot->CastSegment(0, LEDGE_MASK, &bottom, &top, &floor, 0);
+        if (g_mapRootNode != 0)
+            g_mapRootNode->CastSegment(0, LEDGE_MASK, &bottom, &top, &floor, 0);
         from.Copy(floor);
         if (floor.x == LEDGE_NO_GROUND)
             return 0;
@@ -49,7 +49,7 @@ extern "C" int Char_ProbeSideLedge(int index, Vec4 *wall, Vec4 *ground, float *w
     }
     side.Copy(side + from);
     float distance = LEDGE_NO_WALL;
-    if (g_worldRoot != 0 && g_worldRoot->CastRay(0, LEDGE_RAY_FLAGS, LEDGE_MASK, &side, &from, &wallHit, 0) != 0)
+    if (g_mapRootNode != 0 && g_mapRootNode->CastRay(0, LEDGE_RAY_FLAGS, LEDGE_MASK, &side, &from, &wallHit, 0) != 0)
         distance = (wallHit - from).Length();
     if (distance == LEDGE_NO_WALL)
     {
@@ -105,8 +105,8 @@ extern "C" int Char_ProbeSideStep(int index, Vec4 *wall, Vec4 *ground, float *wa
         top.w = g_characterModels[index].matrix.m[MATRIX_TRANSLATION_W];
         bottom.Copy(top);
         bottom.z -= LEDGE_GROUND_DEPTH;
-        if (g_worldRoot != 0)
-            g_worldRoot->CastSegment(0, LEDGE_MASK, &bottom, &top, &floor, 0);
+        if (g_mapRootNode != 0)
+            g_mapRootNode->CastSegment(0, LEDGE_MASK, &bottom, &top, &floor, 0);
         from.Copy(floor);
         if (floor.x == LEDGE_NO_GROUND)
             return 0;
@@ -120,7 +120,7 @@ extern "C" int Char_ProbeSideStep(int index, Vec4 *wall, Vec4 *ground, float *wa
     }
     side.Copy(side + from);
     float distance = LEDGE_NO_WALL;
-    if (g_worldRoot != 0 && g_worldRoot->CastRay(0, LEDGE_RAY_FLAGS, LEDGE_MASK, &side, &from, &wallHit, 0) != 0)
+    if (g_mapRootNode != 0 && g_mapRootNode->CastRay(0, LEDGE_RAY_FLAGS, LEDGE_MASK, &side, &from, &wallHit, 0) != 0)
         distance = (wallHit - from).Length();
     if (distance == LEDGE_NO_WALL)
     {

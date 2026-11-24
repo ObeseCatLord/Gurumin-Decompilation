@@ -46,7 +46,7 @@ extern "C" int Char_ProbeGround(int slot, int unused, float distance)
         to.Copy(from);
         to.z -= GROUND_PROBE_DOWN;
         g_collisionFilter = g_characterModels[slot].collisionFilter;
-        if (g_worldRoot != 0 && g_worldRoot->Collide(0, GROUND_PROBE_MASK, &from, &to, &hit) != 0)
+        if (g_mapRootNode != 0 && g_mapRootNode->Collide(0, GROUND_PROBE_MASK, &from, &to, &hit) != 0)
         {
             g_collisionFilter = 0;
             return 1;

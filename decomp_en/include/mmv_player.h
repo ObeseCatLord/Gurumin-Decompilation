@@ -60,4 +60,28 @@ extern "C" int g_movieFrameCount;         // EN 0x0091fe18 (JP DAT_104bfe74): fr
 // Opens movie `name`, decodes its first frame into the movie texture slot and records the frame count. Returns 1. EN 0x603a10.
 extern "C" int Movie_PlayToTexture(const char *name, int secondPalette);
 
+const int MMV_PALETTE_COLOURS = 0xff;             // palette entries stored in the file (the 256th is the transparent colour)
+
+#pragma pack(push, 1)
+// The start of an MMV file: the size, the palette, the size of the first frame record and then the frame records.
+struct MmvPaletteEntry
+{
+    unsigned char blue;     // 0x00: blue component
+    unsigned char green;    // 0x01: green component
+    unsigned char red;      // 0x02: red component
+    unsigned char pad;      // 0x03: unused
+};
+
+struct MmvFileHeader
+{
+    char m_0000[2];                                    // 0x00: not yet named
+    unsigned short width;                              // 0x02: movie width in pixels
+    unsigned short height;                             // 0x04: movie height in pixels
+    MmvPaletteEntry palette[MMV_PALETTE_COLOURS];      // 0x06: palette of the movie
+    char m_0402[4];                                    // 0x402: not yet named
+    int firstFrameSize;                                // 0x406: size of the first frame record
+    unsigned char frames[1];                           // 0x40a: the frame records
+};
+#pragma pack(pop)
+
 #endif

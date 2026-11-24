@@ -20,9 +20,9 @@ extern "C" Node *Map_FindRegionAt(const Vec4 *point)
     int i = 0;
     Vec4 low;
     Vec4 high;
-    while (g_worldRoot != 0)
+    while (g_mapRootNode != 0)
     {
-        Node *region = g_worldRoot->Find(REGION_NAME, i);
+        Node *region = g_mapRootNode->Find(REGION_NAME, i);
         if (region == 0)
             return 0;
         if (strstr(region->name, REGION_SKIP_EGG) == 0 && strstr(region->name, REGION_SKIP_CROWD) == 0 &&

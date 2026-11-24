@@ -3,6 +3,7 @@
 #ifndef GURUMIN_EN_COLLIDE_REGIONS_H
 #define GURUMIN_EN_COLLIDE_REGIONS_H
 
+#include "visibility.h"
 #include "node.h"
 #include "vec4.h"
 
@@ -18,7 +19,6 @@ const float RAY_DROP = 350.0f;
 const float RAY_STRETCH = 2.0f;
 const float REGION_MARGIN = 150.0f;
 
-extern "C" Node *g_worldRoot;           // EN 0x00927104 (JP DAT_10255f08): root of the loaded world, 0 while none is loaded
 extern "C" Node *g_markerNode;          // EN 0x0091da3c (JP DAT_104c03ac): node whose translation keys are the marker points
 extern "C" char *g_markerFree;          // EN 0x0091d798 (JP DAT_104c0394): per marker point 1 = nothing is in the way
 

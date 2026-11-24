@@ -28,9 +28,9 @@ int Shaga_PushOut(int index)
     int steps = 0;
     do
     {
-        if (g_worldRoot == 0)
+        if (g_mapRootNode == 0)
             break;
-        if (g_worldRoot->Query(&identity, &position, g_shagaRadius[index] + SHAGA_PUSH_MARGIN, &normal, &depth, 0, 0) == 0)
+        if (g_mapRootNode->Query(&identity, &position, g_shagaRadius[index] + SHAGA_PUSH_MARGIN, &normal, &depth, 0, 0) == 0)
             break;
         normal.Normalized3();
         float step = SHAGA_PUSH_STEP;

@@ -66,3 +66,14 @@ address	status	reason
 007a8930	open	Path_GetBaseName: original clears the first 8 bytes with two dword stores (memset gives movq)
 00752190	open	Node::DrawShadow: 1453 vs 1456, casterSize register choice (movaps xmm0,xmm1 copy)
 005c0ca0	open	Party_BlocksMove: only the load of the 0.25 tolerance constant (before the andpd in the original, after it here) differs; tried comparison direction, local turn, AbsFloat helper, fabsf
+007a8ec0	open	MmvPlayer::DrawToTexture: 85 bytes off; the original keeps `this` in ebx and re-reads `frame` for the call, ours holds frame in ebx; ternary/if forms for the palette and the clamp tried (four spellings)
+00734b20	open	ModelNames_ClearAll: loop pointer in edx with the zero kept in eax and both addresses loaded before rep stosd; index loop gives eax pointer and mov eax,0 after (three spellings: index, pointer, memset)
+0071add0	open	Playback::Play: original keeps the repeated `layer != -1` tests separate and every early return gets its own epilogue; ours merges the tests (five spellings with unsigned compares)
+00607020	open	ListBank::LoadText: only register numbering differs (ours c in dl and inQuotes in ecx, original c in cl and inQuotes in edx) and the second `cmp cl,0x22` is kept in the original; int/bool/declaration order tried (four spellings)
+00645ad0	open	ListBank::DeclareVariable: original keeps `this` in ebx and lays out the type 0/1 block before type 2; ours spills this to the stack
+005ec290	open	ListBank::FirstIndexValue: EN inlines the argument reader (ReadArgument loop) into the function; not attempted past reading the disassembly
+00777770	open	PerspectiveMatrix: first 200 bytes match; tail stores m[10] and m[14] in a different order (farPlane*nearPlane operand order)
+00777410	open	Vec3_Normalized: 8 bytes off, xmm0/xmm2 numbering of x and y only
+0071cf80	open	SortByDepth: 25 bytes off; the original reuses the dead count parameter slot for one spill, ours takes a fresh local (bool/early return variants worse)
+00646ae0	open	Char_SetHelmetModel: bytes equal except one duplicated epilogue after the if chain (nested ifs and one && chain tried)
+0063aeb0	open	Char_UpdateShoves: original keeps the 10000 divisor in edi with a spill slot of its own at [ebp-4] (frame 0x2c, loop counter in ebx); ours reuses the argument slot (frame 0x28); tried plain literals, named local before and after the shove pointer

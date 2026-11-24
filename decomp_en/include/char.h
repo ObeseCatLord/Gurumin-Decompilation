@@ -38,6 +38,9 @@ const int PARTY_SIZE = 5;
 const int CHAR_GROUP_COUNT = 0x5c;
 // Bytes of a CharRecord.
 const int CHAR_RECORD_SIZE = 0x188;
+
+// Characters in a character's display name, including the terminator.
+const int CHAR_NAME_SIZE = 0x20;
 // Bytes of a CharState.
 const int CHAR_STATE_SIZE = 0x40;
 // First slot and one past the last slot that hold enemies.
@@ -98,16 +101,38 @@ struct CharRecord
     char defeated;                           // 0x141: 1 once the character is marked defeated
     char m_0142;                             // 0x142: not used by EN code yet
     char colourByte;                         // 0x143: colour value Char_UnpackParameter saves before it switches the kind
-    char m_0144[CHAR_RECORD_SIZE - 0x144];   // 0x144: held flag and name (not used by EN code yet)
+    char heldFlag;                           // 0x144: kept in the CharState while the character is held
+    char name[CHAR_NAME_SIZE];               // 0x145: display name (message boxes show it as the speaker)
+    char m_0165[CHAR_RECORD_SIZE - 0x165];   // 0x165: not used by EN code yet
 };
 
-// The behaviour state of a character slot (0x40 bytes); every behaviour keeps its own variables in `values`.
+// A shove: a timed step applied to a character or a look target (the shoves view of a CharState, 0x10 bytes).
+struct Shove
+{
+    int target;     // 0x00: character to move (the digits above the lowest four are a flag); negative = a head look target
+    int stepX;      // 0x04: x added to the character each frame (for a look target: the character to look at)
+    int stepY;      // 0x08: y added to the character each frame
+    int frames;     // 0x0c: frames left (the digits above the lowest four are a flag); 0 = idle
+};
+
+// Shoves a slot runs at once.
+const int SHOVE_COUNT = 4;
+
+// The behaviour state of a character slot (0x40 bytes); every behaviour keeps its own variables in `values`. The slot of a
+// scripted scene uses the same memory as SHOVE_COUNT shoves instead.
 struct CharState
 {
-    int state;                // 0x00: behaviour step (0 = not started yet)
-    int values[13];           // 0x04: behaviour variables (the AI pickers use values[0] and values[1])
-    int sawPlayer;            // 0x38: 1 once the character saw the player (or was told to react)
-    int behaviour;            // 0x3c: behaviour number the character switches to (set with state 2)
+    union
+    {
+        struct
+        {
+            int state;                // 0x00: behaviour step (0 = not started yet)
+            int values[13];           // 0x04: behaviour variables (the AI pickers use values[0] and values[1])
+            int sawPlayer;            // 0x38: 1 once the character saw the player (or was told to react)
+            int behaviour;            // 0x3c: behaviour number the character switches to (set with state 2)
+        };
+        Shove shoves[SHOVE_COUNT];    // 0x00: the shoves of the slot
+    };
 };
 
 // The model file of a model number.
@@ -118,6 +143,9 @@ struct ModelPath
 
 extern "C" CharRecord g_charRecords[CHAR_SLOT_COUNT];      // EN 0x00f381e0 (JP DAT_10daaae8)
 extern "C" CharState g_charState[CHAR_SLOT_COUNT];         // EN 0x009160e0 (JP DAT_1020b430)
+// Runs the shoves of slot `slot`: look targets turn the player's head, running shoves move their character and play its run or
+// idle motion. Returns 0. EN 0x63aeb0 (JP 0x1002ee70).
+extern "C" int Char_UpdateShoves(int slot);
 extern "C" char g_charRespawned[CHAR_SLOT_COUNT];         // EN 0x009e1810 (JP DAT_1021f9c0): 1 once an enemy dropped in or was defeated and refilled
 extern "C" unsigned char g_charHitLevel[CHAR_SLOT_COUNT];   // EN 0x009e1a10 (JP DAT_102550e0): non-zero = wake at once (1 = hit, attack at once)
 extern "C" short g_charReleaseNow[CHAR_SLOT_COUNT];         // EN 0x009e2278 (JP DAT_103153b0): non-zero = release now (set to 150 for drop-ins)

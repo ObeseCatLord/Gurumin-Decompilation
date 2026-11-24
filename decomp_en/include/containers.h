@@ -19,6 +19,7 @@ struct KeyTrack
     int HasFrame(int frame);       // EN 0x7752e0 (JP 0x101adcb0): 1 when a key sits at `frame`
     void Init();                   // EN: inline in the callers (JP 0x101ad960): one zero key at frame 0, room for 16 keys
     int Insert(int frame, float x, float y, float z, float w);  // EN 0x76f810: inserts a key before the first key at or after `frame` (an existing key at `frame` is kept), returns its index
+    int Sample(int frame, float *x, float *y, float *z, float *w, int flags);  // EN 0x76fd80: the value at `frame`, interpolated between the neighbouring keys (flags 1 = as a rotation)
     int Set(int frame, float x, float y, float z, float w);  // EN 0x779540 (JP 0x101adcf0): sets or inserts the key at `frame`
     int CopyFrom(const KeyTrack *source);  // EN 0x771de0 (JP 0x101ade10): makes this track a copy of `source`
     void Free();                   // EN 0x778450 (JP 0x101ad7b0): frees the three arrays and empties the track

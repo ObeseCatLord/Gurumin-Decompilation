@@ -27,7 +27,7 @@ extern "C" int Markers_TestRegions(void)
     Vec4 from;
     Vec4 to;
     Vec4 hit;
-    if (g_worldRoot == 0)
+    if (g_mapRootNode == 0)
         return 0;
     for (int i = 0; i < g_markerNode->extra->tracks[NODE_TRACK_TRANSLATION].count; i++)
     {
@@ -36,7 +36,7 @@ extern "C" int Markers_TestRegions(void)
         to.Copy(from);
         from.z += REGION_RAY_REACH;
         to.z -= REGION_RAY_REACH;
-        Node *regions = g_worldRoot->Find("testatari", 0);
+        Node *regions = g_mapRootNode->Find("testatari", 0);
         if (regions != 0 && Regions_Collide(regions, 0, NODE_MASK_REGION, &from, &to, &hit) != 0)
             g_markerFree[i] = 0;
         else

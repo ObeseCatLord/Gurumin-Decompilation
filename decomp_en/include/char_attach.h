@@ -58,5 +58,7 @@ extern "C" int Helmet_FaceSettings(int item);
 // Puts helmet item `item` on the player (0 or less takes the helmet off; items of other types are ignored). Returns
 // 1, or 0 when the player has no model or the helmet was only taken off. EN 0x646bb0 (JP 0x100154c0).
 extern "C" int Char_WearHelmet(int item);
+// Puts the helmet model file `model` on the head of character `index` (0 removes the helmet). EN 0x646ae0 (JP 0x100143f0).
+extern "C" int Char_SetHelmetModel(int index, const char *model);
 
 #endif

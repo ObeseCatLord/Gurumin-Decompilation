@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "char.h"
 #include "balloon.h"
+#include "node.h"
 #include "sound_effects.h"
 
 // Character slots the balloons use: the first slot and the slot after the last.

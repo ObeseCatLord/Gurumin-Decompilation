@@ -14,4 +14,7 @@ extern "C" char g_registeredPaths[NAME_PATH_SLOTS][NAME_PATH_SIZE];   // EN 0x02
 // Registers `name` in slot `index` with the path that replaces it. EN 0x7a5ca0 (JP 0x1013e6f0).
 extern "C" int Names_Set(int index, const char *name, const char *path);
 
+// Copies `text` to `out`, replacing every registered name by its path. EN 0x7a5d40 (JP 0x1013e790).
+extern "C" int Names_Expand(char *out, const char *text);
+
 #endif

@@ -107,6 +107,9 @@ Vec4 Vec3_Normalized(Vec4 *v);
 // Translation matrix (EN 0x777220, JP 0x101b1360).
 Matrix4 TranslationMatrix(float x, float y, float z);
 
+// Rotation matrix of the quaternion `quaternion` (x, y, z = vector part, w = scalar part) (EN 0x777a20).
+Matrix4 RotationMatrix(const Vec4 &quaternion);
+
 // Transforms `point` by `matrix` and divides x/y/z by the resulting w (perspective divide); the result's w is that w
 // (EN 0x77a4a0, JP 0x101ae060).
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);

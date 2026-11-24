@@ -333,3 +333,25 @@ extern "C" int Char_WearHelmet(int item)
     }
     return 1;
 }
+
+// Char_SetHelmetModel: gives character `index` the helmet model file `model` on its head (0 = no helmet): an old
+// helmet node is removed first, and nothing is added when the character has a helmet already or no head. Returns 0.
+// Called when a character model is loaded with equipment.
+extern "C" int Char_SetHelmetModel(int index, const char *model)
+{
+    Node *helmet = g_characterModels[index].root->Find("helmet", 0);
+    if (helmet != 0)
+        helmet->parent->RemoveChild(helmet, 0);
+    Node *head;
+    if (model != 0 && g_characterModels[index].root->Find("helmet", 0) == 0 &&
+        (head = g_characterModels[index].root->Find("Bip01 Head", 0)) != 0)
+    {
+        helmet = head->AddChild(0, HELMET_NODE_POSITION);
+        helmet->Load(Path_Data(model, 0), 0, 0, 0);
+        strcpy(helmet->name, "helmet");
+        helmet->parent = head;
+        helmet->Rebuild();
+        helmet->BuildMesh(1, 0);
+    }
+    return 0;
+}

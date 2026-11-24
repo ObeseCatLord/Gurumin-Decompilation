@@ -338,6 +338,10 @@ struct Node
     int CylindersOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *second, const Vec4 *secondOffset, Vec4 *delta, Vec4 *negatedDelta);
     // EN 0x754480 (JP 0x10192200): box `first` against the upright cylinder inscribed in box `second`.
     int BoxCylinderOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *second, const Vec4 *secondOffset, Vec4 *delta, Vec4 *negatedDelta);
+    // EN 0x754840 (JP 0x10192520): box `first` against the sphere `sphere` (radius w * 0.578), each moved by its offset; the push directions of the three views zero the unused axes of the deltas. `this` is not used.
+    int BoxSphereOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *sphere, const Vec4 *sphereOffset, Vec4 *delta, Vec4 *negatedDelta);
+    // EN 0x7550b0 (JP 0x10192c90): the upright cylinder inscribed in box `first` against the sphere `sphere`. `this` is not used.
+    int CylinderSphereOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *sphere, const Vec4 *sphereOffset, Vec4 *delta, Vec4 *negatedDelta);
     int PreScanFile(const char *path, int arg);           // EN 0x759100 (JP 0x101abd60): loads a model file into this node tree
     int CopyMesh(Node *source, int slot);                 // EN 0x74ddc0 (JP 0x1019b350): gives this node the (shared or copied) mesh of `source`
     int MoveToParent(Node *newParent, int position);      // EN 0x74a050: moves this node under `newParent` at `position` among its children

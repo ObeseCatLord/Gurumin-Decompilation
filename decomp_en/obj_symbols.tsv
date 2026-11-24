@@ -750,3 +750,14 @@ _Party_BlocksMove	005c0ca0
 ?ResetVertexColours@Node@@QAEHM@Z	0074f3c0
 _SortByDepth	0071cf80
 _Balloon_Blast	005e85f0
+_Char_SetHelmetModel	00646ae0
+_Char_UpdateShoves	0063aeb0
+# section 3 large (batch 11)
+_Message_Open	00644970
+?AnimatedMatrix@NodeExtra@@QAE?AUMatrix4@@H@Z	00731970
+_Render_DrawGradientQuad@32	00792370
+?LightForRoot@ModelBank@@QAEPBXPAUNode@@PBUVec4@@1@Z	00731600
+?LightDirection@ModelBank@@QAEPBXPAUAnimModel@@PBUVec4@@1@Z	007311a0
+?BoxSphereOverlap@Node@@QAEHPBUVec4@@000PAU2@1@Z	00754840
+?CylinderSphereOverlap@Node@@QAEHPBUVec4@@000PAU2@1@Z	007550b0
+?Upload@TextureObject@@QAEHHHPAEPBE@Z	0077d950

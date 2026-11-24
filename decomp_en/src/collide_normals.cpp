@@ -14,8 +14,8 @@ extern "C" int Collision_AverageNormals(Node *node, const Vec4 *offset, Matrix4 
     {
         Vec4 probe;
         probe.Copy(node->worldMatrix.GetTranslation() + node->bounds + *offset);
-        if (g_worldRoot != 0 &&
-            g_worldRoot->Query(matrix, &probe, node->bounds.w * PROBE_RADIUS_SCALE, normal, depth, 0, 0) != 0)
+        if (g_mapRootNode != 0 &&
+            g_mapRootNode->Query(matrix, &probe, node->bounds.w * PROBE_RADIUS_SCALE, normal, depth, 0, 0) != 0)
         {
             int hits = ++*count;
             float weight = 1.0f / (float)hits;

@@ -23,7 +23,7 @@ Node *Map_BuildTopView(Matrix4 *out, const Matrix4 &matrix)
     if (map->childCount == MAP_ROOT_CHILD_COUNT)
         map = map->children[0];
     if (map == 0)
-        map = g_worldRoot;
+        map = g_mapRootNode;
     Matrix4 view;
     Matrix4 projection;
     view = map->matrix;
@@ -58,7 +58,7 @@ void Map_DrawTopView(void)
         if (g_overheadPassOn != 0 && g_renderTargetsWork != 0)
         {
             g_mapPassRunning = 1;
-            if (g_worldRoot->visibilityCells == 0 || map->name[0] != 'C' || map->name[1] != 'D' || map->name[2] != 'L' ||
+            if (g_mapRootNode->visibilityCells == 0 || map->name[0] != 'C' || map->name[1] != 'D' || map->name[2] != 'L' ||
                 g_regionSwitches[(map->name[3] - '0') * 10 + (map->name[4] - '0')] != 0)
             {
                 Render_Command(0, 0, 0);
@@ -76,7 +76,7 @@ void Map_DrawTopView(void)
                 g_mapDrawArea.max.z += MAP_DRAW_ABOVE;
                 g_mapDrawArea.max.x += MAP_DRAW_MARGIN;
                 g_mapDrawArea.max.y += MAP_DRAW_MARGIN;
-                g_worldRoot->QueueDraw(&g_mapDrawList, &view,
+                g_mapRootNode->QueueDraw(&g_mapDrawList, &view,
                                        g_modelBank.LightDirection(&g_characterModels[0], &g_cameraPositionNow, &g_cameraTargetNow),
                                        -1, &g_fadeColour, 0);
                 g_mapNode->flags = flags;

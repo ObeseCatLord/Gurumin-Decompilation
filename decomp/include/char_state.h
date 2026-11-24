@@ -64,6 +64,7 @@ struct CharState
                     union                         // 0x04
                     {
                         int podFrames;              // enemy_pod_lobber.cpp: frames since the state began (state 2 counts the lob step 1..30, state 3 up to 99)
+                        int lookTarget;           // scene_frame.cpp (slot 0): the character the one named by `state` turns to look at
                         int flierMode;            // route_flier.cpp: 0 = waiting for a route, 1 = flying, 2 = vanishing
                         int pounceStep;           // enemy_pounce_breath.cpp: step of state 10 (0 = roars, 1 = chases, 2 = pounces, 3 = breathes); in state 1 the frame the whirl begins
                         int dropHeight;           // target_race.cpp (target): height the target falls from (900, 30 less each frame to -150)
@@ -91,6 +92,7 @@ struct CharState
                     union                         // 0x08
                     {
                         int podGrowth;              // enemy_pod_lobber.cpp: 0 = hidden, 1..29 fading in or out, 150 = fully there
+                        int lookActive;           // scene_frame.cpp (slot 0): non-zero = the character `state` keeps turning towards `lookTarget`
                         int flierRoute;           // route_flier.cpp: the map record whose route it flies (record 5 flies the other way)
                         int stepFrames;           // enemy_pounce_breath.cpp: frames counted in the current step
                         int rivalHit;             // target_race.cpp (target): 1 once a rival destroyed it (scores for the rivals)

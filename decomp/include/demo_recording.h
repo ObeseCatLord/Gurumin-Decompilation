@@ -7,7 +7,9 @@
 struct DemoRecording : InputState
 {
     int values_now[5];              // 0x20: its five values
-    char pad_0034[0x40];
+    char pad_0034[0xc];
+    float floats_now[9];            // 0x40: its nine floats (positions of the player, the second model and the camera target)
+    char pad_0064[0x10];
     int playFrame;                  // 0x74: next frame to play back
     int frameCount;                 // 0x78: number of recorded frames (at most 36000 = 20 minutes at 30 Hz)
     int pad_007c;
@@ -16,6 +18,8 @@ struct DemoRecording : InputState
     int Load(const char *path);
     int PlayFrame();
     int RecordFrame();
+    int M_1015caa0(int value, int index);     // 0x1015caa0: stores value `index` of values_now
+    int M_1015cac0(float value, int index);   // 0x1015cac0: stores float `index` of floats_now
 };
 
 #endif

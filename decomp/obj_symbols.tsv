@@ -665,3 +665,6 @@ _Enemy_IsBusy	100e1c40
 ?Camera_Update@@YAHPAUVec4@@0@Z	1016c3e0
 ?Enemy_WispCaster@@YAHH@Z	10071ee0
 ?Script_ValueCommand@@YAHHH@Z	101011b0
+?Hud_DrawFrame@@YAHXZ	1008c680
+?Field_Update@@YAHXZ	1011a060
+?Scene_Frame@@YAHXZ	100f5a80

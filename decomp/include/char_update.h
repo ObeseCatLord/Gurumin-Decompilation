@@ -7,7 +7,7 @@ extern "C" int DAT_10c635c8;   // 1 once the enemy-slot table DAT_10254090 has b
 // 0x100f9670 (Char_UpdateByKind; C++ linkage: the original has an EH frame)
 int Char_UpdateByKind(int index);
 
-// 0x100f5a80: the scene frame (not decompiled yet).
-extern "C" void FUN_100f5a80(void);
+// 0x100f5a80: the scene frame (Scene_Frame).
+#include "scene_frame.h"
 
 #endif

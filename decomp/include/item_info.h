@@ -10,7 +10,8 @@ struct ItemInfo
     int consumable;               // 0x0c: non-zero = using the item takes one from the stock
     char pad_0010[8];
     int icon;                     // 0x18: cell of the item icon sheet
-    char pad_001c[8];
+    int helmetKind;               // 0x1c: kind of the helmet effect (0x1a, 0x1c or 0x1d; others use the default one)
+    char pad_0020[4];
     int healsHealth;              // 0x24: non-zero = the item restores health (refused at full health)
     int restricted;               // 0x28: non-zero = the item cannot be used here
     int drillFullFlag;            // 0x2c: script flag that is set while the drill energy is full (0 = none)

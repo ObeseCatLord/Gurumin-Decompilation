@@ -51,7 +51,7 @@ extern "C" int Game_LoadData(void);
 int TitleScreen_Update();                    // 0x10114950 (title_screen.cpp)
 extern "C" void FUN_1011d810(void);
 extern "C" void FUN_10116550(void);
-extern "C" void FUN_1011a060(void);
+#include "field_update.h"
 extern "C" int FUN_1013f070(int command, int value, int extra);
 extern "C" int FUN_101439e0(void);
 extern "C" const char *FUN_1013f8a0(const char *format, ...);
@@ -162,7 +162,7 @@ extern "C" int FUN_10137b10(void)
         else if (DAT_104bf8c0 == MODE_10)
             FUN_10116550();
         else if (DAT_104bf8c0 == MODE_15)
-            FUN_1011a060();
+            Field_Update();
     }
     if (DAT_104bf8c0 == MODE_PLAY && DAT_10daaae8[0].stats[STAT_MAX_HEALTH] > PLAYER_HEALTH_LIMIT)
     {

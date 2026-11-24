@@ -154,7 +154,7 @@ int Char_UpdateByKind(int index)
     if (DAT_10c635ec != 0)
     {
         DAT_10c635ec = 0;
-        FUN_100f5a80();
+        Scene_Frame();
     }
     DAT_1021f6c0[index] = 0;
     if (DAT_10254090[index] == 1 && index >= ENEMY_SLOT_FIRST && index < ENEMY_SLOT_END && DAT_1021f3c0[index] != 2)
@@ -537,7 +537,7 @@ int Char_UpdateByKind(int index)
     {
         if (DAT_104c0350 == 0)
         {
-            FUN_100f5a80();
+            Scene_Frame();
             memset(DAT_10253a58, 0, sizeof(DAT_10253a58));
             DAT_104c0350 = 1;
             for (int slot = 0; slot < 6; slot++)

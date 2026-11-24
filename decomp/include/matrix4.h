@@ -60,6 +60,9 @@ struct Matrix4
 
 Matrix4 RotationZ(float angle);   // 0x101b1b40: turn of `angle` about z
 Matrix4 RotationX(float angle);   // 0x101b1ad0: turn of `angle` about x
+Matrix4 RotationY(float angle);   // 0x101b1bb0: turn of `angle` about y
+Matrix4 Scaling(float x, float y, float z);   // 0x101b13c0: scale by (x, y, z)
+Matrix4 TranslationMatrix(float x, float y, float z);   // 0x101b1360: move by (x, y, z)
 Matrix4 Transpose(const Matrix4 &matrix);   // 0x101b1090: rows and columns swapped
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space

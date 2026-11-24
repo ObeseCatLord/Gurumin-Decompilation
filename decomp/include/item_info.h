@@ -8,7 +8,9 @@ struct ItemInfo
     int levelFlag;                // 0x04: script flag holding the item's level (minus 3205)
     char pad_0008[0x10];
     int icon;                     // 0x18: cell of the item icon sheet
-    char pad_001c[0x34];
+    char pad_001c[0x2c];
+    int price;                    // 0x48: the price in the shop
+    char pad_004c[4];
     int previewHeight;            // 0x50: height of the item in the preview, as 1/320 of a unit raised
     int previewScale;             // 0x54: size of the item in the preview in percent (0 = 100)
     char pad_0058[0x68];

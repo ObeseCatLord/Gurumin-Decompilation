@@ -194,12 +194,12 @@ int Npc_HurlAtPlayer(int index)
         DAT_10db6ee8[index].PlayMotion(HURL_MOTION_THROW, 0, HURL_MOTION_BLEND, 1.0f);
         int frame = DAT_10db6ee8[index].motionFrame;
         DAT_1020b430[index].wait++;
-        if (frame == HURL_RELEASE_FRAME && DAT_1020b430[index].hurlAiming != 0)
+        if (DAT_10db6ee8[index].motionFrame == HURL_RELEASE_FRAME && DAT_1020b430[index].hurlAiming != 0)
         {
             FUN_10065b10(index, HURL_RELEASE_SOUND, 0, 0);
             float reach = range / HURL_FULL_REACH;
-            float heading = DAT_10db6ee8[index].targetHeading;
             DAT_1020b430[index].hurlAiming = 0;
+            float heading = DAT_10db6ee8[index].targetHeading;
             float pitch;
             if (reach > 1.0f)
                 pitch = HURL_FLAT_PITCH;

@@ -198,10 +198,16 @@ int Menu_DrawScene()
         if (DAT_10255f08 != 0)
         {
             for (int caster = 0; caster < SHADOW_CASTERS; caster++)
-                DAT_10255f08->DrawShadow(&DAT_10836ec8, &DAT_108392d8, DAT_104bf8a4,
-                                         &DAT_10803ab8[caster % 2 + caster / 2 * 4], &lightPosition,
-                                         (caster & 1) ? DAT_1020c324 : DAT_1020c320, SHADOW_SCALE, SHADOW_SIZE,
-                                         SHADOW_CASTER_SIZE, 0, 1.0f);
+            {
+                if (caster & 1)
+                    DAT_10255f08->DrawShadow(&DAT_10836ec8, &DAT_108392d8, DAT_104bf8a4,
+                                             &DAT_10803ab8[caster % 2 + caster / 2 * 4], &lightPosition, DAT_1020c324,
+                                             SHADOW_SCALE, SHADOW_SIZE, SHADOW_CASTER_SIZE, 0, 1.0f);
+                else
+                    DAT_10255f08->DrawShadow(&DAT_10836ec8, &DAT_108392d8, DAT_104bf8a4,
+                                             &DAT_10803ab8[caster % 2 + caster / 2 * 4], &lightPosition, DAT_1020c320,
+                                             SHADOW_SCALE, SHADOW_SIZE, SHADOW_CASTER_SIZE, 0, 1.0f);
+            }
         }
     }
     FUN_1013f070(RENDER_DEPTH_WRITE, 1, 0);

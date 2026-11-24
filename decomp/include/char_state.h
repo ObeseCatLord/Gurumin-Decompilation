@@ -28,6 +28,7 @@ struct CharState
         {
             union                                 // 0x00
             {
+                int flierPoint;           // route_flier.cpp: the route point the flier last reached
                 int state;                        // behaviour step: 0 = not started yet, then per behaviour
                 int turn;                         // damage_zone.cpp: turn counter of the zone
                 int counterValue;                 // digit_counter.cpp: the value shown (0..1000)
@@ -41,6 +42,7 @@ struct CharState
                 {
                     union                         // 0x04
                     {
+                        int flierMode;            // route_flier.cpp: 0 = waiting for a route, 1 = flying, 2 = vanishing
                         int wait;                 // frames in the current step (or until the next voice line)
                         int gatePrevious;         // npc_gate_carrier.cpp: the route point before gatePoint
                         int scriptRunning;        // char_script.cpp: 1 while the character's script runs
@@ -58,6 +60,7 @@ struct CharState
                     };
                     union                         // 0x08
                     {
+                        int flierRoute;           // route_flier.cpp: the map record whose route it flies (record 5 flies the other way)
                         int talk;                 // talk id (script number * 100 + line) or the behaviour's
                                                   // parameter from the map (distance, speed limit, ...)
                         int pausing;              // enemy_chase.cpp: 1 = pausing instead of chasing
@@ -90,6 +93,7 @@ struct CharState
                     };
                     union                         // 0x0c
                     {
+                        int flierFrames;          // route_flier.cpp: frames left of the vanishing (counted down from 5)
                         int range;                // char_move.cpp: distance at which a waiting character reacts
                         int count;                // enemy_react.cpp: frames counted towards the next action
                         int pauseFrames;          // enemy_chase.cpp
@@ -163,6 +167,7 @@ struct CharState
                     };
                     union                         // 0x14
                     {
+                        int flierGround;          // route_flier.cpp: height of the ground under it in whole units (-5000 = none)
                         int alarmFlashes;         // char_move.cpp: alarm flashes so far (Npc_RideAlarm)
                         int swing;                // enemy_pendulum.cpp: angle change per frame
                         int reversed;             // route_carrier.cpp, route_follow.cpp: 1 while walking the route
@@ -197,6 +202,7 @@ struct CharState
                     };
                     union                         // 0x18
                     {
+                        int flierReady;           // route_flier.cpp: 1 once its wing node was found
                         int fall;                 // enemy_pendulum.cpp: drop speed (more negative each frame)
                         int speed;                // route_carrier.cpp: units per frame (from the route's first
                                                   // point)
@@ -216,9 +222,11 @@ struct CharState
                         int hurlAiming;           // npc_hurl.cpp: 1 while the thrower holds the missile and aims (its charge effect shows)
                         int shotMirrored;          // enemy_hover_shooter.cpp: non-zero = the bearings are mirrored
                         int airborne;             // enemy_chase_hop.cpp: 1 = no ground within 25 units below (the enemy hops or falls), 0 = on the ground
+                        int swingStarted;         // enemy_dash_slash.cpp: 1 once the hand swing effect of the current attack was started
                     };
                     union                         // 0x1c
                     {
+                        int flierLastX;           // route_flier.cpp: x of its position last frame (whole units)
                         int rider;                // route_carrier.cpp, npc_hover_carrier.cpp: character carried (0 = none)
                         int scriptResult;         // char_script.cpp: result of the last step (5 = run the next
                                                   // step at once, 2 = waiting)
@@ -238,6 +246,7 @@ struct CharState
                     };
                     union                         // 0x20
                     {
+                        int flierLastY;           // route_flier.cpp: y of its position last frame (whole units)
                         int pointPause;           // route_carrier.cpp: frames to wait at a route point
                         int hopRequests;          // enemy_strafe.cpp (Enemy_HopAndStrafe): frames counted
                                                   // towards the next hop
@@ -255,6 +264,7 @@ struct CharState
                     };
                     union                         // 0x24
                     {
+                        int flierLastZ;           // route_flier.cpp: z of its position last frame (whole units)
                         int m_0024;
                         int zoneActiveFrom;        // area_zone.cpp: first frame of the cycle in which the zone acts
                         int sinkLimit;            // map_cursor_walk.cpp: set to -40 while the character is not sinking
@@ -266,6 +276,7 @@ struct CharState
                     };
                     union                         // 0x28
                     {
+                        int flierStillFrames;     // route_flier.cpp: frames it moved less than 10 units (it vanishes after 30)
                         int fadeActions;          // route_carrier.cpp: bit n set = fade out at a point with
                                                   // action n
                         int skipGroundProbe;      // non-zero = skip the ground probe of a shot (0x1001a590)

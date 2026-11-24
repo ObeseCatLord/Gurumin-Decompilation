@@ -6,35 +6,11 @@
 #include "map_vars.h"
 #include "minigame_banner.h"
 #include "minigame_hud.h"
+#include "minigame_timer.h"
 #include "render_state.h"
 #include "texture_object.h"
 
-// The map timer runs at 30 frames per second; the hundredths digits are frames * 100 / 30.
-#define TIMER_FRAMES_PER_SECOND 30
-#define TIMER_HUNDREDTHS_PER_FRAME 3.333333f
 #define TIMER_START_WORD_FRAMES 0x6ea
-#define TIMER_COUNT_DOWN_SECONDS 3
-
-// Timer digits are 32 texel cells, four to a row, on the 128 texel sheet (inset by one texel).
-#define DIGIT_COLUMNS 4
-#define DIGIT_CELL 32
-#define DIGIT_CELL_INSET 1
-#define DIGIT_CELL_END 31
-
-// Screen rectangles of the four timer digits and the dot between the seconds and the hundredths.
-#define TIMER_TENS_LEFT 0x1de
-#define TIMER_ONES_LEFT 0x1fe
-#define TIMER_DOT_LEFT 0x21e
-#define TIMER_HUNDREDTHS_LEFT 0x22e
-#define TIMER_HUNDREDTHS_ONES_LEFT 0x23e
-#define TIMER_HUNDREDTHS_END 0x24e
-#define TIMER_DIGIT_TOP 0x19a
-#define TIMER_DIGIT_BOTTOM 0x1ba
-#define TIMER_SMALL_DIGIT_TOP 0x1aa
-#define TIMER_DOT_U0 (130.0f / 256.0f)
-#define TIMER_DOT_V0 (130.0f / 256.0f)
-#define TIMER_DOT_U1 (190.0f / 256.0f)
-#define TIMER_DOT_V1 (190.0f / 256.0f)
 
 // Score counter: the label at the right edge, the number right-aligned beside it, popping with a growing glow.
 #define SCORE_LABEL_X 0x22e
@@ -52,19 +28,6 @@
 
 // The two-character label drawn after the score (cp932 0x9240 0x82ab).
 #define SCORE_LABEL_TEXT "\x92\x40\x82\xab"
-
-// Draws the digit `digit` (0..9) cut from the sheet's grid of 32 texel cells into the given screen rectangle.
-static __forceinline void DrawTimerDigit(int left, int top, int right, int bottom, int digit)
-{
-    int row = (digit / DIGIT_COLUMNS) * DIGIT_CELL;
-    int column = (digit % DIGIT_COLUMNS) * DIGIT_CELL;
-    DAT_118d0ba8[DAT_102028c8].DrawColoured(left, top, right, bottom, (float)(column + DIGIT_CELL_INSET) / SHEET_WIDTH,
-                                            (float)(row + DIGIT_CELL_INSET) / SHEET_WIDTH,
-                                            (float)(column + DIGIT_CELL_END) / SHEET_WIDTH,
-                                            (float)(row + DIGIT_CELL_END) / SHEET_WIDTH, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-                                            1.0f);
-}
-#define DRAW_TIMER_DIGIT DrawTimerDigit
 
 // Half of a text width, rounded to the nearest pixel.
 static inline int HalfWidth(int width)

@@ -606,3 +606,6 @@ _Enemy_IsBusy	100e1c40
 ?M_10175f20@AnimModel@@QAEHMMMHH@Z	10175f20
 ?ApplyOperator@ListBank@@QAEHPBD@Z	10004b10
 ?Scene_RunCommand@@YAHHHPBD@Z	10083eb0
+?ShopMenu_Draw@@YAXXZ	10056b30
+?FUN_1007c050@@YAHH@Z	1007c050
+?Enemy_StalkAndDashSlash@@YAHH@Z	100af1b0

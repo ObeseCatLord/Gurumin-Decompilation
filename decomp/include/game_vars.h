@@ -112,7 +112,7 @@ extern "C" short DAT_10447338[0x44c];                     // handle of each loop
 extern "C" char DAT_10447dd0;
 extern "C" int DAT_10447fd8[0x80];                       // event slots: third value
 extern "C" int DAT_104481d8[0x80];                       // fade of each message box, 0 (gone) .. 14 (fully shown)
-extern "C" int DAT_10450808[0x800];
+extern "C" char DAT_10450808[0x40][0x80];                 // the entry texts of the list window (0x80 bytes each)
 extern "C" int DAT_10467488[0x20];
 extern "C" int DAT_10467710;
 extern "C" int DAT_10467c20[0x80];                       // frames each message box has been held

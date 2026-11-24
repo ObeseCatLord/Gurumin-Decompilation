@@ -8,6 +8,7 @@ address	name	evidence
 100094e0	Game::DrawWindows	draws the three window slots: panels, page tabs, entry lists, scroll marks, cursor and caption strip (game_draw_windows.cpp, draft)
 1000a0b0	Game::UpdateWindows	per-frame update of the 3 menu window slots: fade, entry highlight, mouse and key handling of list and grid windows (game_update_windows.cpp, draft)
 1000c720	Characters_Draw	draws every character slot under view*projection (character_draw.cpp)
+1000cf80	Message_DrawLabels	draws the message box labels (panel, outlined speaker name, up to four text lines) above each speaker; returns 0 when mode is not 2/5 and DAT_104c0135 is set (message_labels.cpp)
 1000e340	Debris_Draw	draws the used debris pieces (debris.cpp)
 1000eed0	Message_DrawPanel	fading message box with optional subtext (message_panel.cpp)
 10011520	Player_SelectActionMotion	next motion of the player action chain (action_select.cpp, draft)
@@ -189,6 +190,7 @@ address	name	evidence
 10137b10	Game_FrameStep	per-frame step: messages, max-health clamp, noise-table quit check, mode update, pacing/present, clipboard capture saved as capture%05d.jpg with the shape.dat stamp (frame_step.cpp, draft)
 100144c0	Ability_GetDescription	copies the effect text of the highest-priority ability bit and returns the bit (matched, decomp/src/ability_text.cpp)
 1013dfb0	GuruMain	DLL export called by game.exe
+10161770	Image_HalveRgb	halves a width x height 24-bit RGB image in place (2x2 average, signed /4); 0 for a null image, else 1 (image_halve.cpp)
 10163150	AnimModel::Draw	queues the model under viewProjection with the light set; mode 0 normal, 1 flipped about z (overhead pass), else a mirror Matrix4 pointer; rainbow wobble for drawMode 0x24 (anim_model_draw.cpp, matched)
 101643c0	AnimModel_LiftProbes	lifts probe points clear of models and the map (model_lift.cpp, draft)
 10165210	ModelBank_CompareDistance	qsort comparison on the squared-distance keys DAT_10fa6bb8 (model_bank_frame.cpp, matched)

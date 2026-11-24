@@ -13,6 +13,7 @@
 #include "game_vars.h"
 #include "item_caption.h"
 #include "item_info.h"
+#include "message_labels.h"
 #include "render_vars.h"
 #include "tracker.h"
 #include "ui_vars.h"
@@ -24,7 +25,6 @@ Matrix4 RotationZ(float angle);                         // 0x101b1b40
 Matrix4 Scaling(float x, float y, float z);             // 0x101b13c0
 
 extern "C" void FUN_1000cc30(void);                     // Hud_DrawNameBanners (name_banners.cpp)
-extern "C" int FUN_1000cf80(Matrix4 *view);             // draws the scene objects with the view matrix
 extern "C" void FUN_1000dba0(void);                     // Fade_Draw (screen_fade.cpp)
 
 // Position of the item name and the sizes of the preview model.

@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (345)
+## 1. Walls to retry (347)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -27,6 +27,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000a0b0` 3983 — Game::UpdateWindows (game_update_windows.cpp, 4048 vs 3983 bytes): logic and branch structure match; register allocation: the original keeps the constant 5 in ebx across the list key handlers (ours immediates; a named local folds away), m_00b0 in a register in the third hover test, store before compare in the wrap-around scroll tail, fades[] stack slot (shifts loop alignment)
 - [ ] `1000b9f0` 252 — EffectModel setup: 22 bytes; node->Init() is a plain call (no placement-new null check); register choice for 'end' (ecx vs eax) and the m_0038 store position differ
 - [ ] `1000c020` 465 — Text_Substitute: 15 bytes; in the replacement path the original keeps out in edx (stored once at the loop bottom) and loads best before the copy, ours keeps text in the register and stores out on both paths; the word tables are 2-D now (that fixed the search loop); add orders and declaration orders tried
+- [ ] `1000cf80` 33 — Message_DrawLabels (message_labels.cpp): logic done, 1648 vs 1689 bytes; loop shape differs (original do-while without entry jmp, pointer + byte-offset inductions, Vec4 at esp+0x2c); body continues at 0x1000cfa1
 - [ ] `1000e870` 788 — AntiTamper_Check: 5 bytes; first guard loop swaps edi/ebx (counter vs rand value) - register allocation residue
 - [ ] `1000f360` 300 — face change: with the face set indexed directly (no pointer local) only the index/frame registers are swapped (original esi/edi); frame store and condition spellings tried
 - [ ] `100106e0` 1567 — Save_Write: frame, calls and layout identical; the unrolled bit-set loop swaps ebx/edi for two of its counters and the start-position loads use other registers; locals for the position tried
@@ -275,6 +276,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10161200` 167 — Bmp_FlipVertical: VS2003 turns the step-3 inner loop into a precomputed trip count (mul 0xaaaaaaab); cl 13.00 keeps the index compare
 - [ ] `101614c0` 259 — ItmScramble: frame and table layout match (table declared before key); original keeps the sum in ebp and the xor in memory, ours the other way round
 - [ ] `101615d0` 264 — ItmDescramble: same register residue as 0x101614c0
+- [ ] `10161770` 17 — Image_HalveRgb (image_halve.cpp): 2x2 average done, 448 vs 374 bytes; inner loop becomes trip-count form with larger frame (0x30 vs 0x20), original keeps 3 pointers + index
 - [ ] `101643c0` 1520 — AnimModel::LiftProbes (model_lift.cpp, 1520 bytes, same length, 1300 diff bytes): structure and calls identical; register assignment (original this=esi, probes=edi, slot=ebp; ours ebp/esi/edi), an inline early return 0 epilogue before push ebp/edi, and the stack slot order; declaration order, scope, compound assignment and shared hit variables tried
 - [ ] `101649c0` 213 — lighting/init reset: 0 kept in esi and 1.0f in eax across many stores (cl 13.00 constant-register habit)
 - [ ] `10164af0` 284 — ModelBank::AddLitModel: written with a pointer to the light vectors; with lighting[i * 22 + k] indexing only the push order of ebp/esi/edi differs
@@ -357,19 +359,14 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101af960` 1176 — KeyBank::Sample(float) (vec4.cpp, 1168 vs 1176 bytes): Spline member in place; the original holds count in edi and saves esi/edi; same wall as 101af4c0
 - [ ] `101afe00` 1079 — KeyTrack::Sample (vec4.cpp, 1088 vs 1079 bytes): Spline member in place; count/frames registers (ebp/ebx) swapped and the i == count hold copy placed after the cmp in the original
 
-## 2. Small functions (30-250 bytes) (2)
+## 2. Small functions (30-250 bytes) (0)
 
-- [ ] `1000cf80` 33 bytes
-- [ ] `10017c55` 204 bytes (float, calls 8)
 
-## 3. Medium functions (251-800 bytes) (1)
+## 3. Medium functions (251-800 bytes) (0)
 
-- [ ] `10161781` 357 bytes (loops 2, calls 3)
 
-## 4. Large functions (801-3000 bytes) (3)
+## 4. Large functions (801-3000 bytes) (1)
 
-- [ ] `1004f8b7` 802 bytes (loops 2, calls 19)
-- [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
 ## 5. Very large functions (over 3000 bytes) (1)

@@ -28,7 +28,6 @@ extern "C" int FUN_1015fbf0(FontRenderer *renderer, int x, int y, int a, int b, 
 extern "C" int FUN_1015fa90(void);                        // number of visible IME candidates
 extern "C" int FUN_1015fac0(FontRenderer *renderer);      // width of the widest visible candidate
 extern "C" int FUN_1015fb20(FontRenderer *renderer, int x, int y, int colour, int selColour);   // draws the candidates
-extern "C" int FUN_1000cf80(Matrix4 *view);               // draws the scene objects with the view matrix
 extern "C" void FUN_1000f4d0(void);                       // hud_fade.cpp: the dark panel over the HUD
 extern "C" void FUN_1000cc30(void);                       // Hud_DrawNameBanners (name_banners.cpp)
 extern "C" int FUN_1000eed0(void);                        // Message_DrawPanel (message_panel.cpp)

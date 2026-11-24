@@ -24,6 +24,7 @@
 #include "game_vars.h"
 #include "hud_digits.h"
 #include "hud_frame.h"
+#include "message_labels.h"
 #include "item_info.h"
 #include "matrix4.h"
 #include "model_bank.h"

@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 48.0254,
+  "fuzzy_match_percent": 48.0263,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -14,7 +14,7 @@
   "complete_code_percent": 0.0,
   "complete_data": "0",
   "complete_data_percent": 0.0,
-  "total_units": 464,
+  "total_units": 466,
   "complete_units": 186,
   "matched_rules_code": "344871",
   "matched_rules_code_percent": 20.0482,
@@ -11681,6 +11681,52 @@
    }
   },
   {
+   "name": "app/image_halve",
+   "measures": {
+    "fuzzy_match_percent": 14.0625,
+    "total_code": "17",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "17",
+     "fuzzy_match_percent": 14.0625
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_10161770",
+     "size": "17",
+     "fuzzy_match_percent": 14.0625,
+     "metadata": {
+      "virtual_address": "269883248"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/image_halve.cpp"
+   }
+  },
+  {
    "name": "app/ime",
    "measures": {
     "fuzzy_match_percent": 100.0,
@@ -14834,6 +14880,52 @@
    "metadata": {
     "complete": true,
     "source_path": "decomp/src/message_fades.cpp"
+   }
+  },
+  {
+   "name": "app/message_labels",
+   "measures": {
+    "fuzzy_match_percent": 37.4393,
+    "total_code": "33",
+    "matched_code": "0",
+    "matched_code_percent": 0.0,
+    "total_data": "0",
+    "matched_data": "0",
+    "matched_data_percent": 0.0,
+    "total_functions": 1,
+    "matched_functions": 0,
+    "matched_functions_percent": 0.0,
+    "complete_code": "0",
+    "complete_code_percent": 0.0,
+    "complete_data": "0",
+    "complete_data_percent": 0.0,
+    "total_units": 1,
+    "complete_units": 0,
+    "matched_rules_code": "0",
+    "matched_rules_code_percent": 0.0,
+    "matched_rules_functions": 0,
+    "matched_rules_functions_percent": 0.0
+   },
+   "sections": [
+    {
+     "name": ".text",
+     "size": "33",
+     "fuzzy_match_percent": 37.4393
+    }
+   ],
+   "functions": [
+    {
+     "name": "_FUN_1000cf80",
+     "size": "33",
+     "fuzzy_match_percent": 37.4393,
+     "metadata": {
+      "virtual_address": "268488576"
+     }
+    }
+   ],
+   "metadata": {
+    "complete": false,
+    "source_path": "decomp/src/message_labels.cpp"
    }
   },
   {
@@ -27204,13 +27296,13 @@
    "name": "app/unmatched",
    "measures": {
     "fuzzy_match_percent": 0.0,
-    "total_code": "134777",
+    "total_code": "134727",
     "matched_code": "0",
     "matched_code_percent": 0.0,
     "total_data": "0",
     "matched_data": "0",
     "matched_data_percent": 0.0,
-    "total_functions": 14,
+    "total_functions": 12,
     "matched_functions": 0,
     "matched_functions_percent": 0.0,
     "complete_code": "0",
@@ -27227,7 +27319,7 @@
    "sections": [
     {
      "name": ".text",
-     "size": "134777",
+     "size": "134727",
      "fuzzy_match_percent": 0.0
     }
    ],
@@ -27238,14 +27330,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "268467696"
-     }
-    },
-    {
-     "name": "FUN_1000cf80",
-     "size": "33",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "268488576"
      }
     },
     {
@@ -27310,14 +27394,6 @@
      "fuzzy_match_percent": 0.0,
      "metadata": {
       "virtual_address": "269879648"
-     }
-    },
-    {
-     "name": "FUN_10161770",
-     "size": "17",
-     "fuzzy_match_percent": 0.0,
-     "metadata": {
-      "virtual_address": "269883248"
      }
     },
     {

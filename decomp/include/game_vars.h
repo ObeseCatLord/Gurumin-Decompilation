@@ -385,7 +385,7 @@ extern "C" int DAT_104c021c;
 extern "C" char DAT_104c0224;
 extern "C" char DAT_104c022e;
 extern "C" unsigned char DAT_104c0232;
-extern "C" int DAT_104c0234;
+extern "C" float DAT_104c0234;
 extern "C" char DAT_104c023c;
 extern "C" unsigned char DAT_104c023e;
 extern "C" int DAT_104c0270[0x10];                        // anti-tamper noise table

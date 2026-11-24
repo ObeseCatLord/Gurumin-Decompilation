@@ -28,7 +28,7 @@ extern "C" int DAT_1020aeec[4];                       // cleared with the four "
 extern "C" int DAT_1020d64c[4];
 extern "C" int DAT_1020b1e0[0x10];
 extern "C" int DAT_10219f78[0x10];
-extern "C" int DAT_104507e8[6];
+extern "C" short DAT_104507e8[12];   // the pad stick's last 10 magnitudes (newest at [9], see game_frame.cpp), cleared with 2 more entries
 extern "C" short DAT_10467718[0x40];
 extern "C" short DAT_104678a0[0x40];
 extern "C" int DAT_10c62ee0[0x1c1];

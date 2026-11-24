@@ -51,4 +51,14 @@ extern "C" int FUN_10011fb0(int frozen);         // 0x10011fb0 (Water_SetFrozen)
 
 extern "C" int FUN_101b25a0(int a);              // 0x101b25a0: decodes the next frame of the movie library
 
+extern "C" char DAT_1065cb40;                // a key of the current input frame (DemoRecording::buttons_now[0x14]): camera reset request
+extern "C" char DAT_1065cb41;                // a key of the current input frame (buttons_now[0x15]): lock-on
+extern "C" char DAT_1065cb42;                // a key of the current input frame (buttons_now[0x16]): turns the camera right
+extern "C" char DAT_1065cb44;                // a key of the current input frame (buttons_now[0x18]): turns the camera left
+extern "C" int FUN_1016c300(void);           // 0x1016c300: non-zero while the camera is locked (a cutscene or a mode that fixes it)
+extern "C" int FUN_1016b340(float *outX, float *outY, float x, float y);   // 0x1016b340: turns (x, y) by the camera's heading
+extern "C" int FUN_1016bdf0(float angle);    // 0x1016bdf0: puts the camera behind the player looking along `angle`
+
+extern "C" Vec4 DAT_10836dd8[10];            // the pad stick's last 10 directions (unit vectors), the newest last
+
 #endif

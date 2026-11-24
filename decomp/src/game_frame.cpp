@@ -127,6 +127,8 @@
 
 #include "char_hikari.h"
 
+#include "menu_save_load.h"
+
 #include "game_frame.h"
 
 // Hidden-part loop, light shafts: DAT_10f65848 holds SHAFT_COUNT shafts (x, y offsets and w opacity).
@@ -304,6 +306,105 @@ static __forceinline void ResetPlayerTrail(void)
     }
 }
 
+// Releases the model of the item book and its textures (the overlay mode's pages).
+static __forceinline void ReleaseBookModel(void)
+{
+    int slot;
+    if (DAT_104c03c8 != 0)
+    {
+        DAT_104c03dc = 0;
+        DAT_104c03c8->Release();
+        DAT_11b1ba40(DAT_104c03c8);
+        DAT_104c03c8 = 0;
+        DAT_104c03cc = 0;
+        DAT_104c03d0 = 0;
+        DAT_104c03d4 = 0;
+        DAT_104c03d8 = 0;
+        DAT_104c03e0 = 0;
+        DAT_104c03e4 = 0;
+        for (slot = 0; slot < OVERLAY_TEXTURE_SLOT_COUNT; slot++)
+        {
+            if (DAT_1030b870[slot] > -1)
+            {
+                FUN_10174c70(DAT_1030b870[slot], 1);
+                DAT_1030b870[slot] = -1;
+            }
+        }
+    }
+}
+
+// The first half of the sequences that close the item list: the dialogs, the caption and the book model.
+static __forceinline void CloseBookModel(void)
+{
+    DAT_1030c54c = 0;
+    DAT_104bfd78 = 0;
+    DAT_104b7200.CloseWindow(WINDOW_ID_SAVE_MENU);
+    FUN_100106a0();
+    FUN_1000cb30("");
+    FUN_1000cb90("");
+    DAT_104bf8d4 = 1;
+    ReleaseBookModel();
+}
+
+// The whole sequence that closes the item list (dialogs, caption, book model, state).
+static __forceinline void CloseItemList(void)
+{
+    DAT_1030c54c = 0;
+    DAT_104bfd78 = 0;
+    DAT_104b7200.CloseWindow(WINDOW_ID_SAVE_MENU);
+    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+    DAT_1020e0f8[0] = 0;
+    FUN_1000cb30("");
+    FUN_1000cb90("");
+    DAT_104bf8d4 = 1;
+    ReleaseBookModel();
+    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+    DAT_104bfe1c = 0;
+    DAT_1020e0f8[0] = 0;
+    memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+}
+
+// Item list (overlay mode) with the mouse: the cursor area, rows of the list and the corner that opens it.
+#define ITEM_MENU_LEFT 0x1e4
+#define ITEM_MENU_TOP -0x52
+#define ITEM_MENU_RIGHT 0x286
+#define ITEM_MENU_BOTTOM 0x1ca
+#define ITEM_MENU_ROW_TOP 0x4f
+#define ITEM_MENU_ROW_HEIGHT 0x16
+#define ITEM_MENU_ROWS 0xf
+#define ITEM_LIST_CORNER 0x40f
+#define SOUND_ITEM_LIST_OPEN 0x361
+#define SOUND_ITEM_LIST_CLOSE 0x362
+// Camera turn of one wheel notch and of a key press (radians per tick of the key's strength).
+#define CAMERA_WHEEL_TURN 0.314f
+#define CAMERA_KEY_TURN 8.0f
+// Mouse look: the cursor's distance from the player (divided) is the steering, limited to AIM_LIMIT.
+#define AIM_X_DIVISOR 16.0f
+#define AIM_Y_DIVISOR 12.0f
+#define AIM_LIMIT 15.0f
+// DAT_104c0228: at or above TURN_STATE_BASE the character waits for a click behind it (TURN_PENDING) or has been refused.
+#define TURN_STATE_BASE 10000
+#define TURN_PENDING 0x271a
+#define TURN_REFUSED 0x271b
+#define TURN_AROUND_DOT -0.4f
+#define HALF_PI 1.57075f
+// Pad stick: history length, the flick (jump) detector, steering and the page switch limit.
+#define PAD_HISTORY_LENGTH 10
+#define PAD_FLICK_PEAK 0.9f
+#define PAD_FLICK_ALIGN 0.5
+#define PAD_FLICK_LOW_DIVISOR 10.0f
+#define PAD_STEER_DIVISOR 10.0f
+#define PAD_PAGE_LIMIT 50.0
+#define STEER_FULL 16.0f
+#define SOUND_ITEM_LIST_MOVE 0x363
+
+// Lock-on: models LOCK_FIRST_MODEL..DOOR_FIRST_MODEL - 1 are the targets; a target far away at x below TARGET_GONE_X is gone.
+#define LOCK_FIRST_MODEL 0x3a
+#define TARGET_GONE_X -100000.0f
+#define TARGET_SEARCH_START 4000000.0f
+
 // Doors (switch models of kind 0x13/0x14, models DOOR_FIRST_MODEL to DOOR_END_MODEL - 1): animation frames of
 // DAT_1020b128 that start a motion of the door's node tree.
 #define DOOR_FIRST_MODEL 0x5c
@@ -376,7 +477,15 @@ extern "C" int FUN_1011d810(void)
     char mouseExtra;
     int mouseWheel;
     int mousePos[2];
-    float inputStrength;
+    int inputEvents;
+    float steerX;
+    float steerY;
+    int moveInput;
+    int controlsEnabled;
+    int viewWidth;
+    int viewHeight;
+    float aimX;
+    float aimY;
     char gameOverButton;
     char gameOverPadA;
     char gameOverPadB;
@@ -1592,7 +1701,10 @@ sceneStateDone:
         DAT_104bf88c = DAT_104bf88c + DAT_10202348;
         if (DAT_104bf88c == 10 || DAT_104bf88c == 0)
             DAT_10202348 = -DAT_10202348;
+        steerX = 0.0f;
+        steerY = 0.0f;
         DAT_1020234c = 0.5f;
+        moveInput = 0;
         if (DAT_104c00bd != 0 && (DAT_104c00bd++, DAT_104c00bd > 0x3b))
             DAT_104c00bd = 0;
 
@@ -1876,6 +1988,7 @@ waterThaw:
         mouseMiddle = 0;
         mouseExtra = 0;
         mouseWheel = 0;
+        modelIdx = DAT_10202464[0];
         DAT_1020d9e0.M_10001450();
         mousePos[0] = 0;
         mousePos[1] = 0;
@@ -1886,7 +1999,7 @@ waterThaw:
         if (DAT_104c0148 != 0)
             DAT_104c0148--;
         DAT_104c022e = 0;
-        inputStrength = 0.0f;
+        inputEvents = 0;
         if ((DAT_104bfe6c == 2 || DAT_104bfe6c == 3) && (DAT_104bfeb4 != 0 || (DAT_104c0230 & 3) != 0)
             && (mouseLeft == 2 || DAT_1065cb30 != 0))
             DAT_104bfe6c = 0;
@@ -1899,7 +2012,781 @@ waterThaw:
         {
             inputActive = 1;
 
-            // STAGE 3: player input and its actions, first part, pseudo.c lines 3483-4499
+            if (DAT_1032d69c != 0)
+            {
+                if (DAT_1065cb90 == 0)
+                {
+                    if (DAT_1020d9e0.M_10001440() != 0)
+                    {
+                        if (DAT_104c0204 != 0)
+                        {
+                            mouseLeft = 0;
+                            mouseMiddle = 0;
+                            mouseRight = 0;
+                            mouseWheel = 0;
+                        }
+
+                        // The item list (while the overlay mode is open): wheel scrolling, hover and the page tabs.
+                        if (DAT_104bfdf0 == 0 && DAT_104c0028 == 0)
+                        {
+                            int row;
+                            if (DAT_104c0068 == 1 || DAT_104bfe1c == 0 || mousePos[0] < ITEM_MENU_LEFT || mousePos[1] < ITEM_MENU_TOP
+                                || mousePos[0] > ITEM_MENU_RIGHT || mousePos[1] > ITEM_MENU_BOTTOM)
+                            {
+                                DAT_104c0050 = 0;
+                                if (DAT_104bfe1c != 0)
+                                    mouseExtra = 0;
+                            }
+                            else
+                            {
+                                if (mouseLeft == 2)
+                                {
+                                    if (DAT_104c02bc == 1)
+                                    {
+                                        if (mousePos[0] > 0x1e1 && mousePos[1] > 0x35 && mousePos[0] < 0x221 && mousePos[1] < ITEM_MENU_ROW_TOP)
+                                        {
+                                            DAT_104c02bc = 0;
+                                            DAT_104c0048 = 0;
+                                        }
+                                    }
+                                    else if (DAT_104c02bc == 0 && mousePos[0] > 0x21f && mousePos[1] > 0x35 && mousePos[0] < 0x26b
+                                             && mousePos[1] < ITEM_MENU_ROW_TOP)
+                                    {
+                                        DAT_104c02bc = 1;
+                                        DAT_104c0048 = 0;
+                                    }
+                                }
+                                row = (mousePos[1] - ITEM_MENU_ROW_TOP) / ITEM_MENU_ROW_HEIGHT;
+                                if (row > -1 && row < ITEM_MENU_ROWS)
+                                    DAT_10202464[0] = DAT_104485e8[row];
+                                if (mouseWheel < 1 || DAT_104c0048 < 1)
+                                {
+                                    if (mouseWheel < 0 && DAT_104c0044 - DAT_104c0048 > ITEM_MENU_ROWS && mousePos[1] > -0x3d
+                                        && mousePos[1] < 0x19f)
+                                        DAT_104c0048++;
+                                    else
+                                    {
+                                        if (row < 0 && DAT_104c0048 > 0)
+                                        {
+                                            if (mouseWheel == 0)
+                                                DAT_104bfe90 = 0;
+                                            else
+                                                DAT_104bfe90--;
+                                            if (DAT_104c004c < 1)
+                                            {
+                                                DAT_104c0048--;
+menuScrollRepeat:
+                                                DAT_104c004c = 5 - DAT_104c0050;
+                                                if (DAT_104c0050 < 5)
+                                                    DAT_104c0050++;
+                                                if (DAT_104c004c == 0)
+                                                    goto menuInputDone;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (row < 0x10 || DAT_104c0044 - DAT_104c0048 < 0x10 || mousePos[1] < -0x3c
+                                                || mousePos[1] > 0x1d6)
+                                            {
+                                                DAT_104c0050 = 0;
+                                                if (row < ITEM_MENU_ROWS && row > -1 && DAT_104485e8[row] != 0)
+                                                    DAT_104bfe90 = row;
+                                                goto menuInputDone;
+                                            }
+                                            if (mouseWheel == 0)
+                                                DAT_104bfe90 = ITEM_MENU_ROWS - 1;
+                                            else
+                                                DAT_104bfe90--;
+                                            if (DAT_104c004c < 1)
+                                            {
+                                                DAT_104c0048++;
+                                                goto menuScrollRepeat;
+                                            }
+                                        }
+                                        DAT_104c004c--;
+                                    }
+                                }
+                                else
+                                    DAT_104c0048--;
+                            }
+                        }
+menuInputDone:
+                        if (mouseLeft == 0)
+                            DAT_104c0097 = 0;
+
+                        // Mouse wheel: turns the camera about the target.
+                        viewWidth = (DAT_10f654b4 * 0x280) / DAT_10202b2c;
+                        viewHeight = (DAT_10f654b8 * 0x1e0) / DAT_10202b30;
+                        if (DAT_10468128 == 0 && DAT_10db6ee8[0].m_229c < 5 && DAT_104c010f != 0 && mouseWheel != 0
+                            && (DAT_104bfe1c == 0 || (mousePos[0] < viewWidth + 0x280 && mousePos[1] < viewHeight + 0x1e0))
+                            && FUN_1016c300() == 0)
+                        {
+                            DAT_1101de30 = 2;
+                            DAT_11af3e28.Copy(DAT_11af3e28 - DAT_118e6c78);
+                            Matrix4 turn = RotationZ(mouseWheel * CAMERA_WHEEL_TURN);
+                            DAT_11af3e28.Copy(Project(DAT_11af3e28, turn) + DAT_118e6c78);
+                        }
+
+                        if (DAT_104bfdf0 == 0)
+                        {
+                            // Middle button closes the item list.
+                            if (DAT_104bfe1c != 0 && DAT_104c0068 != 1 && DAT_104c0028 == 0 && mouseMiddle != 0)
+                            {
+                                FUN_1003ad20(SOUND_ITEM_LIST_CLOSE, 0, 1.0f);
+                                mouseMiddle = 0;
+                                DAT_104bfe90 = 0;
+                                if (DAT_104bfe1c != 0)
+                                {
+                                    CloseBookModel();
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+                                    memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+                                    DAT_1020e0f8[0] = 0;
+                                    DAT_104bfe1c = 0;
+                                }
+                                DAT_104bfd74 = 1;
+                                if (DAT_104bfdf0 != 0)
+                                    goto itemMouseDone;
+                            }
+                            // Left click on the corner opens or closes the item list.
+                            if (DAT_104c01e0 == 0 && DAT_104c0068 != 1 && DAT_104c0028 == 0 && mouseLeft != 0
+                                && mousePos[0] + mousePos[1] > ITEM_LIST_CORNER)
+                            {
+                                if (mouseLeft == 2)
+                                {
+                                    DAT_104c0232 = 4;
+                                    if (DAT_104bfe1c == 0)
+                                    {
+                                        FUN_1003ad20(SOUND_ITEM_LIST_OPEN, 0, 1.0f);
+                                        DAT_104bfe1c = 1;
+                                    }
+                                    else
+                                    {
+                                        FUN_1003ad20(SOUND_ITEM_LIST_CLOSE, 0, 1.0f);
+                                        DAT_104bfe90 = 0;
+                                        if (DAT_104bfe1c != 0)
+                                        {
+                                            CloseBookModel();
+                                            FUN_100106a0();
+                                            DAT_104bfe1c = 0;
+                                            memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+                                        }
+                                    }
+                                    DAT_104bfe90 = DAT_1030c479;
+                                    DAT_104c0048 = DAT_1049f1f9;
+                                    DAT_104bfd74 = 1;
+                                    DAT_102024b0 = 1;
+                                    DAT_1020249c = 1;
+                                    DAT_1030b868 = 2;
+                                    DAT_104bfeb9 = 2;
+                                    modelIdx = DAT_10202464[0];
+                                }
+                                goto afterMouseControls;
+                            }
+                        }
+itemMouseDone:
+                        // Mouse look: the cursor's offset from the player steers the character.
+                        if (DAT_104c0099 < 0xf || DAT_104c0135 != 0)
+                        {
+                            if (DAT_104bfdf0 == 0)
+                            {
+aimWithMouse:
+                                if (DAT_104bfd78 == 0 && DAT_104c0068 != 1
+                                    && (DAT_104bfe1c == 0 || (mousePos[0] < viewWidth + 0x280 && mousePos[1] < viewHeight + 0x1e0)))
+                                {
+                                    int playerScreen[2];
+                                    int motion;
+                                    DAT_10db6ee8[0].ScreenPosition(&playerScreen[0], &playerScreen[1], DAT_108392d8);
+                                    playerScreen[0] = (int)((float)(playerScreen[0] + 0x140) / 2.0f);
+                                    playerScreen[1] = (int)((float)(playerScreen[1] + 0xf0) / 2.0f);
+                                    aimX = (float)(mousePos[0] - playerScreen[0]) / AIM_X_DIVISOR;
+                                    if (aimX >= AIM_LIMIT)
+                                        aimX = AIM_LIMIT;
+                                    else if (aimX <= -AIM_LIMIT)
+                                        aimX = -AIM_LIMIT;
+                                    aimY = -(float)(mousePos[1] - playerScreen[1]) / AIM_Y_DIVISOR;
+                                    if (aimY >= AIM_LIMIT)
+                                        aimY = AIM_LIMIT;
+                                    else if (aimY <= -AIM_LIMIT)
+                                        aimY = -AIM_LIMIT;
+                                    DAT_102027e8 = aimX;
+                                    DAT_104c0234 = aimY;
+
+                                    // A fresh click behind the player turns the character around.
+                                    if (DAT_104c0228 >= TURN_STATE_BASE && DAT_104bfe1c == 0 && mouseLeft != 0
+                                        && (mouseLeft == 1 || mousePos[1] + mousePos[0] < 0x430) && DAT_104c0097 == 0
+                                        && (aimX != 0.0f || aimY != 0.0f) && DAT_104c0228 == TURN_PENDING)
+                                    {
+                                        Vec4 facing;
+                                        Vec4 wish;
+                                        float behind;
+                                        facing.x = cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI);
+                                        facing.y = sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI);
+                                        facing.z = 0;
+                                        FUN_1016b340(&wish.x, &wish.y, aimX, aimY);
+                                        wish.z = 0;
+                                        wish.Normalized3();
+                                        behind = Vec3_Dot(&facing, &wish);
+                                        if (behind < TURN_AROUND_DOT)
+                                        {
+                                            DAT_10db6ee8[0].PlayMotion(2, 0, 5, 1.0f);
+                                            DAT_104c0228 = 0;
+                                            for (i = PLAYER_TRAIL_LENGTH; i != 0; i--)
+                                            {
+                                                DAT_10802ad8[DAT_104c022c].Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                                                DAT_104c022c = DAT_104c022c + 1 & 0xf;
+                                            }
+                                        }
+                                        else
+                                            DAT_104c0228 = TURN_REFUSED;
+                                    }
+                                    if (mouseExtra != 0 && DAT_104c010e != 0 && DAT_10c652cc != 0 && DAT_104bfe1c == 0
+                                        && DAT_104bfe30 == 0 && DAT_104bfdc8 == 0 && DAT_104c0300 == 0 && DAT_104bfe4c == 0
+                                        && DAT_104c00e0 < 4)
+                                        DAT_104c022e = 1;
+                                    if (DAT_104c0228 < TURN_STATE_BASE && mouseLeft != 0
+                                        && (mouseLeft == 1 || mousePos[1] + mousePos[0] < 0x430) && DAT_104c0097 == 0)
+                                    {
+                                        Vec4 unused;   // constructed by the original but never read
+                                        if ((unsigned char)DAT_10db6ee8[0].m_2288 < 2)
+                                        {
+                                            steerY = aimY;
+                                            steerX = aimX;
+                                        }
+                                        if (DAT_104c009d == 0)
+                                        {
+                                            if (abs((int)steerX) > 4 || abs((int)steerY) > 4)
+                                                moveInput = 1;
+                                        }
+                                        else if (abs((int)steerX) > 2 || abs((int)steerY) > 2)
+                                            moveInput = 1;
+                                    }
+                                    else if (DAT_104bfdc8 == 0 && DAT_1065cb48 == 0 && DAT_1065cb4c == 0 && DAT_104c0228 < TURN_STATE_BASE)
+                                    {
+                                        if (DAT_104c0300 == 0)
+                                        {
+                                            if (DAT_104bfe4c == 0)
+                                            {
+                                                if (DAT_104c00e0 == 0 && DAT_104c009e == 0)
+                                                {
+                                                    motion = 2;
+                                                    goto playIdleMotion;
+                                                }
+                                            }
+                                            else if (DAT_10468128 == 0 && DAT_10db6ee8[0].m_229c == 0)
+                                            {
+                                                motion = 0x1c;
+playIdleMotion:
+                                                DAT_10db6ee8[0].PlayMotion(motion, 0, 5, 1.0f);
+                                            }
+                                        }
+                                        else if (DAT_10468128 == 0 && DAT_10db6ee8[0].m_229c == 0)
+                                        {
+                                            motion = 0x83;
+                                            goto playIdleMotion;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (DAT_104bfdf0 == 0)
+                        {
+                            // The item list's entries are chosen with the mouse.
+                            if (mouseLeft == 0 || DAT_104c0068 == 1 || DAT_104bfe1c == 0 || mousePos[0] < ITEM_MENU_LEFT
+                                || mousePos[1] < ITEM_MENU_ROW_TOP || mousePos[0] > 0x26e || mousePos[1] > 0x194)
+                                goto aimWithMouse;
+                            if (DAT_104c0028 == 0)
+                            {
+                                if (mouseLeft == 2)
+                                {
+                                    int entry = DAT_104485e8[(mousePos[1] - ITEM_MENU_ROW_TOP) / ITEM_MENU_ROW_HEIGHT];
+                                    if (entry != 0)
+                                    {
+                                        DAT_104c0148 = 2;
+                                        if (entry == 0xa0)
+                                            DAT_1030c564 = 1;
+                                        else if (entry == 0xa1)
+                                            DAT_1030c540 = 1;
+                                        else if (entry == 0xa2)
+                                            DAT_1030c558 = 1;
+                                        else if (entry == 0xa3)
+                                            DAT_1030c55c = 1;
+                                        else if (entry == 0xa4)
+                                            DAT_1030c510 = 1;
+                                        else if (entry == 0xa5)
+                                            DAT_1030c508 = 1;
+                                        else if (entry == 0xa9)
+                                        {
+                                            CloseBookModel();
+                                            FUN_100106a0();
+                                            DAT_104bfe1c = 0;
+                                            memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+                                            FUN_1000da20(0x531);
+                                        }
+                                        else
+                                        {
+                                            inputEvents = 1;
+                                            DAT_10202464[0] = entry;
+                                            modelIdx = entry;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+afterMouseControls:
+                if (DAT_1032d69c != 0)
+                {
+                    // Keys and pad: camera turn, camera reset and the lock-on target.
+                    if ((DAT_1065cb44 != 0 || DAT_1065cb42 != 0) && FUN_1016c300() == 0)
+                    {
+                        float cameraTurn = -CAMERA_KEY_TURN;
+                        if (DAT_1065cb44 == 0)
+                            cameraTurn = CAMERA_KEY_TURN;
+                        DAT_1101de30 = 2;
+                        DAT_11af3e28.Copy(DAT_11af3e28 - DAT_118e6c78);
+                        Matrix4 turn = RotationZ(cameraTurn * 0.01f);
+                        DAT_11af3e28.Copy(Project(DAT_11af3e28, turn) + DAT_118e6c78);
+                    }
+                    if (DAT_1065cb32 == 0)
+                    {
+                        if (DAT_1065cb40 != 0 && FUN_1016c300() == 0)
+                            DAT_1101de20 = 1;
+                    }
+                    else if (FUN_1016c300() == 0)
+                    {
+                        DAT_1101de30 = 2;
+                        FUN_1016bdf0(-DAT_10db6ee8[0].targetHeading);
+                    }
+                    if (DAT_1065cb41 != 0 && FUN_1016c300() == 0)
+                    {
+                        Vec4 toTarget;
+                        float angle;
+                        toTarget.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                        if (DAT_1065cb33 == 0)
+                        {
+                            if (DAT_10db6ee8[DAT_102027f8].matrix.m[MATRIX_TRANSLATION_X] >= TARGET_GONE_X)
+                            {
+                                if (DAT_102027f8 > 0)
+                                {
+                                    toTarget.Copy(toTarget - DAT_10db6ee8[DAT_102027f8].matrix.GetTranslation());
+                                    DAT_1101de30 = 2;
+                                    angle = atan2(toTarget.x, toTarget.y);
+                                    goto turnCameraToTarget;
+                                }
+                            }
+                            else
+                                DAT_102027f8 = -1;
+                        }
+                        else
+                        {
+                            if (DAT_102024ac < 1)
+                            {
+                                int nearest = -1;
+                                float nearestDistance = TARGET_SEARCH_START;
+                                for (i = LOCK_FIRST_MODEL; i < DOOR_FIRST_MODEL; i++)
+                                {
+                                    if (DAT_104bfe30 == 0 && (DAT_1021f3c0[i] == 'c' || DAT_1021f3c0[i] == 3)
+                                        && DAT_10daaae8[i].stats[STAT_BUSY] == 0 && DAT_10daaae8[i].stats[STAT_HEALTH] > 0
+                                        && DAT_10daaae8[i].m_0141 == 0)
+                                    {
+                                        float distance = DAT_1020e338[i]->GetTranslation().DistanceSquared(toTarget);
+                                        if (distance < nearestDistance)
+                                        {
+                                            nearest = i;
+                                            nearestDistance = distance;
+                                        }
+                                    }
+                                }
+                                if (nearest < 1)
+                                {
+                                    nearest = -1;
+                                    for (i = LOCK_FIRST_MODEL; i < DOOR_FIRST_MODEL; i++)
+                                    {
+                                        if (DAT_104bfe30 == 0 && (DAT_1021f3c0[i] == 'c' || DAT_1021f3c0[i] == 3)
+                                            && DAT_10daaae8[i].stats[STAT_HEALTH] > 0 && DAT_10daaae8[i].m_0141 == 0)
+                                        {
+                                            float distance = DAT_1020e338[i]->GetTranslation().DistanceSquared(toTarget);
+                                            if (distance < nearestDistance)
+                                            {
+                                                nearest = i;
+                                                nearestDistance = distance;
+                                            }
+                                        }
+                                    }
+                                    if (nearest > 0)
+                                    {
+                                        toTarget.Copy(toTarget - DAT_10db6ee8[nearest].matrix.GetTranslation());
+                                        DAT_1101de30 = 2;
+                                        angle = atan2(toTarget.x, toTarget.y);
+                                        FUN_1016bdf0(-angle);
+                                    }
+                                    DAT_102027f8 = nearest;
+                                    goto lockOnDone;
+                                }
+                                DAT_102027f8 = nearest;
+                                toTarget.Copy(toTarget - DAT_10db6ee8[nearest].matrix.GetTranslation());
+                                DAT_1101de30 = 2;
+                                angle = atan2(toTarget.x, toTarget.y);
+                            }
+                            else
+                            {
+                                toTarget.Copy(toTarget - DAT_10db6ee8[DAT_102024ac].matrix.GetTranslation());
+                                DAT_102027f8 = DAT_102024ac;
+                                DAT_1101de30 = 2;
+                                angle = atan2(toTarget.x, toTarget.y);
+                            }
+turnCameraToTarget:
+                            FUN_1016bdf0(-angle);
+                        }
+                    }
+lockOnDone:
+                    // Middle and Q keys: item list shortcuts; the menu key opens and closes the item list.
+                    if (DAT_104bfdf0 == 0)
+                    {
+                        if (DAT_104c0028 == 0)
+                        {
+                            if (DAT_1065cb3e == 1 && DAT_104c0068 != 1 && DAT_104bfe1c == 0)
+                                mouseMiddle = 1;
+                            if (DAT_1065cb30 == 1 && DAT_104c0068 != 1 && DAT_104bfe1c == 0)
+                                mouseMiddle = 2;
+                        }
+                        if (DAT_1065cb39 != 0 && DAT_104c0068 != 1 && DAT_104c0028 == 0 && DAT_104c01e0 == 0)
+                        {
+                            if (DAT_104bfe1c == 0)
+                            {
+                                DAT_104bfd74 = 1;
+                                modelIdx = DAT_10202464[0];
+                                DAT_104bfe90 = 0;
+                                FUN_1003ad20(SOUND_ITEM_LIST_OPEN, 0, 1.0f);
+                                DAT_104bfe90 = 0;
+                                DAT_104c0048 = 0;
+                                DAT_104bfe1c = 1;
+                            }
+                            else
+                            {
+                                FUN_1003ad20(SOUND_ITEM_LIST_CLOSE, 0, 1.0f);
+                                if (DAT_104bfe1c != 0)
+                                {
+                                    CloseItemList();
+                                }
+                                if (DAT_102024b0 > -1 && DAT_104bfdf0 == 0)
+                                {
+                                    DAT_104bfd74 = DAT_102024b0;
+                                    DAT_1020249c = DAT_102024b0;
+                                }
+                                DAT_102024b0 = -1;
+                            }
+                        }
+                    }
+                    // The pad's stick: flick gestures (jump), turning around, steering and moving through the item list.
+                    if (DAT_1032d69c != 0 && DAT_104bfdf0 == 0)
+                    {
+                        int padX = DAT_1065cb48;
+                        int padY = DAT_1065cb4c;
+                        Vec4 padDir;
+                        float padLength;
+                        padDir.Set((float)padX, (float)padY, 0, 0);
+                        padDir.Normalized3();
+                        padLength = (float)sqrt((double)(padY * padY + padX * padX));
+
+                        // History of the stick: the last PAD_HISTORY_LENGTH magnitudes and directions, the newest last.
+                        for (i = 0; i < PAD_HISTORY_LENGTH - 1; i++)
+                        {
+                            DAT_104507e8[i] = DAT_104507e8[i + 1];
+                            DAT_10836dd8[i].Copy(DAT_10836dd8[i + 1]);
+                        }
+                        DAT_104507e8[PAD_HISTORY_LENGTH - 1] = (short)padLength;
+                        DAT_10836dd8[PAD_HISTORY_LENGTH - 1].Copy(padDir);
+
+                        // A flick (the stick goes out, back in and out again in the same direction) is a jump.
+                        if (padLength > 0.0f)
+                        {
+                            int phase = 0;
+                            float peak = padLength * PAD_FLICK_PEAK;
+                            for (i = PAD_HISTORY_LENGTH - 1; i >= 0; i--)
+                            {
+                                if (peak <= (float)DAT_104507e8[i] && Vec3_Dot(&DAT_10836dd8[i], &padDir) < PAD_FLICK_ALIGN)
+                                    goto padGestureDone;
+                                if (phase == 0)
+                                {
+                                    if ((float)DAT_104507e8[i] < padLength / PAD_FLICK_LOW_DIVISOR)
+                                        phase = 1;
+                                }
+                                else if (phase == 1)
+                                {
+                                    if (peak <= (float)DAT_104507e8[i])
+                                        phase = 2;
+                                }
+                                else if (phase == 2)
+                                {
+                                    if ((float)DAT_104507e8[i] < padLength / PAD_FLICK_LOW_DIVISOR)
+                                        phase = 3;
+                                }
+                            }
+                            if (phase == 3 && DAT_104c010d == 0 && DAT_10c652cc != 0 && DAT_104bfe1c == 0 && DAT_104bfe30 == 0
+                                && DAT_104bfdc8 == 0 && DAT_104c0300 == 0 && DAT_104bfe4c == 0 && DAT_104c00e0 < 4)
+                                DAT_104c022e = 1;
+                        }
+padGestureDone:
+                        if (DAT_10c652cc != 0 && DAT_104c010d != 0 && DAT_1065cb35 != 0 && DAT_104bfe1c == 0 && DAT_104bfe30 == 0
+                            && DAT_104bfdc8 == 0 && DAT_104c0300 == 0 && DAT_104bfe4c == 0 && DAT_104c00e0 < 4)
+                            DAT_104c022e = 1;
+
+                        // A stick push behind the player turns the character around.
+                        if (DAT_104c0228 >= TURN_STATE_BASE && DAT_104bfe1c == 0 && (padX != 0 || padY != 0)
+                            && DAT_104c0228 == TURN_PENDING)
+                        {
+                            Vec4 facing;
+                            Vec4 wish;
+                            float behind;
+                            facing.x = cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI);
+                            facing.y = sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI);
+                            facing.z = 0;
+                            FUN_1016b340(&wish.x, &wish.y, (float)padX, (float)-padY);
+                            wish.z = 0;
+                            wish.Normalized3();
+                            behind = Vec3_Dot(&facing, &wish);
+                            if (behind < TURN_AROUND_DOT)
+                            {
+                                DAT_10db6ee8[0].PlayMotion(2, 0, 5, 1.0f);
+                                DAT_104c0228 = 0;
+                                for (i = PLAYER_TRAIL_LENGTH; i != 0; i--)
+                                {
+                                    DAT_10802ad8[DAT_104c022c].Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                                    DAT_104c022c = DAT_104c022c + 1 & 0xf;
+                                }
+                            }
+                            else
+                                DAT_104c0228 = TURN_REFUSED;
+                        }
+                        if (DAT_104c0068 == 1 || DAT_104c0228 >= TURN_STATE_BASE)
+                        {
+                            if (DAT_104bfe1c != 0)
+                                goto padItemList;
+                        }
+                        else if (DAT_104bfe1c == 0)
+                        {
+                            if ((unsigned char)DAT_10db6ee8[0].m_2288 < 2)
+                            {
+                                if (padX < 0)
+                                {
+                                    steerX = (float)padX / PAD_STEER_DIVISOR;
+                                    DAT_1020d9e0.M_100014a0();
+                                }
+                                if (padX > 0)
+                                {
+                                    steerX = (float)padX / PAD_STEER_DIVISOR;
+                                    DAT_1020d9e0.M_100014a0();
+                                }
+                                if (padY < 0)
+                                {
+                                    steerY = (float)-padY / PAD_STEER_DIVISOR;
+                                    DAT_1020d9e0.M_100014a0();
+                                }
+                                if (padY > 0)
+                                {
+                                    steerY = (float)-padY / PAD_STEER_DIVISOR;
+                                    DAT_1020d9e0.M_100014a0();
+                                }
+                                if (DAT_104c009d == 0)
+                                {
+                                    if (abs((int)steerX) > 8 || abs((int)steerY) > 8)
+                                        moveInput = 1;
+                                }
+                                else if (abs((int)steerX) > 5 || abs((int)steerY) > 5)
+                                    moveInput = 1;
+                            }
+                        }
+                        else
+                        {
+padItemList:
+                            // The stick moves through the item list.
+                            if (DAT_104c0135 == 0 && DAT_104c0148 == 0 && DAT_104c0028 == 0)
+                            {
+                                if (padY == 0 && padX == 0)
+                                {
+                                    if (DAT_104bfe98 < 0x19)
+                                        DAT_104bfe98 += 5;
+                                    DAT_104bfe9c = 0;
+                                }
+                                else if (DAT_104bfe9c < 9)
+                                    DAT_104bfe9c++;
+                                if (DAT_104bfe9c + DAT_104bfe98 > 5)
+                                {
+                                    if (fabs((double)padY) < PAD_PAGE_LIMIT && padX > 0x32 && DAT_104c02bc == 0)
+                                    {
+                                        DAT_104c02bc = 1;
+                                        DAT_104c0048 = 0;
+                                    }
+                                    else if (fabs((double)padY) < PAD_PAGE_LIMIT && padX < -0x32 && DAT_104c02bc == 1)
+                                    {
+                                        DAT_104c02bc = 0;
+                                        DAT_104c0048 = 0;
+                                    }
+                                    if (padY < -0x32)
+                                    {
+                                        DAT_104bfe98 = 0;
+                                        if (DAT_104bfe94 != 0 && DAT_104bfe90 + DAT_104c0048 != 0)
+                                            FUN_1003ad20(SOUND_ITEM_LIST_MOVE, 0, 1.0f);
+                                        if (DAT_104bfe90 < 1)
+                                        {
+                                            if (DAT_104c0048 > 0)
+                                                DAT_104c0048--;
+                                        }
+                                        else
+                                            DAT_104bfe90--;
+                                        DAT_1020d9e0.M_100014a0();
+                                    }
+                                    if (padY > 0x32)
+                                    {
+                                        DAT_104bfe98 = 0;
+                                        if (DAT_104bfe94 != 0 && DAT_104bfe90 + DAT_104c0048 < DAT_104c0044 - 1)
+                                            FUN_1003ad20(SOUND_ITEM_LIST_MOVE, 0, 1.0f);
+                                        if (DAT_104bfe90 == ITEM_MENU_ROWS - 1 && DAT_104c0044 - DAT_104c0048 > ITEM_MENU_ROWS)
+                                            DAT_104c0048++;
+                                        else if (DAT_104c0048 + DAT_104bfe90 < DAT_104c0044 - 1)
+                                            DAT_104bfe90++;
+                                        DAT_1020d9e0.M_100014a0();
+                                    }
+                                }
+                            }
+                        }
+
+                        // Without a stick push the character stands (or keeps the idle pose); with one it starts to walk.
+                        if (DAT_104bfdc8 == 0 && DAT_104c0068 != 1 && DAT_104bfe30 == 0)
+                        {
+                            if (steerX == 0.0f && steerY == 0.0f && DAT_104bf8c4 == 0)
+                            {
+                                int motion;
+                                if (DAT_104c0300 == 0)
+                                {
+                                    if (DAT_104bfe4c == 0)
+                                    {
+                                        if (DAT_104c00e0 == 0 && DAT_104c009e == 0)
+                                        {
+                                            motion = 2;
+                                            goto playPadIdleMotion;
+                                        }
+                                    }
+                                    else if (DAT_10468128 == 0 && DAT_10db6ee8[0].m_229c == 0)
+                                    {
+                                        motion = 0x1c;
+playPadIdleMotion:
+                                        DAT_10db6ee8[0].PlayMotion(motion, 0, 5, 1.0f);
+                                    }
+                                }
+                                else if (DAT_10468128 == 0 && DAT_10db6ee8[0].m_229c == 0)
+                                {
+                                    motion = 0x83;
+                                    goto playPadIdleMotion;
+                                }
+                            }
+                            else if (DAT_104c0300 == 0 && DAT_104bfe4c == 0 && DAT_104c01e0 == 0)
+                            {
+                                float steerLength;
+                                DAT_1020234c = 1.0f;
+                                if (moveInput == 0)
+                                {
+                                    if (DAT_104c009e == 0 && DAT_104c00e0 == 0)
+                                        DAT_10db6ee8[0].PlayMotion(0, 0, 5, 1.0f);
+                                }
+                                else
+                                {
+                                    if (DAT_104c009e == 0 && DAT_104c00e0 == 0)
+                                        DAT_10db6ee8[0].PlayMotion(1, 0, 5, 1.0f);
+                                    moveInput = 1;
+                                }
+                                steerLength = (float)sqrt((double)(steerX * steerX + steerY * steerY));
+                                steerX = steerX / steerLength * STEER_FULL;
+                                steerY = steerY / steerLength * STEER_FULL;
+                            }
+                        }
+                    }
+                }
+            }
+            // While the item list is open: the pad's buttons close it or pick the highlighted entry.
+            controlsEnabled = 1;
+            if (DAT_104c0099 > 0xe)
+            {
+                if (DAT_104c0148 == 0)
+                {
+                    if (DAT_104c0135 == 0)
+                    {
+                        if (DAT_104bfe1c != 0)
+                        {
+                            if (DAT_1032d69c != 0)
+                            {
+                                if (DAT_1065cb30 == 0)
+                                {
+                                    if (DAT_1065cb31 != 0)
+                                    {
+                                        DAT_1065cb31 = 0;
+                                        FUN_1003ad20(SOUND_ITEM_LIST_CLOSE, 0, 1.0f);
+                                        if (DAT_104bfe1c != 0)
+                                            CloseItemList();
+                                    }
+                                }
+                                else
+                                {
+                                    int entry = DAT_104485e8[DAT_104bfe90];
+                                    if (entry != 0)
+                                    {
+                                        if (entry == 0xa0)
+                                        {
+                                            DAT_1030c564 = 1;
+                                            controlsEnabled = 0;
+                                        }
+                                        else if (entry == 0xa1)
+                                        {
+                                            DAT_1030c540 = 1;
+                                            controlsEnabled = 0;
+                                        }
+                                        else if (entry == 0xa2)
+                                        {
+                                            DAT_1030c558 = 1;
+                                            controlsEnabled = 0;
+                                        }
+                                        else if (entry == 0xa3)
+                                        {
+                                            DAT_1030c55c = 1;
+                                            controlsEnabled = 0;
+                                        }
+                                        else if (entry == 0xa4)
+                                        {
+                                            DAT_1030c510 = 1;
+                                            controlsEnabled = 0;
+                                        }
+                                        else if (entry == 0xa5)
+                                        {
+                                            DAT_1030c508 = 1;
+                                            controlsEnabled = 0;
+                                        }
+                                        else if (entry == 0xa9)
+                                        {
+                                            CloseBookModel();
+                                            FUN_100106a0();
+                                            memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+                                            DAT_1020247c[DAT_104bfe88] = 0x531;
+                                            DAT_104bfe88 = DAT_104bfe88 + 1 & 7;
+                                            DAT_104bfe1c = 0;
+                                            controlsEnabled = 0;
+                                        }
+                                        else
+                                        {
+                                            inputEvents = 1;
+                                            controlsEnabled = 0;
+                                            DAT_10202464[0] = entry;
+                                            modelIdx = entry;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             // STAGE 4: player input and its actions, second part, pseudo.c lines 4500-5864
             // STAGE 5: player input and its actions, last part (ends the block), pseudo.c lines 5865-6523
         }

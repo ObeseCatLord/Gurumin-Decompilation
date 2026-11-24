@@ -416,3 +416,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 352 | 38 | match | Sonnet subagents: 3 drafts (Bs001_Update, Bs005_Update, Enemy_UpdateFighter); 858 matched, fuzzy 44.52% |
 | 353 | 38 | match | Sonnet subagents: 3 drafts (Bs004_Update, NeoGalaxy_Update, WorldRenderer::RunScriptFrames); 858 matched, fuzzy 45.31% |
 | 354 | 38 | match | Sonnet subagents: 3 drafts (EffectManager::DrawRecord, Prince_Update, Bs002_Update); 858 matched, fuzzy 46.81% |
+| 355 | 38 | match | Sonnet subagents: MeshData::DrawLit draft; Bs006_Update drafted in 4 stages; 858 matched, fuzzy 48.03% |

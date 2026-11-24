@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (343)
+## 1. Walls to retry (345)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -201,6 +201,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100cb0c0` 4350 — Game_LoadData (game_load_data.cpp, 4288 vs 4350 bytes): all calls, tables and strings in place, tail matches; the original keeps player(0)/camera x(200)/model z(-10) as non-folded stack locals (plus dead zero stores at +0x58/+0xb8), so ebx stays 0 for the whole function and the string-copy loops use cmp cl,bl; the CharSlot table-copy store order and the frame (0x22c vs 0x250) differ; the message-copy loop after the S064/render-texture failures sits at the end in the original. frame_step.cpp still declares it as Game_LoadData
 - [ ] `100cc2a0` 23305 — Bs005_Update (bs005_update.cpp, 13920 vs 23305 bytes): complete draft; ending camera blend (CastSegment, DAT_10866d98/DAT_10edbd48) and end-of-frame camera correction approximate; vector-operation shapes unverified (Ghidra dropped ecx/hidden-return args); footstep sound node and ids guessed; TestScriptFlag(0x1c7) inlined here but out of line in the original (call 0x100022b0); the voice-gate ladder is probably a shared inline across kinds 0x2d/0x46/0x69/0x43/0x3f
 - [ ] `100d2110` 894 — Enemy_SeekShaga (shaga_seek.cpp): body identical; ebx/edi pushed before the FUN_100aa820 call (original: after the step test) and the pair branch's count++ cross-jumps into the single branch; early-return, nested-if, local-placement and candidate-spelling variants tried
+- [ ] `100d24a0` 54584 — Bs006_Update (bs006_update.cpp, 55024 vs 54584 bytes): all states written (staged draft); DIFF from the prologue on (the original sets up other locals and stores earlier); out-of-line wrappers FUN_10001f80/FUN_10001f60 used (math_float.h); unverified: state 5 sound/range tail merging, state 2 heading chain through a shared local, state 1 move.z order, effect names guessed; TestScriptFlag(0x1c7) in state 0x12f as repeated calls as in the asm
 - [ ] `100e0320` 6362 — Partner_Follow (partner_follow.cpp, 6336 vs 6362 bytes): structure matches; register allocation differs from the prologue (original index=ebp, zero=ebx across the first block, leader*0x249c=edi, index<<6 spilled to [esp+0x18], &state in ebx after the state-7 check; ours index=ebx, hoisted ebp=index<<6); an int *state pointer after the early block changed nothing
 - [ ] `100e1c40` 1082 — Enemy_IsBusy (enemy_busy.cpp, rule-clean, queue globals in enemy_queue.h, CharState::fadeOut): two scheduling spots: the talk branch's `+ pi` is added after `add esp,0x10; pop edi` in the original (a float local or `angle` after the join gets that order but then merges or spills the atan2 tails), and the CharState memset is `lea edi; mov ecx,16; xor eax` with `DAT_10c66cd8 = 0` as an immediate (tried memset forms, a word loop, CharState(), inline helpers, the store before the memset).
 - [ ] `100e2080` 144 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
@@ -262,6 +263,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101501f0` 1755 — FontRenderer::DrawText (text_draw.cpp, 1776 vs 1755 bytes): bitmap-font branch matches; in the Windows-font branch the original keeps text in ebp (slot text in eax in the strcmp loop), pushes literal zeros for TextOutA instead of a register, and holds colour16/opaque in ebp; pixel-loop counters and the DrawTinted tail pushes differ (register allocation); int/ushort opaque, pointer and do/while loops, branch swap tried
 - [ ] `10150bb0` 1421 — MeshData::M_10150bb0 / BuildBuffers (mesh_build.cpp, 1440 bytes, 505 diff bytes): the original pushes only ebx/ebp up front and esi/edi after the FUN_101477c0 call, with a two-pop early return (shrink-wrapping), keeps zero in ebx and spills totalIndices*2 into the dead materials parameter slot; early-out and declaration forms tried
 - [ ] `10151150` 2621 — MeshData::Draw (mesh_draw.cpp, shadow-shader mesh draw, 2592 vs ~2500 bytes): control flow and calls match, but the stack layout differs (frame 0x2e8 vs 0x2f8): the original puts viewPoint at +0x90 between shadowPoint (+0x80) and worldPosition (+0xa0), ours at +0x70 (check reference counts, NOTES "Stack-slot order"); the pack loop early-outs and zero-count test differ (original keeps zero in edi, cmp/jle out of line). Tried locals inside blocks, a nine-Vec4 work array, literal 0.5f/300.0f, moving viewPoint
+- [ ] `10151ba0` 43163 — MeshData::DrawLit (mesh_draw_lit.cpp, 36432 vs 43163 bytes): faithful reconstruction of all ~45 modes, pack merge/cull loop, state setting and the recursive outline/overlay/rainbow passes; frame is 0x278 vs 0x3c98 because the original keeps every Transpose/Vec4 temporary in its own slot and ours scopes them in macro blocks; no byte match attempted (macros SET_VECTOR*/BIND_PACK_TEXTURES/DRAW_PACK stand in for the original inlines)
 - [ ] `1015c450` 589 — DShowStream::Open: statements identical; the original cross-jumps the failure messages (push message, jmp to the first OutputDebugStringA call and its return block placed inline) and keeps the results of steps 6 and 10 in other places (ebx, a stack slot); ours emits each failure block with its own call and one epilogue at the end; separate result variables tried
 - [ ] `1015f4e0` 1429 — TextInput_Update (text_input.cpp, 1440 vs 1429 bytes, 51 diffs): one register swap in the candidate loop (original keeps the page size DAT_10f66ab0 in esi and the line counter in edi, and pushes ebp/edi a block later); counter scope/type, compare order and pointer forms tried. Must stay out of ime.cpp (13.00 forwards the globals across the ImeContext calls in that TU)
 - [ ] `1015fb20` 187 — IME candidate draw: the original spills the loop counter to the stack and keeps x, y, the line pointer and the renderer in registers; cl 13.00 here keeps the counter in ebx (for/while/pointer forms tried)
@@ -370,10 +372,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (3)
+## 5. Very large functions (over 3000 bytes) (1)
 
-- [ ] `10151ba0` 43163 bytes (float, loops 10, calls 1169)
-- [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
 
 ## 6. Naming: matched functions without a readable name (0)

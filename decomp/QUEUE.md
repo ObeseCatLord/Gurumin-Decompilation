@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (337)
+## 1. Walls to retry (340)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -197,6 +197,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100bcce0` 3186 — Enemy_ChaseAndHop (enemy_chase_hop.cpp, step 2 of 0x100e0320, no EH, 3168 vs 3186 bytes): control flow and tail match; only residue is register allocation: the original never enregisters index (reloads [esp+0xb0]; edi = model, then the zero constant), ours puts index in edi; frame 0xa0 vs 0x9c. Lead: writing model instead of index in block 1 moves edi to model (a use-count tie), so check whether some statements use the wrong one of index/model. Tried separate DAT_11b002c0 stores, ternary airborne, alias refs, &index, local index copy
 - [ ] `100bd960` 345 — Map_UpdateSpecial: identical except the timer decrement (the original stores it before loading the map number, cl 13.00 here interleaves the two); three decrement spellings tried
 - [ ] `100bdad0` 24177 — Enemy_UpdateFighter (enemy_fighter.cpp, 17888 vs 24177 bytes): state flow and constants follow the original, but Vec4/matrix temporaries were rebuilt without their hidden this-pointers and static helpers (Fighter_Swing, Fighter_Grunt, Fighter_RandomStrike) plus merged case bodies change the shape; approximate: clone-spawn spot search, retreat ray probes, end ground probe, defeat camera lerp, shot-effect hand node; two Copy calls on DAT_10866d98/DAT_10edbd48 omitted
+- [ ] `100c39c0` 29926 — Bs004_Update (bs004_update.cpp, 18992 vs 29926 bytes): structural draft; Vec4 hidden-this/return-buffer flow in every state's step/blend, effect option/pose matrices, acosf/fabs arguments (lost in Ghidra), spawn-reset block and state 18/19 effect details approximate; neighbour-slot words (slots 92-95, minions index+2..4) still read as DAT_1020b430[slot].words[n]
 - [ ] `100cb0c0` 4350 — Game_LoadData (game_load_data.cpp, 4288 vs 4350 bytes): all calls, tables and strings in place, tail matches; the original keeps player(0)/camera x(200)/model z(-10) as non-folded stack locals (plus dead zero stores at +0x58/+0xb8), so ebx stays 0 for the whole function and the string-copy loops use cmp cl,bl; the CharSlot table-copy store order and the frame (0x22c vs 0x250) differ; the message-copy loop after the S064/render-texture failures sits at the end in the original. frame_step.cpp still declares it as Game_LoadData
 - [ ] `100cc2a0` 23305 — Bs005_Update (bs005_update.cpp, 13920 vs 23305 bytes): complete draft; ending camera blend (CastSegment, DAT_10866d98/DAT_10edbd48) and end-of-frame camera correction approximate; vector-operation shapes unverified (Ghidra dropped ecx/hidden-return args); footstep sound node and ids guessed; TestScriptFlag(0x1c7) inlined here but out of line in the original (call 0x100022b0); the voice-gate ladder is probably a shared inline across kinds 0x2d/0x46/0x69/0x43/0x3f
 - [ ] `100d2110` 894 — Enemy_SeekShaga (shaga_seek.cpp): body identical; ebx/edi pushed before the FUN_100aa820 call (original: after the step test) and the pair branch's count++ cross-jumps into the single branch; early-return, nested-if, local-placement and candidate-spelling variants tried
@@ -209,6 +210,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 - [ ] `100e25f0` 19570 — Bs003_Update (bs003_update.cpp, 14640 vs 19570 bytes, EH frame): complete compiling draft, not iterated; 5 KB short: the original repeats the node-pose/facing block in states 0/1 and the main pass (the draft shares helpers); breath/beam vectors, sound positions and the final follow-vector SetPosition guessed from Ghidra; companion record at index-1 (Ghidra bases one record before the tables)
+- [ ] `100e7280` 25057 — NeoGalaxy_Update (neo_galaxy_update.cpp, 17616 vs 25057 bytes): complete draft; ring effects of states 0x28/0x29/0x2a and the three-body ring geometry approximated (Ghidra and asm disagree on the rotation arguments); effect matrices built with helper statics instead of the original inline Matrix4 sequences; effect layouts of states 2, 3, 0x2a and 8 step 0x78 and the wall-pull ray cast inexact; two dead distance computations at the top omitted
 - [ ] `100ed9b0` 1258 — ListBank::CompileStatement (listbank.cpp, 1264 vs 1258 bytes): all but the int/float/string tail matches; the original puts the string-test jne to the call block, then the shared error block, the float declare and the call block last, without cross-jumping the int/float DeclareFromText tails; every spelling gives call-first (1264) or merged declares (1248)
 - [ ] `100f5a80` 14960 — Scene_Frame (scene_frame.cpp, 14000 vs 14960 bytes): rule-clean complete draft; the original has one more 16-byte Vec4 local (frame 0x228 vs 0x218) so all stack slots shift, the DAT_10c64f78 setter does not thread the bank/gauge test, the scripted-walk block layout is unverified, and the people loop, camera chain and tail are not yet compared
 - [ ] `100f9670` 7639 — Char_UpdateByKind (char_update.cpp, 8176 vs 7639 bytes, draft): esi/edi swapped (model vs slot offset), the pause globals DAT_104bfe1c/DAT_104c0135 and the greeting counter are cached in registers in the original, the quaternion temporaries sit elsewhere, the case bodies of the big kind switch are laid out differently, goto rememberMotion; tidy-up before any match: the kind steps use words[WORD_*] index macros instead of named CharState members (typed-members rule)
@@ -302,6 +304,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10175f20` 16619 — AnimModel::MoveWithCollisions (anim_move.cpp, 10480 vs 16619 bytes): complete draft; shares through helpers what the original writes out inline (four near-identical probe-ring/settle/velocity blocks, ground re-test, shadow tail); probe-ring indices/scales read from partial asm; free ring's dead DirectionMatrix and variant-1 dead rotate not reproduced; matching needs the four blocks inline in original order
 - [ ] `1017a010` 3719 — AnimModel::UpdateFrame (anim_model_step.cpp, 3776 vs 3719 bytes): control flow and FPU compares match; frame 0x258 vs 0x238 (the original reuses 3 Vec4 slots for all locals/temps, ours 5), ecx/eax and ecx/edx register picks, float nearest and move.y*share spilled instead of kept in ST0, the PushMotionSpeed argument built via eax, and al vs eax in the shadow init. Tried ~8 spellings each (block scoping, ternaries, locals vs expressions)
 - [ ] `1017c5f0` 750 — ModelBank::LightForRoot (model_bank.cpp, rule-clean): the 16-model search loop (unrolled by 8) and the light code match; the default-light block of both functions constructs two one-element Vec4 arrays through the vector constructor iterator 0x10004650 (count 1), while 13.00 calls the constructor directly for `Vec4 a[1]` (also tried a[1][1] and an array member of a local struct) -- the original array must be declared some other way; an inline helper for the block is not inlined under /Ob1.
+- [ ] `1017cc90` 29886 — WorldRenderer::RunScriptFrames (world_script.cpp, 22352 vs 29886 bytes): complete draft as one flat if/else chain; the original's nested cascade, the unrolled picture/tween loops (4 per pass) and the 0x20 node loop not reproduced; guessed: receivers of hidden-this calls (LMU PreScanFile, face texture swap model in FCC and the lip step), host callback argument layouts and some event codes, the model-loop heading branch, ModelOf alias use in CSD; SetPlayback declared with int params but the original passes a float second argument (SAN/SAE speed)
 - [ ] `10184440` 12476 — EffectManager::Step (effect_step.cpp, 11472 vs 12476 bytes, draft transcribed from asm only): frame layout, EH-state/Matrix4 slot sharing (three Matrix4 temporaries share esp+0xac), duplicated steering/ribbon blocks unaligned; SteerStep/AttachLight/RandomTurn/StartChildEffects are our factoring. Next: align prologue, then split by section
 - [ ] `10187520` 3712 — EffectManager::DrawLight (effect_light.cpp, rule-clean, EffectLight points/widths/colours typed, ScreenVertex fields named): full logic drafted; frame 0x1614 vs 0x160c and ebp pushed in the prologue (the original pushes it after the first dispatch), light base in ebp instead of ebx, kinds 7/9 share one call, vertex pointer stepping differs.
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
@@ -364,11 +367,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (9)
+## 5. Very large functions (over 3000 bytes) (6)
 
-- [ ] `100e7280` 25057 bytes (float, loops 23, calls 629)
-- [ ] `1017cc90` 29886 bytes (float, loops 41, calls 719)
-- [ ] `100c39c0` 29926 bytes (float, loops 41, calls 771)
 - [ ] `10189530` 30969 bytes (float, loops 57, calls 592)
 - [ ] `100edea0` 31560 bytes (float, loops 89, calls 691)
 - [ ] `10104640` 32656 bytes (float, loops 36, calls 706)
@@ -381,7 +381,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (26 files)
+## 7. Comment pass (28 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
@@ -389,6 +389,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/bgm_update.cpp`: 2 of 3 functions without a comment
 - [ ] `src/bs001_update.cpp`: 2 of 8 functions without a comment
 - [ ] `src/bs003_update.cpp`: 3 of 12 functions without a comment
+- [ ] `src/bs004_update.cpp`: 2 of 12 functions without a comment
 - [ ] `src/bs005_update.cpp`: 1 of 7 functions without a comment
 - [ ] `src/camera_chase.cpp`: 1 of 2 functions without a comment
 - [ ] `src/camera_shift_orbit.cpp`: 1 of 2 functions without a comment, no header
@@ -412,6 +413,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/scene_frame.cpp`: 2 of 8 functions without a comment
 - [ ] `src/shaga_update.cpp`: 1 of 6 functions without a comment
 - [ ] `src/swing_platform.cpp`: 2 of 3 functions without a comment
+- [ ] `src/world_script.cpp`: 5 of 11 functions without a comment
 
 ## 8. Structures and globals
 

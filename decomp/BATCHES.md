@@ -414,3 +414,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 350 | 38 | match | Sonnet subagents: callback type fix; 2 drafts (Node::UpdateWorldWithIk, Map18_UpdateFootballGame); 858 matched, fuzzy 42.78% |
 | 351 | 38 | match | Sonnet subagents: 2 drafts (Bs003_Update, Script_SceneCommand); 858 matched, fuzzy 43.43% |
 | 352 | 38 | match | Sonnet subagents: 3 drafts (Bs001_Update, Bs005_Update, Enemy_UpdateFighter); 858 matched, fuzzy 44.52% |
+| 353 | 38 | match | Sonnet subagents: 3 drafts (Bs004_Update, NeoGalaxy_Update, WorldRenderer::RunScriptFrames); 858 matched, fuzzy 45.31% |

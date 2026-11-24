@@ -12,3 +12,6 @@ address	status	reason
 0074a050	open	Node::MoveToParent: 6 bytes off; operand order of the inline strcpy at the two insertion sites and the edi load order
 00779540	open	KeyTrack::Set: Vec4 shift loop; original copies four dwords without reloading values; member-wise copy reloads [edi+8]
 0064bd10	open	Camera_ItemStand: 889 bytes, same length; store scheduling in the sparkle-matrix block (shot-point ints interleaved with matrix stores, z re-read); ~6 spellings
+0063fc10	open	Sound_PlayEffect: EN hoists cvtps2pd of the volume to the top; 507 vs 519 bytes
+007a3be0	open	FontSet::Release: scheduling (fonts[0] loaded before the DeleteObject pointer; ends with lea eax,[edi+1])
+007c5750	open	SoundArc_PlayStream: 8 diffs; EN stores the command (0x65) before the stream value in every spelling

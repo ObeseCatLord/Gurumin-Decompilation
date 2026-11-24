@@ -1,6 +1,7 @@
 // IME support of the name entry screen (EN build). Ported from the matched JP source decomp/src/ime.cpp.
 #include <stdlib.h>
 #include <new>
+#include <string.h>
 
 #include "ime.h"
 
@@ -79,4 +80,49 @@ DWORD ImeContext::LoadCandidates()
     buffer = (CANDIDATELIST *)operator new(size);
     ImmGetCandidateListA(context, 0, buffer, size);
     return buffer->dwCount;
+}
+
+// Copies the finished (converted) text into `out` (empty when nothing was converted). Returns 1 when text was copied.
+int ImeContext::GetResultString(char *out)
+{
+    *out = 0;
+    LONG length = ImmGetCompositionStringA(context, GCS_RESULTSTR, 0, 0);
+    if (length == 0)
+        return 0;
+    char *text = (char *)operator new(length + 1);
+    ImmGetCompositionStringA(context, GCS_RESULTSTR, text, length);
+    text[length] = 0;
+    strcpy(out, text);
+    free(text);
+    return 1;
+}
+
+// Writes the IME input mode as a short Japanese label into `out`, built from the conversion and sentence modes: "R"
+// (romaji input), full or half width, katakana or hiragana, then the sentence-mode marks (renbunsetsu, fukugo,
+// tanbunsetsu, jidou). Shift-JIS bytes are spelled out in the strings. Returns 1.
+int ImeContext::GetModeText(char *out)
+{
+    DWORD conversion;
+    DWORD sentence;
+    out[0] = 0;
+    GetConversion(&conversion, &sentence);
+    if (conversion & IME_CMODE_ROMAN)
+        strcat(out, "\x82\x71");                          // "R" (full width)
+    if (conversion & IME_CMODE_FULLSHAPE)
+        strcat(out, "\x91\x53");                          // "zen" (full width)
+    else
+        strcat(out, "\x94\xbc");                          // "han" (half width)
+    if (conversion & IME_CMODE_KATAKANA)
+        strcat(out, "\x83\x4a\x83\x69");                  // "kana" in katakana
+    else
+        strcat(out, "\x82\xa9\x82\xc8");                  // "kana" in hiragana
+    if (sentence & IME_SMODE_PHRASEPREDICT)
+        strcat(out, "\x98\x41");                          // "ren"
+    if (sentence & IME_SMODE_PLAURALCLAUSE)
+        strcat(out, "\x95\xa1");                          // "fuku"
+    if (sentence & IME_SMODE_SINGLECONVERT)
+        strcat(out, "\x92\x50");                          // "tan"
+    if (sentence & IME_SMODE_AUTOMATIC)
+        strcat(out, "\x8e\xa9");                          // "ji"
+    return 1;
 }

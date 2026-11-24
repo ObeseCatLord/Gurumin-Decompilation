@@ -1,5 +1,7 @@
 // Slot table materials and texture unbinding (EN build). Ported from the matched JP source
 // decomp/src/engine_10143.cpp.
+#include <string.h>
+
 #include "slot_table.h"
 #include "render.h"
 #include "buffer_pool.h"
@@ -123,4 +125,20 @@ int SlotTable::Reset()
     boxes = 0;
     built = 0;
     return 0;
+}
+
+// Uploads the skinning matrices of the mesh: each of the `count` bone matrices is multiplied by `world`, transposed,
+// and its first three rows go to the vertex-shader constants from BONE_CONSTANT_REGISTER. Called when a skinned mesh
+// is drawn.
+void SlotTable::UploadBones(Matrix4 *bones, int count, Matrix4 *world, int unused)
+{
+    Vec4 constants[MAX_SKIN_BONES * BONE_REGISTERS];
+    for (int i = 0; i < count; i++)
+    {
+        Matrix4 matrix;
+        matrix = bones[i] * *world;
+        matrix = Transpose(matrix);
+        memcpy(&constants[i * BONE_REGISTERS], matrix.m, BONE_REGISTERS * sizeof(Vec4));
+    }
+    g_d3dDevice->SetVertexShaderConstantF(BONE_CONSTANT_REGISTER, (const float *)constants, count * BONE_REGISTERS);
 }

@@ -82,7 +82,9 @@ struct Game
     int lastEntry[MENU_SLOT_COUNT];         // 0x0e0: index of the last entry added to the window
     char m_00ec[0x110 - 0xec];              // 0x0ec: not used by EN code yet
     int windowOpen[MENU_SLOT_COUNT];        // 0x110: 1 while the window slot is open
-    char m_011c[0x140 - 0x11c];             // 0x11c: not used by EN code yet
+    char m_011c[0x128 - 0x11c];             // 0x11c: not used by EN code yet
+    int windowFlags[MENU_SLOT_COUNT];       // 0x128: per window slot: layout flags (0x18 when opened, the yes/no dialogs set 0x20)
+    char m_0134[0x140 - 0x134];             // 0x134: not used by EN code yet
     int windowCursor[MENU_SLOT_COUNT];      // 0x140: cursor position in the window
     char m_014c[0x1dc - 0x14c];             // 0x14c: not used by EN code yet
     char cursorRemembered[MENU_FLAG_BYTES]; // 0x1dc: per window id: non-zero when its cursor is remembered
@@ -124,6 +126,7 @@ struct Game
     int FindNamedConstant(const char *name);        // EN 0x5e7ba0 (JP FindConstant)
     int SetWindowCallbackValue(int id, void (*callback)(int cursor, char *caption));  // EN 0x643390
     int SetWindowResult(int id, int *result);       // EN 0x6433e0
+    int OpenWindow(int id, int x, int y, int width, int height);   // EN 0x5c9560 (JP 0x100084b0)
     int CloseWindow(int id);                        // EN 0x5ca0e0
     int SetWindowCursor(int id, int value);         // EN 0x6465e0
     int AddFlagEntry(int id, const char *label, int *flag);     // EN 0x5a2840

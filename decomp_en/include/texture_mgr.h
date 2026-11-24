@@ -110,7 +110,21 @@ struct TextureManager
     int UnloadAllTextures();       // EN 0x740fe0 (JP 0x10173480): unloads every texture slot, clears the names
     int Shutdown();                // EN 0x7a3ad0 (JP 0x1015c730): shuts the renderer down
     void UnloadAndShutdown();      // EN 0x740c30 (JP 0x10175e70)
+    int OnLostDevice();            // EN 0x79f760 (JP 0x1014b2a0): releases every default-pool resource before the device is reset
+    int OnResetDevice();           // EN 0x79cd80 (JP 0x1013fbb0): recreates them afterwards
+    int PumpMessages();            // EN 0x7a2240 (JP 0x1013ec90): handles pending window messages
+    int PumpAndRecover();          // EN 0x7a2050 (JP 0x1015c850): message pump that waits while the game is inactive or the device is lost
+    int Present(const struct tagRECT *source);   // EN 0x7a7fa0 (JP 0x1013edc0): ends the scene and presents a rectangle of the back buffer
+    int ResetFrameTimer();         // EN 0x7a40f0 (JP 0x1013eee0): sets the next-frame deadline to now plus one frame (FrameTimer_ResetNext)
 };
+
+// The renderer object (`this` of the TextureManager methods). EN 0x00da747c (JP DAT_10836c70).
+extern "C" TextureManager g_textureManager;
+
+// Releases the Direct3D data of every texture whose alpha is generated (before a device reset). EN 0x740bb0 (JP 0x101734d0).
+extern "C" int Textures_ReleaseGenerated(void);
+// Recreates those textures after a device reset (not ported yet). EN 0x73fb80 (JP 0x10173510).
+extern "C" int Textures_RestoreGenerated(void);
 
 // Loads the texture file `path` (an .iti file) and returns its slot; `a` and `b` are the load options. EN 0x736f60 (JP 0x10174ce0).
 extern "C" int Texture_LoadIti(const char *path, int a, int b);
@@ -132,6 +146,22 @@ extern "C" int Texture_ReloadMissing(void);
 // Releases one reference to texture slot `slot`; unloads it when the count reaches zero or `force` is set. Returns the
 // remaining count, or -1 for an unused slot (EN 0x748470).
 extern "C" int Texture_Release(int slot, int force);
+
+// Inline copy of Texture_Release: the original inlines it into callers that release a texture slot.
+__forceinline int TextureSlot_Release(int slot, int force)
+{
+    if (slot == -1 || g_textureNames[slot][0] == 0)
+        return -1;
+    g_textureRefCount[slot]--;
+    char refs = g_textureRefCount[slot];
+    if (force != 0 || refs == 0)
+    {
+        g_textureRefCount[slot] = 0;
+        g_textures[slot].Unload();
+        g_textureNames[slot][0] = 0;
+    }
+    return g_textureRefCount[slot];
+}
 
 extern "C" int Texture_BindStage1(int index);   // EN 0x7469d0 (JP 0x101610b0): binds slot `index` to stage 1 (negative = unbind)
 extern "C" int Texture_BindStage0(int index);   // EN 0x746a10 (JP 0x10161070): binds slot `index` to stage 0 (negative = unbind)

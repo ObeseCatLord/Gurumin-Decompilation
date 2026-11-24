@@ -26,6 +26,9 @@ const float STAND_MIN_HEIGHT = 20.0f;
 const int CHAR_NODE_MATRIX_COUNT = 6;
 // CharState::values index of the frame counter the item stand camera shot keeps in character 0's state.
 const int CHARSTATE_CAMERA_FRAMES = 2;
+// CharState::values indices an idle NPC uses: frames to wait before it may speak again, and its talk line (key script * 100 + line).
+const int CHARSTATE_NPC_WAIT = 0;
+const int CHARSTATE_NPC_TALK = 1;
 // Characters in the party table (g_partyCharacters).
 const int PARTY_SIZE = 5;
 // Number of entries of the group table.
@@ -58,7 +61,9 @@ const int CHAR_STAT_COUNT = 16;
 enum CharStat
 {
     STAT_HEALTH = 0,          // 0x04: hit points left
-    STAT_MAX_HEALTH = 1       // 0x08: initial value of the health (restored when the slot is reused)
+    STAT_MAX_HEALTH = 1,      // 0x08: initial value of the health (restored when the slot is reused)
+    STAT_PICKUPS = 6,         // 0x1c: guarded by the anti-tamper copies
+    STAT_GUARDED_B = 7        // 0x20: guarded by the anti-tamper copies
 };
 
 // Entries of CharRecord::params.
@@ -75,9 +80,14 @@ struct CharRecord
     char m_0044[0x9c - 0x44];                // 0x44: not used by EN code yet
     int kind;                                // 0x9c: behaviour kind
     int sharesModel;                         // 0xa0: non-zero = shares the previous slot's model; the actor scans only count slots where it is 0
-    char m_00a4[0xf0 - 0xa4];                // 0xa4: not used by EN code yet
+    int m_00a4;                              // 0xa4: not used by EN code yet
+    int m_00a8;                              // 0xa8: tested on the previous slot by Chars_ReloadModels (0 = reload this slot)
+    char m_00ac[0xb8 - 0xac];                // 0xac: not used by EN code yet
+    int money;                               // 0xb8: money carried (guarded by the anti-tamper copies)
+    char m_00bc[0xf0 - 0xbc];                // 0xbc: not used by EN code yet
     int params[CHAR_PARAM_COUNT];            // 0xf0: by CharParam index
-    char m_0130[0x141 - 0x130];              // 0x130: position and switches held
+    char m_0130[0x140 - 0x130];              // 0x130: position
+    char switchesHeld;                       // 0x140: number of switches the character is holding
     char defeated;                           // 0x141: 1 once the character is marked defeated
     char m_0142[CHAR_RECORD_SIZE - 0x142];   // 0x142: held flag and name (not used by EN code yet)
 };
@@ -87,7 +97,7 @@ struct CharState
 {
     int state;                // 0x00: behaviour step (0 = not started yet)
     int values[13];           // 0x04: behaviour variables (the AI pickers use values[0] and values[1])
-    int m_0038;               // 0x38: not used by EN code yet
+    int sawPlayer;            // 0x38: 1 once the character saw the player (or was told to react)
     int m_003c;               // 0x3c: not used by EN code yet
 };
 
@@ -99,6 +109,8 @@ struct ModelPath
 
 extern "C" CharRecord g_charRecords[CHAR_SLOT_COUNT];      // EN 0x00f381e0 (JP DAT_10daaae8)
 extern "C" CharState g_charState[CHAR_SLOT_COUNT];         // EN 0x009160e0 (JP DAT_1020b430)
+extern "C" int g_charToldToReact[CHAR_SLOT_COUNT];         // EN 0x00920260 (JP DAT_10210b30): non-zero = told to react
+extern "C" char g_charTalkPending[CHAR_SLOT_COUNT];        // EN 0x009e1890 (JP DAT_10255a88): cleared while an NPC idles
 extern "C" int g_charPhase[CHAR_SLOT_COUNT];               // EN 0x00915cb8 (JP DAT_10210d30): non-zero = busy; 2 = finished
 extern "C" char g_charKind[CHAR_SLOT_COUNT];               // EN 0x00a35bc8 (JP DAT_1021f3c0): kind of each slot (3 = enemy)
 extern "C" int g_charGroup[CHAR_GROUP_COUNT];              // EN 0x0091f818 (JP DAT_10255f10): group of each character, -1 = none
@@ -132,7 +144,10 @@ extern "C" int Char_ResetState(int index);
 extern "C" int GameOver_StartQuiet(int value);
 // Returns the first enemy slot that has a model and is out of the world or finished, or -1. EN 0x5eb4b0.
 extern "C" int Enemy_FindReusableSlot(void);
+// Respawns an enemy in a reusable slot and places it at (x, y, z); returns the slot or -1. EN 0x642cd0 (JP 0x10011d40).
+extern "C" int Enemy_Respawn(float x, float y, float z);
 // Actor scans (actor_scan.cpp).
+extern "C" int Enemy_WatchPlayer(int index);                                      // EN 0x5be510 (JP 0x10027400): faces the player until a random end
 extern "C" int Enemy_ClearIdleHealth(void);                                       // EN 0x6e1690
 extern "C" int Object_IsNearPoint(int unused, const Vec4 *point);                 // EN 0x5c1b20
 extern "C" int Char_IsPartyNear(int index, const Vec4 *offset, int range);        // EN 0x5c0bd0

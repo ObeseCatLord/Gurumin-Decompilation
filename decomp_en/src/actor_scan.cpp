@@ -1,5 +1,6 @@
 // Scans of the character slots (EN build). Ported from the matched JP source decomp/src/actor_scan.cpp.
 #include "char.h"
+#include "node.h"
 
 // Enemy_FindReusableSlot: returns the first enemy slot that has a model and is either out of the world or finished
 // (health <= 0 while its phase is 2), or -1. Called when a new enemy needs a slot.
@@ -117,4 +118,31 @@ extern "C" int Char_IsStandingOn(int lower, int upper, int maxHeight, int maxDis
     if (height < 0.0f || height > (float)maxHeight || distanceSquared > (float)maxDistanceSquared)
         return 0;
     return g_characterModels[upper].idleMotionEnabled != 0;
+}
+
+// Colour values a respawned enemy's node tree is reset to: set A is 0xfe, set B is 0x2f, both for every node (-1 mask).
+const unsigned char RESPAWN_COLOUR_A = 0xfe;
+const unsigned char RESPAWN_COLOUR_B = 0x2f;
+const unsigned int RESPAWN_COLOUR_MASK = 0xffffffff;
+// Alpha of a respawned model: fully visible.
+const float RESPAWN_ALPHA = 1.0f;
+
+// Enemy_Respawn: respawns an enemy in the first enemy slot that is free or finished: resets the model's node
+// colours, restores the slot's health, clears the busy and spawn flags, makes the model fully visible and places it
+// at (x, y, z). Returns the slot, or -1 when none is available. Called by the spawn scripts.
+extern "C" int Enemy_Respawn(float x, float y, float z)
+{
+    int i = Enemy_FindReusableSlot();
+    if (i >= 0)
+    {
+        g_characterModels[i].root->SetColourA(RESPAWN_COLOUR_A, RESPAWN_COLOUR_MASK);
+        g_characterModels[i].root->SetColourB(RESPAWN_COLOUR_B, RESPAWN_COLOUR_MASK);
+        g_charRecords[i].stats[STAT_HEALTH] = g_charRecords[i].stats[STAT_MAX_HEALTH];
+        g_charPhase[i] = 0;
+        g_charSpawnFlag[i] = 0;
+        g_characterModels[i].alpha = RESPAWN_ALPHA;
+        g_characterModels[i].Teleport(x, y, z);
+        return i;
+    }
+    return -1;
 }

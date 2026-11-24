@@ -10,6 +10,13 @@ struct VertexPack;
 struct IndexList;
 struct Material;
 
+// Bones the vertex shader can skin with at once.
+const int MAX_SKIN_BONES = 24;
+// Vertex shader constant register the bone matrices start at.
+const int BONE_CONSTANT_REGISTER = 11;
+// Registers one bone takes (the first three rows of its transposed matrix).
+const int BONE_REGISTERS = 3;
+
 struct SlotTable
 {
     int textureSlot;          // 0x00: texture slot the mesh buffers live in (negative = none)
@@ -39,6 +46,9 @@ struct SlotTable
     int Reset();                                        // EN 0x7a4010 (JP 0x10145a10): no texture slot, no entries, every pointer cleared
     void Release();                                     // EN 0x7a3c80 (JP 0x10150a90): frees the texture slot and every table
     // EN 0x7a45b0 (JP 0x10150bb0): builds the Direct3D buffers and the per-pack tables from the node's packs.
+    // EN 0x7a4360 (JP 0x10145a50): uploads the skinning matrices: each of the `count` bone matrices (at most
+    // MAX_SKIN_BONES) times `world`, transposed, goes to the vertex shader constants as three registers.
+    void UploadBones(Matrix4 *bones, int count, Matrix4 *world, int unused);
     int BuildBuffers(VertexPack *packs, IndexList *indexLists, int packCount, Material *materials, int flags);
 };
 

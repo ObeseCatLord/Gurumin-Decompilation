@@ -26,12 +26,25 @@ struct KeyTrack
 // Size of one mesh vertex in bytes.
 const int VERTEX_SIZE = 0x70;
 
-// One mesh vertex; only the position is recovered so far.
+// One mesh vertex.
 struct Vertex
 {
     float position[4];                    // 0x00: x, y, z, 1
-    char m_0010[VERTEX_SIZE - 0x10];      // 0x10: normal, colours, uv, material, weights (not split up yet)
+    float normal[4];                      // 0x10: normal x, y, z, 1
+    float colour[4];                      // 0x20: colour red, green, blue, alpha (0..1)
+    float uv[2];                          // 0x30: first texture coordinates u, v
+    int sourceMaterial;                   // 0x38: material the vertex was read with
+    int material;                         // 0x3c: material index
+    float emissive[4];                    // 0x40: emissive colour
+    float m_0050[4];                      // 0x50: not recovered (cleared by Set)
+    float m_0060;                         // 0x60: not recovered (1 after Set)
+    float m_0064[3];                      // 0x64: not recovered (cleared by Set)
+
+    void SetPosition(float x, float y, float z);   // EN 0x779b20 (JP 0x101acbb0): sets the position, everything else to defaults
+    void Set(float x, float y, float z, float nx, float ny, float nz, float u, float v, float r, float g, float b, float a);  // EN 0x779ec0: position, normal, uv and colour in one call
 };
+
+static_assert(sizeof(Vertex) == VERTEX_SIZE, "Vertex must be 0x70 bytes");
 
 // One drawable pack of a mesh: bounds, material and the vertex buffer.
 struct VertexPack

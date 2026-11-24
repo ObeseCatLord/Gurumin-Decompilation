@@ -34,9 +34,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-24, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 151 of 2,034 game functions (9,231 of 2,080,360 bytes, 0.44 %) |
-| Matched under the rules | 151 |
-| Queue | 506 with a matched JP twin left in section 2; open.tsv: 2 |
+| Matched | 324 of 2,034 game functions (52,210 of 2,080,360 bytes, 2.51 %) |
+| Matched under the rules | 324 |
+| Queue | section 2 about 380 left; open.tsv: 14 |
 
 ## State
 - Pipeline verified; batches 1-4 matched Node (29+), Vec4/Matrix4/Box, containers, AnimModel channels, camera,
@@ -50,6 +50,13 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   (contexts pass 250K tokens by round 4).
 - Not applied yet: `apply_jp_names.bat` (EN Ghidra names).
 - Blocked: `Game::~Game` 0x5a1150 needs a Node destructor (0x7496d0) and an EN Object base (0x76f0e0).
+
+- **Push when the remote moved** (CI commits progress meters; other sessions keep dirty files, never stash): build the
+  commit on origin/master with a temporary index (`GIT_INDEX_FILE=tmp git read-tree origin/master`, `git diff --binary
+  HEAD~1 HEAD | git apply --cached`, `git write-tree`, `git commit-tree -p origin/master`), push it, then `git reset
+  --soft <new>` and `git reset <new> -- <paths the remote changed>`.
+- Batch 7 ownership: game worker = node/anim/char/game headers and their sources; engine worker = vec4, containers,
+  texture_mgr, render, slot_table, buffer_pool, engine, ime, world files; misc worker = only the new files it creates.
 
 ## Next steps
 1. Section 2 of `QUEUE.md` by JP file: scene_node (37 left), char_move (18), model_params (17, AnimModel),

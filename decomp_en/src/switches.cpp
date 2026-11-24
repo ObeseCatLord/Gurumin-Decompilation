@@ -56,3 +56,27 @@ extern "C" int Switch_TurnOff(int slot)
     }
     return 0;
 }
+
+// Switch_Release: lets go of the object held by `holder`: a character holder gives back one held switch and raises
+// the lever events of its switch node off; an object holder loses its held bonus of 1000. Returns 1, or 0 when
+// `holder` holds nothing. Called by the pick-up and throw behaviours.
+extern "C" int Switch_Release(int holder)
+{
+    for (int i = 0; i < SWITCH_HOLD_SLOTS; i++)
+    {
+        if (g_switchHeldObject[i] != 0 && g_switchHolder[i] == holder)
+        {
+            int who = g_switchHolder[i];
+            if (who < SWITCH_HOLDER_OBJECT_BASE)
+            {
+                g_charRecords[who].switchesHeld--;
+                g_game.RaiseLeverEvents(g_characterModels[who].switchNode, 0);
+            }
+            else if (g_objectSwitchState[who % SWITCH_HOLD_SLOTS] >= SWITCH_HELD_BONUS)
+                g_objectSwitchState[who % SWITCH_HOLD_SLOTS] -= SWITCH_HELD_BONUS;
+            g_switchHeldObject[i] = 0;
+            return 1;
+        }
+    }
+    return 0;
+}

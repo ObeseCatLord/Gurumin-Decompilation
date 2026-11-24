@@ -206,3 +206,26 @@ int AnimModel::UpdateCollision()
     root->StartProximityPass(matrix.m, &work, 0, motionFrame, 0);
     return 0;
 }
+
+// Largest slot and layer numbers SetSlotSource accepts.
+const int PLAYBACK_LAST_SLOT_SOURCE = 0xf;
+const int PLAYBACK_LAST_SOURCE_LAYER = 0x8f;
+
+// AnimModel::SetSlotSource: sets the motion source and layer of playback slot `slot` (creates the playback on first
+// use). Slots above 15, layers above 0x8f and an empty source are ignored. Returns 1.
+int AnimModel::SetSlotSource(void *source, int slot, int layer)
+{
+    if (playback == 0)
+    {
+        playback = (Playback *)g_engineAlloc(PLAYBACK_SIZE, "");
+        playback->Init();
+        playback->BindModel(this);
+    }
+    Playback *state = playback;
+    if (layer <= PLAYBACK_LAST_SOURCE_LAYER && slot <= PLAYBACK_LAST_SLOT_SOURCE && source != 0)
+    {
+        state->slotSource[slot] = source;
+        state->slotLayer[slot] = layer;
+    }
+    return 1;
+}

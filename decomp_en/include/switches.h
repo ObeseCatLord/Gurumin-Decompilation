@@ -26,6 +26,19 @@ extern "C" short g_switchFlag[CHAR_SLOT_COUNT];       // EN 0x00920d20 (JP DAT_1
 extern "C" short g_switchDoorId[CHAR_SLOT_COUNT];     // EN 0x00920a18 (JP DAT_10219ec0): door id the switch's events use
 extern "C" int g_soundsMuted;                         // EN 0x0091f534 (JP DAT_104bfe6c): 1 while sounds are muted (cut-scenes)
 
+// Number of switch hold slots, and the holders below this value are character slots (0x80 + n is object n).
+const int SWITCH_HOLD_SLOTS = 0x80;
+const int SWITCH_HOLDER_OBJECT_BASE = 0x80;
+// Held bonus added to an object's switch state while it is held.
+const int SWITCH_HELD_BONUS = 1000;
+
+extern "C" void *g_switchHeldObject[SWITCH_HOLD_SLOTS];    // EN 0x009180e0 (JP DAT_1030bbf8): object held in each hold slot (0 = unused)
+extern "C" int g_switchHolder[SWITCH_HOLD_SLOTS];          // EN 0x009183d0 (JP DAT_10255b08): holder of each hold slot
+extern "C" short g_objectSwitchState[SWITCH_HOLD_SLOTS];   // EN 0x00b919e0 (JP DAT_10254838): per-object switch state; SWITCH_HELD_BONUS is added while held
+
+// Lets go of what character slot `holder` holds. EN 0x5c9fd0 (JP 0x10057b90).
+extern "C" int Switch_Release(int holder);
+
 // Plays sound effect `sound` at `position` with `volume`. EN 0x63fc10 (JP 0x1003ad20).
 extern "C" int Sound_PlayEffect(int sound, const Vec4 *position, float volume);
 

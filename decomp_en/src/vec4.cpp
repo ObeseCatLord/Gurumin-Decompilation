@@ -7,6 +7,7 @@
 #include "vec4.h"
 #include "key_bank.h"
 #include "containers.h"
+#include "plane.h"
 
 // Factor applied to the z difference in DistanceZWeighted.
 static const float Z_DISTANCE_WEIGHT = 2.0f;
@@ -623,4 +624,35 @@ Vec4 Slerp(const Vec4 &a, const Vec4 &b, float t)
 // Destructor: nothing to release. Declared out of line so that constructors of owning types register an unwind frame.
 Matrix4::~Matrix4()
 {
+}
+
+// The normal of the triangle (origin, a, b): the cross product of the edges a - origin and b - origin (not
+// normalised). Called by the collision and lighting code.
+Vec4 TriangleNormal(const Vec4 &a, const Vec4 &origin, const Vec4 &b)
+{
+    Vec4 edgeB;
+    Vec4 edgeA;
+    Vec4 result;
+    edgeA.Copy(a - origin);
+    edgeB.Copy(b - origin);
+    result.Copy(Cross(edgeA, edgeB));
+    return result;
+}
+
+// The plane through the triangle (origin, a, b): the normal is (a - origin) x (b - origin) (not normalised) and d
+// puts `origin` on the plane.
+Plane PlaneFromTriangle(const Vec4 &a, const Vec4 &origin, const Vec4 &b)
+{
+    Vec4 edgeB;
+    Vec4 edgeA;
+    Vec4 normal;
+    edgeA.Copy(a - origin);
+    edgeB.Copy(b - origin);
+    normal.Copy(Cross(edgeA, edgeB));
+    Plane plane;
+    plane.a = normal.x;
+    plane.b = normal.y;
+    plane.c = normal.z;
+    plane.d = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
+    return plane;
 }

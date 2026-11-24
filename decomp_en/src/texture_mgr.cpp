@@ -92,17 +92,7 @@ extern "C" int Texture_ReloadMissing(void)
 // when the count reaches zero or when `force` is set. Returns the remaining count, or -1 for an unused slot.
 extern "C" int Texture_Release(int slot, int force)
 {
-    if (slot == -1 || g_textureNames[slot][0] == 0)
-        return -1;
-    g_textureRefCount[slot]--;
-    char refs = g_textureRefCount[slot];
-    if (force != 0 || refs == 0)
-    {
-        g_textureRefCount[slot] = 0;
-        g_textures[slot].Unload();
-        g_textureNames[slot][0] = 0;
-    }
-    return g_textureRefCount[slot];
+    return TextureSlot_Release(slot, force);
 }
 
 // Binds this texture to stage 0 unless it is bound there already. Pooled textures fetch their frame from the buffer
@@ -190,4 +180,16 @@ int TriangleBatch::AddQuad(TextureObject *newTexture, float left, float top, flo
         Flush();
     AppendQuad(left, top, right, bottom, u0, v0, u1, v1, z, alpha, r, g, b, r2, g2, b2, rotation);
     return 0;
+}
+
+// Textures_ReleaseGenerated: releases the Direct3D data of every texture whose alpha is generated, so
+// the device can be reset (they are rebuilt afterwards). Returns 1. Called while recovering from a lost device.
+extern "C" int Textures_ReleaseGenerated(void)
+{
+    for (int i = 0; i < TEXTURE_SLOT_COUNT; i++)
+    {
+        if (g_textureNames[i][0] != 0 && g_textures[i].generatedAlpha != 0)
+            g_textures[i].Release();
+    }
+    return 1;
 }

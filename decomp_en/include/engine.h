@@ -18,10 +18,22 @@ extern "C" char g_folderPathBuffers[FOLDER_PATH_BUFFERS][PATH_SIZE];  // EN 0x02
 extern "C" unsigned short g_randomPosition;                     // EN 0x021a3604 (JP DAT_10f65558): position in the random table
 extern "C" int g_randomTable[RANDOM_TABLE_SIZE];                // EN 0x021a3608 (JP DAT_10f20590): the random table
 
+const int MESSAGES_PER_PUMP = 30;         // window messages handled per Message_Pump call
+const int GAME_SCREEN_WIDTH = 640;        // width of the game's 2D coordinate space
+const int GAME_SCREEN_HEIGHT = 480;       // height of the game's 2D coordinate space
+
+extern "C" int g_frameBlendActive;                              // EN 0x021e8d54 (JP DAT_10f65498): 1 while the frame blend is active
+extern "C" float g_frameBlendStrength;                          // EN 0x021e8d60 (JP DAT_10f6549c): current blend strength
+extern "C" float g_frameBlendStep;                              // EN 0x021e8d64 (JP DAT_10f1fcf8): strength change per update
+extern "C" float g_frameBlendLimit;                             // EN 0x021e8d68 (JP DAT_10f628d0): upper limit of the strength
+extern "C" int g_frameBlendSupported;                           // EN 0x021e47e0 (JP DAT_10f654f4): non-zero when the device supports blending
+extern "C" int g_singleFrameBuffer;                             // EN 0x00909338 (JP DAT_10202b0c): 1 when only one frame buffer exists
+
 extern "C" int FrameTimer_ResetNext2(void);                     // EN 0x7a40d0 (JP 0x1013faf0)
 extern "C" int FrameTimer_ResetNext(void);                      // EN 0x7a40f0 (JP 0x1013eee0)
 extern "C" char *MakeDataPath(const char *name);                // EN 0x7a31a0 (JP 0x1013f910)
 extern "C" const char *Path_Data(const char *name, int folder); // EN 0x7a31f0 (JP 0x1013f8a0)
+extern "C" int FrameBlend_Start(int active, int target, int frames);  // EN 0x77c840 (JP 0x1013fb10)
 extern "C" int Random(void);                                    // EN 0x7a3a30 (JP 0x1013f880)
 
 #endif

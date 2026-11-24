@@ -3,18 +3,14 @@
 #ifndef GURUMIN_EN_MENU_LIST_H
 #define GURUMIN_EN_MENU_LIST_H
 
+#include "font_renderer.h"
+
 // Candidates shown on one page at most.
 const int CANDIDATES_PER_PAGE = 9;
 // Bytes of one candidate line.
 const int CANDIDATE_TEXT_SIZE = 0x80;
 // Scale at which candidate text is measured and drawn.
 const float CANDIDATE_TEXT_SCALE = 1.0f;
-
-// The renderer's text drawing object; only the members EN code has used.
-struct FontRenderer
-{
-    int TextWidth(const char *text, float scale);   // EN 0x7a10e0 (JP 0x1014fd30): width of `text` in pixels
-};
 
 // One candidate line.
 struct CandidateLine

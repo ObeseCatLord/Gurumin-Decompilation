@@ -96,14 +96,22 @@ struct AnimModel;
 // first use through AnimModel::GetPlayback. Only the members EN code has used are named.
 struct Playback
 {
-    char m_0000[0x1c];                 // 0x0000: not yet named
+    int headerFlag;                    // 0x0000: first word of the state (cleared when the player gets a helmet)
+    char m_0004[0x1c - 4];             // 0x0004: not yet named
     int layer;                         // 0x001c: the layer that plays now
-    char m_0020[0xbec - 0x20];         // 0x0020: not yet named
+    char m_0020[0x2c - 0x20];          // 0x0020: not yet named
+    void *slotSource[16];              // 0x002c: motion source of each slot
+    int slotLayer[16];                 // 0x006c: layer each slot plays
+    char m_00ac[0xbec - 0xac];         // 0x00ac: not yet named
     int endState;                      // 0x0bec: PLAYBACK_END_REACHED once the playback has reached its end
     char m_0bf0[0x1070 - 0xbf0];       // 0x0bf0: not yet named
     int slotOffsetX[PLAYBACK_LAYER_COUNT][PLAYBACK_SLOT_COUNT];  // 0x1070: x offset per layer and slot
     int slotOffsetY[PLAYBACK_LAYER_COUNT][PLAYBACK_SLOT_COUNT];  // 0x3470: y offset per layer and slot
-    char m_5870[PLAYBACK_SIZE - 0x5870];  // 0x5870: not yet named
+    char m_5870[0x7c74 - 0x5870];      // 0x5870: not yet named
+    int blending;                      // 0x7c74: non-zero while blending into nextLayer
+    int m_7c78;                        // 0x7c78: not yet named
+    int nextLayer;                     // 0x7c7c: the layer being blended into
+    char m_7c80[PLAYBACK_SIZE - 0x7c80];  // 0x7c80: not yet named
 
     void Init();                                                       // EN 0x7412b0 (JP 0x10169f90)
     int BindModel(AnimModel *owner);                                   // EN 0x71c060 (JP 0x1016a020)
@@ -116,13 +124,28 @@ struct AnimModel
 {
     char m_0000[0x70];            // 0x000: not yet named
     int collisionFilter;          // 0x070: collision filter of the model's world tests (g_collisionFilter while they run)
-    char m_0074[0x84 - 0x74];     // 0x074: not yet named
+    char m_0074[0x76 - 0x74];     // 0x074: not yet named
+    char uiAnimStarted;           // 0x076: set to 1 by UiAnim_Play (read on the first model only)
+    char m_0077[0x84 - 0x77];     // 0x077: not yet named
     unsigned char speedDivisor;   // 0x084: slows every motion of this model down (0 = no division)
-    char m_0085[0x248 - 0x85];    // 0x085: not yet named
+    char m_0085[0x21c - 0x85];    // 0x085: not yet named
+    Vec4 scale;                   // 0x21c: model scale (x, y, z)
+    char m_022c[0x248 - 0x22c];   // 0x22c: not yet named
     float holdWeight;             // 0x248: blend weight while holding (at most HOLD_WEIGHT_MAX)
-    char m_024c[0x265 - 0x24c];   // 0x24c: not yet named
+    char m_024c[0x260 - 0x24c];   // 0x24c: not yet named
+    float uniformScale;           // 0x260: scale of the whole model (1 for bank models)
+    char m_0264;                  // 0x264: not yet named
     char important;               // 0x265: set when a character is assigned to a slot (CharacterBank::Assign)
-    char m_0266[0x298 - 0x266];   // 0x266: not yet named
+    char m_0266;                  // 0x266: not yet named
+    char idling;                  // 0x267: 1 while an NPC idles; set every frame by the kind updates
+    char m_0268[0x270 - 0x268];   // 0x268: not yet named
+    union
+    {
+        int switchNode;           // 0x270: node id of the switch this character works (switch characters only)
+        int bankIndex;            // 0x270: a model-bank record's own index in the bank (bank models only)
+    };
+    char m_0274[0x294 - 0x274];   // 0x274: not yet named
+    int walkingRoute;             // 0x294: 1 while the character walks a route (cleared when the player gets a helmet)
     Playback *playback;           // 0x298: the motion playback state (allocated on first use)
     float speedScale;             // 0x29c: motion speed scale
     char m_02a0[3];               // 0x2a0: not yet named
@@ -130,7 +153,8 @@ struct AnimModel
     char holdState;               // 0x2a4: HoldState
     char m_02a5[0x2ac - 0x2a5];   // 0x2a5: not yet named
     MotionChannels motion;        // 0x2ac: the motion channel (track A)
-    char m_0d44[0xc];             // 0xd44: not yet named
+    char m_0d44[8];               // 0xd44: not yet named
+    float alpha;                  // 0xd4c: model alpha (1 = fully visible; set when an enemy is respawned)
     MotionChannels trackB;        // 0xd50: track B
     char m_17e8;                  // 0x17e8: not yet named
     char locked;                  // 0x17e9: non-zero while the model ignores queued pushes
@@ -143,7 +167,9 @@ struct AnimModel
     int blendFrames;              // 0x229c: frames a motion change blends over (0 = unset, DEFAULT_BLEND_FRAMES is used)
     char m_22a0[0x22ec - 0x22a0]; // 0x22a0: not yet named
     Node *root;                   // 0x22ec: the model's node tree (0 = free entry of the model bank)
-    char m_22f0[0x2300 - 0x22f0]; // 0x22f0: not yet named
+    Node *loadedRoot;             // 0x22f0: the node tree the model file loaded (a bank model's root)
+    Node *headNode;               // 0x22f4: the model's head node (0 = none)
+    char m_22f8[0x2300 - 0x22f8]; // 0x22f8: not yet named
     Node *swapNode1;              // 0x2300: first node of the material swap
     Node *swapNode2;              // 0x2304: second node of the material swap
     Node *collider;               // 0x2308: the map collision this model moves against (0 = none)
@@ -165,11 +191,12 @@ struct AnimModel
     Vec4 velocity;                // 0x23b8: current movement
     char m_23c8[0x23d8 - 0x23c8]; // 0x23c8: not yet named
     Vec4 moveStep;                // 0x23d8: this frame's movement: x, y scaled by speedScale, z the vertical step
-    char m_23e8[0x2480 - 0x23e8]; // 0x23e8: not yet named
-    float targetHeading;          // 0x2480: angle the character turns towards
+    char m_23e8[0x247c - 0x23e8]; // 0x23e8: not yet named
+    float heading;                // 0x247c: angle the character faces now
+    float targetHeading;         // 0x2480: angle the character turns towards
     char m_2484[0x2494 - 0x2484]; // 0x2484: not yet named
     float eventCameraHeight;      // 0x2494: height the event camera adds to its eye and target (cleared by LoadModel)
-    char m_2498[ANIM_MODEL_SIZE - 0x2498];  // 0x2498: not yet named
+    int mode;                     // 0x2498: behaviour mode (1 = the walking mode that slows movement impulses)
 
     int SetTrackCOptions(int playing, int looping);                      // EN 0x743960 (JP 0x10161b40)
     int SetMotionOptions(int playing, int looping);                      // EN 0x745c00 (JP 0x10161be0)
@@ -202,8 +229,10 @@ struct AnimModel
     int IsPlaybackAtEnd();                                               // EN 0x7356b0 (JP 0x1017b160)
     int LoadModel(const char *path);                                     // EN 0x738f80 (JP 0x1017aeb0)
     int AddMotionSpeed(float speed);                                     // EN 0x73f8a0 (JP 0x101630b0)
+    int Teleport(float x, float y, float z);                             // EN 0x745f30 (JP 0x10162420): puts the model at (x, y, z)
     int SetPosition(float x, float y, float z);                          // EN 0x745c60 (JP 0x10162610)
     void PlayMotion(int layer, int a, int b, float speed);               // EN 0x71af60 (JP 0x1017b0e0)
+    int SetSlotSource(void *source, int slot, int layer);                // EN 0x7454a0 (JP Playback::SetSlotSource through the model): creates the playback on first use
     int GetPlaybackLayer();                                              // EN 0x72ce30 (JP 0x1017b1c0): the layer that plays now
     int UpdateCollision();                                               // EN 0x741b40 (JP 0x10162390): collides the model's position with the map
     int SetLayer(int layer, int a, int first, int last, int b, int c);   // EN 0x7438f0: Playback::SetLayer on the playback

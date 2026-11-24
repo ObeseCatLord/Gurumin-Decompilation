@@ -39,6 +39,7 @@ struct Vec4
     Vec4 operator-(const Vec4 &other) const;         // EN 0x76f6d0 (JP 0x101aca40)
     Vec4 operator*(const Vec4 &other) const;         // EN 0x76f680: component-wise
     Vec4 operator*(const float &scale) const;        // EN 0x76f630: x/y/z times `scale`, w = 0
+    Vec4 Normalized3();                              // EN 0x777320 (JP 0x101af080): x/y/z scaled to length 1, returned (the vector itself is unchanged)
     Vec4 Divided(const float &divisor);              // EN 0x76f7c0 (JP 0x101acb60)
 };
 
@@ -54,6 +55,9 @@ struct Box2
     Vec4 min;  // corner with the smallest x/y/z
     Vec4 max;  // corner with the largest x/y/z
 };
+
+// The matrix with rows and columns swapped (EN 0x776c40, JP 0x101b1090).
+struct Matrix4 Transpose(const struct Matrix4 &matrix);
 
 // Indices into Matrix4::m of the translation row.
 enum Matrix4Element
@@ -74,7 +78,8 @@ struct Matrix4
     void SetIdentity();                             // EN 0x7748e0 (JP 0x101ae7a0): the identity matrix
     void SetTranslation(Vec4 position);             // EN 0x77a170 (JP 0x101adef0)
     void Translate(float x, float y, float z);      // EN 0x776ed0 (JP 0x101adec0)
-    void SetRotationZ(float angle);                 // EN 0x77a1a0 (JP 0x101ae710): rotation about the z axis in the upper-left 3x3
+    Matrix4 operator*(const Matrix4 &other) const;  // EN 0x76f230 (JP 0x101b0670): this transformed by `other` (row vectors)
+    void SetRotationZ(float angle);               // EN 0x77a1a0 (JP 0x101ae710): rotation about the z axis in the upper-left 3x3
 };
 
 // Transforms `point` by `matrix` and divides x/y/z by the resulting w (perspective divide); the result's w is that w

@@ -2,6 +2,7 @@
 // decomp/src/texcache.cpp.
 #include "render.h"
 #include "texcache.h"
+#include "buffer_pool.h"
 
 // Switches the held object off (state 0), when there is one.
 void ToggleHolder::SwitchOff()
@@ -81,4 +82,20 @@ extern "C" int Render_PresentSimple(void)
     g_d3dDevice->Present(0, 0, 0, 0);
     Render_ResetSwapTarget();
     return 1;
+}
+
+// SurfacePool_ReleaseAll: releases every pooled surface, clears the pool tables and the byte total. Called when the
+// renderer shuts down.
+extern "C" int SurfacePool_ReleaseAll(void)
+{
+    g_pooledBytesTotal = 0;
+    for (int i = 0; i < SURFACE_POOL_SIZE; i++)
+    {
+        if (g_pooledSurfaces[i] != 0)
+            g_pooledSurfaces[i]->Release();
+        g_pooledSurfaceUsed[i] = 0;
+        g_pooledSurfaces[i] = 0;
+        g_pooledSurfaceReserved[i] = 0;
+    }
+    return 0;
 }

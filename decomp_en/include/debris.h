@@ -24,6 +24,15 @@ extern "C" int g_debrisLife[DEBRIS_SLOTS];            // EN 0x0091c5d8 (JP DAT_1
 extern "C" Vec4 g_debrisVelocity[DEBRIS_SLOTS];       // EN 0x01337528 (JP DAT_10c66ef0): movement per frame
 extern "C" Vec4 g_debrisScale[DEBRIS_SLOTS];          // EN 0x00dac980 (JP DAT_10866df8): model scale of the piece
 
+extern "C" int g_debrisColour[DEBRIS_SLOTS];          // EN 0x0091ce00 (JP DAT_10446eb0): colour of a thrown piece
+extern "C" int g_characterColour[];                   // EN 0x009e2f40 (JP DAT_10467288): colour of each character slot's model
+
+// Starts a thrown piece of type `type` or `type + 1` at (x, y, z) in the first free thrown slot, along `direction`,
+// with the colour and model scale of character `owner`. Returns 1, or 0 when the slots are all taken. EN 0x5a2190.
+extern "C" int Debris_SpawnFromCharacter(float x, float y, float z, const Vec4 *direction, int type, int owner);
+// Like Debris_SpawnFromCharacter with exactly `type`, colour `colour`, smaller turns and full scale. EN 0x5a2bd0.
+extern "C" int Debris_SpawnFrom(float x, float y, float z, const Vec4 *direction, int type, int colour);
+
 // Starts a simple piece of type `type` at (x, y, z) in the first free slot below DEBRIS_SIMPLE_SLOTS: random spin, a
 // random sideways velocity and 20 upwards, full scale. Returns 1, or 0 when the slots are all taken. EN 0x5a2510.
 extern "C" int Debris_Spawn(float x, float y, float z, int type);

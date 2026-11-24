@@ -31,10 +31,7 @@ extern "C" int Render_EndScene(void)
 // Render_BeginScene: starts a new Direct3D scene, ending the open one first. Called at the start of each frame.
 extern "C" int Render_BeginScene(void)
 {
-    if (g_sceneOpen != 0)
-        g_d3dDevice->EndScene();
-    g_d3dDevice->BeginScene();
-    g_sceneOpen = 1;
+    Render_RestartScene();
     return 0;
 }
 

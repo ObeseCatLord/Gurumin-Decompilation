@@ -296,6 +296,12 @@ struct Node
     int CollideProbesWithMesh(unsigned int mask, Matrix4 *world, Node *node, float reach, float *nearest, Vec4 *probes,
                               int probeCount, int *probeIndex, Vec4 *hitPoint, Vec4 *hitNormal, unsigned int flags,
                               int *hitFlag, int resolve, int *hitMatrix, int *skipped);
+    // EN 0x75db30 (JP 0x101a8e60): moves `position` by `velocity` against this node's meshes (tag filter, mask); fills `hit`.
+    int Collide(const char *tag, unsigned int mask, Vec4 *position, Vec4 *velocity, Vec4 *hit);
+    // EN 0x74c990 (JP 0x101a1640): tests a sphere of `radius` at `point` (in `matrix` space) against the collision below this node, skipping nodes not called `name` (0 = any) and nodes called `excludeName`; the hit normal goes to `normal`, the penetration value to `depth`. Returns 1 on a hit.
+    int Query(Matrix4 *matrix, Vec4 *point, float radius, Vec4 *normal, float *depth, const char *name, const char *excludeName);
+    // EN 0x761d30 (JP 0x101a9670): casts the segment `from` to `to` against this node's meshes (tag filter, mask); fills `hit`, and `t` (may be 0) with the hit fraction.
+    int CastSegment(const char *tag, unsigned int mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
     int BindLinks(Node *root, Node **list, int *count);   // EN 0x76d770 (JP 0x1019eeb0): links nodes and bones under `root`
     Node *AddChild(const char *childName, int position);  // EN 0x74ebb0 (JP 0x101abc30): creates a child at `position` (appended when negative or past the end)
     int SetupSkins(Node *root);            // EN 0x76dbe0 (JP 0x101ab9d0)
@@ -306,7 +312,9 @@ struct Node
     int PreScanFile(const char *path, int arg);           // EN 0x759100 (JP 0x101abd60): loads a model file into this node tree
     int CopyMesh(Node *source, int slot);                 // EN 0x74ddc0 (JP 0x1019b350): gives this node the (shared or copied) mesh of `source`
     int MoveToParent(Node *newParent, int position);      // EN 0x74a050: moves this node under `newParent` at `position` among its children
-    int RemoveChild(Node *child, int keep);               // EN 0x750450 (JP 0x101a2f30): takes `child` out of the child list (destroying it unless `keep`)
+    int LoadIt3(const char *path, int a, int b);           // EN 0x7584f0 (JP 0x101abe30): loads the .it3 model file `path` into this node
+    int Load(const char *path, int noCopy, int a, int b); // EN 0x758630 (JP 0x101ac010): loads the model file `path` into this node
+    int RemoveChild(Node *child, int keep);              // EN 0x750450 (JP 0x101a2f30): takes `child` out of the child list (destroying it unless `keep`)
     int BuildMesh(int recurse, int flags);                // EN 0x76d630 (JP 0x1019afa0)
     int CreateChildCopies();               // EN 0x74dd00 (JP 0x101abb70): makes 32 child copies (for effects drawn many times)
     int ShadeWaveCopy(int phase);          // EN 0x74d5b0 (JP 0x10193d10): wave-shaped normals and lighting of a copy
@@ -340,6 +348,8 @@ struct Node
     int FreeExtraIndexLists();             // EN 0x750a00 (JP 0x101ab980)
     int BuildCollisionSpheres();           // EN 0x74fcf0 (JP 0x1019e120)
     void Release();                        // EN 0x7698e0 (JP 0x1019e9a0): frees the node's meshes and children
+    Node();                                // EN 0x7495f0 (JP 0x1019ebc0): constructs the members, then Init
+    ~Node();                               // EN 0x7496d0 (JP 0x10191480): destroys the matrix members
     void Init();                           // EN 0x76a290 (JP 0x10191500): puts every field back to its default
 
     // Whole-subtree setters and savers.

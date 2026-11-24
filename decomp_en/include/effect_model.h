@@ -29,6 +29,34 @@ struct EffectModel
 
     EffectModel();      // EN 0x5a0fa0 (JP 0x1000be40): members construct themselves
     int Free();       // EN 0x63f320 (JP 0x1000be10): releases the model, the slot is free again
+    void AddKey(int frame, float x, float y, float z);        // inline: adds a position key
+    void SetRotation(float x, float y, float z);              // inline: sets the rotation in degrees
+    int Setup(const char *path, int a, int start, int end);   // EN 0x602e10 (JP 0x1000b9f0): loads model `path` into the slot
 };
+
+// Adds a position key at `frame` and marks the keys changed.
+inline void EffectModel::AddKey(int frame, float x, float y, float z)
+{
+    changed = 1;
+    keys.Insert(frame, x, y, z, 0);
+}
+
+// Sets the rotation (degrees about x, y, z) and marks the model changed.
+inline void EffectModel::SetRotation(float x, float y, float z)
+{
+    changed = 1;
+    rotation.Set(x, y, z, 0);
+}
+
+// Slots of the effect model table.
+const int EFFECT_MODEL_COUNT = 0x40;
+// The effect model table. EN 0x015bd790 (JP DAT_10edbe08).
+extern "C" EffectModel g_effectModels[EFFECT_MODEL_COUNT];
+
+// Places effect model `path` at (x, y, z) in a free slot, rotated by (ox, oy, oz). Returns the slot or -1. EN 0x5a1d30.
+extern "C" int EffectModel_Place(const char *path, float x, float y, float z, int start, float ox, float oy, float oz);
+// Same with a colour. EN 0x5a1e10.
+extern "C" int EffectModel_PlaceColoured(const char *path, float x, float y, float z, int start, float ox, float oy,
+                                         float oz, const Vec4 &colour);
 
 #endif

@@ -20,7 +20,7 @@ reading it, then `AGENTS.md`.
 | Fully linked | 0.00% of code (151 of 264 units complete) |
 | Matched | 20.08% of code, 858 of 1212 functions |
 | Matched under the rules | 20.05% of code, 857 of the 858 matched functions |
-| Fuzzy match | 48.03% |
+| Fuzzy match | 51.09% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -209,6 +209,11 @@ function) and node_world.cpp (0) still break rule 2.
 - Batch 356: drafts Message_DrawLabels 1000cf80 (message_labels.cpp, 1648 vs 1689) and Image_HalveRgb 10161770
   (image_halve.cpp, 448 vs 374). Odd-address queue entries 1000cfa1, 10161781, 10017c55 and 1004f8b7 are bodies
   or branch targets of their owners: open.tsv status `fragment` keeps them out of QUEUE.md.
+- Batch 357: structural passes. CompileCall 10089a10 frame 0xb49c -> 0xa494 (one shared left operand, sibling
+  blocks); RunScriptFrames 1017cc90 22352 -> 28512 bytes (explicit field reads, split M/A commands). DrawLit 10151ba0:
+  inline helpers do not enlarge the frame; cl 13.00 keeps block locals in unique slots only inside a switch body or a
+  loop span, which the original lacks (open.tsv). 0x1011d810 (in-game frame) skeleton in game_frame.cpp with 12 STAGE
+  markers (plan in the scratchpad w1d810/STAGES.md), being filled stage by stage.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

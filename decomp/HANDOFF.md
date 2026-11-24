@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 19.21% of code, 857 of 1212 functions |
-| Matched under the rules | 19.17% of code, 856 of the 857 matched functions |
-| Fuzzy match | 40.85% |
+| Matched | 20.08% of code, 858 of 1212 functions |
+| Matched under the rules | 20.05% of code, 857 of the 858 matched functions |
+| Fuzzy match | 42.19% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -187,6 +187,9 @@ function) and node_world.cpp (0) still break rule 2.
   Enemy_WispCaster 10071ee0 (kind 0x10), Camera_Update 1016c3e0 (5 KB short; wall-search loop approximate).
 - Batch 348: drafts Field_Update 1011a060 (game mode 15; frame 0x838 vs 0x7c0), Hud_DrawFrame 1008c680 (original has
   a /GS cookie we lack), Scene_Frame 100f5a80 (one 16-byte local short; DAT_10c64f78 setter threading differs).
+- Batch 349: MATCH NameEntry_Update 10116550 (game mode 10, name entry). Drafts Map_SetUpTrigger 10058790 (2 bytes
+  short, schedule only; callback returns int but ForEachActiveTrigger takes a void callback, callers not switched),
+  AnimModel::MoveWithCollisions 10175f20 (6 KB short: original writes four probe blocks inline).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

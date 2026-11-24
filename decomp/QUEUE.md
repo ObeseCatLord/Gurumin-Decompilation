@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (327)
+## 1. Walls to retry (329)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -132,6 +132,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100564d0` 1611 — Debris_Update (debris_update.cpp, 1648 vs 1611 bytes): the state dispatch is laid out with the fly/pickup block inline and physics out of line in the original (cmp al,1; jbe; cmp al,6; jb FADE; cmp al,0x14; jne PHYS), 13.00 inlines physics and threads the 0x14 test; if/else orders, condition forms and continue forms tried; frame 0x124 vs 0x120
 - [ ] `10056b30` 4169 — ShopMenu_Draw (shop_menu.cpp, 4240 vs 4169 bytes): structure, calls, constants and EH states match; our compile hoists constant 0 into ebx (cmp eax,ebx / push ebx) where the original has test eax,eax and push 0, so y and the loop counter spill, the frame is 4 bytes larger and every offset shifts. Tried 0.0f arguments, !mode, function-scope locals, an else-chain, no strncpy
 - [ ] `10057c40` 657 — Switch_Hold: same statements and layout; the slot index lives in eax (scratch in esi) in the original, swapped here through the whole function; shared and separate loop variables tried
+- [ ] `10058790` 15026 — Map_SetUpTrigger (map_trigger_setup.cpp, 15024 vs 15026 bytes): shape and frame size (0x1aa8) match; FLAG and OTI identical; remaining diffs are local schedule/register order (BOBJ/OBJ mov ebx,eax after the path computation, KSKK re-reads DAT_1020af20[lever]); tint and box blocks unchecked. It returns int (xor eax,eax) but Game::ForEachActiveTrigger takes void(*)(GameTrigger*), so map_setup_entry/field still pass a local extern "C" FUN_10058790: settle the callback type (check FUN_101008e0) and switch them
 - [ ] `1005c680` 1846 — Bgm_Update (bgm_update.cpp, 1648 vs 1846 bytes): the BGM start, position and ftol half and every bar easing body match; the original unrolls the two 32-bar loops with 8 separate byte-pointer induction variables (4 spilled) and the float pointer as the loop test, ours folds them into one pointer plus displacements; frame struct, byte array, macro index, float-pointer loop variable and 8 explicit lane pointers tried
 - [ ] `1005ce80` 3429 — Player_StartAttack (attack_start.cpp, 3520 vs 3429 bytes): flow, calls, constants and the four inlined voice sets (__forceinline helpers) right, but whole-function register allocation differs: the original puts attack in edi, 0 in ebx and 1 in ebp (hoisted before the first compare) and the heavy flag in an int at [esp+0xc]; ours attack in esi, 0 in edi. The area test "a in {0x23,0x26,0x2a,0x2b} and area==a" is four duplicated "cmp eax,edi" tails in the original, one shared compare in ours. Tried the comma form for the DAT_104c01f8 store, index vs cast loop bound (cast matches), !(a==..||..), int vs bool flag
 - [ ] `1005dbf0` 753 — Player_TakeDamage (player_damage.cpp): flow and calls right; the original keeps GetTranslation's returned pointer for the hurt voice (an inlined helper evaluating its arguments before the voices-off test) but cl 13.00 here will not inline such a helper, even __forceinline; the health gauge store and register roles differ after that
@@ -291,6 +292,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10173550` 5900 — Texture_LoadBmp (texture_load_bmp.cpp, 5792 vs 5900 bytes): structure and the 12-step folder search are right, but the backward goto from the alpha-plugin folder loop into the main .bmp search (original jge 0x10173ef5) gives an ebp/and esp,-8 frame where the original is frame-pointer-free; frame 0x7c bytes smaller, buffer layout and register allocation drift from there. Probably a restart loop or different label placement in the original
 - [ ] `10174ce0` 3480 — Texture_LoadIti (texture_load_iti.cpp, 3504 incl. padding vs 3480, 144 bytes off): flow and registers match; (1) the original shares [esp+8] between packed and the ITP height (a shared variable via reference gets the slot but loses the packed==0 jump threading), (2) cmp eax,edi vs test eax,eax after the first Open, (3) the table-name strcpy destination is lea table first in the original
 - [ ] `10175c90` 476 — Texture_CreateFromPixels: logic identical; register allocation differs (original keeps the slot in esi with a stack copy and width in ebp, ours the slot in ebp); separate found variable and inline size tried
+- [ ] `10175f20` 16619 — AnimModel::MoveWithCollisions (anim_move.cpp, 10480 vs 16619 bytes): complete draft; shares through helpers what the original writes out inline (four near-identical probe-ring/settle/velocity blocks, ground re-test, shadow tail); probe-ring indices/scales read from partial asm; free ring's dead DirectionMatrix and variant-1 dead rotate not reproduced; matching needs the four blocks inline in original order
 - [ ] `1017a010` 3719 — AnimModel::UpdateFrame (anim_model_step.cpp, 3776 vs 3719 bytes): control flow and FPU compares match; frame 0x258 vs 0x238 (the original reuses 3 Vec4 slots for all locals/temps, ours 5), ecx/eax and ecx/edx register picks, float nearest and move.y*share spilled instead of kept in ST0, the PushMotionSpeed argument built via eax, and al vs eax in the shadow init. Tried ~8 spellings each (block scoping, ternaries, locals vs expressions)
 - [ ] `1017c5f0` 750 — ModelBank::LightForRoot (model_bank.cpp, rule-clean): the 16-model search loop (unrolled by 8) and the light code match; the default-light block of both functions constructs two one-element Vec4 arrays through the vector constructor iterator 0x10004650 (count 1), while 13.00 calls the constructor directly for `Vec4 a[1]` (also tried a[1][1] and an array member of a local struct) -- the original array must be declared some other way; an inline helper for the block is not inlined under /Ob1.
 - [ ] `10184440` 12476 — EffectManager::Step (effect_step.cpp, 11472 vs 12476 bytes, draft transcribed from asm only): frame layout, EH-state/Matrix4 slot sharing (three Matrix4 temporaries share esp+0xac), duplicated steering/ribbon blocks unaligned; SteerStep/AttachLight/RandomTurn/StartChildEffects are our factoring. Next: align prologue, then split by section
@@ -354,11 +356,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (20)
+## 5. Very large functions (over 3000 bytes) (17)
 
-- [ ] `10058790` 15026 bytes (float, loops 14, calls 321)
-- [ ] `10116550` 15107 bytes (float, loops 5, calls 63)
-- [ ] `10175f20` 16619 bytes (float, loops 13, calls 529)
 - [ ] `10194f40` 17287 bytes (float, loops 28, calls 457)
 - [ ] `1007f1e0` 19328 bytes (float, loops 47, calls 412)
 - [ ] `100e25f0` 19570 bytes (float, loops 15, calls 587)

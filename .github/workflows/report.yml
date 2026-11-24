@@ -6,8 +6,8 @@ name: Progress report
 #   python decomp_en/tools/build_all.py --report progress/en/report.json                (EN game_en_steam.exe)
 # and committed. This job publishes each as the artifact `<VERSION>_report` (jp_report, en_report) that ByteMatch
 # reads from CI runs on master.
-# The README meter progress/<VERSION>/progress.svg is written by the same command; this job regenerates it from the
-# report and commits it if it is out of date.
+# The README meters progress/<VERSION>/progress.svg are written by the same commands; this job only warns when one is
+# out of date (it never commits, so it cannot race the local loops' pushes).
 # The report contains only function names, addresses, sizes and match percentages (no game bytes).
 on:
   push:
@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   report:
@@ -31,18 +31,14 @@ jobs:
             python3 -c "import json,sys; v=sys.argv[1]; m=json.load(open(f'progress/{v}/report.json'))['measures']; print(v, m['matched_functions'], 'of', m['total_functions'], 'functions,', m['matched_code_percent'], '% of code matched')" "$VERSION"
           done
 
-      - name: Refresh the README progress meters
+      - name: Check the README progress meters
+        # Report only: a CI commit here would put origin ahead of the local loops' checkout and make their next
+        # push fail. The meters are written locally by build_all together with each report.
         run: |
           for VERSION in $VERSIONS; do
-            python3 decomp/tools/progress_svg.py progress/${VERSION}/report.json progress/${VERSION}/progress.svg
+            python3 decomp/tools/progress_svg.py progress/${VERSION}/report.json /tmp/${VERSION}.svg
+            cmp -s /tmp/${VERSION}.svg progress/${VERSION}/progress.svg || echo "::warning::progress/${VERSION}/progress.svg is out of date with its report"
           done
-          if ! git diff --quiet -- progress; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add progress/*/progress.svg
-            git commit -m "Update progress meters"
-            git push
-          fi
 
       - name: Upload JP report
         uses: actions/upload-artifact@v4

@@ -175,3 +175,19 @@ int TextureObject::UpdateImage(int value)
 {
     return BeginRenderTo(sourceWidth, sourceHeight, value);
 }
+
+// TriangleBatch::AddQuad: queues a textured quad (two triangles, six vertices) with `texture`, flushing first when
+// the texture changes or the buffer is full. Returns 0. Called by the 2D drawing code.
+int TriangleBatch::AddQuad(TextureObject *newTexture, float left, float top, float right, float bottom, float u0,
+                           float v0, float u1, float v1, float z, float alpha, float r, float g, float b, float r2,
+                           float g2, float b2, float rotation)
+{
+    g_pendingBatches++;
+    if (texture != 0 && texture != newTexture)
+        Flush();
+    texture = newTexture;
+    if (count + TRIANGLE_VERTICES * 2 >= capacity)
+        Flush();
+    AppendQuad(left, top, right, bottom, u0, v0, u1, v1, z, alpha, r, g, b, r2, g2, b2, rotation);
+    return 0;
+}

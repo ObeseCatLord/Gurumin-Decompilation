@@ -25,6 +25,7 @@ enum NodeFlags
 {
     NODE_FLAG_KEEP_MESH = 0x4,             // the node's mesh data is kept when a unique model file is released
     NODE_FLAG_HIDDEN = 0x20,               // not drawn
+    NODE_FLAG_NEVER_CULLED = 0x40,         // skips the view-volume test
     NODE_FLAG_SHAPE_BOX = 0x200,           // debug pass: shown as its box
     NODE_FLAG_SHAPE_SPHERE = 0x400,        // debug pass: shown as its bounding sphere
     NODE_FLAG_SHAPE_SOLID_BOX = 0x800,     // debug pass: shown as its box, filled
@@ -46,6 +47,7 @@ enum NodeLimits
     NODE_NAME_SIZE = 0x40,      // characters in a node name, including the terminator
     NODE_MAX_CHILDREN = 0x40,   // children (and child names) a node can hold
     NODE_PLUG_COUNT = 16,       // animation plugs per node
+    NODE_FOLDER_SIZE = 0x10,    // characters in an inherited folder name
     NODE_SIZE = 0x18a0          // sizeof(Node)
 };
 
@@ -103,6 +105,18 @@ struct Material
 
 // Number of nodes CreateChildCopies makes.
 const int NODE_CHILD_COPY_COUNT = 0x20;
+// Node::drawMode of the child copies CreateChildCopies makes.
+const int NODE_DRAW_MODE_CHILD_COPY = 0xc;
+// Node::drawMode of a node AddChild creates.
+const int NODE_DRAW_MODE_NEW_CHILD = 8;
+// Allocator tag of a node created as a child.
+#define NODE_CHILD_ALLOC_TAG "m_child[m_numchild]"
+// Node::box corners.
+enum NodeBoxCorner
+{
+    NODE_BOX_MIN = 0,   // lower corner
+    NODE_BOX_MAX = 1    // upper corner
+};
 // Nodes the tracking collection of Rebuild can hold.
 const int NODE_TRACKED_MAX = 8;
 // Nodes the link collection of Rebuild can hold.
@@ -144,15 +158,31 @@ extern "C" char g_defaultTargetObject[];
 // Non-zero = the segment tests also look at skinned nodes. EN 0x0217b8d4 (JP DAT_11b04510).
 extern "C" int g_testSkinnedNodes;
 
+// Called instead of the normal mesh drawing when set (the node's world matrix, the view matrix and Draw's own arguments).
+typedef void (*NodeDrawCallback)(Matrix4 *world, const Matrix4 *view, int a3, const Matrix4 *shadowMatrix,
+                                 float shadowX, float shadowY, float shadowZ, int shadowTexture,
+                                 float shadowScale, int shadowSize, const Vec4 *lightDirection, float modelSize,
+                                 AnimModel *model, float alpha);
+// Called by QueueDraw after the children when set (the node's world matrix and QueueDraw's own arguments).
+typedef void (*NodeQueueCallback)(Matrix4 *world, const Matrix4 *view, const void *lights, unsigned int passMask,
+                                  const Vec4 *colour, const Vec4 *addColour);
+
 struct Node
 {
     char name[NODE_NAME_SIZE];     // 0x000: the node's name ("fire..." / "thun..." set the element)
-    char m_0040[0x64 - 0x40];      // 0x040: not used by EN code yet
+    char folder[NODE_FOLDER_SIZE];  // 0x040: texture folder of the model, inherited by children
+    char folderB[NODE_FOLDER_SIZE]; // 0x050: second inherited name
+    int m_0060;                    // 0x060: not used by EN code yet
     int packCount;                 // 0x064: vertex packs of the mesh (also the entries of triangleSpheres; -1 = none, see ReplaceMaterial)
     VertexPack *packs;             // 0x068: the mesh's vertex packs (0 = none)
     IndexList *indexLists;         // 0x06c: one index list per pack
     IndexList *triangleSpheres;    // 0x070: one sphere list per pack (0 = none)
-    char m_0074[0x89 - 0x74];      // 0x074: not used by EN code yet
+    NodeQueueCallback queueCallback;  // 0x074: run by QueueDraw after the children when set
+    NodeDrawCallback drawCallback;    // 0x078: draws the node instead of the mesh code when set
+    int altPackCount;              // 0x07c: entries of altPacks and altIndexLists
+    VertexPack *altPacks;          // 0x080: second set of vertex packs, freed with the node (0 = none)
+    IndexList *altIndexLists;      // 0x084: second set of index lists, freed with the node (0 = none)
+    char m_0088;                   // 0x088: not used by EN code yet
     char isStatic;                 // 0x089: 1 once the node was collected as static scenery (or is the collector)
     short staticCount;             // 0x08a: on the collector: entries of staticNodes
     Node **staticNodes;            // 0x08c: on the collector: the collected nodes (room for NODE_STATIC_LIST_SIZE bytes)
@@ -164,14 +194,16 @@ struct Node
     int built;                     // 0x0a4: 1 once BuildMesh has created the mesh buffers
     int hasCollision;              // 0x0a8: non-zero when the node has collision
     unsigned int flags;            // 0x0ac: NodeFlags
-    char m_00b0[0xb8 - 0xb0];      // 0x0b0: not used by EN code yet
+    float cullMargin;              // 0x0b0: margin of the view-volume test
+    int group;                     // 0x0b4: not used by EN code yet
     AnimModel *model;              // 0x0b8: the model the tree belongs to
-    char m_00bc[0xc0 - 0xbc];      // 0x0bc: not used by EN code yet
+    int *frameSource;              // 0x0bc: when set, the frame shown is read from here
     int plugType[NODE_PLUG_COUNT];     // 0x0c0: type of each animation plug (PLUG_TYPE_FRAME gives the frame)
     Channel *plugs[NODE_PLUG_COUNT];   // 0x100: the channel behind each plug
     int plugTypeCopy[NODE_PLUG_COUNT]; // 0x140: plug types kept with the private plug data (CopyPlugData)
     void *plugData[NODE_PLUG_COUNT];   // 0x180: private copies of the plug channels' data (CopyPlugData)
-    char m_01c0[0x1c8 - 0x1c0];    // 0x1c0: not used by EN code yet
+    int animated;                  // 0x1c0: non-zero = the mesh holds several frames
+    int frameSize;                 // 0x1c4: primitives per frame
     int frameCount;                // 0x1c8: frames in the mesh
     Matrix4 matrix;                // 0x1cc: the node's own matrix (relative to its parent)
     Matrix4 inverseMatrix;         // 0x20c: inverse of `matrix`
@@ -179,9 +211,11 @@ struct Node
     TextureRef *textureRef;        // 0x28c: shared texture reference (ReleaseTexture)
     Matrix4 *frameMatrices;        // 0x290: the node's matrix for each animation frame (0 = use `matrix`)
     int frameMatrixCount;          // 0x294: entries of the per-frame matrices
-    char m_0298[0x2a8 - 0x298];    // 0x298: not used by EN code yet
+    Vec4 m_0298;                   // 0x298: not used by EN code yet
     NodeExtra *extra;              // 0x2a8: the node's animation tracks (allocated by AllocExtra)
-    char m_02ac[0x2d0 - 0x2ac];    // 0x2ac: not used by EN code yet
+    Vec4 tint;                     // 0x2ac: colour multiplier, w = alpha (1 = fully visible); all 1 after Init
+    Vec4 m_02bc;                   // 0x2bc: not used by EN code yet
+    int frame;                     // 0x2cc: current animation frame (-1, -2, ...: a stored pose)
     unsigned char kind;            // 0x2d0: node kind from the file (0xff = none: decided by the name prefix)
     char m_02d1[0x2d4 - 0x2d1];    // 0x2d1: not used by EN code yet
     Matrix4 poses[NODE_POSE_COUNT];    // 0x2d4: the current pose ([0]) and the stored poses (frames -1 to -16)
@@ -190,23 +224,37 @@ struct Node
     char skinned;                  // 0x704: 1 = the node has skinning data (a bone node when it has none of its own mesh)
     char m_0705[0x708 - 0x705];    // 0x705: not used by EN code yet
     NodeSkin *skin;                // 0x708: skinning data (0 = none)
-    char m_070c[0x74c - 0x70c];    // 0x70c: not used by EN code yet
+    char parentName[NODE_NAME_SIZE];  // 0x70c: the name of the parent node (set when the node is attached)
     Node *parent;                  // 0x74c: the parent node (0 = root)
     int childCount;                // 0x750: entries of children
-    char m_0754[0x1754 - 0x754];   // 0x754: the child names (not used by EN code yet)
+    char childNames[NODE_MAX_CHILDREN][NODE_NAME_SIZE];  // 0x754: the child names
     Node *children[NODE_MAX_CHILDREN];  // 0x1754: the child nodes
     NodeSaved *saved;              // 0x1854: saved-state block (allocated by AllocSaved)
     unsigned char cycleIndex;      // 0x1858: cycling child index (1..childCount), advanced by CycleChild
     int savedDrawMode;             // 0x185c: render mode kept by SaveRenderMode
     int savedFlags;                // 0x1860: flags kept by SaveFlags
     VisData *visibilityCells;      // 0x1864: visibility cells and their boxes of a map root node (0 = none)
-    char m_1868[0x1898 - 0x1868];  // 0x1868: not used by EN code yet
+    Vec4 fogColour;                // 0x1868: fog colour of a "fogset" root node, 1 on every axis after Init
+    unsigned char m_1878;          // 0x1878: 0xe0 after Init
+    char pathKind;                 // 0x1879: 2 = camera path
+    char m_187a;                   // 0x187a: not used by EN code yet
+    unsigned char m_187b;          // 0x187b: 45 after Init
+    unsigned char m_187c;          // 0x187c: copied into the camera path list
+    unsigned char m_187d;          // 0x187d: copied into the camera path list
+    unsigned char m_187e;          // 0x187e: 0xff after Init
+    char m_187f;                   // 0x187f: padding
+    float fogDensity;              // 0x1880: fog density of a "fogset" root node, 1.0 after Init
+    float lightConeInner;          // 0x1884: first value of the "setlightcone" command
+    float m_1888;                  // 0x1888: 45.0 after Init
+    float fogNear;                 // 0x188c: distance the fog of a "fogset" root node starts at
+    float fogFar;                  // 0x1890: distance it is full at
+    int m_1894;                    // 0x1894: not used by EN code yet
     unsigned char element;         // 0x1898: NodeElement bits from the node name
     char m_1899;                   // 0x1899: not used by EN code yet
     unsigned char colourA;         // 0x189a: colour value set by SetColourA on the shape-mode nodes
     unsigned char colourB;         // 0x189b: colour value set by SetColourB
     unsigned char colourC;         // 0x189c: colour value set by SetColourC
-    char m_189d[NODE_SIZE - 0x189d];   // 0x189d: not used by EN code yet
+    char m_189d[NODE_SIZE - 0x189d];   // 0x189d: padding up to the end of the node
 
     // Name lookups in the subtree (scene_node.cpp). `skip` counts down the matches still to pass over.
     Node *Find(const char *name, int index);                   // EN 0x7532c0 (JP 0x1019ece0)
@@ -249,12 +297,20 @@ struct Node
                               int probeCount, int *probeIndex, Vec4 *hitPoint, Vec4 *hitNormal, unsigned int flags,
                               int *hitFlag, int resolve, int *hitMatrix, int *skipped);
     int BindLinks(Node *root, Node **list, int *count);   // EN 0x76d770 (JP 0x1019eeb0): links nodes and bones under `root`
+    Node *AddChild(const char *childName, int position);  // EN 0x74ebb0 (JP 0x101abc30): creates a child at `position` (appended when negative or past the end)
     int SetupSkins(Node *root);            // EN 0x76dbe0 (JP 0x101ab9d0)
     int CopyBindPoses();                   // EN 0x76e130 (JP 0x10191770)
     int CollectTrackingNodes(Node **list, int *count);    // EN 0x76ea90 (JP 0x10191920): nodes in state 0x4000 (up to 8)
     int LinkToChasing(Node *const *nodes, int count);     // EN 0x76d6e0 (JP 0x10191990)
     int StoreLinks(Node **list, int *count);              // EN 0x76eb70 (JP 0x10191870)
+    int PreScanFile(const char *path, int arg);           // EN 0x759100 (JP 0x101abd60): loads a model file into this node tree
+    int CopyMesh(Node *source, int slot);                 // EN 0x74ddc0 (JP 0x1019b350): gives this node the (shared or copied) mesh of `source`
+    int MoveToParent(Node *newParent, int position);      // EN 0x74a050: moves this node under `newParent` at `position` among its children
+    int RemoveChild(Node *child, int keep);               // EN 0x750450 (JP 0x101a2f30): takes `child` out of the child list (destroying it unless `keep`)
     int BuildMesh(int recurse, int flags);                // EN 0x76d630 (JP 0x1019afa0)
+    int CreateChildCopies();               // EN 0x74dd00 (JP 0x101abb70): makes 32 child copies (for effects drawn many times)
+    int ShadeWaveCopy(int phase);          // EN 0x74d5b0 (JP 0x10193d10): wave-shaped normals and lighting of a copy
+    int Clone(Node *source, int a, int b); // EN 0x74e640 (JP 0x101a53b0): copies a loaded node tree into this node
     int CopyPlugData();                    // EN 0x749900 (JP 0x1019bd10)
     int SetMaterialValue(const char *material, int value);  // EN 0x74a400 (JP 0x1019e8c0)
     void ReleaseTexture();                 // EN 0x769e30 (JP 0x10191210)
@@ -284,6 +340,7 @@ struct Node
     int FreeExtraIndexLists();             // EN 0x750a00 (JP 0x101ab980)
     int BuildCollisionSpheres();           // EN 0x74fcf0 (JP 0x1019e120)
     void Release();                        // EN 0x7698e0 (JP 0x1019e9a0): frees the node's meshes and children
+    void Init();                           // EN 0x76a290 (JP 0x10191500): puts every field back to its default
 
     // Whole-subtree setters and savers.
     void SaveFlags();                      // EN 0x7498c0 (JP 0x10191d50): flags into savedFlags
@@ -305,5 +362,7 @@ struct Node
                           int forceChildren);                // EN 0x763e70 (JP 0x10194f40)
     int StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b);  // EN 0x768c70
 };
+
+static_assert(sizeof(Node) == NODE_SIZE, "Node must be 0x18a0 bytes");
 
 #endif

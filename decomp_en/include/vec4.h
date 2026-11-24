@@ -26,6 +26,7 @@ struct Vec4
     float DistanceSquared(const Vec4 &other);        // EN 0x773440 (JP 0x101ac650)
     float Distance(const Vec4 &other);               // EN 0x773270 (JP 0x101ac590)
     float DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b);  // EN 0x772cc0 (JP 0x101acd90): squared distance to the segment a-b
+    float DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest);  // EN 0x772ea0 (JP 0x101acdf0): distance to the segment a-b, closest point in `closest`
     float DistanceZWeighted(const Vec4 &other);      // EN 0x7736f0 (JP 0x101ac5f0)
     int InRect(const Box2 *box);                     // EN 0x7749d0 (JP 0x101ac7c0): inside the box's x/y rectangle
     int InBox(const Box2 *box);                      // EN 0x774a10 (JP 0x101ac6e0)
@@ -70,6 +71,7 @@ struct Matrix4
     Matrix4();                                      // EN 0x76efc0 (JP 0x101ae770): zeroes most elements
     ~Matrix4();                                     // EN 0x76f0e0 (JP 0x1013eda0): empty, out of line; gives constructors of owners an unwind frame
     Vec4 GetTranslation();                          // EN 0x773ef0 (JP 0x101ade80)
+    void SetIdentity();                             // EN 0x7748e0 (JP 0x101ae7a0): the identity matrix
     void SetTranslation(Vec4 position);             // EN 0x77a170 (JP 0x101adef0)
     void Translate(float x, float y, float z);      // EN 0x776ed0 (JP 0x101adec0)
     void SetRotationZ(float angle);                 // EN 0x77a1a0 (JP 0x101ae710): rotation about the z axis in the upper-left 3x3

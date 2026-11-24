@@ -96,7 +96,9 @@ struct AnimModel;
 // first use through AnimModel::GetPlayback. Only the members EN code has used are named.
 struct Playback
 {
-    char m_0000[0xbec];                // 0x0000: not yet named
+    char m_0000[0x1c];                 // 0x0000: not yet named
+    int layer;                         // 0x001c: the layer that plays now
+    char m_0020[0xbec - 0x20];         // 0x0020: not yet named
     int endState;                      // 0x0bec: PLAYBACK_END_REACHED once the playback has reached its end
     char m_0bf0[0x1070 - 0xbf0];       // 0x0bf0: not yet named
     int slotOffsetX[PLAYBACK_LAYER_COUNT][PLAYBACK_SLOT_COUNT];  // 0x1070: x offset per layer and slot
@@ -107,6 +109,7 @@ struct Playback
     int BindModel(AnimModel *owner);                                   // EN 0x71c060 (JP 0x1016a020)
     int SetLayer(int layer, int a, int first, int last, int b, int c); // EN 0x7437e0 (JP 0x1016a100)
     int SetSlotOffset(int layer, int slot, int x, int y);              // EN 0x746490 (JP 0x1016a260)
+    int Play(int layer, int a, int b, float speed);                    // EN 0x71add0 (JP 0x1016a2e0): starts a motion on a layer
 };
 
 struct AnimModel
@@ -122,7 +125,8 @@ struct AnimModel
     char m_0266[0x298 - 0x266];   // 0x266: not yet named
     Playback *playback;           // 0x298: the motion playback state (allocated on first use)
     float speedScale;             // 0x29c: motion speed scale
-    char m_02a0[0x2a4 - 0x2a0];   // 0x2a0: not yet named
+    char m_02a0[3];               // 0x2a0: not yet named
+    unsigned char loadCount;      // 0x2a3: number of model files loaded into this model so far (stops counting at 3)
     char holdState;               // 0x2a4: HoldState
     char m_02a5[0x2ac - 0x2a5];   // 0x2a5: not yet named
     MotionChannels motion;        // 0x2ac: the motion channel (track A)
@@ -148,9 +152,10 @@ struct AnimModel
     Node *dropCollider;           // 0x231c: collision node the model drops onto (set by SetDropCollider)
     char m_2320[0x2328 - 0x2320]; // 0x2320: not yet named
     Matrix4 matrix;               // 0x2328: world matrix; the translation row (m[12..14]) is the position
-    char m_2368[0x236c - 0x2368]; // 0x2368: not yet named
+    int motionFrame;              // 0x2368: frame of the motion file shown now
     float verticalSpeed;          // 0x236c: vertical speed (positive = rising)
-    char m_2370[0x2388 - 0x2370]; // 0x2370: not yet named
+    char m_2370[0x2384 - 0x2370]; // 0x2370: not yet named
+    int collisionResult;          // 0x2384: collision result, cleared before each update (UpdateCollision)
     int speedChangeFrames;        // 0x2388: frames since the speed change (1 once one is pending)
     int idleMotionEnabled;        // 0x238c: non-zero = the model plays its idle motion now and then (Char_RandomIdle)
     int collisionLimit;           // 0x2390: limit of the map collision tests (99999 = none)
@@ -162,7 +167,9 @@ struct AnimModel
     Vec4 moveStep;                // 0x23d8: this frame's movement: x, y scaled by speedScale, z the vertical step
     char m_23e8[0x2480 - 0x23e8]; // 0x23e8: not yet named
     float targetHeading;          // 0x2480: angle the character turns towards
-    char m_2484[ANIM_MODEL_SIZE - 0x2484];  // 0x2484: not yet named
+    char m_2484[0x2494 - 0x2484]; // 0x2484: not yet named
+    float eventCameraHeight;      // 0x2494: height the event camera adds to its eye and target (cleared by LoadModel)
+    char m_2498[ANIM_MODEL_SIZE - 0x2498];  // 0x2498: not yet named
 
     int SetTrackCOptions(int playing, int looping);                      // EN 0x743960 (JP 0x10161b40)
     int SetMotionOptions(int playing, int looping);                      // EN 0x745c00 (JP 0x10161be0)
@@ -196,8 +203,12 @@ struct AnimModel
     int LoadModel(const char *path);                                     // EN 0x738f80 (JP 0x1017aeb0)
     int AddMotionSpeed(float speed);                                     // EN 0x73f8a0 (JP 0x101630b0)
     int SetPosition(float x, float y, float z);                          // EN 0x745c60 (JP 0x10162610)
-    void PlayMotion(int motion, int a, int b, float speed);              // EN 0x71af60 (JP 0x1017b0e0)
+    void PlayMotion(int layer, int a, int b, float speed);               // EN 0x71af60 (JP 0x1017b0e0)
+    int GetPlaybackLayer();                                              // EN 0x72ce30 (JP 0x1017b1c0): the layer that plays now
+    int UpdateCollision();                                               // EN 0x741b40 (JP 0x10162390): collides the model's position with the map
     int SetLayer(int layer, int a, int first, int last, int b, int c);   // EN 0x7438f0: Playback::SetLayer on the playback
 };
+
+static_assert(sizeof(AnimModel) == ANIM_MODEL_SIZE, "AnimModel must be 0x249c bytes");
 
 #endif

@@ -51,21 +51,6 @@ int ListBank::HasParenthesis(const char *text)
     return 0;
 }
 
-// Reports a script parse error: sets the error flag (which makes the readers fail from now on), prints the
-// message, passes it and the error's offset in the script text to the host callback, and frees all script
-// buffers (FreeAll). Returns 0. Called by the readers on a syntax error.
-int ListBank::ReportError(const char *message)
-{
-    failed = 1;
-    printf("%s\n", message);
-    if (callback != 0)
-        callback(1, (int)message);
-    if (callback != 0)
-        callback(5000, cursor[depth] - text);
-    FreeAll();
-    return 0;
-}
-
 // Collects the index of every registered function named `name` (case-sensitive) into `out` and returns how many
 // were found; stops with 0 once a parse error was reported. Called when a call expression is compiled.
 int ListBank::FindAll(const char *name, int *out)
@@ -269,10 +254,10 @@ int ListBank::SkipStatement(char **text)
     char word[0x100];
     char *p = *text;
     int quoted = 0;
-    int braces = 0;
-    int count = 0;
-    int opened = 0;
     int parens = 0;
+    int count = 0;
+    int braces = 0;
+    int opened = 0;
     char *end = &this->text[textLength];
     for (; p < end; p++, count++)
     {

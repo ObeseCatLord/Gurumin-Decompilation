@@ -40,33 +40,35 @@ extern "C" int g_drawCallCount;                                  // EN 0x021fdd0
 
 // Inline copies of Render_SetRenderState, Render_SetTextureStageState and Render_UnbindTexture1: the original
 // inlines them into the texture drawing functions (the out-of-line versions are declared below).
-// Sets a render state unless the cache already holds that value.
-inline void RenderState_Set(D3DRENDERSTATETYPE state, unsigned long value)
+// Sets a render state unless the cache already holds that value. Returns 1 when the state was (re)written, else 0.
+// Render_SetRenderState is the out-of-line copy.
+inline int RenderState_Set(unsigned long state, unsigned long value)
 {
-    if (g_renderStateCache[state] != value)
-    {
-        unsigned long current;
-        g_d3dDevice->GetRenderState(state, &current);
-        if (current != value)
-            g_d3dDevice->SetRenderState(state, value);
-        g_renderStateCache[state] = value;
-    }
+    if (g_renderStateCache[state] == value)
+        return 0;
+    unsigned long current;
+    g_d3dDevice->GetRenderState((D3DRENDERSTATETYPE)state, &current);
+    if (current != value)
+        g_d3dDevice->SetRenderState((D3DRENDERSTATETYPE)state, value);
+    g_renderStateCache[state] = value;
+    return 1;
 }
 
-// Sets a texture stage state unless the cache already holds that value.
-inline void StageState_Set(unsigned long stage, D3DTEXTURESTAGESTATETYPE type, unsigned long value)
+// Sets a texture stage state unless the cache already holds that value. Returns 1 when the state was (re)written,
+// else 0. Render_SetTextureStageState is the out-of-line copy.
+inline int StageState_Set(unsigned long stage, unsigned long type, unsigned long value)
 {
-    if (g_textureStageStateCache[stage][type] != value)
-    {
-        unsigned long current;
-        g_d3dDevice->GetTextureStageState(stage, type, &current);
-        if (current != value)
-            g_d3dDevice->SetTextureStageState(stage, type, value);
-        g_textureStageStateCache[stage][type] = value;
-    }
+    if (g_textureStageStateCache[stage][type] == value)
+        return 0;
+    unsigned long current;
+    g_d3dDevice->GetTextureStageState(stage, (D3DTEXTURESTAGESTATETYPE)type, &current);
+    if (current != value)
+        g_d3dDevice->SetTextureStageState(stage, (D3DTEXTURESTAGESTATETYPE)type, value);
+    g_textureStageStateCache[stage][type] = value;
+    return 1;
 }
 
-// Unbinds texture stage 1 when something is bound there.
+// Unbinds texture stage 1 when something is bound there. Render_UnbindTexture1 is the out-of-line copy.
 inline void Stage1_Unbind()
 {
     if (g_stage1Texture != TEXTURE_BINDING_UNKNOWN)

@@ -15,6 +15,20 @@ int AnimModel::SetDropCollider(Node *node)
     return 1;
 }
 
+// NodeExtra::Clear: frees the arrays of all five key tracks and drops the three track overrides. Called by
+// Node::Release before the block itself is freed.
+void NodeExtra::Clear()
+{
+    tracks[NODE_TRACK_TRANSLATION].Free();
+    tracks[NODE_TRACK_ROTATION].Free();
+    tracks[NODE_TRACK_SCALE].Free();
+    tracks[NODE_TRACK_COLOUR].Free();
+    tracks[NODE_TRACK_EXTRA].Free();
+    translationOverride = 0;
+    rotationOverride = 0;
+    scaleOverride = 0;
+}
+
 // NodeSaved::Reset: resets the rotation limits to +-45 degrees on all three axes. Called when a saved-state block is
 // allocated (Node::AllocSaved).
 void NodeSaved::Reset()

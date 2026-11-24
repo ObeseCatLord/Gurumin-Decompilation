@@ -63,6 +63,7 @@ struct TextureObject
     int BindStage1();                                       // EN 0x7a5840 (JP 0x1014b6e0): binds to stage 1 unless already bound
     int BeginRenderTo(int width, int height, int offset);   // EN 0x7a4bf0 (JP 0x10143870)
     int UpdateImage(int value);                             // EN 0x746550 (JP 0x10169f70): BeginRenderTo with the source size
+    int Release();                                          // EN 0x7a3e50 (JP 0x1014f520): frees the Direct3D texture and surface, forgets bindings
     void Unload();                                          // EN 0x740ea0 (JP 0x10169e40): frees the kept image and the texture
     int DrawTriangles(const void *vertices, int triangles); // EN 0x77ee90 (JP 0x1014bb70)
     int DrawStrip(ScreenVertex *vertices, int count);        // EN 0x77e360 (JP 0x1014ba20)
@@ -88,6 +89,14 @@ struct TriangleBatch
     int blendMode;           // 0x14: render mode passed to Render_Command while drawing (BLEND_MODE_UNSET = none yet)
 
     int Reset();                                                         // EN 0x741ae0 (JP 0x10172aa0)
+    // EN 0x70afe0 (JP 0x10172cb0): appends a quad (two triangles) from (left, top) to (right, bottom) at depth z with
+    // texture coordinates (u0, v0)-(u1, v1), the alpha and two colours; the corners are turned by `rotation` when not 0.
+    int AppendQuad(float left, float top, float right, float bottom, float u0, float v0, float u1, float v1, float z,
+                   float alpha, float r, float g, float b, float r2, float g2, float b2, float rotation);
+    // EN 0x70bce0 (JP 0x10188f10): AppendQuad with `texture`, flushing first when the texture changes or the buffer is full.
+    int AddQuad(TextureObject *texture, float left, float top, float right, float bottom, float u0, float v0,
+                float u1, float v1, float z, float alpha, float r, float g, float b, float r2, float g2, float b2,
+                float rotation);
     int AppendVertices(const ScreenVertex *source, int count);           // EN 0x70aec0 (JP 0x10172ac0)
     int Flush();                                                         // EN 0x70be40 (JP 0x101733f0)
     int SetBlend(int mode, int unused);                                  // EN 0x70bff0 (JP 0x10173450)
@@ -102,6 +111,9 @@ struct TextureManager
     int Shutdown();                // EN 0x7a3ad0 (JP 0x1015c730): shuts the renderer down
     void UnloadAndShutdown();      // EN 0x740c30 (JP 0x10175e70)
 };
+
+// Loads the texture file `path` (an .iti file) and returns its slot; `a` and `b` are the load options. EN 0x736f60 (JP 0x10174ce0).
+extern "C" int Texture_LoadIti(const char *path, int a, int b);
 
 extern "C" int Render_Command(int command, int value, int extra);   // EN 0x7a4f60 (JP 0x1013f070)
 

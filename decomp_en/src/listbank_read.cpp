@@ -305,13 +305,13 @@ int ListBank::GetIndexPart(const char *name, char *part, int n)
 int ListBank::ReadToken(char **text, char *token)
 {
     char *p = *text;
-    int parens = 0;
     int length = 0;
-    int inQuotes = 0;
-    int last = TOKEN_START;
     token[TOKEN_IS_OPERATOR] = 0;
     token[0] = 0;
+    int inQuotes = 0;
     int brackets = 0;
+    int parens = 0;
+    int last = TOKEN_START;
     if (*p == 0)
         return 0;
     while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n' || *p == ';')

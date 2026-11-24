@@ -2,7 +2,7 @@
 
 #include <d3d9.h>
 
-#include "engine_copy.h"
+#include "engine_memory.h"
 #include "vec4.h"
 #include "render.h"
 #include "texture_mgr.h"
@@ -440,4 +440,26 @@ int TextureObject::DrawColoured(int left, int top, int right, int bottom, float 
     g_drawCallCount++;
     g_d3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertices, SCREEN_VERTEX_STRIDE);
     return 1;
+}
+
+// Releases the Direct3D texture (returning pooled frames to the buffer pool first) and the render-target surface,
+// forgets any stage binding that still points at this object, and clears the size and pointers. Returns 0.
+// Called by the texture unload functions.
+int TextureObject::Release()
+{
+    if (texture != 0)
+    {
+        if (poolSlot != 0)
+            TexCache_Free(poolIndex, width, height);
+        texture->Release();
+    }
+    if (surface != 0)
+        surface->Release();
+    ForgetStageBindings(this);
+    width = 0;
+    height = 0;
+    poolSlot = 0;
+    texture = 0;
+    surface = 0;
+    return 0;
 }

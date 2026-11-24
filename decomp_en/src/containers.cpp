@@ -1,9 +1,12 @@
 // EN key tracks, key banks, vertex packs and index lists (JP twins: containers.cpp).
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "containers.h"
 #include "key_bank.h"
 #include "index_list.h"
+#include "motion_list.h"
 #include "engine_memory.h"
 
 // Size of one sphere entry of a sphere list (centre and radius as a Vec4).
@@ -28,6 +31,51 @@ int KeyTrack::HasFrame(int frame)
             return 0;
     }
     return 0;
+}
+
+// Frees the three arrays and empties the track (the arrays come from the C heap, unlike the engine allocator's).
+void KeyTrack::Free()
+{
+    if (capacity != 0)
+    {
+        free(frames);
+        frames = 0;
+        free(values);
+        values = 0;
+        free(flags);
+        flags = 0;
+    }
+    capacity = 0;
+    count = 0;
+}
+
+// Frees the vertex buffer; the count stays. Called while a node releases its packs. Returns 1.
+int VertexPack::FreeVertices()
+{
+    if (vertices != 0)
+        g_engineFree(vertices);
+    vertices = 0;
+    return 1;
+}
+
+// Frees the index buffer and empties the list. Called while a node releases its index lists. Returns 1.
+int IndexList::FreeIndices()
+{
+    if (indices != 0)
+        g_engineFree(indices);
+    indices = 0;
+    count = 0;
+    return 1;
+}
+
+// Frees the sphere buffer and empties the list. Called while a node releases its triangle spheres. Returns 1.
+int IndexList::FreeSpheres()
+{
+    if (spheres != 0)
+        g_engineFree(spheres);
+    spheres = 0;
+    count = 0;
+    return 1;
 }
 
 // Reallocates the vertex buffer for `count` vertices. Returns 1.
@@ -67,4 +115,176 @@ int IndexList::ResizeSpans(int newCount)
     spheres = (Vec4 *)buffer;
     count = newCount;
     return 1;
+}
+
+// Clears the fields of a pack that lives in raw memory (no constructor runs for it). Called by the node copy code.
+void VertexPack::Init()
+{
+    vertices = 0;
+    center[0] = 0;
+    center[1] = 0;
+    center[2] = 0;
+    radius = 0;
+    vertexCount = 0;
+    m_0040 = 0;
+    m_0044 = 0;
+}
+
+// Copies the vertices, bounds and the other pack fields of `source` into this pack. Returns 0 (leaving the pack empty)
+// for a missing or empty source, else 1.
+int VertexPack::CopyFrom(const VertexPack *source)
+{
+    vertexCount = 0;
+    if (source == 0)
+        return 0;
+    if (source->vertexCount == 0)
+        return 0;
+    SetVertexCount(source->vertexCount);
+    boundsMin.x = source->boundsMin.x;
+    boundsMin.y = source->boundsMin.y;
+    boundsMin.z = source->boundsMin.z;
+    boundsMin.w = source->boundsMin.w;
+    boundsMax.x = source->boundsMax.x;
+    boundsMax.y = source->boundsMax.y;
+    boundsMax.z = source->boundsMax.z;
+    boundsMax.w = source->boundsMax.w;
+    center[0] = source->center[0];
+    center[1] = source->center[1];
+    center[2] = source->center[2];
+    radius = source->radius;
+    vertexCount = source->vertexCount;
+    m_0010 = source->m_0010;
+    m_0018 = source->m_0018;
+    material = source->material;
+    m_0040 = source->m_0040;
+    m_0044 = source->m_0044;
+    g_engineCopy(vertices, source->vertices, vertexCount * VERTEX_SIZE);
+    return 1;
+}
+
+// Clears the buffer pointer of a list that lives in raw memory (no constructor runs for it).
+void IndexList::Init()
+{
+    indices = 0;
+}
+
+// Copies the indices of `source` into this list. Returns 0 (leaving the list empty) for a missing or empty source,
+// else 1.
+int IndexList::CopyFrom(const IndexList *source)
+{
+    count = 0;
+    if (source == 0)
+        return 0;
+    if (source->count == 0)
+        return 0;
+    Resize(source->count);
+    memcpy(indices, source->indices, source->count * sizeof(int));
+    return 1;
+}
+
+// Keys a track grows by when it runs out of room (also its initial room).
+const int KEY_TRACK_GROWTH = 16;
+
+// Empties the track and gives it room for KEY_TRACK_GROWTH keys, one of them the zero key at frame 0. Called before a
+// track is filled from another one.
+void KeyTrack::Init()
+{
+    capacity = 0;
+    Reserve(KEY_TRACK_GROWTH);
+    count = 0;
+    frames[0] = 0;
+    float zero = 0;
+    values->Fill(zero);
+}
+
+// Sets the key at `frame` to (x, y, z, w): an existing key at that frame gets the new value (returns 1); otherwise a
+// new key is inserted in frame order, growing the arrays when needed, and its index is returned.
+int KeyTrack::Set(int frame, float x, float y, float z, float w)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        if (frames[i] == frame)
+        {
+            values[i].x = x;
+            values[i].y = y;
+            values[i].z = z;
+            values[i].w = w;
+            return 1;
+        }
+        if (frames[i] > frame)
+            break;
+    }
+    for (int j = count - 1; j >= i; j--)
+    {
+        frames[j + 1] = frames[j];
+        values[j + 1].x = values[j].x;
+        values[j + 1].y = values[j].y;
+        values[j + 1].z = values[j].z;
+        values[j + 1].w = values[j].w;
+        flags[j + 1] = flags[j];
+    }
+    if (count + KEY_TRACK_GROWTH > capacity)
+        Reserve(KEY_TRACK_GROWTH);
+    frames[i] = frame;
+    values[i].x = x;
+    values[i].y = y;
+    values[i].z = z;
+    values[i].w = w;
+    flags[i] = 0;
+    count++;
+    if (count + KEY_TRACK_GROWTH > capacity)
+        Reserve(KEY_TRACK_GROWTH);
+    return i;
+}
+
+// Makes this track a copy of `source`: its keys, values and flags. Returns 1.
+int KeyTrack::CopyFrom(const KeyTrack *source)
+{
+    Free();
+    Init();
+    for (int i = 0; i < source->count; i++)
+    {
+        Set(source->frames[i], source->values[i].x, source->values[i].y, source->values[i].z, source->values[i].w);
+        flags[i] = source->flags[i];
+    }
+    return 1;
+}
+
+// Copies the bank's keys into `target` (a growable track). Returns 0.
+int KeyBank::CopyTo(KeyTrack *target)
+{
+    target->Free();
+    target->Init();
+    for (int i = 0; i < count; i++)
+    {
+        target->Set(frames[i], values[i].x, values[i].y, values[i].z, values[i].w);
+        target->flags[i] = flags[i];
+    }
+    return 0;
+}
+
+// Largest entry count of a MotionList: the highest index AddEntry accepts.
+const int MOTION_LAST_ENTRY = MOTION_ENTRY_COUNT - 1;
+
+// Adds an entry (`id`, `value`, `name` cut to the entry size, `extra`) to the list. Returns 0 when all entries are
+// used, else 1.
+int MotionList::AddEntry(int id, int value, const char *name, int extra)
+{
+    if (entryCount > MOTION_LAST_ENTRY)
+        return 0;
+    ids[entryCount] = id;
+    values[entryCount] = value;
+    strncpy(names[entryCount], name, MOTION_NAME_SIZE - 1);
+    names[entryCount][MOTION_NAME_SIZE - 1] = 0;
+    extras[entryCount] = extra;
+    entryCount++;
+    return 1;
+}
+
+// Sets the identity matrix.
+void Matrix4::SetIdentity()
+{
+    m[12] = m[13] = m[14] = m[8] = m[9] = m[11] = m[4] = m[6] = m[7] = m[1] = m[2] = m[3] = 0.0f;
+    m[0] = m[5] = m[10] = m[15] = 1.0f;
 }

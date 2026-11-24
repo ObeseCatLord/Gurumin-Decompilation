@@ -2,6 +2,8 @@
 // decomp/src/engine_10143.cpp.
 #include "slot_table.h"
 #include "render.h"
+#include "buffer_pool.h"
+#include "engine_memory.h"
 
 // Limits later operations to entries first..last-1. Called when a model part is selected.
 int SlotTable::SetRange(int newFirst, int newLast)
@@ -32,6 +34,52 @@ int SlotTable::ReplaceMaterial(int key, int value)
     return 0;
 }
 
+// Frees the mesh's texture slot and every table it owns, then clears the pointers. Called by Node::ReleaseMesh once
+// the last node using the mesh lets go of it.
+void SlotTable::Release()
+{
+    if (textureSlot >= 0)
+        Texture_ReleaseSlot(textureSlot);
+    textureSlot = -1;
+    if (materialIds != 0)
+        g_engineFree(materialIds);
+    if (material != 0)
+        g_engineFree(material);
+    if (originalMaterial != 0)
+        g_engineFree(originalMaterial);
+    if (secondaryTextures != 0)
+        g_engineFree(secondaryTextures);
+    if (doubleSide != 0)
+        g_engineFree(doubleSide);
+    if (vertexStarts != 0)
+        g_engineFree(vertexStarts);
+    if (vertexEnds != 0)
+        g_engineFree(vertexEnds);
+    if (indexStarts != 0)
+        g_engineFree(indexStarts);
+    if (indexEnds != 0)
+        g_engineFree(indexEnds);
+    if (pointFlags != 0)
+        g_engineFree(pointFlags);
+    if (points != 0)
+        g_engineFree(points);
+    if (boxes != 0)
+        g_engineFree(boxes);
+    count = 0;
+    secondaryTextures = 0;
+    materialIds = 0;
+    material = 0;
+    originalMaterial = 0;
+    doubleSide = 0;
+    vertexStarts = 0;
+    vertexEnds = 0;
+    indexStarts = 0;
+    indexEnds = 0;
+    pointFlags = 0;
+    points = 0;
+    boxes = 0;
+}
+
 // Render_UnbindTexture0: unbinds texture stage 0 (only when something is bound).
 extern "C" void Render_UnbindTexture0(void)
 {
@@ -45,23 +93,34 @@ extern "C" void Render_UnbindTexture0(void)
 // Render_UnbindTexture1: unbinds texture stage 1 (only when something is bound).
 extern "C" void Render_UnbindTexture1(void)
 {
-    if (g_stage1Texture != TEXTURE_BINDING_UNKNOWN)
-    {
-        g_d3dDevice->SetTexture(1, 0);
-        g_stage1Texture = TEXTURE_BINDING_UNKNOWN;
-    }
+    Stage1_Unbind();
 }
 
 // Render_SetTextureStageState: sets a texture stage state unless the cache says it already has that value.
 // Returns 1 when the state was (re)written.
 extern "C" int Render_SetTextureStageState(unsigned long stage, unsigned long type, unsigned long value)
 {
-    if (g_textureStageStateCache[stage][type] == value)
-        return 0;
-    unsigned long current;
-    g_d3dDevice->GetTextureStageState(stage, (D3DTEXTURESTAGESTATETYPE)type, &current);
-    if (current != value)
-        g_d3dDevice->SetTextureStageState(stage, (D3DTEXTURESTAGESTATETYPE)type, value);
-    g_textureStageStateCache[stage][type] = value;
-    return 1;
+    return StageState_Set(stage, type, value);
+}
+
+// SlotTable::Reset: puts a freshly allocated table in its empty state: no texture slot (-1), no entries and every
+// table pointer cleared. Returns 0. Called by the node mesh code after it allocates a table.
+int SlotTable::Reset()
+{
+    textureSlot = -1;
+    count = 0;
+    materialIds = 0;
+    material = 0;
+    originalMaterial = 0;
+    secondaryTextures = 0;
+    doubleSide = 0;
+    vertexStarts = 0;
+    vertexEnds = 0;
+    indexStarts = 0;
+    indexEnds = 0;
+    pointFlags = 0;
+    points = 0;
+    boxes = 0;
+    built = 0;
+    return 0;
 }

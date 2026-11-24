@@ -37,6 +37,22 @@ extern "C" char g_modelFileNames[MODEL_FILE_COUNT][FILE_NAME_SIZE];       // EN 
 extern "C" int g_modelFilePackCount[MODEL_FILE_COUNT];                    // EN 0x01660768 (JP DAT_10fee5e0): packs (-1 = none)
 extern "C" VertexPack *g_modelFilePacks[MODEL_FILE_COUNT];                // EN 0x0165a368 (JP DAT_10ff2ff8)
 extern "C" IndexList *g_modelFileIndexLists[MODEL_FILE_COUNT];            // EN 0x0165d568 (JP DAT_10fe01d8)
+extern "C" SlotTable *g_modelFileMeshes[MODEL_FILE_COUNT];                // EN 0x01657168 (JP DAT_10fa7478): the shared mesh of each model file
+
+// Bytes of the scratch buffer that joins a folder and a name; the joined name is cut to FILE_NAME_SIZE - 1 characters.
+const int MODEL_NAME_SCRATCH_SIZE = 256;
+
+// Returns the first free entry of the model file name table, or -1 when it is full. EN 0x70bc00 (JP 0x10169760).
+extern "C" int ModelNames_FindFree(void);
+// Stores folder + name (cut to 31 characters) as entry `index` of the model file name table. Returns 0.
+// EN 0x7462c0 (JP 0x10169780).
+extern "C" int ModelNames_SetJoined(int index, const char *folder, const char *name);
+// Looks up folder + name (cut to 31 characters) in the model file name table. Returns its index when it is there.
+// Otherwise the name is stored in the first free entry (its reference count reset), that index goes to *freeSlot and
+// -1 is returned. A full table stops the game on purpose. EN 0x72c650 (JP 0x10169840).
+extern "C" int ModelNames_Find(const char *folder, const char *name, int *freeSlot);
+// Adds a reference to the shared model file of `mesh` and returns the new count. EN 0x70b6b0 (JP 0x10169970).
+extern "C" int MeshCache_AddRef(const SlotTable *mesh);
 
 // Releases one reference to the shared model file a mesh was loaded from (freeing the name at 0). Returns the
 // remaining count. EN 0x71cf40.

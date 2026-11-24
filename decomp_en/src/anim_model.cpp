@@ -143,3 +143,66 @@ int AnimModel::SetLayer(int layer, int a, int first, int last, int b, int c)
     playback->SetLayer(layer, a, first, last, b, c);
     return 1;
 }
+
+// AnimModel::GetPlaybackLayer: the layer the motion playback plays now (creates the playback on first use).
+int AnimModel::GetPlaybackLayer()
+{
+    if (playback == 0)
+    {
+        playback = (Playback *)g_engineAlloc(PLAYBACK_SIZE, "");
+        playback->Init();
+        playback->BindModel(this);
+    }
+    return playback->layer;
+}
+
+// AnimModel::PlayMotion: starts motion `layer` on the playback (creates the playback on first use). `a` and `b` are
+// the playback options (loop mode, blend frames). A model flagged as important raises g_importantMotionChange while
+// the motion starts, so blending and playback code can tell.
+void AnimModel::PlayMotion(int layer, int a, int b, float speed)
+{
+    if (playback == 0)
+    {
+        playback = (Playback *)g_engineAlloc(PLAYBACK_SIZE, "");
+        playback->Init();
+        playback->BindModel(this);
+    }
+    if (important != 0)
+        g_importantMotionChange = 1;
+    playback->Play(layer, a, b, speed);
+    g_importantMotionChange = 0;
+}
+
+// Name searched for the biped root when a model file is loaded.
+static const char BIPED_ROOT_NAME[] = "Bip01";
+
+// AnimModel::LoadModel: loads model file `path` into this model's existing node tree. Counts the loads (up to 3),
+// looks up the biped root (the result is unused in the shipped code), clears the event camera height and rebinds the
+// motion playback to the new model. Returns 0 when the model has no node tree yet, else 1.
+int AnimModel::LoadModel(const char *path)
+{
+    if (root == 0)
+        return 0;
+    root->PreScanFile(path, 0);
+    if (loadCount < 3)
+        loadCount++;
+    root->Find(BIPED_ROOT_NAME, 0);
+    Vec4 unused1;
+    Vec4 unused2;
+    eventCameraHeight = 0;
+    if (playback != 0)
+        playback->BindModel(this);
+    return 1;
+}
+
+// AnimModel::UpdateCollision: releases the saved matrix states of the node tree, clears the collision result and
+// runs the proximity pass over the tree with the model's world matrix. Returns 0. Called by the model update.
+int AnimModel::UpdateCollision()
+{
+    Matrix4 work;
+    if (root != 0)
+        root->ReleaseSavedStates();
+    collisionResult = 0;
+    root->StartProximityPass(matrix.m, &work, 0, motionFrame, 0);
+    return 0;
+}

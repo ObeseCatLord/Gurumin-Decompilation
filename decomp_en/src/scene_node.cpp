@@ -249,7 +249,7 @@ int Node::TagElements()
 static void IndexLists_Free(IndexList *lists, int count)
 {
     for (int i = 0; i < count; i++)
-        lists[i].Free();
+        lists[i].FreeSpheres();
 }
 
 // Node::FreeExtraIndexLists: frees the triangle sphere lists of this node, then runs BuildCollisionSpheres on the
@@ -867,6 +867,37 @@ void Node::ReleaseUniqueMeshData()
         children[i]->ReleaseUniqueMeshData();
 }
 
+// Node::FreePackData: frees the vertex buffer of each of `count` vertex packs. Called while a node releases its
+// packs (`this` is not used).
+void Node::FreePackData(VertexPack *packList, int packTotal)
+{
+    if (packList != 0)
+    {
+        for (int i = 0; i < packTotal; i++)
+            packList[i].FreeVertices();
+    }
+}
+
+// Node::FreeIndexListData: frees the index buffer of each of `count` index lists (`this` is not used).
+void Node::FreeIndexListData(IndexList *lists, int listTotal)
+{
+    if (lists != 0)
+    {
+        for (int i = 0; i < listTotal; i++)
+            lists[i].FreeIndices();
+    }
+}
+
+// Node::FreeSphereListData: frees the sphere buffer of each of `count` triangle sphere lists (`this` is not used).
+void Node::FreeSphereListData(IndexList *lists, int listTotal)
+{
+    if (lists != 0)
+    {
+        for (int i = 0; i < listTotal; i++)
+            lists[i].FreeSpheres();
+    }
+}
+
 // Material::SetBlank: turns the material into a blank one: no name or textures, colour (r, g, b), alpha 0 and the first
 // edge flag `edgeFlag`. Called for each new material of a node (Node::AllocMaterials, which EN inlines this into).
 void Material::SetBlank(float r, float g, float b, char edgeFlag)
@@ -1027,5 +1058,268 @@ int Node::BlendFrames(int from, int to, int t)
     }
     for (int i = 0; i < childCount; i++)
         children[i]->BlendFrames(from, to, t);
+    return 1;
+}
+
+// Node::ReleaseMesh: drops this node's reference to its shared mesh and, when it was the last user, frees the mesh,
+// the vertex packs and the index lists. Called by Release.
+void Node::ReleaseMesh()
+{
+    if (mesh != 0 && MeshCache_Release(mesh) == 0)
+    {
+        mesh->Release();
+        g_engineFree(mesh);
+        mesh = 0;
+        FreePackData(packs, packCount);
+        FreeIndexListData(indexLists, packCount);
+        if (packs != 0)
+            g_engineFree(packs);
+        packs = 0;
+        if (indexLists != 0)
+            g_engineFree(indexLists);
+        indexLists = 0;
+        packCount = 0;
+    }
+}
+
+// Node::BuildMesh: builds the Direct3D buffers of the node from its packs (or from its index lists alone when it has
+// no packs), unless it is a bone, and marks it as built; with `recurse` the whole subtree follows. Returns 1. Called
+// after a model file is loaded.
+int Node::BuildMesh(int recurse, int bufferFlags)
+{
+    if (packs == 0 && packCount == -1)
+    {
+        if (skinned == 0)
+        {
+            mesh->BuildBuffers(0, indexLists, -1, materials, bufferFlags);
+            built = 1;
+        }
+    }
+    else if (packs != 0 && skinned == 0)
+    {
+        mesh->BuildBuffers(packs, indexLists, packCount, materials, bufferFlags);
+        built = 1;
+    }
+    if (recurse != 0)
+    {
+        for (int i = 0; i < childCount; i++)
+            children[i]->BuildMesh(1, 0);
+    }
+    return 1;
+}
+
+// Node::Release: frees everything the node owns, then its children (recursively), and resets it with Init: the static
+// node list, the second pack and index lists, the extra data, the skin and saved blocks, the visibility cells, the
+// materials, the texture reference, the triangle spheres, the mesh and the plug channels and data. A node with more
+// than one frame matrix but no texture reference, or with packs but no mesh, stops the game on purpose (fread from
+// address 0), as in the original.
+void Node::Release()
+{
+    if (staticNodes != 0)
+    {
+        g_engineFree(staticNodes);
+        staticNodes = 0;
+    }
+    isStatic = 0;
+    staticCount = 0;
+    FreePackData(altPacks, altPackCount);
+    FreeIndexListData(altIndexLists, altPackCount);
+    if (altPacks != 0)
+        g_engineFree(altPacks);
+    if (altIndexLists != 0)
+        g_engineFree(altIndexLists);
+    altPacks = 0;
+    altIndexLists = 0;
+    if (extra != 0)
+    {
+        extra->Clear();
+        g_engineFree(extra);
+    }
+    extra = 0;
+    if (skin != 0)
+        g_engineFree(skin);
+    skin = 0;
+    if (saved != 0)
+        g_engineFree(saved);
+    saved = 0;
+    if (visibilityCells != 0)
+        g_engineFree(visibilityCells);
+    visibilityCells = 0;
+    if (materials != 0)
+        g_engineFree(materials);
+    materials = 0;
+    if (textureRef != 0)
+        ReleaseTexture();
+    else if (frameMatrixCount > 1)
+        fread(0, 1, 1, 0);
+    if (triangleSpheres != 0)
+    {
+        FreeSphereListData(triangleSpheres, packCount);
+        g_engineFree(triangleSpheres);
+        triangleSpheres = 0;
+    }
+    if (mesh != 0)
+        ReleaseMesh();
+    else if (packCount != 0)
+        fread(0, 1, 1, 0);
+    mesh = 0;
+    packs = 0;
+    indexLists = 0;
+    packCount = 0;
+    for (int j = 0; j < NODE_PLUG_COUNT; j++)
+    {
+        if (plugs[j] != 0)
+        {
+            g_engineFree(plugs[j]);
+            plugs[j] = 0;
+            plugType[j] = 0;
+        }
+    }
+    for (int k = 0; k < NODE_PLUG_COUNT; k++)
+    {
+        if (plugData[k] != 0)
+        {
+            g_engineFree(plugData[k]);
+            plugData[k] = 0;
+            plugTypeCopy[k] = 0;
+        }
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        children[i]->Release();
+        g_engineFree(children[i]);
+    }
+    Init();
+}
+
+// Node::CollectNearSegment: finds the collision nodes (NODE_FLAG_SHAPE_SPHERE, with collision active) in the subtree
+// that lie near the segment from-to: within `range` plus NODE_SEGMENT_RADIUS_FACTOR of their bounds radius. Skinned
+// nodes are skipped unless g_testSkinnedNodes is set. Each hit is appended to `found` (when given) and counted in
+// *foundCount; without a list the search stops at the first hit. *closest receives the closest segment point of the
+// last node tested. Returns 1 when a node was found. Called by the map collision code.
+int Node::CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
+                             Vec4 *closest)
+{
+    if (g_testSkinnedNodes == 0 && skinned != 0)
+        return 0;
+    if ((flags & NODE_FLAG_SHAPE_SPHERE) == 0)
+    {
+        for (int i = 0; i < childCount; i++)
+        {
+            int hit = children[i]->CollectNearSegment(unused, from, to, range, found, foundCount, closest);
+            if (hit != 0 && found == 0)
+                return hit;
+        }
+        return 0;
+    }
+    if (hasCollision == 0)
+        return 0;
+    if (worldMatrix.GetTranslation().DistanceToSegment(*from, *to, *closest) <
+        bounds.w * NODE_SEGMENT_RADIUS_FACTOR + range)
+    {
+        if (found != 0)
+        {
+            found[*foundCount] = this;
+            (*foundCount)++;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+// Name prefix of the biped bones whose skin matrices CopyBindPoses hands on.
+#define BIPED_BONE_PREFIX "bip"
+
+// Node::CopyBindPoses: for every bone of this node's skin that is a skinned "bip" node, copies the skin's inverse bone
+// matrix and bind pose into the bone's own skin, then does the same for the children. Returns 1. Called after the
+// skins are set up.
+int Node::CopyBindPoses()
+{
+    if (skin != 0 && skin->boneCount != 0)
+    {
+        for (int i = 0; i < SKIN_MAX_BONES; i++)
+        {
+            Node *bone = skin->bones[i];
+            if (bone != 0 && bone->skinned != 0 && _strnicmp(bone->name, BIPED_BONE_PREFIX, sizeof(BIPED_BONE_PREFIX) - 1) == 0)
+            {
+                skin->bones[i]->skin->inverseBone = skin->inverseBones[i];
+                skin->bones[i]->skin->bindPoses[0] = skin->bindPoses[i];
+            }
+        }
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->CopyBindPoses();
+    return 1;
+}
+
+// Node::MoveToParent: moves this node under `newParent`, inserting it at `position` in the child list (a position past
+// the end appends). Within the same parent the node is only reordered. Fails (returns 0) for a missing new parent, a
+// node without a parent, a full child list, a new parent that lies inside this node's own subtree, or a reorder to
+// the place the node already has. Returns 1 when the node was moved.
+int Node::MoveToParent(Node *newParent, int position)
+{
+    if (newParent == 0)
+        return 0;
+    if (parent == 0)
+        return 0;
+    if (newParent->childCount >= NODE_MAX_CHILDREN)
+        return 0;
+    if (Find(newParent->name, 0) != 0)
+        return 0;
+    if (parent == newParent)
+    {
+        int index = 0;
+        for (index = 0; index < newParent->childCount; index++)
+        {
+            if (this == newParent->children[index])
+                break;
+        }
+        if (index == newParent->childCount)
+            return 0;
+        int target = position;
+        if (index == position)
+            return 0;
+        for (int i = index; i < newParent->childCount - 1; i++)
+        {
+            newParent->children[i] = newParent->children[i + 1];
+            strcpy(newParent->childNames[i], newParent->childNames[i + 1]);
+        }
+        newParent->childCount--;
+        if (position > index)
+            target = position - 1;
+        for (int i = newParent->childCount - 1; i >= target; i--)
+        {
+            newParent->children[i + 1] = newParent->children[i];
+            strcpy(newParent->childNames[i + 1], newParent->childNames[i]);
+        }
+        if (newParent->childCount < target)
+            target = newParent->childCount;
+        newParent->children[target] = this;
+        strcpy(newParent->childNames[target], name);
+        parent = newParent;
+        strcpy(parentName, newParent->name);
+        newParent->childCount++;
+        return 1;
+    }
+    parent->RemoveChild(this, 1);
+    if (position >= newParent->childCount)
+    {
+        newParent->children[newParent->childCount] = this;
+        strcpy(newParent->childNames[newParent->childCount], name);
+        parent = newParent;
+        strcpy(parentName, newParent->name);
+        newParent->childCount++;
+        return 1;
+    }
+    for (int i = newParent->childCount - 1; i >= position; i--)
+    {
+        newParent->children[i + 1] = newParent->children[i];
+        strcpy(newParent->childNames[i + 1], newParent->childNames[i]);
+    }
+    newParent->children[position] = this;
+    strcpy(newParent->childNames[position], name);
+    parent = newParent;
+    strcpy(parentName, newParent->name);
+    newParent->childCount++;
     return 1;
 }

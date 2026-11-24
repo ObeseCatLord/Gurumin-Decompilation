@@ -17,15 +17,20 @@ struct KeyTrack
     int MarkAll();                 // EN 0x7765b0 (JP 0x101adb80): sets KEY_FLAG_MOTION on every key
     void Reserve(int extra);       // EN 0x7754b0 (JP 0x101ada30): grows the three arrays by `extra` entries, keeping their contents
     int HasFrame(int frame);       // EN 0x7752e0 (JP 0x101adcb0): 1 when a key sits at `frame`
+    void Init();                   // EN: inline in the callers (JP 0x101ad960): one zero key at frame 0, room for 16 keys
+    int Set(int frame, float x, float y, float z, float w);  // EN 0x779540 (JP 0x101adcf0): sets or inserts the key at `frame`
+    int CopyFrom(const KeyTrack *source);  // EN 0x771de0 (JP 0x101ade10): makes this track a copy of `source`
+    void Free();                   // EN 0x778450 (JP 0x101ad7b0): frees the three arrays and empties the track
 };
 
 // Size of one mesh vertex in bytes.
 const int VERTEX_SIZE = 0x70;
 
-// One mesh vertex; the layout is not recovered yet.
+// One mesh vertex; only the position is recovered so far.
 struct Vertex
 {
-    char m_0000[VERTEX_SIZE];  // 0x00: position, normal, uv, weights (not split up yet)
+    float position[4];                    // 0x00: x, y, z, 1
+    char m_0010[VERTEX_SIZE - 0x10];      // 0x10: normal, colours, uv, material, weights (not split up yet)
 };
 
 // One drawable pack of a mesh: bounds, material and the vertex buffer.
@@ -39,10 +44,15 @@ struct VertexPack
     int vertexCount;         // 0x1c: vertices in the buffer
     Vec4 boundsMin;          // 0x20: smallest x, y, z of the vertices (w = 1)
     Vec4 boundsMax;          // 0x30: largest x, y, z (w = 1)
-    char m_0040[0x30];       // 0x40: not recovered
+    int m_0040;              // 0x40: not recovered (cleared by Init)
+    int m_0044;              // 0x44: not recovered (cleared by Init)
+    char m_0048[0x28];       // 0x48: not recovered
     Vertex *vertices;        // 0x70: the vertex buffer (0 = none)
 
     int SetVertexCount(int count);   // EN 0x772150: reallocates the vertex buffer, contents not kept
+    void Init();                     // EN 0x7787e0 (JP 0x101acfa0): empties a pack allocated raw
+    int CopyFrom(const VertexPack *source);  // EN 0x771eb0 (JP 0x101ad040): copies the bounds and the vertices; returns 0 for an empty source
+    int FreeVertices();              // EN 0x7784a0 (JP 0x101acfc0): frees the vertex buffer (the count is kept); returns 1
 };
 
 #endif

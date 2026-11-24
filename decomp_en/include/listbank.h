@@ -1,5 +1,5 @@
 // EN twin of decomp/include/listbank.h (same layout, checked on the EN functions ported so far).
-// The script parser (DAT_104687b8, also seen as ResourceBanks and TokenReader: one object). It holds the declared
+// The script parser (JP DAT_104687b8, also seen as ResourceBanks and TokenReader: one object). It holds the declared
 // script variables in 8 nesting levels ("groups") of up to 0x80 named entries, the registered builtin functions,
 // the script text being parsed with one read cursor per nesting level, and an error flag that makes every reader
 // fail once an error was reported. Methods: listbank.cpp, listbank_vars.cpp (FindVariable, RegisterBuiltin),
@@ -7,6 +7,8 @@
 // This is the one declaration of these types: include this header, never redeclare them.
 #ifndef GURUMIN_EN_LISTBANK_H
 #define GURUMIN_EN_LISTBANK_H
+
+#include <stdio.h>
 
 
 struct ListBank;
@@ -182,9 +184,20 @@ struct ListBank
     int HasParenthesis(const char *text);
     int M_10004a30(const char *text, int *value);
     int M_10004aa0(const char *text, float *value);
-    // 0x100359c0: reports a parse error through the callback and frees the script buffers. Returns 0. In the original
-    // it was an inline member: listbank_vars.cpp expanded one call and called this copy from the other.
-    int ReportError(const char *message);
+    // Reports a parse error: sets the error flag (every reader then fails), prints the message, passes it and the
+    // error's offset in the script text to the callback, and frees the script buffers. Returns 0. Inline in the
+    // original: some callers expand it, others call the one out-of-line copy.
+    int ReportError(const char *message)
+    {
+        failed = 1;
+        printf("%s\n", message);
+        if (callback != 0)
+            callback(1, (int)message);
+        if (callback != 0)
+            callback(5000, cursor[depth] - text);
+        FreeAll();
+        return 0;
+    }
     int FindAll(const char *name, int *out);
     int FreeAll();                                             // 0x10007d50 (resource_banks.cpp)
     int FreeBank(int group);                                   // 0x10007ce0 (resource_banks.cpp)

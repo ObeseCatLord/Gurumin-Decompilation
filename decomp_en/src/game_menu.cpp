@@ -62,3 +62,97 @@ int Game::SetWindowCursor(int id, int value)
     }
     return 0;
 }
+
+// Game::AddFlagEntry: adds a flag entry (kind MENU_ENTRY_FLAG) to menu window `id`: `flag` (cleared now) is the
+// variable it sets. Returns MENU_ENTRY_COUNT, or 0 when the window is not open or has no free entry. Called by the
+// menu scripts.
+int Game::AddFlagEntry(int id, const char *label, int *flag)
+{
+    int slot = FindSlot(id);
+    if (slot == MENU_SLOT_NONE)
+        return 0;
+    int i;
+    for (i = 0; i < MENU_ENTRY_SLOTS; i++)
+    {
+        if (labels[slot][i][0] == 0)
+            break;
+    }
+    if (i == MENU_ENTRY_SLOTS)
+        return 0;
+    if (flag != 0)
+        *flag = 0;
+    strcpy(labels[slot][i], label);
+    menuItems[slot].entries[i] = flag;
+    entryKind[slot][i] = MENU_ENTRY_FLAG;
+    entryMax[slot][i] = -1;
+    entryMin[slot][i] = 0;
+    lastEntry[slot] = i;
+    for (i = 0; i < MENU_ENTRY_COUNT; i++)
+    {
+        if (menuItems[slot].entries[i] != 0 && entryKind[slot][i] == MENU_ENTRY_FLAG)
+            *menuItems[slot].entries[i] = 0;
+    }
+    return i;
+}
+
+// Game::AddKind5Entry: AddFlagEntry with entry kind MENU_ENTRY_KIND5.
+int Game::AddKind5Entry(int id, const char *label, int *flag)
+{
+    int slot = FindSlot(id);
+    if (slot == MENU_SLOT_NONE)
+        return 0;
+    int i;
+    for (i = 0; i < MENU_ENTRY_SLOTS; i++)
+    {
+        if (labels[slot][i][0] == 0)
+            break;
+    }
+    if (i == MENU_ENTRY_SLOTS)
+        return 0;
+    if (flag != 0)
+        *flag = 0;
+    strcpy(labels[slot][i], label);
+    menuItems[slot].entries[i] = flag;
+    entryKind[slot][i] = MENU_ENTRY_KIND5;
+    entryMax[slot][i] = -1;
+    entryMin[slot][i] = 0;
+    lastEntry[slot] = i;
+    for (i = 0; i < MENU_ENTRY_COUNT; i++)
+    {
+        if (menuItems[slot].entries[i] != 0 && entryKind[slot][i] == MENU_ENTRY_FLAG)
+            *menuItems[slot].entries[i] = 0;
+    }
+    return i;
+}
+
+// Game::AddRangeEntry: adds a range entry (kind MENU_ENTRY_RANGE) to menu window `id`: `value` (cleared now) is the
+// variable it sets between `low` and `high`. Returns MENU_ENTRY_COUNT, or 0 when the window is not open or has no free
+// entry.
+int Game::AddRangeEntry(int id, const char *label, int low, int high, int *value)
+{
+    int slot = FindSlot(id);
+    if (slot == MENU_SLOT_NONE)
+        return 0;
+    int i;
+    for (i = 0; i < MENU_ENTRY_SLOTS; i++)
+    {
+        if (labels[slot][i][0] == 0)
+            break;
+    }
+    if (i == MENU_ENTRY_SLOTS)
+        return 0;
+    if (value != 0)
+        *value = 0;
+    strcpy(labels[slot][i], label);
+    menuItems[slot].entries[i] = value;
+    entryMax[slot][i] = high;
+    entryKind[slot][i] = MENU_ENTRY_RANGE;
+    entryMin[slot][i] = low;
+    lastEntry[slot] = i;
+    for (i = 0; i < MENU_ENTRY_COUNT; i++)
+    {
+        if (menuItems[slot].entries[i] != 0 && entryKind[slot][i] == MENU_ENTRY_FLAG)
+            *menuItems[slot].entries[i] = 0;
+    }
+    return i;
+}

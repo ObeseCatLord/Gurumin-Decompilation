@@ -474,6 +474,26 @@ float Vec4::DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b)
     return LengthSquaredXyz(a + direction * t - *this);
 }
 
+// Distance from this point to the segment a-b (x/y/z); the closest point of the segment is stored in `closest`.
+// Unlike DistanceSquaredToSegment a segment of zero length is not special-cased. Called by the collision tests.
+float Vec4::DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest)
+{
+    Vec4 direction = b - a;
+    float t = (Vec3_Dot(this, &direction) - Vec3_Dot(&a, &direction)) / LengthSquaredXyz(direction);
+    if (t < 0.0f)
+    {
+        closest.Copy(a);
+        return Distance(a);
+    }
+    if (t > 1.0f)
+    {
+        closest.Copy(b);
+        return Distance(b);
+    }
+    closest.Copy(a + direction * t);
+    return Distance(closest);
+}
+
 // Grows the three key arrays by `extra` entries, keeping their contents. Called when a track runs out of room.
 void KeyTrack::Reserve(int extra)
 {

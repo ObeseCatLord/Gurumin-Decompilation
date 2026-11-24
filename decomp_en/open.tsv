@@ -1,3 +1,14 @@
 address	status	reason
 00779400	open	Vec4::RotateZ: 17 bytes off; y*cos is scheduled before x*sin so the products land in swapped xmm registers; six spellings tried (JP form, operand flips, cos/sin locals in both orders)
 007ad3b0	open	ImeCandidates_WidestWidth: 54 bytes off; VS2013 rotates the loop (test before the loop) in every spelling, the original tests at the top; five spellings tried (for, while, for(;;)+break, min four ways)
+00779300	open	Vec4::RotateY: 9 bytes off, xmm2/xmm3 numbering only (RotateX matches with the same form)
+00775320	open	View_ContainsPoint: 6 bytes off, one subss placement in the behind-camera branch
+0078ae20	open	EN rewrite of JP DrawTinted (extra mode argument, widescreen globals); port from the EN bytes, not JP
+0078bc00	open	EN rewrite of JP SwapTarget_DrawPreview (back-buffer RECT, device vtable +0x88); port from the EN bytes
+007955c0	open	DrawFrame: EN differs from JP (stage alpha before colour, second pass, stage-1 tail); JP draft 2550 vs 2138 bytes
+00639500	open	ListBank::SkipStatement: register allocation (original keeps text in ebx, parens in memory); declaration orders tried; 541 diffs
+005ec6d0	open	ListBank::ReadToken: stack-slot assignment (original puts inQuotes in the parameter slot); 313 diffs
+00643b20	open	ListBank::DeclareFunction: 21 diffs; first source copy should reuse the parameter slot, one cmp scheduled earlier
+0074a050	open	Node::MoveToParent: 6 bytes off; operand order of the inline strcpy at the two insertion sites and the edi load order
+00779540	open	KeyTrack::Set: Vec4 shift loop; original copies four dwords without reloading values; member-wise copy reloads [edi+8]
+0064bd10	open	Camera_ItemStand: 889 bytes, same length; store scheduling in the sparkle-matrix block (shot-point ints interleaved with matrix stores, z re-read); ~6 spellings

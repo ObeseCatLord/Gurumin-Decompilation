@@ -65,12 +65,5 @@ extern "C" int Random(void)
 // when the state was (re)written.
 extern "C" int Render_SetRenderState(unsigned long state, unsigned long value)
 {
-    if (g_renderStateCache[state] == value)
-        return 0;
-    unsigned long current;
-    g_d3dDevice->GetRenderState((D3DRENDERSTATETYPE)state, &current);
-    if (current != value)
-        g_d3dDevice->SetRenderState((D3DRENDERSTATETYPE)state, value);
-    g_renderStateCache[state] = value;
-    return 1;
+    return RenderState_Set(state, value);
 }

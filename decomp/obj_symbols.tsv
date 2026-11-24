@@ -564,3 +564,12 @@ _Enemy_IsBusy	100e1c40
 ?FUN_100460d0@@YAHH@Z	100460d0
 ?SphereHitsMesh@Node@@QAEHPAUMatrix4@@PAUVec4@@M1PAM@Z	101a0cf0
 ?CastSegment2@Node@@QAEHPBDIPAUVec4@@11PAM@Z	101aa080
+?CastSegment@Node@@QAEHPBDIPAUVec4@@11PAM@Z	101aaa20
+?Char_RollingBall@@YAHH@Z	1007a370
+?DrawLightKind22@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	1016fb80
+?RayCast@Node@@QAEHPBDIIPBUVec4@@1PAU2@PAM@Z	101a9670
+?DrawWorldPictures@WorldRenderer@@QAEXPBUMatrix4@@0@Z	10167d90
+?Char_SwingPlatform@@YAHH@Z	10025ce0
+?Draw@MeshData@@QAEHPAUMatrix4@@PBU2@1HMMMHMHPBUVec4@@MM@Z	10151150
+?DrawCaption@WorldRenderer@@QAEXXZ	101687e0
+?DrawScreenOverlays@WorldRenderer@@QAEXXZ	10184160

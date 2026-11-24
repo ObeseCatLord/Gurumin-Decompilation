@@ -100,8 +100,8 @@ int WorldRenderer::Bind(AnimModel *models, void *mapRoot, int *state, WorldCallb
     notifyPending = 0;
     m_039a8 = -1;
     m_03868 = 900;
-    this->data = data;
-    m_03870 = 0;
+    font = (FontRenderer *)data;
+    captionVisible = 0;
     fadeTarget = 0;
     fadeAmount = 0;
     StartFade(0, 0, 0);

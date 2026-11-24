@@ -8,6 +8,7 @@
 #include "matrix4.h"
 #include "key_track.h"
 #include "node.h"
+#include "font_renderer.h"
 
 struct AnimModel;
 
@@ -58,9 +59,12 @@ struct WorldRenderer
     int m_03860;
     int m_03864;
     int m_03868;
-    void *data;                                      // 0x386c: passed to the callback
-    int m_03870;
-    char pad_03874[0x10c];
+    FontRenderer *font;                              // 0x386c: the text renderer (captions)
+    int captionVisible;                              // 0x3870: 1 = the caption is drawn
+    int captionSize;                                 // 0x3874: font size in percent, less 25
+    int captionX;                                    // 0x3878: left of the caption, -1 = centred
+    int captionY;                                    // 0x387c: baseline of the caption
+    char caption[0x100];                             // 0x3880: caption text; a literal backslash-n splits two lines, an opening bracket starts the speech
     int m_03980;
     int m_03984;
     int m_03988;
@@ -178,8 +182,11 @@ struct WorldRenderer
     int AdvanceFrame();
     int Release();
     int Seek(int target);                    // 0x10189000
+    void DrawCaption();                      // 0x101687e0 (world_caption.cpp)
+    void DrawScreenOverlays();               // 0x10184160 (world_caption.cpp)
     void DrawOverlay();
     void DrawPictures(const Matrix4 &view);  // 0x10167440 (world_pictures.cpp)
+    void DrawWorldPictures(const Matrix4 *view, const Matrix4 *camera);  // 0x10167d90 (world_in_pictures.cpp)
 };
 
 extern "C" WorldRenderer DAT_10c68000;  // the world

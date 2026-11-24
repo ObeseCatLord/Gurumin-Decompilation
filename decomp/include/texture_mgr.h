@@ -1,4 +1,4 @@
-// ZeroVec, Transform, Animator: declared here once (first used by src/texture_mgr.cpp).
+// ZeroVec, Transform: declared here once (first used by src/texture_mgr.cpp).
 #ifndef GURUMIN_TEXTURE_MGR_H
 #define GURUMIN_TEXTURE_MGR_H
 
@@ -22,11 +22,4 @@ struct Transform
     Matrix4 matrix;
     Transform();
 };
-struct Animator
-{
-    void M_101687e0();
-    int M_101692c0();
-    int M_10184160();
-};
-
 #endif

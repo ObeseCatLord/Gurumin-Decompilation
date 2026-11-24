@@ -14,7 +14,11 @@ struct RegionVertex
     Vec4 tint;                // 0x20: blended between a point's two tints
     char pad_0030[0x10];
     Vec4 offset;              // 0x40: blended between a point's two offsets (w unused)
-    char pad_0050[0x20];
+    Vec4 baseTint;            // 0x50: the tint as built (the wave shading scales `tint` from it)
+    float baseX;              // 0x60: the vertex position as built
+    float baseY;
+    float baseZ;
+    float nearness;           // 0x6c: distance to the closest lit vertex of another region over 900 (1 = none near)
 };
 // A control point of a region, 0x7c bytes.
 struct RegionPoint
@@ -52,5 +56,6 @@ struct MapRegion
 // The current map's regions (DAT_102564a0 of them), allocated by the map loader; 0 when no map is loaded.
 extern "C" MapRegion *DAT_104c03c0;
 extern "C" int DAT_104c03c4;               // non-zero once the regions are in use (0 = all invisible)
+extern "C" int DAT_102028e0;               // texture slot of the "@moya" node (the haze of the water regions)
 
 #endif

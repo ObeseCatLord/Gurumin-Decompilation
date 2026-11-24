@@ -50,6 +50,7 @@ struct CharState
                         int layerCount;           // flame_layers.cpp: flame layers found (their timers are values[1..])
                         int counterPhase;         // digit_counter.cpp: 0 = idle, 1..10 = turning to count + 1
                         int shockFrames;          // npc_link_shock.cpp: 0 = standing, 1..60 = frames shaking (counted up)
+                        int ballFrame;            // rolling_ball.cpp: 0 = not set up, 1 = waiting, then the frame count of the roll
                         // (route_follow.cpp uses `wait` for the frames left at a pause point)
                     };
                     union                         // 0x08
@@ -74,6 +75,9 @@ struct CharState
                         int spiritStep;           // char_spirit.cpp: motion step of the character's motion table row
                         int lookoutMode;          // npc_lookout.cpp: what the lookout watches for (1..5)
                         int hitFrames;            // map_cursor_walk.cpp: frames since it was hit (state 1), 0..0xaa
+                        int ballSlot;             // rolling_ball.cpp: slot of the character dropped in (states 1..30)
+                        int ballTimer;            // rolling_ball.cpp: frames counted in state 3000
+                  int swingReady;           // swing_platform.cpp: 1 once the platform was set up
                     };
                     union                         // 0x0c
                     {
@@ -106,6 +110,8 @@ struct CharState
                         int neighbour;            // npc_gesture.cpp: slot of the character it reacts to (own slot - talk / 100)
                         int gazeTimer;            // npc_greet.cpp: frames left in the current gaze step (counted down)
                         int shakeX;               // npc_link_shock.cpp: shake steps of the three axes, -/+ (x)
+                        int ballSavedKind;        // rolling_ball.cpp: the dropped-in character's kind, restored after it landed
+                  int swingStatus;          // swing_platform.cpp: 7 = the swing is running, -1 = the character was told to leave
                     };
                     union                         // 0x10
                     {
@@ -126,6 +132,7 @@ struct CharState
                                                   // 3 = leaving
                         int greeted;              // npc_greet.cpp: 0 = has not greeted yet
                         int shakeY;               // npc_link_shock.cpp: shake step of the y axis
+                  int swingFlip;            // swing_platform.cpp: non-zero = the acceleration flips when the angle passes 0 or +-180
                     };
                     union                         // 0x14
                     {
@@ -148,6 +155,8 @@ struct CharState
                         int pitFrames;            // map_cursor_walk.cpp: frames in the current pit phase
                         int greetPending;         // npc_greet.cpp: 1 = greeted, the event is raised once greetings are off
                         int shakeZ;               // npc_link_shock.cpp: shake step of the z axis
+                        int ballRollFrame;        // rolling_ball.cpp: frames the ball has rolled (the ball node's frame source)
+                  int swingLength;          // swing_platform.cpp: length of the arm in units (distance from the pivot + 50)
                     };
                     union                         // 0x18
                     {
@@ -164,6 +173,7 @@ struct CharState
                         int cheerReady;           // npc_gesture.cpp: 0 = the cheer is queued instead of played at once
                         int pickupHeight;         // npc_gate_carrier.cpp: lowest player height (below the carrier) for a pick-up
                         int shakeLevel;           // npc_link_shock.cpp: three digits (x, y, z) = how strongly each axis shakes
+                  int swingMirror;          // swing_platform.cpp: non-zero = the swing turns the other way round
                     };
                     union                         // 0x1c
                     {
@@ -189,6 +199,7 @@ struct CharState
                         int gesturing;            // npc_gesture.cpp: 1 while the gesture shows (neighbours react to it)
                         int hikariSound;          // char_hikari.cpp: 1 while its "anime" sound plays
                         int releaseDistance;      // npc_link_shock.cpp: player distance (talk / 10 * 10) below which it is released
+                  int swingGround;          // swing_platform.cpp: highest ground under the swing so far (-3500 = none)
                     };
                     union                         // 0x24
                     {
@@ -211,6 +222,7 @@ struct CharState
                         int headingFrom;          // route_step.cpp: heading (degrees) at the route's first point
                         int markerSlot;           // marker_rider.cpp: slot of the marker character ridden
                         int lastHealth;           // map_cursor_walk.cpp: the health of the slot, copied every frame
+                  int swingMaxAngle;        // swing_platform.cpp: largest swing angle seen over ground
                     };
                     union                         // 0x2c
                     {
@@ -220,6 +232,7 @@ struct CharState
                         int vanishFrames;         // marker_rider.cpp: frames left of the vanishing once the marker fell
                         int hopFrame;             // enemy_strafe.cpp (Enemy_HopAndStrafe): frame of the hop
                                                   // under way (0 = not hopping)
+                  int swingMinAngle;        // swing_platform.cpp: smallest swing angle seen over ground
                     };
                     union                         // 0x30
                     {

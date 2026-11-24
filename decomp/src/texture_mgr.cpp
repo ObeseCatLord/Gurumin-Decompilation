@@ -111,13 +111,6 @@ int AnimModel::M_1017b1c0()
     return motion->layer;
 }
 
-// Advances the animation one step and returns its state.
-int Animator::M_10184160()
-{
-    M_101687e0();
-    return M_101692c0();
-}
-
 // After a map change: unloads every texture that was not marked as kept and has no generated alpha.
 extern "C" int FUN_10188fb0(void)
 {

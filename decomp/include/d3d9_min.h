@@ -110,7 +110,7 @@ struct IDirect3DDevice9
     virtual long __stdcall SetNPatchMode() = 0;
     virtual long __stdcall GetNPatchMode() = 0;
     virtual long __stdcall DrawPrimitive() = 0;
-    virtual long __stdcall DrawIndexedPrimitive() = 0;
+    virtual long __stdcall DrawIndexedPrimitive(int type, int baseVertex, unsigned int minVertex, unsigned int vertexCount, unsigned int startIndex, unsigned int primitiveCount) = 0;
     virtual long __stdcall DrawPrimitiveUP(int type, unsigned int count, const void *data, unsigned int stride) = 0;
     virtual long __stdcall DrawIndexedPrimitiveUP(int type, unsigned int minIndex, unsigned int vertexCount, unsigned int primitiveCount, const void *indices, int indexFormat, const void *vertices, unsigned int stride) = 0;
     virtual long __stdcall ProcessVertices() = 0;
@@ -128,11 +128,11 @@ struct IDirect3DDevice9
     virtual long __stdcall GetVertexShaderConstantI() = 0;
     virtual long __stdcall SetVertexShaderConstantB() = 0;
     virtual long __stdcall GetVertexShaderConstantB() = 0;
-    virtual long __stdcall SetStreamSource() = 0;
+    virtual long __stdcall SetStreamSource(unsigned int stream, void *buffer, unsigned int offset, unsigned int stride) = 0;
     virtual long __stdcall GetStreamSource() = 0;
     virtual long __stdcall SetStreamSourceFreq() = 0;
     virtual long __stdcall GetStreamSourceFreq() = 0;
-    virtual long __stdcall SetIndices() = 0;
+    virtual long __stdcall SetIndices(void *indexBuffer) = 0;
     virtual long __stdcall GetIndices() = 0;
     virtual long __stdcall CreatePixelShader() = 0;
     virtual long __stdcall SetPixelShader(void *shader) = 0;

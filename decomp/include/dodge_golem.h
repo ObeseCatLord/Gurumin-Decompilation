@@ -6,6 +6,7 @@
 
 #include "matrix4.h"
 #include "node.h"
+#include "math_float.h"
 
 // First and last piece slots: 0x3d and 0x3e are the fists, 0x3f..0x47 loose rocks and 0x48..0x4c rocks that are
 // linked to the pieces before them.
@@ -19,7 +20,6 @@ extern "C" Node *DAT_10e3dd2c;       // the golem's model tree (holds the "@BS_0
 extern "C" Matrix4 DAT_10e3dd68;     // the model tree's world matrix: positions are taken relative to its translation
 extern "C" int DAT_10db03c8;         // effect option value handed to every effect the pieces start
 
-extern "C" float FUN_10001f80(float y, float x);   // 0x10001f80 (math_float.cpp): atan2f
 
 // 0x1005fc00 (DodgeGame_UpdateGolemPiece): one frame of piece `index`. Returns 0.
 int DodgeGame_UpdateGolemPiece(int index);

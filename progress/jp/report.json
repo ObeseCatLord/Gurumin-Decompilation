@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 48.0748,
+  "fuzzy_match_percent": 48.0254,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -3001,7 +3001,7 @@
   {
    "name": "app/bs006_update",
    "measures": {
-    "fuzzy_match_percent": 24.3765,
+    "fuzzy_match_percent": 22.821,
     "total_code": "54584",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -3026,14 +3026,14 @@
     {
      "name": ".text",
      "size": "54584",
-     "fuzzy_match_percent": 24.3765
+     "fuzzy_match_percent": 22.821
     }
    ],
    "functions": [
     {
      "name": "?Bs006_Update@@YAHH@Z",
      "size": "54584",
-     "fuzzy_match_percent": 24.3765,
+     "fuzzy_match_percent": 22.821,
      "metadata": {
       "virtual_address": "269296800"
      }

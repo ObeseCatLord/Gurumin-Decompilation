@@ -38,6 +38,7 @@
 #include "char_vars.h"
 #include "game_vars.h"
 #include "map_vars.h"
+#include "math_float.h"
 #include "render_vars.h"
 #include "route_flier.h"
 #include "target_race.h"
@@ -117,6 +118,15 @@
 #define BS006_EFFECT_FIRE_SHOT 0x7ba            // state 0xca: one flame of the fan
 #define BS006_FLAME_FLAG 0x1c7                  // script flag: 2 = the fan has five flames instead of three
 #define BS006_EFFECT_RAIN 0x36f3                // state 0xcc: the fire that rains from above
+#define BS006_EFFECT_RAIN_SHOT 0x36f2           // state 0xcb: a shot of fire that falls near the dragon
+#define BS006_EFFECT_HEAD_STREAK 0x36e3                // state 5: the streak from the jaw
+#define BS006_EFFECT_HEAD_FLASH 0x36e5          // state 5: the flash on every 15th frame
+#define BS006_EFFECT_TAIL_TRAIL 0x36df          // state 2: a trail from the tail nodes
+#define BS006_EFFECT_TAIL_LASH 0x36e1           // state 2: the lash between tail nodes 3 and 5
+#define BS006_EFFECT_TAIL_LASH_B 0x36e2
+#define BS006_EFFECT_TAIL_SPARK 0x7aa
+#define BS006_EFFECT_TOE_DUST 0x2e5             // state 8: dust at the stamping toe
+#define BS006_EFFECT_TOE_RING 0x60f             // state 8: a ring of dust on every third frame
 #define BS006_EFFECT_KNEE_SHOT 0x36d6           // state 0x130: the shot from a knee pad
 #define BS006_KNEE_SWEEP 0.29671f               // state 0x130: how far the shot angle moves per step of the sweep
 #define BS006_PICK_NEAR 150.0f                  // state 100: the distances the table of attacks changes at
@@ -125,6 +135,9 @@
 #define BS006_PICK_SIDE_TURN 1.09663f           // state 100: squared angle from which the player is to the side
 #define BS006_PICK_BEHIND_TURN 5.55163f         // state 100: squared angle from which the player is behind it
 #define BS006_PICK_TURN_AROUND 1.0966278f       // state 100: squared angle from which it turns round first
+#define BS006_CIRCLE_RADIUS 1650.0f             // state 1: the circle it strides round the middle on
+#define BS006_CIRCLE_TURN 4.3865113f            // state 1: squared angle (about 120 degrees) up to which it follows the circle
+#define BS006_WALK_END_FRAME 0x406              // state 1: after 1000 frames the stride slows over this many frames
 
 // DAT_1042d918[BS006_BONE_*] as a node.
 static __forceinline Node *Bs006Bone(int which)
@@ -143,14 +156,6 @@ int Bs006_Update(int index)
     Bs006State &st = DAT_1020b430[index].bs006;
     CharSlot &slot = DAT_10daaae8[index];
     int &defeatTimer = DAT_1020b49c[index].value;
-    Vec4 playerPos;
-    Vec4 ownPos;
-    Vec4 move;
-    int motion = -1;
-    int restart = 0;
-    int blendFrames = 5;
-    int moveMode = BS006_MOVE_NONE;
-    int armed = 0;
 
     slot.m_0141 = 1;
     model.uniformScale = 0.05f;
@@ -370,15 +375,15 @@ int Bs006_Update(int index)
                         float pitch;
                         float yaw;
                         spot.Copy(node->parent->worldMatrix.GetTranslation() - node->worldMatrix.GetTranslation());
-                        yaw = atan2f(spot.x, spot.y) + BS006_PI;
+                        yaw = FUN_10001f80(spot.x, spot.y) + BS006_PI;
                         spot.y = spot.Length2D();
                         spot.x = 0.0f;
                         if (spot.Length() >= 1.0f)
                         {
                             if (spot.z <= 0.0f)
-                                pitch = -acosf(spot.Length2D() / spot.Length());
+                                pitch = -FUN_10001f60(spot.Length2D() / spot.Length());
                             else
-                                pitch = acosf(spot.Length2D() / spot.Length());
+                                pitch = FUN_10001f60(spot.Length2D() / spot.Length());
                         }
                         else
                             pitch = 0.0f;
@@ -404,15 +409,15 @@ int Bs006_Update(int index)
                             float pitch;
                             float yaw;
                             spot.Copy(node->parent->worldMatrix.GetTranslation() - node->worldMatrix.GetTranslation());
-                            yaw = atan2f(spot.x, spot.y) + BS006_PI;
+                            yaw = FUN_10001f80(spot.x, spot.y) + BS006_PI;
                             spot.y = spot.Length2D();
                             spot.x = 0.0f;
                             if (spot.Length() >= 1.0f)
                             {
                                 if (spot.z <= 0.0f)
-                                    pitch = -acosf(spot.Length2D() / spot.Length());
+                                    pitch = -FUN_10001f60(spot.Length2D() / spot.Length());
                                 else
-                                    pitch = acosf(spot.Length2D() / spot.Length());
+                                    pitch = FUN_10001f60(spot.Length2D() / spot.Length());
                             }
                             else
                                 pitch = 0.0f;
@@ -500,10 +505,18 @@ int Bs006_Update(int index)
     else if (DAT_104c02c7 < barTarget)
         DAT_104c02c7++;
     st.lastHealth = health;
+    Vec4 playerPos;
+    Vec4 ownPos;
+    Vec4 move;
     playerPos.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     ownPos.Copy(model.matrix.GetTranslation());
     (playerPos - ownPos).Length();
     float distance2D = (playerPos - ownPos).Length2D();
+    int motion = -1;
+    int restart = 0;
+    int blendFrames = 5;
+    int moveMode = BS006_MOVE_NONE;
+    int armed = 0;
 
     if (st.state != BS006_STATE_SET_UP)
     {
@@ -560,15 +573,15 @@ int Bs006_Update(int index)
                         float pitch;
                         float yaw;
                         spot.Copy(node->parent->worldMatrix.GetTranslation() - node->worldMatrix.GetTranslation());
-                        yaw = atan2f(spot.x, spot.y) + BS006_PI;
+                        yaw = FUN_10001f80(spot.x, spot.y) + BS006_PI;
                         spot.y = spot.Length2D();
                         spot.x = 0.0f;
                         if (spot.Length() >= 1.0f)
                         {
                             if (spot.z <= 0.0f)
-                                pitch = -acosf(spot.Length2D() / spot.Length());
+                                pitch = -FUN_10001f60(spot.Length2D() / spot.Length());
                             else
-                                pitch = acosf(spot.Length2D() / spot.Length());
+                                pitch = FUN_10001f60(spot.Length2D() / spot.Length());
                         }
                         else
                             pitch = 0.0f;
@@ -594,15 +607,15 @@ int Bs006_Update(int index)
                             float pitch;
                             float yaw;
                             spot.Copy(node->parent->worldMatrix.GetTranslation() - node->worldMatrix.GetTranslation());
-                            yaw = atan2f(spot.x, spot.y) + BS006_PI;
+                            yaw = FUN_10001f80(spot.x, spot.y) + BS006_PI;
                             spot.y = spot.Length2D();
                             spot.x = 0.0f;
                             if (spot.Length() >= 1.0f)
                             {
                                 if (spot.z <= 0.0f)
-                                    pitch = -acosf(spot.Length2D() / spot.Length());
+                                    pitch = -FUN_10001f60(spot.Length2D() / spot.Length());
                                 else
-                                    pitch = acosf(spot.Length2D() / spot.Length());
+                                    pitch = FUN_10001f60(spot.Length2D() / spot.Length());
                             }
                             else
                                 pitch = 0.0f;
@@ -784,17 +797,343 @@ int Bs006_Update(int index)
         ending.SetPosition(BS006_FAR_X, 0.0f, 0.0f);
         DAT_10836c70.ResetFrameTimer();
     }
-    // STAGE: state 1, pseudo.c lines 5193-5413
-    // STAGE: state 2, pseudo.c lines 5059-5191
+    else if (st.state == 1)
+    {
+        // The circling walk: the dragon strides round the arena at 1650 units from the middle (it heads for the point
+        // that far ahead of it, or for the next point on the circle when it does not face the way round), speeding up
+        // over its first 30 frames. After 1000 frames it stops, shaking the ground at its hands and feet, and ends
+        // the state once it is at the motion frame where its feet are down.
+        if (st.frames == 0)
+        {
+            motion = 1;
+            restart = 1;
+            blendFrames = 10;
+            st.frames = 1;
+        }
+        else
+        {
+            st.frames++;
+            if (st.frames < 1000)
+            {
+                if (st.frames > 0x1e)
+                {
+                    EffectOptions options;
+                    Matrix4 pose;
+                    Vec4 spot;
+                    options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+                    options.flags |= 2;
+                    options.m_0008 = 1.5f;
+                    options.m_000e = 5;
+                    pose.SetIdentity();
+                    for (int foot = BS006_NODE_RIGHT_FINGER; foot <= BS006_NODE_LEFT_TOE; foot++)
+                    {
+                        if (Bs006Node(index, foot) != 0)
+                        {
+                            float zero = 0.0f;
+                            spot.Fill(zero);
+                            pose.SetIdentity();
+                            pose.SetTranslation(Bs006Node(index, foot)->worldMatrix.GetTranslation());
+                            FUN_1001d8b0(index, BS006_EFFECT_TAIL_SPARK, spot, -1, -1, 0, 0, 0, &pose, &options);
+                        }
+                    }
+                }
+                if (st.frames > 0xf)
+                {
+                    for (int foot = 0; foot < 4; foot++)
+                    {
+                        if (Bs006Node(index, BS006_NODE_RIGHT_FINGER + foot) != 0)
+                            LastPositionVector((index + 1) * 4 + foot)
+                                .Copy(Bs006Node(index, BS006_NODE_RIGHT_FINGER + foot)->worldMatrix.GetTranslation());
+                    }
+                }
+                motion = 1;
+            }
+            else
+            {
+                motion = 2;
+                if (Bs006Node(index, BS006_NODE_RIGHT_FINGER) != 0 && Bs006Node(index, BS006_NODE_LEFT_FINGER) != 0 &&
+                    Bs006Node(index, BS006_NODE_RIGHT_TOE) != 0 && Bs006Node(index, BS006_NODE_LEFT_TOE) != 0)
+                {
+                    Matrix4 pose;
+                    Vec4 spot;
+                    pose = TranslationMatrix(Bs006Node(index, BS006_NODE_RIGHT_FINGER)->worldMatrix._41,
+                                             Bs006Node(index, BS006_NODE_RIGHT_FINGER)->worldMatrix._42,
+                                             Bs006Node(index, BS006_NODE_RIGHT_FINGER)->worldMatrix._43);
+                    DAT_10daaa80.Start(BS006_EFFECT_DUST, spot, -1, -1, 0, 0, 0, &pose, 0, 0);
+                    pose = TranslationMatrix(Bs006Node(index, BS006_NODE_LEFT_FINGER)->worldMatrix._41,
+                                             Bs006Node(index, BS006_NODE_LEFT_FINGER)->worldMatrix._42,
+                                             Bs006Node(index, BS006_NODE_LEFT_FINGER)->worldMatrix._43);
+                    DAT_10daaa80.Start(BS006_EFFECT_DUST, spot, -1, -1, 0, 0, 0, &pose, 0, 0);
+                    pose = TranslationMatrix(Bs006Node(index, BS006_NODE_RIGHT_TOE)->worldMatrix._41,
+                                             Bs006Node(index, BS006_NODE_RIGHT_TOE)->worldMatrix._42,
+                                             Bs006Node(index, BS006_NODE_RIGHT_TOE)->worldMatrix._43);
+                    DAT_10daaa80.Start(BS006_EFFECT_DUST, spot, -1, -1, 0, 0, 0, &pose, 0, 0);
+                    pose = TranslationMatrix(Bs006Node(index, BS006_NODE_LEFT_TOE)->worldMatrix._41,
+                                             Bs006Node(index, BS006_NODE_LEFT_TOE)->worldMatrix._42,
+                                             Bs006Node(index, BS006_NODE_LEFT_TOE)->worldMatrix._43);
+                    DAT_10daaa80.Start(BS006_EFFECT_DUST, spot, -1, -1, 0, 0, 0, &pose, 0, 0);
+                }
+            }
+
+            // The point it heads for: 1650 units ahead, or the next point on the circle round the middle.
+            Vec4 ahead;
+            float ownBearing = (float)atan2(ownPos.x, ownPos.y);
+            float turn = model.heading - (ownBearing + BS006_PI);
+            while (turn > BS006_PI)
+                turn -= BS006_TWO_PI;
+            while (turn < -BS006_PI)
+                turn += BS006_TWO_PI;
+            float arcStep = BS006_TURN_QUICK;
+            if (turn <= 0.0f)
+                arcStep = -BS006_TURN_QUICK;
+            float zeroAhead = 0.0f;
+            ahead.Fill(zeroAhead);
+            ahead.y = -BS006_CIRCLE_RADIUS;
+            ahead.RotateZ(-model.heading);
+            float ownBearingAgain = (float)atan2(ownPos.x, ownPos.y);
+            float aheadBearing = (float)atan2(ahead.x, ahead.y);
+            turn = aheadBearing - ownBearingAgain;
+            while (turn > BS006_PI)
+                turn -= BS006_TWO_PI;
+            while (turn < -BS006_PI)
+                turn += BS006_TWO_PI;
+            turn = turn * turn;
+            if (turn < BS006_CIRCLE_TURN || motion == 2)
+            {
+                ahead.Copy(ownPos);
+                ahead.z = 0.0f;
+                ahead.Normalized3();
+                ahead.Copy(ahead * BS006_CIRCLE_RADIUS);
+                ahead.RotateZ(-arcStep);
+            }
+            move.Copy(ahead - ownPos);
+            move.Normalized3();
+            model.targetHeading = (float)atan2(move.x, move.y) + BS006_PI;
+            move.z = 0.0f;
+            if (st.frames < 1000)
+            {
+                int ramp = st.frames;
+                if (ramp >= 0x1e)
+                    ramp = 0x1e;
+                move.Copy(move * 50.0f * ((float)ramp / 30.0f));
+            }
+            else
+            {
+                int ramp = BS006_WALK_END_FRAME - st.frames;
+                ramp = ramp > 0 ? ramp : 0;
+                move.Copy(move * 50.0f * ((float)ramp / 30.0f));
+            }
+            move.Copy(move * 0.5f + DAT_10802bf8[index].position * 0.5f);
+            DAT_10802bf8[index].position.Copy(move);
+            move.Copy(move + ownPos);
+            moveMode = BS006_MOVE_PLACE;
+            if (st.frames < 1000)
+            {
+                if (st.frames > 0x5a && FUN_1013f880() % 5000 < st.frames * 10 && model.motionFrame == 0x3b9)
+                {
+                    st.frames = 1000;
+                    motion = 2;
+                    restart = 1;
+                    blendFrames = 0xf;
+                    FUN_10065b10(index, 0x195, 1, 0);
+                }
+            }
+            else if (st.frames > 0x3f7)
+                st.state = BS006_STATE_PICK;
+            if (motion == 2)
+                model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        }
+    }
+    else if (st.state == 2)
+    {
+        // The tail sweep: it swings round while the motion plays (the heading follows fixed steps per motion
+        // frame range and it slides along the heading it started with); sparks fly from the tail's nodes while the
+        // motion blends in, at frame 0x296 a lash joins tail nodes 3 and 5, and from 0x299 to 0x2b4 flashes and sparks
+        // ring the tail on every other frame.
+        st.frames++;
+        blendFrames = 0x1e;
+        motion = 0x18;
+        if (st.frames == 1)
+        {
+            restart = 1;
+            DAT_10255160[index][0] = model.heading;
+        }
+        else
+        {
+            if (model.motion->blending != 0)
+            {
+                Matrix4 pose;
+                EffectOptions options;
+                Vec4 spot;
+                options.flags |= 2;
+                if (DAT_104c0380 % 3 == 0)
+                {
+                    for (int tail = BS006_NODE_TAIL_1; tail <= BS006_NODE_TAIL_5; tail++)
+                    {
+                        if (Bs006Node(index, tail) != 0)
+                        {
+                            pose.SetIdentity();
+                            pose.SetTranslation(Bs006Node(index, tail)->worldMatrix.GetTranslation());
+                            FUN_1001d8b0(index, BS006_EFFECT_TAIL_TRAIL, spot, -1, -1, 0, 0, 0, &pose, &options);
+                        }
+                    }
+                }
+            }
+            if (model.motionFrame == 0x296 && Bs006Node(index, BS006_NODE_TAIL_5) != 0 &&
+                Bs006Node(index, BS006_NODE_TAIL_3) != 0)
+            {
+                FUN_10065b10(index, 0x30f, 1, 0);
+                EffectOptions options;
+                Matrix4 pose;
+                Vec4 spot;
+                options.flags |= 2;
+                pose.SetIdentity();
+                FUN_1001d8b0(index, BS006_EFFECT_TAIL_LASH, spot, -1, -1, &Bs006Node(index, BS006_NODE_TAIL_5)->worldMatrix,
+                             (int)&Bs006Node(index, BS006_NODE_TAIL_3)->worldMatrix, 0, &pose, &options);
+                FUN_1001d8b0(index, BS006_EFFECT_TAIL_LASH_B, spot, -1, -1, &Bs006Node(index, BS006_NODE_TAIL_5)->worldMatrix,
+                             0, 0, &pose, &options);
+            }
+            if (model.motionFrame > 0x298 && model.motionFrame < 0x2b5)
+            {
+                EffectOptions options;
+                Matrix4 pose;
+                Vec4 spot;
+                options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+                options.flags |= 2;
+                options.m_0008 = 1.0f;
+                options.m_000e = 5;
+                options.m_0000 = 0;
+                if ((DAT_104c0380 & 1) != 0)
+                {
+                    for (int tail = BS006_NODE_TAIL_1; tail <= BS006_NODE_TAIL_5; tail++)
+                    {
+                        if (Bs006Node(index, tail) != 0)
+                        {
+                            pose.SetIdentity();
+                            pose.SetTranslation(Bs006Node(index, tail)->worldMatrix.GetTranslation());
+                            FUN_1001d8b0(index, BS006_EFFECT_SHOCK_FLASH, spot, -1, -1, 0, 0, 0, &pose, &options);
+                            FUN_1001d8b0(index, BS006_EFFECT_TAIL_TRAIL, spot, -1, -1, 0, 0, 0, &pose, &options);
+                            pose._42 = pose._42 + 200.0f;
+                            FUN_1001d8b0(index, BS006_EFFECT_TAIL_SPARK, spot, -1, -1, 0, 0, 0, &pose, &options);
+                            pose._41 = pose._41 - 173.0f;
+                            pose._42 = pose._42 - 300.0f;
+                            FUN_1001d8b0(index, BS006_EFFECT_TAIL_SPARK, spot, -1, -1, 0, 0, 0, &pose, &options);
+                            pose._41 = pose._41 + 346.0f;
+                            FUN_1001d8b0(index, BS006_EFFECT_TAIL_SPARK, spot, -1, -1, 0, 0, 0, &pose, &options);
+                        }
+                    }
+                }
+            }
+            if (model.motionFrame > 0x28e && model.motionFrame < 0x29e)
+                model.heading = model.targetHeading = model.targetHeading - 0.10006554f;
+            else if (model.motionFrame > 0x29d && model.motionFrame < 0x2a5)
+                model.heading = model.targetHeading = model.targetHeading - 0.19447953f;
+            else if (model.motionFrame > 0x2a4 && model.motionFrame < 0x2ac)
+                model.heading = model.targetHeading = model.targetHeading - 0.05609984f;
+            else if (model.motionFrame > 0x2ab && model.motionFrame < 0x2d0)
+                model.heading = model.targetHeading = model.targetHeading + 0.00315128f;
+            if (model.motionFrame > 0x28e && model.motionFrame < 0x2ab)
+            {
+                float zero = 0.0f;
+                move.Fill(zero);
+                move.y = -10.158607f;
+                move.RotateZ(-DAT_10255160[index][0]);
+                moveMode = BS006_MOVE_STEP;
+            }
+            if (model.motionFrame == 0x2cf)
+            {
+                motion = 2;
+                restart = 1;
+                blendFrames = 0;
+                st.state = BS006_STATE_PICK;
+            }
+        }
+    }
     else if (st.state == 3)
     {
-        // STAGE: state 3, pseudo.c lines 1932-1944
+        // The idle wait: it stands until a roll that grows with the wait (at once after the first 90 frames when the
+        // script asks for it) picks the next attack.
+        st.frames++;
+        motion = 2;
+        if (DAT_102550e0[index] != 0 || (st.frames > 0x5a && FUN_1013f880() % 2000 < st.frames))
+            st.state = BS006_STATE_PICK;
     }
     else if (st.state == 4)
     {
-        // STAGE: state 4, pseudo.c lines 1945-1963
+        // The stomp: it turns to the player while the motion plays; the ground shakes from motion frame 0x7f and the
+        // state ends at frame 0x8d.
+        st.frames++;
+        motion = 4;
+        if (st.frames == 1)
+            restart = 1;
+        model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        if (model.motionFrame == 0x7f)
+            st.impact = 1;
+        if (model.motionFrame == 0x8d)
+        {
+            st.state = BS006_STATE_PICK;
+            st.impact = 1;
+        }
     }
-    // STAGE: state 5, pseudo.c lines 4977-5057
+    else if (st.state == 5)
+    {
+        // The head swing: a coin toss on the first frame picks which of the two motions (0xb, 0xc) plays first; the
+        // state ends when the second one reaches its frame. From frame 0x113 to 0x137 of either motion effects
+        // follow the line from the jaw's grandparent node, a flash on every 15th frame.
+        st.frames++;
+        if (st.frames == 1)
+        {
+            restart = 1;
+            if (FUN_1013f880() % 2 != 0)
+            {
+                st.frames = 1000;
+                motion = 0xc;
+                if (model.motionFrame == 0x138)
+                    FUN_10065b10(index, 0x30a, 1, 0);
+            }
+            else
+            {
+                motion = 0xb;
+                if (model.motionFrame == 0x112)
+                    FUN_10065b10(index, 0x30a, 1, 0);
+            }
+        }
+        else if (st.frames < 1000)
+        {
+            if (model.motionFrame == 0xf6)
+                st.state = BS006_STATE_PICK;
+            motion = 0xc;
+            if (model.motionFrame == 0x138)
+                FUN_10065b10(index, 0x30a, 1, 0);
+        }
+        else
+        {
+            if (model.motionFrame == 0x148)
+                st.state = BS006_STATE_PICK;
+            motion = 0xb;
+            if (model.motionFrame == 0x112)
+                FUN_10065b10(index, 0x30a, 1, 0);
+        }
+        if (model.motionFrame > 0x112 && model.motionFrame < 0x138 && Bs006Node(index, BS006_NODE_JAW) != 0)
+        {
+            Matrix4 pose;
+            Vec4 spot;
+            EffectOptions options;
+            options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+            options.flags |= 2;
+            options.m_0008 = 0.8f;
+            const Matrix4 *follow = model.headNode == 0 ? 0 : &DAT_10db91dc->worldMatrix;
+            spot.Copy(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation() -
+                      Bs006Node(index, BS006_NODE_JAW)->parent->parent->worldMatrix.GetTranslation());
+            pose = RotationZ(FUN_10001f80(spot.x, spot.y) + BS006_PI);
+            pose.SetTranslation(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation());
+            float zero = 0.0f;
+            spot.Fill(zero);
+            FUN_1001d8b0(index, BS006_EFFECT_HEAD_STREAK, spot, -1, -1, follow, 0, 0, &pose, &options);
+            if (model.motionFrame == 0x113 || model.motionFrame == 0x137 || model.motionFrame % 0xf == 0)
+                FUN_1001d8b0(index, BS006_EFFECT_HEAD_FLASH, spot, -1, -1, follow, 0, 0, &pose, &options);
+        }
+    }
     else if (st.state == 6)
     {
         // The fire breath: three rings of shots fly out of the dragon's mouth, then fire bursts on its hand.
@@ -908,8 +1247,8 @@ int Bs006_Update(int index)
                 // The left hand: a ring standing on the hand's motion since the last frame.
                 dir.Copy(Bs006Node(index, BS006_NODE_LEFT_FINGER_B)->worldMatrix.GetTranslation() -
                          DAT_10802bf8[index + 1].position);
-                float yaw = atan2f(dir.x, dir.y) + BS006_PI;
-                float pitch = acosf(dir.Length2D() / dir.Length());
+                float yaw = FUN_10001f80(dir.x, dir.y) + BS006_PI;
+                float pitch = FUN_10001f60(dir.Length2D() / dir.Length());
                 dir.Copy(dir.Normalized3() * 100.0f);
                 if (dir.z < 0.0f)
                     pitch = pitch * -1.0f;
@@ -927,8 +1266,8 @@ int Bs006_Update(int index)
                 // The right hand.
                 dir.Copy(Bs006Node(index, BS006_NODE_RIGHT_FINGER_B)->worldMatrix.GetTranslation() -
                          DAT_10802bf8[index + 1].step);
-                yaw = atan2f(dir.x, dir.y) + BS006_PI;
-                pitch = acosf(dir.Length2D() / dir.Length());
+                yaw = FUN_10001f80(dir.x, dir.y) + BS006_PI;
+                pitch = FUN_10001f60(dir.Length2D() / dir.Length());
                 dir.Copy(dir.Normalized3() * 100.0f);
                 if (dir.z < 0.0f)
                     pitch = pitch * -1.0f;
@@ -1017,7 +1356,167 @@ int Bs006_Update(int index)
             FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
-    // STAGE: state 8, pseudo.c lines 4611-4975
+    else if (st.state == 8)
+    {
+        // The stamping turn: on the first frame it picks the left (motion 0x16) or the right (0x17, from frame 1000)
+        // stamp, mostly towards the side the player is on. While the motion runs, the toe (node 16 on the left,
+        // 17 on the right) throws shock rings, sparks, a flash and dust along the line it moved on, and the state
+        // ends when the motion reaches its last frame.
+        st.frames++;
+        if (st.frames == 1)
+        {
+            float turn = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI - (model.heading + BS006_PI);
+            while (turn > BS006_PI)
+                turn -= BS006_TWO_PI;
+            while (turn < -BS006_PI)
+                turn += BS006_TWO_PI;
+            if (FUN_1013f880() % 100 < 10)
+            {
+                if (FUN_1013f880() % 2 != 0)
+                    motion = 0x16;
+                else
+                {
+                    st.frames = 1000;
+                    motion = 0x17;
+                }
+            }
+            else if (0.0f <= turn)
+                motion = 0x16;
+            else
+            {
+                st.frames = 1000;
+                motion = 0x17;
+            }
+            restart = 1;
+            FUN_10065b10(index, 0x191, 1, 0);
+        }
+        else if (st.frames < 1000)
+        {
+            if (Bs006Node(index, BS006_NODE_LEFT_TOE_B) != 0)
+            {
+                if (model.motionFrame > 0x259 && model.motionFrame < 0x26b)
+                {
+                    Vec4 spot;
+                    Matrix4 pose;
+                    EffectOptions options;
+                    options.flags |= 2;
+                    options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+                    options.m_0000 = 0;
+                    options.m_000e = 5;
+                    options.m_0008 = 1.0f;
+                    spot.Copy(Bs006Node(index, BS006_NODE_LEFT_TOE_B)->worldMatrix.GetTranslation() - DAT_10802bf8[index + 1].position);
+                    float yaw = FUN_10001f80(spot.x, spot.y) + BS006_PI;
+                    float pitch = FUN_10001f60(spot.Length2D() / spot.Length());
+                    spot.Normalized3();
+                    spot.Copy(spot * 100.0f);
+                    if (spot.z < 0.0f)
+                        pitch = pitch * -1.0f;
+                    pose = RotationX(pitch) * RotationZ(yaw);
+                    pose.SetTranslation(Bs006Node(index, BS006_NODE_LEFT_TOE_B)->worldMatrix.GetTranslation() + spot);
+                    float zero = 0.0f;
+                    spot.Fill(zero);
+                    if (st.frames % 2 != 0)
+                    {
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_RING, spot, -1, -1, 0, 0, 0, &pose, &options);
+                        pose = RotationX(BS006_QUARTER_TURN) * pose;
+                        pose.SetTranslation(pose.GetTranslation() - spot * 0.5f);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, spot, -1, -1, 0, 0, 0, &pose, &options);
+                        pose.SetTranslation(pose.GetTranslation() - spot);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, spot, -1, -1, 0, 0, 0, &pose, &options);
+                    }
+                    pose.SetIdentity();
+                    pose.SetTranslation(Bs006Node(index, BS006_NODE_LEFT_TOE_B)->worldMatrix.GetTranslation());
+                    FUN_1001d8b0(index, BS006_EFFECT_SHOCK_FLASH, spot, -1, -1, 0, 0, 0, &pose, &options);
+                    if (model.motionFrame < 0x266)
+                    {
+                        options.flags |= 2;
+                        pose = RotationX((float)(FUN_1013f880() % 0x1e) * BS006_PI / 180.0f + BS006_ROOM_TURN) *
+                               RotationZ(-model.heading);
+                        pose.SetTranslation(Bs006Node(index, BS006_NODE_LEFT_TOE_B)->worldMatrix.GetTranslation());
+                        pose._43 = (float)(FUN_1013f880() % 0x1e);
+                        if (st.frames % 2 != 0)
+                        {
+                            DAT_10daaa80.Start(BS006_EFFECT_TOE_DUST, spot, -1, -1, 0, 0, 0, &pose, &options, 0);
+                            DAT_10daaa80.Start(BS006_EFFECT_TOE_DUST, spot, -1, -1, 0, 0, 0, &pose, &options, 0);
+                        }
+                        if (st.frames % 3 == 0)
+                        {
+                            pose = RotationX(-2.0944f) * RotationZ(-model.heading);
+                            pose.SetTranslation(Bs006Node(index, BS006_NODE_LEFT_TOE_B)->worldMatrix.GetTranslation());
+                            pose._43 = (float)(FUN_1013f880() % 0x1e);
+                            DAT_10daaa80.Start(BS006_EFFECT_TOE_RING, spot, -1, -1, 0, 0, 0, &pose, &options, 0);
+                        }
+                    }
+                }
+                DAT_10802bf8[index + 1].position.Copy(Bs006Node(index, BS006_NODE_LEFT_TOE_B)->worldMatrix.GetTranslation());
+            }
+            if (model.motionFrame == 0x271)
+                st.state = BS006_STATE_PICK;
+        }
+        else
+        {
+            if (Bs006Node(index, BS006_NODE_RIGHT_TOE_B) != 0)
+            {
+                if (model.motionFrame > 0x273 && model.motionFrame < 0x285)
+                {
+                    Vec4 spot;
+                    Matrix4 pose;
+                    EffectOptions options;
+                    options.flags |= 2;
+                    options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+                    options.m_0000 = 0;
+                    options.m_000e = 5;
+                    options.m_0008 = 1.0f;
+                    spot.Copy(Bs006Node(index, BS006_NODE_RIGHT_TOE_B)->worldMatrix.GetTranslation() - DAT_10802bf8[index + 1].step);
+                    float yaw = FUN_10001f80(spot.x, spot.y) + BS006_PI;
+                    float pitch = FUN_10001f60(spot.Length2D() / spot.Length());
+                    spot.Normalized3();
+                    spot.Copy(spot * 100.0f);
+                    if (spot.z < 0.0f)
+                        pitch = pitch * -1.0f;
+                    pose = RotationX(pitch) * RotationZ(yaw);
+                    pose.SetTranslation(Bs006Node(index, BS006_NODE_RIGHT_TOE_B)->worldMatrix.GetTranslation() + spot);
+                    float zero = 0.0f;
+                    spot.Fill(zero);
+                    if (st.frames % 2 != 0)
+                    {
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_RING, spot, -1, -1, 0, 0, 0, &pose, &options);
+                        pose = RotationX(BS006_QUARTER_TURN) * pose;
+                        pose.SetTranslation(pose.GetTranslation() - spot * 0.5f);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, spot, -1, -1, 0, 0, 0, &pose, &options);
+                        pose.SetTranslation(pose.GetTranslation() - spot);
+                        FUN_1001d8b0(index, BS006_EFFECT_SHOCK_SPARK, spot, -1, -1, 0, 0, 0, &pose, &options);
+                    }
+                    pose.SetIdentity();
+                    pose.SetTranslation(Bs006Node(index, BS006_NODE_RIGHT_TOE_B)->worldMatrix.GetTranslation());
+                    FUN_1001d8b0(index, BS006_EFFECT_SHOCK_FLASH, spot, -1, -1, 0, 0, 0, &pose, &options);
+                    if (model.motionFrame < 0x280)
+                    {
+                        options.flags |= 2;
+                        pose = RotationX((float)(FUN_1013f880() % 0x1e) * BS006_PI / 180.0f + BS006_ROOM_TURN) *
+                               RotationZ(-model.heading);
+                        pose.SetTranslation(Bs006Node(index, BS006_NODE_RIGHT_TOE_B)->worldMatrix.GetTranslation());
+                        pose._43 = (float)(FUN_1013f880() % 0x1e);
+                        if (st.frames % 2 != 0)
+                        {
+                            DAT_10daaa80.Start(BS006_EFFECT_TOE_DUST, spot, -1, -1, 0, 0, 0, &pose, &options, 0);
+                            DAT_10daaa80.Start(BS006_EFFECT_TOE_DUST, spot, -1, -1, 0, 0, 0, &pose, &options, 0);
+                        }
+                        if (st.frames % 3 == 0)
+                        {
+                            pose = RotationX(-2.0944f) * RotationZ(-model.heading);
+                            pose.SetTranslation(Bs006Node(index, BS006_NODE_RIGHT_TOE_B)->worldMatrix.GetTranslation());
+                            pose._43 = (float)(FUN_1013f880() % 0x1e);
+                            DAT_10daaa80.Start(BS006_EFFECT_TOE_RING, spot, -1, -1, 0, 0, 0, &pose, &options, 0);
+                        }
+                    }
+                }
+                DAT_10802bf8[index + 1].step.Copy(Bs006Node(index, BS006_NODE_RIGHT_TOE_B)->worldMatrix.GetTranslation());
+            }
+            if (model.motionFrame == 0x28a)
+                st.state = BS006_STATE_PICK;
+        }
+    }
     else if (st.state == 9)
     {
         // The jump: a burst from the chest, a short wait, then a leap (the vector in DAT_10802bf8[index].position is
@@ -1072,7 +1571,7 @@ int Bs006_Update(int index)
                 DAT_10802bf8[index].position.RotateZ(-model.heading);
                 FUN_10065b10(index, 0x29e, 1, 0);
             }
-            model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+            model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
             FUN_1001bfb0(index, BS006_JUMP_TURN);
         }
         else if (st.frames < 2000)
@@ -1189,7 +1688,7 @@ int Bs006_Update(int index)
                 model.mode = 0;
                 moveMode = BS006_MOVE_ADD;
                 move.z = 80.0f;
-                model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
                 FUN_1001bfb0(index, BS006_RISE_TURN);
                 DAT_10802bf8[index].position.Copy(move);
             }
@@ -1231,12 +1730,12 @@ int Bs006_Update(int index)
             motion = 0xe;
             move.z = 80.0f;
             moveMode = BS006_MOVE_ADD;
-            model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+            model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
             FUN_1001bfb0(index, BS006_RISE_TURN);
             if (ownPos.z > 2000.0f)
             {
                 st.frames = 2000;
-                model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
                 Vec4 soundPos;
                 soundPos.Copy(ownPos);
                 soundPos.z = 300.0f;
@@ -1255,7 +1754,7 @@ int Bs006_Update(int index)
         {
             model.mode = 1;
             if (ownPos.z >= 1500.0f || model.motion->layer == 0x13 || model.motion->nextLayer == 0x13)
-                model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
             else
             {
                 motion = 0x13;
@@ -1341,7 +1840,7 @@ int Bs006_Update(int index)
                     model.mode = 0;
                     moveMode = BS006_MOVE_ADD;
                     move.z = 80.0f;
-                    model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                    model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
                     FUN_1001bfb0(index, BS006_RISE_TURN);
                     DAT_10802bf8[index].position.Copy(move);
                 }
@@ -1357,12 +1856,12 @@ int Bs006_Update(int index)
                 motion = 0xe;
                 move.z = 80.0f;
                 moveMode = BS006_MOVE_ADD;
-                model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
                 FUN_1001bfb0(index, BS006_RISE_TURN);
                 if (ownPos.z > 2000.0f)
                 {
                     st.frames = 2000;
-                    float heading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                    float heading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
                     model.targetHeading = heading;
                     model.heading = heading;
                 }
@@ -1497,7 +1996,7 @@ int Bs006_Update(int index)
                     ownPos.y = 0.0f;
                     move.Copy(ownPos);
                     moveMode = BS006_MOVE_PLACE;
-                    model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                    model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
                     Vec4 soundPos;
                     soundPos.Copy(ownPos);
                     soundPos.z = 300.0f;
@@ -1508,7 +2007,7 @@ int Bs006_Update(int index)
             {
                 model.mode = 1;
                 if (ownPos.z >= 1500.0f || model.motion->layer == 0x13 || model.motion->nextLayer == 0x13)
-                    model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                    model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
                 else
                 {
                     motion = 0x13;
@@ -1556,7 +2055,7 @@ int Bs006_Update(int index)
         motion = 0x1c;
         if (st.frames == 1)
             restart = 1;
-        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
         FUN_1001bfb0(index, BS006_TURN_QUICK);
         if (model.motionFrame == BS006_ROAR_SHAKE_FRAME)
             st.impact = 2;
@@ -1573,7 +2072,7 @@ int Bs006_Update(int index)
         st.frames++;
         blendFrames = 15;
         Vec4 reach;
-        float aimAngle = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        float aimAngle = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
         model.targetHeading = aimAngle;
         float turn = aimAngle - model.heading;
         while (turn > BS006_PI)
@@ -1596,13 +2095,13 @@ int Bs006_Update(int index)
                 eyeSpot.Copy(Bs006Bone(BS006_BONE_EYE)->worldMatrix.GetTranslation());
                 line.Copy(targetSpot - eyeSpot);
                 if (targetSpot.z <= eyeSpot.z)
-                    pose = RotationX(-acosf(line.Length2D() / line.Length())) * RotationZ(atan2f(line.x, line.y) + BS006_PI);
+                    pose = RotationX(-FUN_10001f60(line.Length2D() / line.Length())) * RotationZ(FUN_10001f80(line.x, line.y) + BS006_PI);
                 else
-                    pose = RotationX(acosf(line.Length2D() / line.Length())) * RotationZ(atan2f(line.x, line.y) + BS006_PI);
+                    pose = RotationX(FUN_10001f60(line.Length2D() / line.Length())) * RotationZ(FUN_10001f80(line.x, line.y) + BS006_PI);
                 pose.SetTranslation(eyeSpot);
                 options.m_0000 = 0;
                 options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
-                float aim = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI - model.heading;
+                float aim = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI - model.heading;
                 while (aim > BS006_PI)
                     aim -= BS006_TWO_PI;
                 while (aim < -BS006_PI)
@@ -1671,7 +2170,7 @@ int Bs006_Update(int index)
         motion = 5;
         if (st.frames == 0)
             st.frames = 1;
-        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
         FUN_1001bfb0(index, BS006_TURN_SLOW);
         if (DAT_102550e0[index] != 0)
             st.frames = 10;
@@ -1772,7 +2271,49 @@ int Bs006_Update(int index)
                 st.state = BS006_STATE_PICK;
         }
     }
-    // STAGE: state 0xcb, pseudo.c lines 4558-4610
+    else if (st.state == 0xcb)
+    {
+        // The fire rain: it raises its head until frame 0xb8, then holds the pose while fire shots fall around it
+        // (one every 22 frames, from the jaw's height) until a roll that grows with the wait lets it finish at
+        // motion frame 199.
+        st.frames++;
+        if (st.frames < 1000)
+        {
+            motion = 6;
+            if (model.motionFrame == 0xb8)
+                st.frames = 1000;
+        }
+        else if (st.frames < 2000)
+        {
+            motion = 7;
+            if (model.motionFrame == 0xbd && FUN_1013f880() % 1000 < st.frames - 1000)
+                st.frames = 2000;
+            if (st.frames % 0x16 == 0 && Bs006Node(index, BS006_NODE_JAW) != 0)
+            {
+                Matrix4 pose;
+                EffectOptions options;
+                Vec4 spot;
+                options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+                options.m_0008 = 0.7f;
+                pose.SetIdentity();
+                pose.SetTranslation(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation());
+                int shotChar;
+                int shotSlot;
+                if (FUN_1001c410(3, &pose, &shotChar, &shotSlot, 402.0f,
+                                 (float)(FUN_1013f880() % 0x28 - 0x14) * BS006_PI / 180.0f + model.heading,
+                                 (float)(FUN_1013f880() % 0x32) + 10.0f, 0) != 0)
+                    DAT_10daaa80.Start(BS006_EFFECT_RAIN_SHOT, spot, -1, -1, &DAT_10868838[shotChar][shotSlot], 0, 0, &pose,
+                                       &options, 0);
+                FUN_10065b10(index, 0x30c, 1, 0);
+            }
+        }
+        else if (st.frames < 3000)
+        {
+            motion = 9;
+            if (model.motionFrame == 199)
+                st.state = BS006_STATE_PICK;
+        }
+    }
     else if (st.state == 0xcc)
     {
         // The scream: the screen darkens while it roars and fire rains from above, then it spits rings and sparks
@@ -1851,8 +2392,8 @@ int Bs006_Update(int index)
                         // The jaw: a ring and two sparks along its motion since the last frame.
                         dir.Copy(Bs006Node(index, BS006_NODE_JAW)->worldMatrix.GetTranslation() -
                                  DAT_10802bf8[index + 1].position);
-                        float yaw = atan2f(dir.x, dir.y) + BS006_PI;
-                        float pitch = acosf(dir.Length2D() / dir.Length());
+                        float yaw = FUN_10001f80(dir.x, dir.y) + BS006_PI;
+                        float pitch = FUN_10001f60(dir.Length2D() / dir.Length());
                         dir.Copy(dir.Normalized3() * 100.0f);
                         if (dir.z < 0.0f)
                             pitch = pitch * -1.0f;
@@ -1870,8 +2411,8 @@ int Bs006_Update(int index)
                         // The right hand (its ring sits at the jaw like the first).
                         dir.Copy(Bs006Node(index, BS006_NODE_RIGHT_FINGER)->worldMatrix.GetTranslation() -
                                  DAT_10802bf8[index + 1].step);
-                        yaw = atan2f(dir.x, dir.y) + BS006_PI;
-                        pitch = acosf(dir.Length2D() / dir.Length());
+                        yaw = FUN_10001f80(dir.x, dir.y) + BS006_PI;
+                        pitch = FUN_10001f60(dir.Length2D() / dir.Length());
                         dir.Copy(dir.Normalized3() * 100.0f);
                         if (dir.z < 0.0f)
                             pitch = pitch * -1.0f;
@@ -1889,8 +2430,8 @@ int Bs006_Update(int index)
                         // The left hand.
                         dir.Copy(Bs006Node(index, BS006_NODE_LEFT_FINGER)->worldMatrix.GetTranslation() -
                                  DAT_10802bf8[index + 1].history2);
-                        yaw = atan2f(dir.x, dir.y) + BS006_PI;
-                        pitch = acosf(dir.Length2D() / dir.Length());
+                        yaw = FUN_10001f80(dir.x, dir.y) + BS006_PI;
+                        pitch = FUN_10001f60(dir.Length2D() / dir.Length());
                         dir.Copy(dir.Normalized3() * 100.0f);
                         if (dir.z < 0.0f)
                             pitch = pitch * -1.0f;
@@ -1930,14 +2471,14 @@ int Bs006_Update(int index)
             move.RotateZ(-model.heading);
             if (model.motionFrame < 0xcd && model.motionFrame > 0xca)
             {
-                model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+                model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
                 FUN_1001bfb0(index, BS006_RISE_TURN);
             }
             else
                 model.targetHeading = model.heading;
             if (model.motionFrame > 0xcd && model.motionFrame < 0xe1)
             {
-                model.targetHeading = atan2f(move.x, move.y) + BS006_PI;
+                model.targetHeading = FUN_10001f80(move.x, move.y) + BS006_PI;
                 move.z = -0.5f;
                 if (model.motionFrame <= 0xd6)
                     move.z = 0.5f;
@@ -1967,13 +2508,27 @@ int Bs006_Update(int index)
             }
         }
     }
-    // STAGE: state 0xcd, pseudo.c lines 4541-4557
+    else if (st.state == 0xcd)
+    {
+        // The stagger recovery: it faces the player (turning slowly) while the motion plays; the ground shake stops
+        // at frame 0x80 and the state ends at frame 0x79 of the next motion.
+        motion = 0x20;
+        model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        FUN_1001bfb0(index, BS006_TURN_SLOW);
+        if (model.motionFrame == 0x80)
+            st.impact = 0;
+        if (model.motionFrame == 0x79)
+        {
+            st.state = BS006_STATE_PICK;
+            st.impact = 0;
+        }
+    }
     else if (st.state == 0x12d)
     {
         // The long stand: it faces the player (turning slowly) until a roll that grows with the wait ends the state.
         st.frames++;
         motion = 0x1d;
-        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
         FUN_1001bfb0(index, BS006_TURN_SLOW);
         if (DAT_102550e0[index] != 0)
             st.frames = 10000;
@@ -1990,7 +2545,7 @@ int Bs006_Update(int index)
             restart = 1;
             blendFrames = 10;
         }
-        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
         FUN_1001bfb0(index, BS006_TURN_QUICK);
         if (model.motionFrame == 0x395)
             st.impact = 0;
@@ -2000,14 +2555,70 @@ int Bs006_Update(int index)
             st.impact = 0;
         }
     }
-    // STAGE: state 0x12f, pseudo.c lines 4428-4540
+    else if (st.state == 0x12f)
+    {
+        // The long stand with knee fire: it faces the player (turning slowly) until a roll that grows with the wait
+        // ends the state; meanwhile a shot leaves one knee pad every 15 frames (25 once the flame flag is 1), the
+        // sides alternating, at a random angle up to 90 degrees.
+        st.frames++;
+        motion = 0x1d;
+        model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        FUN_1001bfb0(index, BS006_TURN_SLOW);
+        if (st.frames > 0x5a && FUN_1013f880() % 10000 < st.frames)
+            st.state = BS006_STATE_PICK;
+        if ((DAT_10874848.TestScriptFlag(BS006_FLAME_FLAG) != 1 && st.frames % 0xf == 0) ||
+            (DAT_10874848.TestScriptFlag(BS006_FLAME_FLAG) == 1 && st.frames % 0x19 == 0))
+        {
+            Matrix4 pose;
+            Vec4 spot;
+            EffectOptions options;
+            spot.Copy(ownPos);
+            pose.SetIdentity();
+            if ((DAT_10874848.TestScriptFlag(BS006_FLAME_FLAG) != 1 && st.frames / 0xf % 2 != 0) ||
+                (DAT_10874848.TestScriptFlag(BS006_FLAME_FLAG) == 1 && st.frames / 0x19 % 2 != 0))
+            {
+                if (Bs006Node(index, BS006_NODE_RIGHT_KNEEPAD_NULL) != 0)
+                {
+                    spot.Copy(Bs006Node(index, BS006_NODE_RIGHT_KNEEPAD_NULL)->worldMatrix.GetTranslation());
+                    pose = RotationZ((float)(FUN_1013f880() % 0x5a) * BS006_PI / 180.0f) *
+                           Bs006Node(index, BS006_NODE_RIGHT_KNEEPAD_NULL)->parent->worldMatrix;
+                }
+            }
+            else if (Bs006Node(index, BS006_NODE_LEFT_KNEEPAD_NULL) != 0)
+            {
+                spot.Copy(Bs006Node(index, BS006_NODE_LEFT_KNEEPAD_NULL)->worldMatrix.GetTranslation());
+                pose = RotationZ((float)(FUN_1013f880() % 0x5a) * -BS006_PI / 180.0f) *
+                       Bs006Node(index, BS006_NODE_LEFT_KNEEPAD_NULL)->parent->worldMatrix;
+            }
+            pose.SetTranslation(spot);
+            float zeroA = 0.0f;
+            spot.Fill(zeroA);
+            spot.y = 100.0f;
+            FUN_1001c510(&spot, &pose);
+            pose.SetTranslation(spot);
+            float zeroB = 0.0f;
+            spot.Fill(zeroB);
+            options.m_0000 = 0;
+            options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+            options.m_0008 = 1.3f;
+            options.owner = index + BS006_EFFECT_OWNER_BASE;
+            float zeroC = 0.0f;
+            spot.Fill(zeroC);
+            int shotChar;
+            int shotSlot;
+            if (FUN_1001c410(1, &pose, &shotChar, &shotSlot, -20.0f, 25.0f, 0.0f, 0.0f) != 0)
+                FUN_1001d8b0(index, BS006_EFFECT_KNEE_SHOT, spot, -1, -1, &DAT_10868838[shotChar][shotSlot], 0, 0, &pose,
+                             &options);
+            FUN_10065b10(index, 0x29f, 1, 0);
+        }
+    }
     else if (st.state == 0x130)
     {
         // The knee shots: it stands facing the player; every 7 frames after the first 30 a shot leaves each knee pad
         // (the first one on the left, then the right), the angle sweeping with the frame count.
         st.frames++;
         motion = 0x1d;
-        model.targetHeading = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
+        model.targetHeading = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI;
         FUN_1001bfb0(index, BS006_TURN_SLOW);
         if (st.frames > 0x3c)
             st.state = BS006_STATE_PICK;
@@ -2083,7 +2694,7 @@ int Bs006_Update(int index)
         {
             Vec4 toPlayer;
             toPlayer.Copy(playerPos - ownPos);
-            float turn = atan2f(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI - model.heading;
+            float turn = FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS006_PI - model.heading;
             while (turn > BS006_PI)
                 turn -= BS006_TWO_PI;
             while (turn < -BS006_PI)

@@ -62,7 +62,7 @@ int AnimModel::CloneModel(AnimModel *source, int unused)
     m_025c = FUN_1013f880() % M_025C_RANGE;
     m_0240 = 0;
     m_2408.Fill(0.0f);
-    m_0268 = 0;
+    pullTarget = 0;
     speedScale = 1.0f;
     shadowHidden = 0;
     m_231c = 0;
@@ -99,7 +99,7 @@ int AnimModel::CloneModel(AnimModel *source, int unused)
     m_17e8 = 0;
     m_0266 = 0;
     mode = 1;
-    m_0268 = 0;
+    pullTarget = 0;
     m_2288 = 0;
     alpha = 1.0f;
     m_02a0 = 0;
@@ -262,7 +262,7 @@ int AnimModel::LoadFile(const char *path)
     m_022c.Fill(0.0f);
     m_0076 = 0;
     m_0240 = 0;
-    m_0268 = 0;
+    pullTarget = 0;
     speedScale = 1.0f;
     shadowHidden = 0;
     m_231c = 0;
@@ -305,7 +305,7 @@ int AnimModel::LoadFile(const char *path)
     m_17e8 = 0;
     m_0266 = 0;
     mode = 1;
-    m_0268 = 0;
+    pullTarget = 0;
     m_2288 = 0;
     alpha = 1.0f;
     m_02a0 = 0;

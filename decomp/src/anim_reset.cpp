@@ -42,8 +42,8 @@ int AnimModel::ResetState()
     important = 0;
     m_0266 = 0;
     m_0267 = 0;
-    m_0268 = 0;
-    m_026c = 0;
+    pullTarget = 0;
+    pullFrames = 0;
     bankIndex = 0;
     m_0274 = 0;
     m_0278 = 0;
@@ -130,7 +130,7 @@ int AnimModel::ResetState()
     m_02a2 = 0;
     m_17e8 = 0;
     m_0266 = 0;
-    m_0268 = 0;
+    pullTarget = 0;
     m_2288 = 0;
     alpha = 1.0f;
     m_02a0 = 0;

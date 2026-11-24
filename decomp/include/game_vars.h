@@ -61,7 +61,7 @@ extern "C" int DAT_102199b0;
 extern "C" char DAT_10219bc0[];                           // the message shown
 extern "C" char DAT_1021a360;
 extern "C" Node *DAT_1021b548[0x20];                       // nodes attached to a parent (each removed from DAT_10467e20[i] on reset)
-extern "C" int DAT_1021b5c8[0x18];
+extern "C" char DAT_1021b5c8[0x60];
 extern "C" int DAT_1021bbf0;
 extern "C" int DAT_1021bbf4;
 extern "C" char DAT_1021f640[0x80];                      // event slots: in-use flags
@@ -69,7 +69,7 @@ extern "C" int DAT_1021fb40;
 extern "C" int DAT_1021fb44;
 extern "C" char DAT_10223a50;
 extern "C" char DAT_10223a58[0x400];
-extern "C" int DAT_10253f18[0x18];
+extern "C" char DAT_10253f18[0x60];
 extern "C" int DAT_10254088;
 extern "C" unsigned char DAT_10254310[0x80];               // per character slot: Enemy_HopAndStrafe sets its own to 1
 extern "C" int DAT_10254590;

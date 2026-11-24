@@ -7,17 +7,23 @@
 #include "item_caption.h"
 
 struct Node;
+struct AnimModel;   // anim_model.h
 
 struct GimmickSlot : Latch
 {
-    char pad_0018[0xc];
+    int m_0018;
+    char pad_001c[8];
     char modelName[0x40];         // 0x24
     char motionOn[0x20];          // 0x64: colour plug motion played when the gimmick is switched on
     char motionOff[0x20];         // 0x84: colour plug motion played when it is switched off
     char pad_00a4[0x40];
     char pad_00e4[0x10];          // 0xe4: position
     Node *node;                   // 0xf4: the gimmick's model (0 = none)
-    int active;                   // 0xf8
+    union
+    {
+        int active;               // 0xf8
+        AnimModel *owner;         // 0xf8: the character model of a lever or chest (map triggers)
+    };
 };
 
 extern "C" GimmickSlot DAT_10860cec[0x41];

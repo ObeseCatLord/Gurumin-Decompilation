@@ -603,7 +603,7 @@ _Enemy_IsBusy	100e1c40
 ?DrawLightKind7@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	101713f0
 ?DrawLightKind23@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	10170580
 ?UpdateFrame@AnimModel@@QAEHPAUMatrix4@@HHH0@Z	1017a010
-?M_10175f20@AnimModel@@QAEHMMMHH@Z	10175f20
+?MoveWithCollisions@AnimModel@@QAEHMMMHH@Z	10175f20
 ?ApplyOperator@ListBank@@QAEHPBD@Z	10004b10
 ?Scene_RunCommand@@YAHHHPBD@Z	10083eb0
 ?ShopMenu_Draw@@YAXXZ	10056b30
@@ -668,3 +668,5 @@ _Enemy_IsBusy	100e1c40
 ?Hud_DrawFrame@@YAHXZ	1008c680
 ?Field_Update@@YAHXZ	1011a060
 ?Scene_Frame@@YAHXZ	100f5a80
+?NameEntry_Update@@YAHXZ	10116550
+?Map_SetUpTrigger@@YAHPAUGameTrigger@@@Z	10058790

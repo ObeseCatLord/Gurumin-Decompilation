@@ -99,10 +99,11 @@ struct AnimModel
     char mapTested;           // 0x11: 0 until the first map test of LiftProbes, then 1
     char m_0012;              // 0x12: set to 2 every frame by many characters (Enemy_FlyAndStrafe)
     char m_0013;
-    char pad_0014[4];
+    char hitSolid;            // 0x14: 1 when the probe MoveWithCollisions settled on was not blocked by a camera node
+    char pad_0015[3];
     Matrix4 m_0018;
     Vec4 m_0058;
-    int m_0068;
+    float m_0068;             // 0x68: -1000.0 on objects set up by a map trigger (FLOAT, LIFT, BUTTON...)
     char m_006c;
     char pad_006d[3];
     union
@@ -159,8 +160,8 @@ struct AnimModel
     char important;           // 0x265: motion changes are flagged important (DAT_11b04508); set by Enemy_ShoveAndBlast
     char m_0266;
     char m_0267;              // 0x267: 1 while an NPC idles; set every frame by the kind updates
-    int m_0268;
-    int m_026c;
+    Vec4 *pullTarget;         // 0x268: position the model is drawn towards while pullFrames last (0 = none; MoveWithCollisions)
+    int pullFrames;           // 0x26c: frames left of the pull towards pullTarget
     // 0x270-0x290: values whose meaning depends on the character's kind (each struct names one kind's use).
     union
     {
@@ -197,7 +198,7 @@ struct AnimModel
         };
     };
     int m_0280;               // 0x280: 0 or 1 while the character has not been defeated or moved on
-    char pad_0284[4];
+    int m_0284;               // 0x284: set to a random number below 1000 by the "PCON" trigger
     int m_0288;               // 0x288: set to 6 when destroyed
     int m_028c;               // 0x28c: cleared when destroyed
     float m_0290;             // 0x290: set to a count by LiftProbes on the model it collided with
@@ -370,10 +371,10 @@ struct AnimModel
     int CloneModel(AnimModel *source, int unused);                 // 0x1017b210 (anim_clone.cpp)
     int LoadFile(const char *path);                                // 0x1017b9b0 (anim_clone.cpp)
     // 0x1017a010 (anim_model_step.cpp): the per-frame update of a model: advances its motion, fades the shadow,
-    // plays footsteps, moves it by its pending movement (collision tested by M_10175f20), turns it towards its target
+    // plays footsteps, moves it by its pending movement (collision tested by MoveWithCollisions), turns it towards its target
     // heading and refreshes its node tree under `view`; see the definition.
     int UpdateFrame(Matrix4 *view, int withView, int force, int frame, Matrix4 *reference);
-    int M_10175f20(float x, float y, float z, int a, int b);       // 0x10175f20: moves by (x, y, z) against the collisions
+    int MoveWithCollisions(float x, float y, float z, int wantHitOther, int unused);  // 0x10175f20 (anim_move.cpp): moves by (x, y, z) against the collisions
     int SetDropCollider(Node *collider);                           // 0x10163e70: sets dropCollider (the same code as ModelObject::M_10163e70)
 };
 

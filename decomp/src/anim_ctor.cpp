@@ -16,7 +16,7 @@ AnimModel::AnimModel()
 {
     uniformScale = 1.0f;
     speedScale = 1.0f;
-    m_0268 = 0;
+    pullTarget = 0;
     motion = 0;
     shadowHidden = 0;
     m_231c = 0;

@@ -48,7 +48,7 @@
 // pushes take effect, plays a footstep when a toe touches down, animates the colours of the wobbling model and
 // decides whether the model is on screen under `view`. The heading eases towards targetHeading by the shortest way
 // round. When the model is visible (or `force`) it then adds up its pending moves (move, velocity, the push m_228c,
-// m_23c8, m_23d8), tests the move against the collisions (M_10175f20), settles the vertical speed, and refreshes
+// m_23c8, m_23d8), tests the move against the collisions (MoveWithCollisions), settles the vertical speed, and refreshes
 // the world matrices of its node tree with `frame` as the motion frame: root->UpdateWorld, or
 // root->StartProximityPass under `view` and `reference` when `withView` is set; a held model is turned about its
 // hold point and a spun one about y first. Returns 1 when it ran to the end (also when the model was not
@@ -254,7 +254,7 @@ int AnimModel::UpdateFrame(Matrix4 *view, int withView, int force, int frame, Ma
             }
         }
         stepZ = move.z * MOVE_SHARE + m_228c.z + verticalSpeed + m_23d8.z + m_23c8.z;
-        if (m_2384 != 0 && M_10175f20(stepX, stepY, stepZ, 1, 0) != 0)
+        if (m_2384 != 0 && MoveWithCollisions(stepX, stepY, stepZ, 1, 0) != 0)
         {
             if (m_0074 != 0)
             {

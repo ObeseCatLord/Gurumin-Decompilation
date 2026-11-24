@@ -50,7 +50,7 @@ extern "C" int FUN_1000e750(void);
 extern "C" int Game_LoadData(void);
 int TitleScreen_Update();                    // 0x10114950 (title_screen.cpp)
 extern "C" void FUN_1011d810(void);
-extern "C" void FUN_10116550(void);
+#include "name_entry.h"
 #include "field_update.h"
 extern "C" int FUN_1013f070(int command, int value, int extra);
 extern "C" int FUN_101439e0(void);
@@ -160,7 +160,7 @@ extern "C" int FUN_10137b10(void)
         else if (DAT_104bf8c0 == MODE_5)
             ItemDictionary_Update();
         else if (DAT_104bf8c0 == MODE_10)
-            FUN_10116550();
+            NameEntry_Update();
         else if (DAT_104bf8c0 == MODE_15)
             Field_Update();
     }

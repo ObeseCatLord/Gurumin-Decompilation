@@ -362,3 +362,96 @@ extern "C" int SoundEngine_PlayMovingEffect(const char *path, const float *x, co
     LeaveCriticalSection(&g_soundEffectLock);
     return -1;
 }
+
+// Lines per source in the mixer volume cache index.
+const int SOUND_MIXER_LINES = 64;
+// Line numbers the volume sliders are looked up for.
+const int SOUND_MIXER_LINE_A = 5;
+const int SOUND_MIXER_LINE_B = 6;
+// Mixer control id of a slider that does not exist.
+const DWORD SOUND_MIXER_NO_CONTROL = 0xffffffff;
+// Sources that have volume sliders.
+const int SOUND_MIXER_SOURCE_COUNT = 4;
+
+// Reads the Windows mixer volume of a source and line and caches it (a pair is looked up only once, failures cache
+// 0 for the volume). Reopens the mixer handle when it went stale. Returns the volume magnitude, or 0 when the mixer or
+// the control is missing. Not called by the game code that survived in this build.
+extern "C" int SoundEngine_GetMixerVolume(int source, int line)
+{
+    int cacheIndex = source * SOUND_MIXER_LINES + line;
+    if (g_soundMixerCacheValid[cacheIndex] != 0)
+        return g_soundMixerCacheVolume[cacheIndex];
+    g_soundMixerCacheValid[cacheIndex] = 1;
+    if (g_soundMixer != 0)
+    {
+        MIXERCAPS caps;
+        memset(&caps, 0, sizeof(caps));
+        MMRESULT result = mixerGetDevCaps((UINT_PTR)g_soundMixer, &caps, sizeof(caps));
+        if (result == MMSYSERR_INVALHANDLE)
+        {
+            if (mixerOpen(&g_soundMixer, 0, 0, 0, 0) == 0)
+                return g_soundMixerCacheVolume[cacheIndex];
+        }
+        else if (result == MMSYSERR_NOERROR)
+        {
+            MIXERCONTROLDETAILS details;
+            memset(&details, 0, sizeof(details));
+            details.dwControlID = SOUND_MIXER_NO_CONTROL;
+            switch (source)
+            {
+            case 0:
+                if (line != SOUND_MIXER_LINE_A)
+                    return 0;
+                details.dwControlID = g_soundMixerControlSource0;
+                break;
+            case 1:
+                if (line != SOUND_MIXER_LINE_A)
+                    return 0;
+                details.dwControlID = g_soundMixerControlSource1;
+                break;
+            case 2:
+                if (line != SOUND_MIXER_LINE_A)
+                    return 0;
+                details.dwControlID = g_soundMixerControlSource2;
+                break;
+            case 3:
+                switch (line)
+                {
+                case SOUND_MIXER_LINE_A:
+                    details.dwControlID = g_soundMixerControlSource3Line5;
+                    break;
+                case SOUND_MIXER_LINE_B:
+                    details.dwControlID = g_soundMixerControlSource3Line6;
+                    break;
+                default:
+                    return 0;
+                }
+                break;
+            default:
+                return 0;
+            }
+            if (details.dwControlID != SOUND_MIXER_NO_CONTROL)
+            {
+                int raw;
+                EnterCriticalSection(&g_soundStreamLock);
+                details.cbStruct = sizeof(details);
+                details.paDetails = &raw;
+                details.cbDetails = sizeof(raw);
+                details.cChannels = 1;
+                int volume;
+                if (mixerGetControlDetails((HMIXEROBJ)g_soundMixer, &details, MIXER_GETCONTROLDETAILSF_VALUE) == 0)
+                {
+                    volume = raw;
+                    if (raw < 0)
+                        volume = -raw;
+                }
+                else
+                    volume = 0;
+                LeaveCriticalSection(&g_soundStreamLock);
+                g_soundMixerCacheVolume[cacheIndex] = volume;
+                return volume;
+            }
+        }
+    }
+    return 0;
+}

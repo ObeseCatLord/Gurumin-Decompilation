@@ -656,3 +656,28 @@ Plane PlaneFromTriangle(const Vec4 &a, const Vec4 &origin, const Vec4 &b)
     plane.d = -(normal.x * origin.x + normal.y * origin.y + normal.z * origin.z);
     return plane;
 }
+
+// Matrix product this * other for row vectors: element (row, column) is the dot product of row `row` of this with
+// column `column` of other. Used wherever transforms are chained (view * projection, node matrices).
+Matrix4 Matrix4::operator*(const Matrix4 &other) const
+{
+    Matrix4 result;
+    result.m[0] = other.m[0] * m[0] + m[1] * other.m[4] + m[2] * other.m[8] + m[3] * other.m[12];
+    result.m[1] = other.m[1] * m[0] + other.m[5] * m[1] + other.m[9] * m[2] + m[3] * other.m[13];
+    result.m[2] = other.m[2] * m[0] + m[1] * other.m[6] + m[2] * other.m[10] + other.m[14] * m[3];
+    result.m[3] = m[1] * other.m[7] + m[0] * other.m[3] + m[2] * other.m[11] + m[3] * other.m[15];
+    result.m[4] = m[5] * other.m[4] + m[4] * other.m[0] + other.m[8] * m[6] + other.m[12] * m[7];
+    result.m[5] = m[5] * other.m[5] + m[4] * other.m[1] + other.m[9] * m[6] + m[7] * other.m[13];
+    result.m[6] = m[5] * other.m[6] + m[4] * other.m[2] + other.m[10] * m[6] + other.m[14] * m[7];
+    result.m[7] = m[5] * other.m[7] + m[4] * other.m[3] + other.m[11] * m[6] + other.m[15] * m[7];
+    result.m[8] = m[9] * other.m[4] + m[8] * other.m[0] + other.m[8] * m[10] + m[11] * other.m[12];
+    result.m[9] = other.m[1] * m[8] + other.m[5] * m[9] + other.m[9] * m[10] + m[11] * other.m[13];
+    result.m[10] = other.m[6] * m[9] + m[8] * other.m[2] + other.m[10] * m[10] + other.m[14] * m[11];
+    result.m[11] = m[9] * other.m[7] + m[8] * other.m[3] + m[10] * other.m[11] + m[11] * other.m[15];
+    result.m[12] = m[12] * other.m[0] + m[13] * other.m[4] + other.m[8] * m[14] + m[15] * other.m[12];
+    result.m[13] = m[13] * other.m[5] + other.m[1] * m[12] + other.m[9] * m[14] + m[15] * other.m[13];
+    result.m[14] = m[12] * other.m[2] + m[13] * other.m[6] + other.m[10] * m[14] + other.m[14] * m[15];
+    result.m[15] = m[12] * other.m[3] + m[13] * other.m[7] + other.m[11] * m[14] + m[15] * other.m[15];
+    g_matrixProductCount++;
+    return result;
+}

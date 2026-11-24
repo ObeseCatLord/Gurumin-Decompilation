@@ -25,6 +25,7 @@ struct VisData
 };
 
 extern "C" Node *g_mapRootNode;                     // EN 0x00927104 (JP DAT_10255f08): root node of the current map
+extern "C" char g_regionsOnlyEnabled;                  // EN 0x0217faff (JP DAT_11b04514): 1 while a node with visibility cells is drawn: only enabled collision regions are drawn
 extern "C" char g_visibleCells[VIS_CELL_COUNT];     // EN 0x0217fb08 (JP DAT_11afffe8): 1 for each cell currently visible
 
 // 1 when `pos` lies in a currently visible cell (or the map has no visibility data), else 0. EN 0x5a67a0.

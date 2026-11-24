@@ -27,6 +27,8 @@ extern "C" CRITICAL_SECTION g_soundEffectLock;
 
 // Position of the listener, as last set by the game. EN 0x0276b500 (x, y, z).
 extern "C" float g_soundListenerPosition[3];
+// Front vector of the listener, as last set by the game. EN 0x0276b50c (x, y, z).
+extern "C" float g_soundListenerFront[3];
 // Handle of the system mixer used to read the Windows volume controls (0 when closed). EN 0x02973ef0.
 extern "C" HMIXER g_soundMixer;
 // Buffer mode chosen by the game (0, 1 or 2; selects the DirectSound buffer flags). EN 0x0276b520.
@@ -62,6 +64,20 @@ extern "C" int SoundEngine_Init(HWND window);
 // Stops the engine and frees every voice and data block. Returns 1, or 0 when it was not running. EN 0x7c5d10.
 extern "C" int SoundEngine_Release(void);
 
+// Number of (source, line) pairs the mixer volume cache holds: 64 sources of 64 lines.
+const int SOUND_MIXER_CACHE_ENTRIES = 64 * 64;
+// Which mixer volumes were already read: one byte per source * 64 + line. EN 0x02972ef0.
+extern "C" char g_soundMixerCacheValid[SOUND_MIXER_CACHE_ENTRIES];
+// The mixer volumes that were read. EN 0x0296eef0.
+extern "C" int g_soundMixerCacheVolume[SOUND_MIXER_CACHE_ENTRIES];
+// Mixer control ids of the volume sliders, by (source, line); 0xffffffff when the control does not exist.
+extern "C" DWORD g_soundMixerControlSource0;    // EN 0x02974058: source 0, line 5
+extern "C" DWORD g_soundMixerControlSource1;    // EN 0x02974070: source 1, line 5
+extern "C" DWORD g_soundMixerControlSource2;    // EN 0x02974064: source 2, line 5
+extern "C" DWORD g_soundMixerControlSource3Line5;   // EN 0x02973f8c: source 3, line 5
+extern "C" DWORD g_soundMixerControlSource3Line6;   // EN 0x02973ef4: source 3, line 6
+// Reads (and caches) the Windows mixer volume of a source and line; 0 when unavailable. EN 0x7c4760.
+extern "C" int SoundEngine_GetMixerVolume(int source, int line);
 // Closes the system mixer when open. Returns 0. EN 0x7c48e0.
 extern "C" int SoundEngine_CloseMixer(void);
 // Stores the buffer mode and the sound option code split into digits. Returns 1. EN 0x7c5f80.

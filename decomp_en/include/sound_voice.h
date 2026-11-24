@@ -21,6 +21,10 @@ const int SOUND_FADE_MAX_MS = 60000;
 // Fade length of the plain "fade out" command, in milliseconds.
 const int SOUND_FADE_DEFAULT_MS = 1000;
 
+// Listener axis value an all-zero front vector (y) or top vector (z) is replaced by, and the doppler factor.
+const float LISTENER_DEFAULT_AXIS = -1.0f;
+const float LISTENER_DOPPLER_FACTOR = 1.0f;
+
 // Number of music stream voices and of sound effect voices.
 const int SOUND_STREAM_COUNT = 2;
 const int SOUND_EFFECT_COUNT = 24;
@@ -57,13 +61,14 @@ struct SoundSource
     MmioFile file;                  // 0x15c: the sound file (a plain file or a section of an archive)
     unsigned dataSize;              // 0x16c: size of the sound data
     unsigned decodedPosition;       // 0x170: position within the decoded data
-    int m_0174;                     // 0x174: not used by ported code yet
+    int m_0174;                     // 0x174: set once the data size is known (cleared while opening)
     int isFileSource;               // 0x178: non-zero when the data is read straight from the file
     int m_017c;                     // 0x17c: not used by ported code yet
     void *pcmBuffer;                // 0x180: decoded sound data
     int m_0184;                     // 0x184: cleared when a position is set
     int m_0188;                     // 0x188: set when a position is set
-    char m_018c[0x194 - 0x18c];     // 0x18c: not used by ported code yet
+    int isCompressed;               // 0x18c: set when the data is in the compressed layout
+    int compressedParam;            // 0x190: value stored at the start of compressed data (sets its size ratio)
     int dataOffset;                 // 0x194: offset of the data in the file
     int m_0198;                     // 0x198: not used by ported code yet
     int m_019c;                     // 0x19c: not used by ported code yet
@@ -73,6 +78,10 @@ struct SoundSource
     SoundSource();
     // Destructor: frees the decoder and the decoded data, closes the file. EN 0x7be8e0.
     ~SoundSource();
+    // Opens a file in the compressed layout and measures its decoded size. EN 0x7c0550.
+    int OpenCompressed(const char *path);
+    // Copies the next `count` decoded bytes of the sound to `destination` (decoding as needed). EN 0x7c0850.
+    int ReadData(void *destination, unsigned count);
     // Closes the source (decoder and file). EN 0x7be980.
     int CloseSource();
     // Frees the buffers and ACM streams of the decoder. EN 0x7c1230.
@@ -129,10 +138,10 @@ struct SoundVoice : SoundSource
     PCMWAVEFORMAT bufferFormat;     // 0x208: format of the DirectSound buffer (the buffer holds three seconds)
     WaveFileHeader waveHeader;      // 0x218: header of the sound data being played
     unsigned playCursor;            // 0x244: play cursor of the DirectSound buffer at the last update
-    IDirectSound *directSound;      // 0x248: the DirectSound device
-    int ownsDirectSound;            // 0x24c: non-zero when this voice created the device
+    IDirectSound8 *directSound;     // 0x248: the DirectSound device
+    int usesSharedDevice;           // 0x24c: non-zero when the device belongs to another voice (not released here)
     IDirectSoundBuffer *primaryBuffer;   // 0x250
-    int ownsPrimaryBuffer;          // 0x254
+    int usesSharedPrimary;          // 0x254: non-zero when the primary buffer belongs to another voice
     IDirectSoundBuffer *buffer;     // 0x258: the secondary buffer being played
     IDirectSound3DBuffer *buffer3d; // 0x25c
     IDirectSound3DListener *listener;    // 0x260
@@ -162,12 +171,18 @@ struct SoundVoice : SoundSource
     // Sets the 3D position (and optionally velocity) of the voice. EN 0x7c4020.
     int SetPosition(const float *x, const float *y, const float *z, const float *velocityX, const float *velocityY,
                     const float *velocityZ);
+    // Sets the DirectSound cooperative level of the voice's device to exclusive. EN 0x7c3ae0.
+    int SetCooperativeLevel(HWND window);
+    // Places the 3D listener: rolloff factor, position, front vector and top vector. An all-zero front vector
+    // gets y = -1, a zero top z gets -1. Also remembers the position and front vector. EN 0x7c3e60.
+    int SetListener(float rolloff, float x, float y, float z, float frontX, float frontY, float frontZ, float topX,
+                    float topY, float topZ);
     // Pushes the stored position to DirectSound and updates the pan and volume from the listener. EN 0x7c41c0.
     int UpdatePosition();
     // Derives volume and pan of a software-positioned voice from the listener. EN 0x7c42d0.
     int UpdatePanFromListener();
     // Creates (or adopts the given) DirectSound device and primary buffer and sets up the 3D listener. EN 0x7c1ce0.
-    int InitDevice(HWND window, IDirectSound *sharedDevice, IDirectSoundBuffer *sharedPrimary);
+    int InitDevice(HWND window, IDirectSound8 *sharedDevice, IDirectSoundBuffer *sharedPrimary);
     // Starts a sound effect: file, looping flag, position and velocity (pointers to three floats each), a
     // "positioned" flag and the volume. Not ported. EN 0x7c2ac0.
     int PlayEffect(const char *path, int looping, const float *x, const float *y, const float *z, const float *vx,
@@ -178,6 +193,13 @@ struct SoundVoice : SoundSource
     int GetPlayPosition();
     // Starts playing the sound file `path` (looping flag, start sample, loop start and end samples). EN 0x7c25b0.
     int Play(const char *path, int looping, int startSample, int loopStartSample, int loopEndSample);
+    // Fills part of the DirectSound buffer with the next sound data: locks `length` bytes at `offset`, reads (looping
+    // back to the loop start at the end of the data, or padding with silence and stopping at the end of a one-shot
+    // sound) and unlocks. `reserved` is not used. Returns 0 when the lock fails, else 1. EN 0x7c3b00.
+    int FillBuffer(unsigned length, int reserved, unsigned offset);
+    // One update step of a playing voice: advances its fade and refills the third of the buffer the play cursor just
+    // left. Returns 0 when the voice is not playing. EN 0x7c1ef0.
+    int UpdateBuffer();
     // Plays at the master volume at once (no fade). EN 0x7c29e0.
     int PlayAtOnce(const char *path, int looping, int startSample, int loopStartSample, int loopEndSample);
     // Plays with the default one second fade in to the master volume. EN 0x7c2830.

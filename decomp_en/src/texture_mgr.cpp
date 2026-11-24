@@ -2,8 +2,6 @@
 
 #include <d3d9.h>
 
-// Keep out-of-line copies of TriangleBatch::SetBlend, AddQuad and TextureObject::UpdateImage here (see texture_mgr.h).
-#define TEXTURE_MGR_OUT_OF_LINE
 #include "render.h"
 #include "texture_mgr.h"
 
@@ -12,6 +10,13 @@ void TextureManager::UnloadAndShutdown()
 {
     UnloadAllTextures();
     Shutdown();
+}
+
+// Makes the texture the render target at its source image size, shifted by `value`. Called by the shadow texture
+// and effect code.
+int TextureObject::UpdateImage(int value)
+{
+    return BeginRenderTo(sourceWidth, sourceHeight, value);
 }
 
 // Empties the batch and forgets its texture.

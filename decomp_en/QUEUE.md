@@ -5,7 +5,7 @@ Re-run after each batch (finished items drop out). Per function: `python tools/p
 the JP twin's matched source, the EN callees with their JP names and the EN disassembly (`--brief` makes a
 subagent brief). Low-confidence map rows: check the twin before porting.
 
-## 1. Walls to retry (39)
+## 1. Walls to retry (44)
 
 - [ ] `005beb30` — Enemy_BackAwayFromPlayer: 1000 vs 994 bytes, only the move.x/move.y *= speedScale pair differs (original multiplies both then stores y then x); tried x-first, y-first, scale-on-left, float temporaries
 - [ ] `005bf520` — Enemy_TurnToPlayer: 149 diffs; EN keeps a targetHeading store in each clamp branch with a shared tail, ours merges them
@@ -17,13 +17,18 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0063fc10` — Sound_PlayEffect: EN hoists cvtps2pd of the volume to the top; 507 vs 519 bytes
 - [ ] `00643b20` — ListBank::DeclareFunction: 21 diffs; first source copy should reuse the parameter slot, one cmp scheduled earlier
 - [ ] `0064bd10` — Camera_ItemStand: 889 bytes, same length; store scheduling in the sparkle-matrix block (shot-point ints interleaved with matrix stores, z re-read); ~6 spellings
+- [ ] `006b4220` — Npc_FaceAndTalk: matches except edi/esi swapped (original keeps index in edi and index<<6 in esi; ours the reverse), length 1007 vs 998
+- [ ] `006d0f20` — Npc_RunToMarker: 1469 vs 1474 bytes; matches except that the original keeps the shared told-to-react store inside both marker branches (ours hoists it before the test) and stores state 2 after the wake call
 - [ ] `006d5dd0` — Npc_WaitFacingAway: 633 vs 649 bytes, register allocation differs from the prologue
 - [ ] `006d68b0` — Npc_Idle: same length, only the push esi position (original pushes inside the state==1 branch)
+- [ ] `006de0c0` — Enemy_DropInWhenNear: 1111 vs 1119 bytes, same register-pressure wall as Enemy_DropIn (original keeps 20 in esi and spills index*0x249c and the model pointer)
+- [ ] `006de520` — Enemy_DropIn: 1013 vs 1021 bytes; the original keeps 20 in esi and spills index*0x249c and the model pointer to the stack (register pressure in the drop-in state), ours keeps both in registers; tried a model pointer local
 - [ ] `0071c740` — Texture_CreateCopy: 12 diffs; strcpy temp register al/cl swapped, epilogue
 - [ ] `00729610` — ModelBank::DrawLensFlares: ~281 diffs; constant hoisting of 240.0/320.0 around the DrawScreenCopy calls
 - [ ] `00739250` — WorldRenderer::SetModelState: the original reloads this->models after every limit store (ours keeps it in ecx); NodeSaved::limitMin/Max are floats, tried literal and named limits
 - [ ] `0074a050` — Node::MoveToParent: 6 bytes off; operand order of the inline strcpy at the two insertion sites and the edi load order
 - [ ] `00750450` — Node::RemoveChild: 1 diff, the inlined strcpy loop addresses [ecx + ebx - 1] in the original, [ebx + ecx - 1] in ours
+- [ ] `00752190` — Node::DrawShadow: only difference is register choice at the large-caster frame (original loads casterSize into xmm1 and copies it with movaps before the subtraction; ours uses xmm0 and no copy), 3 bytes shorter; two spellings tried
 - [ ] `00754e20` — Node::CylindersOverlap: 8 diffs, dx/dy temporaries live in swapped xmm2/xmm3 registers
 - [ ] `00775320` — View_ContainsPoint: 6 bytes off, one subss placement in the behind-camera branch
 - [ ] `00779300` — Vec4::RotateY: 9 bytes off, xmm2/xmm3 numbering only (RotateX matches with the same form)
@@ -47,7 +52,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007c5a60` — SoundArc_PlayFile: EN keeps the queue index in a byte and recomputes slot*0x1c0 for the tick store; every spelling keeps one pointer
 - [ ] `007c5f80` — SoundEngine_SetOptions: store of the tens digit scheduled after the second division
 
-## 2. JP twin matched: port the JP source (175 functions, 227684 bytes)
+## 2. JP twin matched: port the JP source (158 functions, 210095 bytes)
 
 - [ ] `0071dd90` 16 bytes <- APP.dll `10184160` WorldRenderer::DrawScreenOverlays [decomp/src/world_caption.cpp] (high 0.90)
 - [ ] `006e2110` 53 bytes <- APP.dll `10001fb0` cosf [decomp/src/enemy_flock_diver.cpp] (medium 0.35)
@@ -56,7 +61,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005a10d0` 109 bytes <- APP.dll `10007e10` Panel::~Panel [decomp/src/panel_dtor.cpp] (high 0.67)
 - [ ] `007496d0` 122 bytes <- APP.dll `10191480` NodeBody::~NodeBody [decomp/src/node_dtor.cpp] (high 0.67)
 - [ ] `007aa8f0` 122 bytes <- APP.dll `10001090` Mouse::SetCursorGamePos [decomp/src/app_0005.cpp] (high 0.83)
-- [ ] `007a3f90` 128 bytes <- APP.dll `1015c6a0` VideoSurface::CopyTo [decomp/src/surface_copy.cpp] (medium 0.44)
 - [ ] `007aef40` 133 bytes <- APP.dll `1013e0c0` Path_CreateDirectories [decomp/src/path_util.cpp] (low 0.18)
 - [ ] `007465f0` 137 bytes <- APP.dll `1016bdf0` Camera_Orbit [decomp/src/camera_orbit.cpp] (high 0.90)
 - [ ] `005a1f00` 144 bytes <- APP.dll `100020d0` FlagOwner::Register [decomp/src/flag_list.cpp] (high 0.79)
@@ -112,7 +116,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005a1200` 553 bytes <- APP.dll `100357a0` CharParams::operator= [decomp/src/game_load_data.cpp] (high 1.00)
 - [ ] `005e2320` 582 bytes <- APP.dll `100236c0` Overlay_DrawModel [decomp/src/overlay_draw.cpp] (high 0.65)
 - [ ] `005b4760` 585 bytes <- APP.dll `1000c390` Drops_Update [decomp/src/falling_drops.cpp] (high 0.78)
-- [ ] `00734e60` 613 bytes <- APP.dll `101842a0` EffectManager::Init [decomp/src/char_effects.cpp] (medium 0.58)
 - [ ] `0069a2e0` 622 bytes <- APP.dll `1009ddd0` Kind4a_Update [decomp/src/kind4a_turret.cpp] (high 0.79)
 - [ ] `007a8f90` 648 bytes <- APP.dll `10160a90` MmvPlayer::Open [decomp/src/mmv_texreg.cpp] (medium 0.55)
 - [ ] `006df520` 662 bytes <- APP.dll `1001d920` Carry_StackOnObject [decomp/src/carry_stack.cpp] (high 0.96)
@@ -122,33 +125,24 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005cdf70` 707 bytes <- APP.dll `1003c370` Item_DrawCaption [decomp/src/item_caption.cpp] (high 0.80)
 - [ ] `00769b60` 711 bytes <- APP.dll `101a5860` NodePool_ReleaseAll [decomp/src/node_pool.cpp] (high 0.86)
 - [ ] `005c1840` 734 bytes <- APP.dll `100b8220` Npc_Greet [decomp/src/npc_greet.cpp] (high 1.00)
-- [ ] `006c3210` 734 bytes <- APP.dll `100b5f80` Npc_AlertWhenSeen [decomp/src/char_move.cpp] (high 0.70)
 - [ ] `0072a420` 742 bytes <- APP.dll `10165e00` ModelBank::DrawShadows [decomp/src/model_bank.cpp] (high 0.85)
 - [ ] `006ac8d0` 743 bytes <- APP.dll `10026730` Watcher_Update [decomp/src/hover_watcher.cpp] (high 0.65)
 - [ ] `00748740` 790 bytes <- APP.dll `1016be80` Camera_LiftOverGround [decomp/src/camera_lift.cpp] (high 0.63)
 - [ ] `0076a290` 790 bytes <- APP.dll `10191500` Node::Init [decomp/src/node_init.cpp] (high 0.84)
-- [ ] `006c34f0` 822 bytes <- APP.dll `100b5c30` Npc_TurnWhenSeen [decomp/src/char_move.cpp] (high 0.71)
 - [ ] `0064d540` 838 bytes <- APP.dll `10019d80` Camera_Between [decomp/src/camera_follow.cpp] (high 0.93)
 - [ ] `006dea00` 853 bytes <- APP.dll `10034920` Bs003_SetVariant [decomp/src/bs003_variant.cpp] (high 1.00)
-- [ ] `006b0d60` 863 bytes <- APP.dll `100b3430` Npc_RiseWhenSeen [decomp/src/char_move.cpp] (high 0.91)
-- [ ] `006ae950` 873 bytes <- APP.dll `10048b70` Char_SwingDoor [decomp/src/char_move.cpp] (high 0.62)
 - [ ] `006bc630` 885 bytes <- APP.dll `10045830` Npc_SleepUntilWoken [decomp/src/npc_sleep.cpp] (high 0.80)
 - [ ] `005ecf70` 893 bytes <- APP.dll `10029cf0` Char_RunScriptStep [decomp/src/char_script.cpp] (high 0.73)
 - [ ] `00741c50` 898 bytes <- APP.dll `1016a980` Camera_Reset [decomp/src/camera_reset.cpp] (high 0.80)
 - [ ] `00640040` 914 bytes <- APP.dll `1003b2c0` Save_Load [decomp/src/save_slot.cpp] (medium 0.46)
 - [ ] `006d1b40` 932 bytes <- APP.dll `100dfcf0` Char_RunBehaviour [decomp/src/npc_dispatch.cpp] (high 0.88)
-- [ ] `00699f20` 950 bytes <- APP.dll `1009dfd0` Enemy_FollowAndBlast [decomp/src/char_move.cpp] (high 0.73)
 - [ ] `007a8460` 967 bytes <- APP.dll `1014ade0` Frame_Pace [decomp/src/frame_pacer.cpp] (high 0.81)
 - [ ] `005cbd30` 969 bytes <- APP.dll `1000baf0` MeshSlot::Draw [decomp/src/mesh_slots.cpp] (high 0.66)
-- [ ] `006b4220` 998 bytes <- APP.dll `100b1ff0` Npc_FaceAndTalk [decomp/src/char_move.cpp] (high 0.74)
 - [ ] `00755750` 1009 bytes <- APP.dll `1019dca0` Node::IntersectTriangle [decomp/src/node_triangle.cpp] (high 0.90)
 - [ ] `005d5190` 1018 bytes <- APP.dll `1000c720` Characters_Draw [decomp/src/character_draw.cpp] (high 0.94)
-- [ ] `006de520` 1021 bytes <- APP.dll `10048e90` Enemy_DropIn [decomp/src/char_move.cpp] (high 0.85)
 - [ ] `0064b210` 1051 bytes <- APP.dll `100425f0` Shaga_Create [decomp/src/shaga_spawn.cpp] (high 0.80)
 - [ ] `005ce240` 1068 bytes <- APP.dll `1000e340` Debris_Draw [decomp/src/debris.cpp] (high 0.67)
-- [ ] `00699990` 1072 bytes <- APP.dll `1009d100` Enemy_ChaseAndBlast [decomp/src/char_move.cpp] (high 0.84)
 - [ ] `005a8320` 1118 bytes <- APP.dll `1005f750` Lava_Update [decomp/src/lava_hazard.cpp] (high 0.83)
-- [ ] `006de0c0` 1119 bytes <- APP.dll `10049240` Enemy_DropInWhenNear [decomp/src/char_move.cpp] (high 0.85)
 - [ ] `007aa3a0` 1132 bytes <- APP.dll `10001170` Obj::Update [decomp/src/app_0001.cpp] (high 0.86)
 - [ ] `006af410` 1143 bytes <- APP.dll `100469d0` Npc_Held [decomp/src/npc_frozen.cpp] (high 0.72)
 - [ ] `006aa070` 1177 bytes <- APP.dll `1001a990` Char_AttachWeapon [decomp/src/weapon_attach.cpp] (high 0.76)
@@ -161,19 +155,13 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006d6a10` 1244 bytes <- APP.dll `10046f10` Enemy_AppearNearby [decomp/src/enemy_blink.cpp] (high 0.91)
 - [ ] `0078ce10` 1279 bytes <- APP.dll `10144320` TextureObject::DrawThroughShader [decomp/src/texture_bind.cpp] (high 0.71)
 - [ ] `00790e70` 1307 bytes <- APP.dll `101446f0` TextureObject_DrawBlurred [decomp/src/texture_bind.cpp] (high 0.69)
-- [ ] `007693b0` 1319 bytes <- APP.dll `101a24e0` Node::RenderShadowTexture [decomp/src/shadow_texture.cpp] (high 0.60)
-- [ ] `0069a550` 1341 bytes <- APP.dll `10098be0` Enemy_ShoveAndBlast [decomp/src/char_move.cpp] (high 0.81)
 - [ ] `007413f0` 1342 bytes <- APP.dll `10161f80` AnimModel::ResetState [decomp/src/anim_reset.cpp] (high 0.86)
 - [ ] `00791e30` 1342 bytes <- APP.dll `1014e940` TextureObject::DrawFrameAlt [decomp/src/texture_bind.cpp] (medium 0.47)
-- [ ] `00725440` 1357 bytes <- APP.dll `10189340` EffectManager::DrawSpriteB [decomp/src/effect_sprites.cpp] (high 0.62)
 - [ ] `0074e640` 1376 bytes <- APP.dll `101a53b0` Node::Clone [decomp/src/scene_node.cpp] (high 0.86)
 - [ ] `005f4060` 1402 bytes <- APP.dll `100169c0` Ground_BuildHeights [decomp/src/ground_height.cpp] (high 0.88)
 - [ ] `006adbd0` 1426 bytes <- APP.dll `10043fc0` Npc_RideMarker [decomp/src/marker_rider.cpp] (high 0.88)
-- [ ] `00725990` 1449 bytes <- APP.dll `101890f0` EffectManager::DrawSpriteA [decomp/src/effect_sprites.cpp] (high 0.69)
-- [ ] `00752190` 1456 bytes <- APP.dll `101a29e0` Node::DrawShadow [decomp/src/shadow_texture.cpp] (medium 0.58)
 - [ ] `007369a0` 1463 bytes <- APP.dll `10166950` WorldRenderer::LoadCharacter [decomp/src/world_ctor.cpp] (high 0.91)
 - [ ] `006975e0` 1474 bytes <- APP.dll `100a77f0` Enemy_CallBarrage [decomp/src/enemy_barrage.cpp] (high 0.79)
-- [ ] `006d0f20` 1474 bytes <- APP.dll `100b6290` Npc_RunToMarker [decomp/src/char_move.cpp] (high 0.86)
 - [ ] `005bef20` 1525 bytes <- APP.dll `10027da0` Enemy_KeepDistanceFromPlayer [decomp/src/enemy_flee.cpp] (high 0.97)
 - [ ] `006b10c0` 1540 bytes <- APP.dll `10044560` Enemy_Pendulum [decomp/src/enemy_pendulum.cpp] (high 0.93)
 - [ ] `006b4610` 1542 bytes <- APP.dll `100b23b0` Npc_ChildFollow [decomp/src/char_move.cpp] (high 0.83)
@@ -225,7 +213,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007ab210` 7222 bytes <- APP.dll `1015d520` Text_ToFullWidth [decomp/src/text_fullwidth.cpp] (high 0.65)
 - [ ] `005d3360` 7715 bytes <- APP.dll `10038c10` Scene_DrawFrame [decomp/src/scene_draw.cpp] (high 0.85)
 
-## 3. JP twin not matched yet (434 functions, 1481139 bytes)
+## 3. JP twin not matched yet (429 functions, 1479196 bytes)
 
 - [ ] `006eab60` 10 bytes <- sound3d.dll `1004be9d`  (medium 0.35)
 - [ ] `007af3b0` 23 bytes <- sound3d.dll `100595ec`  (low 0.19)
@@ -258,7 +246,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007bcf70` 126 bytes <- Packs.dll `100070e0` ExecUnpack (high 0.65)
 - [ ] `007a8b20` 131 bytes <- Packs.dll `10006240`  (high 0.76)
 - [ ] `007aa2a0` 140 bytes <- APP.dll `100014b0` Mouse_ReportCursor (high 0.69)
-- [ ] `007bf540` 141 bytes <- sound3d.dll `10001170`  (high 0.91)
 - [ ] `005baa30` 143 bytes <- APP.dll `100e2440` Enemy_UpdateAI_C (high 0.90)
 - [ ] `005baac0` 145 bytes <- APP.dll `100e24d0` Enemy_UpdateAI_D (high 0.90)
 - [ ] `005a68a0` 146 bytes <- APP.dll `10015710`  (high 0.90)
@@ -280,7 +267,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00779480` 186 bytes <- APP.dll `101b13c0` Scaling (high 0.90)
 - [ ] `00777220` 187 bytes <- APP.dll `101b1360`  (high 0.90)
 - [ ] `006e8d10` 189 bytes <- Packs.dll `1002fab1` _wctomb (low 0.32)
-- [ ] `007bf670` 192 bytes <- sound3d.dll `10001000`  (high 0.73)
 - [ ] `007775a0` 194 bytes <- APP.dll `101ad2c0` Plane::IntersectRay (high 0.69)
 - [ ] `00602660` 198 bytes <- APP.dll `10035a30` ListBank::SkipBlock (high 0.81)
 - [ ] `00646ae0` 198 bytes <- APP.dll `100143f0` Char_SetHelmet (high 0.76)
@@ -301,7 +287,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007c3d30` 252 bytes <- sound3d.dll `10006700`  (high 0.85)
 - [ ] `0071c8d0` 257 bytes <- APP.dll `101614c0`  (high 0.72)
 - [ ] `00777770` 257 bytes <- APP.dll `101b0c10` Perspective (high 0.90)
-- [ ] `007beaa0` 257 bytes <- APP.dll `101615d0` ItmDescramble (high 0.72)
 - [ ] `007437e0` 261 bytes <- APP.dll `1016a100` Playback::SetLayer (high 0.79)
 - [ ] `007c0550` 264 bytes <- sound3d.dll `10004750`  (high 0.84)
 - [ ] `005ee540` 271 bytes <- APP.dll `100360f0` ListBank::ReadToken (high 0.61)
@@ -320,7 +305,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0063c170` 332 bytes <- APP.dll `10054770` Game::MarkKilled (medium 0.55)
 - [ ] `007bfd30` 335 bytes <- sound3d.dll `1001faa0` __alldiv (medium 0.35)
 - [ ] `007b95a0` 339 bytes <- Packs.dll `10002bc0`  (high 0.87)
-- [ ] `007c3e60` 339 bytes <- sound3d.dll `10005990`  (medium 0.58)
 - [ ] `006ec790` 341 bytes <- sound3d.dll `10054ce1`  (medium 0.49)
 - [ ] `00699dc0` 343 bytes <- APP.dll `10011dd0` Npc_StandOnGround (high 0.64)
 - [ ] `00602e10` 348 bytes <- APP.dll `1000b9f0`  (high 0.87)
@@ -431,7 +415,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00792370` 987 bytes <- APP.dll `10143bc0` Render_DrawGradientQuad (high 0.71)
 - [ ] `005be740` 995 bytes <- APP.dll `10027630` Enemy_ChasePlayer (high 0.97)
 - [ ] `005e75f0` 1014 bytes <- APP.dll `10055ee0` Player_KnockBack (high 0.96)
-- [ ] `0076f230` 1014 bytes <- APP.dll `101b0670`  (high 0.89)
 - [ ] `0074fcf0` 1026 bytes <- APP.dll `1019e120` Node::BuildCollisionSpheres (high 0.74)
 - [ ] `0074f580` 1036 bytes <- APP.dll `101a82d0` Node::BuildMesh (high 0.63)
 - [ ] `005f4b40` 1039 bytes <- APP.dll `10037090` ListBank::FindVariable (high 0.67)
@@ -662,7 +645,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006883a0` 51470 bytes <- APP.dll `100d24a0` Bs006_Update (medium 0.60)
 - [ ] `0060cb10` 113582 bytes <- APP.dll `1011d810`  (high 0.72)
 
-## 4. EN-only (no JP twin found) (856 functions, 243878 bytes)
+## 4. EN-only (no JP twin found) (854 functions, 243488 bytes)
 
 - [ ] `006e6210` 6 bytes (launcher (EN-only config dialog))
 - [ ] `006e6220` 6 bytes (launcher (EN-only config dialog))
@@ -824,7 +807,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00749270` 30 bytes (unknown)
 - [ ] `00749290` 30 bytes (unknown)
 - [ ] `007aab10` 30 bytes (unknown)
-- [ ] `007c3ae0` 30 bytes (unknown)
 - [ ] `007c1710` 31 bytes (unknown)
 - [ ] `007c1970` 31 bytes (unknown)
 - [ ] `006eb600` 32 bytes (launcher (EN-only config dialog))
@@ -1377,7 +1359,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007c5040` 346 bytes (unknown)
 - [ ] `007485c0` 348 bytes (unknown)
 - [ ] `007b01c0` 349 bytes (unknown)
-- [ ] `007c4760` 360 bytes (unknown)
 - [ ] `00747730` 361 bytes (unknown)
 - [ ] `00752740` 361 bytes (unknown)
 - [ ] `006ec360` 362 bytes (launcher (EN-only config dialog))

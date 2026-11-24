@@ -2,7 +2,9 @@
 #include <stddef.h>
 
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "engine_memory.h"
 #include "sound_engine.h"
@@ -167,9 +169,9 @@ SoundSource::SoundSource()
 // starts.
 SoundVoice::SoundVoice()
 {
-    ownsDirectSound = 0;
+    usesSharedDevice = 0;
     directSound = 0;
-    ownsPrimaryBuffer = 0;
+    usesSharedPrimary = 0;
     primaryBuffer = 0;
     buffer = 0;
     buffer3d = 0;
@@ -463,7 +465,7 @@ int SoundVoice::Release()
     Stop();
     if (decoderOpen != 0)
         FreeDecoder();
-    if (ownsPrimaryBuffer != 0)
+    if (usesSharedPrimary != 0)
         primaryBuffer = 0;
     if (buffer != 0)
         buffer->Release();
@@ -476,7 +478,7 @@ int SoundVoice::Release()
     if (primaryBuffer != 0)
         primaryBuffer->Release();
     primaryBuffer = 0;
-    if (ownsDirectSound != 0)
+    if (usesSharedDevice != 0)
         directSound = 0;
     if (directSound != 0)
     {
@@ -580,4 +582,119 @@ SoundSource::~SoundSource()
     if (pcmBuffer != 0)
         free(pcmBuffer);
     pcmBuffer = 0;
+}
+
+// Output format of the primary buffer: 16-bit stereo at 44.1 kHz.
+const int PRIMARY_CHANNELS = 2;
+const int PRIMARY_SAMPLE_RATE = 44100;
+const int PRIMARY_BITS = 16;
+// Rolloff factor of the listener a new device starts with.
+static const float LISTENER_START_ROLLOFF = 0.2f;
+
+// Starts the voice's DirectSound objects: releases what it held, then creates the device (or adopts the shared
+// `sharedDevice`) and the primary buffer (or adopts `sharedPrimary`). A device it creates gets the exclusive cooperative
+// level; a primary buffer it creates gets 3D control, the 44.1 kHz 16-bit stereo format, a 3D listener with default
+// orientation and starts looping. Returns 1, or 0 when a DirectSound call fails. Called for the engine's own device
+// voice with nothing shared and for every other voice with the device voice's objects.
+int SoundVoice::InitDevice(HWND window, IDirectSound8 *sharedDevice, IDirectSoundBuffer *sharedPrimary)
+{
+    Release();
+    if (sharedDevice == 0)
+    {
+        if (DirectSoundCreate8(0, &directSound, 0) != 0)
+            return 0;
+        if (directSound->SetCooperativeLevel(window, DSSCL_EXCLUSIVE) != 0)
+        {
+            directSound->Release();
+            return 0;
+        }
+    }
+    else
+    {
+        directSound = sharedDevice;
+        usesSharedDevice = 1;
+    }
+    if (sharedPrimary == 0)
+    {
+        DSBUFFERDESC description;
+        memset(&description, 0, sizeof(description));
+        description.dwSize = sizeof(DSBUFFERDESC);
+        description.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D;
+        if (directSound->CreateSoundBuffer(&description, &primaryBuffer, 0) != 0)
+        {
+            directSound->Release();
+            return 0;
+        }
+        WAVEFORMATEX format;
+        format.wFormatTag = WAVE_FORMAT_PCM;
+        format.nChannels = PRIMARY_CHANNELS;
+        format.wBitsPerSample = PRIMARY_BITS;
+        format.nSamplesPerSec = PRIMARY_SAMPLE_RATE;
+        format.nAvgBytesPerSec = PRIMARY_SAMPLE_RATE * PRIMARY_CHANNELS * PRIMARY_BITS / 8;
+        format.nBlockAlign = PRIMARY_CHANNELS * PRIMARY_BITS / 8;
+        format.cbSize = 0;
+        primaryBuffer->SetFormat(&format);
+        primaryBuffer->GetFormat(&format, sizeof(WAVEFORMATEX), 0);
+        primaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **)&listener);
+        if (listener != 0)
+        {
+            DS3DLISTENER parameters;
+            parameters.dwSize = sizeof(DS3DLISTENER);
+            listener->GetAllParameters(&parameters);
+            parameters.flRolloffFactor = LISTENER_START_ROLLOFF;
+            parameters.vPosition.x = 0;
+            parameters.vPosition.y = 0;
+            parameters.vPosition.z = 0;
+            parameters.vVelocity.x = 0;
+            parameters.vVelocity.y = 0;
+            parameters.vVelocity.z = 0;
+            parameters.vOrientFront.x = 0;
+            parameters.vOrientFront.y = LISTENER_DEFAULT_AXIS;
+            parameters.vOrientFront.z = 0;
+            parameters.vOrientTop.x = 0;
+            parameters.vOrientTop.y = 0;
+            parameters.vOrientTop.z = 1.0f;
+            parameters.flDopplerFactor = LISTENER_DOPPLER_FACTOR;
+            listener->SetAllParameters(&parameters, DS3D_IMMEDIATE);
+        }
+        primaryBuffer->Restore();
+        primaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
+    }
+    else
+    {
+        primaryBuffer = sharedPrimary;
+        usesSharedPrimary = 1;
+    }
+    return 1;
+}
+
+// Mode string the sound files are opened with.
+static const char SOUND_OPEN_READ_BINARY[] = "rb";
+// Factor of the decoded size: decoded bytes = compressed bytes * this / (compressedParam + 8).
+const int SOUND_COMPRESSED_SIZE_SCALE = 0x13e20;
+// Added to the compressed parameter before it divides the size.
+const int SOUND_COMPRESSED_PARAM_BIAS = 8;
+
+// Opens a sound file in the compressed layout (a wave header, a 32-bit parameter, then compressed data) and works out
+// the decoded size from the file length and the parameter. Returns 1, or 0 when a file is already open or cannot be
+// opened. Called by the opener for files whose name ends in 'c'.
+int SoundSource::OpenCompressed(const char *path)
+{
+    m_0174 = 0;
+    if (file.handle != 0)
+        return 0;
+    if (file.Open(path, SOUND_OPEN_READ_BINARY) == 0)
+        return 0;
+    decodedPosition = 0;
+    m_019c = 0;
+    file.Seek(WAVE_HEADER_BYTES, SEEK_SET);
+    file.Read((char *)&compressedParam, 1, ARCHIVE_FIELD_BYTES);
+    file.Seek(0, SEEK_END);
+    int length = file.Tell();
+    int ratio = compressedParam + SOUND_COMPRESSED_PARAM_BIAS;
+    unsigned __int64 scaled = (unsigned __int64)(unsigned)(length - WAVE_HEADER_BYTES) * SOUND_COMPRESSED_SIZE_SCALE;
+    dataSize = (int)((__int64)scaled / ratio) + WAVE_HEADER_BYTES;
+    m_0174 = 1;
+    isCompressed = 1;
+    return 1;
 }

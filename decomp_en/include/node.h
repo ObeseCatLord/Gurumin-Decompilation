@@ -378,8 +378,27 @@ struct Node
     ~Node();                               // EN 0x7496d0 (JP 0x10191480): destroys the matrix members
     void Init();                           // EN 0x76a290 (JP 0x10191500): puts every field back to its default
 
+    // EN 0x7693b0 (JP 0x101a24e0): draws this node tree into the shadow texture slot `texture` as seen from the light
+    // (see shadow_texture.cpp). `sceneView`, `a3`, `tileX` and `tileY` are not used. Returns 0 when the texture cannot
+    // become the render target, else 1.
+    int RenderShadowTexture(DrawList *list, const Matrix4 *sceneView, int a3, const Vec4 *casterPosition,
+                            const Vec4 *lightPosition, int texture, float casterSize, int tileX, int tileY);
+
+    // EN 0x751ee0 (JP 0x101995a0): draws the subtree under `list` with `view`; the arguments after `view` pass through to
+    // the mesh (the shadow pass fills them with its projector matrix, the shadow's centre, texture, scale and size, the
+    // light direction, the caster's size, model and opacity).
+    int Draw(DrawList *list, Matrix4 *view, int a3, const Matrix4 *shadowMatrix, float shadowX, float shadowY,
+             float shadowZ, int shadowTexture, float shadowScale, int shadowSize, const Vec4 *lightDirection,
+             float modelSize, AnimModel *model, float alpha);
+    // EN 0x752190 (JP 0x101a29e0): draws the subtree as the shadow of a caster at `casterPosition` lit from
+    // `lightPosition` (see shadow_texture.cpp). Returns 1.
+    int DrawShadow(DrawList *list, Matrix4 *view, int a3, const Vec4 *casterPosition, const Vec4 *lightPosition,
+                   int texture, float scale, int size, float casterSize, AnimModel *model, float alpha);
+    // EN 0x749b10 (JP 0x10199be0): marks the visibility cells of a map root node that are visible (not ported yet).
+    int UpdateVisibleCells();
+
     // Whole-subtree setters and savers.
-    void SaveFlags();                      // EN 0x7498c0 (JP 0x10191d50): flags into savedFlags
+    void SaveFlags();                    // EN 0x7498c0 (JP 0x10191d50): flags into savedFlags
     void SaveRenderMode();                 // EN 0x749990 (JP 0x10191dd0): drawMode into savedDrawMode
     void RestoreFlags();                   // EN 0x76a870 (JP 0x10191d90): savedFlags back into flags
     void RestoreRenderMode();              // EN 0x76a940 (JP 0x10191e10): savedDrawMode back into drawMode

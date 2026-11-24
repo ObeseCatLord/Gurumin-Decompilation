@@ -146,7 +146,9 @@ struct AnimModel
     char uiAnimStarted;           // 0x076: set to 1 by UiAnim_Play (read on the first model only)
     char m_0077[0x84 - 0x77];     // 0x077: not yet named
     unsigned char speedDivisor;   // 0x084: slows every motion of this model down (0 = no division)
-    char m_0085[0xb0 - 0x85];       // 0x85: not yet named
+    char m_0085[0x8d - 0x85];       // 0x85: not yet named
+    char childRunning;              // 0x8d: set while a child runs to the player (Npc_ChildFollow, Enemy_DropIn)
+    char m_008e[0xb0 - 0x8e];       // 0x8e: not yet named
     float placeHeight;       // 0xb0: height the model was placed at (SetPosition, Teleport)
     char m_00b4[0x1d4 - 0xb4];       // 0xb4: not yet named
     int m_01d4;              // 0x1d4: cleared when the model is placed
@@ -185,7 +187,7 @@ struct AnimModel
     char locked;                  // 0x17e9: non-zero while the model ignores queued pushes
     char pad_17ea[2];
     MotionChannels trackC;        // 0x17ec: track C
-    int m_2284;                   // 0x2284: not yet named
+    int shadowHidden;             // 0x2284: non-zero = no shadow is drawn for the model (model_bank.cpp)
     char pushFlag;                // 0x2288: flag of the queued push
     char pad_2289[3];
     Vec4 pushVector;              // 0x228c: queued push (x, y, z)

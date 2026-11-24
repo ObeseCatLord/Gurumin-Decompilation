@@ -11,6 +11,58 @@ const int SOUND_FILE_READ_BLOCK = 0x80000;
 // Milliseconds slept between two blocks.
 const int SOUND_FILE_READ_SLEEP_MS = 2;
 
+// Scrambled .itm data: size of the key table, of the key string, characters of the key that are used, seed of the
+// check value, where the file name goes into the table, how much of it, and the index mask into the table.
+const int ITM_TABLE_BYTES = 70;
+const int ITM_KEY_BYTES = 16;
+const int ITM_KEY_LENGTH = 15;
+const unsigned int ITM_CHECK_SEED = 0xde2f;
+const int ITM_TABLE_NAME_OFFSET = 8;
+const int ITM_TABLE_NAME_LENGTH = 8;
+const int ITM_TABLE_MASK = 0x3f;
+// Size of a path buffer.
+const int SOUND_PATH_BYTES = 256;
+
+// Distance between an upper case and the matching lower case ASCII letter.
+const char CASE_OFFSET = ' ';
+// Directory separator of the paths the sound engine handles.
+const char PATH_SEPARATOR = '\\';
+
+// Name of a sound inside an archive: up to eight characters, compared as two words.
+union ArchiveName
+{
+    char text[8];   // the characters
+    int word[2];    // the same bytes as two words
+};
+
+// Four characters (a file extension) that can also be compared as one word.
+union ExtensionTag
+{
+    char text[4];   // the characters
+    int word;       // the same bytes as one word
+};
+
+// What an archive lookup searches for: the extension group and the name inside it.
+struct ArchiveKey
+{
+    int extension;      // the extension tag as a word
+    ArchiveName name;   // the file name
+};
+
+// Archive layout: the sizes of the fields the header and the tables are read in, in bytes.
+const int ARCHIVE_FIELD_BYTES = 4;
+// Longest "name ext" part of a path the lookup accepts (including the separator).
+const int ARCHIVE_NAME_LIMIT = 0x14;
+// Characters of an archive name that are significant.
+const int ARCHIVE_NAME_CHARS = 8;
+// Bytes of the buffer a name is read into.
+const int ARCHIVE_NAME_BUFFER = 16;
+
+// Reverses the scrambling of an .itm data block in place. Returns 1 when the checks match. EN 0x7beaa0.
+extern "C" int ItmDescramble(unsigned char *data, int size, char *name, int expectedSum, unsigned int expectedCheck);
+// Copies the file name of a path without directory and extension. EN 0x7bf670.
+extern "C" void SoundFile_BaseName(ArchiveName *name, const char *path);
+
 // A sound file opened through the multimedia I/O functions.
 struct MmioFile
 {
@@ -21,6 +73,9 @@ struct MmioFile
 
     // Destructor: closes the file when open. EN 0x7be960.
     ~MmioFile();
+    // Opens `path`: mode "w" creates or opens it for writing, "a" for appending, anything else reads it from the
+    // "<dir>.arc"/"<dir>.dat" archive of its folder when the name is in there, else as a plain file. EN 0x7bf170.
+    int Open(const char *path, const char *mode);
     // Closes the file when open. Returns 0. EN 0x7bf150.
     int Close();
     // Reads size * count bytes; from an archive in blocks with a short sleep in between. EN 0x7bf540.

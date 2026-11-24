@@ -88,7 +88,8 @@ int ModelBank::CreateTextures()
         {
             for (int i = 0; i < MODEL_BANK_SHADOW_TARGETS; i++)
             {
-                g_textures[shadows[i]].UpdateImage(0);
+                TextureObject &shadow = g_textures[shadows[i]];
+                shadow.BeginRenderTo(shadow.sourceWidth, shadow.sourceHeight, 0);
                 Render_Command(RENDER_CLEAR, -1, 0);
                 Render_Command(RENDER_FLUSH_SCENE, 0, 0);
             }
@@ -161,5 +162,135 @@ int ModelBank::DrawLensFlares()
     }
     Render_Command(RENDER_BLEND_MODE, BLEND_ALPHA, 0);
     Render_Command(RENDER_DEPTH_WRITE, 1, 0);
+    return 1;
+}
+
+// State written to AnimModel::m_17e8 when DrawShadows resets a caster (DrawShadowsInto writes 0).
+const char CASTER_RESET_STATE_SHADOWS = 2;
+// DrawShadowsInto raises the caster's shadow matrix by this much along z before drawing.
+const float SHADOW_INTO_LIFT = 6.1f;
+// Model alpha a reset caster gets when the shadows have their own render targets.
+const float CASTER_RESET_ALPHA = 1.0f;
+
+// Draws the shadows of the first ten shadow casters through `scene`: with shadow targets each caster uses its own
+// target, else all use the shadow blob (kage.bmp). A caster without a timeout is first reset: identity matrix at its
+// position parameter, shown, opacity 15 (with targets also model alpha 1). Casters with model data that are shown and
+// not transparent are drawn. Returns 0 when shadows are off, else 1. Called every frame by the world drawing.
+int ModelBank::DrawShadows(Node *scene, DrawList *list, Matrix4 *view, int a3)
+{
+    if (enabled == 0)
+        return 0;
+    if (g_shadowsSwitchedOn == 0)
+        return 0;
+    if (g_blueSquareSeen == 0)
+        return 0;
+    if (g_shadowsEnabled != 0)
+    {
+        for (int i = 0; i < shadowCasterCount && i < MODEL_BANK_SHADOW_TARGETS; i++)
+        {
+            if (litModels[casters[i]]->collisionLimit == MODEL_BANK_NO_TIMEOUT)
+            {
+                litModels[casters[i]]->m_17e8 = CASTER_RESET_STATE_SHADOWS;
+                litModels[casters[i]]->matrix.SetIdentity();
+                litModels[casters[i]]->matrix.SetTranslation(*params[litModels[casters[i]]->bankIndex]);
+                litModels[casters[i]]->shadowHidden = 0;
+                litModels[casters[i]]->shadowOpacity = SHADOW_OPACITY_PLACED;
+                litModels[casters[i]]->alpha = CASTER_RESET_ALPHA;
+            }
+            AnimModel *model = litModels[casters[i]];
+            if (model->loadedRoot != 0 && model->shadowHidden == 0 && model->shadowOpacity > 0)
+                scene->DrawShadow(list, view, a3, &casterPosition[i], &casterParams[i], shadows[i], model->uniformScale,
+                                  (int)casterSize[i], model->loadedRoot->bounds.w, model, model->alpha);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < shadowCasterCount && i < MODEL_BANK_SHADOW_TARGETS; i++)
+        {
+            if (litModels[casters[i]]->collisionLimit == MODEL_BANK_NO_TIMEOUT)
+            {
+                litModels[casters[i]]->m_17e8 = CASTER_RESET_STATE_SHADOWS;
+                litModels[casters[i]]->matrix.SetIdentity();
+                litModels[casters[i]]->matrix.SetTranslation(*params[litModels[casters[i]]->bankIndex]);
+                litModels[casters[i]]->shadowHidden = 0;
+                litModels[casters[i]]->shadowOpacity = SHADOW_OPACITY_PLACED;
+            }
+            AnimModel *model = litModels[casters[i]];
+            if (model->loadedRoot != 0 && model->shadowHidden == 0 && model->shadowOpacity > 0)
+                scene->DrawShadow(list, view, a3, &casterPosition[i], &casterParams[i], shadowTexture, model->uniformScale,
+                                  (int)casterSize[i], model->loadedRoot->bounds.w, model, model->alpha);
+        }
+    }
+    return 1;
+}
+
+// Like DrawShadows, drawing each shadow with the caster's shadow matrix raised 6.1 units, set as `scene`'s world
+// matrix, and with the depth test off around it. A caster reset here also takes its shadow matrix from its world
+// matrix. Returns 0 when shadows are off or there is no scene, else 1. Called by the map top view drawing.
+int ModelBank::DrawShadowsInto(Node *scene, DrawList *list, Matrix4 *view, int a3)
+{
+    if (enabled == 0)
+        return 0;
+    if (scene == 0)
+        return 0;
+    if (g_shadowsSwitchedOn == 0)
+        return 0;
+    if (g_blueSquareSeen == 0)
+        return 0;
+    if (g_shadowsEnabled != 0)
+    {
+        for (int i = 0; i < shadowCasterCount && i < MODEL_BANK_SHADOW_TARGETS; i++)
+        {
+            if (litModels[casters[i]]->collisionLimit == MODEL_BANK_NO_TIMEOUT)
+            {
+                litModels[casters[i]]->m_17e8 = 0;
+                litModels[casters[i]]->matrix.SetIdentity();
+                litModels[casters[i]]->matrix.SetTranslation(*params[litModels[casters[i]]->bankIndex]);
+                litModels[casters[i]]->shadowMatrix = litModels[casters[i]]->matrix;
+                litModels[casters[i]]->shadowHidden = 0;
+                litModels[casters[i]]->shadowOpacity = SHADOW_OPACITY_PLACED;
+                litModels[casters[i]]->alpha = CASTER_RESET_ALPHA;
+            }
+            if (litModels[casters[i]]->loadedRoot != 0 && litModels[casters[i]]->shadowHidden == 0 &&
+                litModels[casters[i]]->shadowOpacity > 0)
+            {
+                scene->worldMatrix = litModels[casters[i]]->shadowMatrix;
+                scene->worldMatrix.Translate(0, 0, SHADOW_INTO_LIFT);
+                Render_Command(RENDER_DEPTH_TEST, 0, 0);
+                scene->DrawShadow(list, view, a3, &casterPosition[i], &casterParams[i], shadows[i],
+                                  litModels[casters[i]]->uniformScale, (int)casterSize[i],
+                                  litModels[casters[i]]->loadedRoot->bounds.w, litModels[casters[i]],
+                                  litModels[casters[i]]->alpha);
+                Render_Command(RENDER_DEPTH_TEST, 1, 0);
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < shadowCasterCount && i < MODEL_BANK_SHADOW_TARGETS; i++)
+        {
+            if (litModels[casters[i]]->collisionLimit == MODEL_BANK_NO_TIMEOUT)
+            {
+                litModels[casters[i]]->m_17e8 = 0;
+                litModels[casters[i]]->matrix.SetIdentity();
+                litModels[casters[i]]->matrix.SetTranslation(*params[litModels[casters[i]]->bankIndex]);
+                litModels[casters[i]]->shadowMatrix = litModels[casters[i]]->matrix;
+                litModels[casters[i]]->shadowHidden = 0;
+                litModels[casters[i]]->shadowOpacity = SHADOW_OPACITY_PLACED;
+            }
+            if (litModels[casters[i]]->loadedRoot != 0 && litModels[casters[i]]->shadowHidden == 0 &&
+                litModels[casters[i]]->shadowOpacity > 0)
+            {
+                scene->worldMatrix = litModels[casters[i]]->shadowMatrix;
+                scene->worldMatrix.Translate(0, 0, SHADOW_INTO_LIFT);
+                Render_Command(RENDER_DEPTH_TEST, 0, 0);
+                scene->DrawShadow(list, view, a3, &casterPosition[i], &casterParams[i], shadowTexture,
+                                  litModels[casters[i]]->uniformScale, (int)casterSize[i],
+                                  litModels[casters[i]]->loadedRoot->bounds.w, litModels[casters[i]],
+                                  litModels[casters[i]]->alpha);
+                Render_Command(RENDER_DEPTH_TEST, 1, 0);
+            }
+        }
+    }
     return 1;
 }

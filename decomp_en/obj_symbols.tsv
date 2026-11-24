@@ -611,3 +611,33 @@ _Npc_TalkWhenNear	006d6220
 ?Npc_TurnWhenSeen@@YAHH@Z	006c34f0
 ?Npc_RiseWhenSeen@@YAHH@Z	006b0d60
 ?Char_SwingDoor@@YAHH@Z	006ae950
+_Enemy_FollowAndBlast	00699f20
+?Npc_FaceAndTalk@@YAHH@Z	006b4220
+
+# sound engine (batch 9)
+_ItmDescramble	007beaa0
+_SoundFile_BaseName	007bf670
+# render (batch 9)
+?DrawSpriteA@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	00725990
+?DrawSpriteB@EffectManager@@QAEHHABUMatrix4@@PBU2@@Z	00725440
+?Enemy_DropIn@@YAHH@Z	006de520
+_Enemy_ChaseAndBlast	00699990
+?RenderShadowTexture@Node@@QAEHPAUDrawList@@PBUMatrix4@@HPBUVec4@@2HMHH@Z	007693b0
+?Open@MmioFile@@QAEHPBD0@Z	007bf170
+?Enemy_DropInWhenNear@@YAHH@Z	006de0c0
+_Enemy_ShoveAndBlast	0069a550
+_Npc_RunToMarker	006d0f20
+_SoundEngine_GetMixerVolume	007c4760
+??DMatrix4@@QBE?AU0@ABU0@@Z	0076f230
+?SetCooperativeLevel@SoundVoice@@QAEHPAUHWND__@@@Z	007c3ae0
+?SetListener@SoundVoice@@QAEHMMMMMMMMMM@Z	007c3e60
+?InitDevice@SoundVoice@@QAEHPAUHWND__@@PAUIDirectSound8@@PAUIDirectSoundBuffer@@@Z	007c1ce0
+?Init@EffectManager@@QAEHXZ	00734e60
+?UpdatePanFromListener@SoundVoice@@QAEHXZ	007c42d0
+?CopyTo@VideoSurface@@QAEXPAUTextureObject@@@Z	007a3f90
+?OpenCompressed@SoundSource@@QAEHPBD@Z	007c0550
+?DrawShadow@Node@@QAEHPAUDrawList@@PAUMatrix4@@HPBUVec4@@2HMHMPAUAnimModel@@M@Z	00752190
+?FillBuffer@SoundVoice@@QAEHIHI@Z	007c3b00
+?UpdateBuffer@SoundVoice@@QAEHXZ	007c1ef0
+?DrawShadows@ModelBank@@QAEHPAUNode@@PAUDrawList@@PAUMatrix4@@H@Z	0072a420
+?DrawShadowsInto@ModelBank@@QAEHPAUNode@@PAUDrawList@@PAUMatrix4@@H@Z	0072a710

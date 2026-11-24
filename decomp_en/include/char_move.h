@@ -2,6 +2,8 @@
 #ifndef GURUMIN_EN_CHAR_MOVE_H
 #define GURUMIN_EN_CHAR_MOVE_H
 
+struct Playback;
+
 // AnimModel::mode value of the walking mode.
 const int MODEL_MODE_WALKING = 1;
 // AnimModel::idleMotionEnabled value that excludes the walking-mode slowdown.
@@ -75,4 +77,26 @@ extern "C" Playback *g_lastEnemyPlayback;
 // An enemy that follows the player and blasts. EN 0x699f20 (JP 0x1009dfd0).
 extern "C" int Enemy_FollowAndBlast(int index);
 
+// An NPC that keeps facing the player and talks. EN 0x6b4220 (JP 0x100b1ff0).
+int Npc_FaceAndTalk(int index);
+
+// An enemy that drops in from above. EN 0x6de520 (JP 0x10048e90).
+int Enemy_DropIn(int index);
+
+// An enemy that runs and walks to the player and blasts. EN 0x699990 (JP 0x1009d100).
+extern "C" int Enemy_ChaseAndBlast(int index);
+
+// Enemy_DropIn that first waits hidden until the player comes near. EN 0x6de0c0 (JP 0x10049240).
+int Enemy_DropInWhenNear(int index);
+
+// An enemy that idles, shoves (attacks) and blasts. EN 0x69a550 (JP 0x10098be0).
+extern "C" int Enemy_ShoveAndBlast(int index);
+
 #endif
+
+// Messenger that claims a marker and runs to it once it has seen the player. EN 0x6d0f20 (JP 0x100b6290).
+extern "C" int Npc_RunToMarker(int index);
+
+struct Vec4;
+// 1 when `eye` (looking along `heading`) sees `target` within `range` and `angleRange` (or `nearRange`), optionally with a wall test. EN 0x5b9500 (JP 0x10043e20).
+extern "C" int Char_CanSee(const Vec4 *target, const Vec4 *eye, float heading, float range, float angleRange, float nearRange, int checkWalls);

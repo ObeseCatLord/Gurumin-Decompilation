@@ -93,6 +93,17 @@ Matrix4 InverseMatrix(const Matrix4 &matrix);
 Matrix4 RotationY(float angle);   // EN 0x779290 (JP 0x101b1bb0): turn of `angle` radians about y
 Matrix4 IdentityMatrix();
 
+// Number of matrix products taken (incremented by Matrix4::operator*, reset by the frame code at EN 0x60c750).
+extern "C" int g_matrixProductCount;   // EN 0x0218ee80
+
+// Scale matrix (EN 0x779480, JP 0x101b13c0), perspective projection from the near and far planes and the field of
+// view in radians and an aspect factor, 1 for none (EN 0x777770, JP 0x101b0c10), and `v` scaled to length 1 by x/y/z (EN 0x777410, JP 0x101b1180).
+Matrix4 ScaleMatrix(float x, float y, float z);
+Matrix4 PerspectiveMatrix(float nearPlane, float farPlane, float fov, float aspect);
+Vec4 Vec3_Normalized(Vec4 *v);
+// Translation matrix (EN 0x777220, JP 0x101b1360).
+Matrix4 TranslationMatrix(float x, float y, float z);
+
 // Transforms `point` by `matrix` and divides x/y/z by the resulting w (perspective divide); the result's w is that w
 // (EN 0x77a4a0, JP 0x101ae060).
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);

@@ -34,9 +34,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-24, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 421 of 2,034 game functions (76,409 of 2,080,360 bytes, 3.67 %) |
-| Matched under the rules | 421 |
-| Queue | section 2: 246 left (mostly 500+ bytes); section 3: 482; section 4: 867; open.tsv: 18 |
+| Matched | 530 of 2,034 game functions (104,193 of 2,080,360 bytes, 5.01 %) |
+| Matched under the rules | 530 (AddQuad/SetBlend/UpdateImage rely on a temporary out-of-line macro, see State) |
+| Queue | regenerate with gen_queue.py; open.tsv: ~40 near-misses |
 
 ## State
 - Pipeline verified; batches 1-4 matched Node (29+), Vec4/Matrix4/Box, containers, AnimModel channels, camera,
@@ -59,6 +59,10 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   was cleared).
 - Batch 8 workers: render/UI, characters/scene nodes, misc new files; ADDITIVE header edits allowed for all, via the
   Edit tool (scripted bulk edits of shared headers were denied by the permission classifier).
+- **Temporary:** `TEXTURE_MGR_INLINE`/`TEXTURE_MGR_OUT_OF_LINE` in texture_mgr.h emits out-of-line copies of
+  AddQuad/SetBlend/UpdateImage; remove it once their real out-of-line caller (EN 0x71e010) is ported (batch 9 task).
+  Never add address-taking tables or data that only force COMDAT emission (one was removed from sound_file.cpp).
+- Sound engine (0x7be000-0x7c6220, JP sound3d not matched) is ported from Ghidra + EN bytes: 67 matched in batch 8.
 - (old) Batch 7 ownership: game worker = node/anim/char/game headers and their sources; engine worker = vec4, containers,
   texture_mgr, render, slot_table, buffer_pool, engine, ime, world files; misc worker = only the new files it creates.
 

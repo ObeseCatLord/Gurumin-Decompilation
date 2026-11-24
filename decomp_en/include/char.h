@@ -113,6 +113,9 @@ struct ModelPath
 
 extern "C" CharRecord g_charRecords[CHAR_SLOT_COUNT];      // EN 0x00f381e0 (JP DAT_10daaae8)
 extern "C" CharState g_charState[CHAR_SLOT_COUNT];         // EN 0x009160e0 (JP DAT_1020b430)
+extern "C" char g_charRespawned[CHAR_SLOT_COUNT];         // EN 0x009e1810 (JP DAT_1021f9c0): 1 once an enemy dropped in or was defeated and refilled
+extern "C" unsigned char g_charHitLevel[CHAR_SLOT_COUNT];   // EN 0x009e1a10 (JP DAT_102550e0): non-zero = wake at once (1 = hit, attack at once)
+extern "C" short g_charReleaseNow[CHAR_SLOT_COUNT];         // EN 0x009e2278 (JP DAT_103153b0): non-zero = release now (set to 150 for drop-ins)
 extern "C" int g_charGroupTimer[CHAR_SLOT_COUNT];       // EN 0x0091f618 (JP DAT_102199b8): set to 2 when an NPC notices the player
 extern "C" int g_charToldToReact[CHAR_SLOT_COUNT];         // EN 0x00920260 (JP DAT_10210b30): non-zero = told to react
 extern "C" char g_charTalkPending[CHAR_SLOT_COUNT];        // EN 0x009e1890 (JP DAT_10255a88): cleared while an NPC idles

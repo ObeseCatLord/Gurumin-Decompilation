@@ -172,9 +172,17 @@ typedef char check_effect_sprite[sizeof(EffectSprite) == 0xc4 ? 1 : -1];
 typedef char check_effect_record[sizeof(EffectRecord) == 0x1dc ? 1 : -1];
 typedef char check_effect_light[sizeof(EffectLight) == 0x4014 ? 1 : -1];
 
+// Script ids of the most recently started effects (32 entries) and the next entry to overwrite.
+const int EFFECT_RECENT_COUNT = 32;
+extern "C" int g_recentEffectIds[EFFECT_RECENT_COUNT];   // EN 0x01674670 (JP DAT_110186a8): set to -1 by Init
+extern "C" char g_recentEffectNext;                      // EN 0x01664469 (JP DAT_1101de64): next entry of that cache
+// The bytes of the effect definition table as Init clears them: EFFECT_DEFINITION_COUNT * sizeof(EffectDef) bytes
+// starting 0x174 bytes before g_effectDefs (the same offset as in the JP build, DAT_1101de68).
+extern "C" char g_effectDefStorage[EFFECT_DEFINITION_COUNT * sizeof(EffectDef)];   // EN 0x01dd01e0
+
 struct EffectManager
 {
-    char m_0000[0x10];                               // 0x00: not yet named
+    Vec4 colour;                                     // 0x00: effect colour (set to white by Init)
     int groupStart[EFFECT_GROUP_COUNT];              // 0x10: first record offset of each effect group
     char m_0028[8];                                  // 0x28: not yet named
     int groupCurrent[EFFECT_GROUP_COUNT];            // 0x30: current offset of each group (reset to the start)
@@ -185,8 +193,27 @@ struct EffectManager
     // non-zero. Returns the effect handle. EN 0x70a7f0 (JP 0x10172350).
     // Draws the running effects with `view` and the camera matrix `camera`. EN 0x725f40 (JP 0x10190e30).
     void Draw(const Matrix4 &view, Matrix4 *camera, int flag);
+    // Queues sprite `index` of table A (world position, projected with `view`) / table B (screen position) into the
+    // effect batch. EN 0x725990 (JP 0x101890f0) / EN 0x725440 (JP 0x10189340).
+    int DrawSpriteA(int index, const Matrix4 &view, const Matrix4 *camera);
+    int DrawSpriteB(int index, const Matrix4 &view, const Matrix4 *camera);
     int RemoveChildren(int parent);   // EN 0x747950 (JP 0x10172260): stops every effect attached to record `parent`
     int RemoveOfType(int type);       // EN 0x747a50 (JP 0x10188490): stops every effect whose definition has type `type`
+    // Full initialisation at load time: Reset plus the node pool release and the effect definitions. Returns 0. EN 0x734e60 (JP 0x101842a0).
+    int Init();
+    int AddDefaultDefinition();   // EN 0x73ede0 (JP 0x1016f900): adds the default effect definition to the table (not ported yet)
+    // Marks the effect definitions' texture (field 0xfc) and both sprite tables free (-1); inline in the EN Init.
+    int ClearTables()
+    {
+        int i;
+        for (i = 0; i < EFFECT_DEFINITION_COUNT; i++)
+            g_effectDefs[i].texture = EFFECT_NONE;
+        for (i = 0; i < EFFECT_SPRITE_COUNT; i++)
+            g_effectSpritesA[i].type = EFFECT_NONE;
+        for (i = 0; i < EFFECT_SPRITE_COUNT; i++)
+            g_effectSpritesB[i].type = EFFECT_NONE;
+        return 0;
+    }
     int Reset();   // EN 0x734ce0 (JP 0x10184170): removes every running effect
     int Start(int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame,
               const Matrix4 *matrix, const EffectOptions *options, int *pause);

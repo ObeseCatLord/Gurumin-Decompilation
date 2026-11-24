@@ -38,3 +38,8 @@ address	status	reason
 00729610	open	ModelBank::DrawLensFlares: ~281 diffs; constant hoisting of 240.0/320.0 around the DrawScreenCopy calls
 007a4ef0	open	Render_SetSamplerState: 104 vs 111; original has two cache stores and two rets, GetSamplerState writes into the parameter slot
 0071c740	open	Texture_CreateCopy: 12 diffs; strcpy temp register al/cl swapped, epilogue
+006b4220	open	Npc_FaceAndTalk: matches except edi/esi swapped (original keeps index in edi and index<<6 in esi; ours the reverse), length 1007 vs 998
+006de520	open	Enemy_DropIn: 1013 vs 1021 bytes; the original keeps 20 in esi and spills index*0x249c and the model pointer to the stack (register pressure in the drop-in state), ours keeps both in registers; tried a model pointer local
+006de0c0	open	Enemy_DropInWhenNear: 1111 vs 1119 bytes, same register-pressure wall as Enemy_DropIn (original keeps 20 in esi and spills index*0x249c and the model pointer)
+006d0f20	open	Npc_RunToMarker: 1469 vs 1474 bytes; matches except that the original keeps the shared told-to-react store inside both marker branches (ours hoists it before the test) and stores state 2 after the wake call
+00752190	open	Node::DrawShadow: only difference is register choice at the large-caster frame (original loads casterSize into xmm1 and copies it with movaps before the subtraction; ours uses xmm0 and no copy), 3 bytes shorter; two spellings tried

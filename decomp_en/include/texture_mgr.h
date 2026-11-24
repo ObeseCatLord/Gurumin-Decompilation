@@ -4,12 +4,6 @@
 #ifndef GURUMIN_EN_TEXTURE_MGR_H
 #define GURUMIN_EN_TEXTURE_MGR_H
 
-#ifdef TEXTURE_MGR_OUT_OF_LINE
-#define TEXTURE_MGR_INLINE
-#else
-#define TEXTURE_MGR_INLINE inline
-#endif
-
 struct IDirect3DTexture9;
 struct IDirect3DBaseTexture9;
 struct IDirect3DSurface9;
@@ -24,6 +18,8 @@ const int BLEND_MODE_UNSET = -1;
 const int RENDER_BLEND_MODE = 0;
 // Render_Command code that sets the texture addressing of stage 0 (value 0 = wrap).
 const int RENDER_TEXTURE_ADDRESS = 2;
+// Render_Command code that turns the depth test on (value 1) or off (0).
+const int RENDER_DEPTH_TEST = 9;
 // Render_Command codes that clear the target to colour `value` (4) and end the scene to begin a new one (6).
 const int RENDER_CLEAR = 4;
 const int RENDER_FLUSH_SCENE = 6;
@@ -85,7 +81,7 @@ struct TextureObject
     int BindStage0();                                       // EN 0x7a58b0 (JP 0x1014b670): binds to stage 0 unless already bound
     int BindStage1();                                       // EN 0x7a5840 (JP 0x1014b6e0): binds to stage 1 unless already bound
     int BeginRenderTo(int width, int height, int offset);   // EN 0x7a4bf0 (JP 0x10143870)
-    int UpdateImage(int value);                             // EN 0x746550 (JP 0x10169f70): BeginRenderTo with the source size (inline below)
+    int UpdateImage(int value);                             // EN 0x746550 (JP 0x10169f70): BeginRenderTo with the source size (out of line)
     int Release();                                          // EN 0x7a3e50 (JP 0x1014f520): frees the Direct3D texture and surface, forgets bindings
     void Unload();                                          // EN 0x740ea0 (JP 0x10169e40): frees the kept image and the texture
     int DrawTriangles(const void *vertices, int triangles); // EN 0x77ee90 (JP 0x1014bb70)
@@ -221,19 +217,8 @@ __forceinline int TextureSlot_Release(int slot, int force)
     return g_textureRefCount[slot];
 }
 
-// TriangleBatch::SetBlend, AddQuad and TextureObject::UpdateImage are inline in the original: callers expand them and
-// the code that calls the out-of-line copies (effect record drawing 0x71e010, not ported yet) keeps them in the exe.
-// texture_mgr.cpp defines TEXTURE_MGR_OUT_OF_LINE to keep out-of-line copies for the byte comparison until that caller
-// is ported.
-
-// Calls BeginRenderTo with the size of the source image and `value`.
-TEXTURE_MGR_INLINE int TextureObject::UpdateImage(int value)
-{
-    return BeginRenderTo(sourceWidth, sourceHeight, value);
-}
-
 // Switches the batch to blend mode `mode`, flushing the queued triangles when the mode changes.
-TEXTURE_MGR_INLINE int TriangleBatch::SetBlend(int mode, int unused)
+inline int TriangleBatch::SetBlend(int mode, int unused)
 {
     if (blendMode != BLEND_MODE_UNSET)
     {
@@ -248,7 +233,7 @@ TEXTURE_MGR_INLINE int TriangleBatch::SetBlend(int mode, int unused)
 
 // Queues a textured quad (two triangles, six vertices) with `newTexture`, flushing first when the texture changes or
 // the buffer is full. Returns 0. Called by the effect record drawing.
-TEXTURE_MGR_INLINE int TriangleBatch::AddQuad(TextureObject *newTexture, float left, float top, float right, float bottom, float u0,
+inline int TriangleBatch::AddQuad(TextureObject *newTexture, float left, float top, float right, float bottom, float u0,
                                   float v0, float u1, float v1, float z, float alpha, float r, float g, float b,
                                   float r2, float g2, float b2, float rotation)
 {

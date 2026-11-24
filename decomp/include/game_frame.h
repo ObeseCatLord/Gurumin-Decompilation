@@ -3,6 +3,7 @@
 #define GURUMIN_GAME_FRAME_H
 
 #include "vec4.h"
+#include "matrix4.h"
 
 // 0x1011d810 (the in-game frame, called by the frame step in game mode 1). Runs one pass of the game logic for each
 // engine tick that has elapsed since the last frame (the first frame also resets the mode's globals), then prepares
@@ -63,4 +64,5 @@ extern "C" Vec4 DAT_10836dd8[10];            // the pad stick's last 10 directio
 
 extern "C" unsigned int DAT_1042dda8[30];    // the last 30 input codes (greetings, walking, action), newest last
 extern "C" void FUN_100114a0(void);          // 0x100114a0
+extern "C" Matrix4 DAT_10836c98;           // copy of the player's matrix, raised for the held item's effects
 #endif

@@ -37,14 +37,13 @@
 #include "texture_load.h"
 #include "tutorial_book.h"
 #include "field_item_menu.h"
+#include "item_use_texts.h"
 
 #pragma auto_inline(on)
 
 #define SOUND_MENU_OPEN 0x361
 #define SOUND_MENU_CLOSE 0x362
 #define SOUND_MENU_SCROLL 0x363
-#define SOUND_ITEM_USED 0x1f
-#define VOLUME_FULL 1.0f
 
 #define INPUT_LOCK_FRAMES 10
 #define STICK_DEAD_ZONE 4
@@ -68,7 +67,6 @@
 #define MENU_ANIM_FRAMES 15
 
 #define WINDOW_ID_SLOT_LIST 0x22c
-#define ALTERNATE_STYLE_FRAMES 0x1e
 
 // Entries of DAT_104485e8 that are commands, not items.
 #define ENTRY_SAVE 0xa1
@@ -77,18 +75,7 @@
 #define ENTRY_PAGE_COMMAND 0xa4
 #define ENTRY_QUIT 0xa5
 
-// Costumes that refuse equipment (DAT_10c655f0).
-#define COSTUME_TOO_SMALL 6
-#define COSTUME_UNSUITED_A 8
-#define COSTUME_UNSUITED_B 0xb
-#define COSTUME_UNSUITED_C 0xc
 
-// Shift-JIS messages shown when an item cannot be used.
-#define TEXT_HEALTH_FULL "\x82\x67\x82\x6f\x82\xcd\x96\x9e\x83\x5e\x83\x93\x82\xc5\x82\xb7\x81\x42"
-#define TEXT_CANNOT_USE_HERE "\x82\xb1\x82\xb1\x82\xc5\x82\xcd\x8e\x67\x82\xa6\x82\xdc\x82\xb9\x82\xf1\x81\x42"
-#define TEXT_DRILL_FULL "\x83\x68\x83\x8a\x83\x8b\x83\x47\x83\x6c\x83\x8b\x83\x4d\x81\x5b\x82\xaa\x96\x9e\x83\x5e\x83\x93\x82\xc5\x82\xb7\x81\x42"
-#define TEXT_TOO_SMALL "\x83\x54\x83\x43\x83\x59\x82\xaa\x8d\x87\x82\xed\x82\xc8\x82\xa2\x81\x42"
-#define TEXT_UNSUITED "\x8e\x97\x8d\x87\x82\xed\x82\xc8\x82\xa2\x81\x42"
 
 // Closes the item menu: the close sound, the menu windows and caption, the overlay model with its texture slots,
 // then the menu state. Does nothing past the sound when the menu is not open.

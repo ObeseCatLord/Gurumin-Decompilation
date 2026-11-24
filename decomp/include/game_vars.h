@@ -56,7 +56,7 @@ extern "C" int DAT_1020d648;
 extern "C" EffectHold DAT_1020dcf8[EFFECT_HOLD_COUNT];
 extern "C" char DAT_1020e0f8[];                           // second banner text (empty = none)
 extern "C" int DAT_10210b28;
-extern "C" int DAT_10210b2c;
+extern "C" float DAT_10210b2c;
 extern "C" int DAT_102199b0;
 extern "C" char DAT_10219bc0[];                           // the message shown
 extern "C" char DAT_1021a360;
@@ -91,7 +91,7 @@ extern "C" char DAT_1030c47a;
 extern "C" char DAT_1030c47b;
 extern "C" int DAT_1030c500[0x100];                       // the overlay mode's state (entry 0x13 is cleared first)
 extern "C" int DAT_1030c568;
-extern "C" int DAT_1030c990;
+extern "C" float DAT_1030c990;
 extern "C" char DAT_103150c0[0x80];                      // item stock per item id (saved with the game)
 extern "C" int DAT_103154b0[0x6000];
 extern "C" float DAT_1032d4b0;                            // fade step per frame

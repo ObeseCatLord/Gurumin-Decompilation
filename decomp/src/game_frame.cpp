@@ -129,6 +129,12 @@
 
 #include "menu_save_load.h"
 
+#include "map_placement.h"
+
+#include "item_info.h"
+
+#include "item_use_texts.h"
+
 #include "game_frame.h"
 
 // Hidden-part loop, light shafts: DAT_10f65848 holds SHAFT_COUNT shafts (x, y offsets and w opacity).
@@ -463,6 +469,16 @@ static __forceinline void CloseItemList(void)
 #define LOCK_TAG_KIND_BASE 200       // nearTag = kind + 200: the near position has a kind above 2
 #define LOCK_SPARKLE_EFFECT 0x26ff
 #define SETTLE_MOTION_SPEED 35.0f
+#define LOCK_NEAREST_START 100000.0f // distance a lock candidate must beat
+#define LOCK_AHEAD 60.0f             // the lock search point lies this far ahead of the player
+#define LOCK_KEEP_HEIGHT 0x1e0       // the locked target stays while it is within this height of that point
+#define LOCK_BASE_REACH 0x15e        // reach added to the target's own value (DAT_102192c0) and the player's collider reach
+#define LOCK_REACH_HEIGHT 480.0
+#define ITEM_USE_TIME_LIMIT 10000    // DAT_104c0228 at or above this: items cannot be used
+#define HELD_LIGHT_RAISE 60.0f       // the player's matrix is raised this much for the held item's effects
+#define HELMET_KIND_RED 0x1a         // ItemInfo::helmetKind values with their own light colour
+#define HELMET_KIND_BLUE 0x1c
+#define HELMET_KIND_WHITE 0x1d
 #define FocusPoint(index) ((Vec4 *)DAT_1032d5b8[index])   // the camera position as a Vec4 (the records are 16 bytes)
 
 // The door models that play the swing effect when their animation starts.
@@ -3143,8 +3159,175 @@ pullTargetChosen:
                 DAT_104c0155 = 0;
                 DAT_10db6ee8[0].matrix.GetTranslation();
             }
-settleTargetDone:;
-            // STAGE 4b: player input and its actions, second part, pseudo.c lines 4864-5864
+settleTargetDone:
+            {
+                // Lock on the character slot nearest to the point LOCK_AHEAD units ahead of the player (the slots
+                // LOCK_FIRST_MODEL..DOOR_FIRST_MODEL - 1 that can be lunged at).
+                int lockTarget = -1;
+                float nearestLock = LOCK_NEAREST_START;
+                Vec4 ahead = DAT_10db6ee8[0].matrix.GetTranslation();
+                float aheadCos = (float)cos((double)(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI));
+                ahead.x = aheadCos * LOCK_AHEAD + ahead.x;
+                float aheadSin = (float)sin((double)(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI));
+                ahead.y = aheadSin * LOCK_AHEAD + ahead.y;
+                if (DAT_104c02b8 > 0 && DAT_102239d0[DAT_104c02b8] != 0
+                    && abs((int)(DAT_10db6ee8[DAT_104c02b8].matrix.translation.z - ahead.z)) < LOCK_KEEP_HEIGHT)
+                    DAT_102024ac = DAT_104c02b8;
+                else
+                {
+                    for (i = LOCK_FIRST_MODEL; i < DOOR_FIRST_MODEL; i++)
+                    {
+                        float distance;
+                        if (i == DAT_104c02b8)
+                        {
+                            if (DAT_104bfe30 == 0 && (DAT_1021f3c0[i] == 'c' || DAT_1021f3c0[i] == 3)
+                                && DAT_10daaae8[i].stats[STAT_BUSY] == 0
+                                && (DAT_102239d0[i] != 0 || DAT_10daaae8[i].stats[STAT_HEALTH] > 0)
+                                && DAT_10daaae8[i].m_0141 == 0)
+                            {
+                                distance = (DAT_1020e338[i]->GetTranslation() - ahead).Length2D();
+                                if (distance < nearestLock)
+                                {
+                                    nearestLock = distance;
+                                    goto lockCandidateFound;
+                                }
+                            }
+                        }
+                        else if (DAT_104bfe30 == 0 && (DAT_1021f3c0[i] == 'c' || DAT_1021f3c0[i] == 3)
+                                 && DAT_10daaae8[i].stats[STAT_BUSY] == 0
+                                 && (DAT_102239d0[i] != 0 || DAT_10daaae8[i].stats[STAT_HEALTH] > 0)
+                                 && DAT_10daaae8[i].m_0141 == 0)
+                        {
+                            distance = DAT_1020e338[i]->GetTranslation().Distance(ahead);
+                            if (distance < nearestLock)
+                            {
+                                nearestLock = distance;
+lockCandidateFound:
+                                lockTarget = i;
+                            }
+                        }
+                    }
+                    DAT_104bfeba = 0;
+                    if (DAT_104bfdf0 == 0)
+                    {
+                        if (lockTarget >= 0)
+                        {
+                            Vec4 lockAt = DAT_1020e338[lockTarget]->GetTranslation();
+                            if (DAT_104bfe30 == 0 && DAT_104c00ac == 0
+                                && (DAT_1021f3c0[lockTarget] == 'c' || DAT_1021f3c0[lockTarget] == 3)
+                                && (DAT_102239d0[lockTarget] != 0 || DAT_10daaae8[lockTarget].stats[STAT_HEALTH] > 0))
+                            {
+                                float lockDistance = (ahead - lockAt).Length2D();
+                                float lockLimit = (float)(DAT_102192c0[lockTarget] + LOCK_BASE_REACH);
+                                if (lockDistance <= lockLimit + DAT_10db6ee8[DAT_104bf8b4].colliderReach
+                                    && fabs((double)(lockAt.z - ahead.z)) < LOCK_REACH_HEIGHT)
+                                {
+                                    DAT_104bfe20 = 1;
+                                    DAT_102024ac = lockTarget;
+                                    goto lockTargetStored;
+                                }
+                            }
+                        }
+                        DAT_104bfe20 = 0;
+                        DAT_102024ac = -1;
+                    }
+                }
+lockTargetStored:
+                DAT_104c02b8 = DAT_102024ac;
+                // The held item: refused while it cannot be used here, otherwise taken in hand.
+                if (DAT_104bfdf0 == 0 && inputEvents != 0)
+                {
+                    DAT_10db6ee8[0].matrix.GetTranslation();
+                    if (DAT_104c0228 >= ITEM_USE_TIME_LIMIT)
+                        FUN_1000edf0(TEXT_CANNOT_USE_NOW, 0, ALTERNATE_STYLE_FRAMES);
+                    else if (DAT_104bfe30 != 0)
+                        FUN_1000edf0(TEXT_CANNOT_USE_LADDER, 0, ALTERNATE_STYLE_FRAMES);
+                    else if (DAT_104bfe4c != 0)
+                        FUN_1000edf0(TEXT_CANNOT_USE_UNDERWATER, 0, ALTERNATE_STYLE_FRAMES);
+                    else if (DAT_104c0300 != 0)
+                        FUN_1000edf0(TEXT_HEAD_BUMP, 0, ALTERNATE_STYLE_FRAMES);
+                    else
+                    {
+                        const ItemInfo &info = DAT_1088e6b0[modelIdx];
+                        const ItemText &text = DAT_108f667c[modelIdx];
+                        if (info.type == 1 && DAT_10c655f0 == COSTUME_TOO_SMALL)
+                            FUN_1000edf0(TEXT_TOO_SMALL, 0, ALTERNATE_STYLE_FRAMES);
+                        else if (info.type == 1 && (DAT_10c655f0 == COSTUME_UNSUITED_A || DAT_10c655f0 == COSTUME_UNSUITED_B
+                                                    || DAT_10c655f0 == COSTUME_UNSUITED_C))
+                            FUN_1000edf0(TEXT_UNSUITED, 0, ALTERNATE_STYLE_FRAMES);
+                        else if (modelIdx > 0)
+                        {
+                            if (info.healsHealth != 0 && DAT_10daaae8[0].stats[STAT_HEALTH] == DAT_10daaae8[0].stats[STAT_MAX_HEALTH])
+                                FUN_1000edf0(TEXT_HEALTH_FULL, 0, ALTERNATE_STYLE_FRAMES);
+                            else if (info.drillFullFlag != 0 && DAT_10874848.TestScriptFlag(info.drillFullFlag) != 0)
+                                FUN_1000edf0(TEXT_DRILL_FULL, 0, ALTERNATE_STYLE_FRAMES);
+                            else
+                            {
+                                DAT_102024ac = -1;
+                                if (info.type != 2 && info.type != 3 && info.type != 4)
+                                {
+                                    DAT_10db6ee8[0].m_0294 = 1;
+                                    DAT_10db6ee8[0].motionFrame = 0;
+                                    DAT_10db6ee8[0].LoadModel(FUN_1013f8a0(text.modelPath, 0));
+                                    DAT_104bfdf0 = text.heldState;
+                                    DAT_104c0319 = 0;
+                                }
+                                if (text.keepOnUse == 0 && info.consumable != 0)
+                                {
+                                    int amount = 1;
+                                    int index = modelIdx;
+                                    FUN_100120a0(&index, &amount);
+                                    if (DAT_103150c0[modelIdx] < 1)
+                                        DAT_10202464[0] = 0;
+                                }
+                                if (DAT_10c5e1c4[text.useScript] != 0)
+                                {
+                                    DAT_1020247c[DAT_104bfe88] = text.useScript;
+                                    DAT_104bfe88 = DAT_104bfe88 + 1 & 7;
+                                    FUN_1003ad20(SOUND_ITEM_USED, 0, VOLUME_FULL);
+                                    return 0;
+                                }
+                            }
+                        }
+                    }
+                }
+                // The player's matrix raised for the effects, and the light colour of the worn helmet kind.
+                DAT_10836c98 = DAT_10db6ee8[0].matrix;
+                DAT_10836c98.m[MATRIX_TRANSLATION_Z] = DAT_10db9248 + HELD_LIGHT_RAISE;
+                DAT_1030c990 = steerY;
+                DAT_10210b2c = steerX;
+                DAT_10db6ee8[0].m_02a1 = 0;
+                {
+                    float lightR, lightG, lightB;
+                    int helmetKind = DAT_1088e6b0[DAT_10daabb8].helmetKind;
+                    if (helmetKind == HELMET_KIND_RED)
+                    {
+                        lightR = 1.0f;
+                        lightG = 0.3f;
+                        lightB = 0.1f;
+                    }
+                    else if (helmetKind == HELMET_KIND_BLUE)
+                    {
+                        lightR = 0.4f;
+                        lightG = 0.3f;
+                        lightB = 1.0f;
+                    }
+                    else if (helmetKind == HELMET_KIND_WHITE)
+                    {
+                        lightR = 1.0f;
+                        lightG = 1.0f;
+                        lightB = 1.0f;
+                    }
+                    else
+                    {
+                        lightR = 0.9f;
+                        lightG = 0.8f;
+                        lightB = 0.5f;
+                    }
+                    DAT_10daaa80.colour.Set(lightR, lightG, lightB, 1.0f);
+                }
+                // STAGE 4c: the greeting and talk block, pseudo.c lines 5073-5864 (ends with the closing brace of the block opened above)
+            }
             // STAGE 5: player input and its actions, last part (ends the block), pseudo.c lines 5865-6523
         }
         // The block above is left by a goto at pseudo line 6480 (label LAB_1012984b, next line).

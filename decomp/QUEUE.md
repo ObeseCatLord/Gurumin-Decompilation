@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (324)
+## 1. Walls to retry (327)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -161,6 +161,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10086380` 11823 — Enemy_FlockDiver (enemy_flock_diver.cpp, 11872 vs 11823 bytes, first-pass draft): esi/edi roles swapped (the original keeps the formation state in esi and the slot's AnimModel offset in edi); the formation A/B tests share the pull body by a jump in the original; holdFlag shares a stack slot with an int-to-float spill; the pattern switch tail merge; floorf and RotationZ results discarded as in the asm
 - [ ] `10089210` 2033 — ListBank::RunStatements (script_run.cpp, 2048 vs 2033 bytes): structure, stack slots and calls match; from the switch default sprintf onward the scratch registers shift by one (original eax/edx, ours edx/ecx) and the loop-entry compare is cmp edx,ecx / jbe instead of cmp ecx,edx / jae; || form, a hit variable, goto into the else, while/do/for(;;) and reversed operands tried
 - [ ] `10089a10` 11265 — ListBank::CompileCall (Script_CompileCall, script_compile_call.cpp, 10544 vs 11265 bytes, first-pass draft): the original has an 8-aligned ebp frame (push ebp; mov ebp,esp; and esp,-8; frame 0xa474, cookie xored with [ebp+4]) so every offset differs (a double local?); the reduction passes keep n-1 in a slot decremented by 2 and jump back without re-testing, with full duplicated else-if conditions (ours passes i/n by pointer to ReduceBinary helpers); postfix ++/-- re-tests dl (two separate ifs)
+- [ ] `1008c680` 14341 — Hud_DrawFrame (hud_frame.cpp, 12656 vs 14341 bytes): whole function reconstructed, opening through the margin bars and IME panel line up; the original has a /GS cookie (frame 0x1e0 vs ours 0x1e4, trigger unknown); middle (gauge, strip, ring, number arms) not compared, ~1685 bytes short; the original's function-scope Matrix4 before the cutscene block is an unused local here (check against the no-dummy rule)
 - [ ] `1008fea0` 8040 — DrillClaws_Update (drill_claws.cpp, 8080 vs 8040 bytes, full draft): diverges at the top: the original keeps level/gauge in eax/edx loaded right after the four null checks and tests costume 6 with je to the costume-6 path (ours reloads gauge into eax); area test as a macro vs ternary tried; the orbit/sweep/launch loops and the docked loop not compared yet
 - [ ] `10092af0` 4552 — Scene_HostCallback (scene_callback.cpp, 4560 vs 4552 bytes): everything matches except the new-slot reset after rep stosd (codes 1..99, orig 0x100930a0): the original stores the six per-slot zeroes as mov [..],0 immediates before the first Vec4::Fill call, ours reuses al/eax/edi as a zero register and splits them around the Fill pushes; loop vs memset for the CharState clear and store reordering tried. scene_start.cpp still passes it as extern "C" FUN_10092af0(int,int); WorldCallback should be (int, int *)
 - [ ] `10099b30` 2897 — Enemy_StrafeAndBurst (enemy_strafe.cpp, rule-clean): the same ebx/edi swap as 1009a690, and the idle block (motion 2, then `if (rand % 100 > 2) return 0;` before the motion-speed check) is merged into two copies (chase/left/right and back) where the original has one, placed before the end check. The defeated branch matches only as an if/else with two full FUN_1003a7d0 calls (cl hoists the common arguments); a ternary path is evaluated first.
@@ -202,6 +203,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 - [ ] `100ed9b0` 1258 — ListBank::CompileStatement (listbank.cpp, 1264 vs 1258 bytes): all but the int/float/string tail matches; the original puts the string-test jne to the call block, then the shared error block, the float declare and the call block last, without cross-jumping the int/float DeclareFromText tails; every spelling gives call-first (1264) or merged declares (1248)
+- [ ] `100f5a80` 14960 — Scene_Frame (scene_frame.cpp, 14000 vs 14960 bytes): rule-clean complete draft; the original has one more 16-byte Vec4 local (frame 0x228 vs 0x218) so all stack slots shift, the DAT_10c64f78 setter does not thread the bank/gauge test, the scripted-walk block layout is unverified, and the people loop, camera chain and tail are not yet compared
 - [ ] `100f9670` 7639 — Char_UpdateByKind (char_update.cpp, 8176 vs 7639 bytes, draft): esi/edi swapped (model vs slot offset), the pause globals DAT_104bfe1c/DAT_104c0135 and the greeting counter are cached in registers in the original, the quaternion temporaries sit elsewhere, the case bodies of the big kind switch are laid out differently, goto rememberMotion; tidy-up before any match: the kind steps use words[WORD_*] index macros instead of named CharState members (typed-members rule)
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
 - [ ] `100fb7b0` 3089 — Scene_Reset (scene_reset.cpp, 3104 vs 3089 bytes): (1) slot 16 kind: the original keeps a redundant cmp edx,0x64; jge before storing 0x16 on the map<100 path; (2) first-state loop compares value%100 against ebx (ours test edx,edx) and increments before storing the pointer; (3) DAT_1021b928[0..4] zeroed via a fresh xor edx with the fifth store interleaved (ours ebx); (4) O_067 pair loop uses add eax,2 (ours reuses ebp=2) and stores the link slot before SetIdentity. Rule cleanup: (&DAT_10802bf8[slot].position)[k] and (&DAT_1049f0c8[0].first)[n] index across struct members; M_1019ed10 returns a Node* but node.h declares int (cast at the call)
@@ -211,6 +213,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `101011b0` 13173 — Script_ValueCommand (value_command.cpp, 10928 vs 13173 bytes): first draft, logic complete but not shaped; the original's frame keeps three Vec4 and a Matrix4 constructed at entry (omitted); TestScriptFlag is an out-of-line call with ecx=0x10874848 (ours inlines Game::TestScriptFlag); 13-byte text lines staged through a stack buffer; per-slot statement pairs unrolled; FUN_1005ce80 called with 3 args (header) where the original pushes 4
 - [ ] `10112140` 10038 — Menu_Main (menu_main.cpp, 10048 vs 10038 bytes): structure and frame (0x200) match through the difficulty and save-list blocks; residue: hoisted esi=0x218/ebp=1 constants at the top, the c7e0/c7e4 goto-shaped join into the load-list build, the shop mode-3 chain (a redundant ==3 re-test in the original), map-start tail order, final close sequence; Game::FindSlot stays out of line, so a file-local forceinline FindWindowSlot repeats its loop
 - [ ] `10115cd0` 2163 — ItemDictionary_Update (item_dictionary.cpp, 2176 bytes, 119 off): only the prologue register choice differs (original loads the DAT_104bf8bc flag into eax after push eax with the constant 1 in ecx and later in ebp; ours loads the flag into ecx before push -1 with 1 in eax, so mov [x],eax is 1 byte shorter and a nop shifts the first loop); obtained[4] (frame 0x3c0), function-scope locals, x==0/!x/local flag, store orders and the fade ladder all tried. FUN_101603c0 is int* here but unsigned* in save_write.cpp (original sar)
+- [ ] `1011a060` 14244 — Field_Update (field_update.cpp, complete compiling draft, 13824 vs 14244 bytes, frame 0x838 vs 0x7c0): not tuned. Unverified: the DistanceSquared pairs for culling flag m_2378; targets of the three Copy calls after the first camera setup; effect-hold Start argument order; the tick camera block builds 4 Matrix4 vs 5; distances[] vs afStack_128[67]; DrawHeldItem written from asm; first-frame clear of DAT_1020c2b0 is a memset because dodge_game.h and soccer_ai.h declare it differently; kumo nodes DAT_1021c624/628/62c should become one array
 - [ ] `10137b10` 1889 — Game_FrameStep (frame_step.cpp, 1904 vs 1889 bytes; was named Screenshot_Capture): one register residue spreads through the function: the original keeps the constant 1 in ebx throughout and writes 100 as an immediate or through esi, ours puts 100 in ebx and 1 in edi; limit local vs direct stats compare, store order, reversed compare and a mode local tried
 - [ ] `10138280` 10107 — Script_GameBuiltin (script_game_builtin.cpp, 10992 vs 10107 bytes, draft; cases in the original's address order): frame 0x8f0 vs 0x81c (the char buffers do not share slots like the original's), Recover keeps the GetTranslation pointer in esi, PLAY_MOVIE post-loop block order, PLAY_MOVIE2 uses ebp as the zero register; the later cases (Custom, Ksk, Kabe, Type) not compared
 - [ ] `1013b700` 10376 — Game_Main (game_main.cpp, 10512 vs 10376 bytes, complete draft): frame 0xb40 vs 0xbb0, so the 256-byte path buffers (executableFolder, pathFileName, dataFolder, userName, appDllPath, userFolder, checkedPath, tableDll, demoName) need the original's scoping (original offsets 0x3d4/0x3f4/0x4bc/0x5c0/0x6c0/0x7c4); the original loads ecx = DAT_10836c70 / DAT_10804bf8 before FUN_10161970, FUN_1013eeb0, FUN_1013eed0 and FUN_101649c0 (methods with `this` unused, defined as extern "C" free functions in engine_1013e/engine_base/mmv_texreg); text_fields.cpp declares FUN_1013dfc0 with the wrong parameters
@@ -351,11 +354,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (23)
+## 5. Very large functions (over 3000 bytes) (20)
 
-- [ ] `1011a060` 14244 bytes (float, loops 39, calls 354)
-- [ ] `1008c680` 14341 bytes (float, loops 12, calls 204)
-- [ ] `100f5a80` 14960 bytes (float, loops 32, calls 323)
 - [ ] `10058790` 15026 bytes (float, loops 14, calls 321)
 - [ ] `10116550` 15107 bytes (float, loops 5, calls 63)
 - [ ] `10175f20` 16619 bytes (float, loops 13, calls 529)
@@ -382,7 +382,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (20 files)
+## 7. Comment pass (21 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
@@ -405,6 +405,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/player_path_walk.cpp`: 1 of 2 functions without a comment
 - [ ] `src/route_carrier.cpp`: 0 of 2 functions without a comment, no header
 - [ ] `src/route_follow.cpp`: 0 of 0 functions without a comment, no header
+- [ ] `src/scene_frame.cpp`: 2 of 8 functions without a comment
 - [ ] `src/shaga_update.cpp`: 1 of 6 functions without a comment
 - [ ] `src/swing_platform.cpp`: 2 of 3 functions without a comment
 

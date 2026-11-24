@@ -409,3 +409,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 345 | 38 | match | Sonnet subagents: 3 drafts (Game_Main, Node::ParseChunks, OnResetDevice ~7 diffs); 857 matched, fuzzy 38.42% |
 | 346 | 38 | match | Sonnet subagents: 5 drafts (CompileCall, Enemy_FlockDiver, Enemy_LeapAndClimb, Npc_RoamZones, EffectManager::Step); 857 matched, fuzzy 39.24% |
 | 347 | 38 | match | Sonnet subagents: 3 drafts (Script_ValueCommand, Enemy_WispCaster, Camera_Update); 857 matched, fuzzy 39.97% |
+| 348 | 38 | match | Sonnet subagents: 3 drafts (Field_Update, Hud_DrawFrame, Scene_Frame); 857 matched, fuzzy 40.85% |

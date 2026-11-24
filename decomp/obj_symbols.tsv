@@ -637,3 +637,10 @@ _Enemy_IsBusy	100e1c40
 ?CollideProbesWithMesh@Node@@QAEHIPAUMatrix4@@PAU1@MPAMPAUVec4@@HPAH33I4H44@Z	1019f340
 ?DodgeGame_UpdateGolemPiece@@YAHH@Z	1005fc00
 ?Enemy_WanderHopAndSpit@@YAHH@Z	10065bf0
+?ApplyCommandText@Node@@QAEHPBD@Z	101a3000
+?NextToken@Node@@QAEHPADPBDPAH@Z	1019b280
+?DecomposeMatrix@@YAXPBUMatrix4@@PAUVec4@@11@Z	101b1910
+?Script_SystemCommand@@YAHHH@Z	100fedd0
+?Scene_DrawFrame@@YAXH@Z	10038c10
+?DrawGradient@TextureObject@@QAEHHHHHIIMM@Z	10143bc0
+?FUN_100404e0@@YAHHHHHHHH@Z	100404e0

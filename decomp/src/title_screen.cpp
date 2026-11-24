@@ -282,7 +282,7 @@ int TitleScreen_Update()
                                               BACKGROUND_Z, progress > 1.0 ? 1.0 : progress, 0, 0);
     }
     if (DAT_10255f08 != 0)
-        FUN_10038c10(0);
+        Scene_DrawFrame(0);
     FUN_1013f070(0xe, 0, 0);
     FUN_1013f070(0, 5, 0);
     FUN_1013f070(0, 0, 0);

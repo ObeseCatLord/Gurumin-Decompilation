@@ -454,7 +454,7 @@ extern "C" char DAT_10f60590[];                           // save directory pref
 extern "C" int DAT_10f654b4;
 extern "C" int DAT_10f654b8;
 extern "C" int DAT_10f654f8;
-extern "C" int DAT_10f654fc;
+extern "C" float DAT_10f654fc;                         // strength of the post effect (shader constant)
 extern "C" char DAT_1101d87c;
 extern "C" int DAT_11b044f0;
 

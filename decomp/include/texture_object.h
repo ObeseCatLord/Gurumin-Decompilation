@@ -66,6 +66,8 @@ struct TextureObject : TextureHandle
                  float alpha, float angle);
     int DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
                    float alpha, float angle, float grey);
+    int DrawGradient(int left, int top, int right, int bottom, unsigned int topColour, unsigned int bottomColour, float z,
+                     float alpha);                            // 0x10143bc0: untextured rectangle, colour fading from top to bottom
     int DrawColoured(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
                      float alpha, float angle, float red, float green, float blue);                          // 0x1014c960
     int DrawFrame(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);

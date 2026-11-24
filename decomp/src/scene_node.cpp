@@ -1823,7 +1823,7 @@ int Node::Clone(Node *source, int motionSlot, int meshSlot)
     fogColour.Copy(source->fogColour);
     m_1878 = source->m_1878;
     fogDensity = source->fogDensity;
-    m_1884 = source->m_1884;
+    lightConeInner = source->lightConeInner;
     m_1888 = source->m_1888;
     fogNear = source->fogNear;
     fogFar = source->fogFar;

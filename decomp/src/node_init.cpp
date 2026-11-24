@@ -36,7 +36,7 @@ void Node::Init()
     m_187e = 0xff;
     m_0098 = DAT_11b07118;
     m_1858 = 0;
-    m_1884 = 0;
+    lightConeInner = 0;
     m_1888 = 45.0f;
     fogNear = 0;
     fogFar = 0;

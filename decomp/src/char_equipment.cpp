@@ -30,7 +30,7 @@
 extern "C" int FUN_1013f880(void);                                         // the game's random number
 extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a);   // ColourFade_Start
 extern "C" int FUN_1003a7d0(const char *path, float x, float y, float z, int start, float ox, float oy, float oz);  // EffectModel_Place
-extern "C" int FUN_100404e0(int index, int a, int b, int c, int d, int e, int f);
+int FUN_100404e0(int index, int mount, int clothes, int head, int weapon, int skipKindSelect, int alternative);  // Char_PutOnEquipment (char_equip_models.h; an #include here changes FUN_100615f0's code)
 extern "C" int FUN_1001b0a0(int index, int alternative, int quiet);        // Char_SelectKind
 
 #define EQUIP_FIELD_UNIT 100

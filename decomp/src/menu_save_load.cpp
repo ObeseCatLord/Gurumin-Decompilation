@@ -167,7 +167,7 @@ extern "C" int FUN_10064630(void)
         {
             DAT_10f65484 = 0;
             if (DAT_104bf8c0 == 1)
-                FUN_10038c10(0);
+                Scene_DrawFrame(0);
             else
                 Menu_DrawScene();
             FUN_1013f070(RENDER_FLUSH_SCENE, 0, 0);
@@ -176,7 +176,7 @@ extern "C" int FUN_10064630(void)
         else
         {
             if (DAT_104bf8c0 == 1)
-                FUN_10038c10(0);
+                Scene_DrawFrame(0);
             else
                 Menu_DrawScene();
             FUN_1013f070(RENDER_FLUSH_SCENE, 0, 0);

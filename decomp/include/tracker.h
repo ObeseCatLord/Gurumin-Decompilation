@@ -18,6 +18,7 @@ struct Tracker
     HWND window;
     int m_0020;
     int m_0024;
+    int M_10001010(int p, int q, int r);   // 0x10001010 (Obj::M_10001010 in app_0001.cpp)
     int M_10001110(int *pos, char *a, char *b, char *c, int *d, char *e);   // Mouse_GetState
     int M_10001090(int x, int y);
     int M_10001440();

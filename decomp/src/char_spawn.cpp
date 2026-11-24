@@ -32,7 +32,7 @@
 #define NODE_FLAGS_HIDE 0x20
 
 extern "C" int FUN_10011d40(float a, float b, float c);
-extern "C" int FUN_100404e0(int index, int a, int b, int c, int d, int e, int f);
+#include "char_equip_models.h"
 
 // 0x10050510 (Char_SpawnEnemy). Starts an enemy at (a, b, c). Without `kind` and `route` it takes the first free
 // enemy slot (FUN_10011d40). Otherwise it searches the enemy slots for a live enemy that is out of the world or

@@ -145,7 +145,7 @@ struct Node
     unsigned char m_187d;        // 0x187d: copied into the camera path list
     unsigned char m_187e;        // 0x187e: 0xff after Init
     float fogDensity;            // 0x1880: fog density of a "fogset" root node, 1.0 after Init
-    int m_1884;                  // 0x1884
+    float lightConeInner;        // 0x1884: first value of the "setlightcone" command
     float m_1888;                // 0x1888: 45.0 after Init
     float fogNear;               // 0x188c: distance the fog of a "fogset" root node starts at
     float fogFar;                // 0x1890: distance it is full at
@@ -239,7 +239,10 @@ struct Node
     int M_1019d680();                                     // 0x1019d680: clears the special pass marker upwards
     int ClearSpecialPassOnLinks();                        // 0x1019d6a0
     int M_101a8760();                                     // 0x101a8760: both special pass steps
-    int M_101a3000(const int *parameters);                // 0x101a3000: applies a block of node parameters (Scene callback 0x458)
+    // 0x101a3000 (node_commands.cpp): reads the text of node commands ("hide", "setlightcolor 1 1 1", "priority 3", ...) word
+    // by word and applies each to this node: flags, light settings, animation keys, matrices. Returns 1.
+    int ApplyCommandText(const char *commands) throw();
+    int NextToken(char *out, const char *text, int *position);  // 0x1019b280 (text_token.cpp): the next word of `text`
 
     // Saved states
     int AllocSaved();                                     // 0x101947b0: allocates `saved` on first use

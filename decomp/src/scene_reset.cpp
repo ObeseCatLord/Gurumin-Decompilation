@@ -35,7 +35,7 @@
 #include "scene_reset.h"
 
 extern "C" int FUN_101011b0(int id, int value);
-extern "C" int FUN_100404e0(int index, int a, int b, int c, int d, int e, int f);
+#include "char_equip_models.h"
 extern "C" int FUN_1001b5b0(int index);
 extern "C" int FUN_1016b230(const char *text);
 extern "C" int FUN_100f9670(int slot);

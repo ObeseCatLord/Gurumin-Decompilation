@@ -196,7 +196,8 @@ struct AnimModel
             int blastPush;    // 0x27c: strength of the push
         };
     };
-    char pad_0280[8];
+    int m_0280;               // 0x280: 0 or 1 while the character has not been defeated or moved on
+    char pad_0284[4];
     int m_0288;               // 0x288: set to 6 when destroyed
     int m_028c;               // 0x28c: cleared when destroyed
     float m_0290;             // 0x290: set to a count by LiftProbes on the model it collided with

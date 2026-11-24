@@ -3,6 +3,8 @@
 #ifndef GURUMIN_MENU_SAVE_LOAD_H
 #define GURUMIN_MENU_SAVE_LOAD_H
 
+#include "scene_draw.h"
+
 // Menu window ids used by the save/load menu.
 enum SaveLoadWindow
 {
@@ -47,7 +49,6 @@ extern "C" int DAT_10c646e4;                  // non-zero = the save was trigger
 extern "C" int DAT_10c66d18;
 extern "C" char DAT_10f65370[];               // the config file name
 
-extern "C" int FUN_10038c10(int value);                       // 0x10038c10: draws the scene behind the menu (while DAT_104bf8c0 is 1)
 extern "C" void FUN_1003b180(int cursor, char *caption);      // 0x1003b180: writes the caption of the slot under the cursor
 extern "C" void FUN_100106d0(int cursor, char *caption);      // 0x100106d0: writes the caption of the command under the cursor
 extern "C" void FUN_1014b480(void);                           // 0x1014b480 (Render_ResetSwapTarget, render_reset.cpp)

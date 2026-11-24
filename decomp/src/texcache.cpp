@@ -9,7 +9,7 @@
 
 #include "render_vars.h"
 
-extern "C" void FUN_101493f0(void);
+#include "render_overlay.h"
 extern "C" int FUN_1013ed60(void);
 extern "C" void FUN_101439e0(void);
 extern "C" void FUN_1014b480(void);

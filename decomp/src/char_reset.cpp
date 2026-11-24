@@ -18,8 +18,7 @@
 
 #include "char_tables.h"
 extern "C" void FUN_1000ec70(int frames, float r, float g, float b, float a);   // ColourFade_Start
-extern "C" int FUN_100404e0(int index, int a, int b, int c, int d, int e, int f);
-extern "C" int FUN_1001b0a0(int index, int a, int b);
+#include "char_equip_models.h"
 
 // 0x10043cc0 (Char_ResetState). Starts character `index` over: a kind 0x62 character in mode 11 or 12 first fades
 // the screen to white over 15 frames. The AI state, the start vectors and the pose entry are cleared, a few flags

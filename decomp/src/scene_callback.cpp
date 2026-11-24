@@ -553,7 +553,7 @@ int Scene_HostCallback(int code, int *args)
                         Node *node = DAT_10255f08->Find((const char *)args, i);
                         if (node == 0)
                             return 0;
-                        node->M_101a3000(args + 0x10);
+                        node->ApplyCommandText((const char *)(args + 0x10));
                     }
                 }
                 else if (code == SCENE_CB_DETACH_NODE)

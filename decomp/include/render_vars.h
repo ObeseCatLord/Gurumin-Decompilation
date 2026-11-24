@@ -90,7 +90,7 @@ extern "C" int DAT_10f1de70[0x200];
 extern "C" int DAT_10f1e670[0x5a0];
 extern "C" IDirect3DDevice9 *DAT_10f1fcf0;                // the Direct3D device
 extern "C" float DAT_10f1fcf8;                            // step per update; step per tick
-extern "C" IUnknownLike *DAT_10f1fcfc[2];                 // the two swap targets, created with the device (Render_CreateDevice)
+extern "C" IDirect3DSurface9Like *DAT_10f1fcfc[2];                 // the two swap targets, created with the device (Render_CreateDevice)
 extern "C" IUnknownLike *DAT_10f1fd00;
 extern "C" IUnknownLike *DAT_10f1fd04[8];                 // render-target surfaces
 extern "C" void *DAT_10f1fd08;                            // the four-tap blur pixel shader (overlaps the last render-target surfaces above)

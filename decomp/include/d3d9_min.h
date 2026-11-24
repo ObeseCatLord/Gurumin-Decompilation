@@ -17,6 +17,24 @@ struct D3DVIEWPORT9_
     float MaxZ;
 };
 
+// D3DVERTEXELEMENT9: one element of a vertex declaration (8 bytes).
+struct D3DVERTEXELEMENT9_
+{
+    unsigned short Stream;
+    unsigned short Offset;
+    unsigned char Type;
+    unsigned char Method;
+    unsigned char Usage;
+    unsigned char UsageIndex;
+};
+
+// D3DGAMMARAMP: the three 256-entry gamma curves.
+struct D3DGAMMARAMP_
+{
+    unsigned short red[256];
+    unsigned short green[256];
+    unsigned short blue[256];
+};
 
 // IDirect3DDevice9 in vtable order (the VS2003 SDK has no d3d9.h). Parameters are filled in as methods get used.
 struct IDirect3DDevice9
@@ -42,7 +60,7 @@ struct IDirect3DDevice9
     virtual long __stdcall GetBackBuffer(unsigned int swapChain, unsigned int index, int type, void **surface) = 0;
     virtual long __stdcall GetRasterStatus() = 0;
     virtual long __stdcall SetDialogBoxMode() = 0;
-    virtual long __stdcall SetGammaRamp() = 0;
+    virtual long __stdcall SetGammaRamp(unsigned int swapChain, unsigned long flags, const D3DGAMMARAMP_ *ramp) = 0;
     virtual long __stdcall GetGammaRamp() = 0;
     virtual long __stdcall CreateTexture(unsigned int width, unsigned int height, unsigned int levels,
                                          unsigned long usage, int format, int pool, struct IUnknownLike **texture,
@@ -54,7 +72,9 @@ struct IDirect3DDevice9
     virtual long __stdcall CreateIndexBuffer(unsigned int length, unsigned long usage, int format, int pool,
                                              IUnknownLike **buffer, void *sharedHandle) = 0;
     virtual long __stdcall CreateRenderTarget() = 0;
-    virtual long __stdcall CreateDepthStencilSurface() = 0;
+    virtual long __stdcall CreateDepthStencilSurface(unsigned int width, unsigned int height, int format, int multiSample,
+                                                     unsigned long quality, int discard, IUnknownLike **surface,
+                                                     void *sharedHandle) = 0;
     virtual long __stdcall UpdateSurface() = 0;
     virtual long __stdcall UpdateTexture(struct IUnknownLike *source, struct IUnknownLike *destination) = 0;
     virtual long __stdcall GetRenderTargetData(void *renderTarget, void *destSurface) = 0;
@@ -65,9 +85,9 @@ struct IDirect3DDevice9
     virtual long __stdcall CreateOffscreenPlainSurface(unsigned int width, unsigned int height, int format, int pool,
                                                        void **surface, void *sharedHandle) = 0;
     virtual long __stdcall SetRenderTarget(unsigned long index, void *surface) = 0;
-    virtual long __stdcall GetRenderTarget() = 0;
+    virtual long __stdcall GetRenderTarget(unsigned long index, IUnknownLike **surface) = 0;
     virtual long __stdcall SetDepthStencilSurface(void *surface) = 0;
-    virtual long __stdcall GetDepthStencilSurface() = 0;
+    virtual long __stdcall GetDepthStencilSurface(IUnknownLike **surface) = 0;
     virtual long __stdcall BeginScene() = 0;
     virtual long __stdcall EndScene() = 0;
     virtual long __stdcall Clear(unsigned long count, const struct D3DRECT_ *rects, unsigned long flags,
@@ -105,7 +125,7 @@ struct IDirect3DDevice9
     virtual long __stdcall GetCurrentTexturePalette() = 0;
     virtual long __stdcall SetScissorRect() = 0;
     virtual long __stdcall GetScissorRect() = 0;
-    virtual long __stdcall SetSoftwareVertexProcessing() = 0;
+    virtual long __stdcall SetSoftwareVertexProcessing(int software) = 0;
     virtual long __stdcall GetSoftwareVertexProcessing() = 0;
     virtual long __stdcall SetNPatchMode() = 0;
     virtual long __stdcall GetNPatchMode() = 0;
@@ -114,12 +134,12 @@ struct IDirect3DDevice9
     virtual long __stdcall DrawPrimitiveUP(int type, unsigned int count, const void *data, unsigned int stride) = 0;
     virtual long __stdcall DrawIndexedPrimitiveUP(int type, unsigned int minIndex, unsigned int vertexCount, unsigned int primitiveCount, const void *indices, int indexFormat, const void *vertices, unsigned int stride) = 0;
     virtual long __stdcall ProcessVertices() = 0;
-    virtual long __stdcall CreateVertexDeclaration() = 0;
+    virtual long __stdcall CreateVertexDeclaration(const D3DVERTEXELEMENT9_ *elements, IUnknownLike **declaration) = 0;
     virtual long __stdcall SetVertexDeclaration(void *declaration) = 0;
     virtual long __stdcall GetVertexDeclaration() = 0;
     virtual long __stdcall SetFVF(unsigned long fvf) = 0;
     virtual long __stdcall GetFVF() = 0;
-    virtual long __stdcall CreateVertexShader() = 0;
+    virtual long __stdcall CreateVertexShader(const void *function, IUnknownLike **shader) = 0;
     virtual long __stdcall SetVertexShader(void *shader) = 0;
     virtual long __stdcall GetVertexShader() = 0;
     virtual long __stdcall SetVertexShaderConstantF(unsigned int start, const float *data, unsigned int count) = 0;
@@ -134,7 +154,7 @@ struct IDirect3DDevice9
     virtual long __stdcall GetStreamSourceFreq() = 0;
     virtual long __stdcall SetIndices(void *indexBuffer) = 0;
     virtual long __stdcall GetIndices() = 0;
-    virtual long __stdcall CreatePixelShader() = 0;
+    virtual long __stdcall CreatePixelShader(const void *function, void **shader) = 0;
     virtual long __stdcall SetPixelShader(void *shader) = 0;
     virtual long __stdcall GetPixelShader() = 0;
     virtual long __stdcall SetPixelShaderConstantF(unsigned int start, const float *data, unsigned int count) = 0;

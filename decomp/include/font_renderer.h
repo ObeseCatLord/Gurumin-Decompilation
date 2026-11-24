@@ -22,6 +22,7 @@ struct FontRenderer
     int useAlt;                 // 0x2394: 1 = draw with the alternative font when it is loaded
 
     int Init(HWND window, const char *path);
+    int Release();   // 0x10145970: frees the fonts, bitmap and glyph tables (called at shutdown)
     int GlyphWidth(int color, int x, int y, unsigned short code, unsigned short size, unsigned short sizeAgain);
     int DrawGlyph(unsigned short *pixels, int x, int y, unsigned short code, unsigned short color, unsigned short unused);
     int DrawString(int color, int x, int y, const char *text, unsigned short size, int fixedAdvance);

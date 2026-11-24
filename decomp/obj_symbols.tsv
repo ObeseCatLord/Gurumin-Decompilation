@@ -654,3 +654,6 @@ _Enemy_IsBusy	100e1c40
 ?Char_UpdateByKind@@YAHH@Z	100f9670
 ?Enemy_SpitAndCharge@@YAHH@Z	1006be40
 ?Script_GameBuiltin@@YAXHPATScriptArgument@@PAUListBank@@@Z	10138280
+?ParseChunks@Node@@QAEHPAUGameFile@@HHHI@Z	101a58a0
+?OnResetDevice@TextureManager@@QAEHXZ	1013fbb0
+?Game_Main@@YAHPAUHINSTANCE__@@PBD0@Z	1013b700

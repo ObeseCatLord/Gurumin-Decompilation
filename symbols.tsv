@@ -137,7 +137,9 @@ address	name	evidence
 10114950	TitleScreen_Update	title screen (game mode 0): loads tit*/menu3/6/7 textures, per-tick world, Menu_Main, music and fade, flickering logo pieces, waits for a key or click, draws background, logo and menu frame (title_screen.cpp, matched)
 10115cd0	ItemDictionary_Update	game mode 5: item dictionary window (qsort by level flag, ??? for unobtained items, mouse-spun preview, closes on Esc/key/right click) (item_dictionary.cpp, draft)
 10138280	Script_GameBuiltin	handler of the game's script built-ins (Message, Recover, Wait, movies, Look, reload character, ksk fireworks, wallpaper, Type, custom helmet ...), registered through RegisterBuiltin (script_game_builtin.cpp, draft)
+1013b700	Game_Main	the program's main (GuruMain jumps to it): reads config.ini and the key bindings, creates the window and device, checks the data files against soundarc.dll, builds the projection matrices, runs the Game_FrameStep loop with the anti-tamper checks, then releases everything (game_main.cpp, draft)
 1013f070	Render_Command	renderer command switch: blend mode, texture address/filter, alpha test, cull, depth, fog, clears, begin/end scene (render_command.cpp)
+1013fbb0	TextureManager::OnResetDevice	Render_OnResetDevice: recreates the device resources after creation or Reset: wobble vectors, crossfade size, gamma ramp, back and depth buffers, default states, viewport, crossfade textures, vertex declaration, 7 pixel and 62 vertex shaders (render_on_reset.cpp, draft)
 10143180	Input::ReadControls	joystick (DirectInput or joyGetPosEx) + keyboard through the button mappings: 0 = button mask, 1/2 = x/y axis -128..127 (input_controls.cpp, draft)
 101446f0	TextureObject_DrawBlurred	four-tap blurred full-screen quad (texture_bind.cpp)
 10145ba0	Debug_DrawShape	draws a debug wire or solid shape (ellipsoid, box, tube, rings, cone, line, translucent blue box) with the plain colour shader for the node skeleton and collision debug views (debug_shape.cpp, draft)
@@ -198,6 +200,7 @@ address	name	evidence
 101a1640	Node::Query	tests a sphere at point (matrix space) against the collision triangles of this node and its children or static nodes, filtered by name/exclude tags; -1 on a hit with normal and depth (node_sphere_query.cpp, draft)
 101a3000	Node::ApplyCommandText	node command interpreter: reads the command text word by word (convkeytoani, flags, object/camera, cgmat, iklim, setlight, shader, rename, setanitb ...) and sets the node fields; Scene callback 0x458 (node_commands.cpp, draft, 15 bytes off)
 101a4a60	Node::ScanChunks	pre-pass over the INFO/PLUG/PLU2/MANI/MAN2 chunks of an .it3 file: keeps the plugs, frame matrices and motion cache of the named nodes (model_scan_chunks.cpp, draft)
+101a58a0	Node::ParseChunks	It3_ParseChunks: reads every chunk of an .it3 model file (INFO, RTY2, LIG3, KAN3, INFS, MAT4, VPA2, CHID, MAN2, BONE, CAME, CDLO ...) into the node tree, checks the name key, links parents and children by name and frees orphans (model_parse_chunks.cpp, draft)
 101a9670	Node::RayCast	nearest-hit ray cast over the node tree with required/excluded flags and a two-letter tag filter ("CT" exact, second letter S as wildcard) (node_ray_cast.cpp, draft)
 101aa080	Node::CastSegment2	nearest-hit segment cast over the node tree (mask and name tag filters, keeps the hit closest to the end point, recurses into children or static nodes) (node_segment_cast.cpp, draft)
 101aaa20	Node::CastSegment	nearest-hit segment cast over the node tree like CastSegment2, but tags with a second character S pass the mask test and "CS" passes the name test (node_segment_cast_tags.cpp, draft)
@@ -209,9 +212,7 @@ address	name	evidence
 101b2310	File_Open	File object: stores base name, fopen(path, mode); 15 loader callers
 10160a90	MmvPlayer::Open	loads a whole .MMV movie, its RGB565 palette and first frame (decomp/src/mmv_texreg.cpp)
 101abd60	Model_LoadIt3Alt	error "no 3D data"
-101a58a0	It3_ParseChunks	compares chunk tags INFO/RTY2/LIG3/KAN3/INFS/MAT4/VPA2/CHID/MAN2/BONE/CAME/CDLO
 101455d0	Font_Init	ddfont8.dat, MS P Gothic, m_lpFont (FontRenderer::Init, decomp/src/font_metrics.cpp)
-1013b700	Game_Startup	reads every gurumin.def key (docs/config_keys.tsv), loads packs.dll, demo.sav/%s.sav
 10166950	WorldRenderer::LoadCharacter	resets the scene and reads the character's .itm message file ("##nnnnn text" lines) (decomp/src/world_ctor.cpp)
 101602d0	File_Checksum	sum/xor (seed 0xcc82) over a file in dwords
 1013ed20	Render_BeginScene	EndScene if a scene is open, then IDirect3DDevice9::BeginScene on the device at 0x10f1fcf0
@@ -268,7 +269,6 @@ address	name	evidence
 10188fb0	Texture_ReloadMissing	reloads (0x10174c70) every named texture whose D3D object is gone
 1015c850	Frame_PumpAndRecover	PeekMessage loop (WM_QUIT -> quit flag 0x10f6552c), waits while inactive, TestCooperativeLevel; on DEVICENOTRESET: lost-device release, IDirect3DDevice9::Reset(&0x10f0ff84), restore; then BeginScene
 1014b2a0	Render_OnLostDevice	releases default-pool resources before Reset
-1013fbb0	Render_OnResetDevice	restores render state after Reset
 1001d850	SeasonalEvent	GetLocalTime: 1 on Christmas (Dec 25, or Dec 24 after 18:00), 2 on Jan 1-3, else 0
 10016580	Movie_PlayToTexture	opens an .mmv into the movie player at 0x10f08ab0 and renders it into the texture slot 0x10202478
 10017b10	Script_UnpackVar	decodes a packed script global (low nibble type 1; bits 5-12 and 13-20)

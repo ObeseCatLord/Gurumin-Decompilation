@@ -249,17 +249,17 @@ extern "C" int FUN_100bcce0(int index, int model, Vec4 *target, Vec4 *self)
             int frames = DAT_1020b430[index].airFrames;
             float rise = (float)frames * CHASE_RISE_PER_FRAME;
             float limitedRise = CHASE_RISE_LIMIT > rise ? rise : CHASE_RISE_LIMIT;
-            float speed = (CHASE_SLACK - limitedRise) + DAT_10db6ee8[index].motionSpeed;
-            DAT_10db6ee8[index].motionSpeed = speed;
+            float speed = (CHASE_SLACK - limitedRise) + DAT_10db6ee8[index].verticalSpeed;
+            DAT_10db6ee8[index].verticalSpeed = speed;
             if (speed > CHASE_SPEED_LIMIT)
-                DAT_10db6ee8[index].motionSpeed = CHASE_SPEED_LIMIT;
-            if (DAT_10db6ee8[index].motionSpeed > 0.0f)
+                DAT_10db6ee8[index].verticalSpeed = CHASE_SPEED_LIMIT;
+            if (DAT_10db6ee8[index].verticalSpeed > 0.0f)
                 DAT_10db6ee8[index].m_237c = 0;
             if (DAT_10db6ee8[model].m_238c != 0)
                 DAT_1020b430[index].airFrames = frames + 1;
             Vec4 landing;
             landing.Fill(0.0f);
-            landing.z = DAT_10db6ee8[index].motionSpeed - CHASE_LAND_SPEED;
+            landing.z = DAT_10db6ee8[index].verticalSpeed - CHASE_LAND_SPEED;
             if (landing.z > 0.0f && DAT_10db6ee8[index].IsClearAny(&landing) == 0)
                 DAT_10db6ee8[index].matrix._43 += landing.z;
         }
@@ -273,7 +273,7 @@ extern "C" int FUN_100bcce0(int index, int model, Vec4 *target, Vec4 *self)
     if ((distance > CHASE_FAR || (DAT_1020b430[index].airborne != 0 && distance > CHASE_NEAR)) &&
         (DAT_10802bf8[index].step - *self).Length2D() < CHASE_STILL_DISTANCE && avoiding == 0)
     {
-        if (DAT_10db6ee8[index].motionSpeed < 0.0f || DAT_10db6ee8[index].m_238c != 0 || distance > CHASE_FARTHEST)
+        if (DAT_10db6ee8[index].verticalSpeed < 0.0f || DAT_10db6ee8[index].m_238c != 0 || distance > CHASE_FARTHEST)
             DAT_1020b430[index].stalledFrames++;
         if (DAT_1020b430[index].stalledFrames > CHASE_STALL_LIMIT ||
             (DAT_1020b430[index].airborne != 0 && DAT_1020b430[index].stalledFrames > CHASE_STALL_LIMIT_AIR))

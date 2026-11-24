@@ -9,6 +9,7 @@
 
 #include "game_vars.h"
 #include "ui_vars.h"
+#include "message_window.h"
 
 // Draws the full-screen overlay quad (texture slot DAT_104c0140) with additive blending.
 extern "C" int FUN_1000c340(void)
@@ -20,25 +21,8 @@ extern "C" int FUN_1000c340(void)
     return 1;
 }
 
-// Sets the message window title text (DAT_10210ae8); passing 0 closes the window (state 2).
-// Opening it the first time resets its animation counter.
+// 0x1000cb30. Sets the message window title text (DAT_10210ae8); passing 0 closes the window.
 extern "C" int FUN_1000cb30(const char *text)
 {
-    if (DAT_104bf8d4 != 1)
-    {
-        DAT_104bf8d4 = 1;
-        DAT_104bf8d8 = 0;
-    }
-    if (text != 0)
-    {
-        if (*text == 0)
-        {
-            DAT_10210ae8[0] = 0;
-            return 0;
-        }
-        strcpy(DAT_10210ae8, text);
-        return 0;
-    }
-    DAT_104bf8d4 = 2;
-    return 0;
+    return MessageWindow_SetTitle(text);
 }

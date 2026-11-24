@@ -44,7 +44,7 @@ struct MapRegion
     void *buffer0004;         // 0x04: a third buffer of the region, freed with the others (map_unload.cpp)
     RegionPoint *points;      // 0x08
     int pointCount;           // 0x0c
-    char pad_0010[4];
+    int indexCount;           // 0x10: number of 16-bit indices in buffer0004
     Vec4 min;                 // 0x14: box corner with the smallest coordinates
     Vec4 max;                 // 0x24: box corner with the largest coordinates
     int visible;              // 0x34: set by the update each frame

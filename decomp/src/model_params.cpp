@@ -67,13 +67,13 @@ int AnimModel::AddMotionSpeed(float speed)
         speed = speed / speedDivisor;
     m_2388 = 0;
     m_238c = 0;
-    speed = speed * 0.9f + motionSpeed;
-    motionSpeed = speed;
+    speed = speed * 0.9f + verticalSpeed;
+    verticalSpeed = speed;
     if (m_229c == 0)
         m_229c = 8;
     m_2388 = 1;
     if (speed > 60.0f)
-        motionSpeed = 60.0f;
+        verticalSpeed = 60.0f;
     return 0;
 }
 
@@ -89,13 +89,13 @@ int AnimModel::PushMotionSpeed(float speed)
     {
         m_2388 = 0;
         if (m_229c < 16)
-            motionSpeed = speed * 0.9f + motionSpeed;
+            verticalSpeed = speed * 0.9f + verticalSpeed;
         m_238c = 0;
         if (m_229c == 0)
             m_229c = 8;
     }
-    if (motionSpeed > 60.0f)
-        motionSpeed = 60.0f;
+    if (verticalSpeed > 60.0f)
+        verticalSpeed = 60.0f;
     m_2388++;
     return 0;
 }

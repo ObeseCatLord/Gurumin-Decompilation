@@ -82,7 +82,7 @@ int AnimModel::ResetState()
     m_228c.Fill(0.0f);
     m_229c = 0;
     motionFrame = 0;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     m_2370 = 0;
     m_2374 = 0;
     m_2378 = 0;
@@ -103,7 +103,7 @@ int AnimModel::ResetState()
     m_23f8.Fill(0.0f);
     m_2420.Fill(0.0f);
     m_2430 = 0;
-    m_2478 = 0;
+    updateCount = 0;
     targetHeading = 0;
     m_2484 = 0;
     speedScale = 1.0f;
@@ -145,7 +145,7 @@ int AnimModel::ResetState()
     m_23d8.y = 0;
     m_23d8.z = 0;
     m_2394 = 0;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     m_2370 = 0;
     m_229c = 0;
     m_0294 = 0;

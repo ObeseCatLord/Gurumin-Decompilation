@@ -7,6 +7,8 @@
 #ifndef GURUMIN_LISTBANK_H
 #define GURUMIN_LISTBANK_H
 
+#include "script_value.h"
+
 struct ListBank;
 struct ScriptValue;
 
@@ -27,6 +29,13 @@ typedef int (*BuiltinHandler)(ListBank *bank, int id);
 #define TOKEN_OPERAND 0
 #define TOKEN_OPERATOR 1
 #define TOKEN_START 2
+// Operand slots of the expression evaluator: a pair (left, right) per nesting level, at slot level * 16.
+#define LISTBANK_OPERANDS_PER_LEVEL 16
+#define LISTBANK_OPERAND_SLOTS (LISTBANK_GROUP_COUNT * LISTBANK_OPERANDS_PER_LEVEL)
+// Value types: an int, a float, quoted text.
+#define SCRIPT_TYPE_INT 0
+#define SCRIPT_TYPE_FLOAT 1
+#define SCRIPT_TYPE_TEXT 2
 
 // A top-level `{ ... }` block of a script (its start in the text).
 struct ScriptBlock
@@ -72,7 +81,16 @@ struct ListBank
     ScriptFunction builtinHandlers[0x100];// 0x11f0c: the handler of a builtin, the body text of a script function
     char builtinParamNames[0x100][0x10][0x10];  // 0x1230c: parameter names of the declared script functions
     char builtinParamCounts[0x100];       // 0x2230c
-    int resultBuffer[0x2070];             // 0x2240c: where Evaluate leaves its result (`result` points here)
+    union
+    {
+        int resultBuffer[0x2070];             // 0x2240c: where Evaluate leaves its result (`result` points here)
+        struct
+        {
+            ScriptValue resultValue;                          // 0x2240c: the same buffer as a value
+            char operandTypes[LISTBANK_OPERAND_SLOTS];        // 0x2250c: type of each operand (ApplyOperator)
+            ScriptValue operands[LISTBANK_OPERAND_SLOTS];     // 0x2258c: the operands, LISTBANK_OPERANDS_PER_LEVEL per level
+        };
+    };
     int pad_2a5cc;
     int compiling;            // 0x2a5d0: 1 while CompileText runs
     int builtinCount;         // 0x2a5d4: number of registered builtin functions
@@ -138,6 +156,7 @@ struct ListBank
     int DeclareVariable(const char *name, int group, char type);
     int RegisterBuiltin(const char *signature, short id, BuiltinHandler handler);  // 0x10036ca0
     int InitLibrary();
+    int ApplyOperator(const char *op);                         // 0x10004b10 (script_operators.cpp)
 };
 
 // The game's script parser.

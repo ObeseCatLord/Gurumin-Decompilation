@@ -72,7 +72,7 @@ int AnimModel::CloneModel(AnimModel *source, int unused)
     loadedRoot = 0;
     heading = 0;
     motionFrame = 0;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     collider = 0;
     matrix = IdentityMatrix();
     m_2418 = 0;
@@ -115,7 +115,7 @@ int AnimModel::CloneModel(AnimModel *source, int unused)
     m_23d8.z = 0;
     m_2394 = 0;
     m_2390 = 0;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     m_2370 = 0;
     m_229c = 0;
     m_0294 = 0;
@@ -269,7 +269,7 @@ int AnimModel::LoadFile(const char *path)
     trackA.playing = 0;
     heading = 0;
     motionFrame = 0;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     collider = 0;
     m_2418 = 0;
     m_22a0 = 0;
@@ -277,7 +277,7 @@ int AnimModel::LoadFile(const char *path)
     loadedRoot = 0;
     heading = 0;
     motionFrame = 0;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     collider = 0;
     matrix = IdentityMatrix();
     m_2418 = 0;
@@ -321,7 +321,7 @@ int AnimModel::LoadFile(const char *path)
     m_23d8.z = 0;
     m_2394 = 0;
     m_2390 = 0;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     m_2370 = 0;
     m_229c = 0;
     m_0294 = 0;

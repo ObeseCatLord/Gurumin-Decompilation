@@ -103,6 +103,7 @@ Expect codegen differences between 13.00 and 13.10 (scheduling/inlining); judge 
   declarations only where the
   original shows the missing state store.
 - Callee-saved push placement follows the early exits: a test written as its own `if (x == 0) return 0;` before the rest keeps the push after it (0x1015c9e0). Where the original pushes *before* the first test (0x100014b0, 0x10199be0) no spelling has been found yet.
+- A loop-style alignment pad (`lea ebx,[ebx]`, or `jmp` over `lea esp,[esp]`) before a 16-aligned join point with no loop around it is the end label of an inlined helper. Menu_SaveLoad 0x10064630 has two after `if (DAT_104bf8d4 != 1) DAT_104bf8d8 = 0; DAT_104bf8d4 = 2;`, which is MessageWindow_SetTitle(0) (0x1000cb30, `include/message_window.h`) inlined and folded. The same body written by hand has no pads. Look for a small function whose constant-argument fold gives the padded sequence.
 
 ## 2026-11-17: the original compiler (VS .NET 2002, cl 13.00.9466)
 - The user installed VS .NET 2002 at `E:\Visual StudioNET 2002\`; `cl` reports 13.00.9466 and `link` 7.00.9466, the

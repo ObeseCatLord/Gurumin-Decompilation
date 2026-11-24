@@ -16,4 +16,14 @@
 // A colour channel of 1.0 is 255.
 #define TRAIL_CHANNEL_SCALE 255.0f
 
+// Scale of EffectLight::widths (stored in 1/1000).
+#define TRAIL_WIDTH_SCALE 0.001f
+// Turning the direction of travel a quarter turn (clockwise) gives the way the trail widens.
+#define TRAIL_SIDE_TURN (-1.5707964f)
+// Keys of the interleaved trail's banks are 40 frames apart; the trail is sampled four times as densely (10 apart).
+#define TRAIL_KEY_SPACING 0x28
+#define TRAIL_SAMPLE_SPACING 10
+// Weight of the previous side when two neighbouring segments are blended.
+#define TRAIL_BLEND_WEIGHT 0.5f
+
 #endif

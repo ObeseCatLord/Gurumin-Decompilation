@@ -238,8 +238,8 @@ int Enemy_PulseAndCharge(int index)
         {
             if (DAT_10db6ee8[index].m_238c == 0)
             {
-                if (DAT_10db6ee8[index].motionSpeed > 0.0f)
-                    DAT_10db6ee8[index].motionSpeed += CHARGER_CHARGE_SPEED_UP;
+                if (DAT_10db6ee8[index].verticalSpeed > 0.0f)
+                    DAT_10db6ee8[index].verticalSpeed += CHARGER_CHARGE_SPEED_UP;
                 else
                     DAT_10db6ee8[index].m_237c -= CHARGER_CHARGE_SLOW_DOWN;
             }
@@ -284,10 +284,10 @@ int Enemy_PulseAndCharge(int index)
                 if (DAT_1020b430[index].squashStep == 0 && DAT_10db6ee8[index].IsClearOfMapLimited(&probe) == 0)
                     FUN_1001a390(index);
             }
-            if (DAT_10db6ee8[index].motionSpeed > 0.0f)
+            if (DAT_10db6ee8[index].verticalSpeed > 0.0f)
             {
                 if (DAT_10db6ee8[index].m_238c == 0)
-                    DAT_10db6ee8[index].motionSpeed += CHARGER_SPEED_UP;
+                    DAT_10db6ee8[index].verticalSpeed += CHARGER_SPEED_UP;
                 else if (DAT_1020b430[index].squashStep == 0)
                     FUN_1001a390(index);
             }

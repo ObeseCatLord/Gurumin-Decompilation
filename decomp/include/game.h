@@ -4,6 +4,7 @@
 #include "node.h"
 
 struct FontRenderer;   // font_renderer.h
+struct Tracker;        // tracker.h
 
 // Event trigger (0xc8 bytes): runs when its map matches and all four script flags pass.
 struct GameTrigger
@@ -24,6 +25,25 @@ enum { MENU_RESULT = 0x80 };
 struct GameMenuItems
 {
     int *entries[0x82];
+};
+
+// Menu control state the game keeps current (Game::controls): one byte per control, non-zero while it is pressed.
+struct MenuControls
+{
+    char pad_0000[4];
+    char previousPage;          // 0x04: page left
+    char nextPage;              // 0x05: page right
+    char pad_0006[2];
+    char select;                // 0x08: choose the entry under the cursor
+    char cancel;                // 0x09
+    char pad_000a[8];
+    char left;                  // 0x12
+    char right;                 // 0x13
+    char up;                    // 0x14
+    char down;                  // 0x15
+    char hold;                  // 0x16: while held the direction keys are ignored in grid windows
+    char confirm;               // 0x17: grid windows: the confirm result
+    char alternate;             // 0x18
 };
 
 // Scroll marks of the window lists, Shift-JIS: filled while the blink frame is at most 5, outlined after that.
@@ -84,19 +104,19 @@ struct Game : Object
     int m_00ec[3];
     int m_00f8[3];
     int m_0104;                 // 0x104: set to 10 when a window opens
-    int pad_0108;
+    int m_0108;                 // 0x108: key repeat delay (0 while no direction is held)
     int m_010c;                 // 0x10c: part of the open window under the cursor (0 = list, 1 = previous page tab, 2 = next page tab)
     int m_0110[3];              // 0x110: 1 while the window slot is open
     int m_011c[3];
     int m_0128[3];
     int m_0134[3];
     int m_0140[3];              // 0x140: cursor position in the window (restored from m_0434 when remembered)
-    int pad_014c[3];
+    int m_014c[3];              // 0x14c: rows of a grid window
     int m_0158[3];
     int m_0164[3];
     int m_0170[3];              // 0x170: column of the cursor in grid windows
     int m_017c[3];              // 0x17c: row of the cursor in grid windows
-    int m_0188[3];
+    int *m_0188[3];             // 0x188: set to 1 when the page number changes
     int *m_0194[3];             // 0x194: the page number a window shows (zero-based)
     int m_01a0[3];
     int m_01ac[3];
@@ -107,14 +127,16 @@ struct Game : Object
     char m_0434[0x258];
     char m_068c[4];
     int (*m_0690)(int x, int y, int slot, float alpha);   // 0x690: draws the icon of a list entry (Item_DrawIcon while the item list is open)
-    char pad_0694[8];
+    MenuControls *controls;     // 0x694
+    Tracker *tracker;           // 0x698: mouse tracker
     char m_069c[3][0x80][0x36]; // 0x69c: per-window item labels (0x80 items of 0x36 characters)
     GameMenuItems m_579c[3];    // 0x579c: per-window entries and result pointer
     int m_5db4[3][0x82];        // 0x5db4: entry kind (0 = flag cleared on open, 1 = value, 2 = range, 5)
     int m_63cc[3][0x82];        // 0x63cc: range entries' upper value (-1 for the others)
     int m_69e4[3][0x82];        // 0x69e4: range entries' lower value
     int m_6ffc;
-    char pad_7000[0x630];
+    float m_7000[3][0x82];      // 0x7000: per entry highlight (0 to 255)
+    char pad_7618[0x18];
     int m_7630;                 // 0x7630: menu cursor target x
     int m_7634;                 // 0x7634: menu cursor target y
     int m_7638;                 // 0x7638: menu cursor x (follows the target)
@@ -123,7 +145,7 @@ struct Game : Object
     int m_7644;
     int m_7648;
     int m_764c;
-    int m_7650;
+    int *m_7650;                // 0x7650: while it points at a non-zero flag the windows ignore input
     void (*m_7654[3])(int cursor, char *caption);   // 0x7654: per-window callback writing the caption of the entry under the cursor
     void (*m_7660)(int);
     FontRenderer *textRenderer;   // 0x7664: draws the window marks (set by LoadMenuTextures)
@@ -213,7 +235,7 @@ struct Game : Object
     int FindConstant(const char *name);
     int CloseWindow(int id);
     int SetWindowCursor(int id, int value);
-    int SetWindowLayout(int id, int a, int b, int *c, int d);
+    int SetWindowLayout(int id, int a, int b, int *c, int *d);
     int SetWindowLayout2(int id, int a, int b, int *c);
     int OpenWindow(int id, int x, int y, int width, int height);  // 0x100084b0
     int SetWindowResult(int id, int *result);

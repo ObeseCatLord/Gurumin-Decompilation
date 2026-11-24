@@ -17,6 +17,7 @@ struct GameFile
     int Seek(int offset, int origin);                // 0x101b2380: fseek
     int Read(void *buffer, int size, int count);     // 0x101b23a0: fread
     int ReadPacked(void *buffer, int size, int count);    // 0x101b2450: u32 packed size, then ExecUnpack into `buffer`
+    int ReadPackedImage(void *buffer, int width, int height);   // 0x101b24e0: u32 packed size, then the wavelet unpack of a width x height RGB image
     int AtEnd();                                     // 0x101b2360: the stdio end-of-file flag
     int Write(const void *buffer, int size, int count);   // 0x101b2420: fwrite
 };

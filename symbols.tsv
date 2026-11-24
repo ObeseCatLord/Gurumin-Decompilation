@@ -4,7 +4,9 @@ address	name	evidence
 10001b70	SoundArc_Message227	SendMessageA(wnd,0x400,0x227,param)
 10001ee0	SoundArc_Init	formats ".\soundarc.dll" / "%s\soundarc.dll"
 10002440	MapData_Load	opens bin\map.itm, descrambles, parses #...Table sections
+10004b10	ListBank::ApplyOperator	script expression evaluator operator step: unifies operand types (int/float/text), then applies the 2-character operator code (+ - * / %, x= forms, comparisons, && ||, t-prefixed unary ! ++ -- + -) to operands[depth*16], result in *result/resultType (script_operators.cpp, draft)
 100094e0	Game::DrawWindows	draws the three window slots: panels, page tabs, entry lists, scroll marks, cursor and caption strip (game_draw_windows.cpp, draft)
+1000a0b0	Game::UpdateWindows	per-frame update of the 3 menu window slots: fade, entry highlight, mouse and key handling of list and grid windows (game_update_windows.cpp, draft)
 1000c720	Characters_Draw	draws every character slot under view*projection (character_draw.cpp)
 1000e340	Debris_Draw	draws the used debris pieces (debris.cpp)
 1000eed0	Message_DrawPanel	fading message box with optional subtext (message_panel.cpp)
@@ -22,6 +24,7 @@ address	name	evidence
 10020090	Collide_RayThroughRegions	probe ray against the visible region nodes (collide_regions.cpp)
 10020560	Regions_Build	prepares the region table DAT_104c03c0: boxes, sinks vertices under the testatari collision, lights the rest from nearby lit vertices by the @Light direction, stores the @moya texture slot (region_build.cpp, draft)
 10021e70	SaveSummary_Draw	save game summary panel: coins, counter, max health, date/time, map-icon grid (save_summary.cpp)
+10022830	Menu_DrawScene	draws the 3D map scene behind the menus: target reset and overhead pass, camera and fog clear, fading regions, map, shadows, player, effects, debris, lens flares and the three scrolling haze layers of the water regions (menu_scene.cpp, draft)
 10024f80	Char_Drifter	kind 0x0b: drifts straight and bounces off walls, or circles a centre with three growing spin angles; turns its @O_057:Layer node with its speed (drifter.cpp, draft)
 10025ce0	Char_SwingPlatform	behaviour kind 0x0e: a pendulum-style swinging platform turning its @O_056:Layer node, with ground height and angle limits (swing_platform.cpp, matched)
 10026730	Watcher_Update	hovering watcher: faces the player, keeps its home height, eases its turn (behaviour from 0x100f9670)
@@ -62,15 +65,19 @@ address	name	evidence
 10057ee0	UpdateDrillLevel	clamps the drill gauge and moves the drill level (drill_level.cpp)
 1005c680	Bgm_Update	per-frame music: starts the requested track, playback position in samples, eases the 64 spectrum bars towards the .de2 frame (bgm_update.cpp, draft)
 1005ce80	Player_StartAttack	handles the player's attack request: refusal rules, chain step, attack motion from the attack table, event queue, stamina scale and shout/grunt voices per face variant (attack_start.cpp, draft)
+1005def0	Map_PlaceCharacters	populates the map on entry: reloads the player, parks model slots, clones template models for the map's character records into slots 58+ (tint, heading, difficulty-scaled stats, per-slot table reset) and loads the actor records' models and names (map_place_characters.cpp, draft)
 1005ecb0	Gimmick_Use	the player uses the lever (types 0xb/0xf) or chest (type 10) in slot DAT_104bf888: toggles, sounds, inventory and messages (gimmick_use.cpp, draft)
 1005f750	Lava_Update	lava damage, camera mode and lava effects (lava_hazard.cpp)
 100627d0	Enemy_Defeat	takes a defeated enemy out of the world, scatters debris, drops coins (helmet gold bonus) and a random item (enemy_defeat.cpp)
+10064630	Menu_SaveLoad	pause-screen command list (quit/save/load): slot lists of 7 saves per page, overwrite and quit/title questions, save write (LSF in config, system.sav costume bits) and load of the picked slot; closes the message window with the inlined MessageWindow_SetTitle(0) (menu_save_load.cpp, matched)
 10065450	TutorialBook_Update	per-frame tutorial book mode: turn/close/open states, stick or mouse turns, draws the book from the overlay camera (tutorial_update.cpp)
 1006f490	Enemy_HoverAndShoot	flying enemy (kind 0x54): hovers 75 above the ground, steers a smoothed course round the player with banking motions, fires effect 0x3e9 when aligned within 1500 units, then holds course for 30 frames (enemy_hover_shooter.cpp, draft)
+10079470	Char_HikariButtonRide	route-riding light platform with a "Box01" call button (blue/red/stop/up): pauses on a global switch, presses the button when the player leaves it, carries the player along its route (sibling of Char_HikariRide; hikari_button.cpp, draft)
 1007a370	Char_RollingBall	the rolling ball scene behaviour (link block at state 2000, 3D rolling sound, effects) (rolling_ball.cpp, draft)
 1007ad20	Char_AreaZone	kind 0x23 area zone: pushes the player along the zone force (types 0-4), sets camera values (5, 7, 8), timed effect and sound (area_zone.cpp, draft)
 1007b870	Npc_GatedRouteCarrier	behaviour 0xd: carrier on a gated route, picks up a kind 0x21 enemy at type-4 gates and drops it at type-2 gates (npc_gate_carrier.cpp, draft)
 1007d0a0	TextWindows_Draw	draws the three on-screen text windows (DAT_10255960) with their pictures, panels and frames, and the full-screen story card (text_windows_draw.cpp, draft)
+10083eb0	Scene_RunCommand	scene-command dispatcher over 38 ids: status-panel text, picture load/release, message windows, node flags and groups, effect starts at nodes or models, camera follow, node position into DAT_10c6356c/70/74 (scene_command.cpp, draft)
 10089210	ListBank::RunStatements	script interpreter statement runner: blocks, return/break/continue, switch/case/default, while, for, if/else; converts the result to the wanted type (script_run.cpp, draft)
 100a3900	Enemy_PulseAndCharge	kind 0x42: pulses (squash), wanders and stops at walls, faces the player and charges for 40 frames once hit, leaving effect 0x7c0 (enemy_pulse_charge.cpp, matched)
 100a8ac0	Enemy_FetchDroppedWeapon	walks to the knocked-away weapon node and picks it back up (Char_AttachWeapon), gives up after 120 blocked frames (weapon_fetch.cpp)
@@ -113,7 +120,6 @@ address	name	evidence
 10089a10	Script_CompileCall	argument count/type/reference checks
 100cb0c0	Game_LoadData	loads effects.efx, logo.mmv, bin\map.txt (map.itm), render textures
 1003aef0	Bgm_Play	streams bgm\<name>.de2 and checks its header, anti-tamper noise on failure (decomp/src/bgm_play.cpp)
-10064630	Menu_SaveLoad	save/load/quit confirmation texts, gdata%02d.sav
 10112140	Menu_Main	main menu, shop, sound config, name entry, gdata%02d.sav
 10137b10	Game_FrameStep	per-frame step: messages, max-health clamp, noise-table quit check, mode update, pacing/present, clipboard capture saved as capture%05d.jpg with the shape.dat stamp (frame_step.cpp, draft)
 100144c0	Ability_GetDescription	copies the effect text of the highest-priority ability bit and returns the bit (matched, decomp/src/ability_text.cpp)
@@ -128,7 +134,11 @@ address	name	evidence
 1016b6c0	Camera_TrackPathFrame	keeps the camera path frame DAT_1101c800 on the frame closest to the camera target, switching paths near the ends (camera_path_track.cpp, draft)
 1016be80	Camera_LiftOverGround	lifts the camera target above the ground (camera_lift.cpp)
 1016fb80	EffectManager::DrawLightKind22	draws effect light kind 0x16 as two crossed twisting ribbons along its trail points (effect_light_kind22.cpp, draft)
+10170580	EffectManager::DrawLightKind23	draws effect light kind 0x17 as a trail strip over the last 13 points, width scaled by depth (((1-z)*0.99+0.01)*10) (effect_trail_draw.cpp, draft)
+101713f0	EffectManager::DrawLightKind7	draws effect light kinds 7 and 9 as a trail strip whose width also shrinks with depth ((1-z)*8) (effect_trail_draw.cpp, draft)
 10172cb0	TriangleBatch::AppendQuad	appends a screen quad (two triangles) scaled to the back buffer, optionally rotated about its centre (tri_batch_quad.cpp, draft)
+10174ce0	Texture_LoadIti	loads a texture into a free slot from <folder>\<path>.iti, ./<path>.itp or ./data/<path>.itp: ITP 999/1000 pixel conversion, packed ITI formats or the decoder path, optional half-size (texture_load_iti.cpp, draft)
+1017a010	AnimModel::UpdateFrame	per-frame model update: motion advance, shadow fade, footsteps, colour wobble, view test, heading ease, summed move with collision (M_10175f20), node tree refresh (anim_model_step.cpp, draft)
 10184160	WorldRenderer::DrawScreenOverlays	draws the caption, then the overlay (world_caption.cpp, matched)
 101886d0	EffectManager::LoadDefinitions	loads the effect definition file (version 20000/22000) into free slots, textures and per-slot definitions (effect_definition_loader.cpp)
 10191fd0	Node::BoxesOverlap	overlap test of two offset boxes with optional centre deltas (matched, decomp/src/box_overlap.cpp)
@@ -152,7 +162,6 @@ address	name	evidence
 101b3304	fopen	CRT (_fsopen wrapper)
 101b2310	File_Open	File object: stores base name, fopen(path, mode); 15 loader callers
 10173550	Texture_LoadBmp	"%s\images\%s.bmp", "%s\%s.itm" (scrambled BMP), error "texture missing"
-10174ce0	Texture_LoadIti	"%s\%s.iti", ./data/%s.itp
 10160a90	MmvPlayer::Open	loads a whole .MMV movie, its RGB565 palette and first frame (decomp/src/mmv_texreg.cpp)
 101abd60	Model_LoadIt3Alt	error "no 3D data"
 101a58a0	It3_ParseChunks	compares chunk tags INFO/RTY2/LIG3/KAN3/INFS/MAT4/VPA2/CHID/MAN2/BONE/CAME/CDLO

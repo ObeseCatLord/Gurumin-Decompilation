@@ -45,7 +45,7 @@ int AnimModel::Teleport(float x, float y, float z)
     m_23c8.Set(0, 0, 0, 0);
     m_23f8.Set(0, 0, 0, 0);
     m_23e8.Set(0, 0, 0, 0);
-    motionSpeed = 0;
+    verticalSpeed = 0;
     m_237c = 1.0f;
     m_2374 = 0;
     if (collider != 0)
@@ -83,7 +83,7 @@ int AnimModel::SetPosition(float x, float y, float z)
     DAT_118e69a8 = IdentityMatrix();
     m_2394 = 1;
     m_237c = 1.0f;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     move.Set(0, 0, 0, 0);
     velocity.Set(0, 0, 0, 0);
     m_23d8.Set(0, 0, 0, 0);

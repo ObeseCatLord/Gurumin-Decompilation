@@ -98,7 +98,7 @@ extern "C" float DAT_1032d4b0;                            // fade step per frame
 extern "C" int DAT_1032d67c[0x8];
 extern "C" int DAT_1032d6a0;
 extern "C" int DAT_1032d6a4;                              // set to 9 when the player is knocked back (0x10055ee0)
-extern "C" int DAT_1032d6a8[0x40];
+extern "C" char DAT_1032d6a8[0x100];                         // name of the save to load
 extern "C" short DAT_1032d7a8[0x60];                    // per ground object: buried treasure marker (below 9000: depth it lies at; from 9000: level % 1000)
 extern "C" int DAT_1042d918[0x10];
 extern "C" int DAT_1042d9e4;

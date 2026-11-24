@@ -114,13 +114,24 @@ struct AnimModel
     char m_0075;
     char m_0076;
     unsigned char m_0077;     // 0x77: model variant loaded (Costume_LoadPlayerModel 0x1003b6e0)
-    int m_0078;
-    int m_007c;
+    union
+    {
+        struct
+        {
+            int m_0078;
+            int m_007c;
+        };
+        int footState[2];     // 0x78: frames each foot has been planted (0 = in the air; UpdateFrame)
+    };
     int m_0080;
     unsigned char speedDivisor;  // 0x84: slows every motion of this model down (0 = no division)
     char pad_0085[3];
-    int m_0088;               // 0x88: cleared by CloneModel
-    char m_008c;
+    union
+    {
+        int m_0088;           // 0x88: cleared by CloneModel
+        float spinAngle;      // 0x88: angle the drawn model is turned about y (0 = not turned; UpdateFrame)
+    };
+    unsigned char m_008c;
     char m_008d;              // 0x8d: set while a child runs to the player (Npc_ChildFollow)
     char pad_008e[2];
     Vec4 m_0090;
@@ -136,7 +147,9 @@ struct AnimModel
     Vec4 m_022c;
     int m_023c;
     char m_0240;
-    char pad_0241[3];
+    char idleFrames;          // 0x241: frames m_238c has been non-zero (stops at 100; UpdateFrame)
+    char activeFrames;        // 0x242: frames m_238c has been zero (stops at 100)
+    char pad_0243;
     Node *spineNode;          // 0x244: the "Bip01 Spine" bone (loadedRoot when the model has none; CloneModel)
     float holdWeight;         // 0x248: blend weight while holding (at most 0.9)
     Vec4 m_024c;
@@ -201,7 +214,11 @@ struct AnimModel
     unsigned char loadCount;  // 0x2a3: number of models loaded so far (stops counting at 3)
     char holdState;           // 0x2a4: HOLD_*
     char pad_02a5[3];
-    int m_02a8;
+    union
+    {
+        int m_02a8;
+        float holdAngle;      // 0x2a8: angle the held model is turned about the hold point (0 to 2 pi; UpdateFrame)
+    };
     MotionChannels trackA;    // 0x2ac: motion keys (KEY_FLAG_MOTION)
     int m_0d44;
     int m_0d48;
@@ -224,8 +241,15 @@ struct AnimModel
     Node *loadedRoot;         // 0x22f0: the same node tree as root while the model is in use, 0 when free (key
                               // prompts are drawn only for loaded characters; model_bank.cpp reads its model data)
     Node *headNode;           // 0x22f4: the head bone node (0 = none)
-    Node *leftToeNode;        // 0x22f8: the "Bip01 L Toe0" bone (loadedRoot when the model has none)
-    Node *rightToeNode;       // 0x22fc: the "Bip01 R Toe0" bone (loadedRoot when the model has none)
+    union
+    {
+        struct
+        {
+            Node *leftToeNode;    // 0x22f8: the "Bip01 L Toe0" bone (loadedRoot when the model has none)
+            Node *rightToeNode;   // 0x22fc: the "Bip01 R Toe0" bone (loadedRoot when the model has none)
+        };
+        Node *toeNodes[2];
+    };
     Node *swapNode1;          // 0x2300: nodes whose materials M_10161a20 swaps (0 = none)
     Node *swapNode2;          // 0x2304
     Node *collider;           // 0x2308: the map collision this model moves against
@@ -236,7 +260,11 @@ struct AnimModel
         int m_231c;
         Node *dropCollider;   // 0x231c: the collision the dropped pieces bounce on (debris_update.cpp)
     };
-    int m_2320;               // 0x2320: cleared by CloneModel
+    union
+    {
+        int m_2320;           // 0x2320: cleared by CloneModel
+        Node *followNode;     // 0x2320: node whose world matrix and frame this model copies (0 = none; UpdateFrame)
+    };
     Node *bipNode;            // 0x2324: the "Bip01" bone (0 = no node tree)
     Matrix4 matrix;           // 0x2328: world matrix; matrix.translation is the position
     union
@@ -244,7 +272,7 @@ struct AnimModel
         int motionFrame;      // 0x2368: frame of the motion file shown now (held while sleeping)
         float radius;         // 0x2368: collision radius (UpdateCollision)
     };
-    float motionSpeed;        // 0x236c: current motion playback speed (at most 60)
+    float verticalSpeed;      // 0x236c: vertical speed (positive = rising)
     float m_2370;             // 0x2370: height the model was placed at
     int m_2374;
     char m_2378;
@@ -274,7 +302,7 @@ struct AnimModel
                               // (char_ground.cpp)
     char m_2474;
     char pad_2475[3];
-    int m_2478;
+    int updateCount;          // 0x2478: frames updated (UpdateFrame)
     float heading;            // 0x247c: facing angle in radians
     float targetHeading;      // 0x2480: angle the character turns towards
     int m_2484;
@@ -338,6 +366,12 @@ struct AnimModel
     int M_1017b1c0();
     int CloneModel(AnimModel *source, int unused);                 // 0x1017b210 (anim_clone.cpp)
     int LoadFile(const char *path);                                // 0x1017b9b0 (anim_clone.cpp)
+    // 0x1017a010 (anim_model_step.cpp): the per-frame update of a model: advances its motion, fades the shadow,
+    // plays footsteps, moves it by its pending movement (collision tested by M_10175f20), turns it towards its target
+    // heading and refreshes its node tree under `view`; see the definition.
+    int UpdateFrame(Matrix4 *view, int withView, int force, int frame, Matrix4 *reference);
+    int M_10175f20(float x, float y, float z, int a, int b);       // 0x10175f20: moves by (x, y, z) against the collisions
+    int SetDropCollider(Node *collider);                           // 0x10163e70: sets dropCollider (the same code as ModelObject::M_10163e70)
 };
 
 // The character models (one per character slot; slot 0 is the player).

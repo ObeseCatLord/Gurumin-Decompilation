@@ -1023,7 +1023,7 @@ extern "C" int FUN_1009b120(int index)
         }
         return 0;
     }
-    if (DAT_10db6ee8[index].m_238c == 1 && DAT_10db6ee8[index].motionSpeed == 0.0f &&
+    if (DAT_10db6ee8[index].m_238c == 1 && DAT_10db6ee8[index].verticalSpeed == 0.0f &&
         ++DAT_1020b430[index].restFrames > HOP_REST_FRAMES)
     {
         // resting: when there is ground below, remember this position

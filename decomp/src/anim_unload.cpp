@@ -41,7 +41,7 @@ int AnimModel::Unload()
     loadedRoot = 0;
     heading = 0;
     motionFrame = 0;
-    motionSpeed = 0;
+    verticalSpeed = 0;
     collider = 0;
     matrix = IdentityMatrix();
     m_2418 = 0;

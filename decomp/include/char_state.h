@@ -328,6 +328,7 @@ struct CharState
                 int zoneSoundDelay;               // area_zone.cpp: frames before that sound plays (0 = at once)
                 int cursorPrevious;               // map_cursor_walk.cpp: the node reached before (MapCursor_Step)
                 int releasable;                   // npc_approach.cpp: non-zero = the release flag ends the approach
+                int buttonLiftOff;                // hikari_button.cpp: non-zero = the button light is switched off (blue, held still)
             };
             union                                 // 0x3c
             {

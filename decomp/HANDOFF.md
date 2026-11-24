@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 18.81% of code, 856 of 1212 functions |
-| Matched under the rules | 18.77% of code, 855 of the 856 matched functions |
-| Fuzzy match | 34.18% |
+| Matched | 19.21% of code, 857 of 1212 functions |
+| Matched under the rules | 19.17% of code, 856 of the 857 matched functions |
+| Fuzzy match | 35.61% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -165,6 +165,10 @@ function) and node_world.cpp (0) still break rule 2.
   decision (17 spellings identical); TargetRace's stun chain threads in ours (45 spellings); StalkAndStrike's dead variant
   load comes only from an equal-arm if/else (fakematch); PounceAndBreathe got its real constants (45.5/34.5) but the esi
   zero register remains. These four are permuter candidates rather than spelling retries.
+- Batch 342: Scene_DrawFrame 10038c10 matched (the in-game 3D frame; a redundant `!= 0 &&` test is genuine). Drafts:
+  Render_ComposeFrame 101493f0 (early), Node::ApplyCommandText 101a3000 (15 bytes, two spill slots; needs throw()),
+  Script_SystemCommand 100fedd0 (first pass), Char_PutOnEquipment 100404e0 (9 bytes, first init block load order).
+  Lesson (NOTES): anonymous unions in Node/AnimModel change unrelated matched code; use one typed member instead.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

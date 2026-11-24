@@ -59,7 +59,7 @@ extern "C" int FUN_10165210(const void *first, const void *second)
 // and makes it a shadow caster entry (m_0484/m_0c84/casterSize/casters), drawing its shadow texture when
 // `renderShadowTextures` is set. The camera entry and the spare entry take up to six lights and up to three caster
 // entries. Returns 1.
-int ModelBank::PrepareFrame(Node *scene, const Matrix4 *view, int a3, int renderShadowTextures)
+int ModelBank::PrepareFrame(const Matrix4 *world, const Matrix4 *view, int a3, int renderShadowTextures)
 {
     if (enabled == 0)
         return 0;

@@ -59,7 +59,7 @@ extern "C" int DAT_104c038c;
 extern "C" Node *DAT_104c0390;                            // the model of the map's held object
 extern "C" char *DAT_104c0394;                            // one byte per marker: 1 = no ground below it
 extern "C" short DAT_104c0398;
-extern "C" void *DAT_104c03a0;
+extern "C" struct Playback *DAT_104c03a0;                  // the motion playback of the player model (character 0)
 extern "C" int DAT_104c03a4;
 extern "C" Node *DAT_104c03a8;
 extern "C" Node *DAT_104c03ac;                            // the camera path node (its translation keys are the marker points)

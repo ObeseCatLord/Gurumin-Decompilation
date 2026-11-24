@@ -91,6 +91,8 @@ struct CharState
                         int driftSignY;           // drifter.cpp (state 0): non-zero = the y step is added, else subtracted
                         int orbitCentreX;         // drifter.cpp (state 1): x of the centre the character circles (whole units)
                         int startHeight;          // perch_swooper.cpp: height (whole units) of the player when it took off
+                        int sightBlocked;         // enemy_shy_ghost.cpp: 1 = a wall blocks the line to the player (looked up every 15th frame)
+                        int rayLength0;           // rolling_tire.cpp: length of ray 0 (outermost left, whole units, -1 = not cast yet)
                     };
                     union                         // 0x0c
                     {
@@ -136,6 +138,10 @@ struct CharState
                         int driftSignZ;           // drifter.cpp (state 0): non-zero = the z step is added, else subtracted
                         int orbitCentreY;         // drifter.cpp (state 1): y of the centre the character circles (whole units)
                         int anchorPoint;          // perch_swooper.cpp: which of the four LastPosition vectors it swoops to (1..3)
+                        int castSetUp;            // enemy_cast_teleport.cpp: 1 once its spine node was found and it stood on the ground
+                        int strafeFrames;         // enemy_shy_ghost.cpp: sidestep timer, positive = drifting one way (counts down), negative = the other (counts up)
+                        int huntFrames;           // enemy_roam_spit.cpp: 0 = not hunting, else frames since the hunt began (counted to 150, then back to 0)
+                        int rayLength1;           // rolling_tire.cpp: length of ray 1
                     };
                     union                         // 0x10
                     {
@@ -167,6 +173,10 @@ struct CharState
                         int hurlRetryDigit;       // npc_hurl.cpp: (talk / 10) % 10, after a throw the next one starts when a roll of 100 reaches (this + 1) * 3
                         int driftStarted;         // drifter.cpp: 1 once the drift or orbit was set up
                         int flapTicks;            // perch_swooper.cpp: wing beat counter (flap speed * 50 per frame; a wing flap at 300)
+                        int sightCountdown;       // enemy_cast_teleport.cpp: frames it keeps hunting after losing sight of the player (reset to 300)
+                        int circleSide;           // enemy_hover_strike.cpp: which way it circles the player (1 = right, 0 = left; re-rolled every 120 frames)
+                        int bodyRadius;           // enemy_roam_spit.cpp: how far (x 2.5) the other roamers steer clear of this character
+                        int rayLength2;           // rolling_tire.cpp: length of ray 2 (straight ahead)
                     };
                     union                         // 0x14
                     {
@@ -202,6 +212,9 @@ struct CharState
                         int shotAligned;           // enemy_hover_shooter.cpp: 1 = the bearing to the player is close enough to fire
                         int stalled;              // breath_enemy.cpp: 1 = the last step was blocked (no ground or a wall ahead)
                         int orbitCentreZ;         // drifter.cpp (state 1): z of the centre the character circles (whole units)
+                        int fadeStep;             // enemy_cast_teleport.cpp: step of the teleport fade (15 counts down to 1, then up to 15)
+                        int alerted;              // enemy_shy_ghost.cpp: 1 once it has shown itself to the player
+                        int rayLength3;           // rolling_tire.cpp: length of ray 3
                     };
                     union                         // 0x18
                     {
@@ -226,10 +239,15 @@ struct CharState
                         int shotMirrored;          // enemy_hover_shooter.cpp: non-zero = the bearings are mirrored
                         int airborne;             // enemy_chase_hop.cpp: 1 = no ground within 25 units below (the enemy hops or falls), 0 = on the ground
                         int swingStarted;         // enemy_dash_slash.cpp: 1 once the hand swing effect of the current attack was started
+                        int castMotion;           // enemy_cast_teleport.cpp: motion to play (1 = back off, 2 = idle, 5 = advance)
+                        int hoverBase;            // enemy_hover_strike.cpp: height of the ground below it (or of the player, plus 75, where it has none)
+                        int rayLength4;           // rolling_tire.cpp: length of ray 4 (outermost right)
                     };
                     union                         // 0x1c
                     {
                         int flierLastX;           // route_flier.cpp: x of its position last frame (whole units)
+                        int sightState;           // enemy_cast_teleport.cpp: 0 = player not seen, 1 = seen, 2 = seen in the line of sight
+                        int hoverGrounded;        // enemy_hover_strike.cpp: 1 = hoverBase is ground the probe found (it floats 75 to 150 above it), 0 = none
                         int rider;                // route_carrier.cpp, npc_hover_carrier.cpp: character carried (0 = none)
                         int scriptResult;         // char_script.cpp: result of the last step (5 = run the next
                                                   // step at once, 2 = waiting)
@@ -246,6 +264,7 @@ struct CharState
                         int hurlHit;              // npc_hurl.cpp: 1 once the thrower was hit (it stops waiting and acts at once)
                         int motionFrameSaved;      // enemy_hover_shooter.cpp: motion frame kept while it flies (motion 7)
                         int airFrames;            // enemy_chase_hop.cpp: frames airborne (the hop eases with it), 0 once it lands
+                        int turnDirection;        // rolling_tire.cpp: 0 = straight on, 1 / 2 = veering one way / the other
                     };
                     union                         // 0x20
                     {
@@ -264,6 +283,10 @@ struct CharState
                         int zonePeriod;            // area_zone.cpp: frames in the cycle
                         int floorHeight;           // enemy_hover_shooter.cpp: height of the ground under the spawn point
                         int hurlWound;            // npc_hurl.cpp: 1 once the wind-up motion reached its held pose (0x1b)
+                        int specialTarget;         // partner_skill.cpp: slot of the enemy aimed at (slot 16) or grabbed (slot 7)
+                        int specialFrames;         // partner_skill.cpp (slot 11): frames counted since its skill started
+                        int hurtFrames;           // enemy_shy_ghost.cpp: frames since it was hit (counted up to 46, then it sinks away; counted down while not hit)
+                        int driveFrames;          // rolling_tire.cpp: frames driven in the current heading (negative after a bounce)
                     };
                     union                         // 0x24
                     {
@@ -276,6 +299,8 @@ struct CharState
                         int hurlCarryHeight;      // npc_hurl.cpp: height the carried character is held at (set by the carrier)
                         int shotDelayMax;          // enemy_hover_shooter.cpp: frames after which a shot is certain (150)
                         int sparkCooldown;        // npc_tricks.cpp: frames before the next spark effect (counted down from 10)
+                        int specialPhase;          // partner_skill.cpp: step of the partner skill (0 = ready, 1 = starts, then counts up; 1000 and above = the long one of slot 7)
+                        int bumpCooldown;         // rolling_tire.cpp: frames left (10 after a bounce) in which it may not pick a new veer
                     };
                     union                         // 0x28
                     {
@@ -297,6 +322,7 @@ struct CharState
                         int hurlCarried;          // npc_hurl.cpp: non-zero = the thrower is carried (moved to the node [8] position)
                         int shotDelayMin;          // enemy_hover_shooter.cpp: frames before a shot may come (30)
                         int retreatFrames;        // breath_enemy.cpp: frames left of a failed retreat (state 5 ends when it runs out)
+                        int wallAhead;            // rolling_tire.cpp: 1 = the 500-unit look-ahead hit the world
                     };
                     union                         // 0x2c
                     {
@@ -309,6 +335,8 @@ struct CharState
                   int swingMinAngle;        // swing_platform.cpp: smallest swing angle seen over ground
                         int shotTimer;             // enemy_hover_shooter.cpp: frames since the last shot
                         int zoneEffect;            // area_zone.cpp: effect started at one frame of the cycle (0 = none)
+                        int specialMark;           // partner_skill.cpp: set to 75 (0x4b) when the skill of slot 6 or 7 starts
+                        int rayPlayerGap0;        // rolling_tire.cpp: distance of the player to ray 0 (whole units)
                     };
                     union                         // 0x30
                     {
@@ -319,6 +347,8 @@ struct CharState
                         int frozenFrames;          // enemy_hover_shooter.cpp: frames its course stays frozen after a shot
                         int hikariScanned;        // char_hikari.cpp: 1 once the character to carry along was looked up
                                                   // having been carried by a rider (15 after one lands on it)
+                        int specialPause;          // partner_skill.cpp (slot 7): frames to wait before it picks an enemy
+                        int rayPlayerGap1;        // rolling_tire.cpp: the same for ray 1
                     };
                     union                         // 0x34
                     {
@@ -331,6 +361,8 @@ struct CharState
                         int hoverHeight;           // enemy_hover_shooter.cpp: height it hovers at (-200000 = not set yet)
                         int gateStarted;          // npc_gate_carrier.cpp: 2 once the carrier was set up on its route
                                                   // the position history in LastPosition
+                        int specialResume;         // partner_skill.cpp (slot 7): the step to continue from after the long skill
+                        int rayPlayerGap2;        // rolling_tire.cpp: the same for ray 2
                     };
                 };
                 int values[13];                   // the same variables by index (enemy_ai.cpp, enemy_moves.cpp,
@@ -343,12 +375,14 @@ struct CharState
                 int cursorPrevious;               // map_cursor_walk.cpp: the node reached before (MapCursor_Step)
                 int releasable;                   // npc_approach.cpp: non-zero = the release flag ends the approach
                 int buttonLiftOff;                // hikari_button.cpp: non-zero = the button light is switched off (blue, held still)
+                int rayPlayerGap3;                // rolling_tire.cpp: the same for ray 3 (overlays sawPlayer)
             };
             union                                 // 0x3c
             {
                 int behaviour;                    // behaviour number (0 = not unpacked from the script parameter yet);
                                                   // setting it switches behaviour
                 int zoneTracking;                 // area_zone.cpp (type 8): 1 once the follow height was taken
+                int rayPlayerGap4;                // rolling_tire.cpp: the same for ray 4 (overlays behaviour)
             };
         };
         int words[0x10];                          // the whole block by index (resets and copies)

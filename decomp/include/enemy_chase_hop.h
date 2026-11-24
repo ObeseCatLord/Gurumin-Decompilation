@@ -9,8 +9,8 @@
 // and collision filter it also reads) towards `target`, from `self`. Returns 0.
 extern "C" int FUN_100bcce0(int index, int model, Vec4 *target, Vec4 *self);
 
-// 0x10078060: steering away from other enemies. Sets `found` when it has to avoid one and writes the step to take
-// into `steer`; returns the motion to play (negative = none).
+// 0x10078060 (Partner_SpecialSkill, partner_skill.h): the partner skills. Declared here with C linkage because the
+// callers treat it as a function that cannot throw (their frames have no EH registration for it).
 extern "C" int FUN_10078060(int index, Vec4 *position, int *found, Vec4 *steer);
 
 // 0x100244b0 (Char_ProbeDirection), 0x10024750 (Char_ProbeGround), 0x100248e0 (Collision_ProbeDown), 0x100241e0

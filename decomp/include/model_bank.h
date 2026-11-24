@@ -71,7 +71,7 @@ struct ModelBank
     int DrawShadowsInto(Node *scene, const Matrix4 *parent, const Matrix4 *view, int a3);
     // 0x10165240: per frame, collects the lens flares and the lit models in view, gives each one its three nearest
     // lights and its shadow caster entries, and draws the shadow textures.
-    int PrepareFrame(Node *scene, const Matrix4 *view, int a3, int renderShadowTextures);
+    int PrepareFrame(const Matrix4 *world, const Matrix4 *view, int a3, int renderShadowTextures);
 };
 
 // The model bank.

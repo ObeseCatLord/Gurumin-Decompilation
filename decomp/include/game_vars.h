@@ -60,7 +60,7 @@ extern "C" int DAT_10210b2c;
 extern "C" int DAT_102199b0;
 extern "C" char DAT_10219bc0[];                           // the message shown
 extern "C" char DAT_1021a360;
-extern "C" int DAT_1021b548[0x20];
+extern "C" Node *DAT_1021b548[0x20];                       // nodes attached to a parent (each removed from DAT_10467e20[i] on reset)
 extern "C" int DAT_1021b5c8[0x18];
 extern "C" int DAT_1021bbf0;
 extern "C" int DAT_1021bbf4;
@@ -116,7 +116,7 @@ extern "C" char DAT_10450808[0x40][0x80];                 // the entry texts of 
 extern "C" int DAT_10467488[0x20];
 extern "C" int DAT_10467710;
 extern "C" int DAT_10467c20[0x80];                       // frames each message box has been held
-extern "C" int DAT_10467e20[0x20];
+extern "C" Node *DAT_10467e20[0x20];                       // the parent of each node in DAT_1021b548
 extern "C" char DAT_10467ea0[];                          // message subtext line (empty = none)
 extern "C" int DAT_10467f20;
 extern "C" int DAT_10468128;
@@ -282,7 +282,7 @@ extern "C" int DAT_104c0070;
 extern "C" int DAT_104c0074;
 extern "C" int DAT_104c0078;
 extern "C" char DAT_104c0088;
-extern "C" int DAT_104c008c;
+extern "C" Node *DAT_104c008c;                           // the map's "MiniMap" node (or its first node of kind 0x4000004)
 extern "C" char DAT_104c0090;
 extern "C" char DAT_104c0091;
 extern "C" char DAT_104c0092;
@@ -399,7 +399,7 @@ extern "C" float DAT_104c02f8;
 extern "C" float DAT_104c02fc;
 extern "C" char DAT_104c0300;
 extern "C" char DAT_104c0301;
-extern "C" int DAT_104c0304;
+extern "C" Node *DAT_104c0304;                           // the "@yotsu" node of the map
 extern "C" char DAT_104c0308;
 extern "C" char DAT_104c030a;
 extern "C" int DAT_104c030c;

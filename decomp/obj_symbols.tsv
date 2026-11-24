@@ -585,7 +585,7 @@ _Enemy_IsBusy	100e1c40
 ?Npc_PerchOnNeighbour@@YAHH@Z	100b3770
 ?Camera_Refresh@@YAHXZ	10015960
 ?Enemy_PulseAndCharge@@YAHH@Z	100a3900
-?PrepareFrame@ModelBank@@QAEHPAUNode@@PBUMatrix4@@HH@Z	10165240
+?PrepareFrame@ModelBank@@QAEHPBUMatrix4@@0HH@Z	10165240
 ?DrawWindows@Game@@QAEHH@Z	100094e0
 ?Npc_HurlAtPlayer@@YAHH@Z	100b6740
 ?Query@Node@@QAEHPAUMatrix4@@PAUVec4@@M1PAMPBD3@Z	101a1640
@@ -615,3 +615,13 @@ _Enemy_IsBusy	100e1c40
 ?Debug_DrawShape@@YAHHPBUVec4@@0PAUMatrix4@@PBU2@@Z	10145ba0
 ?Scene_HostCallback@@YAHHPAH@Z	10092af0
 ?FUN_10042a30@@YAHXZ	10042a30
+?Enemy_CastAndTeleport@@YAHH@Z	1006e150
+?FieldItemMenu_Update@@YAHXZ	100ba2a0
+?Enemy_HoverAndCallStrike@@YAHHH@Z	100ade30
+?TitleScreen_Update@@YAHXZ	10114950
+?FUN_100fda40@@YAHH@Z	100fda40
+?Partner_SpecialSkill@@YAHHPAUVec4@@PAH0@Z	10078060
+?Player_UpdateFrame@@YAHXZ	1004d960
+?Enemy_ShyGhost@@YAHH@Z	10075350
+?Enemy_RoamAndSpit@@YAHH@Z	10084e80
+?Enemy_RollingTire@@YAHHD@Z	100a4440

@@ -3,6 +3,8 @@
 
 #include "barrage_enemy.h"
 #include "perch_swooper.h"
+#include "dash_slash_enemy.h"
+#include "enemy_hover_strike.h"
 #include "world.h"
 #include "anim_model.h"
 #include "char_state.h"
@@ -85,8 +87,6 @@ extern "C" int FUN_1009e2d0(int index)
 // Enemy behaviour updaters selected by DAT_1020b230 (one value per character slot).
 extern "C" int FUN_100a9240(int index, int variant);
 extern "C" int FUN_100aa820(int index, int variant);
-extern "C" int FUN_100af1b0(int index);
-extern "C" int FUN_100ade30(int index, int variant);
 extern "C" int FUN_10076790(int index, int variant);
 extern "C" int FUN_1001d2d0(int index);
 
@@ -111,13 +111,13 @@ extern "C" int FUN_100bcb30(int index)
         FUN_100aa820(index, 1);
         return 0;
     case 7:
-        FUN_100af1b0(index);
+        Enemy_StalkAndDashSlash(index);
         return 0;
     case 8:
-        FUN_100ade30(index, 0);
+        Enemy_HoverAndCallStrike(index, 0);
         return 0;
     case 9:
-        FUN_100ade30(index, 1);
+        Enemy_HoverAndCallStrike(index, 1);
         return 0;
     case 10:
         Enemy_PerchAndSwoop(index);

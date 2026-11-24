@@ -48,7 +48,7 @@
 
 extern "C" int FUN_1000e750(void);
 extern "C" int Game_LoadData(void);
-extern "C" void FUN_10114950(void);
+int TitleScreen_Update();                    // 0x10114950 (title_screen.cpp)
 extern "C" void FUN_1011d810(void);
 extern "C" void FUN_10116550(void);
 extern "C" void FUN_1011a060(void);
@@ -154,7 +154,7 @@ extern "C" int FUN_10137b10(void)
     {
         QuitIfNoiseTableUsed();
         if (DAT_104bf8c0 == 0)
-            FUN_10114950();
+            TitleScreen_Update();
         else if (DAT_104bf8c0 == MODE_PLAY)
             FUN_1011d810();
         else if (DAT_104bf8c0 == MODE_5)

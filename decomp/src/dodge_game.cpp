@@ -93,6 +93,9 @@
 
 #define END_EVENT 0xea
 
+// Obstacle index of an effect owner id (the first loop walks the owner ids, the arrays follow by index).
+#define DODGE_INDEX(owner) ((owner) - EFFECT_OWNER_BASE)
+
 // Scales a step by the obstacle's speed factor and the difficulty; the fast kind first moves at twice the speed.
 static __forceinline void ScaleStep(Vec4 &step, int kind, int fastKind, const float &speed)
 {
@@ -118,11 +121,10 @@ int Map16_UpdateDodgeGame()
     int floorCandidate = SPEED_FLOOR_START - (DAT_1020c2b4 - SPEED_FLOOR_FALL_START) / SPEED_FLOOR_FALL_FRAMES;
     if (floorCandidate >= SPEED_FLOOR_MIN)
         speedFloor = floorCandidate;
-    float rawRamp = (float)(DAT_1020c2b4 - RAMP_START_FRAMES) / RAMP_LENGTH;
-    float ramp = (RAMP_MIN < rawRamp) ? ((RAMP_MAX > rawRamp) ? rawRamp : RAMP_MAX) : RAMP_MIN;
+    float ramp = (float)(DAT_1020c2b4 - RAMP_START_FRAMES) / RAMP_LENGTH;
+    ramp = (RAMP_MIN < ramp) ? ((RAMP_MAX > ramp) ? ramp : RAMP_MAX) : RAMP_MIN;
     int roll = FUN_1013f880() % (int)(ramp * SPEED_UNIT_F);
-    if (roll <= speedFloor)
-        roll = speedFloor;
+    roll = (speedFloor < roll) ? roll : speedFloor;
     float speedScale = (float)roll / SPEED_UNIT_F;
     if (DAT_10c635f8 == 1)
         spawnScale = SPAWN_SCALE_EASY;
@@ -255,7 +257,7 @@ int Map16_UpdateDodgeGame()
         {
             float rawInterval = (float)(int)(spawnScale * SPAWN_LATE_INTERVAL) - speedScale / SPAWN_LATE_SPEED_DIVISOR;
             float interval = (SPAWN_LATE_MIN_INTERVAL < rawInterval) ? rawInterval : SPAWN_LATE_MIN_INTERVAL;
-            if (interval < (float)DAT_1020c2b8)
+            if ((float)DAT_1020c2b8 > interval)
             {
                 int rollBelow = FUN_1013f880() % ((DAT_1020c2b8 - SPEED_FLOOR_FALL_START) / SPAWN_LATE_GROWTH_FRAMES + 1) +
                                 SPAWN_LATE_ROLL_BASE;
@@ -267,22 +269,22 @@ int Map16_UpdateDodgeGame()
             }
         }
         int hit = 0;
-        for (int i = 0; i < DODGE_OBJECT_COUNT; i++)
+        for (int owner = EFFECT_OWNER_BASE; owner < EFFECT_OWNER_BASE + DODGE_OBJECT_COUNT; owner++)
         {
             int offscreen = 0;
-            if (DAT_1020c2f0[i].kind != 0)
+            if (DAT_1020c2f0[DODGE_INDEX(owner)].kind != 0)
             {
                 vector.Fill(0.0f);
-                switch (DAT_1020c2f0[i].kind)
+                switch (DAT_1020c2f0[DODGE_INDEX(owner)].kind)
                 {
                 case DODGE_KIND_BAR:
                 case DODGE_KIND_FAST_BAR:
                 {
                     vector.y = -SWEEP_SPEED;
-                    ScaleStep(vector, DAT_1020c2f0[i].kind, DODGE_KIND_FAST_BAR, DAT_10255510[i].scale);
-                    float y = DAT_1086e0b8[i].endA.translation.y + vector.y;
-                    DAT_1086e0b8[i].endA.translation.y = y;
-                    DAT_1086e0b8[i].endB.translation.y += vector.y;
+                    ScaleStep(vector, DAT_1020c2f0[DODGE_INDEX(owner)].kind, DODGE_KIND_FAST_BAR, DAT_10255510[DODGE_INDEX(owner)].scale);
+                    float y = DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.y + vector.y;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.y = y;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.y += vector.y;
                     if (y < DAT_10803a78.endY)
                         offscreen = 1;
                     break;
@@ -291,21 +293,21 @@ int Map16_UpdateDodgeGame()
                 case DODGE_KIND_FAST_POLE:
                 {
                     vector.y = -POLE_FALL_SPEED;
-                    ScaleStep(vector, DAT_1020c2f0[i].kind, DODGE_KIND_FAST_POLE, DAT_10255510[i].scale);
-                    float y = DAT_1086e0b8[i].endA.translation.y + vector.y;
-                    DAT_1086e0b8[i].endA.translation.y = y;
-                    DAT_1086e0b8[i].endB.translation.y += vector.y;
+                    ScaleStep(vector, DAT_1020c2f0[DODGE_INDEX(owner)].kind, DODGE_KIND_FAST_POLE, DAT_10255510[DODGE_INDEX(owner)].scale);
+                    float y = DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.y + vector.y;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.y = y;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.y += vector.y;
                     if (y < DAT_10803a78.endY)
                         offscreen = 1;
                     else if (y + vector.y < DAT_10803a78.endY)
                     {
-                        DAT_1086e0b8[i].landingA = DAT_1086e0b8[i].endA;
-                        DAT_1086e0b8[i].landingA.translation.y += vector.y;
-                        DAT_1086e0b8[i].landingB = DAT_1086e0b8[i].endB;
-                        DAT_1086e0b8[i].landingB.translation.y += vector.y;
+                        DAT_1086e0b8[DODGE_INDEX(owner)].landingA = DAT_1086e0b8[DODGE_INDEX(owner)].endA;
+                        DAT_1086e0b8[DODGE_INDEX(owner)].landingA.translation.y += vector.y;
+                        DAT_1086e0b8[DODGE_INDEX(owner)].landingB = DAT_1086e0b8[DODGE_INDEX(owner)].endB;
+                        DAT_1086e0b8[DODGE_INDEX(owner)].landingB.translation.y += vector.y;
                         vector.Fill(0.0f);
-                        DAT_10daaa80.Start(LANDING_EFFECT, vector, -1, -1, &DAT_1086e0b8[i].landingA,
-                                           (int)&DAT_1086e0b8[i].landingB, 0, 0, 0, 0);
+                        DAT_10daaa80.Start(LANDING_EFFECT, vector, -1, -1, &DAT_1086e0b8[DODGE_INDEX(owner)].landingA,
+                                           (int)&DAT_1086e0b8[DODGE_INDEX(owner)].landingB, 0, 0, 0, 0);
                     }
                     break;
                 }
@@ -313,10 +315,10 @@ int Map16_UpdateDodgeGame()
                 case DODGE_KIND_FAST_SWEEP_RIGHT:
                 {
                     vector.x = SWEEP_SPEED;
-                    ScaleStep(vector, DAT_1020c2f0[i].kind, DODGE_KIND_FAST_SWEEP_RIGHT, DAT_10255510[i].scale);
-                    float x = DAT_1086e0b8[i].endA.translation.x + vector.x;
-                    DAT_1086e0b8[i].endA.translation.x = x;
-                    DAT_1086e0b8[i].endB.translation.x += vector.x;
+                    ScaleStep(vector, DAT_1020c2f0[DODGE_INDEX(owner)].kind, DODGE_KIND_FAST_SWEEP_RIGHT, DAT_10255510[DODGE_INDEX(owner)].scale);
+                    float x = DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.x + vector.x;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.x = x;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.x += vector.x;
                     if (x > DAT_10803a78.maxX)
                         offscreen = 1;
                     break;
@@ -325,10 +327,10 @@ int Map16_UpdateDodgeGame()
                 case DODGE_KIND_FAST_SWEEP_LEFT:
                 {
                     vector.x = -SWEEP_SPEED;
-                    ScaleStep(vector, DAT_1020c2f0[i].kind, DODGE_KIND_FAST_SWEEP_LEFT, DAT_10255510[i].scale);
-                    float x = DAT_1086e0b8[i].endA.translation.x + vector.x;
-                    DAT_1086e0b8[i].endA.translation.x = x;
-                    DAT_1086e0b8[i].endB.translation.x += vector.x;
+                    ScaleStep(vector, DAT_1020c2f0[DODGE_INDEX(owner)].kind, DODGE_KIND_FAST_SWEEP_LEFT, DAT_10255510[DODGE_INDEX(owner)].scale);
+                    float x = DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.x + vector.x;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.x = x;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.x += vector.x;
                     if (x < DAT_10803a78.minX)
                         offscreen = 1;
                     break;
@@ -336,38 +338,38 @@ int Map16_UpdateDodgeGame()
                 case DODGE_KIND_DIAGONAL_RIGHT:
                 case DODGE_KIND_FAST_DIAGONAL_RIGHT:
                 {
-                    vector.x = (float)DAT_1020c2f0[i].driftX;
-                    vector.y = (float)-DAT_1020c2f0[i].driftY;
-                    ScaleStep(vector, DAT_1020c2f0[i].kind, DODGE_KIND_FAST_DIAGONAL_RIGHT, DAT_10255510[i].scale);
-                    if (DAT_1086e0b8[i].endA.translation.x < DAT_10803a78.maxX)
-                        DAT_1086e0b8[i].endA.translation.x += vector.x;
+                    vector.x = (float)DAT_1020c2f0[DODGE_INDEX(owner)].driftX;
+                    vector.y = (float)-DAT_1020c2f0[DODGE_INDEX(owner)].driftY;
+                    ScaleStep(vector, DAT_1020c2f0[DODGE_INDEX(owner)].kind, DODGE_KIND_FAST_DIAGONAL_RIGHT, DAT_10255510[DODGE_INDEX(owner)].scale);
+                    if (DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.x < DAT_10803a78.maxX)
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.x += vector.x;
                     else
-                        DAT_1086e0b8[i].endA.translation.y += vector.y;
-                    if (DAT_1086e0b8[i].endB.translation.y > DAT_10803a78.endY)
-                        DAT_1086e0b8[i].endB.translation.y += vector.y;
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.y += vector.y;
+                    if (DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.y > DAT_10803a78.endY)
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.y += vector.y;
                     else
-                        DAT_1086e0b8[i].endB.translation.x += vector.x;
-                    if (DAT_1086e0b8[i].endB.translation.y <= DAT_10803a78.endY &&
-                        DAT_1086e0b8[i].endA.translation.y <= DAT_10803a78.endY)
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.x += vector.x;
+                    if (DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.y <= DAT_10803a78.endY &&
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.y <= DAT_10803a78.endY)
                         offscreen = 1;
                     break;
                 }
                 case DODGE_KIND_DIAGONAL_LEFT:
                 case DODGE_KIND_FAST_DIAGONAL_LEFT:
                 {
-                    vector.x = (float)-DAT_1020c2f0[i].driftX;
-                    vector.y = (float)-DAT_1020c2f0[i].driftY;
-                    ScaleStep(vector, DAT_1020c2f0[i].kind, DODGE_KIND_FAST_DIAGONAL_LEFT, DAT_10255510[i].scale);
-                    if (DAT_1086e0b8[i].endA.translation.x > DAT_10803a78.minX)
-                        DAT_1086e0b8[i].endA.translation.x += vector.x;
+                    vector.x = (float)-DAT_1020c2f0[DODGE_INDEX(owner)].driftX;
+                    vector.y = (float)-DAT_1020c2f0[DODGE_INDEX(owner)].driftY;
+                    ScaleStep(vector, DAT_1020c2f0[DODGE_INDEX(owner)].kind, DODGE_KIND_FAST_DIAGONAL_LEFT, DAT_10255510[DODGE_INDEX(owner)].scale);
+                    if (DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.x > DAT_10803a78.minX)
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.x += vector.x;
                     else
-                        DAT_1086e0b8[i].endA.translation.y += vector.y;
-                    if (DAT_1086e0b8[i].endB.translation.y > DAT_10803a78.endY)
-                        DAT_1086e0b8[i].endB.translation.y += vector.y;
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.y += vector.y;
+                    if (DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.y > DAT_10803a78.endY)
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.y += vector.y;
                     else
-                        DAT_1086e0b8[i].endB.translation.x += vector.x;
-                    if (DAT_1086e0b8[i].endB.translation.y <= DAT_10803a78.endY &&
-                        DAT_1086e0b8[i].endA.translation.y <= DAT_10803a78.endY)
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.x += vector.x;
+                    if (DAT_1086e0b8[DODGE_INDEX(owner)].endB.translation.y <= DAT_10803a78.endY &&
+                        DAT_1086e0b8[DODGE_INDEX(owner)].endA.translation.y <= DAT_10803a78.endY)
                         offscreen = 1;
                     break;
                 }
@@ -377,25 +379,25 @@ int Map16_UpdateDodgeGame()
                 Vec4 endB;
                 player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
                 player.z += PLAYER_HEIGHT;
-                endA.Copy(DAT_1086e0b8[i].endA.GetTranslation());
-                endB.Copy(DAT_1086e0b8[i].endB.GetTranslation());
+                endA.Copy(DAT_1086e0b8[DODGE_INDEX(owner)].endA.GetTranslation());
+                endB.Copy(DAT_1086e0b8[DODGE_INDEX(owner)].endB.GetTranslation());
                 if (hit || player.DistanceSquaredToSegment(endA, endB) < HIT_DISTANCE_SQUARED)
                     hit = 1;
                 if (offscreen)
                 {
-                    DAT_10daaa80.RemoveOwnedBy(i + EFFECT_OWNER_BASE);
+                    DAT_10daaa80.RemoveOwnedBy(owner);
                     DAT_1020c32c = DAT_10c65060 + 1;
-                    DAT_1020c2f0[i].kind = 0;
+                    DAT_1020c2f0[DODGE_INDEX(owner)].kind = 0;
                     DAT_1020c2ec = SCORE_POP_FRAMES;
                     DAT_10c65060 = DAT_1020c32c;
                     FUN_1003ad20(SCORE_SOUND, 0, SOUND_VOLUME);
                 }
             }
             vector.Fill(0.0f);
-            if (spawnKind != 0 && DAT_1020c2f0[i].kind == 0)
+            if (spawnKind != 0 && DAT_1020c2f0[DODGE_INDEX(owner)].kind == 0)
             {
-                DAT_10255510[i].scale = speedScale;
-                DAT_1020c2f0[i].kind = spawnKind;
+                DAT_10255510[DODGE_INDEX(owner)].scale = speedScale;
+                DAT_1020c2f0[DODGE_INDEX(owner)].kind = spawnKind;
                 switch (spawnKind)
                 {
                 case DODGE_KIND_BAR:
@@ -403,9 +405,9 @@ int Map16_UpdateDodgeGame()
                     vector.x = DAT_10803a78.minX;
                     vector.y = DAT_10803a78.spawnY;
                     vector.z = DAT_10803a78.minZ;
-                    DAT_1086e0b8[i].endA.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.SetTranslation(vector);
                     vector.x = DAT_10803a78.maxX;
-                    DAT_1086e0b8[i].endB.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.SetTranslation(vector);
                     break;
                 case DODGE_KIND_POLE:
                 case DODGE_KIND_FAST_POLE:
@@ -419,55 +421,55 @@ int Map16_UpdateDodgeGame()
                     } while (DAT_10803a78.maxX - POLE_EDGE_MARGIN < vector.x);
                     vector.y = DAT_10803a78.spawnY;
                     vector.z = DAT_10803a78.minZ - POLE_EDGE_MARGIN;
-                    DAT_1086e0b8[i].endA.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.SetTranslation(vector);
                     vector.z += POLE_HEIGHT;
-                    DAT_1086e0b8[i].endB.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.SetTranslation(vector);
                     break;
                 case DODGE_KIND_SWEEP_RIGHT:
                 case DODGE_KIND_FAST_SWEEP_RIGHT:
                     vector.x = DAT_10803a78.minX;
                     vector.y = DAT_10803a78.spawnY;
                     vector.z = DAT_10803a78.minZ;
-                    DAT_1086e0b8[i].endA.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.SetTranslation(vector);
                     vector.y = DAT_10803a78.endY;
-                    DAT_1086e0b8[i].endB.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.SetTranslation(vector);
                     break;
                 case DODGE_KIND_SWEEP_LEFT:
                 case DODGE_KIND_FAST_SWEEP_LEFT:
                     vector.x = DAT_10803a78.maxX;
                     vector.y = DAT_10803a78.endY;
                     vector.z = DAT_10803a78.minZ;
-                    DAT_1086e0b8[i].endA.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.SetTranslation(vector);
                     vector.y = DAT_10803a78.spawnY;
-                    DAT_1086e0b8[i].endB.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.SetTranslation(vector);
                     break;
                 case DODGE_KIND_DIAGONAL_RIGHT:
                 case DODGE_KIND_FAST_DIAGONAL_RIGHT:
                     vector.x = DAT_10803a78.minX;
                     vector.y = DAT_10803a78.spawnY;
                     vector.z = DAT_10803a78.minZ;
-                    DAT_1086e0b8[i].endA.SetTranslation(vector);
-                    DAT_1086e0b8[i].endB.SetTranslation(vector);
-                    DAT_1020c2f0[i].driftX = FUN_1013f880() % DRIFT_RANGE + DRIFT_MIN;
-                    DAT_1020c2f0[i].driftY = DRIFT_SUM - DAT_1020c2f0[i].driftX;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.SetTranslation(vector);
+                    DAT_1020c2f0[DODGE_INDEX(owner)].driftX = FUN_1013f880() % DRIFT_RANGE + DRIFT_MIN;
+                    DAT_1020c2f0[DODGE_INDEX(owner)].driftY = DRIFT_SUM - DAT_1020c2f0[DODGE_INDEX(owner)].driftX;
                     break;
                 case DODGE_KIND_DIAGONAL_LEFT:
                 case DODGE_KIND_FAST_DIAGONAL_LEFT:
                     vector.x = DAT_10803a78.maxX;
                     vector.y = DAT_10803a78.spawnY;
                     vector.z = DAT_10803a78.minZ;
-                    DAT_1086e0b8[i].endA.SetTranslation(vector);
-                    DAT_1086e0b8[i].endB.SetTranslation(vector);
-                    DAT_1020c2f0[i].driftX = FUN_1013f880() % DRIFT_RANGE + DRIFT_MIN;
-                    DAT_1020c2f0[i].driftY = DRIFT_SUM - DAT_1020c2f0[i].driftX;
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endA.SetTranslation(vector);
+                    DAT_1086e0b8[DODGE_INDEX(owner)].endB.SetTranslation(vector);
+                    DAT_1020c2f0[DODGE_INDEX(owner)].driftX = FUN_1013f880() % DRIFT_RANGE + DRIFT_MIN;
+                    DAT_1020c2f0[DODGE_INDEX(owner)].driftY = DRIFT_SUM - DAT_1020c2f0[DODGE_INDEX(owner)].driftX;
                     break;
                 }
                 EffectOptions options;
                 vector.Fill(0.0f);
-                options.owner = i + EFFECT_OWNER_BASE;
+                options.owner = owner;
                 options.m_0000 = 0;
                 options.m_0004 = 0;
-                DAT_10daaa80.Start(SPAWN_EFFECT, vector, -1, -1, &DAT_1086e0b8[i].endA, (int)&DAT_1086e0b8[i].endB, 0, 0,
+                DAT_10daaa80.Start(SPAWN_EFFECT, vector, -1, -1, &DAT_1086e0b8[DODGE_INDEX(owner)].endA, (int)&DAT_1086e0b8[DODGE_INDEX(owner)].endB, 0, 0,
                                    &options, 0);
                 spawnKind = 0;
             }

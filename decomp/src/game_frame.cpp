@@ -448,6 +448,22 @@ static __forceinline void CloseItemList(void)
 #define GAME_OVER_END_FRAME2 0x78
 #define GAME_OVER_SKIP_FRAME 0x3a
 #define GAME_OVER_RESTART_FRAME 0x8c
+// Walking, locking on and the other input actions (stage 4).
+#define INPUT_HISTORY_LAST 29        // DAT_1042dda8 keeps the last 30 input codes
+#define RIDING_HEIGHT_MARGIN 80.0f   // the player is high above the riding floor when higher than this
+#define PROBE_FAR 30.0f              // floor probes ahead of the player (walk start and stop)
+#define PROBE_NEAR 20.0f
+#define SOUND_WALK_START 0x35c
+#define SEAT_PUSH_FRAMES 0x78        // frames before the end of a seat animation in which a push counts
+#define SEAT_PUSH_KICK (-28.0f)
+#define LOCK_REACH 150.0f            // camera positions within this distance of the player (or of the point ahead) count
+#define LOCK_RANGE 350.0f
+#define LOCK_HEIGHT 200.0
+#define LOCK_TAG_INDEX_BASE 100      // nearTag = index + 100: the near position of kind 1 or 2 at that index
+#define LOCK_TAG_KIND_BASE 200       // nearTag = kind + 200: the near position has a kind above 2
+#define LOCK_SPARKLE_EFFECT 0x26ff
+#define SETTLE_MOTION_SPEED 35.0f
+#define FocusPoint(index) ((Vec4 *)DAT_1032d5b8[index])   // the camera position as a Vec4 (the records are 16 bytes)
 
 // The door models that play the swing effect when their animation starts.
 #define DoorSwingsEffect(model) ((model) == 0xe7 || (model) == 0xe8 || (model) == 0xcd || (model) == 0xce)
@@ -497,6 +513,11 @@ extern "C" int FUN_1011d810(void)
     int modelPos;
     int modelIdx;
     int i;
+    unsigned char flag0155;
+    unsigned int greetings;
+    char stepDelay;
+    bool riding;
+    int ridingFlag;
     int modelOrder[125];
 
     if (DAT_104bfd84 != 0)
@@ -2787,7 +2808,343 @@ playPadIdleMotion:
                     }
                 }
             }
-            // STAGE 4: player input and its actions, second part, pseudo.c lines 4500-5864
+            // The walking state: counters, the input history, the riding speed and the start / stop of walking.
+            flag0155 = DAT_104c0155;
+            greetings = DAT_104c00e0;
+            DAT_104c009d = (char)moveInput;
+            if (0 < DAT_1020d430)
+                DAT_1020d430 = DAT_1020d430 - 1;
+            if (0 < DAT_1032d6a4)
+                DAT_1032d6a4 = DAT_1032d6a4 - 1;
+            if (DAT_104c010c != 0)
+                DAT_104c010c = DAT_104c010c - 1;
+            stepDelay = DAT_104c010c;
+            if (DAT_10db9274 == 0)
+            {
+                DAT_1042dda8[INPUT_HISTORY_LAST] = (unsigned int)DAT_104c0155 + (DAT_10468128 * 100 + DAT_104c00e0) * 10;
+                for (i = 0; i < INPUT_HISTORY_LAST; i++)
+                    DAT_1042dda8[i] = DAT_1042dda8[i + 1];
+            }
+            else
+            {
+                flag0155 = 0;
+                DAT_104c0155 = 0;
+            }
+            riding = false;
+            ridingFlag = 0;
+            if (DAT_104bfe4c == 0)
+                DAT_10db6ee8[0].speedDivisor = 0;
+            else
+            {
+                riding = true;
+                ridingFlag = 1;
+                if (DAT_10db9248 <= DAT_104bfe24 - RIDING_HEIGHT_MARGIN)
+                    DAT_10db6ee8[0].speedDivisor = 3;
+                else
+                    DAT_10db6ee8[0].speedDivisor = 1;
+            }
+            if (DAT_104c01e0 == 0)
+            {
+                if (DAT_104bfdc8 != 0 || DAT_104c0300 != 0 || DAT_1032d69c == 0
+                    || (DAT_1065cb31 == 0 && mouseRight != 2 && stepDelay == 0) || mouseMiddle == 2 || DAT_1065cb30 != 0)
+                    goto walkTailCheck;
+                if (DAT_104c01e8 != 0 || DAT_104c0068 == 1 || DAT_104bfdf0 != 0)
+                {
+walkCancel:
+                    if (3 < greetings)
+                        DAT_104c010c = 8;
+                    goto walkTailCheck;
+                }
+                if (DAT_104c00e8 == 0x2b)
+                {
+                    if (greetings == 0 || DAT_1065cb3e != 0 || mouseMiddle != 0)
+                        goto walkNeedsGreeting;
+                }
+                else if (DAT_104c00e8 != 0x24 || 7 < greetings)
+                {
+walkNeedsGreeting:
+                    if (3 < greetings && flag0155 == 0)
+                        goto walkCancel;
+                }
+                if (DAT_104bfe1c != 0 || 7 < DAT_104c009a)
+                    goto walkCancel;
+                if (controlsEnabled == 0)
+                    goto walkTailCheck;
+                DAT_104c010c = 0;
+                DAT_104c0154 = 1;
+                if (9999 < DAT_104c0228)
+                {
+                    if (DAT_104c0228 == 0x271a)
+                        DAT_104c0228 = 0x271b;
+                    goto walkTailCheck;
+                }
+                if ((riding && DAT_10db6ee8[0].m_229c != 0) || DAT_104bfe30 != 0 || DAT_104c02e4 != 0 || DAT_104bfe3c != 0)
+                    goto walkTailCheck;
+                if (!riding && flag0155 == 0 && DAT_10db6ee8[DAT_104bf8b4].m_238c == 0)
+                {
+                    // Only start walking when there is floor ahead of the player.
+                    Vec4 groundProbe;
+                    groundProbe.Set(0.0f, 0.0f, -PROBE_FAR, 0.0f);
+                    int blockedAhead = DAT_10db6ee8[DAT_104bf8b4].IsClearOfMap(&groundProbe) == 0;
+                    if (!blockedAhead)
+                    {
+                        groundProbe.Set(0.0f, 0.0f, -PROBE_NEAR, 0.0f);
+                        blockedAhead = DAT_10db6ee8[DAT_104bf8b4].IsClear(&groundProbe) == 0;
+                        if (!blockedAhead && DAT_104c0155 == 0)
+                        {
+                            greetings = DAT_104c00e0;
+                            goto walkCancel;
+                        }
+                    }
+                }
+                DAT_104c009c = 0;
+                DAT_1032d6a4 = 9;
+                DAT_1020d430 = 0xf;
+                DAT_1020d4b8 = 0;
+                DAT_104bfdb0 = -0x1e;
+                FUN_1003ad20(SOUND_WALK_START, &DAT_10db6ee8[0].matrix.GetTranslation(), 1.0f);
+                if (DAT_104bfdc8 != 0)
+                {
+                    DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
+                    DAT_10db6ee8[0].m_0075 = 0;
+                    DAT_104bfdc8 = 0;
+                    DAT_104bfdcc = 0;
+                    DAT_104c0090 = 1;
+                }
+                DAT_104bfdd0 = 0;
+                DAT_104c009e = 0x14;
+                if (DAT_104c00e8 == 0x2b && DAT_104c00e0 != 0)
+                    FUN_100114a0();
+                if (DAT_10db6ee8[DAT_104bf8b4].m_238c != 0 || riding)
+                {
+                    if (DAT_104c0155 != 0)
+                        goto walkResetBlend;
+                }
+                else
+                {
+                    if (DAT_104c0155 == 0)
+                    {
+                        DAT_10db6ee8[DAT_104bf8b4].m_237c = 0.4f;
+                        DAT_10db6ee8[DAT_104bf8b4].m_238c = 1;
+                        goto walkBlendDone;
+                    }
+walkResetBlend:
+                    DAT_10db6ee8[DAT_104bf8b4].m_237c = 0.4f;
+walkBlendDone:;
+                }
+                if (DAT_10db6ee8[DAT_104bf8b4].m_238c != 0)
+                    DAT_104687b0 = 1;
+                DAT_1021a360 = 0;
+                DAT_104c009c = 0;
+                if (moveInput == 0)
+                {
+                    if (riding)
+                        DAT_10db6ee8[0].PlayMotion(0x1e, 0, 5, 1.0f);
+                    else
+                    {
+                        DAT_10db6ee8[0].PlayMotion(9, 0, 2, 1.0f);
+                    }
+                    DAT_10468128 = 8;
+                }
+                else
+                {
+                    DAT_10db6ee8[0].PlayMotion(0x1e, 0, riding ? 5 : 2, 1.0f);
+                    DAT_10468128 = 8;
+                }
+walkTail:
+                if (DAT_10db6ee8[DAT_104bf8b4].m_238c == 0 && !riding && DAT_104c0155 == 0)
+                {
+                    Vec4 floorProbe;
+                    floorProbe.Set(0.0f, 0.0f, -PROBE_FAR, 0.0f);
+                    greetings = DAT_10db6ee8[DAT_104bf8b4].IsClearOfMap(&floorProbe) == 0;
+                    if (greetings == 0)
+                    {
+                        floorProbe.Set(0.0f, 0.0f, -PROBE_NEAR, 0.0f);
+                        greetings = DAT_10db6ee8[DAT_104bf8b4].IsClear(&floorProbe) == 0;
+                    }
+                    DAT_10db6ee8[DAT_104bf8b4].m_238c = greetings;
+                }
+                DAT_10468128 = DAT_10468128 + 1;
+            }
+            else
+            {
+                if (((0 < DAT_104c01e0 && DAT_104c01e4 < DAT_104c01dc->frameMatrixCount - SEAT_PUSH_FRAMES)
+                     || (DAT_104c01e0 < 0 && SEAT_PUSH_FRAMES < DAT_104c01e4))
+                    && (DAT_1065cb31 != 0 || mouseRight == 2) && DAT_104c0210 == 0)
+                    DAT_104c0214 = SEAT_PUSH_KICK;
+walkTailCheck:
+                if (DAT_10468128 != 0)
+                    goto walkTail;
+            }
+            if (DAT_104c009e != 0)
+                DAT_104c009e = DAT_104c009e - 1;
+            if (DAT_104c0300 != 0 || DAT_104bfe4c != 0 || DAT_104bfe50 != 0)
+                DAT_104c010c = 0;
+            // Walking on level ground: the camera positions ahead of the player that the sparkle marks.
+            if (DAT_104bfe3c == 0)
+            {
+                if (DAT_104bfdc8 == 0 && DAT_104c0228 < 10000
+                    && ((DAT_10db6ee8[DAT_104bf8b4].m_238c != 0 || (riding && DAT_104bfe24 - RIDING_HEIGHT_MARGIN < DAT_10db9248))
+                        && DAT_1049f0f0 != 0 && DAT_10c635f8 == 1))
+                {
+                    Vec4 playerAt = DAT_10db6ee8[0].matrix.GetTranslation();
+                    Vec4 reach = playerAt;
+                    float facingCos = (float)cos((double)(-DAT_10db6ee8[DAT_104bf8b4].heading - HALF_PI));
+                    reach.x = facingCos * LOCK_REACH + reach.x;
+                    float facingSin = (float)sin((double)(-DAT_10db6ee8[DAT_104bf8b4].heading - HALF_PI));
+                    reach.y = facingSin * LOCK_REACH + reach.y;
+                    int nearTag = 0;
+                    int blockedIdx = -1;
+                    for (i = 0; i < DAT_1049f0f0; i++)
+                    {
+                        if (FocusPoint(i)->Distance(playerAt) < LOCK_REACH)
+                        {
+                            unsigned char kind = DAT_1021bbc0[i];
+                            if (kind < 3)
+                                nearTag = (kind != 0) ? i + LOCK_TAG_INDEX_BASE : 1;
+                            else
+                            {
+                                nearTag = kind + LOCK_TAG_KIND_BASE;
+                                blockedIdx = i;
+                            }
+                        }
+                    }
+                    int bestIdx = -1;
+                    float bestDistance = LOCK_RANGE;
+                    for (i = 0; i < DAT_1049f0f0; i++)
+                    {
+                        float distance = FocusPoint(i)->Distance(reach);
+                        if (distance < bestDistance && distance < FocusPoint(i)->Distance(playerAt))
+                        {
+                            unsigned char kind = DAT_1021bbc0[i];
+                            if (fabs((double)(DAT_1032d5b8[i]->z - playerAt.z)) < LOCK_HEIGHT
+                                && (kind == 0 || nearTag == 1
+                                    || (kind > 2 && blockedIdx != i && nearTag - LOCK_TAG_KIND_BASE == kind)
+                                    || (kind == 2 && nearTag != 0 && nearTag - LOCK_TAG_INDEX_BASE != i)))
+                            {
+                                bestDistance = distance;
+                                bestIdx = i;
+                            }
+                        }
+                    }
+                    DAT_104c01ac = DAT_104c01ac + 1;
+                    if (bestIdx != DAT_104c01a8)
+                    {
+                        DAT_104c01ac = 0;
+                        DAT_104c01a8 = bestIdx;
+                    }
+                    if (bestIdx >= 0 && (DAT_104c01ac & 7) == 0)
+                        DAT_10daaa80.Start(LOCK_SPARKLE_EFFECT, *FocusPoint(bestIdx), -1, 0, 0, 0, 0, 0, 0, 0);
+                }
+            }
+            // After ten idle steps: pull the player towards the camera position it faces and settle.
+            if (9 < DAT_10468128)
+            {
+                Vec4 *pullTarget;
+                int blockedAhead = 0;
+                if (ridingFlag == 0)
+                {
+                    if (DAT_104c0155 == 0)
+                    {
+                        if (DAT_10db6ee8[DAT_104bf8b4].m_238c == 0)
+                        {
+                            Vec4 settleProbe;
+                            settleProbe.Set(0.0f, 0.0f, -PROBE_FAR, 0.0f);
+                            blockedAhead = DAT_10db6ee8[DAT_104bf8b4].IsClearOfMap(&settleProbe) == 0;
+                            if (blockedAhead == 0)
+                            {
+                                settleProbe.Set(0.0f, 0.0f, -PROBE_NEAR, 0.0f);
+                                blockedAhead = DAT_10db6ee8[DAT_104bf8b4].IsClear(&settleProbe) == 0;
+                                if (blockedAhead == 0)
+                                {
+                                    if (DAT_104c0155 == 0)
+                                        goto settleTargetDone;
+                                    goto noPullTarget;
+                                }
+                            }
+                        }
+                        else
+                            blockedAhead = 1;
+                        goto pickPullTarget;
+                    }
+                    goto noPullTarget;
+                }
+                else
+                {
+                    if (DAT_10db9248 <= DAT_104bfe24 - RIDING_HEIGHT_MARGIN)
+                        goto noPullTarget;
+pickPullTarget:
+                    if (DAT_1049f0f0 == 0 || DAT_10c635f8 != 1)
+                        goto noPullTarget;
+                    {
+                        Vec4 playerAt = DAT_10db6ee8[0].matrix.GetTranslation();
+                        Vec4 reach = playerAt;
+                        float facingCos = (float)cos((double)(-DAT_10db6ee8[DAT_104bf8b4].heading - HALF_PI));
+                        reach.x = facingCos * LOCK_REACH + reach.x;
+                        float facingSin = (float)sin((double)(-DAT_10db6ee8[DAT_104bf8b4].heading - HALF_PI));
+                        reach.y = facingSin * LOCK_REACH + reach.y;
+                        int nearTag = 0;
+                        int blockedIdx = -1;
+                        for (i = 0; i < DAT_1049f0f0; i++)
+                        {
+                            if (FocusPoint(i)->Distance(playerAt) < LOCK_REACH)
+                            {
+                                unsigned char kind = DAT_1021bbc0[i];
+                                if (kind < 3)
+                                    nearTag = (kind != 0) ? i + LOCK_TAG_INDEX_BASE : 1;
+                                else
+                                {
+                                    nearTag = kind + LOCK_TAG_KIND_BASE;
+                                    blockedIdx = i;
+                                }
+                            }
+                        }
+                        int bestIdx = -1;
+                        float bestDistance = LOCK_RANGE;
+                        if (DAT_1049f0f0 < 1)
+                            goto noPullTarget;
+                        for (i = 0; i < DAT_1049f0f0; i++)
+                        {
+                            float distance = FocusPoint(i)->Distance(reach);
+                            if (distance < bestDistance && distance < FocusPoint(i)->Distance(playerAt))
+                            {
+                                unsigned char kind = DAT_1021bbc0[i];
+                                if (fabs((double)(DAT_1032d5b8[i]->z - playerAt.z)) < LOCK_HEIGHT
+                                    && (kind == 0 || nearTag == 1
+                                        || (kind > 2 && blockedIdx != i && nearTag - LOCK_TAG_KIND_BASE == kind)
+                                        || (kind == 2 && nearTag != 0 && nearTag - LOCK_TAG_INDEX_BASE != i)))
+                                {
+                                    bestDistance = distance;
+                                    bestIdx = i;
+                                }
+                            }
+                        }
+                        if (bestIdx < 0)
+                            goto noPullTarget;
+                        pullTarget = FocusPoint(bestIdx);
+                    }
+                    goto pullTargetChosen;
+                }
+noPullTarget:
+                pullTarget = 0;
+pullTargetChosen:
+                DAT_10db6ee8[DAT_104bf8b4].SetPullTarget(pullTarget);
+                DAT_10468128 = 0;
+                if (ridingFlag != 0 || blockedAhead != 0 || DAT_104c0155 != 0)
+                {
+                    DAT_10db6ee8[DAT_104bf8b4].m_229c = 0;
+                    DAT_10db6ee8[DAT_104bf8b4].m_237c = 1.0f;
+                    DAT_10db6ee8[DAT_104bf8b4].verticalSpeed = 0.0f;
+                    DAT_10db6ee8[DAT_104bf8b4].AddMotionSpeed(SETTLE_MOTION_SPEED);
+                }
+                DAT_10db6ee8[DAT_104bf8b4].m_008c = 0;
+                if (ridingFlag != 0)
+                    DAT_10db6ee8[DAT_104bf8b4].mode = 1;
+                DAT_104c0155 = 0;
+                DAT_10db6ee8[0].matrix.GetTranslation();
+            }
+settleTargetDone:;
+            // STAGE 4b: player input and its actions, second part, pseudo.c lines 4864-5864
             // STAGE 5: player input and its actions, last part (ends the block), pseudo.c lines 5865-6523
         }
         // The block above is left by a goto at pseudo line 6480 (label LAB_1012984b, next line).

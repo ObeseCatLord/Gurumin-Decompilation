@@ -346,6 +346,7 @@ struct AnimModel
     int SnapHeadingToSide();                                       // 0x10162d50
     int FaceAwayFrom(AnimModel *other);                            // 0x10162e00
     int FaceAway(const Vec4 &point);                               // 0x10162ea0
+    int SetPullTarget(Vec4 *target);                               // 0x10162f20: pullTarget = target, pullFrames = 0x17 (0 when no target); the same code as ModelObject::M_10162f20
     int ScreenPosition(int *x, int *y, const Matrix4 &viewProjection);  // 0x10162f50
     int PushMotionSpeed(float speed);                              // 0x10163000
     int AddMotionSpeed(float speed);                               // 0x101630b0

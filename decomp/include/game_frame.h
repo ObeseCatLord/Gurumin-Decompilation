@@ -61,4 +61,6 @@ extern "C" int FUN_1016bdf0(float angle);    // 0x1016bdf0: puts the camera behi
 
 extern "C" Vec4 DAT_10836dd8[10];            // the pad stick's last 10 directions (unit vectors), the newest last
 
+extern "C" unsigned int DAT_1042dda8[30];    // the last 30 input codes (greetings, walking, action), newest last
+extern "C" void FUN_100114a0(void);          // 0x100114a0
 #endif

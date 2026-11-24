@@ -761,3 +761,9 @@ _Render_DrawGradientQuad@32	00792370
 ?BoxSphereOverlap@Node@@QAEHPBUVec4@@000PAU2@1@Z	00754840
 ?CylinderSphereOverlap@Node@@QAEHPBUVec4@@000PAU2@1@Z	007550b0
 ?Upload@TextureObject@@QAEHHHPAEPBE@Z	0077d950
+# section 2 rest (batch 11)
+?DrawScreenOverlays@WorldRenderer@@QAEXXZ	0071dd90
+_Bgm_StartStream	0063e6d0
+?Bgm_Play@@YAHHH@Z	005a5500
+# section 3 small (batch 11)
+_Char_RetireWaveEnemy	006d64e0

@@ -219,4 +219,21 @@ extern "C" int Char_IsStandingOn(int lower, int upper, int maxHeight, int maxDis
 extern "C" int EnemyAI_PickSingle(int index);        // EN 0x5b9ae0: always behaviour 0
 extern "C" int Enemy_PickAction_65_35(int index);    // EN 0x5b9a80: behaviour 0 65 %, behaviour 1 35 %
 
+// Wave enemies (char_retire.cpp).
+const int WAVE_GRID_SIZE = 10;                      // the wave grid is 10 rows by 10 columns (formation number = row * 10 + column)
+const float CHAR_RETIRE_OFFSET = -100000.0f;        // a retired character's x becomes this minus its x (moves it far out of the world)
+const float CHAR_MARKER_HIDDEN = -200000.0f;        // marker y of a character that is not placed
+// The marker record of a placed character (0x10 bytes; only y is used so far).
+struct CharMarker
+{
+    float y;           // 0x00: height of the marker (CHAR_MARKER_HIDDEN = hidden)
+    char m_0004[0xc];  // 0x04: not used by EN code yet
+};
+extern "C" char g_charInPlay[CHAR_SLOT_COUNT];                       // EN 0x0091d608 (JP DAT_1020d540): 1 = the character is in play
+extern "C" int g_waveEnemiesAlive;                                    // EN 0x01333350 (JP DAT_10c635a8): wave enemies still alive
+extern "C" char g_waveGrid[WAVE_GRID_SIZE][WAVE_GRID_SIZE];           // EN 0x0091e740 (JP DAT_1049efb0): character in each wave slot (0 = empty)
+extern "C" CharMarker g_charMarkers[CHAR_SLOT_COUNT];                 // EN 0x0147b258 (JP DAT_10867e18): where a character in play was placed
+// Retires a wave enemy: moves it out of the world and records it in the wave grid. EN 0x6d64e0 (JP 0x1001b7b0).
+extern "C" int Char_RetireWaveEnemy(int index);
+
 #endif

@@ -50,6 +50,7 @@ struct IAMMultiMediaStreamLike : IUnknownLike
                                           IMediaStreamLike **added) = 0;
     virtual long __stdcall OpenFile(const WCHAR *name, unsigned long flags) = 0;
 };
+struct TextureObject;
 struct DShowStream
 {
     IAMMultiMediaStreamLike *stream;         // 0x00
@@ -63,6 +64,10 @@ struct DShowStream
     int height;                              // 0x24
     void Close();
     long Open(const char *path);
+    void M_10148910();                       // 0x10148910 (ToggleHolder::M_10148910 in texcache.cpp: same object)
+    void M_10148920();                       // 0x10148920
+    char M_10148930();                       // 0x10148930
+    void M_1015c6a0(TextureObject *texture); // 0x1015c6a0 (VideoSurface::CopyTo in surface_copy.cpp: same object)
 };
 
 #endif

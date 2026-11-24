@@ -65,6 +65,9 @@ Matrix4 Scaling(float x, float y, float z);   // 0x101b13c0: scale by (x, y, z)
 Matrix4 TranslationMatrix(float x, float y, float z);   // 0x101b1360: move by (x, y, z)
 Matrix4 Transpose(const Matrix4 &matrix);   // 0x101b1090: rows and columns swapped
 
+Vec4 QuatFromMatrix(const Matrix4 &matrix);   // 0x101ae2a0: rotation quaternion (x, y, z, w) of the rotation block
+Matrix4 RotationMatrix(const Vec4 &quaternion);   // 0x101b08c0: rotation block from a quaternion (x, y, z, w)
+
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space
 
 #endif

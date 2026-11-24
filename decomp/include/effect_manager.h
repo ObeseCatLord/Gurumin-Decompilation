@@ -235,6 +235,7 @@ struct EffectManager
     int Init();                                      // 0x101842a0: Reset plus the effect definitions
     void M_1016fab0();                               // 0x1016fab0 (called by Init)
     int ClearTables();                               // 0x1016fb10
+    void ClearNodePool();                            // 0x1016faf0: marks every effect node unused
     int RemoveOwnedBy(int owner);                    // 0x101883b0
     int RemoveChildren(int parent);                  // 0x10172260
     int RemoveOfType(int type);                      // 0x10188490

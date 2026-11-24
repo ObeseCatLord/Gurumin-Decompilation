@@ -175,6 +175,7 @@ struct WorldRenderer
     WorldRenderer();
     int Bind(AnimModel *models, void *mapRoot, int *state, WorldCallback callback, void *data);  // 0x1017c9c0
     int LoadCharacter(const char *path);                                                       // 0x10166950
+    int M_10166910(int slot, int character, int value);                                        // 0x10166910 (CharacterBank::M_10166910 in model_misc.cpp)
     int StartFade(int mode, int target, int frames);
     void TickFade();
     int SetModelState(int index, int mode);  // 0x10166f20 (world_model_state.cpp)

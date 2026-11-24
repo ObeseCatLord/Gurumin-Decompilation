@@ -19,4 +19,8 @@ struct LastPosition
 
 extern "C" LastPosition DAT_10802bf8[0x80];  // per character slot (CHAR_SLOT_COUNT)
 
+// The vectors of all slots as one array, four per slot (perch_swooper.cpp keeps its perch and landing points in the
+// vectors 1..3 of its slot: LastPositionVector(slot * 4 + n)).
+#define LastPositionVector(flatIndex) ((&DAT_10802bf8[0].position)[flatIndex])
+
 #endif

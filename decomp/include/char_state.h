@@ -90,6 +90,7 @@ struct CharState
                         int zoneRampMax;           // area_zone.cpp: the push stops growing at this strength
                         int driftSignY;           // drifter.cpp (state 0): non-zero = the y step is added, else subtracted
                         int orbitCentreX;         // drifter.cpp (state 1): x of the centre the character circles (whole units)
+                        int startHeight;          // perch_swooper.cpp: height (whole units) of the player when it took off
                     };
                     union                         // 0x0c
                     {
@@ -134,6 +135,7 @@ struct CharState
                         int hurlReactDigit;       // npc_hurl.cpp: talk % 10, a ready thrower throws with a chance of 2 * this + 2 percent per frame
                         int driftSignZ;           // drifter.cpp (state 0): non-zero = the z step is added, else subtracted
                         int orbitCentreY;         // drifter.cpp (state 1): y of the centre the character circles (whole units)
+                        int anchorPoint;          // perch_swooper.cpp: which of the four LastPosition vectors it swoops to (1..3)
                     };
                     union                         // 0x10
                     {
@@ -164,6 +166,7 @@ struct CharState
                         int phaseFrames;          // enemy_chase_hop.cpp: frames counted in the following step (3)
                         int hurlRetryDigit;       // npc_hurl.cpp: (talk / 10) % 10, after a throw the next one starts when a roll of 100 reaches (this + 1) * 3
                         int driftStarted;         // drifter.cpp: 1 once the drift or orbit was set up
+                        int flapTicks;            // perch_swooper.cpp: wing beat counter (flap speed * 50 per frame; a wing flap at 300)
                     };
                     union                         // 0x14
                     {

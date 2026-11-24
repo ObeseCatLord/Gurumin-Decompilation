@@ -239,6 +239,7 @@ struct Node
     int M_1019d680();                                     // 0x1019d680: clears the special pass marker upwards
     int ClearSpecialPassOnLinks();                        // 0x1019d6a0
     int M_101a8760();                                     // 0x101a8760: both special pass steps
+    int M_101a3000(const int *parameters);                // 0x101a3000: applies a block of node parameters (Scene callback 0x458)
 
     // Saved states
     int AllocSaved();                                     // 0x101947b0: allocates `saved` on first use

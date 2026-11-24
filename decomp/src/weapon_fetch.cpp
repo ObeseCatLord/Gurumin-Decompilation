@@ -27,7 +27,7 @@ extern "C" int FUN_1001a450(int slot, const Vec4 *point);                   // S
 extern "C" int FUN_100242c0(int index, Vec4 *ground, float depth, int fromHead, int testOnly, const Vec4 *offset);
 extern "C" int FUN_100241e0(int index, float x, float y, float z);          // Character_SetMove
 extern "C" int FUN_1001b0a0(int index, int alternative, int quiet);         // Char_SelectKind
-extern "C" int FUN_100615f0(int index, int a, int b);                       // drops the weapon models of a character
+#include "char_equipment.h"
 extern "C" int FUN_1001a990(int index, int weapon, int right, int left, int slot);  // Char_AttachWeapon
 
 // 0x100a8ac0 (Enemy_FetchDroppedWeapon). Character `index` has lost the weapon in one hand: a mark word holds

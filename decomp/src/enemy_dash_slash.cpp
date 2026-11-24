@@ -143,8 +143,7 @@ int Enemy_StalkAndDashSlash(int index)
     player.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     float amount = (player - self).Length2D();
-    float delta;   // the player's y offset while stalking, later the no-ground slow-down factor
-    float scratch; // the x offset while stalking, the constants passed by reference, the retreat angle
+    float delta;
     DAT_10255a88[index] = 0;
     if (DAT_10210b30[index] != 0 && DAT_1020b430[index].state != 0)
     {
@@ -177,9 +176,9 @@ int Enemy_StalkAndDashSlash(int index)
         else if (DAT_1020b430[index].state == DASH_STEP_STALK)
         {
             delta = player.y - self.y;
-            scratch = player.x - self.x;
-            scratch = (float)atan2((double)scratch, (double)delta);
-            DAT_10db6ee8[index].targetHeading = scratch + DASH_PI;
+            float dx = player.x - self.x;
+            delta = (float)atan2((double)dx, (double)delta);
+            DAT_10db6ee8[index].targetHeading = delta + DASH_PI;
             if (amount > DASH_FAR)
             {
                 move.y = DASH_WALK_SPEED;
@@ -302,13 +301,11 @@ int Enemy_StalkAndDashSlash(int index)
                                      0, 0, &options);
                         if (DAT_1021bdf8[index][DASH_HAND_SLOT] != 0)
                         {
-                            scratch = 0.5f;
                             offset.Copy((DAT_1021bdf8[index][0]->worldMatrix.GetTranslation() +
                                          DAT_1021bdf8[index][DASH_HAND_SLOT]->worldMatrix.GetTranslation()) *
-                                        scratch);
+                                        0.5f);
                             trail.SetTranslation(offset);
-                            scratch = 0.0f;
-                            offset.Fill(scratch);
+                            offset.Fill(0.0f);
                             FUN_1001d8b0(index, DASH_TRAIL_EFFECT, offset, -1, -1, 0, 0, 0, &trail, &options);
                             FUN_1001d8b0(index, DASH_TRAIL_EFFECT, offset, -1, -1,
                                          &DAT_1021bdf8[index][DASH_HAND_SLOT]->worldMatrix, 0, 0, 0, &options);
@@ -388,13 +385,11 @@ int Enemy_StalkAndDashSlash(int index)
                                      0, 0, &options);
                         if (DAT_1021bdf8[index][DASH_HAND_SLOT] != 0)
                         {
-                            scratch = 0.5f;
                             offset.Copy((DAT_1021bdf8[index][0]->worldMatrix.GetTranslation() +
                                          DAT_1021bdf8[index][DASH_HAND_SLOT]->worldMatrix.GetTranslation()) *
-                                        scratch);
+                                        0.5f);
                             trail.SetTranslation(offset);
-                            scratch = 0.0f;
-                            offset.Fill(scratch);
+                            offset.Fill(0.0f);
                             FUN_1001d8b0(index, DASH_TRAIL_EFFECT, offset, -1, -1, 0, 0, 0, &trail, &options);
                             FUN_1001d8b0(index, DASH_TRAIL_EFFECT, offset, -1, -1,
                                          &DAT_1021bdf8[index][DASH_HAND_SLOT]->worldMatrix, 0, 0, 0, &options);
@@ -430,9 +425,7 @@ int Enemy_StalkAndDashSlash(int index)
                 int tries = 0;
                 do
                 {
-                    int roll = FUN_1013f880() % DASH_RETREAT_SPREAD - DASH_RETREAT_HALF;
-                    scratch = (float)roll;
-                    DAT_10255160[index][0] = scratch * DASH_PI / DASH_HALF_TURN + DASH_PI;
+                    DAT_10255160[index][0] = (float)(FUN_1013f880() % DASH_RETREAT_SPREAD - DASH_RETREAT_HALF) * DASH_PI / DASH_HALF_TURN + DASH_PI;
                     if (FUN_1001a590(index, &self, DASH_PROBE_DISTANCE) != 0)
                         break;
                     tries++;

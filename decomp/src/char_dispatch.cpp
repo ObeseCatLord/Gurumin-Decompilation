@@ -2,6 +2,7 @@
 // the special characters with their own update routines.
 
 #include "barrage_enemy.h"
+#include "perch_swooper.h"
 #include "world.h"
 #include "anim_model.h"
 #include "char_state.h"
@@ -86,7 +87,6 @@ extern "C" int FUN_100a9240(int index, int variant);
 extern "C" int FUN_100aa820(int index, int variant);
 extern "C" int FUN_100af1b0(int index);
 extern "C" int FUN_100ade30(int index, int variant);
-extern "C" int FUN_100a5960(int index);
 extern "C" int FUN_10076790(int index, int variant);
 extern "C" int FUN_1001d2d0(int index);
 
@@ -120,7 +120,7 @@ extern "C" int FUN_100bcb30(int index)
         FUN_100ade30(index, 1);
         return 0;
     case 10:
-        FUN_100a5960(index);
+        Enemy_PerchAndSwoop(index);
         return 0;
     case 11:
         FUN_10076790(index, 1);

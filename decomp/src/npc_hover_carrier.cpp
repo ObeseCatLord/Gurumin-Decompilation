@@ -76,9 +76,6 @@ extern "C" int FUN_10048050(int index)
     Vec4 reference;
     Vec4 self;
     Vec4 selfCopy;
-    float pitch;
-    float scale;
-    float limit;
     reference.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
     self.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     selfCopy.Copy(self);
@@ -167,21 +164,17 @@ extern "C" int FUN_10048050(int index)
                     else
                         DAT_1020b430[index].hoverGround = HOVER_NO_GROUND;
                 }
-                limit = (float)DAT_1020b430[index].hoverGround + HOVER_GROUND_CLEARANCE;
-                if (offset.z + self.z < limit)
-                    offset.z = limit - self.z;
-                limit = reference.z + HOVER_PLAYER_CLEARANCE;
-                if (offset.z + self.z < limit)
-                    offset.z = limit - self.z;
-                limit = (float)(DAT_1020b430[index].playerGround + HOVER_PLAYER_CEILING);
-                if (offset.z + self.z > limit)
-                    offset.z = limit - self.z;
+                if (self.z + offset.z < (float)DAT_1020b430[index].hoverGround + HOVER_GROUND_CLEARANCE)
+                    offset.z = (float)DAT_1020b430[index].hoverGround + HOVER_GROUND_CLEARANCE - self.z;
+                if (self.z + offset.z < reference.z + HOVER_PLAYER_CLEARANCE)
+                    offset.z = reference.z + HOVER_PLAYER_CLEARANCE - self.z;
+                if (self.z + offset.z > (float)(DAT_1020b430[index].playerGround + HOVER_PLAYER_CEILING))
+                    offset.z = (float)(DAT_1020b430[index].playerGround + HOVER_PLAYER_CEILING) - self.z;
                 DAT_10db6ee8[index].targetHeading = atan2f(offset.x, offset.y) + HOVER_PI;
                 if (offset.Length() < HOVER_PLAYER_NEAR)
                 {
                     float height = offset.z;
-                    scale = -1.0f;
-                    offset.Copy(offset * scale);
+                    offset.Copy(offset * -1.0f);
                     offset.z = height;
                 }
                 int limits = DAT_1020b430[index].hoverLimits;
@@ -199,17 +192,15 @@ extern "C" int FUN_10048050(int index)
                     offset.y = DAT_10802bf8[index].step.y - self.y;
                 offset.Normalized3();
                 offset.z *= 2.0f;
-                scale = HOVER_SPEED;
-                offset.Copy(offset * scale);
+                offset.Copy(offset * HOVER_SPEED);
                 if (DAT_1020b430[index].hoverLowered != 0)
                     offset.z -= HOVER_LOWERED_DROP;
-                scale = HOVER_VELOCITY_KEEP;
-                limit = HOVER_VELOCITY_TAKE;
-                offset.Copy(offset * limit + DAT_10802bf8[index].position * scale);
+                offset.Copy(offset * HOVER_VELOCITY_TAKE + DAT_10802bf8[index].position * HOVER_VELOCITY_KEEP);
                 DAT_10802bf8[index].position.Copy(offset);
                 FUN_100241e0(index, offset.x, offset.y, offset.z);
                 if (DAT_10db6ee8[index].IsClearOfMapLimited(&DAT_10802bf8[index].position) == 0)
                 {
+                    float pitch;
                     if (DAT_10802bf8[index].position.Length() > 1.0f)
                     {
                         if (DAT_10802bf8[index].position.z > 0.0f)
@@ -219,18 +210,19 @@ extern "C" int FUN_10048050(int index)
                     }
                     else
                         pitch = 0.0f;
-                    limit = atan2f(DAT_10802bf8[index].position.x, DAT_10802bf8[index].position.y);
+                    float bounce;
+                    float heading = atan2f(DAT_10802bf8[index].position.x, DAT_10802bf8[index].position.y);
                     if (DAT_10802bf8[index].position.Length() * 2.0f < HOVER_BOUNCE_SPEED_LIMIT)
-                        scale = DAT_10802bf8[index].position.Length() * 2.0f;
+                        bounce = DAT_10802bf8[index].position.Length() * 2.0f;
                     else
-                        scale = HOVER_BOUNCE_SPEED_LIMIT;
+                        bounce = HOVER_BOUNCE_SPEED_LIMIT;
                     DAT_10802bf8[index].position.x = 0.0f;
                     DAT_10802bf8[index].position.z = 0.0f;
-                    DAT_10802bf8[index].position.y = -scale;
+                    DAT_10802bf8[index].position.y = -bounce;
                     pitch += (float)(FUN_1013f880() % HOVER_BOUNCE_SPREAD - HOVER_BOUNCE_SPREAD / 2) * HOVER_PI / 360.0f;
-                    limit += (float)(FUN_1013f880() % HOVER_BOUNCE_SPREAD - HOVER_BOUNCE_SPREAD / 2) * HOVER_PI / 360.0f;
+                    heading += (float)(FUN_1013f880() % HOVER_BOUNCE_SPREAD - HOVER_BOUNCE_SPREAD / 2) * HOVER_PI / 360.0f;
                     DAT_10802bf8[index].position.RotateX(-pitch);
-                    DAT_10802bf8[index].position.RotateZ(-limit);
+                    DAT_10802bf8[index].position.RotateZ(-heading);
                 }
             }
             else if (DAT_1020b430[index].state == 4)
@@ -241,8 +233,7 @@ extern "C" int FUN_10048050(int index)
                     FUN_10043cc0(rider);
                 FUN_10043cc0(index);
                 Vec4 place;
-                scale = HOVER_RESET_DAMPING;
-                DAT_10802bf8[index].position.Copy(DAT_10802bf8[index].position * scale);
+                DAT_10802bf8[index].position.Copy(DAT_10802bf8[index].position * HOVER_RESET_DAMPING);
                 place.Copy(DAT_10db6ee8[index].matrix.GetTranslation() + DAT_10802bf8[index].position);
                 DAT_10db6ee8[index].SetPosition(place.x, place.y, place.z);
             }

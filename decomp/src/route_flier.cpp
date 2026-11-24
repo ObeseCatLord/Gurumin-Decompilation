@@ -110,37 +110,39 @@ int FUN_1007c050(int slot)
         DAT_11b002c0 = 0;
     }
     DAT_10db6ee8[slot].m_238c = 0;
-    Vec4 last;
-    last.x = (float)DAT_1020b430[slot].flierLastX;
-    last.y = (float)DAT_1020b430[slot].flierLastY;
-    last.z = (float)DAT_1020b430[slot].flierLastZ;
-    if ((last - DAT_10db6ee8[slot].matrix.GetTranslation()).Length() < FLIER_STUCK_DISTANCE)
-        DAT_1020b430[slot].flierStillFrames++;
-    else
-        DAT_1020b430[slot].flierStillFrames = 0;
-    last.Copy(DAT_10db6ee8[slot].matrix.GetTranslation());
-    DAT_1020b430[slot].flierLastX = (int)last.x;
-    DAT_1020b430[slot].flierLastY = (int)last.y;
-    DAT_1020b430[slot].flierLastZ = (int)last.z;
-    if (DAT_1020b430[slot].flierStillFrames > FLIER_STUCK_FRAMES && DAT_1020b430[slot].flierMode < 2)
-    {
-        DAT_1020b430[slot].flierFrames = FLIER_BURST_FRAMES;
-        DAT_1020b430[slot].flierMode = 2;
-        Vec4 offset;
-        EffectOptions options;
-        Matrix4 matrix;
-        Vec4 origin;
-        offset.Fill(0.0f);
-        origin.Copy(DAT_10db6ee8[slot].matrix.GetTranslation());
-        matrix.SetIdentity();
-        matrix.SetTranslation(origin);
-        matrix = DAT_10db6ee8[slot].matrix;
-        options.m_0004 = 0;
-        options.m_0000 = 0;
-        FUN_1001d8b0(slot, FLIER_BURST_EFFECT, offset, -1, -1, 0, 0, 0, &matrix, &options);
-        if (DAT_10daaae8[slot].money != 0)
-            FUN_1000dd90(DAT_10db6ee8[slot].matrix.translation.x, DAT_10db6ee8[slot].matrix.translation.y,
-                         DAT_10db6ee8[slot].matrix.translation.z + FLIER_DEBRIS_LIFT, FLIER_DEBRIS_TYPE);
+    {   // `last` lives through the stuck check, so the burst block cannot reuse its slot
+        Vec4 last;
+        last.x = (float)DAT_1020b430[slot].flierLastX;
+        last.y = (float)DAT_1020b430[slot].flierLastY;
+        last.z = (float)DAT_1020b430[slot].flierLastZ;
+        if ((last - DAT_10db6ee8[slot].matrix.GetTranslation()).Length() < FLIER_STUCK_DISTANCE)
+            DAT_1020b430[slot].flierStillFrames++;
+        else
+            DAT_1020b430[slot].flierStillFrames = 0;
+        last.Copy(DAT_10db6ee8[slot].matrix.GetTranslation());
+        DAT_1020b430[slot].flierLastX = (int)last.x;
+        DAT_1020b430[slot].flierLastY = (int)last.y;
+        DAT_1020b430[slot].flierLastZ = (int)last.z;
+        if (DAT_1020b430[slot].flierStillFrames > FLIER_STUCK_FRAMES && DAT_1020b430[slot].flierMode < 2)
+        {
+            DAT_1020b430[slot].flierFrames = FLIER_BURST_FRAMES;
+            DAT_1020b430[slot].flierMode = 2;
+            Vec4 offset;
+            EffectOptions options;
+            Matrix4 matrix;
+            Vec4 origin;
+            offset.Fill(0.0f);
+            origin.Copy(DAT_10db6ee8[slot].matrix.GetTranslation());
+            matrix.SetIdentity();
+            matrix.SetTranslation(origin);
+            matrix = DAT_10db6ee8[slot].matrix;
+            options.m_0004 = 0;
+            options.m_0000 = 0;
+            FUN_1001d8b0(slot, FLIER_BURST_EFFECT, offset, -1, -1, 0, 0, 0, &matrix, &options);
+            if (DAT_10daaae8[slot].money != 0)
+                FUN_1000dd90(DAT_10db6ee8[slot].matrix.translation.x, DAT_10db6ee8[slot].matrix.translation.y,
+                             DAT_10db6ee8[slot].matrix.translation.z + FLIER_DEBRIS_LIFT, FLIER_DEBRIS_TYPE);
+        }
     }
     if (DAT_1020b430[slot].behaviour == 0 && DAT_1020b430[slot].flierMode != 2)
     {

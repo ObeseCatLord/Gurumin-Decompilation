@@ -27,6 +27,7 @@
 #include "game_vars.h"
 #include "map_vars.h"
 #include "menu_scene.h"
+#include "dodge_game.h"            // DAT_1086e0b8: the debris placement is the first dodge obstacle matrix
 #include "minigame_hud.h"
 #include "render_vars.h"
 #include "ui_vars.h"
@@ -222,7 +223,7 @@ int Menu_DrawScene()
         Vec4 fade;
         fade.Fill(1.0f);
         fade.w = (float)abs(abs(DAT_104c00d0 - DEBRIS_STATE_CENTRE) - DEBRIS_STATE_OFFSET) / DEBRIS_OPACITY_DIVISOR;
-        DAT_104d2a08[DAT_104c0198].QueueDraw(&DAT_1086e0b8, &DAT_108392d8,
+        DAT_104d2a08[DAT_104c0198].QueueDraw(&DAT_1086e0b8[0].endA, &DAT_108392d8,
                                              DAT_10804bf8.LightForRoot(DAT_104c039c, &DAT_118e69e8, &DAT_118e69e8), -1,
                                              &fade, 0);
     }

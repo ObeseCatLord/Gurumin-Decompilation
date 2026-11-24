@@ -609,3 +609,9 @@ _Enemy_IsBusy	100e1c40
 ?ShopMenu_Draw@@YAXXZ	10056b30
 ?FUN_1007c050@@YAHH@Z	1007c050
 ?Enemy_StalkAndDashSlash@@YAHH@Z	100af1b0
+?Enemy_PerchAndSwoop@@YAHH@Z	100a5960
+?FUN_100615f0@@YAHHHH@Z	100615f0
+?Map16_UpdateDodgeGame@@YAHXZ	10053020
+?Debug_DrawShape@@YAHHPBUVec4@@0PAUMatrix4@@PBU2@@Z	10145ba0
+?Scene_HostCallback@@YAHHPAH@Z	10092af0
+?FUN_10042a30@@YAHXZ	10042a30

@@ -16,7 +16,6 @@ extern "C" Node *DAT_1021c634;               // the map's "ClearORoot" node (fou
 extern "C" int DAT_1020c320;                 // texture slot of the shadow of the first and third caster
 extern "C" int DAT_102028e4;                 // texture slot of the first haze layer of the water regions
 extern "C" Vec4 DAT_10803ab8[8];             // the shadow casters' positions: two per row, four per two casters
-extern "C" Matrix4 DAT_1086e0b8;             // placement of the debris model drawn in the scene
 extern "C" Node DAT_108654f8;                // the scene's model tree (searched for the node the shadows are drawn from)
 
 int Menu_DrawScene();                                      // 0x10022830

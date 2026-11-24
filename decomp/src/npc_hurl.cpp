@@ -84,7 +84,7 @@ inline float WeightedLength(Vec4 offset)
 extern "C" int FUN_1013f880(void);                                            // the game's random number
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 extern "C" int FUN_10043cc0(int index);                                       // Char_ResetState
-extern "C" int FUN_100615f0(int index, int a, int b);                         // drops the weapon models of a character
+#include "char_equipment.h"
 extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner,
                             int value, int frame, const Matrix4 *matrix, const void *options);  // Char_StartEffect
 

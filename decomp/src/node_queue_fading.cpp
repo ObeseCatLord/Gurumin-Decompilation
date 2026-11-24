@@ -12,23 +12,12 @@
 #include "render_state.h"
 #include "render_vars.h"
 #include "camera_vars.h"
+#include "debug_shape.h"
 
 extern "C" int FUN_101ae4d0(const Vec4 *point, const Matrix4 *matrix, float margin);   // View_ContainsPoint
 // RenderQueue_Push (render_queue.cpp): queues `node` to be drawn later with colour `a` and added colour `b`.
 extern "C" int FUN_10199880(Node *node, const void *extra, const Matrix4 *matrix, const Vec4 *a, const Vec4 *b,
                             int group);
-// Draws a debug shape of `kind` (DebugShape) from `a` and `b` placed by `matrix`, seen through `view`.
-extern "C" void FUN_10145ba0(int kind, const Vec4 *a, const Vec4 *b, Matrix4 *matrix, const Matrix4 *view);
-
-// FUN_10145ba0's shape kinds used here.
-enum DebugShape
-{
-    DEBUG_SHAPE_CUBE = 0,       // a = size on each axis
-    DEBUG_SHAPE_BOX = 1,        // a = lower, b = upper corner
-    DEBUG_SHAPE_SOLID_BOX = 3,  // a = lower, b = upper corner, filled
-    DEBUG_SHAPE_LINE = 5        // from a to b
-};
-
 // The mesh range of a node that is not animated: every primitive.
 #define NODE_FULL_MESH_RANGE 0x1000
 // Size of the cube that stands for a bone without skinned children in the skeleton view.
@@ -101,7 +90,7 @@ int Node::QueueDrawFading(const Matrix4 *parent, const Matrix4 *view, const void
                 Vec4 to = children[i]->worldMatrix.GetTranslation();
                 to.w = 1.0f;
                 drewBone = 1;
-                FUN_10145ba0(DEBUG_SHAPE_LINE, &from, &to, &identity, view);
+                Debug_DrawShape(DEBUG_SHAPE_CONE, &from, &to, &identity, view);
             }
         }
         if (!drewBone) {
@@ -110,7 +99,7 @@ int Node::QueueDrawFading(const Matrix4 *parent, const Matrix4 *view, const void
             Matrix4 place;
             place.SetIdentity();
             place.Translate(worldMatrix.translation.x, worldMatrix.translation.y, worldMatrix.translation.z);
-            FUN_10145ba0(DEBUG_SHAPE_CUBE, &size, 0, &place, view);
+            Debug_DrawShape(DEBUG_SHAPE_ELLIPSOID, &size, 0, &place, view);
         }
     } else {
         if (flags & NODE_FLAG_SKIP_SUBTREE) {
@@ -165,17 +154,17 @@ int Node::QueueDrawFading(const Matrix4 *parent, const Matrix4 *view, const void
                 place.SetIdentity();
                 place.Translate(bounds.x + worldMatrix.translation.x, bounds.y + worldMatrix.translation.y,
                                 bounds.z + worldMatrix.translation.z);
-                FUN_10145ba0(DEBUG_SHAPE_CUBE, &size, 0, &place, view);
+                Debug_DrawShape(DEBUG_SHAPE_ELLIPSOID, &size, 0, &place, view);
             } else if (flags & NODE_FLAG_SHAPE_BOX) {
                 Matrix4 place;
                 place.SetIdentity();
                 place.Translate(worldMatrix.translation.x, worldMatrix.translation.y, worldMatrix.translation.z);
-                FUN_10145ba0(DEBUG_SHAPE_BOX, &box[NODE_BOX_MIN], &box[NODE_BOX_MAX], &place, view);
+                Debug_DrawShape(DEBUG_SHAPE_BOX, &box[NODE_BOX_MIN], &box[NODE_BOX_MAX], &place, view);
             } else if (flags & NODE_FLAG_SHAPE_SOLID_BOX) {
                 Matrix4 place;
                 place.SetIdentity();
                 place.Translate(worldMatrix.translation.x, worldMatrix.translation.y, worldMatrix.translation.z);
-                FUN_10145ba0(DEBUG_SHAPE_SOLID_BOX, &box[NODE_BOX_MIN], &box[NODE_BOX_MAX], &place, view);
+                Debug_DrawShape(DEBUG_SHAPE_RINGS, &box[NODE_BOX_MIN], &box[NODE_BOX_MAX], &place, view);
             }
         }
     }

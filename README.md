@@ -13,10 +13,20 @@ No game files are included. Point the tools at your own copy of the game.
 
 ## Progress
 
-<p align="center"><img src="progress/jp/progress.svg" alt="Decompilation progress" width="600"></p>
+### Japanese PC release (APP.dll, Visual C++ .NET 2002)
 
-The meter is regenerated with every progress report and refreshed by CI on each push to `master`; the same data is
-published as the `jp_report` artifact for ByteMatch. Matched functions are the smaller ones
+<p align="center"><img src="progress/jp/progress.svg" alt="JP decompilation progress" width="600"></p>
+
+### English Steam release (game_en_steam.exe, Visual C++ 2013)
+
+<p align="center"><img src="progress/en/progress.svg" alt="EN decompilation progress" width="600"></p>
+
+The EN project lives in `decomp_en/` and reuses the JP work: `decomp_en/jp_en_map.tsv` pairs 1,143 of its 2,034
+game functions with their JP twins, and matched JP source is ported as the first draft. Library code linked into
+the exe (MFC, the C runtime) is not counted.
+
+The meters are regenerated with every progress report and refreshed by CI on each push to `master`; the same data is
+published as the `jp_report` and `en_report` artifacts for ByteMatch. In the JP project, matched functions are the smaller ones
 so far: a few very large functions (the model loader at 0x1017cc90 alone is 29,886 bytes) hold most of the code, so
 the byte share lags the function share. `python decomp/tools/build_all.py` prints the current figures and
 `decomp/tools/todo.py` lists what is left.

@@ -1,9 +1,11 @@
 name: Progress report
 
-# The original compiler (Visual C++ .NET 2002/2003) and APP.dll cannot be used on GitHub-hosted runners, so the
-# objdiff-format report is generated locally with
-#   python decomp/tools/build_all.py --report progress/jp/report.json --version jp
-# and committed. This job publishes it as the artifact `<VERSION>_report` that ByteMatch reads from CI runs on master.
+# The original compilers (Visual C++ .NET 2002 for JP, Visual C++ 2013 for EN) and the game binaries cannot be used
+# on GitHub-hosted runners, so the objdiff-format reports are generated locally with
+#   python decomp/tools/build_all.py --report progress/jp/report.json --version jp      (JP APP.dll)
+#   python decomp_en/tools/build_all.py --report progress/en/report.json                (EN game_en_steam.exe)
+# and committed. This job publishes each as the artifact `<VERSION>_report` (jp_report, en_report) that ByteMatch
+# reads from CI runs on master.
 # The README meter progress/<VERSION>/progress.svg is written by the same command; this job regenerates it from the
 # report and commits it if it is out of date.
 # The report contains only function names, addresses, sizes and match percentages (no game bytes).
@@ -19,26 +21,37 @@ jobs:
   report:
     runs-on: ubuntu-latest
     env:
-      VERSION: jp
+      VERSIONS: jp en
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check the report
-        run: python3 -c "import json; r=json.load(open('progress/${VERSION}/report.json')); m=r['measures']; print(m['matched_functions'], 'of', m['total_functions'], 'functions,', m['matched_code_percent'], '% of code matched')"
-
-      - name: Refresh the README progress meter
+      - name: Check the reports
         run: |
-          python3 decomp/tools/progress_svg.py progress/${VERSION}/report.json progress/${VERSION}/progress.svg
-          if ! git diff --quiet -- progress/${VERSION}/progress.svg; then
+          for VERSION in $VERSIONS; do
+            python3 -c "import json,sys; v=sys.argv[1]; m=json.load(open(f'progress/{v}/report.json'))['measures']; print(v, m['matched_functions'], 'of', m['total_functions'], 'functions,', m['matched_code_percent'], '% of code matched')" "$VERSION"
+          done
+
+      - name: Refresh the README progress meters
+        run: |
+          for VERSION in $VERSIONS; do
+            python3 decomp/tools/progress_svg.py progress/${VERSION}/report.json progress/${VERSION}/progress.svg
+          done
+          if ! git diff --quiet -- progress; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add progress/${VERSION}/progress.svg
-            git commit -m "Update progress meter"
+            git add progress/*/progress.svg
+            git commit -m "Update progress meters"
             git push
           fi
 
-      - name: Upload report
+      - name: Upload JP report
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.VERSION }}_report
-          path: progress/${{ env.VERSION }}/report.json
+          name: jp_report
+          path: progress/jp/report.json
+
+      - name: Upload EN report
+        uses: actions/upload-artifact@v4
+        with:
+          name: en_report
+          path: progress/en/report.json

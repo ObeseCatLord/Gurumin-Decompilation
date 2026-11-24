@@ -1,5 +1,11 @@
-"""progress_svg.py <report.json> <out.svg> : ByteMatch-style progress meter for the README."""
-import json, sys
+"""progress_svg.py <report.json> <out.svg> : ByteMatch-style progress meter for the README.
+The title follows the version folder the meter is written to (progress/jp or progress/en)."""
+import json, os, sys
+
+TITLES = {
+    "jp": "Gurumin (JP PC) APP.dll matching decompilation",
+    "en": "Gurumin (EN Steam) game_en_steam.exe matching decompilation",
+}
 
 
 def bar(y, label, percent, detail, colour):
@@ -14,6 +20,8 @@ def bar(y, label, percent, detail, colour):
 
 def main():
     report = json.load(open(sys.argv[1], encoding="utf-8"))
+    version = os.path.basename(os.path.dirname(os.path.abspath(sys.argv[2])))
+    title = TITLES.get(version, TITLES["jp"])
     m = report["measures"]
     functions = float(m["matched_functions_percent"])
     code = float(m["matched_code_percent"])
@@ -33,7 +41,7 @@ def main():
 .track {{ fill: #333842; }}
 </style>
 <rect width="600" height="200" rx="10" class="bg"/>
-<text x="20" y="30" class="title">Gurumin (JP PC) APP.dll matching decompilation</text>
+<text x="20" y="30" class="title">{title}</text>
 {''.join(rows)}
 </svg>
 """

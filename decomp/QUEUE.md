@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (308)
+## 1. Walls to retry (310)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -15,6 +15,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100016c0` 256 — sound play: identical apart from cross-jumping; the original merges the two position branches only at the code-5 SendMessage, cl 13.00 here already at code 4 (code 4 hoisted out, branches swapped tried)
 - [ ] `10001980` 263 — looping sound play: same cross-jumping residue as 0x100016c0
 - [ ] `10001cb0` 547 — Bgm_CheckHeader: store order identical; the spills of the name characters and the registers of key[16]..key[24] differ (register allocation)
+- [ ] `10002440` 8698 — Game::LoadMapData (game_load_map_data.cpp, 8672 vs 8698 bytes): sections match; residue: loop head (the original zeroes [esp+0x1c] before jmp top and loads lea ebx token after ReadWord; ours hoists it, swapping edi/ebx in the validation loops) and record addressing (Item/Status/Ab/BtMot/CharMot/Skill labels: this+id*stride first, then the field constants; ours folds the table base); LVTable id*0x20+this order. The front tables overlay MapFront through one *(MapFront *)this cast: needs the real class split of Game/DAT_10874848
 - [ ] `10004760` 236 — ListBank::DeclareVariable: identical apart from block order (the original puts the type 0/1 block right after the type == 0 test, cl 13.00 here after all the tests); switch form tried
 - [ ] `10004b10` 3854 — ListBank::ApplyOperator (script_operators.cpp, 3792 vs 3854 bytes): head differs (the original sets the loop count with mov ecx,1/mov esi,ecx per unary branch and mov esi,2 for binary, 8-byte frame vs our 4; the right operand type is read from memory three times with a redundant test al,al), (float)atof is copied via fld/fstp instead of integer movs, 0.0 is a data reference, some setg/setne picks. Fixed: duplicated case bodies in address order (1062 -> 62 bytes), operands[depth*16+slot] without a cached index
 - [ ] `100084b0` 413 — Game::OpenWindow: logic identical; this/slot registers swapped (esi/edi) and the x/y/width/height stores come out in address order instead of the original y, x, height ... width
@@ -195,6 +196,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e24d0` 141 — enemy AI update: identical except cl 13.00 keeps 0 in ebx (push ebx / xor ebx,ebx) where VS2003 uses immediates
 - [ ] `100e2560` 143 — enemy AI update kind E: same 0-in-ebx residue as 0x100e2080 (switch and if/else forms tried)
 - [ ] `100ed9b0` 1258 — ListBank::CompileStatement (listbank.cpp, 1264 vs 1258 bytes): all but the int/float/string tail matches; the original puts the string-test jne to the call block, then the shared error block, the float declare and the call block last, without cross-jumping the int/float DeclareFromText tails; every spelling gives call-first (1264) or merged declares (1248)
+- [ ] `100f9670` 7639 — Char_UpdateByKind (char_update.cpp, 8176 vs 7639 bytes, draft): esi/edi swapped (model vs slot offset), the pause globals DAT_104bfe1c/DAT_104c0135 and the greeting counter are cached in registers in the original, the quaternion temporaries sit elsewhere, the case bodies of the big kind switch are laid out differently, goto rememberMotion; tidy-up before any match: the kind steps use words[WORD_*] index macros instead of named CharState members (typed-members rule)
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
 - [ ] `100fb7b0` 3089 — Scene_Reset (scene_reset.cpp, 3104 vs 3089 bytes): (1) slot 16 kind: the original keeps a redundant cmp edx,0x64; jge before storing 0x16 on the map<100 path; (2) first-state loop compares value%100 against ebx (ours test edx,edx) and increments before storing the pointer; (3) DAT_1021b928[0..4] zeroed via a fresh xor edx with the fifth store interleaved (ours ebx); (4) O_067 pair loop uses add eax,2 (ours reuses ebp=2) and stores the link slot before SetIdentity. Rule cleanup: (&DAT_10802bf8[slot].position)[k] and (&DAT_1049f0c8[0].first)[n] index across struct members; M_1019ed10 returns a Node* but node.h declares int (cast at the call)
 - [ ] `100fc4a0` 5485 — Map_SetupByNumber (map_setup_field.cpp, 5504 vs 5485 bytes): (1) DAT_104c02dc byte store hoisted via al instead of an immediate after DAT_1101de30 (any statement order); (2) model loop (i in esi, imul model address, record pointer as loop limit) differs in register/induction choice; (3) DAT_1021b3c0 read as a dword for the +0x80/+0x100 sum but movsx word for the index (type probably wider than short); (4) title[0] cached in bl for the S/U/I tests (a local char went to the stack); (5) fish == 0 test is test eax,eax instead of cmp eax,ebp. Sibling Map_SetupFromEntry may search sakana01 instead of sakana%02d and orders the water-block stores differently
@@ -335,10 +337,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (39)
+## 5. Very large functions (over 3000 bytes) (37)
 
-- [ ] `100f9670` 7639 bytes (float, loops 30, calls 183)
-- [ ] `10002440` 8698 bytes MapData_Load (float, loops 142, calls 291)
 - [ ] `1006be40` 8962 bytes (float, loops 7, calls 176)
 - [ ] `10112140` 10038 bytes Menu_Main (float, loops 32, calls 252)
 - [ ] `10138280` 10107 bytes Script_GameBuiltin (float, loops 42, calls 240)

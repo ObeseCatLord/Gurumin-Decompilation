@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 16.37% of code, 845 of 1212 functions |
-| Matched under the rules | 16.34% of code, 844 of the 845 matched functions |
-| Fuzzy match | 25.20% |
+| Matched | 17.11% of code, 849 of 1212 functions |
+| Matched under the rules | 17.07% of code, 848 of the 849 matched functions |
+| Fuzzy match | 27.18% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -117,6 +117,12 @@ function) and node_world.cpp (0) still break rule 2.
   Char_AreaZone, Npc_PerchOnNeighbour (4 bytes; seat.z += aligns every slot, so the tail seat needs ~2 more
   references). Pending: Npc_RoamRoute 0x100b2900 is drafted but parked outside the tree (its char_state.h edit was
   refused by the permission check; see the shared notes file npc_roam_route_pending.md).
+- Batch 334: Enemy_PulseAndCharge 0x100a3900, Char_UpdateAttachSlots 0x1001c670, Enemy_StalkAndBreathe 0x100ac440,
+  Enemy_StalkAndLunge 0x100ad0f0 and ModelBank_CompareDistance 0x10165210 matched. FontRenderer DrawText/DrawOutlined/
+  DrawOutlinedIn take float depth; Game window setters and Node::RenderShadowTexture retyped. Drafts (open.tsv has
+  the residues): Ground_BuildMesh, ModelBank::PrepareFrame, Game::DrawWindows, Scene_Reset, Npc_HurlAtPlayer (6 bytes),
+  Node::Query, MapMinigame_DrawTimerHud, Enemy_ChaseAndHop, Npc_PerformTricks, Node::SplitIntoCells, Char_Drifter
+  (wrap loop keeps st0), Player_StartAttack, Enemy_HoverAndShoot (frame 0x184 vs 0x174).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

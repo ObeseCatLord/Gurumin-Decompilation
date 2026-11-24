@@ -1,0 +1,2035 @@
+en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	level	method	evidence
+005a0f30	81	-					0.00	none	en-only	unknown
+005a0f90	12	-					0.00	none	en-only	unknown
+005a0fa0	90	APP.dll	1000be40	EffectModel::EffectModel	90	matched:effect_model.cpp	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 1.00
+005a1000	12	-					0.00	none	en-only	unknown
+005a1010	18	-					0.00	none	en-only	unknown
+005a1030	12	-					0.00	none	en-only	unknown
+005a1040	53	-					0.00	none	en-only	unknown
+005a1080	18	-					0.00	none	en-only	unknown
+005a10a0	18	-					0.00	none	en-only	unknown
+005a10d0	109	APP.dll	10007e10	Panel::~Panel	112	matched:panel_dtor.cpp	0.67	high	features	shared i3, 0 rare
+005a1140	8	-					0.00	none	en-only	unknown
+005a1150	91	APP.dll	10007e80	Game::~Game	92	matched:menu_textures.cpp	0.70	high	features	shared c1,i2, 1 rare
+005a1200	553	APP.dll	100357a0	CharParams::operator=	537	matched:game_load_data.cpp	1.00	high	features	shared i8, 2 rare
+005a1430	35	-					0.00	none	en-only	unknown
+005a1460	1987	APP.dll	1005ecb0	Gimmick_Use	2161	unmatched	0.91	high	features	shared i10,s2, 4 rare
+005a1c60	204	APP.dll	1003ab40	Pickup_Collect	209	unmatched	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.98
+005a1d30	217	APP.dll	1003a7d0	EffectModel_Place	163	matched:effect_model.cpp	0.90	high	callgraph	neighbours 9 of 9 mapped agree, size ratio 0.75
+005a1e10	231	APP.dll	1003a880	EffectModel_PlaceColoured	179	matched:effect_model.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.77
+005a1f00	144	APP.dll	100020d0	FlagOwner::Register	181	matched:flag_list.cpp	0.79	high	features	shared i3, 2 rare
+005a1fa0	426	APP.dll	10057c40	Switch_Hold	657	unmatched	0.62	high	features	shared i5, 0 rare
+005a2150	60	APP.dll	1000d620	KeyPrompt_Show	74	matched:app_0008.cpp	0.78	high	callgraph	neighbours 19 of 25 mapped agree, size ratio 0.81
+005a2190	485	APP.dll	1000df10	Debris_SpawnFromCharacter	544	matched:debris.cpp	0.91	high	features	shared f2,i5, 1 rare
+005a2380	94	-					0.00	none	en-only	unknown
+005a23e7	221	APP.dll	10017c55		204	unmatched	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.92
+005a24d0	57	-					0.00	none	en-only	unknown
+005a2510	341	APP.dll	1000dd90	Debris_Spawn	373	matched:debris.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.91
+005a2670	73	-					0.00	none	en-only	unknown
+005a26c0	278	-					0.00	none	en-only	unknown
+005a27e0	80	-					0.00	none	en-only	unknown
+005a2840	291	APP.dll	1000b2c0	Game::AddFlagEntry	544	matched:menu_items.cpp	0.52	medium	features	shared i7, 0 rare
+005a2970	291	APP.dll	1000b060	Game::AddValueEntry	595	matched:menu_items.cpp	0.50	medium	features	shared i7, 0 rare
+005a2aa0	289	APP.dll	1000b4e0	Game::AddKind5Entry	613	matched:menu_items.cpp	0.50	medium	features	shared i7, 0 rare
+005a2bd0	460	APP.dll	1000e130	Debris_SpawnFrom	519	matched:debris.cpp	0.88	high	features	shared f2,i3, 1 rare
+005a2da0	34	APP.dll	1000da20	History_Push	28	matched:app_0008.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.82
+005a2dd0	6854	APP.dll	1003e710	Game_Reset	5401	matched:game_reset.cpp	0.80	high	features	shared f3,i10,s1, 1 rare
+005a48a0	3160	APP.dll	1005ce80	Player_StartAttack	3429	unmatched	0.95	high	features	shared f1,i10, 1 rare
+005a5500	488	APP.dll	1003aef0	Bgm_Play	611	matched:bgm_play.cpp	0.57	medium	features	shared c1,i2,s2, 2 rare
+005a56f0	1774	APP.dll	10035050	Camera_ChaseTarget	1858	matched:camera_chase.cpp	0.86	high	features	shared f14,i6,s1, 3 rare
+005a5e10	735	APP.dll	1002a490	Block_Update	685	unmatched	0.99	high	features	shared f7,i7, 3 rare
+005a60f0	1697	APP.dll	1002a740	Char_SpiritUpdate	1833	unmatched	0.83	high	features	shared f9,i16,s2, 3 rare
+005a67a0	80	APP.dll	10015860	Vis_IsVisible	78	matched:visibility.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.97
+005a67f0	171	APP.dll	100157b0	Char_UpdateNearCells	167	unmatched	0.80	high	features	shared i4, 0 rare
+005a68a0	146	APP.dll	10015710		148	unmatched	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.99
+005a6940	1841	APP.dll	100b0f00	Companion2_Update	1558	matched:companion_update.cpp	0.85	high	features	shared i11, 2 rare
+005a7080	337	APP.dll	1001a840	Char_ClampStatus	330	matched:char_status.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.98
+005a71e0	1942	APP.dll	100b0880	Companion1_Update	1662	matched:companion_update.cpp	0.82	high	features	shared i13, 3 rare
+005a7980	1880	APP.dll	100b0250	Companion0_Update	1583	unmatched	0.81	high	features	shared i12, 2 rare
+005a80e0	564	APP.dll	100182a0	Map_UpdateWalls	566	matched:wall_flags.cpp	1.00	high	features	shared s12, 12 rare
+005a8320	1118	APP.dll	1005f750	Lava_Update	1200	matched:lava_hazard.cpp	0.83	high	features	shared f2,i12,s4, 7 rare
+005a8790	1334	APP.dll	10037b40	EffectModel_DrawKeyed	1232	unmatched	0.52	medium	features	shared f2,i8, 0 rare
+005a8cd0	24	-					0.00	none	en-only	unknown
+005a8cf0	125	APP.dll	1003a940	UpdateMeshSlots	131	matched:ai_pick.cpp	0.80	high	callgraph	neighbours 4 of 5 mapped agree, size ratio 0.95
+005a8d70	540	APP.dll	1005c680	Bgm_Update	1846	unmatched	0.44	medium	features	shared c1,f2,i3,s1, 2 rare
+005a8f90	291	APP.dll	1003a6c0	Scene_Finish	271	matched:scene_start.cpp	0.57	medium	features	shared i2, 0 rare
+005a90c0	3382	APP.dll	10015960	Camera_Refresh	2968	matched:camera_refresh.cpp	0.67	high	features	shared f6,i11, 3 rare
+005a9e00	55	-					0.00	none	en-only	unknown
+005a9e40	416	APP.dll	10009050	Game::MoveCursor	375	unmatched	0.99	high	features	shared f3,i7, 7 rare
+005a9fe0	1731	APP.dll	10057ee0	UpdateDrillLevel	1550	matched:drill_level.cpp	0.63	high	features	shared i16,s1, 2 rare
+005aa6b0	303	-					0.00	none	en-only	unknown
+005aa7f0	7473	APP.dll	1008fea0	DrillClaws_Update	8040	unmatched	0.58	medium	features	shared f9,i35,s2, 5 rare
+005ac530	515	APP.dll	10058500	Switch_UpdateEffects	644	matched:switch_effects.cpp	0.62	high	features	shared f1,i3, 2 rare
+005ac740	398	APP.dll	1000cdf0	Messages_Update	385	matched:message_fades.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.97
+005ac8d0	49	-					0.00	none	en-only	unknown
+005ac910	59	-					0.00	none	en-only	unknown
+005ac950	1726	APP.dll	100564d0	Debris_Update	1611	unmatched	0.86	high	features	shared f5,i11, 3 rare
+005ad010	7096	APP.dll	1002d4e0	Char_LaserZone	5810	unmatched	0.83	high	features	shared f2,i26,s3, 11 rare
+005aec10	1767	APP.dll	1001e4b0	StatusPanel_UpdateText	2161	unmatched	0.53	medium	features	shared i9,s5, 5 rare
+005af380	79	APP.dll	1000ed20	ColourBlend_Step	77	matched:app_0009.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.97
+005af3d0	4030	APP.dll	1000a0b0	Game::UpdateWindows	3983	unmatched	0.87	high	features	shared f2,i36, 7 rare
+005b03b0	131	-					0.00	none	en-only	unknown
+005b0440	568	APP.dll	10021c80	Sound_UpdateListener	496	matched:sound_listener.cpp	0.86	high	features	shared f1,i6, 0 rare
+005b0680	5066	APP.dll	1004d960	Player_UpdateFrame	5105	unmatched	0.74	high	features	shared f13,i30,s3, 7 rare
+005b1a60	5243	APP.dll	100ba2a0	FieldItemMenu_Update	4913	unmatched	0.90	high	features	shared f2,i23, 6 rare
+005b2ee0	2432	APP.dll	1001f4d0	Player_WalkAlongPath	2846	unmatched	0.70	high	features	shared f11,i5, 0 rare
+005b3860	602	APP.dll	1001f270	Map_SelectMovie	588	unmatched	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.98
+005b3ac0	1159	APP.dll	1004d4b0	Regions_Update	1188	unmatched	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.98
+005b3f50	449	APP.dll	100211a0	Region_WaveVertex	466	unmatched	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.96
+005b4120	271	APP.dll	10017fc0	FadeNodes_Update	312	matched:node_fade.cpp	0.88	high	features	shared f2,i7, 1 rare
+005b4240	426	APP.dll	1003a9d0	Overlay_UpdateFade	360	matched:app_0010.cpp	0.80	high	features	shared i3, 0 rare
+005b43f0	780	APP.dll	1000e870	AntiTamper_Check	788	unmatched	0.97	high	features	shared i10, 2 rare
+005b4710	77	-					0.00	none	en-only	unknown
+005b4760	585	APP.dll	1000c390	Drops_Update	540	matched:falling_drops.cpp	0.78	high	features	shared f8,i3, 0 rare
+005b49d0	15261	APP.dll	100f5a80	Scene_Frame	14960	unmatched	0.83	high	features	shared c1,f25,i62,s4, 15 rare
+005b8590	1817	APP.dll	10065450	TutorialBook_Update	1714	matched:tutorial_update.cpp	0.64	high	features	shared f3,i5,s3, 4 rare
+005b8cb0	204	APP.dll	100fc3e0	Script_RunQueued	179	matched:script_queue.cpp	0.50	medium	features	shared s1, 1 rare
+005b8d90	1895	APP.dll	10089210	ListBank::RunStatements	2033	unmatched	0.79	high	features	shared c1,i10,s4, 8 rare
+005b9500	328	APP.dll	10043e20	Char_CanSee	402	matched:sight_check.cpp	0.53	medium	features	shared f4,i1, 0 rare
+005b9650	69	-					0.00	none	en-only	unknown
+005b96a0	95	-					0.00	none	en-only	unknown
+005b9700	408	APP.dll	100558d0	ListBank::FindCase	449	matched:listbank.cpp	0.56	medium	features	shared c1,i3, 0 rare
+005b98a0	244	APP.dll	100241e0	Character_SetMove	210	matched:char_move.cpp	0.65	high	features	shared f4,i1,s1, 0 rare
+005b99a0	106	APP.dll	10026af0	Enemy_PickAction_40_25_35	126	matched:ai_pick.cpp	0.72	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.84
+005b9a10	106	-					0.00	none	en-only	unknown
+005b9a80	83	APP.dll	10026bf0	Enemy_PickAction_65_35	87	matched:ai_pick.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.95
+005b9ae0	48	APP.dll	10026c50	EnemyAI_PickSingle	35	matched:app_0012.cpp	0.70	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.73
+005b9b10	106	APP.dll	10026c80	Enemy_PickAction_60_10_30	126	matched:ai_pick.cpp	0.72	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.84
+005b9b80	106	-					0.00	none	en-only	unknown
+005b9bf0	2597	APP.dll	10116550	NameEntry_Update	15107	matched:name_entry.cpp	0.88	high	callgraph	neighbours 22 of 23 mapped agree, size ratio 0.17; also inlines APP.dll:1015f4e0
+005ba630	151	APP.dll	100e2080	Enemy_UpdateAI_A	144	unmatched	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.95
+005ba6d0	149	-					0.00	none	en-only	unknown
+005ba770	693	APP.dll	100e21a0	Enemy_DefaultStep	671	unmatched	0.84	high	features	shared i7, 1 rare
+005baa30	143	APP.dll	100e2440	Enemy_UpdateAI_C	139	unmatched	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.97
+005baac0	145	APP.dll	100e24d0	Enemy_UpdateAI_D	141	unmatched	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.97
+005bab60	149	-					0.00	none	en-only	unknown
+005bac00	1144	APP.dll	100e1c40	Enemy_IsBusy	1082	unmatched	0.92	high	features	shared f5,i7, 0 rare
+005bb080	5147	APP.dll	10078060	Partner_SpecialSkill	5123	matched:partner_skill.cpp	0.85	high	features	shared f17,i34,s7, 14 rare
+005bc4a0	6388	APP.dll	100e0320	Partner_Follow	6362	unmatched	0.70	high	features	shared c1,f12,i39,s5, 5 rare
+005bddd0	1851	APP.dll	10026d80	Enemy_WanderNearHome	1658	unmatched	0.93	high	features	shared f2,i7, 0 rare
+005be510	332	APP.dll	10027400	Enemy_WatchPlayer	339	matched:enemy_moves.cpp	0.75	high	features	shared f1,i5, 0 rare
+005be660	209	APP.dll	10027560	Enemy_IdleMotion	207	matched:enemy_moves.cpp	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.99
+005be740	995	APP.dll	10027630	Enemy_ChasePlayer	882	unmatched	0.97	high	features	shared f7,i5, 0 rare
+005beb30	996	APP.dll	100279b0	Enemy_BackAwayFromPlayer	998	matched:enemy_flee.cpp	1.00	high	features	shared f3,i11, 3 rare
+005bef20	1525	APP.dll	10027da0	Enemy_KeepDistanceFromPlayer	1461	matched:enemy_flee.cpp	0.97	high	features	shared f11,i9, 1 rare
+005bf520	861	APP.dll	10028360	Enemy_TurnToPlayer	846	matched:enemy_moves.cpp	0.83	high	features	shared f3,i5, 0 rare
+005bf880	524	APP.dll	1001c210	Npc_TalkFacing	505	matched:npc_facing.cpp	0.84	high	features	shared f2,i4, 0 rare
+005bfaa0	3514	APP.dll	100bcce0	Enemy_ChaseAndHop	3186	unmatched	0.83	high	features	shared f19,i9, 5 rare
+005c0860	185	APP.dll	10054c60	Game::RaiseOpenEvents	239	matched:app_0003.cpp	0.54	medium	features	shared i4, 0 rare
+005c0920	375	-					0.00	none	en-only	unknown
+005c0aa0	86	APP.dll	1001d850	SeasonalEvent	88	matched:app_0014.cpp	0.41	medium	features	shared c1, 1 rare
+005c0b00	205	APP.dll	100248e0	Collision_ProbeDown	210	matched:collide_query.cpp	0.83	high	callgraph	neighbours 6 of 7 mapped agree, size ratio 0.98
+005c0bd0	203	APP.dll	10034e80	Char_NearParty	233	matched:actor_scan.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.87
+005c0ca0	403	APP.dll	10034cc0	Party_BlocksMove	429	matched:party_block.cpp	0.51	medium	features	shared f2,i1, 0 rare
+005c0e40	383	APP.dll	10024750	Char_ProbeGround	397	matched:collide_query.cpp	0.58	medium	callgraph	neighbours 5 of 12 mapped agree, size ratio 0.96
+005c0fc0	190	APP.dll	10024c40	Collision_GroundAhead	192	matched:collide_query.cpp	0.52	medium	features	shared f1,i1, 0 rare
+005c1080	689	APP.dll	100ba040	Npc_PlayGreeting	604	unmatched	0.95	high	features	shared f3,i6, 1 rare
+005c1340	365	APP.dll	10020f60	Markers_ProbeGround	259	matched:collide_regions.cpp	0.77	high	features	shared f1,i1,s1, 1 rare
+005c14b0	81	-					0.00	none	en-only	unknown
+005c1510	219	APP.dll	100249c0	Char_IsAbove	246	matched:actor_scan.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.89
+005c15f0	370	APP.dll	10024d00	Enemy_CanReturnHome	377	unmatched	0.82	high	callgraph	neighbours 5 of 6 mapped agree, size ratio 0.98
+005c1770	185	APP.dll	10024e80	Char_OutsideLimit	245	matched:char_leash.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.76
+005c1840	734	APP.dll	100b8220	Npc_Greet	627	matched:npc_greet.cpp	1.00	high	features	shared f2,i13, 5 rare
+005c1b20	200	APP.dll	1001ba40	Char_NearKind5c	219	matched:actor_scan.cpp	0.43	medium	features	shared f2,i1, 1 rare
+005c1bf0	206	APP.dll	100235e0	Slots_Reset	210	matched:slot_defaults.cpp	0.60	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.98
+005c1cc0	434	APP.dll	100242c0	Char_ProbeAhead	487	unmatched	0.62	high	features	shared i4,s1, 0 rare
+005c1e80	132	-					0.00	none	en-only	unknown
+005c1f10	451	APP.dll	100244b0	Char_ProbeDirection	502	unmatched	0.65	high	features	shared i4,s1, 0 rare
+005c20e0	946	APP.dll	100509e0	Char_ProbeSideStep	1035	matched:ledge_probe.cpp	0.76	high	features	shared f4,i7, 0 rare
+005c24a0	855	APP.dll	10050df0	Char_ProbeSideLedge	921	matched:ledge_probe.cpp	0.75	high	features	shared f3,i7, 0 rare
+005c2800	340	APP.dll	10024ac0	Collision_AverageNormals	377	matched:collide_normals.cpp	0.71	high	features	shared f2,i5, 0 rare
+005c2960	530	APP.dll	10017d30	RenderTarget_Probe	488	unmatched	0.41	medium	features	shared i1,s1, 2 rare
+005c2b80	177	-					0.00	none	en-only	unknown
+005c2c40	934	APP.dll	1004f250	TutorialBook_Close	655	unmatched	0.84	high	features	shared i2,s11, 3 rare
+005c3000	245	-					0.00	none	en-only	unknown
+005c3100	603	-					0.00	none	en-only	unknown
+005c3360	194	APP.dll	1000ff80	Collision_ProbePoint	178	matched:collide_query.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.92
+005c3430	19657	APP.dll	10093cc0		20188	unmatched	0.60	high	features	shared c1,f18,i105,s24, 35 rare
+005c8130	4926	APP.dll	10092af0	Scene_HostCallback	4552	unmatched	0.86	high	features	shared c1,f4,i52,s4, 27 rare
+005c9480	51	-					0.00	none	en-only	unknown
+005c94c0	70	-					0.00	none	en-only	unknown
+005c9510	68	APP.dll	1000c020	Text_Substitute	465	unmatched	0.88	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.15
+005c9560	481	APP.dll	100084b0	Game::OpenWindow	413	unmatched	0.97	high	features	shared f1,i22, 5 rare
+005c9750	650	APP.dll	1000f5a0	Map_BuildTopView	577	matched:map_view.cpp	0.75	high	features	shared f1,i10, 0 rare
+005c99e0	276	APP.dll	1003e650	EffectSlot_StartModel	188	matched:app_0011.cpp	0.69	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.68
+005c9b00	160	APP.dll	10011aa0	EventSlots_AddWaiting	196	matched:event_slots.cpp	0.37	medium	features	shared i1, 1 rare
+005c9ba0	162	APP.dll	100119d0	EventSlots_Add	199	matched:event_slots.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.81
+005c9c50	712	APP.dll	1005dbf0	Player_TakeDamage	753	unmatched	0.89	high	features	shared f1,i3,s1, 2 rare
+005c9f70	72	-					0.00	none	en-only	unknown
+005c9fd0	165	APP.dll	10057b90	Switch_Release	165	matched:switches.cpp	0.77	high	features	shared i6, 0 rare
+005ca080	81	-					0.00	none	en-only	unknown
+005ca0e0	85	APP.dll	100083e0	Game::CloseMenu	80	matched:app_0006.cpp	0.52	medium	features	shared i2, 1 rare
+005ca140	87	APP.dll	10004680	ListBank::ClearGroup	78	matched:listbank.cpp	0.61	high	features	shared i3, 0 rare
+005ca1a0	43	APP.dll	100106a0	Dialog_CloseAll	43	matched:app_0010.cpp	0.50	medium	features	shared i2, 0 rare
+005ca1d0	713	APP.dll	10054550	Sound_PlayDelayed	191	unmatched	0.36	medium	features	shared i2, 1 rare
+005ca4b0	108	APP.dll	10007ce0	ResourceBanks::FreeBank	104	matched:resource_banks.cpp	0.60	high	features	shared i3, 0 rare
+005ca520	878	APP.dll	1001bb20	Char_DrawLinks	925	unmatched	0.57	medium	features	shared f1,i4, 2 rare
+005ca890	482	APP.dll	10055690	Game::IsQueuedEventReady	566	matched:app_0003.cpp	0.63	high	features	shared i7, 2 rare
+005caa80	2955	-					0.00	none	en-only	unknown
+005cb610	311	APP.dll	100552f0	Game::ForEachActiveTrigger	285	matched:app_0003.cpp	0.88	high	features	shared i6, 2 rare
+005cb750	267	APP.dll	1005f640	Switch_TurnOff	259	matched:switches.cpp	0.92	high	features	shared i5, 1 rare
+005cb860	38	-					0.00	none	en-only	unknown
+005cb890	267	APP.dll	1005f530	Switch_TurnOn	259	matched:switches.cpp	0.92	high	features	shared i5, 2 rare
+005cb9a0	902	-					0.00	none	en-only	unknown
+005cbd30	969	APP.dll	1000baf0	MeshSlot::Draw	794	matched:mesh_slots.cpp	0.66	high	features	shared i10, 0 rare
+005cc110	660	APP.dll	100131b0	Number_DrawBack	1012	matched:hud_digits.cpp	0.48	medium	features	shared f1,i7, 6 rare
+005cc3b0	634	APP.dll	10012d90	Number_DrawRightAligned	1028	matched:hud_digits.cpp	0.47	medium	features	shared f1,i7, 6 rare
+005cc630	642	APP.dll	10012990	Number_Draw	1006	matched:hud_digits.cpp	0.49	medium	features	shared f1,i6, 5 rare
+005cc8c0	505	APP.dll	1000cc30	Hud_DrawNameBanners	436	matched:name_banners.cpp	0.94	high	features	shared f1,i5, 0 rare
+005ccac0	2389	-					0.00	none	en-only	unknown
+005cd420	204	APP.dll	10008fa0	Game::DrawCursor	167	matched:game_panels.cpp	0.90	high	features	shared f1,i8, 6 rare
+005cd4f0	2009	APP.dll	1000cfa1		1656	unmatched	0.80	high	features	shared f10,i6, 0 rare
+005cdcd0	669	APP.dll	1000d6b0	KeyPrompt_DrawAll	666	matched:key_prompt_draw.cpp	0.87	high	features	shared f8,i9, 0 rare
+005cdf70	707	APP.dll	1003c370	Item_DrawCaption	497	matched:item_caption.cpp	0.80	high	callgraph	neighbours 4 of 5 mapped agree, size ratio 0.70
+005ce240	1068	APP.dll	1000e340	Debris_Draw	1035	matched:debris.cpp	0.67	high	features	shared f7,i7, 0 rare
+005ce680	2380	APP.dll	100308e0	MapMinigame_DrawHudTwoScores	2252	unmatched	0.83	high	features	shared c1,f15,i16,s1, 1 rare
+005cefe0	435	APP.dll	1001e340	Panel_DrawStatus	354	matched:status_panel.cpp	0.87	high	features	shared f2,i8, 3 rare
+005cf1a0	218	APP.dll	1000f4d0	Hud_DrawFadePanel	195	matched:hud_fade.cpp	0.94	high	features	shared f1,i4, 3 rare
+005cf280	16546	APP.dll	1008c680	Hud_DrawFrame	14341	unmatched	0.89	high	features	shared f31,i148,s4, 53 rare
+005d3360	7715	APP.dll	10038c10	Scene_DrawFrame	6818	matched:scene_draw.cpp	0.85	high	features	shared c1,f14,i32,s1, 4 rare
+005d5190	1018	APP.dll	1000c720	Characters_Draw	1032	matched:character_draw.cpp	0.94	high	features	shared f3,i7, 3 rare
+005d55a0	10316	APP.dll	1003c570	FieldItemMenu_Draw	8384	unmatched	0.80	high	features	shared f6,i45,s2, 3 rare
+005d7e00	1613	APP.dll	1001ed80	Map_DrawMovie	1257	unmatched	0.84	high	features	shared f3,i7, 2 rare
+005d84b0	3948	APP.dll	100094e0	Game::DrawWindows	3023	unmatched	0.76	high	features	shared i27,s4, 10 rare
+005d9430	523	APP.dll	100092c0	Game::DrawWindowMarks	535	unmatched	0.84	high	features	shared i5, 1 rare
+005d9640	1216	APP.dll	1000eed0	Message_DrawPanel	1101	matched:message_panel.cpp	0.95	high	features	shared f4,i3, 0 rare
+005d9b00	6785	-					0.00	none	en-only	unknown
+005db5a0	4123	APP.dll	10022830	Menu_DrawScene	3502	unmatched	0.70	high	features	shared c1,f8,i21,s3, 16 rare
+005dc5c0	52	APP.dll	10052480	Map_RunFrameScript	52	matched:app_0012.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 1.00
+005dc610	2168	APP.dll	10021e70	SaveSummary_Draw	1839	matched:save_summary.cpp	0.97	high	features	shared c1,i28,s7, 11 rare
+005dcea0	1067	APP.dll	1000f7f0	Map_DrawTopView	911	matched:map_view.cpp	0.77	high	features	shared f3,i2, 1 rare
+005dd2e0	3434	APP.dll	1002f520	MapMinigame_DrawTimerHud	3192	unmatched	0.83	high	features	shared c1,f15,i28,s1, 3 rare
+005de050	632	-					0.00	none	en-only	unknown
+005de2d0	1961	APP.dll	100301a0	MapMinigame_DrawHud	1850	unmatched	0.82	high	features	shared c1,f15,i15,s1, 0 rare
+005dea80	392	-					0.00	none	en-only	unknown
+005dec10	524	APP.dll	10008a30	Game::DrawLabelledNumber	528	matched:game_panels.cpp	0.66	high	features	shared f1,i5,s1, 2 rare
+005dee20	392	-					0.00	none	en-only	unknown
+005defb0	523	APP.dll	1000dba0	Fade_Draw	484	matched:screen_fade.cpp	0.92	high	features	shared f7,i6,s1, 1 rare
+005df1c0	4693	APP.dll	10056b30	ShopMenu_Draw	4169	unmatched	0.71	high	features	shared c1,f9,i39, 3 rare
+005e0430	295	-					0.00	none	en-only	unknown
+005e0560	77	APP.dll	1000c340	Overlay_DrawFullScreen	69	matched:app_0007.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.90
+005e05b0	248	APP.dll	100091d0	Game::DrawDebugText	239	unmatched	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.96
+005e06b0	4255	APP.dll	100311b0	MapMinigame_DrawHudMinuteTimer	4234	unmatched	0.84	high	features	shared c1,f15,i32,s1, 4 rare
+005e1750	3006	APP.dll	1007d0a0	TextWindows_Draw	2569	unmatched	0.89	high	features	shared f7,i21,s1, 3 rare
+005e2320	582	APP.dll	100236c0	Overlay_DrawModel	563	matched:overlay_draw.cpp	0.65	high	features	shared f2,i5, 1 rare
+005e2570	438	APP.dll	10008910	Game::DrawBalloon	275	unmatched	0.98	high	features	shared i6, 1 rare
+005e2730	187	APP.dll	10008880	Game::DrawPanelAlt	141	matched:game_panels.cpp	0.85	high	callgraph	neighbours 9 of 10 mapped agree, size ratio 0.75
+005e27f0	190	APP.dll	100087f0	Game::DrawPanel	144	matched:game_panels.cpp	0.57	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.76
+005e28b0	229	APP.dll	1000c200	Item_DrawIcon	226	matched:item_icon.cpp	0.63	high	features	shared f2,i2, 0 rare
+005e29a0	1228	APP.dll	10038070	DrawItemPreview	1195	unmatched	0.64	high	features	shared f2,i15, 0 rare
+005e2e70	134	-					0.00	none	en-only	unknown
+005e2f00	427	APP.dll	10054a60	Game::RaiseGameOverEvents	270	matched:app_0003.cpp	0.57	medium	features	shared i4, 0 rare
+005e30b0	3188	-					0.00	none	en-only	unknown
+005e3d30	1603	APP.dll	100ed9b0	Script_CompileStatement	1258	unmatched	0.90	high	features	shared i5,s21, 20 rare
+005e4390	12823	APP.dll	10089a10	ListBank::CompileCall	11265	unmatched	0.81	high	features	shared i21,s7, 20 rare
+005e75f0	1014	APP.dll	10055ee0	Player_KnockBack	881	unmatched	0.96	high	features	shared i8, 0 rare
+005e79f0	33	-					0.00	none	en-only	unknown
+005e7a20	264	-					0.00	none	en-only	unknown
+005e7b30	23	-					0.00	none	en-only	steam
+005e7b50	33	-					0.00	none	en-only	steam
+005e7b80	28	-					0.00	none	en-only	steam
+005e7ba0	103	APP.dll	10002060	Game::FindNamedConstant	108	matched:app_0006.cpp	0.78	high	features	shared c1,i3, 3 rare
+005e7c10	2507	APP.dll	10020560	Regions_Build	2533	unmatched	0.80	high	features	shared f13,i7,s3, 5 rare
+005e85f0	459	APP.dll	100543a0	Balloon_Blast	425	matched:balloon_burst.cpp	0.95	high	features	shared f3,i9, 4 rare
+005e87d0	10526	APP.dll	10138280	Script_GameBuiltin	10107	unmatched	0.66	high	features	shared c4,f5,i38,s10, 21 rare
+005eb360	305	APP.dll	100caf90	ListBank::Evaluate	292	matched:listbank.cpp	0.72	high	features	shared c1,s1, 1 rare
+005eb4b0	88	APP.dll	10011cd0	Enemy_FindReusableSlot	99	matched:actor_scan.cpp	0.44	medium	features	shared f1,i2, 0 rare
+005eb510	1748	APP.dll	10029730	Route_StepPatrol	1440	unmatched	0.82	high	features	shared f2,i4, 0 rare
+005ebc00	487	APP.dll	10036560	ListBank::GetIndexPart	343	matched:listbank.cpp	0.55	medium	features	shared i1,s1, 0 rare
+005ebdf0	318	APP.dll	10035d20	ListBank::ReadArgument	328	matched:listbank.cpp	0.54	medium	features	shared i1,s1, 0 rare
+005ebf40	20	-					0.00	none	en-only	unknown
+005ebf60	348	APP.dll	10049990	Map_RouteLength	354	matched:map_route.cpp	0.84	high	features	shared i5, 0 rare
+005ec0d0	45	-					0.00	none	en-only	unknown
+005ec130	161	APP.dll	10034f70	AttachedMatrix_Add	108	matched:group_tables.cpp	0.68	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.67
+005ec1e0	51	-					0.00	none	en-only	steam
+005ec220	21	-					0.00	none	en-only	steam
+005ec240	79	APP.dll	100022b0	Game::TestScriptFlag	72	matched:app_0003.cpp	0.70	high	features	shared i2, 0 rare
+005ec290	454	APP.dll	10037470	ListBank::FirstIndexValue	235	unmatched	0.70	high	callgraph	neighbours 3 of 4 mapped agree, size ratio 0.52
+005ec460	176	APP.dll	10012130		172	unmatched	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.98
+005ec510	49	APP.dll	10012100	GameOver_StartQuiet	48	matched:app_0010.cpp	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.98
+005ec550	117	APP.dll	1003b670	GameOver_Start	111	matched:engine_base.cpp	0.74	high	features	shared i3, 0 rare
+005ec5d0	252	APP.dll	100364a0	Parser_ReadType	183	matched:type_parse.cpp	0.86	high	features	shared s6, 1 rare
+005ec6d0	861	APP.dll	10035b10	ListBank::ReadStatement	520	matched:listbank.cpp	0.55	medium	features	shared i1,s1, 0 rare
+005eca30	1308	APP.dll	100286d0	Char_StepRouteTarget	2211	unmatched	0.68	high	callgraph	neighbours 4 of 7 mapped agree, size ratio 0.59
+005ecf70	893	APP.dll	10029cf0	Char_RunScriptStep	999	matched:char_script.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.89
+005ed320	1902	APP.dll	10028fa0	Spirit_StepRoute	1900	unmatched	0.82	high	features	shared f3,i4, 0 rare
+005edac0	190	-					0.00	none	en-only	unknown
+005edb90	445	APP.dll	1002f320	Route_Follow	494	matched:route_follow.cpp	0.74	high	features	shared i5, 0 rare
+005edd60	933	APP.dll	10049b00	Map_RoutePosition	954	matched:map_route.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.98
+005ee110	573	APP.dll	1002f050	Route_FollowGates	690	unmatched	0.67	high	features	shared f1,i3, 0 rare
+005ee370	200	APP.dll	10034810	SmoothApproach	260	matched:group_tables.cpp	0.66	high	features	shared f4, 1 rare
+005ee440	38	APP.dll	10017b80	EffectSlots_FindFree	38	matched:app_0011.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 1.00
+005ee4b0	24	-					0.00	none	en-only	steam
+005ee4d0	107	APP.dll	10017b10	Script_UnpackVar	103	matched:app_0014.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.96
+005ee540	271	APP.dll	100360f0	ListBank::ReadToken	939	unmatched	0.61	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.29
+005ee660	254	APP.dll	10035fa0	ListBank::ReadTerm	329	matched:listbank.cpp	0.85	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.77
+005ee760	298	APP.dll	10035e80	ListBank::ReadWord	277	matched:listbank.cpp	0.55	medium	features	shared i1,s1, 0 rare
+005ee890	208	-					0.00	none	en-only	steam
+005ee980	13021	APP.dll	10049ec0	Npc_RoamZones	12199	unmatched	0.85	high	features	shared f15,i53,s11, 44 rare
+005f1d00	1729	APP.dll	1003bc60	Ground_Dig	1804	unmatched	0.68	high	features	shared f5,i18, 4 rare
+005f23d0	646	APP.dll	10016700	Ground_HeightAt	694	unmatched	0.81	high	features	shared f6,i7, 2 rare
+005f2660	747	APP.dll	10037850	ListBank::InitLibrary	706	matched:listbank.cpp	1.00	high	features	shared i39,s25, 54 rare
+005f2970	780	APP.dll	10007fd0	Game::LoadMenuTextures	773	matched:menu_textures.cpp	1.00	high	features	shared i4,s27, 30 rare
+005f2cd0	4915	APP.dll	100cb0c0	Game_LoadData	4350	unmatched	0.93	high	features	shared f5,i35,s34, 41 rare
+005f4060	1402	APP.dll	100169c0	Ground_BuildHeights	1220	matched:ground_height.cpp	0.88	high	features	shared f9,i5, 4 rare
+005f4650	166	APP.dll	1000e750	AntiTamper_Store	183	matched:anti_tamper.cpp	0.76	high	features	shared i6, 0 rare
+005f4700	353	APP.dll	1000e810	AntiTamper_StoreArrays	74	matched:anti_tamper.cpp	0.82	high	callgraph	neighbours 5 of 6 mapped agree, size ratio 0.21
+005f4870	88	APP.dll	100048f0	ListBank::FindKeyword	90	matched:listbank.cpp	0.63	high	features	shared c1,i1, 1 rare
+005f48d0	102	-					0.00	none	en-only	unknown
+005f4940	133	APP.dll	10004850	ListBank::FindAll	145	matched:listbank.cpp	0.77	high	features	shared i3, 1 rare
+005f49d0	98	-					0.00	none	en-only	unknown
+005f4a40	78	APP.dll	100049e0	ListBank::HasParenthesis	73	matched:listbank.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.94
+005f4a90	48	-					0.00	none	en-only	unknown
+005f4ad0	44	APP.dll	1000dab0	Bgm_FadeGroup300	117	matched:volume_fade.cpp	0.51	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.38
+005f4b00	53	-					0.00	none	en-only	unknown
+005f4b40	1039	APP.dll	10037090	ListBank::FindVariable	976	unmatched	0.67	high	features	shared i8,s2, 4 rare
+005f4f60	335	APP.dll	10021070	Region_IsVisible	290	matched:region_view.cpp	0.75	high	features	shared f1,i1, 0 rare
+005f50b0	496	APP.dll	100541f0	Enemy_Destroy	430	matched:enemy_destroy.cpp	0.99	high	features	shared f3,i9, 0 rare
+005f52a0	6200	APP.dll	1007dab0	Map15_UpdateTargetRace	5930	unmatched	0.82	high	features	shared f13,i34,s3, 12 rare
+005f6af0	4521	APP.dll	10083eb0	Scene_RunCommand	4012	unmatched	0.68	high	features	shared c2,f4,i40,s1, 25 rare
+005f7cd0	21147	APP.dll	1009e380	Script_SceneCommand	21807	unmatched	0.76	high	features	shared f25,i103,s10, 40 rare
+005fd1b0	7848	APP.dll	100fedd0	Script_SystemCommand	6739	unmatched	0.89	high	features	shared c2,f4,i88,s40, 98 rare
+005ff130	13273	APP.dll	101011b0	Script_ValueCommand	13173	unmatched	0.92	high	features	shared c1,f11,i183,s15, 136 rare
+00602660	198	APP.dll	10035a30	ListBank::SkipBlock	224	unmatched	0.81	high	features	shared i6,s1, 4 rare
+00602730	967	APP.dll	10051190	MapCursor_Step	988	unmatched	0.70	high	features	shared f2,i4, 0 rare
+00602b00	241	APP.dll	10011b70	Char_PushAwayFrom	236	matched:char_turn.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.98
+00602c00	270	-					0.00	none	en-only	unknown
+00602d10	171	-					0.00	none	en-only	unknown
+00602dc0	66	-					0.00	none	en-only	unknown
+00602e10	348	APP.dll	1000b9f0		252	unmatched	0.87	high	features	shared i3,s1, 1 rare
+00602f70	516	APP.dll	1000fb80	Loading_Tick	453	matched:loading_tick.cpp	1.00	high	features	shared c1,f3,i10, 5 rare
+00603180	1200	APP.dll	1003b6e0	Costume_LoadPlayerModel	1208	unmatched	0.86	high	features	shared i5,s9, 9 rare
+00603630	769	-					0.00	none	en-only	steam
+00603940	205	-					0.00	none	en-only	unknown
+00603a10	99	APP.dll	10016580	Movie_PlayToTexture	85	matched:app_0014.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.86
+00603a90	6320	APP.dll	100fda40	Map_SetupFromEntry	4958	unmatched	0.82	high	features	shared c1,f3,i29,s28, 28 rare
+00605380	7075	APP.dll	100fc4a0	Map_SetupByNumber	5485	unmatched	0.79	high	features	shared c1,f3,i32,s28, 31 rare
+00606f50	118	APP.dll	10016500	Char_PlayMotionFile	123	matched:char_motion.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.96
+00606fe0	59	APP.dll	100121e0	Char_ReloadModel	64	matched:app_0010.cpp	0.48	medium	features	shared i3, 0 rare
+00607020	224	APP.dll	100fb6d0	ListBank::LoadText	223	unmatched	0.76	high	features	shared i4, 1 rare
+00607110	10709	APP.dll	10002440	Game::LoadMapData	8698	unmatched	0.92	high	features	shared c5,f1,i157,s103, 244 rare
+00609b20	204	APP.dll	1001e240	Map_IconTexture	253	matched:map_icons.cpp	0.81	high	features	shared s3, 3 rare
+00609bf0	151	APP.dll	1001e1a0	Texture_Load	150	matched:texture_load.cpp	0.90	high	callgraph	neighbours 10 of 10 mapped agree, size ratio 0.99
+00609c90	328	APP.dll	1000beb0	TestDat_Load	366	matched:test_dat.cpp	0.77	high	features	shared c3,s1, 1 rare
+00609df0	278	APP.dll	100165e0	Player_SetHeadTracking	275	matched:head_look.cpp	0.86	high	features	shared i8, 6 rare
+00609f10	82	APP.dll	100120a0	Inventory_Remove	83	matched:app_0013.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.99
+00609f70	10132	APP.dll	1013b700	Game_Main	10376	unmatched	0.76	high	features	shared c9,f2,i43,s84, 91 rare
+0060c750	887	APP.dll	10137b10	Game_FrameStep	1889	unmatched	0.85	high	callgraph	neighbours 15 of 17 mapped agree, size ratio 0.47
+0060cb10	113582	APP.dll	1011d810		107161	unmatched	0.72	high	features	shared c3,f98,i872,s26, 492 rare
+00628750	17383	APP.dll	10058790	Map_SetUpTrigger	15026	unmatched	0.93	high	features	shared c1,f6,i57,s94, 89 rare; also inlines APP.dll:10017c00
+0062cb70	6201	APP.dll	10114950	TitleScreen_Update	4978	matched:title_screen.cpp	0.85	high	features	shared f16,i53,s7, 29 rare
+0062e3b0	15	-					0.00	none	en-only	unknown
+0062e3c0	185	-					0.00	none	en-only	unknown
+0062e480	12009	APP.dll	10112140	Menu_Main	10038	unmatched	0.81	high	features	shared c1,f3,i43,s5, 11 rare
+00631380	116	APP.dll	1000ed70	Message_Show	113	matched:app_0013.cpp	0.90	high	callgraph	neighbours 8 of 8 mapped agree, size ratio 0.97
+00631400	116	APP.dll	1000edf0	Message_ShowAlt	108	matched:app_0009.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.93
+00631480	335	APP.dll	10018100	Map_FindRegionAt	410	matched:map_regions.cpp	0.74	high	features	shared f1,i4,s4, 3 rare
+006315e0	680	-					0.00	none	en-only	unknown
+00631890	14173	APP.dll	1011a060	Field_Update	14244	unmatched	0.81	high	features	shared c4,f24,i52,s50, 63 rare
+00635010	984	APP.dll	10020090	Collide_RayThroughRegions	1224	matched:collide_regions.cpp	0.66	high	features	shared f2,i9, 0 rare
+006353f0	143	APP.dll	1001fff0	Model_CollideRegions	159	matched:collide_regions.cpp	0.65	high	features	shared i4, 0 rare
+00635480	310	APP.dll	100bd960	Map_UpdateSpecial	345	unmatched	0.67	high	features	shared f1,i2, 1 rare
+006355e0	4075	APP.dll	10064630	Menu_SaveLoad	3598	matched:menu_save_load.cpp	0.75	high	features	shared c1,i13,s7, 6 rare
+006365f0	2904	APP.dll	100524d0	Map17_UpdateMoleGame	2888	unmatched	0.86	high	features	shared f8,i31,s2, 12 rare
+00637160	3544	APP.dll	1005def0	Map_PlaceCharacters	3516	unmatched	0.96	high	features	shared f4,i42,s7, 16 rare
+00637f40	1137	APP.dll	10011520	Player_SelectActionMotion	1188	unmatched	0.65	high	features	shared f3, 1 rare
+006383c0	4297	APP.dll	10053020	Map16_UpdateDodgeGame	4449	unmatched	0.75	high	features	shared f19,i25, 8 rare
+00639500	555	APP.dll	10055ca0	ListBank::SkipStatement	562	matched:listbank.cpp	0.72	high	features	shared i3,s2, 2 rare
+00639730	2613	APP.dll	1007a370	Char_RollingBall	2478	unmatched	0.95	high	features	shared f5,i32,s3, 11 rare
+0063a170	2802	APP.dll	1007ad20	Char_AreaZone	2884	unmatched	0.86	high	features	shared f7,i4, 1 rare
+0063ac70	560	APP.dll	1002ebf0	DamageZone_Update	628	unmatched	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.89
+0063aeb0	483	APP.dll	1002ee70	Char_UpdateShoves	473	matched:char_shove.cpp	0.82	high	features	shared f3,i4, 0 rare
+0063b0a0	3002	APP.dll	1001c670	Char_UpdateAttachSlots	3125	matched:attach_slots.cpp	0.72	high	features	shared f11,i13, 2 rare
+0063bc80	1121	APP.dll	1001d2d0	DigitCounter_Update	1154	unmatched	0.98	high	features	shared i4,s20, 20 rare
+0063c170	332	APP.dll	10054770	Game::MarkKilled	506	unmatched	0.55	medium	features	shared i3,s1, 3 rare
+0063c2c0	287	APP.dll	10055110	Game::RaiseDoorEvents	476	unmatched	0.47	medium	features	shared i1,s4, 4 rare
+0063c3e0	118	-					0.00	none	en-only	unknown
+0063c460	133	APP.dll	10054970	Game::RaiseKskonEvents	239	matched:app_0003.cpp	0.70	high	callgraph	neighbours 3 of 4 mapped agree, size ratio 0.56
+0063c4f0	287	APP.dll	10054f30	Game::RaiseLeverEvents	476	unmatched	0.48	medium	features	shared i1,s4, 4 rare
+0063c610	287	APP.dll	10054d50	Game::RaiseFireEvents	476	unmatched	0.48	medium	features	shared i1,s4, 4 rare
+0063c730	140	-					0.00	none	en-only	unknown
+0063c7c0	140	APP.dll	10054b70	Game::RaiseTalkEvents	239	matched:app_0003.cpp	0.54	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.59
+0063c850	3329	APP.dll	10004b10	ListBank::ApplyOperator	3854	unmatched	0.84	high	features	shared c1,f1,i20, 17 rare
+0063d5a0	43	-					0.00	none	en-only	unknown
+0063d5d0	1495	APP.dll	1004ed60	TutorialBook_Open	1262	unmatched	0.88	high	features	shared i6,s20, 13 rare
+0063dbb0	101	APP.dll	100359c0	ListBank::ReportError	100	matched:listbank.cpp	0.77	high	features	shared i5, 0 rare
+0063dc20	1340	APP.dll	1004f8b7		802	unmatched	0.75	high	features	shared i1,s6, 2 rare
+0063e180	1346	APP.dll	1004f4f0	TutorialBook_NextPage	873	unmatched	0.77	high	features	shared i2,s6, 2 rare
+0063e6d0	144	APP.dll	10010480	Bgm_StartStream	152	matched:bgm_stream.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.95
+0063e760	224	APP.dll	100cc1d0	Scene_Start	202	matched:scene_start.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.90
+0063e840	86	-					0.00	none	en-only	unknown
+0063e8a0	213	-					0.00	none	en-only	unknown
+0063e980	25	-					0.00	none	en-only	unknown
+0063e9a0	65	-					0.00	none	en-only	unknown
+0063e9f0	1123	APP.dll	10010d10	Save_ReadSlotInfo	1323	unmatched	0.58	medium	features	shared i11, 4 rare
+0063ee60	569	APP.dll	10011240	Save_ReadThumbnail	605	unmatched	0.30	low	features	shared i3, 1 rare
+0063f0d0	261	APP.dll	10002330	Game::ReadWordInLine	262	matched:app_0003.cpp	0.85	high	features	shared i4, 4 rare
+0063f1f0	277	APP.dll	10002190	Game::ReadWord	277	matched:app_0003.cpp	0.85	high	features	shared i4, 4 rare
+0063f320	55	APP.dll	1000be10	MeshOwner::Release	48	matched:effect_model.cpp	0.72	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.87
+0063f360	152	APP.dll	10007d50	ScriptBuffers_FreeAll	159	matched:resource_banks.cpp	0.76	high	features	shared i5, 0 rare
+0063f400	71	APP.dll	1000d9d0	MeshSlots_ReleaseAll	69	matched:app_0008.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.97
+0063f480	216	APP.dll	10007f20	Game::ResetMenus	162	matched:menu_textures.cpp	0.93	high	features	shared i13, 9 rare
+0063f560	255	APP.dll	100114a0	Scene_ResetBattleState	125	matched:app_0013.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.49
+0063f660	48	-					0.00	none	en-only	unknown
+0063f6e0	82	-					0.00	none	en-only	unknown
+0063f740	70	-					0.00	none	en-only	unknown
+0063f790	852	-					0.00	none	en-only	unknown
+0063faf0	284	APP.dll	1003ac20	Sound_PlayWav	242	matched:sound_effects.cpp	0.72	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.85; also inlines APP.dll:10010310
+0063fc10	523	APP.dll	1003ad20	Sound_PlayEffect	463	matched:sound_effects.cpp	0.44	medium	features	shared f1,i1,s1, 0 rare
+0063fe20	45	APP.dll	100102e0	SoundLoops_StopAll	43	matched:app_0010.cpp	0.54	medium	features	shared i2, 0 rare
+0063fe50	57	APP.dll	100102a0	SoundLoop_Stop	52	matched:app_0009.cpp	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.91
+0063fe90	418	APP.dll	10055aa0	ListBank::FindLabel	496	matched:listbank.cpp	0.50	medium	features	shared i3, 0 rare
+00640040	914	APP.dll	1003b2c0	Save_Load	943	matched:save_slot.cpp	0.46	medium	features	shared i7, 1 rare
+006403e0	124	APP.dll	1005cdc0	Save_LoadSlot	180	matched:save_slot.cpp	0.84	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.69
+00640460	180	APP.dll	10012450	Char_AttachHandModel	188	matched:char_attach.cpp	0.75	high	features	shared i2,s2, 0 rare
+00640520	667	APP.dll	10012510	Char_SetHandTool	617	matched:char_attach.cpp	0.86	high	features	shared i2,s14, 7 rare
+006407c0	570	APP.dll	10012780	Char_SetHandToolPlain	522	matched:char_attach.cpp	0.85	high	features	shared i2,s12, 5 rare
+00640a00	5783	APP.dll	10062e70	Regions_StartLightMorph	6028	unmatched	0.69	high	features	shared f15,i14,s2, 9 rare
+006420b0	2238	APP.dll	10021380	Map_SetEntryFlags	2047	matched:map_entry_flags.cpp	0.95	high	features	shared i63, 44 rare
+00642ca0	35	-					0.00	none	en-only	steam
+00642cd0	163	APP.dll	10011d40	Enemy_Respawn	138	matched:actor_scan.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.85
+00642d80	1384	APP.dll	10050510	Char_SpawnEnemy	1219	unmatched	0.87	high	features	shared f1,i8,s1, 0 rare
+006432f0	118	APP.dll	100123d0	Chars_ReloadModels	127	matched:char_motion.cpp	0.78	high	features	shared f1,i5, 0 rare
+00643370	18	-					0.00	none	en-only	unknown
+00643390	66	APP.dll	10008390	Game::SetMenuCallbackValue	67	matched:app_0004.cpp	0.39	medium	features	shared i1, 1 rare
+006433e0	87	APP.dll	10008330	Game::SetMenuResultPointer	83	matched:app_0004.cpp	0.53	medium	features	shared i2, 1 rare
+00643440	382	APP.dll	10012220	Model_ApplyCommands	418	unmatched	0.77	high	features	shared c1,i3, 0 rare
+006435d0	1348	APP.dll	1004cf20	ClearMarkers_Create	1416	unmatched	0.76	high	features	shared f1,i6,s5, 5 rare
+00643b20	2002	APP.dll	100366c0	ListBank_DeclareFunction	1495	matched:listbank.cpp	0.82	high	features	shared c1,i15,s9, 12 rare
+00644300	1276	APP.dll	10036ca0	ListBank::RegisterBuiltin	987	unmatched	0.76	high	features	shared i14,s7, 9 rare
+00644850	151	-					0.00	none	en-only	unknown
+006448f0	67	-					0.00	none	en-only	unknown
+00644940	43	APP.dll	10002300	Game::SetScriptFlag	39	matched:app_0003.cpp	0.49	medium	features	shared i2, 0 rare
+00644970	704	APP.dll	10056260	Message_Open	616	unmatched	0.23	low	features	shared i3, 1 rare
+00644c50	57	-					0.00	none	en-only	unknown
+00644c90	229	APP.dll	10011fb0	Water_SetFrozen	230	matched:water_ice.cpp	0.55	medium	features	shared i2, 1 rare
+00644db0	2417	APP.dll	1013ad90	Script_RegisterGameBuiltins	2411	matched:listbank.cpp	1.00	high	features	shared i93,s93, 184 rare
+00645730	49	APP.dll	100143c0	Camera_AddTrackedPosition	47	matched:app_0010.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.96
+00645770	326	APP.dll	1001c090	Char_PlaceOnGround	384	matched:char_ground.cpp	0.63	high	features	shared f1,i4, 0 rare
+006458c0	25	-					0.00	none	en-only	unknown
+006458e0	118	-					0.00	none	en-only	unknown
+00645960	176	APP.dll	1000ec70	ColourFade_Start	169	matched:app_0009.cpp	0.79	high	callgraph	neighbours 13 of 17 mapped agree, size ratio 0.96
+00645a10	58	-					0.00	none	en-only	unknown
+00645a50	114	APP.dll	100046d0	ListBank::AddEntry	130	matched:listbank.cpp	0.46	medium	features	shared i3, 0 rare
+00645ad0	210	APP.dll	10004760	ListBank::DeclareVariable	236	unmatched	0.70	high	features	shared i3,s1, 1 rare
+00645bb0	1241	APP.dll	100ed510	ListBank_DeclareFromText	1160	matched:listbank.cpp	0.79	high	features	shared c1,i11,s1, 3 rare
+006460b0	224	-					0.00	none	en-only	unknown
+00646190	67	-					0.00	none	en-only	unknown
+006461e0	77	-					0.00	none	en-only	unknown
+00646230	130	APP.dll	1001bfb0	Char_LimitTurn	218	matched:char_turn.cpp	0.47	medium	callgraph	neighbours 2 of 4 mapped agree, size ratio 0.60
+006462c0	71	-					0.00	none	en-only	unknown
+00646310	87	-					0.00	none	en-only	unknown
+00646370	98	-					0.00	none	en-only	unknown
+006463e0	111	-					0.00	none	en-only	unknown
+00646450	101	APP.dll	1000db30	Bgm_FadeGroup100	104	matched:volume_fade.cpp	0.54	medium	callgraph	neighbours 4 of 11 mapped agree, size ratio 0.97
+006464c0	280	APP.dll	100f9520	ListBank::CompileText	319	matched:listbank.cpp	0.77	high	features	shared i10, 3 rare
+006465e0	74	APP.dll	10008650	Game::SetMenuCursor	84	matched:app_0006.cpp	0.47	medium	features	shared i3, 0 rare
+00646630	48	-					0.00	none	en-only	unknown
+00646660	140	-					0.00	none	en-only	unknown
+006466f0	96	APP.dll	100158b0	UiAnim_Play	94	matched:app_0013.cpp	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.98
+00646750	819	APP.dll	10037560	ListBank::AssignValue	743	unmatched	0.83	high	features	shared c1,i5,s1, 3 rare
+00646a90	77	-					0.00	none	en-only	steam
+00646ae0	198	APP.dll	100143f0	Char_SetHelmet	201	unmatched	0.76	high	features	shared i2,s2, 0 rare
+00646bb0	568	APP.dll	100154c0	Char_WearHelmet	587	matched:char_attach.cpp	0.93	high	features	shared i3,s4, 2 rare
+00646df0	1204	APP.dll	10014d30	Helmet_FaceSettings	1931	unmatched	0.77	high	features	shared i54, 34 rare
+006472b0	1752	APP.dll	100144c0	Ability_GetDescription	2146	matched:ability_text.cpp	0.69	high	features	shared i22, 2 rare
+00647990	171	APP.dll	1003bba0	Ability_BuildList	192	matched:text_fields.cpp	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.89
+00647a40	36	-					0.00	none	en-only	unknown
+00647a80	79	-					0.00	none	en-only	unknown
+00647ad0	8374	APP.dll	10005a70	Script_LibraryBuiltin	8695	unmatched	0.86	high	features	shared f19,i445, 183 rare
+00649c00	206	APP.dll	1001bec0	Char_SlowNearKind14	233	matched:actor_scan.cpp	0.58	medium	features	shared f1,i2, 0 rare
+00649cd0	197	APP.dll	10065b10	Character_PlaySound	211	matched:char_sound.cpp	0.78	high	callgraph	neighbours 61 of 82 mapped agree, size ratio 0.93
+00649da0	5229	APP.dll	10042a30	Shaga_Update	4745	matched:shaga_update.cpp	0.65	high	features	shared f16,i38,s3, 8 rare
+0064b210	1051	APP.dll	100425f0	Shaga_Create	1081	matched:shaga_spawn.cpp	0.80	high	features	shared f8,i3,s5, 4 rare
+0064b640	133	APP.dll	10062750	Shaga_Spawn	116	matched:shaga_spawn.cpp	0.87	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.87
+0064b6d0	1204	APP.dll	10042140	Shaga_BreakOff	1195	matched:shaga_spawn.cpp	0.71	high	features	shared f8,i5,s5, 4 rare
+0064bb90	369	APP.dll	1001af10	Shaga_PushOut	394	matched:shaga_pushout.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.94
+0064bd10	889	APP.dll	100184e0	Camera_ItemStand	911	matched:camera_follow.cpp	0.94	high	features	shared f3,i7,s2, 3 rare
+0064c090	1779	APP.dll	10018870	Camera_PullToItemStand	1850	matched:camera_item_stand_pull.cpp	0.90	high	features	shared f5,i9,s1, 1 rare
+0064c790	584	APP.dll	10018fb0	Camera_Ease	601	matched:camera_follow.cpp	0.77	high	features	shared i3, 0 rare
+0064c9e0	235	APP.dll	10019210	Player_LookAround	248	matched:head_look.cpp	0.81	high	features	shared f1,i2, 0 rare
+0064caf0	865	APP.dll	10019310	Camera_Shift	849	unmatched	0.73	high	features	shared f1,i4, 0 rare
+0064ce60	1757	APP.dll	10019670	Camera_ShiftOrbit	1801	unmatched	0.71	high	features	shared f5,i4, 0 rare
+0064d540	838	APP.dll	10019d80	Camera_Between	842	matched:camera_follow.cpp	0.93	high	features	shared f5,i6, 1 rare
+0064d890	717	APP.dll	1001a0d0	Camera_Orbit	691	matched:camera_follow.cpp	0.93	high	features	shared f1,i5, 0 rare
+0064db60	67	APP.dll	10017bb0	EffectSlots_GetValue	68	matched:app_0011.cpp	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.99
+0064dbb0	17131	APP.dll	1007f1e0	Map18_UpdateFootballGame	19328	unmatched	0.70	high	features	shared f47,i63,s4, 22 rare
+00652b60	8179	APP.dll	10032240	SoccerGame_UpdateCpuPlayer	8119	unmatched	0.91	high	features	shared f29,i15, 9 rare
+00654b60	1212	APP.dll	10034210	Move_SweepToWorld	1460	unmatched	0.61	high	features	shared f4,i3,s1, 1 rare
+00655020	6568	APP.dll	10076790	Enemy_ChaseLungeAndSpit	6351	unmatched	0.67	high	features	shared f9,i29,s2, 4 rare
+006569d0	7023	APP.dll	10065bf0	Enemy_WanderHopAndSpit	6610	unmatched	0.68	high	features	shared f23,i24, 9 rare
+00658540	5384	APP.dll	10084e80	Enemy_RoamAndSpit	5359	unmatched	0.63	high	features	shared f14,i22, 3 rare
+00659a80	11736	APP.dll	10068f70	Enemy_LeapAndClimb	11973	unmatched	0.73	high	features	shared f41,i58,s2, 17 rare
+0065c860	12913	APP.dll	10086380	Enemy_FlockDiver	11823	unmatched	0.86	high	features	shared f56,i62,s4, 27 rare
+0065fb40	6948	APP.dll	100675d0	Enemy_PounceAndBreathe	6548	unmatched	0.83	high	features	shared f24,i43,s2, 9 rare
+00661670	2130	APP.dll	10051570	MapCursor_Walk	2211	unmatched	0.63	high	features	shared f4,i11, 2 rare
+00661f00	8871	APP.dll	1006be40	Enemy_SpitAndCharge	8962	unmatched	0.72	high	features	shared f30,i26,s2, 12 rare
+006641b0	3531	APP.dll	10024f80	Char_Drifter	3419	unmatched	0.71	high	features	shared f17,i7,s1, 7 rare
+00664f80	2807	APP.dll	100a3900	Enemy_PulseAndCharge	2875	matched:enemy_pulse_charge.cpp	0.81	high	features	shared f19,i19,s2, 5 rare
+00665a80	230	APP.dll	1001a390	Char_PulseScale	191	matched:pulse_scale.cpp	0.80	high	features	shared f4,i1,s1, 0 rare
+00665b70	4211	APP.dll	1006e150	Enemy_CastAndTeleport	4917	matched:enemy_cast_teleport.cpp	0.65	high	features	shared f13,i31,s1, 4 rare
+00666bf0	2563	APP.dll	10025ce0	Char_SwingPlatform	2608	matched:swing_platform.cpp	0.77	high	features	shared f14,i9,s1, 7 rare
+00667610	3345	APP.dll	1006f490	Enemy_HoverAndShoot	3422	unmatched	0.82	high	features	shared f8,i21, 5 rare
+00668330	7066	APP.dll	10070200	Enemy_PodLobber	7360	unmatched	0.79	high	features	shared f25,i38,s10, 21 rare
+00669ed0	13389	APP.dll	10071ee0	Enemy_WispCaster	13408	unmatched	0.85	high	features	shared f25,i79,s4, 25 rare
+0066d330	5181	APP.dll	10075350	Enemy_ShyGhost	5154	unmatched	0.85	high	features	shared f14,i26,s5, 6 rare
+0066e780	27242	APP.dll	100e7280	NeoGalaxy_Update	25057	unmatched	0.85	high	features	shared f25,i148,s18, 53 rare
+006752a0	20678	APP.dll	100e25f0	Bs003_Update	19570	unmatched	0.84	high	features	shared f27,i105,s43, 94 rare
+0067a380	20482	APP.dll	1010c650	Bs001_Update	23098	unmatched	0.75	high	features	shared f39,i103,s19, 37 rare
+0067fcc0	1054	APP.dll	100b9bb0	Enemy_PlayVoice	867	unmatched	0.83	high	callgraph	neighbours 6 of 7 mapped agree, size ratio 0.82
+00680210	40	APP.dll	10011f80	Char_MarkDefeated	37	matched:app_0010.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.93
+00680280	32813	APP.dll	10104640	Bs002_Update	32656	unmatched	0.78	high	features	shared f54,i201,s21, 84 rare
+006883a0	51470	APP.dll	100d24a0	Bs006_Update	54584	unmatched	0.60	medium	features	shared f42,i444,s37, 188 rare
+00694f90	1902	APP.dll	100a6a50	Enemy_AimedShots	1792	unmatched	0.62	high	features	shared f3,i12, 3 rare
+00695710	1781	APP.dll	100a8370	Enemy_CallBursts	1866	matched:enemy_barrage.cpp	0.86	high	features	shared f1,i21,s1, 4 rare
+00695e20	1898	APP.dll	100a7150	Enemy_StarVolley	1688	unmatched	0.57	medium	features	shared f3,i13, 5 rare
+006965a0	4142	APP.dll	100a5960	Enemy_PerchAndSwoop	4331	unmatched	0.87	high	features	shared f22,i32, 9 rare
+006975e0	1474	APP.dll	100a77f0	Enemy_CallBarrage	1463	matched:enemy_barrage.cpp	0.79	high	features	shared f6,i13, 3 rare
+00697bb0	5649	APP.dll	100a4440	Enemy_RollingTire	5381	unmatched	0.80	high	features	shared f20,i22,s4, 12 rare
+006991e0	1580	APP.dll	100a7db0	Enemy_SpinFire	1471	matched:enemy_barrage.cpp	0.83	high	features	shared f3,i16,s1, 5 rare
+00699810	39	-					0.00	none	en-only	unknown
+00699840	117	APP.dll	101148b0	Char_UpdateSpecialKind	117	matched:char_dispatch.cpp	0.48	medium	features	shared f1,i2, 0 rare
+006998e0	176	APP.dll	1009e2d0	Char_UpdateKind47to51	175	matched:char_dispatch.cpp	0.90	high	callgraph	neighbours 12 of 12 mapped agree, size ratio 0.99
+00699990	1072	APP.dll	1009d100	Enemy_ChaseAndBlast	905	matched:char_move.cpp	0.84	high	features	shared f3,i7, 0 rare
+00699dc0	343	APP.dll	10011dd0	Npc_StandOnGround	419	unmatched	0.64	high	features	shared f1,i5, 0 rare
+00699f20	950	APP.dll	1009dfd0	Enemy_FollowAndBlast	764	matched:char_move.cpp	0.73	high	features	shared f2,i6, 0 rare
+0069a2e0	622	APP.dll	1009ddd0	Kind4a_Update	507	matched:kind4a_turret.cpp	0.79	high	features	shared i6, 0 rare
+0069a550	1341	APP.dll	10098be0	Enemy_ShoveAndBlast	1120	matched:char_move.cpp	0.81	high	features	shared f3,i6, 1 rare
+0069aa90	3972	APP.dll	1009a690	Enemy_StrafeAndShoot	2703	unmatched	0.83	high	features	shared f4,i13, 0 rare
+0069ba20	4039	APP.dll	10099b30	Enemy_StrafeAndBurst	2897	unmatched	0.86	high	features	shared c1,f5,i15,s3, 4 rare
+0069c9f0	3751	APP.dll	10099040	Enemy_StrafeAndLunge	2800	matched:enemy_strafe.cpp	0.83	high	features	shared f4,i13, 0 rare
+0069d8a0	3072	APP.dll	1009d490	Enemy_ChaseAndSlash	2368	unmatched	0.91	high	features	shared f7,i10,s2, 3 rare
+0069e4a0	4768	APP.dll	1009b120	Enemy_HopAndStrafe	3918	matched:enemy_strafe.cpp	0.84	high	features	shared f4,i14, 1 rare
+0069f740	4567	APP.dll	1009c070	Enemy_FlyAndStrafe	4229	unmatched	0.82	high	features	shared f10,i16, 0 rare
+006a0950	8252	APP.dll	100f9670	Char_UpdateByKind	7639	unmatched	0.74	high	features	shared f12,i33,s3, 10 rare
+006a2c20	66	APP.dll	1001d8b0	Char_StartEffect	97	matched:char_effects.cpp	0.77	high	callgraph	neighbours 50 of 69 mapped agree, size ratio 0.68
+006a2c70	1595	APP.dll	10047440	Npc_PushCart	1473	unmatched	0.80	high	features	shared f5,i13,s2, 2 rare
+006a32b0	2210	APP.dll	100460d0	Npc_ShockByLink	2285	unmatched	0.81	high	features	shared f3,i7, 1 rare
+006a3b60	456	APP.dll	1001b880	Npc_TalkFacingSimple	444	matched:npc_facing.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.97
+006a3d30	278	APP.dll	100bcb30	Enemy_UpdateBehaviour	259	matched:char_dispatch.cpp	0.90	high	callgraph	neighbours 13 of 13 mapped agree, size ratio 0.93
+006a3ef0	3629	APP.dll	100ad0f0	Enemy_StalkAndLunge	3383	matched:enemy_lunger.cpp	0.85	high	features	shared f6,i34,s2, 5 rare
+006a4d20	243	APP.dll	1001a590	Shot_ProbeGround	227	matched:char_shots.cpp	0.66	high	features	shared f2,i2, 0 rare
+006a4e20	3215	APP.dll	100ac440	Enemy_StalkAndBreathe	3233	matched:enemy_breather.cpp	0.78	high	features	shared f9,i30,s1, 3 rare
+006a5ab0	4412	APP.dll	100af1b0	Enemy_StalkAndDashSlash	4254	unmatched	0.80	high	features	shared f6,i40,s3, 7 rare
+006a6c00	4155	APP.dll	100ade30	Enemy_HoverAndCallStrike	4977	unmatched	0.69	high	features	shared f11,i23,s2, 6 rare
+006a7c50	7272	APP.dll	100aa820	Enemy_StalkAndClaw	7194	unmatched	0.85	high	features	shared f11,i62,s3, 19 rare
+006a98c0	1963	APP.dll	100a8ac0	Enemy_FetchDroppedWeapon	1912	matched:weapon_fetch.cpp	0.98	high	features	shared f3,i12,s2, 3 rare
+006aa070	1177	APP.dll	1001a990	Char_AttachWeapon	1350	matched:weapon_attach.cpp	0.76	high	features	shared f1,i4,s23, 21 rare
+006aa540	6043	APP.dll	100a9240	Enemy_StalkAndStrike	5587	unmatched	0.86	high	features	shared f11,i41,s3, 6 rare
+006abce0	316	APP.dll	1001a450	Slot_HasNoGround	315	matched:collide_query.cpp	0.75	high	features	shared f2,i3, 0 rare
+006abe20	46	APP.dll	10047400	Char_UpdateGroup	62	matched:app_0011.cpp	0.70	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.74
+006abe50	647	APP.dll	100b9930	Enemy_DragToPit	637	unmatched	0.85	high	features	shared f1,i6, 1 rare
+006ac0e0	308	APP.dll	1001b670	Enemies_WakeNearby	307	unmatched	0.90	high	callgraph	neighbours 18 of 18 mapped agree, size ratio 1.00
+006ac220	62	APP.dll	1001b840	Char_RandomIdle	59	matched:app_0011.cpp	0.56	medium	features	shared i3, 0 rare
+006ac260	1648	APP.dll	10051e20	Flames_Update	1618	unmatched	0.86	high	features	shared f2,i22,s2, 3 rare
+006ac8d0	743	APP.dll	10026730	Watcher_Update	950	matched:hover_watcher.cpp	0.65	high	features	shared f6,i5, 0 rare
+006acbc0	4101	APP.dll	1007c050	Char_RouteFlier	4174	unmatched	0.74	high	features	shared f18,i19,s1, 3 rare
+006adbd0	1426	APP.dll	10043fc0	Npc_RideMarker	1423	matched:marker_rider.cpp	0.88	high	features	shared f3,i8, 0 rare
+006ae170	2009	APP.dll	1007b870	Npc_GatedRouteCarrier	2009	unmatched	0.87	high	features	shared f12,i10, 3 rare
+006ae950	873	APP.dll	10048b70	Char_SwingDoor	799	matched:char_move.cpp	0.62	high	features	shared f2,i4, 1 rare
+006aecc0	196	-					0.00	none	en-only	unknown
+006aeda0	1642	APP.dll	100b4f00	Npc_PopUp	1614	matched:char_move.cpp	0.88	high	features	shared f6,i8, 0 rare
+006af410	1143	APP.dll	100469d0	Npc_Held	1337	matched:npc_frozen.cpp	0.72	high	features	shared f3,i12,s1, 3 rare
+006af890	3314	APP.dll	100b84a0	Npc_PerformTricks	3244	unmatched	0.85	high	features	shared f5,i22, 1 rare
+006b0590	1983	APP.dll	100b9150	Npc_GestureWithNeighbour	2009	unmatched	0.79	high	features	shared f3,i12, 1 rare
+006b0d60	863	APP.dll	100b3430	Npc_RiseWhenSeen	818	matched:char_move.cpp	0.91	high	features	shared f6,i4, 1 rare
+006b10c0	1540	APP.dll	10044560	Enemy_Pendulum	1449	matched:enemy_pendulum.cpp	0.93	high	features	shared f9,i7, 1 rare
+006b16e0	3297	APP.dll	100fb7b0	Scene_Reset	3089	unmatched	0.96	high	features	shared c2,f5,i30,s9, 11 rare
+006b23d0	1398	APP.dll	10023900	Map_ResetOnEnter	1069	unmatched	0.90	high	features	shared c2,i5, 4 rare
+006b2950	2708	APP.dll	100b2900		2848	unmatched	0.85	high	features	shared f12,i13, 1 rare
+006b33f0	969	APP.dll	100d2110		894	unmatched	0.95	high	features	shared f2,i7, 0 rare
+006b37c0	863	APP.dll	100b1800	Npc_GroupWatch	1977	unmatched	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.44
+006b3b20	1750	APP.dll	100b1520	Npc_WatchForPlayer	736	matched:char_move.cpp	0.75	high	features	shared f5,i6, 0 rare
+006b4220	998	APP.dll	100b1ff0	Npc_FaceAndTalk	951	matched:char_move.cpp	0.74	high	features	shared f3,i5, 0 rare
+006b4610	1542	APP.dll	100b23b0	Npc_ChildFollow	1347	matched:char_move.cpp	0.83	high	features	shared f6,i10, 1 rare
+006b4c30	28699	APP.dll	100c39c0	Bs004_Update	29926	unmatched	0.81	high	features	shared f58,i151,s19, 58 rare
+006bbea0	1927	APP.dll	100b7360	Npc_GreetWhenFaced	1953	unmatched	0.78	high	features	shared f7,i9,s1, 0 rare
+006bc630	885	APP.dll	10045830	Npc_SleepUntilWoken	843	matched:npc_sleep.cpp	0.80	high	features	shared f2,i4, 1 rare
+006bc9b0	1653	APP.dll	10044b10	Npc_PatrolRoute	1711	unmatched	0.81	high	features	shared f7,i9, 0 rare
+006bd030	80	APP.dll	100347d0	Char_FollowLeader	54	matched:app_0012.cpp	0.69	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.68
+006bd090	13728	APP.dll	100bdad0	Enemy_UpdateFighter	24177	unmatched	0.50	medium	features	shared f29,i84,s11, 35 rare
+006c3210	734	APP.dll	100b5f80	Npc_AlertWhenSeen	770	matched:char_move.cpp	0.70	high	features	shared f1,i5, 0 rare
+006c34f0	822	APP.dll	100b5c30	Npc_TurnWhenSeen	843	matched:char_move.cpp	0.71	high	features	shared f2,i5, 0 rare
+006c3850	29924	APP.dll	100edea0	Prince_Update	31560	unmatched	0.82	high	features	shared c1,f53,i176,s16, 81 rare
+006cb140	1989	APP.dll	1003fc40	Kind43_UpdateShots	2194	unmatched	0.56	medium	features	shared f13,i11, 7 rare
+006cb910	216	APP.dll	1001a680	Char_FireShot	220	matched:char_shots.cpp	0.73	high	features	shared f1,i3, 1 rare
+006cb9f0	203	APP.dll	1001a760	Char_AttachLeftHand	214	matched:char_attach.cpp	0.88	high	features	shared i2,s2, 1 rare
+006cbad0	1645	APP.dll	10023d30	Map_Unload	1181	unmatched	0.61	high	features	shared i3, 1 rare
+006cc180	1867	APP.dll	100b4930	Npc_RideAlarm	1473	unmatched	0.76	high	features	shared f8,i11, 0 rare
+006cc8d0	1449	APP.dll	100b4300	Npc_RaiseAlarm	1583	unmatched	0.70	high	features	shared f6,i12, 0 rare
+006cce80	1967	APP.dll	100627d0	Enemy_Defeat	1685	matched:enemy_defeat.cpp	0.97	high	features	shared f13,i7, 2 rare
+006cd640	7555	APP.dll	100404e0	Char_PutOnEquipment	7072	unmatched	0.85	high	features	shared c1,f4,i12,s130, 118 rare
+006cf480	4910	APP.dll	100615f0	Char_DropEquipment	4264	unmatched	0.86	high	features	shared f3,i14,s70, 57 rare
+006d0870	1527	APP.dll	1001b0a0	Char_SelectKind	1106	unmatched	1.00	high	features	shared i24, 19 rare
+006d0f20	1474	APP.dll	100b6290	Npc_RunToMarker	1189	matched:char_move.cpp	0.86	high	features	shared f5,i10, 1 rare
+006d14f0	1613	APP.dll	10047a10	Npc_RideBehindMarker	1598	unmatched	0.81	high	features	shared f7,i6, 1 rare
+006d1b40	932	APP.dll	100dfcf0	Char_RunBehaviour	1385	matched:npc_dispatch.cpp	0.88	high	callgraph	neighbours 42 of 44 mapped agree, size ratio 0.67
+006d1fb0	179	APP.dll	1001b5b0	Char_UnpackParameter	188	matched:char_score.cpp	0.69	high	features	shared i4, 0 rare
+006d2070	520	APP.dll	10043cc0	Char_ResetState	340	unmatched	0.75	high	features	shared i5, 0 rare
+006d2280	2776	APP.dll	100b6740	Npc_HurlAtPlayer	3098	matched:npc_hurl.cpp	0.76	high	features	shared f16,i18,s2, 6 rare
+006d2d60	18	-					0.00	none	en-only	unknown
+006d2d90	3171	APP.dll	100b3770	Npc_PerchOnNeighbour	2948	unmatched	0.77	high	features	shared f7,i15,s1, 3 rare
+006d3a00	2958	APP.dll	10048050	Npc_HoverCarrier	2837	matched:npc_hover_carrier.cpp	0.89	high	features	shared f11,i14,s1, 2 rare
+006d4590	1613	APP.dll	100451c0	Npc_WalkRoute	1644	unmatched	0.85	high	features	shared f3,i6, 0 rare
+006d4be0	1746	APP.dll	1001dc20	Char_InitSlot	1397	unmatched	0.94	high	features	shared f1,i11, 2 rare
+006d52c0	1809	APP.dll	100b7b10	Npc_Lookout	1798	unmatched	0.98	high	features	shared f5,i5,s2, 2 rare
+006d59e0	151	APP.dll	10045b80	Char_IdleWatchPlayer	169	matched:char_proximity.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.89
+006d5a80	837	APP.dll	100b5550	Npc_GreetWhenNear	840	unmatched	0.85	high	features	shared f2,i10, 1 rare
+006d5dd0	649	APP.dll	10045c30	Npc_WaitFacingAway	653	matched:char_move.cpp	0.89	high	features	shared f3,i6, 0 rare
+006d6060	444	APP.dll	10045ed0	Npc_ApproachPlayer	497	unmatched	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.89
+006d6220	700	APP.dll	100b58a0	Npc_TalkWhenNear	568	matched:char_move.cpp	0.79	high	features	shared f1,i9, 1 rare
+006d64e0	147	APP.dll	1001b7b0		138	unmatched	0.65	high	features	shared f2,i2, 0 rare
+006d6580	811	APP.dll	10049650	Wave_Update	822	unmatched	0.86	high	features	shared f4,i4, 0 rare
+006d68b0	343	APP.dll	100b5ae0	Npc_Idle	332	matched:char_move.cpp	0.74	high	features	shared i6, 0 rare
+006d6a10	1244	APP.dll	10046f10	Enemy_AppearNearby	1250	matched:enemy_blink.cpp	0.91	high	features	shared f5,i9, 1 rare
+006d6ef0	20760	APP.dll	100cc2a0	Bs005_Update	23305	unmatched	0.74	high	features	shared f27,i164,s13, 76 rare
+006dc5d0	6857	APP.dll	1005fc00	DodgeGame_UpdateGolemPiece	6603	unmatched	0.80	high	features	shared f13,i25,s6, 12 rare
+006de0c0	1119	APP.dll	10049240	Enemy_DropInWhenNear	1027	matched:char_move.cpp	0.85	high	features	shared f6,i8, 2 rare
+006de520	1021	APP.dll	10048e90	Enemy_DropIn	938	matched:char_move.cpp	0.85	high	features	shared f5,i8, 2 rare
+006de920	53	-					0.00	none	en-only	unknown
+006de960	152	-					0.00	none	en-only	unknown
+006dea00	853	APP.dll	10034920	Bs003_SetVariant	839	matched:bs003_variant.cpp	1.00	high	features	shared i1,s22, 22 rare
+006dedc0	1874	APP.dll	1004fbe0	Sound_UpdateDopplerLoops	2142	matched:doppler_loops.cpp	0.83	high	features	shared f18,i8, 3 rare
+006df520	662	APP.dll	1001d920	Carry_StackOnObject	666	matched:carry_stack.cpp	0.96	high	features	shared f6,i2,s1, 5 rare
+006df7c0	3600	APP.dll	100135b0	Map_ShowEquipment	3600	unmatched	1.00	high	features	shared s36, 36 rare
+006e05d0	43	-					0.00	none	en-only	unknown
+006e0600	369	APP.dll	1001c510	Point_Transform	350	matched:point_transform.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.95
+006e0790	178	APP.dll	10010520	Dialog_YesNo	176	matched:dialog_yesno.cpp	0.59	medium	features	shared i1, 0 rare
+006e0850	178	APP.dll	100105e0	Dialog_NoYes	176	matched:dialog_yesno.cpp	0.59	medium	features	shared i1, 0 rare
+006e0910	3437	APP.dll	10016ec0	Ground_BuildMesh	2970	unmatched	0.67	high	features	shared f5,i15,s1, 3 rare
+006e1690	106	APP.dll	10011c60	Enemy_ClearIdleCounters	108	matched:actor_scan.cpp	0.64	high	features	shared f1,i2, 1 rare
+006e1700	2439	APP.dll	10115cd0	ItemDictionary_Update	2163	unmatched	0.79	high	features	shared f5,i27, 2 rare
+006e2090	13	-					0.00	none	en-only	unknown
+006e20a0	33	-					0.00	none	en-only	unknown
+006e20d0	30	-					0.00	none	en-only	unknown
+006e20f0	30	-					0.00	none	en-only	unknown
+006e2110	53	APP.dll	10001fb0	cosf	27	matched:enemy_flock_diver.cpp	0.35	medium	callgraph	neighbours 1 of 2 mapped agree, size ratio 0.51
+006e2150	30	-					0.00	none	en-only	unknown
+006e2170	46	-					0.00	none	en-only	unknown
+006e21c0	30	-					0.00	none	en-only	unknown
+006e21e0	37	-					0.00	none	en-only	unknown
+006e2210	30	-					0.00	none	en-only	unknown
+006e2230	33	-					0.00	none	en-only	unknown
+006e2260	46	-					0.00	none	en-only	unknown
+006e2290	566	APP.dll	1002a110	Char_WalkRoute	559	unmatched	0.59	medium	features	shared i3, 0 rare
+006e24d0	3577	APP.dll	10079470	Char_HikariButtonRide	3839	unmatched	0.83	high	features	shared f12,i8,s7, 9 rare
+006e32d0	7209	APP.dll	1002ae70	Char_HikariWarp	7666	unmatched	0.74	high	features	shared f15,i37,s4, 10 rare
+006e4f10	2098	APP.dll	1002cc70	Char_HikariRide	2150	unmatched	0.79	high	features	shared f10,i4,s3, 3 rare
+006e5750	355	APP.dll	1002a340	Char_RunScript	325	unmatched	0.91	high	features	shared f1,i2, 1 rare
+006e58c0	30	-					0.00	none	en-only	unknown
+006e58e0	30	-					0.00	none	en-only	unknown
+006e5900	81	-					0.00	none	en-only	unknown
+006e5960	38	-					0.00	none	en-only	unknown
+006e5990	30	-					0.00	none	en-only	unknown
+006e59b0	37	-					0.00	none	en-only	unknown
+006e59e0	40	-					0.00	none	en-only	unknown
+006e5a10	9	-					0.00	none	en-only	unknown
+006e5a20	30	-					0.00	none	en-only	unknown
+006e5a40	37	-					0.00	none	en-only	unknown
+006e5a70	30	-					0.00	none	en-only	unknown
+006e5a90	30	-					0.00	none	en-only	unknown
+006e5ab0	53	APP.dll	10001f60	acosf	27	matched:attach_slots.cpp	0.40	medium	callgraph	neighbours 4 of 20 mapped agree, size ratio 0.51
+006e5af0	30	-					0.00	none	en-only	unknown
+006e5b10	46	-					0.00	none	en-only	unknown
+006e5b40	30	-					0.00	none	en-only	unknown
+006e5b60	37	-					0.00	none	en-only	unknown
+006e5b90	30	-					0.00	none	en-only	unknown
+006e5bb0	33	-					0.00	none	en-only	unknown
+006e5be0	46	-					0.00	none	en-only	unknown
+006e5c10	30	-					0.00	none	en-only	unknown
+006e5c30	30	-					0.00	none	en-only	unknown
+006e5c50	38	-					0.00	none	en-only	unknown
+006e5c80	30	-					0.00	none	en-only	unknown
+006e5ca0	37	-					0.00	none	en-only	unknown
+006e5cd0	40	-					0.00	none	en-only	unknown
+006e5d00	30	-					0.00	none	en-only	unknown
+006e5d20	37	-					0.00	none	en-only	unknown
+006e5d60	302	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e5ed0	114	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e5f50	18	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e5f70	133	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6000	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6030	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6060	26	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6080	12	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6090	18	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e60b0	319	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6200	12	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6210	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6220	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6340	196	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6420	26	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6490	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e64f0	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6570	40	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e65a0	38	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6610	119	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6710	29	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6730	29	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6760	11	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6770	11	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6780	78	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e67d0	71	sound3d.dll	100550dd		25	unmatched	0.37	medium	features	shared c1, 1 rare
+006e68b0	45	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6900	444	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6ac0	618	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6d30	62	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6d70	62	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6de0	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6e10	39	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6e40	39	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6e70	97	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6ee0	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6f10	27	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6f50	25	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6fa0	24	sound3d.dll	10019483		11	unmatched	0.38	medium	features	shared i1, 1 rare; also inlines sound3d.dll:10001610
+006e6fc0	15	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e6fd0	31	sound3d.dll	1001a13f		28	unmatched	0.36	medium	features	shared c1, 1 rare
+006e7010	9	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7020	56	sound3d.dll	1001df20	CreateCompatibleDC	33	unmatched	0.63	high	features	shared c2, 0 rare
+006e7060	56	sound3d.dll	1001e2fd	CreatePatternBrush	33	unmatched	0.66	high	features	shared c2, 1 rare
+006e70b0	27	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e70d0	25	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7100	92	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7170	13	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7180	126	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7220	9	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7230	121	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e72c0	29	sound3d.dll	100193d1		29	unmatched	0.36	medium	features	shared c1, 1 rare
+006e72e0	57	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7320	19	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e73b0	9	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e73d0	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e73e0	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7420	24	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e7470	3262	sound3d.dll	1003f700		917	unmatched	0.23	low	features	shared i2, 1 rare
+006e8140	24	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e81a0	41	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e81d0	2793	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e8cc0	29	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e8ce0	39	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e8d10	189	Packs.dll	1002fab1	_wctomb	102	unmatched	0.32	low	features	shared c1, 1 rare
+006e8dd0	450	sound3d.dll	1005255b		621	unmatched	0.19	low	features	shared c1,i1, 1 rare
+006e8fa0	142	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e90a0	46	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e90d0	130	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e9160	130	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e91f0	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e9230	30	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e9260	37	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e9290	36	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e92c0	37	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e92f0	37	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e9320	37	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e9350	37	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e93b0	9	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e93c0	9	-					0.00	none	en-only	launcher (EN-only config dialog)
+006e9410	3643	sound3d.dll	10057768		734	unmatched	0.42	medium	features	shared c4, 2 rare
+006ea250	372	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea3d0	85	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea450	160	sound3d.dll	10053e99		98	unmatched	0.45	medium	features	shared c2, 0 rare
+006ea4f0	27	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea520	49	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea560	141	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea620	51	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea660	9	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea670	107	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea6e0	57	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea720	85	sound3d.dll	10053d8f		106	unmatched	0.33	low	features	shared c1,i2, 1 rare
+006ea780	55	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea7e0	40	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea810	22	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea830	343	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea990	30	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea9b0	25	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea9d0	26	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ea9f0	26	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eaa10	27	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eaa30	40	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eaa60	57	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eaaa0	159	sound3d.dll	10020bf0	_memset	96	unmatched	0.52	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.60
+006eab40	27	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eab60	10	sound3d.dll	1004be9d		11	unmatched	0.35	medium	features	shared i1, 1 rare
+006eb540	102	sound3d.dll	10019267	_AtlGetStringResourceImage	92	unmatched	0.85	high	features	shared c3, 3 rare
+006eb5e0	16	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb5f0	16	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb600	32	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb630	39	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb670	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb680	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb6a0	182	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb770	39	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb7a0	181	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb860	202	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb930	26	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eb950	286	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eba70	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eba80	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebaa0	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebaf0	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebb40	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebb90	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebbe0	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebc30	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebc80	80	sound3d.dll	100587a7	DDX_CBIndex	85	unmatched	0.50	medium	features	shared c1,i2, 0 rare; also inlines sound3d.dll:10050c72
+006ebcd0	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebd20	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebd70	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebdc0	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebe10	80	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ebe60	647	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec0f0	154	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec190	120	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec210	51	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec250	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec270	52	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec2b0	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec2e0	51	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec320	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec340	22	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec360	362	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec4e0	158	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec590	59	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec5d0	425	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ec790	341	sound3d.dll	10054ce1		164	unmatched	0.49	medium	features	shared c2, 0 rare
+006ec8f0	282	-					0.00	none	en-only	launcher (EN-only config dialog)
+006eca20	244	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ecb30	25	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ecb50	973	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ecf40	1127	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ed3b0	183	sound3d.dll	10053f0d	CDialog	64	unmatched	0.24	low	features	shared i1, 1 rare
+006ed470	1029	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ed8a0	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ed8d0	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ed900	201	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ed9d0	60	sound3d.dll	100196f0	CheckImplicitLoad	32	unmatched	0.40	medium	features	shared i1, 1 rare
+006eda40	1240	Packs.dll	1000f696		47	unmatched	0.26	low	features	shared i4, 2 rare
+006edf20	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006edf60	19	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ef790	21	-					0.00	none	en-only	launcher (EN-only config dialog)
+006ef7b0	804	sound3d.dll	10049698	GetPathName	279	unmatched	0.49	medium	features	shared c3, 1 rare
+006efae0	27	-					0.00	none	en-only	launcher (EN-only config dialog)
+006efb10	218	sound3d.dll	1004ebdc		104	unmatched	0.49	medium	features	shared c2, 0 rare
+006efbf0	51	-					0.00	none	en-only	launcher (EN-only config dialog)
+006effd0	359	Packs.dll	10028559		254	unmatched	0.19	low	features	shared i1, 1 rare
+006f0140	226	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0230	314	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f03b0	11	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f03c0	39	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f03f0	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0420	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0430	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0470	149	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0510	114	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0590	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f05c0	133	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0650	70	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f06a0	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f06b0	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f06f0	1439	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0c90	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0cc0	33	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f0cf0	1384	sound3d.dll	1004fa6c	ExecuteDlgInit	225	unmatched	0.20	low	features	shared i2, 1 rare
+006f1260	6	-					0.00	none	en-only	launcher (EN-only config dialog)
+006f1550	94	-					0.00	none	en-only	launcher (EN-only config dialog)
+00709ca0	120	APP.dll	101668b0	ModelState::ModelState	82	matched:model_state.cpp	0.55	medium	features	shared i2, 1 rare
+00709d20	39	-					0.00	none	en-only	unknown
+00709d50	39	-					0.00	none	en-only	unknown
+00709d80	211	APP.dll	101728c0	ModelInstance::ModelInstance	205	matched:anim_channels.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.97
+00709e60	200	-					0.00	none	en-only	unknown
+00709f30	483	APP.dll	101670e0	WorldRenderer::WorldRenderer	465	matched:world_ctor.cpp	0.96	high	features	shared i21, 14 rare
+0070a120	222	APP.dll	1017c8e0	ModelBank::ModelBank	224	matched:model_bank.cpp	0.87	high	features	shared i8, 2 rare
+0070a200	26	-					0.00	none	en-only	unknown
+0070a220	8	-					0.00	none	en-only	unknown
+0070a230	8	-					0.00	none	en-only	unknown
+0070a240	97	-					0.00	none	en-only	unknown
+0070a2b0	397	APP.dll	10164af0	ModelBank::AddLitModel	284	unmatched	0.85	high	features	shared i29, 9 rare
+0070a440	502	APP.dll	1017c570	ModelBank::Add	123	matched:model_bank.cpp	0.71	high	features	shared i10, 6 rare
+0070a640	189	-					0.00	none	en-only	unknown
+0070a700	239	-					0.00	none	en-only	unknown
+0070a7f0	1078	APP.dll	10172350	EffectManager::Start	1068	unmatched	0.80	high	features	shared i7, 0 rare
+0070ac30	231	-					0.00	none	en-only	unknown
+0070ad20	104	APP.dll	10161af0	AnimModel::AddTrackCKey	77	matched:anim_model.cpp	0.78	high	features	shared i3, 0 rare
+0070ad90	114	APP.dll	10161a90	AnimModel::AddTrackCKeyFlagged	88	matched:anim_model.cpp	0.82	high	features	shared i4, 1 rare
+0070ae10	169	APP.dll	10165140	ModelBank::AddFlarePoint	202	matched:model_bank.cpp	0.76	high	features	shared f2,i5, 3 rare
+0070aec0	165	-					0.00	none	en-only	unknown
+0070af70	103	APP.dll	10161b90	AnimModel::AddMotionKey	74	matched:anim_model.cpp	0.90	high	features	shared i4, 1 rare
+0070afe0	1711	APP.dll	10172cb0	TriangleBatch::AppendQuad	1855	unmatched	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.92
+0070b690	24	-					0.00	none	en-only	unknown
+0070b6b0	25	-					0.00	none	en-only	unknown
+0070b6d0	95	-					0.00	none	en-only	unknown
+0070b730	139	APP.dll	10162d50	AnimModel::SnapHeadingToSide	171	matched:model_params.cpp	0.66	high	features	shared f2,i1, 0 rare
+0070b8b0	205	-					0.00	none	en-only	unknown
+0070b980	374	APP.dll	10161cb0	AnimModel::SnapPosition	386	matched:model_params.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.97
+0070bb00	223	APP.dll	10161e40	AnimModel::SnapHeight	234	matched:model_params.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.95
+0070bbe0	27	-					0.00	none	en-only	unknown
+0070bc00	30	-					0.00	none	en-only	unknown
+0070bc20	13	APP.dll	1016a8d0	Camera_SetMode2	13	matched:camera.cpp	0.90	high	callgraph	neighbours 11 of 11 mapped agree, size ratio 1.00
+0070bc30	168	APP.dll	1016a8f0	Player_ResetMotion	137	matched:player_reset.cpp	0.39	medium	features	shared i1, 1 rare
+0070bce0	257	APP.dll	10188f10	SpriteBatch_AddQuad	159	matched:texture_mgr.cpp	0.64	high	callgraph	neighbours 3 of 5 mapped agree, size ratio 0.62
+0070bdf0	74	APP.dll	10188eb0	TriangleBatch::Queue	83	matched:texture_mgr.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.89
+0070be40	87	APP.dll	101733f0	TriangleBatch::Flush	92	matched:tri_batch.cpp	0.60	high	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.95
+0070bea0	149	APP.dll	10161c00	AnimModel::StepTrackA	166	matched:anim_model.cpp	0.89	high	features	shared i8, 0 rare
+0070bf40	171	APP.dll	10175e80	AnimModel::StepPath	160	matched:path_anim.cpp	0.94	high	features	shared i6, 0 rare
+0070bff0	51	APP.dll	10173450	TriangleBatch::SetTexture	48	matched:texture_mgr.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.94
+0070c030	125	-					0.00	none	en-only	unknown
+0070c0b0	106	APP.dll	10167390	WorldRenderer::StartFade	104	unmatched	0.99	high	features	shared i5, 3 rare
+0070c120	28249	APP.dll	1017cc90	WorldRenderer::RunScriptFrames	29886	unmatched	0.85	high	features	shared c3,f6,i256,s2, 157 rare; also inlines APP.dll:101687c0 APP.dll:10167400
+00712f90	13348	APP.dll	1016c3e0	Camera_Update	13569	unmatched	0.69	high	features	shared f27,i68,s2, 5 rare
+007163e0	13151	APP.dll	10184440	EffectManager::Step	12476	unmatched	0.58	medium	features	shared f11,i25, 1 rare
+00719750	348	APP.dll	10188580	EffectManager::Update	325	unmatched	0.65	high	features	shared f1,i3, 0 rare
+007198f0	3375	APP.dll	10165240	ModelBank::PrepareFrame	2986	unmatched	0.84	high	features	shared f8,i57, 24 rare
+0071a640	82	APP.dll	1016af50	Camera_StartMove	69	matched:camera.cpp	0.87	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.84
+0071a6a0	230	-					0.00	none	en-only	unknown
+0071a790	238	APP.dll	10163e90	AnimModel::IsClear	253	matched:model_params.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.94
+0071a880	241	APP.dll	10163f90	AnimModel::IsClearFlagged	256	matched:model_params.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.94
+0071a980	238	APP.dll	101640b0	AnimModel::IsClearAny	253	matched:model_params.cpp	0.90	high	callgraph	neighbours 36 of 36 mapped agree, size ratio 0.94
+0071aa70	256	APP.dll	101642c0	AnimModel::IsClearOfMap	252	matched:model_params.cpp	0.79	high	features	shared i5, 0 rare
+0071ab70	277	APP.dll	101641b0	AnimModel::IsClearOfMapLimited	255	matched:model_params.cpp	0.77	high	features	shared i5, 0 rare
+0071ac90	61	APP.dll	10161a20	AnimModel::ApplyMaterialSwap	58	matched:anim_model.cpp	0.63	high	features	shared i2, 0 rare
+0071acd0	125	-					0.00	none	en-only	unknown
+0071ad50	119	-					0.00	none	en-only	unknown
+0071add0	395	APP.dll	1016a2e0	Playback::Play	413	unmatched	0.84	high	features	shared i10, 0 rare
+0071af60	129	APP.dll	1017b0e0	AnimModel::PlayMotion	116	matched:texture_mgr.cpp	0.75	high	features	shared i3, 0 rare
+0071aff0	2568	APP.dll	1017b210	AnimModel::CloneModel	1944	matched:anim_clone.cpp	0.83	high	features	shared f5,i88,s7, 5 rare
+0071ba10	1363	APP.dll	101643c0	AnimModel_LiftProbes	1520	unmatched	0.75	high	features	shared f2,i17, 2 rare
+0071bf70	44	-					0.00	none	en-only	unknown
+0071bfa0	181	-					0.00	none	en-only	unknown
+0071c060	120	APP.dll	1016a020	Playback::BindModel	109	unmatched	0.79	high	features	shared i6, 1 rare
+0071c0e0	108	APP.dll	1016a090	Playback::BindNode	97	unmatched	0.73	high	features	shared i5, 1 rare
+0071c150	701	-					0.00	none	en-only	unknown
+0071c410	402	APP.dll	10169c60	TextureObject::Create	399	unmatched	0.92	high	features	shared i1,s2, 2 rare
+0071c5b0	385	APP.dll	10175c90	Texture_CreateFromPixels	476	unmatched	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.81
+0071c740	394	APP.dll	10175a90	Texture_CreateCopy	507	matched:texture_create.cpp	0.86	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.78
+0071c8d0	257	APP.dll	101614c0		259	unmatched	0.72	high	features	shared c2,i1,s2, 1 rare
+0071c9e0	143	-					0.00	none	en-only	unknown
+0071ca80	329	-					0.00	none	en-only	unknown
+0071cbe0	32	-					0.00	none	en-only	unknown
+0071cc00	65	-					0.00	none	en-only	unknown
+0071cc50	684	-					0.00	none	en-only	unknown
+0071cf00	55	APP.dll	10169c00	TextureFile_Release	60	matched:mesh_cache.cpp	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.92
+0071cf40	56	APP.dll	10169990	MeshCache_Release	61	matched:mesh_cache.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.92
+0071cf80	225	APP.dll	10165020	SortByDepth	272	unmatched	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.83
+0071d070	262	-					0.00	none	en-only	unknown
+0071d180	183	APP.dll	101616e0	Texture_DrawSpritePixels	141	matched:item_icon.cpp	0.70	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.77
+0071d240	2884	APP.dll	10163150	AnimModel::Draw	2845	matched:anim_model_draw.cpp	0.69	high	features	shared f3,i34, 1 rare
+0071dd90	16	APP.dll	10184160	WorldRenderer::DrawScreenOverlays	16	matched:world_caption.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 1.00
+0071dda0	280	-					0.00	none	en-only	unknown
+0071dec0	55	APP.dll	10172a40	TriangleBatch::DrawWith	57	matched:tri_batch.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.96
+0071df00	233	-					0.00	none	en-only	unknown
+0071e010	29707	APP.dll	10189530	EffectManager::DrawRecord	30969	unmatched	0.57	medium	features	shared f17,i119, 5 rare
+00725440	1357	APP.dll	10189340	EffectManager::DrawSpriteB	490	matched:effect_sprites.cpp	0.62	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.36
+00725990	1449	APP.dll	101890f0	EffectManager::DrawSpriteA	579	matched:effect_sprites.cpp	0.69	high	features	shared f5,i1, 0 rare
+00725f40	925	APP.dll	10190e30	EffectManager::Draw	884	unmatched	0.82	high	features	shared c1,f1,i4, 0 rare
+00726300	3486	APP.dll	10187520	EffectManager::DrawLight	3712	unmatched	0.70	high	features	shared f11,i11, 0 rare
+007270b0	2517	APP.dll	1016fb80	EffectManager::DrawLightKind22	2545	unmatched	0.73	high	features	shared f11,i21,s1, 5 rare
+00727a90	3500	APP.dll	10170580	EffectManager::DrawLightKind23	3679	unmatched	0.71	high	features	shared f11,i10, 0 rare
+00728860	3502	APP.dll	101713f0	EffectManager::DrawLightKind7	3674	unmatched	0.72	high	features	shared f11,i10, 0 rare
+00729610	588	APP.dll	10166520	ModelBank::DrawLensFlares	751	matched:model_bank.cpp	0.73	high	features	shared f6,i6, 3 rare
+00729870	2664	APP.dll	10167d90	WorldRenderer::DrawWorldPictures	2599	unmatched	0.79	high	features	shared f6,i20, 6 rare
+0072a2e0	320	APP.dll	101692c0	WorldRenderer::DrawOverlay	294	matched:world_frame.cpp	0.98	high	features	shared f2,i9, 3 rare
+0072a420	742	APP.dll	10165e00	ModelBank::DrawShadows	757	matched:model_bank.cpp	0.85	high	features	shared i21, 0 rare
+0072a710	1180	APP.dll	10166100	ModelBank::DrawShadowsInto	1055	matched:model_bank.cpp	0.83	high	features	shared i24, 1 rare
+0072abb0	2413	APP.dll	10167440	WorldRenderer::DrawPictures	2374	unmatched	0.78	high	features	shared f5,i15, 5 rare
+0072b530	2882	APP.dll	101687e0	WorldRenderer::DrawCaption	2777	matched:world_caption.cpp	0.90	high	features	shared f1,i13, 8 rare
+0072c0d0	190	-					0.00	none	en-only	unknown
+0072c190	243	sound3d.dll	10002d60		264	unmatched	0.69	high	features	shared c2,i1,s2, 1 rare
+0072c290	194	-					0.00	none	en-only	unknown
+0072c360	230	-					0.00	none	en-only	unknown
+0072c450	226	-					0.00	none	en-only	unknown
+0072c540	270	-					0.00	none	en-only	unknown
+0072c650	270	-					0.00	none	en-only	unknown
+0072c760	70	APP.dll	10161920	Texture_FindByName	71	matched:mmv_texreg.cpp	0.87	high	callgraph	neighbours 16 of 17 mapped agree, size ratio 0.99
+0072c7b0	242	-					0.00	none	en-only	unknown
+0072c8b0	268	-					0.00	none	en-only	unknown
+0072c9d0	195	APP.dll	1017cc10	WorldRenderer::Release	125	matched:world_frame.cpp	0.93	high	features	shared i8, 1 rare
+0072caa0	186	-					0.00	none	en-only	unknown
+0072cb60	707	-					0.00	none	en-only	unknown
+0072ce30	67	APP.dll	1017b1c0	AnimModel::M_1017b1c0	79	matched:texture_mgr.cpp	0.87	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.85
+0072ce80	1315	-					0.00	none	en-only	unknown
+0072d3b0	1709	-					0.00	none	en-only	unknown
+0072da60	365	-					0.00	none	en-only	unknown
+0072dbd0	253	-					0.00	none	en-only	unknown
+0072dcd0	422	-					0.00	none	en-only	unknown
+0072de80	422	-					0.00	none	en-only	unknown
+0072e030	310	-					0.00	none	en-only	unknown
+0072e170	253	-					0.00	none	en-only	unknown
+0072e270	198	-					0.00	none	en-only	unknown
+0072e340	93	-					0.00	none	en-only	unknown
+0072e3a0	78	-					0.00	none	en-only	unknown
+0072e3f0	78	-					0.00	none	en-only	unknown
+0072e440	78	-					0.00	none	en-only	unknown
+0072e490	78	-					0.00	none	en-only	unknown
+0072e4e0	78	-					0.00	none	en-only	unknown
+0072e530	78	-					0.00	none	en-only	unknown
+0072e580	78	-					0.00	none	en-only	unknown
+0072e5d0	216	-					0.00	none	en-only	unknown
+0072e6b0	286	-					0.00	none	en-only	unknown
+0072e7e0	78	-					0.00	none	en-only	unknown
+0072e830	59	-					0.00	none	en-only	unknown
+0072e870	78	-					0.00	none	en-only	unknown
+0072e8c0	34	-					0.00	none	en-only	unknown
+0072e8f0	78	-					0.00	none	en-only	unknown
+0072e940	78	-					0.00	none	en-only	unknown
+0072e990	134	-					0.00	none	en-only	unknown
+0072ea20	27	-					0.00	none	en-only	unknown
+0072ea40	166	-					0.00	none	en-only	unknown
+0072eb00	9873	-					0.00	none	en-only	unknown
+007311a0	1120	APP.dll	10164c10	ModelBank::LightDirection	906	unmatched	0.85	high	features	shared f5,i28, 20 rare
+00731600	874	APP.dll	1017c5f0	ModelBank::LightForRoot	750	unmatched	0.85	high	features	shared f5,i24, 16 rare
+00731970	528	APP.dll	101693f0	NodeExtra::AnimatedMatrix	557	matched:node_extra.cpp	0.90	high	callgraph	neighbours 13 of 13 mapped agree, size ratio 0.95
+00731b80	129	-					0.00	none	en-only	unknown
+00731c10	341	-					0.00	none	en-only	unknown
+00731db0	264	-					0.00	none	en-only	unknown
+00731ec0	649	-					0.00	none	en-only	unknown
+00732150	748	-					0.00	none	en-only	unknown
+00732440	500	-					0.00	none	en-only	unknown
+00732640	589	-					0.00	none	en-only	unknown
+00732890	2152	APP.dll	101af260	Vec4::DistanceToSegment	243	matched:vec4.cpp	0.78	high	callgraph	neighbours 4 of 5 mapped agree, size ratio 0.11
+00733100	168	APP.dll	10162f50	AnimModel::ScreenPosition	173	matched:model_params.cpp	0.82	high	features	shared f5,i1, 0 rare
+007331b0	589	-					0.00	none	en-only	unknown
+00733400	156	-					0.00	none	en-only	unknown
+007334a0	18	-					0.00	none	en-only	unknown
+007334c0	3558	-					0.00	none	en-only	unknown
+007342b0	133	-					0.00	none	en-only	unknown
+00734340	85	-					0.00	none	en-only	unknown
+007343a0	1002	APP.dll	1017c160	ModelBank::CreateTextures	1037	matched:model_bank.cpp	0.98	high	features	shared f1,i16,s17, 31 rare
+00734790	49	APP.dll	10161970	Render_InitDevice	15	matched:mmv_texreg.cpp	0.61	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.31
+007347d0	25	-					0.00	none	en-only	unknown
+007347f0	17	-					0.00	none	en-only	unknown
+00734840	713	APP.dll	1017c9c0	WorldRenderer::Bind	581	matched:world_ctor.cpp	0.75	high	features	shared f1,i37,s1, 18 rare
+00734b20	37	APP.dll	10169720		40	unmatched	0.40	medium	features	shared i1, 1 rare
+00734b50	309	APP.dll	101649c0		213	unmatched	1.00	high	features	shared i30, 25 rare
+00734cc0	23	-					0.00	none	en-only	unknown
+00734ce0	318	APP.dll	10184170	EffectManager::Reset	276	matched:char_effects.cpp	0.52	medium	features	shared i5, 0 rare
+00734e60	613	APP.dll	101842a0	EffectManager::Init	375	matched:char_effects.cpp	0.58	medium	features	shared i6, 0 rare
+00735100	78	-					0.00	none	en-only	unknown
+00735170	262	-					0.00	none	en-only	unknown
+00735280	256	-					0.00	none	en-only	unknown
+00735390	211	-					0.00	none	en-only	unknown
+00735470	105	-					0.00	none	en-only	unknown
+007354e0	118	-					0.00	none	en-only	unknown
+007355d0	156	-					0.00	none	en-only	unknown
+00735670	58	-					0.00	none	en-only	unknown
+007356b0	76	APP.dll	1017b160	AnimModel::M_1017b160	81	matched:scene_misc.cpp	0.71	high	features	shared i3, 0 rare
+00735700	105	-					0.00	none	en-only	unknown
+00735780	2609	APP.dll	1017b9b0	AnimModel::LoadFile	1961	matched:anim_clone.cpp	0.83	high	features	shared f5,i88,s7, 5 rare
+007361c0	2006	APP.dll	101886d0	EffectManager::LoadDefinitions	2012	matched:effect_definition_loader.cpp	0.73	high	features	shared c1,i10, 2 rare
+007369a0	1463	APP.dll	10166950	WorldRenderer::LoadCharacter	1470	matched:world_ctor.cpp	0.91	high	features	shared c1,f1,i79,s1, 42 rare
+00736f60	2897	APP.dll	10174ce0	Texture_LoadIti	3480	unmatched	0.58	medium	features	shared i12,s4, 5 rare
+00737ac0	5290	APP.dll	10173550	Texture_LoadBmp	5900	unmatched	0.57	medium	features	shared c2,i4,s14, 13 rare
+00738f80	128	APP.dll	1017aeb0	AnimModel::LoadModel	129	matched:texture_mgr.cpp	0.81	high	features	shared i4,s1, 0 rare
+00739000	144	-					0.00	none	en-only	unknown
+00739090	106	APP.dll	1016fa40	Effect_LoadModel	107	matched:scene_misc.cpp	0.47	medium	features	shared i2, 0 rare
+00739100	13	APP.dll	1016a8c0	Camera_SetMode1	13	matched:camera.cpp	0.60	high	callgraph	neighbours 1 of 1 mapped agree, size ratio 1.00
+00739110	139	APP.dll	10162ea0	AnimModel::FaceAway	120	matched:model_params.cpp	0.46	medium	features	shared i2, 0 rare
+007391a0	167	APP.dll	10162e00	AnimModel::FaceAwayFrom	150	matched:model_params.cpp	0.60	medium	features	shared i2, 0 rare
+00739250	441	APP.dll	10166f20	WorldRenderer::SetModelState	440	matched:world_model_state.cpp	0.90	high	features	shared i13, 7 rare
+00739410	1983	-					0.00	none	en-only	unknown
+00739be0	18040	APP.dll	10175f20	AnimModel::MoveWithCollisions	16619	unmatched	0.72	high	features	shared f22,i89,s3, 18 rare
+0073e270	166	-					0.00	none	en-only	unknown
+0073e320	953	-					0.00	none	en-only	unknown
+0073e6e0	1771	APP.dll	1016b6c0	Camera_TrackPathFrame	1833	unmatched	0.88	high	features	shared f3,i3, 2 rare
+0073ede0	298	APP.dll	1016f900	EffectDefs_Allocate	307	matched:effect_defs.cpp	0.79	high	features	shared i5,s1, 1 rare
+0073ef10	128	-					0.00	none	en-only	unknown
+0073efb0	62	-					0.00	none	en-only	unknown
+0073eff0	1092	APP.dll	1016a480	Playback_Advance	1045	unmatched	0.91	high	features	shared i14, 2 rare
+0073f440	93	APP.dll	10189080	WorldRenderer::AdvanceFrame	98	matched:world_frame.cpp	0.79	high	features	shared i3, 2 rare
+0073f580	464	-					0.00	none	en-only	unknown
+0073f750	25	-					0.00	none	en-only	unknown
+0073f770	116	-					0.00	none	en-only	unknown
+0073f7f0	161	APP.dll	10163000	AnimModel::PushMotionSpeed	169	matched:model_params.cpp	0.83	high	features	shared f3,i5, 0 rare
+0073f8a0	145	APP.dll	101630b0	AnimModel::AddMotionSpeed	157	matched:model_params.cpp	0.80	high	features	shared f2,i5, 0 rare
+0073f940	66	APP.dll	101628b0	AnimModel::SetPendingAction	55	matched:anim_model.cpp	0.93	high	features	shared i5, 2 rare
+0073f990	59	APP.dll	101627d0	AnimModel::SetMoveStep	47	matched:model_params.cpp	0.72	high	features	shared i4, 0 rare
+0073f9d0	237	APP.dll	101628f0	AnimModel::Push	188	matched:model_params.cpp	0.87	high	features	shared f4,i6,s1, 1 rare
+0073fac0	148	APP.dll	10162800	AnimModel::MoveTowards	172	matched:model_params.cpp	0.87	high	features	shared f2,i7, 1 rare
+0073fb80	68	-					0.00	none	en-only	unknown
+0073fbd0	3998	APP.dll	1017a010	AnimModel::UpdateFrame	3719	unmatched	0.90	high	features	shared f12,i64, 15 rare
+00740bb0	56	-					0.00	none	en-only	unknown
+00740c30	16	APP.dll	10175e70	TextureManager::Shutdown	16	matched:texture_mgr.cpp	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 1.00
+00740c40	325	APP.dll	10162c50	AnimModel::Unload	242	matched:anim_unload.cpp	0.94	high	features	shared i15, 2 rare
+00740d90	50	APP.dll	1016fab0	EffectNodes_ReleaseAll	50	matched:camera.cpp	0.61	high	callgraph	neighbours 2 of 3 mapped agree, size ratio 1.00
+00740dd0	63	-					0.00	none	en-only	unknown
+00740e20	105	APP.dll	10164aa0	ModelBank::Reset	77	matched:model_bank.cpp	0.82	high	features	shared i4, 2 rare
+00740ea0	311	APP.dll	10169e40	MeshInstance::FreeImage	297	matched:mesh_cache.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.95
+00740fe0	328	-					0.00	none	en-only	unknown
+00741130	364	-					0.00	none	en-only	unknown
+007412b0	178	APP.dll	10169f90	Playback::Init	136	matched:model_state.cpp	0.74	high	features	shared i5, 0 rare
+00741370	121	APP.dll	10166810	NodeSkin::Clear	83	matched:scene_misc.cpp	0.75	high	features	shared i6, 0 rare
+007413f0	1342	APP.dll	10161f80	AnimModel::ResetState	1027	matched:anim_reset.cpp	0.86	high	features	shared i80, 3 rare
+00741930	17	-					0.00	none	en-only	unknown
+00741950	72	APP.dll	10166870	ViewLimits::Reset	52	matched:model_misc.cpp	0.53	medium	features	shared i2, 1 rare
+007419a0	314	APP.dll	10169660	NodeExtra::Init	185	matched:model_misc.cpp	0.52	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.59
+00741ae0	27	APP.dll	10172aa0	TriangleBatch::Reset	21	matched:texture_mgr.cpp	0.39	medium	callgraph	neighbours 1 of 2 mapped agree, size ratio 0.78
+00741b40	134	APP.dll	10162390	AnimModel::UpdateCollision	138	matched:texture_mgr.cpp	0.70	high	features	shared i4, 0 rare
+00741bd0	58	APP.dll	10161a60	AnimModel::ClearTrackC	46	matched:anim_model.cpp	0.82	high	features	shared i6, 0 rare
+00741c10	58	APP.dll	10161b60	AnimModel::ClearMotionKeys	46	matched:anim_model.cpp	0.81	high	features	shared i6, 0 rare
+00741c50	898	APP.dll	1016a980	Camera_Reset	718	matched:camera_reset.cpp	0.80	high	features	shared f2,i3, 1 rare
+00741fe0	58	APP.dll	10161f30	AnimModel::ClearTrackB	46	matched:anim_model.cpp	0.81	high	features	shared i6, 0 rare
+00742020	127	-					0.00	none	en-only	unknown
+007420b0	222	-					0.00	none	en-only	unknown
+00742190	344	-					0.00	none	en-only	unknown
+007422f0	411	-					0.00	none	en-only	unknown
+00742490	858	-					0.00	none	en-only	unknown
+007427f0	99	-					0.00	none	en-only	unknown
+00742860	769	-					0.00	none	en-only	unknown
+00742b70	1856	-					0.00	none	en-only	unknown
+007432d0	424	-					0.00	none	en-only	unknown
+00743480	830	-					0.00	none	en-only	unknown
+007437e0	261	APP.dll	1016a100	Playback::SetLayer	280	unmatched	0.79	high	features	shared i18, 9 rare
+007438f0	98	APP.dll	1017afb0	AnimModel::SetLayerOffset	97	matched:scene_misc.cpp	0.65	high	features	shared i2, 0 rare
+00743960	27	APP.dll	10161b40	AnimModel::SetTrackCOptions	25	matched:anim_model.cpp	0.57	medium	features	shared i2, 0 rare
+00743980	57	APP.dll	10166910	CharacterBank::Assign	56	matched:model_misc.cpp	0.88	high	features	shared i5, 1 rare
+007439c0	61	APP.dll	1016ac50	Camera_LookAt	59	matched:camera.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.97
+00743a00	4157	-					0.00	none	en-only	unknown
+00744a40	64	-					0.00	none	en-only	unknown
+00744a80	958	-					0.00	none	en-only	unknown
+00744e40	665	APP.dll	1016ac90	Camera_CollectPaths	687	matched:camera_path_select.cpp	0.82	high	features	shared c1,i6,s2, 3 rare
+007450e0	305	-					0.00	none	en-only	unknown
+00745220	562	-					0.00	none	en-only	unknown
+00745460	57	-					0.00	none	en-only	unknown
+007454a0	109	APP.dll	1017af40	AnimModel::SetPlayback	107	matched:scene_misc.cpp	0.66	high	features	shared i2, 0 rare
+00745510	53	-					0.00	none	en-only	unknown
+00745550	52	-					0.00	none	en-only	unknown
+00745590	109	-					0.00	none	en-only	unknown
+00745600	121	APP.dll	1016afa0	ColourEffect_Set	99	matched:colour_fades.cpp	0.86	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.82
+00745680	407	APP.dll	1016b050	Camera_SelectPath	399	unmatched	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.98
+00745820	546	-					0.00	none	en-only	unknown
+00745a50	67	-					0.00	none	en-only	unknown
+00745aa0	74	-					0.00	none	en-only	unknown
+00745af0	34	-					0.00	none	en-only	unknown
+00745b20	38	-					0.00	none	en-only	unknown
+00745b60	152	APP.dll	10164fa0	ModelBank::CollectLights	120	matched:model_bank.cpp	0.90	high	features	shared i1,s2, 2 rare
+00745c00	27	APP.dll	10161be0	AnimModel::SetMotionOptions	25	matched:anim_model.cpp	0.57	medium	features	shared i2, 0 rare
+00745c20	54	-					0.00	none	en-only	unknown
+00745c60	715	APP.dll	10162610	AnimModel::SetPosition	436	matched:model_place.cpp	0.82	high	features	shared i25, 0 rare
+00745f30	755	APP.dll	10162420	AnimModel::Teleport	494	matched:model_place.cpp	0.82	high	features	shared i26, 0 rare
+00746230	131	-					0.00	none	en-only	unknown
+007462c0	131	-					0.00	none	en-only	unknown
+00746350	305	-					0.00	none	en-only	unknown
+00746490	63	APP.dll	1016a260	LayerTable::SetOffset	60	matched:mesh_cache.cpp	0.56	medium	features	shared i2, 1 rare
+007464d0	118	-					0.00	none	en-only	unknown
+00746550	21	APP.dll	10169f70	TextureObject::UpdateImage	21	matched:mesh_cache.cpp	0.84	high	callgraph	neighbours 7 of 8 mapped agree, size ratio 1.00
+00746570	21	-					0.00	none	en-only	unknown
+00746590	86	-					0.00	none	en-only	unknown
+007465f0	137	APP.dll	1016bdf0	Camera_Orbit	132	matched:camera_orbit.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.96
+00746680	319	-					0.00	none	en-only	unknown
+007467c0	254	APP.dll	10163d60	AnimModel::Hold	257	matched:model_params.cpp	0.84	high	features	shared f1,i6,s1, 0 rare
+007468c0	229	APP.dll	10163c70	AnimModel::HoldAtSpine	230	matched:model_params.cpp	0.82	high	features	shared f1,i7,s1, 0 rare
+007469b0	27	APP.dll	10161f60	AnimModel::SetTrackBOptions	25	matched:anim_model.cpp	0.55	medium	features	shared i2, 0 rare
+007469d0	62	APP.dll	101610b0	Texture_BindStage1	54	matched:mmv_texreg.cpp	0.72	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.87
+00746a10	62	APP.dll	10161070	Texture_BindStage0	54	matched:mmv_texreg.cpp	0.87	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.87
+00746a50	322	-					0.00	none	en-only	unknown
+00746ba0	21	-					0.00	none	en-only	unknown
+00746bc0	21	APP.dll	10163e70	ModelObject::SetValue231c	18	matched:model_misc.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.86
+00746be0	43	APP.dll	1016b230	Caption_SetTitle	36	matched:camera.cpp	0.85	high	callgraph	neighbours 15 of 17 mapped agree, size ratio 0.84
+00746c10	71	-					0.00	none	en-only	unknown
+00746c60	273	-					0.00	none	en-only	unknown
+00746d80	634	-					0.00	none	en-only	unknown
+00747010	662	-					0.00	none	en-only	unknown
+007472b0	997	-					0.00	none	en-only	unknown
+007476a0	132	APP.dll	1016c340	SnapAngle	150	matched:vec_math.cpp	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.88
+00747730	361	-					0.00	none	en-only	unknown
+007478a0	129	APP.dll	10189000	WorldRenderer::Seek	127	matched:world_frame.cpp	0.85	high	features	shared i3, 2 rare
+00747950	245	APP.dll	10172260	EffectManager::RemoveChildren	231	matched:char_effects.cpp	0.61	high	features	shared i2, 0 rare
+00747a50	243	APP.dll	10188490	EffectManager::RemoveOfType	237	matched:char_effects.cpp	0.70	high	features	shared i3, 0 rare
+00747b50	237	APP.dll	101883b0	EffectManager::RemoveOwnedBy	221	unmatched	0.61	high	features	shared i2, 0 rare
+00747c40	33	-					0.00	none	en-only	unknown
+00747c70	79	APP.dll	10188fb0	Texture_ReloadMissing	68	matched:texture_mgr.cpp	0.59	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.86
+00747cc0	84	-					0.00	none	en-only	unknown
+00747d20	801	-					0.00	none	en-only	unknown
+00748050	888	-					0.00	none	en-only	unknown
+007483d0	156	-					0.00	none	en-only	unknown
+00748470	102	APP.dll	10174c70	Texture_Release	97	matched:texture_mgr.cpp	0.87	high	callgraph	neighbours 15 of 16 mapped agree, size ratio 0.95
+007484e0	133	-					0.00	none	en-only	unknown
+007485b0	13	APP.dll	1016a8e0	Camera_SetModeFollow	13	matched:camera.cpp	0.90	high	callgraph	neighbours 8 of 8 mapped agree, size ratio 1.00
+007485c0	348	-					0.00	none	en-only	unknown
+00748740	790	APP.dll	1016be80	Camera_LiftOverGround	1139	matched:camera_lift.cpp	0.63	high	features	shared f4,i2, 0 rare
+00748a60	83	-					0.00	none	en-only	unknown
+00748ac0	83	-					0.00	none	en-only	unknown
+00748b20	175	-					0.00	none	en-only	unknown
+00748bd0	193	-					0.00	none	en-only	unknown
+00748ca0	132	-					0.00	none	en-only	unknown
+00748d30	135	-					0.00	none	en-only	unknown
+00748e40	335	-					0.00	none	en-only	unknown
+00748fa0	273	-					0.00	none	en-only	unknown
+007490c0	285	-					0.00	none	en-only	unknown
+007491e0	144	-					0.00	none	en-only	unknown
+00749270	30	-					0.00	none	en-only	unknown
+00749290	30	-					0.00	none	en-only	unknown
+007492b0	9	-					0.00	none	en-only	unknown
+007492c0	9	-					0.00	none	en-only	unknown
+007492d0	390	-					0.00	none	en-only	unknown
+00749460	396	-					0.00	none	en-only	unknown
+007495f0	216	APP.dll	1019ebc0	Node_Construct	218	matched:node_ctor.cpp	0.87	high	features	shared i10, 0 rare
+007496d0	122	APP.dll	10191480	NodeBody::~NodeBody	125	matched:node_dtor.cpp	0.67	high	features	shared c1,i4, 1 rare
+00749750	61	-					0.00	none	en-only	unknown
+00749790	304	APP.dll	10199880		275	unmatched	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.90
+007498c0	56	APP.dll	10191d90	Node::RestoreFlags	60	matched:scene_node.cpp	0.58	medium	features	shared i3, 0 rare
+00749900	141	APP.dll	1019bd10	Node::CopyPlugData	157	matched:scene_node.cpp	0.62	high	features	shared i2,s1, 0 rare
+00749990	56	APP.dll	10191e10	Node::RestoreRenderMode	60	matched:scene_node.cpp	0.60	medium	features	shared i3, 1 rare
+007499d0	310	-					0.00	none	en-only	unknown
+00749b10	250	APP.dll	10199be0	VisNode::UpdateVisibleCells	224	unmatched	0.90	high	callgraph	neighbours 12 of 12 mapped agree, size ratio 0.90
+00749c20	470	-					0.00	none	en-only	unknown
+00749e00	591	APP.dll	1019b630	Node::BlendFrames	604	matched:scene_node.cpp	0.80	high	features	shared c2,i5,s2, 0 rare
+0074a050	698	APP.dll	101a2f30	Node_RemoveChild	195	matched:scene_node.cpp	0.57	medium	features	shared i4, 1 rare
+0074a310	84	-					0.00	none	en-only	unknown
+0074a370	143	APP.dll	1019e830	Node::ReplaceMaterial	142	matched:scene_node.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.99
+0074a400	232	APP.dll	1019e8c0	Node_SetMaterialValue	217	matched:scene_node.cpp	0.67	high	features	shared c1,i3, 0 rare
+0074a4f0	33	APP.dll	10199860	RenderQueue_Clear	18	matched:scene_node.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.55
+0074a530	5919	APP.dll	1019f340	Node::CollideProbesWithMesh	6560	unmatched	0.67	high	features	shared f3,i33, 3 rare
+0074bc60	980	-					0.00	none	en-only	unknown
+0074c040	2371	APP.dll	101a0cf0	Node::SphereHitsMesh	2380	unmatched	0.67	high	features	shared f2,i10, 0 rare
+0074c990	3089	APP.dll	101a1640	Node::Query	3132	unmatched	0.61	high	features	shared f2,i13, 0 rare
+0074d5b0	1869	APP.dll	10193d10	Node_ShadeWaveCopy	1600	unmatched	0.93	high	features	shared f6,i14, 4 rare
+0074dd00	183	APP.dll	101abb70	Node::CreateChildCopies	179	matched:scene_node.cpp	0.88	high	features	shared i7,s1, 1 rare
+0074ddc0	723	APP.dll	1019b350	Node::CopyMesh	728	matched:scene_node.cpp	0.90	high	features	shared c1,i4,s4, 3 rare
+0074e0a0	217	-					0.00	none	en-only	unknown
+0074e180	1212	APP.dll	1019b890	Node::CopyAnimation	1040	matched:scene_node.cpp	0.80	high	features	shared i9,s3, 1 rare
+0074e640	1376	APP.dll	101a53b0	Node::Clone	1174	matched:scene_node.cpp	0.86	high	features	shared i34,s2, 3 rare
+0074ebb0	304	APP.dll	101abc30	Node::AddChild	292	matched:scene_node.cpp	0.94	high	features	shared i6,s2, 2 rare
+0074ece0	1154	APP.dll	1019bdd0	Node::ProjectPlanarUVs	1032	unmatched	0.73	high	features	shared f1,i1, 0 rare
+0074f170	87	-					0.00	none	en-only	unknown
+0074f1d0	321	-					0.00	none	en-only	unknown
+0074f320	154	-					0.00	none	en-only	unknown
+0074f3c0	446	APP.dll	1019c3a0	Node::ResetVertexColours	434	matched:node_vertex_colours.cpp	0.69	high	features	shared f1,i3, 0 rare
+0074f580	1036	APP.dll	101a82d0	Node::BuildMesh	1153	unmatched	0.63	high	features	shared c1,i10,s2, 1 rare
+0074f9a0	829	-					0.00	none	en-only	unknown
+0074fcf0	1026	APP.dll	1019e120	Node::BuildCollisionSpheres	1246	unmatched	0.74	high	features	shared f1,i3,s1, 1 rare
+00750100	103	APP.dll	101948c0	Node::ClearState4000	43	matched:scene_node.cpp	0.43	medium	features	shared i2, 0 rare
+007501a0	99	APP.dll	10194870	Node::RestoreState2000	68	matched:scene_node.cpp	0.64	high	features	shared i3, 1 rare
+00750210	94	APP.dll	10194830	Node::RestoreState400000	62	matched:scene_node.cpp	0.65	high	features	shared i3, 1 rare
+00750270	94	APP.dll	101947f0	Node::RestoreState1000	60	matched:scene_node.cpp	0.62	high	features	shared i3, 1 rare
+007502d0	45	-					0.00	none	en-only	unknown
+00750300	23	-					0.00	none	en-only	unknown
+00750320	72	APP.dll	1019b1b0	Node::ClearFlags	82	matched:scene_node.cpp	0.90	high	callgraph	neighbours 28 of 28 mapped agree, size ratio 0.88
+00750370	211	APP.dll	1019bca0	Node::ReleaseTexturesExcept	109	matched:scene_node.cpp	0.51	medium	features	shared i3, 0 rare
+00750450	910	APP.dll	1013eda0	Object::~Object	1	matched:engine_base.cpp	0.24	low	callgraph	neighbours 13 of 178 mapped agree, size ratio 0.00
+007507e0	391	APP.dll	10191280	Node::ReleaseUniqueMeshData	368	matched:scene_node.cpp	0.58	medium	features	shared i3, 0 rare
+00750970	38	-					0.00	none	en-only	unknown
+007509a0	38	-					0.00	none	en-only	unknown
+007509d0	38	-					0.00	none	en-only	unknown
+00750a00	73	APP.dll	101ab980	Node::FreeExtraIndexLists	75	matched:scene_node.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.97
+00750a50	2216	APP.dll	10199e20	Node::QueueDraw	2168	unmatched	0.83	high	features	shared c1,f2,i35,s1, 0 rare
+00751300	547	APP.dll	101999a0	DrawList_DrawPass	571	matched:draw_list.cpp	0.84	high	features	shared i9, 0 rare
+00751530	2469	-					0.00	none	en-only	unknown
+00751ee0	684	APP.dll	101995a0	Node::Draw	584	matched:node_draw.cpp	0.81	high	features	shared i8, 0 rare
+00752190	1456	APP.dll	101a29e0	Node::DrawShadow	1359	matched:shadow_texture.cpp	0.58	medium	features	shared f4,i10, 4 rare
+00752740	361	-					0.00	none	en-only	unknown
+007528b0	2320	APP.dll	1019a6b0	Node::QueueDrawFading	2276	unmatched	0.84	high	features	shared c1,f3,i36,s1, 1 rare
+007531d0	109	APP.dll	10191a30	Node::FindRecursive	112	matched:scene_node.cpp	0.57	medium	features	shared c1,i2, 0 rare
+00753240	126	APP.dll	10191c30	Node::FindPrefixRecursive	130	matched:scene_node.cpp	0.56	medium	features	shared c1,i2, 0 rare
+007532c0	42	APP.dll	1019ece0	Node::Find	41	matched:scene_node.cpp	0.88	high	callgraph	neighbours 114 of 119 mapped agree, size ratio 0.98
+007532f0	63	-					0.00	none	en-only	unknown
+00753330	98	-					0.00	none	en-only	unknown
+007533a0	9	-					0.00	none	en-only	unknown
+007533b0	111	-					0.00	none	en-only	unknown
+00753420	131	APP.dll	10191cc0	Node::FindByFlags	130	matched:scene_node.cpp	0.90	high	callgraph	neighbours 11 of 11 mapped agree, size ratio 0.99
+007534b0	174	-					0.00	none	en-only	unknown
+00753560	38	-					0.00	none	en-only	unknown
+00753590	195	APP.dll	10191aa0	Node::FindRecursiveStripped	188	matched:scene_node.cpp	0.68	high	features	shared c1,i3, 0 rare
+00753660	209	APP.dll	10191b60	Node::FindPrefixRecursiveStripped	204	matched:scene_node.cpp	0.69	high	features	shared c1,i3, 0 rare
+00753740	42	APP.dll	1019ed10	Node::Find2	41	matched:scene_node.cpp	0.90	high	callgraph	neighbours 9 of 9 mapped agree, size ratio 0.98
+00753770	168	-					0.00	none	en-only	unknown
+00753820	507	APP.dll	10199380	Node::FindBone	526	unmatched	0.73	high	features	shared i7, 0 rare
+00753a20	874	APP.dll	101a23b0	Node::BoneMatrix	299	matched:node_bones.cpp	0.77	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.34
+00753d90	603	-					0.00	none	en-only	unknown
+00753ff0	298	-					0.00	none	en-only	unknown
+00754120	81	APP.dll	10199340	Node::GetLastFrame	64	matched:scene_node.cpp	0.86	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.79
+00754180	43	APP.dll	10199310	Node::GetLinkedRoot	38	matched:scene_node.cpp	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.88
+007541b0	31	APP.dll	101992f0	Node::Root	29	matched:scene_node.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.94
+007541d0	118	-					0.00	none	en-only	unknown
+00754250	554	APP.dll	10191fd0	Node::BoxesOverlap	549	matched:box_overlap.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.99
+00754480	948	APP.dll	10192200	Node::BoxCylinderOverlap	796	matched:box_overlap.cpp	0.53	medium	features	shared f2,i1, 0 rare
+00754840	1491	APP.dll	10192520	Node::BoxSphereOverlap	1233	unmatched	0.59	medium	features	shared f2,i1, 0 rare
+00754e20	650	APP.dll	10192a00	Node::CylindersOverlap	649	matched:box_overlap.cpp	0.66	high	features	shared f2, 0 rare
+007550b0	1224	APP.dll	10192c90	Node::CylinderSphereOverlap	975	unmatched	0.66	high	features	shared f3, 0 rare
+00755580	202	APP.dll	10193060	Node::SpheresOverlap	221	matched:node_spheres.cpp	0.80	high	callgraph	neighbours 4 of 5 mapped agree, size ratio 0.91
+00755650	89	APP.dll	10194ee0	Node::CycleChild	91	matched:scene_node.cpp	0.89	high	features	shared i3, 0 rare
+007556b0	17	-					0.00	none	en-only	unknown
+007556d0	64	-					0.00	none	en-only	unknown
+00755710	61	-					0.00	none	en-only	unknown
+00755750	1009	APP.dll	1019dca0	Node::IntersectTriangle	1141	matched:node_triangle.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.88
+00755b50	907	-					0.00	none	en-only	unknown
+00755ef0	9700	APP.dll	101a58a0	Node::ParseChunks	10762	unmatched	0.85	high	features	shared c3,f2,i44,s44, 47 rare
+007584f0	316	APP.dll	101abe30	Node::LoadIt3	468	matched:model_prescan.cpp	0.61	high	features	shared c2,i1,s2, 3 rare
+00758630	382	APP.dll	101ac010	Node::Load	387	matched:node_cache.cpp	0.80	high	features	shared c1,i3,s1, 1 rare
+007587c0	2349	APP.dll	101a4a60	Node::ScanChunks	2157	unmatched	0.80	high	features	shared c2,f2,i11,s12, 12 rare
+00759100	149	APP.dll	101abd60	Model_LoadIt3Alt	198	matched:model_prescan.cpp	0.37	medium	features	shared s1, 1 rare
+007591a0	341	-					0.00	none	en-only	unknown
+00759300	430	APP.dll	10194360	Camera_SetMatrices	366	matched:camera_setup.cpp	0.68	high	features	shared i7, 0 rare
+007594b0	1430	-					0.00	none	en-only	unknown
+00759a60	104	-					0.00	none	en-only	unknown
+00759ad0	2704	APP.dll	10193140	Node::CollideModel	2922	unmatched	0.65	high	features	shared f1,i28, 4 rare
+0075a560	251	-					0.00	none	en-only	unknown
+0075a660	257	APP.dll	10191ec0	Node::CollectNearSegment	263	matched:scene_node.cpp	0.73	high	features	shared f1,i5, 0 rare
+0075a770	390	APP.dll	1019f210	Node::FindTouchingSphere	290	matched:node_spheres.cpp	0.73	high	features	shared f1,i5, 0 rare
+0075a900	112	APP.dll	1019d600	Node::MarkSpecialPass	114	matched:scene_node.cpp	0.67	high	features	shared i5, 0 rare
+0075a970	180	APP.dll	1019d6a0	Node::ClearSpecialPassOnLinks	163	matched:scene_node.cpp	0.81	high	features	shared i6, 1 rare
+0075aa30	28	APP.dll	1019d680	Node::ClearSpecialPassUp	28	matched:scene_node.cpp	0.54	medium	features	shared i2, 1 rare
+0075aa50	19	APP.dll	101a8760	Node::RunSpecialPass	19	matched:scene_node.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 1.00
+0075aa70	405	APP.dll	1019d750	Node::CollectStatic	398	matched:scene_node.cpp	0.96	high	features	shared f1,i5,s1, 2 rare
+0075ac10	277	-					0.00	none	en-only	unknown
+0075ad30	3040	APP.dll	1019c8d0	Node::SplitIntoCells	3342	unmatched	0.69	high	features	shared f5,i7,s2, 5 rare
+0075b920	522	APP.dll	1019e610	Node::WeldVertices	526	matched:node_sort_packs.cpp	0.61	high	features	shared s1, 1 rare
+0075bb30	943	APP.dll	1019d8e0	Node::ComputeBounds	954	unmatched	0.72	high	features	shared i13, 0 rare
+0075bef0	606	APP.dll	1019c690	Node::SortPacks	561	matched:node_sort_packs.cpp	0.74	high	features	shared f1,i1,s1, 1 rare
+0075c160	1012	-					0.00	none	en-only	unknown
+0075c560	1203	-					0.00	none	en-only	unknown
+0075ca20	1761	APP.dll	101a8780	Node::SegmentHitsMesh	1751	matched:node_mesh_hits.cpp	0.60	high	features	shared f2,i12, 0 rare
+0075d110	2071	-					0.00	none	en-only	unknown
+0075d930	503	-					0.00	none	en-only	unknown
+0075db30	2104	APP.dll	101a8e60	Node::Collide	2060	unmatched	0.60	high	features	shared f2,i15, 0 rare
+0075e370	1757	APP.dll	1014d850	TextureObject::DrawFillAlt	1429	unmatched	0.44	medium	features	shared i16, 0 rare
+0075ea50	1837	-					0.00	none	en-only	unknown
+0075f180	1420	-					0.00	none	en-only	unknown
+0075f710	1990	APP.dll	101ab3e0	Node::SegmentHitsBox	1437	matched:node_box_hit.cpp	0.52	medium	features	shared i15, 0 rare
+0075fee0	2732	-					0.00	none	en-only	unknown
+007609a0	2539	APP.dll	101aaa20	Node::CastSegment	2483	unmatched	0.61	high	features	shared f2,i16, 0 rare
+00761390	2461	APP.dll	101aa080	Node::CastSegment2	2442	unmatched	0.61	high	features	shared f2,i16, 0 rare
+00761d30	2516	APP.dll	101a9670	Node::RayCast	2574	unmatched	0.58	medium	features	shared f2,i16, 0 rare
+00762710	2277	-					0.00	none	en-only	unknown
+00763000	1943	-					0.00	none	en-only	unknown
+007637a0	1721	-					0.00	none	en-only	unknown
+00763e70	19925	APP.dll	10194f40	Node::UpdateWorldWithIk	17287	unmatched	0.67	high	features	shared c1,f11,i92, 2 rare
+00768c70	95	APP.dll	101a2370	Node::StartProximityPass	54	matched:scene_node.cpp	0.90	high	callgraph	neighbours 16 of 16 mapped agree, size ratio 0.57
+00768cd0	594	APP.dll	10194c60	Node::UpdateWorld	629	unmatched	0.81	high	features	shared i10, 0 rare
+00768f30	1147	-					0.00	none	en-only	unknown
+007693b0	1319	APP.dll	101a24e0	Node::RenderShadowTexture	1267	matched:shadow_texture.cpp	0.60	high	features	shared f4,i11, 7 rare
+007698e0	637	APP.dll	1019e9a0	Node::Release	539	matched:scene_node.cpp	0.84	high	features	shared c1,i9, 0 rare
+00769b60	711	APP.dll	101a5860	NodePool_ReleaseAll	50	matched:node_pool.cpp	0.86	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.07
+00769e30	118	APP.dll	10191210	Node::ReleaseTexture	100	matched:scene_node.cpp	0.80	high	features	shared i3, 0 rare
+00769eb0	185	APP.dll	101913f0	Node::ReleaseMesh	138	matched:scene_node.cpp	0.85	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.75
+00769fa0	386	APP.dll	1019ed40	Node::Rename	359	matched:scene_node.cpp	0.87	high	features	shared c1,i7, 0 rare
+0076a130	194	APP.dll	10199cd0	Node::TagRegion	235	matched:scene_node.cpp	0.40	medium	features	shared i1,s1, 1 rare
+0076a200	133	-					0.00	none	en-only	unknown
+0076a290	790	APP.dll	10191500	Node::Init	608	matched:node_init.cpp	0.84	high	features	shared i46,s1, 5 rare
+0076a5b0	60	APP.dll	101944d0	Node::ClearA8	62	matched:scene_node.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.97
+0076a5f0	445	APP.dll	10194510	Node::ReleaseSavedStates	287	matched:scene_node.cpp	0.90	high	features	shared i8, 2 rare
+0076a7b0	177	-					0.00	none	en-only	unknown
+0076a870	56	APP.dll	10191d50	Node::SaveFlags	60	matched:scene_node.cpp	0.58	medium	features	shared i3, 0 rare
+0076a8b0	140	-					0.00	none	en-only	unknown
+0076a940	56	APP.dll	10191dd0	Node::SaveRenderMode	60	matched:scene_node.cpp	0.60	medium	features	shared i3, 1 rare
+0076a9c0	887	-					0.00	none	en-only	unknown
+0076ad50	86	-					0.00	none	en-only	unknown
+0076adb0	75	APP.dll	1019b300	Node::RestartColourPlugs	76	matched:scene_node.cpp	0.56	medium	features	shared i2, 0 rare
+0076ae00	428	-					0.00	none	en-only	unknown
+0076afb0	120	APP.dll	10194730	Node::SetColourB	117	matched:scene_node.cpp	0.86	high	features	shared i3, 1 rare
+0076b030	120	APP.dll	101946b0	Node::SetColourA	117	matched:scene_node.cpp	0.87	high	features	shared i3, 1 rare
+0076b0b0	201	-					0.00	none	en-only	unknown
+0076b180	120	APP.dll	10194630	Node::SetColourC	117	matched:scene_node.cpp	0.85	high	features	shared i3, 0 rare
+0076b200	102	APP.dll	10191e50	Node_TagElements	107	matched:scene_node.cpp	0.89	high	features	shared c1,i3,s2, 1 rare
+0076b270	114	-					0.00	none	en-only	unknown
+0076b2f0	51	APP.dll	101947b0	Node::AllocSaved	52	matched:scene_node.cpp	0.82	high	callgraph	neighbours 5 of 6 mapped agree, size ratio 0.98
+0076b330	111	-					0.00	none	en-only	unknown
+0076b3a0	111	-					0.00	none	en-only	unknown
+0076b410	162	APP.dll	101948f0	Node::EnterTargetState	131	matched:scene_node.cpp	0.83	high	callgraph	neighbours 6 of 7 mapped agree, size ratio 0.81
+0076b4c0	111	-					0.00	none	en-only	unknown
+0076b530	51	APP.dll	101949d0	Node::AllocExtra	52	matched:scene_node.cpp	0.76	high	features	shared i1,s1, 1 rare
+0076b570	251	APP.dll	101a52d0	Node::SetUniqueName	215	matched:scene_node.cpp	0.28	low	features	shared s1, 1 rare
+0076b670	153	-					0.00	none	en-only	unknown
+0076b710	21	-					0.00	none	en-only	unknown
+0076b730	68	APP.dll	1019b130	Node::SetFlags	82	matched:scene_node.cpp	0.90	high	callgraph	neighbours 33 of 33 mapped agree, size ratio 0.83
+0076b780	6979	APP.dll	101a3000	Node::ApplyCommandText	6726	unmatched	0.96	high	features	shared c3,f2,i80,s79, 97 rare
+0076d2e0	80	-					0.00	none	en-only	unknown
+0076d330	104	APP.dll	1019b050	Node::SetRenderMode	98	matched:scene_node.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.94
+0076d3a0	123	APP.dll	1019b0c0	Node::SetRenderModeExcept	112	matched:scene_node.cpp	0.88	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.91
+0076d420	68	APP.dll	1019b230	Node::SetB8	68	matched:scene_node.cpp	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 1.00
+0076d470	198	-					0.00	none	en-only	unknown
+0076d540	228	APP.dll	101a2290	Node::MakeNameUnique	222	matched:scene_node.cpp	0.71	high	features	shared i1,s2, 2 rare
+0076d630	174	APP.dll	1019afa0	Node::BuildMesh	168	matched:scene_node.cpp	0.69	high	features	shared i3, 0 rare
+0076d6e0	131	-					0.00	none	en-only	unknown
+0076d770	1123	APP.dll	1019eeb0	Node::SetupSkinning	844	unmatched	0.84	high	features	shared c1,i14,s1, 0 rare
+0076dbe0	592	APP.dll	101ab9d0	Node::SetupSkins	412	matched:node_bones.cpp	0.74	high	features	shared i10, 0 rare
+0076de30	143	-					0.00	none	en-only	unknown
+0076dec0	615	-					0.00	none	en-only	unknown
+0076e130	325	APP.dll	10191770	Node::CopyBindPoses	245	matched:scene_node.cpp	0.78	high	features	shared c1,i9, 0 rare
+0076e280	1981	-					0.00	none	en-only	unknown
+0076ea50	58	-					0.00	none	en-only	unknown
+0076ea90	103	-					0.00	none	en-only	unknown
+0076eb00	111	APP.dll	101ac1a0	Node::Rebuild	81	matched:scene_node.cpp	0.90	high	callgraph	neighbours 16 of 16 mapped agree, size ratio 0.73
+0076eb70	171	-					0.00	none	en-only	unknown
+0076ec20	250	-					0.00	none	en-only	unknown
+0076ed20	515	-					0.00	none	en-only	unknown
+0076ef30	12	-					0.00	none	en-only	unknown
+0076ef40	9	-					0.00	none	en-only	unknown
+0076ef50	109	APP.dll	101af420	KeyBank::KeyBank	41	matched:vec4.cpp	0.63	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.38
+0076efc0	93	APP.dll	101ae770	Matrix4::Matrix4	43	matched:vec_math.cpp	0.90	high	callgraph	neighbours 133 of 133 mapped agree, size ratio 0.46
+0076f090	48	APP.dll	101ac9a0	Vec4::Vec4	32	matched:vec4.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.67
+0076f0c0	30	APP.dll	101ac590	Vec4::Distance	88	matched:vec_math.cpp	0.90	high	callgraph	neighbours 21 of 21 mapped agree, size ratio 0.34
+0076f0f0	36	-					0.00	none	en-only	unknown
+0076f120	35	-					0.00	none	en-only	unknown
+0076f150	29	-					0.00	none	en-only	unknown
+0076f170	57	-					0.00	none	en-only	unknown
+0076f1b0	29	APP.dll	101acc40	Vec4::Fill	26	matched:vec4.cpp	0.90	high	callgraph	neighbours 151 of 151 mapped agree, size ratio 0.90
+0076f1d0	32	APP.dll	101af080	Vec4::Normalized3	189	matched:vec_math.cpp	0.90	high	callgraph	neighbours 97 of 98 mapped agree, size ratio 0.17
+0076f1f0	64	-					0.00	none	en-only	unknown
+0076f230	1014	APP.dll	101b0670		592	unmatched	0.89	high	callgraph	neighbours 81 of 82 mapped agree, size ratio 0.58
+0076f630	65	APP.dll	10008430	PointInRectEdges	45	matched:app_0003.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.69
+0076f680	70	APP.dll	101acaa0	Vec4::operator*	95	matched:vec4.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.74
+0076f6d0	70	APP.dll	101aca40	Vec4::operator-	95	matched:vec4.cpp	0.90	high	callgraph	neighbours 193 of 194 mapped agree, size ratio 0.74
+0076f720	70	APP.dll	101ac9e0	Vec4::operator+	95	matched:vec4.cpp	0.90	high	callgraph	neighbours 116 of 116 mapped agree, size ratio 0.74
+0076f770	69	-					0.00	none	en-only	unknown
+0076f7c0	66	APP.dll	101acb60	Vec4::Divided	83	matched:vec4.cpp	0.90	high	callgraph	neighbours 15 of 15 mapped agree, size ratio 0.80
+0076f810	240	-					0.00	none	en-only	unknown
+0076f900	196	APP.dll	101ad760	KeyBank::Insert	185	matched:vec4.cpp	0.72	high	features	shared i6, 1 rare
+0076f9d0	129	APP.dll	101ad6a0	MotionList::AddEntry	136	matched:containers.cpp	0.82	high	features	shared c1,i6, 0 rare
+0076fa60	112	-					0.00	none	en-only	unknown
+0076fad0	195	-					0.00	none	en-only	unknown
+0076fba0	473	APP.dll	101ad350	MotionList::FrameAt	500	unmatched	0.95	high	features	shared i5, 1 rare
+0076fd80	1647	APP.dll	101afe00	KeyTrack_Sample	1079	unmatched	0.83	high	callgraph	neighbours 6 of 7 mapped agree, size ratio 0.66
+007703f0	1801	APP.dll	101af4c0	KeyBank::Sample	1182	unmatched	0.79	high	features	shared i9, 0 rare
+00770b00	1629	APP.dll	101b0240		1071	unmatched	0.72	high	callgraph	neighbours 3 of 4 mapped agree, size ratio 0.66
+00771170	1718	APP.dll	101af960	KeyBank_SampleFloat	1176	unmatched	0.74	high	features	shared i9, 0 rare
+00771830	814	APP.dll	101b1420		713	unmatched	0.88	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.88
+00771b60	203	APP.dll	101ad920	Spline	179	unmatched	0.60	high	features	shared f4, 0 rare
+00771c30	203	-					0.00	none	en-only	unknown
+00771d00	220	APP.dll	101af450	KeyBank::CopyTo	110	matched:containers.cpp	0.65	high	features	shared i3, 0 rare
+00771de0	207	APP.dll	101ade10	KeyTrack::CopyFrom	104	matched:containers.cpp	0.65	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.50
+00771eb0	229	-					0.00	none	en-only	unknown
+00771fa0	122	-					0.00	none	en-only	unknown
+00772020	125	-					0.00	none	en-only	unknown
+007720a0	175	APP.dll	101af360	PlaneFromTriangle	188	matched:vec_ops.cpp	0.80	high	callgraph	neighbours 4 of 5 mapped agree, size ratio 0.93
+00772150	69	APP.dll	101acff0	VertexPack::SetVertexCount	68	matched:containers.cpp	0.50	medium	features	shared s1, 1 rare
+007721a0	72	APP.dll	101ad110	IndexList::Resize	69	matched:containers.cpp	0.49	medium	features	shared s1, 1 rare
+007721f0	89	APP.dll	101ad1c0	IndexList::ResizeSpans	115	matched:containers.cpp	0.53	medium	features	shared s1, 1 rare
+00772250	103	APP.dll	101ae820	Cross	107	matched:vec_math.cpp	0.30	low	callgraph	neighbours 1 of 4 mapped agree, size ratio 0.96
+007722c0	13	-					0.00	none	en-only	unknown
+007722d0	156	-					0.00	none	en-only	unknown
+00772370	69	-					0.00	none	en-only	unknown
+007723c0	1219	-					0.00	none	en-only	unknown
+00772890	138	-					0.00	none	en-only	unknown
+00772920	175	-					0.00	none	en-only	unknown
+007729d0	96	-					0.00	none	en-only	unknown
+00772a40	136	-					0.00	none	en-only	unknown
+00772ad0	489	-					0.00	none	en-only	unknown
+00772cc0	477	APP.dll	101acd90	Vec4::DistanceSquaredToSegment	263	matched:vec4.cpp	0.84	high	callgraph	neighbours 7 of 8 mapped agree, size ratio 0.55
+00772ea0	501	-					0.00	none	en-only	unknown
+007730a0	144	-					0.00	none	en-only	unknown
+00773130	314	-					0.00	none	en-only	unknown
+00773270	88	APP.dll	101acb00	Vec4::Scaled	83	matched:vec4.cpp	0.28	low	callgraph	neighbours 15 of 154 mapped agree, size ratio 0.94
+007732d0	69	APP.dll	101ac4e0	Vec4::Length	28	matched:vec4.cpp	0.90	high	callgraph	neighbours 106 of 106 mapped agree, size ratio 0.41
+00773320	278	-					0.00	none	en-only	unknown
+00773440	66	APP.dll	101ac650	Vec4::DistanceSquared	69	matched:vec_math.cpp	0.90	high	callgraph	neighbours 12 of 12 mapped agree, size ratio 0.96
+00773490	50	APP.dll	101ac6a0	Vec4::LengthSquared3	55	matched:vec_math.cpp	0.90	high	callgraph	neighbours 39 of 39 mapped agree, size ratio 0.91
+007734d0	316	APP.dll	101acc60	Vec4::DistanceSquaredToSegment2D	301	unmatched	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.95
+00773610	68	APP.dll	101ac540	Vec4::Distance2D	65	matched:vec_math.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.96
+00773660	56	APP.dll	101ac500	Vec4::Length2D	57	matched:vec_math.cpp	0.90	high	callgraph	neighbours 104 of 104 mapped agree, size ratio 0.98
+007736a0	78	-					0.00	none	en-only	unknown
+007736f0	96	APP.dll	101ac5f0	Vec4::DistanceZWeighted	90	matched:vec_math.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.94
+00773750	31	APP.dll	101ac200	Vec3_Dot	29	matched:vec4.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.94
+00773770	410	-					0.00	none	en-only	unknown
+00773910	394	-					0.00	none	en-only	unknown
+00773aa0	117	-					0.00	none	en-only	unknown
+00773b20	118	-					0.00	none	en-only	unknown
+00773bd0	37	-					0.00	none	en-only	unknown
+00773c00	304	-					0.00	none	en-only	unknown
+00773d30	304	-					0.00	none	en-only	unknown
+00773e60	136	APP.dll	101ae8b0	TriangleNormal	156	matched:vec_ops.cpp	0.59	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.87
+00773ef0	34	APP.dll	101ade80	Matrix4::GetTranslation	54	matched:vec4.cpp	0.90	high	callgraph	neighbours 221 of 221 mapped agree, size ratio 0.63
+00773f20	801	APP.dll	101b17a0		355	unmatched	0.73	high	callgraph	neighbours 4 of 6 mapped agree, size ratio 0.44
+00774250	175	-					0.00	none	en-only	unknown
+00774300	175	APP.dll	101b0a80		130	unmatched	0.73	high	callgraph	neighbours 3 of 4 mapped agree, size ratio 0.74
+007743b0	1328	APP.dll	101b1910	DecomposeMatrix	443	unmatched	0.73	high	callgraph	neighbours 4 of 6 mapped agree, size ratio 0.33
+007748e0	112	APP.dll	101ae7a0	Matrix4::SetIdentity	55	matched:containers.cpp	0.90	high	callgraph	neighbours 95 of 95 mapped agree, size ratio 0.49
+00774950	119	APP.dll	101b0ba0		108	unmatched	0.90	high	callgraph	neighbours 10 of 10 mapped agree, size ratio 0.91
+007749d0	61	APP.dll	101ac7c0	Vec4::InRect	66	matched:vec_math.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.92
+00774a10	82	APP.dll	101ac6e0	Vec4::InBox	92	matched:vec_math.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.89
+00774a70	148	-					0.00	none	en-only	unknown
+00774b10	123	APP.dll	101ac740	Vec4::InBoxMargin	116	matched:vec_math.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.94
+00774b90	104	-					0.00	none	en-only	unknown
+00774c00	51	-					0.00	none	en-only	unknown
+00774c40	300	-					0.00	none	en-only	unknown
+00774d70	399	-					0.00	none	en-only	unknown
+00774f00	981	APP.dll	101b0d40		844	unmatched	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.86
+007752e0	53	APP.dll	101adcb0	KeyTrack::HasFrame	51	matched:containers.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.96
+00775320	394	APP.dll	101ae4d0	View_ContainsPoint	568	matched:vec4.cpp	0.90	high	callgraph	neighbours 12 of 12 mapped agree, size ratio 0.69
+007754b0	270	APP.dll	101ada30	KeyTrack::Reserve	268	matched:vec4.cpp	0.60	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.99
+007755d0	152	-					0.00	none	en-only	unknown
+00775670	139	-					0.00	none	en-only	unknown
+00775700	1926	-					0.00	none	en-only	unknown
+00775e90	265	-					0.00	none	en-only	unknown
+00775fa0	1542	-					0.00	none	en-only	unknown
+007765b0	23	APP.dll	101adb80	KeyTrack::MarkAll	34	matched:containers.cpp	0.54	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.68
+007765e0	675	-					0.00	none	en-only	unknown
+00776890	72	-					0.00	none	en-only	unknown
+007768e0	155	APP.dll	101b10f0	Multiply	129	unmatched	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.83
+00776990	676	APP.dll	101ae2a0	QuatFromMatrix	545	matched:vec4.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.81
+00776c40	152	APP.dll	101b1090		86	unmatched	0.80	high	callgraph	neighbours 4 of 5 mapped agree, size ratio 0.57
+00776ce0	238	-					0.00	none	en-only	unknown
+00776dd0	243	-					0.00	none	en-only	unknown
+00776ed0	52	APP.dll	101adec0	Matrix4::Translate	33	matched:vec_math.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.63
+00776f10	254	-					0.00	none	en-only	unknown
+00777010	266	-					0.00	none	en-only	unknown
+00777120	249	-					0.00	none	en-only	unknown
+00777220	187	APP.dll	101b1360		96	unmatched	0.90	high	callgraph	neighbours 26 of 26 mapped agree, size ratio 0.51
+007772e0	54	-					0.00	none	en-only	unknown
+00777320	238	APP.dll	10004650	VectorConstructorIterator	48	matched:app_0004.cpp	0.80	high	callgraph	neighbours 12 of 15 mapped agree, size ratio 0.20
+00777410	205	APP.dll	101b1180		117	unmatched	0.87	high	callgraph	neighbours 17 of 18 mapped agree, size ratio 0.57
+007774e0	179	-					0.00	none	en-only	unknown
+007775a0	194	APP.dll	101ad2c0	Plane::IntersectRay	135	unmatched	0.69	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.70
+00777670	56	-					0.00	none	en-only	unknown
+007776b0	190	-					0.00	none	en-only	unknown
+00777770	257	APP.dll	101b0c10	Perspective	183	unmatched	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.71
+00777880	218	-					0.00	none	en-only	unknown
+00777960	184	-					0.00	none	en-only	unknown
+00777a20	488	APP.dll	101b08c0		442	unmatched	0.82	high	callgraph	neighbours 5 of 6 mapped agree, size ratio 0.91
+00777c10	270	-					0.00	none	en-only	unknown
+00777d20	660	APP.dll	101aeae0	Slerp	425	matched:vec_math.cpp	0.68	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.64
+00777fc0	1158	APP.dll	101aed50	Vec4::Mirror	385	unmatched	0.54	medium	callgraph	neighbours 3 of 6 mapped agree, size ratio 0.33
+00778450	71	-					0.00	none	en-only	unknown
+007784a0	34	-					0.00	none	en-only	unknown
+007784d0	40	-					0.00	none	en-only	unknown
+00778500	40	-					0.00	none	en-only	unknown
+00778530	101	-					0.00	none	en-only	unknown
+007785a0	64	-					0.00	none	en-only	unknown
+007785e0	57	APP.dll	101ad730	KeyBank::Clear	33	matched:containers.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.58
+007787e0	56	-					0.00	none	en-only	unknown
+00778820	8	-					0.00	none	en-only	unknown
+00778830	8	-					0.00	none	en-only	unknown
+00778840	117	-					0.00	none	en-only	unknown
+007788c0	260	-					0.00	none	en-only	unknown
+007789d0	398	-					0.00	none	en-only	unknown
+00778b60	629	APP.dll	101b16f0		174	unmatched	0.49	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.28
+00778de0	222	-					0.00	none	en-only	unknown
+00778ed0	690	APP.dll	101b1290	Vec4::RotateAxis	207	unmatched	0.61	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.30
+00779190	108	APP.dll	101b1ad0	RotationX	106	unmatched	0.89	high	callgraph	neighbours 46 of 47 mapped agree, size ratio 0.98
+00779200	132	APP.dll	101ac440	Vec4::RotateX	159	matched:vec_math.cpp	0.90	high	callgraph	neighbours 19 of 19 mapped agree, size ratio 0.83
+00779290	104	APP.dll	101b1bb0	RotationY	106	unmatched	0.90	high	callgraph	neighbours 14 of 14 mapped agree, size ratio 0.98
+00779300	130	APP.dll	101ac3a0	Vec4::RotateY	156	matched:vec_math.cpp	0.90	high	callgraph	neighbours 9 of 9 mapped agree, size ratio 0.83
+00779390	107	APP.dll	101b1b40		106	unmatched	0.89	high	callgraph	neighbours 76 of 77 mapped agree, size ratio 0.99
+00779400	104	APP.dll	101ac300	Vec4::RotateZ	146	matched:vec_math.cpp	0.90	high	callgraph	neighbours 113 of 113 mapped agree, size ratio 0.71
+00779480	186	APP.dll	101b13c0	Scaling	96	unmatched	0.90	high	callgraph	neighbours 28 of 28 mapped agree, size ratio 0.52
+00779540	315	APP.dll	101adcf0	KeyTrack::Set	280	matched:containers.cpp	0.88	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.89
+00779690	271	APP.dll	101ad820	KeyBank::Set	245	matched:vec4.cpp	0.80	high	features	shared i6, 1 rare
+007797b0	194	-					0.00	none	en-only	unknown
+00779880	209	APP.dll	1019c1e0	Node::AllocMaterials	309	matched:scene_node.cpp	0.53	medium	features	shared i10, 0 rare
+00779960	191	-					0.00	none	en-only	unknown
+00779a20	193	-					0.00	none	en-only	unknown
+00779af0	46	APP.dll	101ac9c0	Vec4::Set	30	matched:vec4.cpp	0.90	high	callgraph	neighbours 80 of 80 mapped agree, size ratio 0.65
+00779b20	211	APP.dll	101acea0	Vertex::SetPosition	105	matched:vertex.cpp	0.65	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.50
+00779c00	217	-					0.00	none	en-only	unknown
+00779ce0	226	-					0.00	none	en-only	unknown
+00779dd0	232	-					0.00	none	en-only	unknown
+00779ec0	238	APP.dll	101acf10	Vertex_Set	141	matched:vertex.cpp	0.67	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.59
+00779fb0	250	-					0.00	none	en-only	unknown
+0077a0b0	104	-					0.00	none	en-only	unknown
+0077a120	63	-					0.00	none	en-only	unknown
+0077a170	37	APP.dll	101adef0	Matrix4::SetTranslation	24	matched:containers.cpp	0.90	high	callgraph	neighbours 100 of 101 mapped agree, size ratio 0.65
+0077a1a0	125	APP.dll	101ae710	Matrix4::SetRotationZ	93	matched:vec_math.cpp	0.55	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.74
+0077a220	62	-					0.00	none	en-only	unknown
+0077a260	50	-					0.00	none	en-only	unknown
+0077a2a0	152	APP.dll	101ae130	TransformNormal	135	matched:vec_math.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.89
+0077a340	337	-					0.00	none	en-only	unknown
+0077a4a0	217	APP.dll	101ae060	Project	206	matched:vec4.cpp	0.90	high	callgraph	neighbours 32 of 32 mapped agree, size ratio 0.95
+0077a580	205	-					0.00	none	en-only	unknown
+0077a650	272	-					0.00	none	en-only	unknown
+0077a760	574	APP.dll	101b1f30		263	unmatched	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.46
+0077a9a0	1271	-					0.00	none	en-only	unknown
+0077aea0	1191	APP.dll	101b1c20	LookAt	770	unmatched	0.90	high	callgraph	neighbours 12 of 12 mapped agree, size ratio 0.65
+0077b350	901	-					0.00	none	en-only	unknown
+0077b6e0	926	-					0.00	none	en-only	unknown
+0077ba80	119	APP.dll	101b0cd0		103	unmatched	0.59	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.87
+0077bb00	129	-					0.00	none	en-only	unknown
+0077bb90	113	sound3d.dll	10008790		153	unmatched	0.60	high	features	shared i1,s1, 1 rare
+0077bc20	96	-					0.00	none	en-only	unknown
+0077bc90	8	-					0.00	none	en-only	unknown
+0077bcb0	148	sound3d.dll	10008610		214	unmatched	0.73	high	features	shared c1,i3, 2 rare
+0077bd60	72	-					0.00	none	en-only	unknown
+0077be10	12	-					0.00	none	en-only	unknown
+0077be20	78	-					0.00	none	en-only	unknown
+0077be70	16	-					0.00	none	en-only	unknown
+0077bf20	17	-					0.00	none	en-only	unknown
+0077bf40	24	APP.dll	10146d90	SlotTable::SetRange	22	matched:engine_10143.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.92
+0077bf70	82	APP.dll	10147700	BufferPool_Clear	82	matched:buffer_pool.cpp	0.61	high	features	shared i1, 0 rare
+0077bfd0	132	APP.dll	10148280	BufferPool_ReleaseAll	132	matched:buffer_pool.cpp	0.75	high	features	shared i2, 0 rare
+0077c060	50	APP.dll	1013ed20	Render_BeginScene	50	matched:engine_1013e.cpp	0.78	high	callgraph	neighbours 3 of 4 mapped agree, size ratio 1.00
+0077c0a0	961	APP.dll	101441b0		365	unmatched	0.72	high	features	shared i10, 1 rare
+0077c470	961	APP.dll	10144040		365	unmatched	0.72	high	features	shared i10, 2 rare
+0077c840	152	APP.dll	1013fb10	FrameBlend_Start	154	matched:engine_1013e.cpp	0.90	high	callgraph	neighbours 13 of 13 mapped agree, size ratio 0.99
+0077c8e0	647	-					0.00	none	en-only	unknown
+0077cc40	11	-					0.00	none	en-only	unknown
+0077cc50	491	-					0.00	none	en-only	unknown
+0077cee0	103	APP.dll	1013f9a0	ColourBlends_Update	98	matched:colour_fades.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.95
+0077cf50	73	APP.dll	10147690	SlotTable::ReplaceMaterial	65	matched:engine_10143.cpp	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.89
+0077cfa0	31	APP.dll	101476e0	SlotTable::SetMaterial	29	matched:engine_10143.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.94
+0077cfc0	103	APP.dll	101488b0	DShowStream::Close	87	matched:dshow_stream.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.84
+0077d030	375	APP.dll	1014ef20	TextureObject::WriteRgb32	311	matched:texture_bind.cpp	0.57	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.83
+0077d1b0	290	APP.dll	1014f120	TextureObject::WritePaletted	204	matched:texture_bind.cpp	0.54	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.70
+0077d2e0	246	APP.dll	1014f060	TextureObject::Write16	186	matched:texture_bind.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.76
+0077d3e0	58	-					0.00	none	en-only	unknown
+0077d420	129	APP.dll	10148a40	RenderWindow_Create	182	matched:window_create.cpp	0.69	high	features	shared c1,i3, 1 rare
+0077d4b0	295	APP.dll	10147880	MeshBuffers_Create	372	matched:buffer_pool.cpp	0.56	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.79
+0077d5e0	720	-					0.00	none	en-only	unknown
+0077d8b0	151	APP.dll	10147620	Bounds_ResetFour	97	matched:buffer_pool.cpp	0.44	medium	features	shared i2, 1 rare
+0077d950	763	APP.dll	1014f1f0	TextureObject::Upload	806	unmatched	0.86	high	features	shared i4, 2 rare
+0077dc60	219	APP.dll	1015c9e0	Screen_StartTransition	187	matched:screen_transition.cpp	0.90	high	callgraph	neighbours 9 of 9 mapped agree, size ratio 0.85
+0077dd40	402	APP.dll	101439e0	Render_ResetTarget	364	matched:render_reset.cpp	0.90	high	callgraph	neighbours 8 of 8 mapped agree, size ratio 0.91
+0077dee0	479	APP.dll	1014b480	Render_ResetSwapTarget	484	matched:render_reset.cpp	0.54	medium	features	shared f1,i2, 0 rare
+0077e240	97	-					0.00	none	en-only	unknown
+0077e2b0	164	APP.dll	101477c0	Texture_ReleaseSlot	183	matched:texture_slots.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.90
+0077e360	1469	APP.dll	1014ba20	TextureObject::DrawStrip	333	matched:texture_bind.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.23
+0077e930	1376	-					0.00	none	en-only	unknown
+0077ee90	712	APP.dll	1014bb70	TextureObject::DrawTriangles	240	matched:texture_bind.cpp	0.44	medium	callgraph	neighbours 2 of 4 mapped agree, size ratio 0.34
+0077f160	2683	APP.dll	1014ddf0	TextureObject::DrawMesh	2003	unmatched	0.57	medium	features	shared f2,i10, 0 rare
+0077fbe0	1364	APP.dll	1014c080	TextureObject::DrawQuad	943	unmatched	0.69	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.69
+00780150	42994	APP.dll	10151ba0	MeshData::DrawLit	43163	unmatched	0.50	medium	features	shared f9,i472,s2, 96 rare
+0078a950	1217	APP.dll	1014b750	TextureObject::DrawScreenCopy	713	matched:texture_bind.cpp	0.71	high	features	shared f3,i7, 0 rare
+0078ae20	2296	APP.dll	1014c430	TextureObject::DrawTinted	1315	matched:texture_bind.cpp	0.78	high	features	shared f4,i9, 0 rare
+0078b720	1233	-					0.00	none	en-only	unknown
+0078bc00	1264	APP.dll	10149100	SwapTarget_DrawPreview	742	matched:texture_bind.cpp	0.72	high	features	shared f1,i8, 0 rare
+0078c0f0	3345	APP.dll	10146db0	MeshData::DrawDebugBox	2152	matched:mesh_debug_box.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.64
+0078ce10	1279	APP.dll	10144320	TextureObject::DrawThroughShader	907	matched:texture_bind.cpp	0.71	high	features	shared f2,i8, 0 rare
+0078d310	1414	-					0.00	none	en-only	unknown
+0078d8a0	1113	APP.dll	10143e00	Render_FillRect	566	unmatched	0.71	high	features	shared f3,i7, 0 rare
+0078dd00	861	-					0.00	none	en-only	unknown
+0078e060	913	-					0.00	none	en-only	unknown
+0078e400	1212	-					0.00	none	en-only	unknown
+0078e8d0	1206	-					0.00	none	en-only	unknown
+0078ed90	1373	APP.dll	1014c960	TextureObject_DrawColoured	1234	matched:texture_bind.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.90
+0078f2f0	1914	-					0.00	none	en-only	unknown
+0078fa70	726	-					0.00	none	en-only	unknown
+0078fd50	1531	APP.dll	101501f0	FontRenderer::DrawText	1755	unmatched	0.73	high	features	shared c4,f1,i11, 3 rare
+00790350	870	-					0.00	none	en-only	unknown
+007906d0	1232	APP.dll	1014fdd0	FontRenderer_DrawTextClipped	1048	matched:font_metrics.cpp	0.75	high	features	shared c1,f1,i8, 0 rare
+00790bc0	331	APP.dll	101508d0	TextRenderer::DrawOutlined	214	matched:text_outline.cpp	0.52	medium	features	shared f1,s1, 0 rare
+00790d10	339	APP.dll	101509b0	TextRenderer::DrawOutlinedIn	214	matched:text_outline.cpp	0.52	medium	features	shared f1,s1, 0 rare
+00790e70	1307	APP.dll	101446f0	TextureObject_DrawBlurred	1273	matched:texture_bind.cpp	0.69	high	features	shared f2,i8, 0 rare
+00791390	1309	-					0.00	none	en-only	unknown
+007918b0	1397	APP.dll	1014bc60	TextureObject::DrawCell	1051	matched:texture_bind.cpp	0.85	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.75
+00791e30	1342	APP.dll	1014e940	TextureObject::DrawFrameAlt	749	matched:texture_bind.cpp	0.47	medium	callgraph	neighbours 2 of 4 mapped agree, size ratio 0.56
+00792370	987	APP.dll	10143bc0	Render_DrawGradientQuad	572	unmatched	0.71	high	features	shared f3,i7, 0 rare
+00792750	1016	-					0.00	none	en-only	unknown
+00792b50	6215	APP.dll	10145ba0	Debug_DrawShape	4547	unmatched	0.50	medium	features	shared f3,i20, 2 rare
+00794c70	2375	APP.dll	1014e5d0	TextureObject::DrawFrameAltStretched	870	matched:texture_bind.cpp	0.77	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.37
+007955c0	2138	APP.dll	1014d4e0	TextureObject::DrawFrame	874	matched:texture_bind.cpp	0.48	medium	features	shared f3,i7, 0 rare
+00795e20	2154	APP.dll	1014ec30	TextureObject::DrawFrameAltTinted	749	matched:texture_bind.cpp	0.62	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.35
+007966a0	2181	-					0.00	none	en-only	unknown
+00796f40	4060	-					0.00	none	en-only	unknown
+00797f30	2636	-					0.00	none	en-only	unknown
+00798980	2214	-					0.00	none	en-only	unknown
+00799230	1603	Packs.dll	10020df8		1699	unmatched	0.24	low	features	shared i2, 2 rare
+00799880	3089	APP.dll	10151150	MeshData::Draw	2621	unmatched	0.55	medium	features	shared f7,i13, 1 rare
+0079a4a0	1029	-					0.00	none	en-only	unknown
+0079a8b0	921	-					0.00	none	en-only	unknown
+0079ac50	1430	-					0.00	none	en-only	unknown
+0079b1f0	988	-					0.00	none	en-only	unknown
+0079b5d0	929	-					0.00	none	en-only	unknown
+0079b980	2275	-					0.00	none	en-only	unknown
+0079c270	1666	-					0.00	none	en-only	unknown
+0079c900	855	-					0.00	none	en-only	unknown
+0079cd80	10661	APP.dll	1013fbb0	TextureManager::OnResetDevice	10920	unmatched	0.48	medium	features	shared c1,f1,i30,s8, 15 rare
+0079f760	247	APP.dll	1014b2a0	Render_OnLostDevice	230	matched:render_reset.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.93
+0079f890	31	APP.dll	1013ed60	Render_EndScene	36	matched:engine_1013e.cpp	0.42	medium	callgraph	neighbours 2 of 6 mapped agree, size ratio 0.86
+0079f8b0	1248	APP.dll	10147a20	GetMeshBuffers	2131	unmatched	0.70	high	features	shared i3, 0 rare
+0079fd90	103	-					0.00	none	en-only	unknown
+0079fe00	402	sound3d.dll	10018aac		666	unmatched	0.39	medium	features	shared i1, 1 rare
+0079ffa0	189	-					0.00	none	en-only	unknown
+007a0060	226	-					0.00	none	en-only	unknown
+007a0150	329	-					0.00	none	en-only	unknown
+007a02a0	3045	APP.dll	10143180	Input::ReadControls	1633	unmatched	0.62	high	features	shared i6, 0 rare
+007a1080	88	-					0.00	none	en-only	unknown
+007a10e0	120	APP.dll	1014fd30	FontRenderer::TextWidth	154	matched:font_metrics.cpp	0.87	high	callgraph	neighbours 13 of 14 mapped agree, size ratio 0.78
+007a1170	110	-					0.00	none	en-only	unknown
+007a11e0	488	APP.dll	10148590	TexturePool_Get	731	unmatched	0.68	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.67
+007a13e0	1899	APP.dll	10148b00	TextureManager::CreateDevice	1534	unmatched	0.54	medium	features	shared c6,i3,s1, 4 rare
+007a1b50	921	APP.dll	101455d0	Font_Init	914	unmatched	0.90	high	features	shared c6,i8,s7, 14 rare
+007a1f10	61	-					0.00	none	en-only	unknown
+007a1f50	39	APP.dll	10148930	ToggleHolder::IsOff	39	matched:texcache.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 1.00
+007a2050	315	APP.dll	1015c850	Frame_PumpAndRecover	270	matched:render_shutdown.cpp	0.86	high	features	shared c4,i2, 2 rare
+007a2240	130	APP.dll	1013ec90	Window_PumpMessages	126	matched:engine_1013e.cpp	0.65	high	features	shared c3, 0 rare
+007a22d0	25	-					0.00	none	en-only	unknown
+007a22f0	475	APP.dll	1013e4f0	GameWindow::WindowProc	431	unmatched	0.98	high	features	shared c7,i7, 6 rare
+007a24d0	55	-					0.00	none	en-only	unknown
+007a2510	640	APP.dll	1015c450	DShowStream::Open	589	unmatched	0.94	high	features	shared c3,f1,i3,s10, 13 rare
+007a2790	1224	APP.dll	1014f590	FontRenderer::DrawString	865	matched:font_metrics.cpp	0.89	high	features	shared c1,i12, 11 rare
+007a2c60	1331	-					0.00	none	en-only	unknown
+007a31a0	65	APP.dll	1013f910	MakeDataPath	63	matched:engine_1013e.cpp	0.44	medium	features	shared s1, 0 rare
+007a31f0	75	APP.dll	1013f8a0	Path_Data	72	matched:path_format.cpp	0.44	medium	features	shared s1, 0 rare
+007a3260	589	sound3d.dll	1004dbb1		168	unmatched	0.24	low	features	shared c1, 1 rare
+007a34b0	60	APP.dll	1013e410	Window_StaticProc	63	matched:window_create.cpp	0.70	high	features	shared c2, 2 rare
+007a34f0	555	APP.dll	101453e0	Font_DrawGlyph	485	unmatched	0.66	high	features	shared i7, 4 rare
+007a3720	591	sound3d.dll	1000bc52		555	unmatched	0.35	low	features	shared i1, 1 rare
+007a3980	163	APP.dll	10145380	Font_GlyphWidth	87	unmatched	0.66	high	features	shared i5, 2 rare
+007a3a30	25	APP.dll	1013f880	Random	25	matched:type_parse.cpp	0.90	high	callgraph	neighbours 126 of 126 mapped agree, size ratio 1.00
+007a3a50	128	APP.dll	101489c0	RenderWindow_RegisterClass	120	matched:window_create.cpp	0.82	high	features	shared c2,i1, 3 rare
+007a3ad0	260	APP.dll	1015c730	Render_Shutdown	288	matched:render_shutdown.cpp	0.85	high	features	shared c4,s4, 7 rare
+007a3be0	143	APP.dll	10145970	Font_Release	145	matched:input_font.cpp	0.87	high	features	shared c1,i2, 1 rare
+007a3c80	321	APP.dll	10150a90	MeshData::Release	273	matched:mesh_release.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.85
+007a3dd0	97	-					0.00	none	en-only	unknown
+007a3e50	125	APP.dll	1014f520	TextureObject::Release	108	matched:texture_bind.cpp	0.57	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.86
+007a3ed0	77	-					0.00	none	en-only	unknown
+007a3f20	97	APP.dll	10148520	TexCache_Free	101	matched:buffer_pool.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.96
+007a3f90	128	APP.dll	1015c6a0	VideoSurface::CopyTo	142	matched:surface_copy.cpp	0.44	medium	features	shared i1, 1 rare
+007a4010	107	APP.dll	10145a10	SlotTable::Reset	51	matched:engine_10143.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.48
+007a4080	66	-					0.00	none	en-only	unknown
+007a40d0	17	APP.dll	1013faf0	FrameTimer_ResetNext2	17	matched:engine_1013e.cpp	0.90	high	callgraph	neighbours 10 of 10 mapped agree, size ratio 1.00
+007a40f0	20	APP.dll	1013eee0	FrameTimer_ResetNext	20	matched:engine_1013e.cpp	0.90	high	callgraph	neighbours 19 of 19 mapped agree, size ratio 1.00
+007a4110	76	-					0.00	none	en-only	unknown
+007a4160	285	APP.dll	1014b390		233	unmatched	0.56	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.82
+007a4280	217	APP.dll	1014b1c0	FontRandom_Load	209	matched:type_parse.cpp	0.67	high	features	shared i1,s1, 1 rare
+007a4360	337	APP.dll	10145a50	MeshData::UploadBones	321	matched:mesh_release.cpp	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.95
+007a44c0	232	-					0.00	none	en-only	unknown
+007a45b0	1333	APP.dll	10150bb0	MeshData_BuildBuffers	1421	unmatched	0.96	high	features	shared i5,s11, 12 rare
+007a4af0	35	-					0.00	none	en-only	unknown
+007a4b20	63	-					0.00	none	en-only	unknown
+007a4b60	35	-					0.00	none	en-only	unknown
+007a4b90	82	APP.dll	1013ef30	Render_SetRenderState	83	matched:render_state.cpp	0.38	medium	callgraph	neighbours 4 of 22 mapped agree, size ratio 0.99
+007a4bf0	390	APP.dll	10143870	TextureObject::BeginRenderTo	366	unmatched	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.94
+007a4d80	309	-					0.00	none	en-only	unknown
+007a4ed0	26	-					0.00	none	en-only	unknown
+007a4ef0	111	APP.dll	1013f000	Render_SetSamplerState	99	matched:render_state.cpp	0.59	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.89
+007a4f60	2002	APP.dll	1013f070	Render_Command	1928	matched:render_command.cpp	0.90	high	callgraph	neighbours 55 of 55 mapped agree, size ratio 0.96
+007a57c0	113	-					0.00	none	en-only	unknown
+007a5840	106	APP.dll	1014b6e0	TextureObject::BindStage1	110	matched:texture_bind.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.96
+007a58b0	106	APP.dll	1014b670	TextureObject::BindStage0	110	matched:texture_bind.cpp	0.80	high	callgraph	neighbours 4 of 5 mapped agree, size ratio 0.96
+007a5920	38	-					0.00	none	en-only	unknown
+007a5950	38	APP.dll	10143b50	Render_UnbindTexture0	38	matched:engine_10143.cpp	0.29	low	callgraph	neighbours 2 of 13 mapped agree, size ratio 1.00
+007a5980	102	APP.dll	10143b80	Render_UnbindTexture1	38	matched:engine_10143.cpp	0.28	low	callgraph	neighbours 2 of 10 mapped agree, size ratio 0.37
+007a59f0	257	APP.dll	1013fa10	ColourBlend_Start	223	matched:colour_fades.cpp	0.57	medium	features	shared f2, 1 rare
+007a5b00	362	-					0.00	none	en-only	unknown
+007a5c80	15	-					0.00	none	en-only	unknown
+007a5c90	15	-					0.00	none	en-only	unknown
+007a5ca0	146	APP.dll	1013e6f0	Names_Set	146	matched:names_od.cpp	0.61	high	callgraph	neighbours 2 of 3 mapped agree, size ratio 1.00
+007a5d40	588	APP.dll	1013e790	Names_Expand	561	unmatched	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.95
+007a5f90	93	APP.dll	10147760	BufferPool_ReleaseDynamic	93	matched:buffer_pool.cpp	0.64	high	features	shared i2, 0 rare
+007a5ff0	76	APP.dll	10148350	TexCache_ReleaseAll	74	matched:texcache.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.97
+007a6040	6	-					0.00	none	en-only	unknown
+007a6050	83	-					0.00	none	en-only	unknown
+007a60b0	7702	APP.dll	101493f0	Render_ComposeFrame	6616	unmatched	0.75	high	features	shared f8,i26, 3 rare
+007a7ed0	190	-					0.00	none	en-only	unknown
+007a7fa0	211	APP.dll	1013edc0	Render_Present	237	matched:engine_1013e.cpp	0.61	high	features	shared c1,f2, 0 rare
+007a8080	100	APP.dll	1015c960	Render_Present	72	matched:texcache.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.72
+007a80f0	75	APP.dll	1015c9b0	Render_PresentSimple	47	matched:texcache.cpp	0.83	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.63
+007a81a0	122	-					0.00	none	en-only	unknown
+007a8220	195	-					0.00	none	en-only	unknown
+007a82f0	89	APP.dll	10148960	ToggleHolder::Poll	82	matched:texcache.cpp	0.47	medium	features	shared i1, 1 rare
+007a8350	264	-					0.00	none	en-only	unknown
+007a8460	967	APP.dll	1014ade0	Frame_Pace	980	matched:frame_pacer.cpp	0.81	high	features	shared c3,f2,i1, 0 rare
+007a8830	43	-					0.00	none	en-only	unknown
+007a8860	151	SoundArc.dll	00401280		66	unmatched	0.56	medium	features	shared c3, 0 rare
+007a8900	9	-					0.00	none	en-only	unknown
+007a8910	26	-					0.00	none	en-only	unknown
+007a8930	194	-					0.00	none	en-only	unknown
+007a8a00	69	-					0.00	none	en-only	unknown
+007a8a50	61	-					0.00	none	en-only	unknown
+007a8a90	11	-					0.00	none	en-only	unknown
+007a8aa0	26	-					0.00	none	en-only	unknown
+007a8ac0	87	-					0.00	none	en-only	unknown
+007a8b20	131	Packs.dll	10006240		121	unmatched	0.76	high	features	shared i2, 1 rare
+007a8bb0	122	-					0.00	none	en-only	unknown
+007a8c30	117	-					0.00	none	en-only	unknown
+007a8cb0	23	-					0.00	none	en-only	unknown
+007a8cd0	11	-					0.00	none	en-only	unknown
+007a8ce0	37	-					0.00	none	en-only	unknown
+007a8d10	110	-					0.00	none	en-only	unknown
+007a8d80	102	-					0.00	none	en-only	unknown
+007a8df0	52	-					0.00	none	en-only	unknown
+007a8e30	142	-					0.00	none	en-only	unknown
+007a8ec0	91	APP.dll	10160960		75	unmatched	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.82
+007a8f20	107	-					0.00	none	en-only	unknown
+007a8f90	648	APP.dll	10160a90	MmvPlayer::Open	850	matched:mmv_texreg.cpp	0.55	medium	features	shared i6,s3, 6 rare
+007a9220	408	-					0.00	none	en-only	unknown
+007a93c0	586	-					0.00	none	en-only	unknown
+007a9610	314	APP.dll	10160f00	MmvPlayer::ReadFrameOnce	326	unmatched	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.96
+007a9750	250	-					0.00	none	en-only	unknown
+007a9850	15	APP.dll	10161050	MmvPlayer::DecodeNextFrame	17	matched:mmv_texreg.cpp	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.88
+007a9860	105	APP.dll	101609b0	MmvPlayer_Close	97	matched:mmv_texreg.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.92
+007a98d0	280	-					0.00	none	en-only	unknown
+007a99f0	26	-					0.00	none	en-only	unknown
+007a9a10	95	-					0.00	none	en-only	unknown
+007a9a70	212	-					0.00	none	en-only	unknown
+007a9bb0	78	-					0.00	none	en-only	unknown
+007a9c00	71	-					0.00	none	en-only	steam
+007a9c70	96	-					0.00	none	en-only	steam
+007a9cf0	6	-					0.00	none	en-only	unknown
+007a9d00	26	-					0.00	none	en-only	unknown
+007a9d20	66	-					0.00	none	en-only	steam
+007a9d70	14	-					0.00	none	en-only	unknown
+007a9d80	20	-					0.00	none	en-only	unknown
+007a9db0	330	APP.dll	1003b260	Save_WriteSlot	88	matched:save_slot.cpp	0.35	medium	features	shared i1,s1, 1 rare
+007a9f00	287	APP.dll	1013e260	UserFolder_FindNt	428	unmatched	0.33	low	features	shared c4,i1, 4 rare
+007aa020	206	sound3d.dll	100537f8		243	unmatched	0.43	medium	features	shared c2,i1, 2 rare; also inlines sound3d.dll:10052dfc
+007aa0f0	57	-					0.00	none	en-only	unknown
+007aa130	282	SoundArc.dll	00402640		114	unmatched	0.44	medium	features	shared i2, 1 rare
+007aa250	33	APP.dll	10001450	Mouse_UpdateMoved	67	matched:app_0001.cpp	0.82	high	callgraph	neighbours 5 of 6 mapped agree, size ratio 0.49
+007aa280	23	APP.dll	10001550	Sound_StopAll	23	matched:app_0002.cpp	0.90	high	callgraph	neighbours 8 of 8 mapped agree, size ratio 1.00
+007aa2a0	140	APP.dll	100014b0	Mouse_ReportCursor	159	unmatched	0.69	high	features	shared c3,i1, 0 rare
+007aa330	101	APP.dll	10001110	Mouse_GetState	91	matched:app_0001.cpp	0.90	high	callgraph	neighbours 9 of 9 mapped agree, size ratio 0.90
+007aa3a0	1132	APP.dll	10001170	Obj::Update	712	matched:app_0001.cpp	0.86	high	features	shared c5,i4, 3 rare
+007aa810	65	APP.dll	10001010	Mouse::Init	63	matched:app_0001.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.97
+007aa870	64	-					0.00	none	en-only	unknown
+007aa8b0	10	APP.dll	100014a0	Mouse::ClearChanged	10	matched:app_0005.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 1.00
+007aa8f0	122	APP.dll	10001090	Mouse::SetCursorGamePos	127	matched:app_0005.cpp	0.83	high	features	shared c3,i2, 1 rare
+007aa970	34	-					0.00	none	en-only	unknown
+007aa9a0	331	-					0.00	none	en-only	unknown
+007aaaf0	18	-					0.00	none	en-only	unknown
+007aab10	30	-					0.00	none	en-only	unknown
+007aab30	56	-					0.00	none	en-only	unknown
+007aabb0	29	-					0.00	none	en-only	unknown
+007aabd0	33	-					0.00	none	en-only	unknown
+007aac00	33	-					0.00	none	en-only	unknown
+007aac30	83	APP.dll	1015d430	ImeContext::LoadCandidates	85	matched:ime.cpp	0.43	medium	features	shared c1, 1 rare
+007aac90	39	-					0.00	none	en-only	unknown
+007aacc0	132	APP.dll	1015d2e0	ImeContext::GetResultString	115	matched:ime.cpp	0.64	high	features	shared c1,i1, 0 rare
+007aad50	27	APP.dll	1015d140	ImeContext::GetConversion	28	matched:ime.cpp	0.41	medium	features	shared c1, 1 rare
+007aad70	349	APP.dll	1015d180	ImeContext::GetModeText	338	matched:ime.cpp	0.41	medium	features	shared f1, 1 rare
+007aaee0	119	-					0.00	none	en-only	unknown
+007aaf70	61	APP.dll	1015d0a0	ImeContext::Release	62	matched:ime.cpp	0.33	low	features	shared c1, 1 rare
+007aafb0	24	APP.dll	1015d120	ImeContext::SetOpen	23	matched:ime.cpp	0.47	medium	features	shared c1, 1 rare
+007aafd0	31	APP.dll	1015d160	ImeContext::SetConversion	32	matched:ime.cpp	0.46	medium	features	shared c1, 1 rare
+007aaff0	85	APP.dll	1015d0e0	ImeContext::Attach	36	matched:ime.cpp	0.41	medium	features	shared c1, 1 rare
+007ab140	142	-					0.00	none	en-only	unknown
+007ab1e0	23	APP.dll	1015fd30	TextInput_End	99	matched:ime.cpp	0.58	medium	callgraph	neighbours 3 of 5 mapped agree, size ratio 0.23
+007ab210	7222	APP.dll	1015d520	Text_ToFullWidth	7652	matched:text_fullwidth.cpp	0.65	high	features	shared f17,i387, 106 rare
+007ace50	245	-					0.00	none	en-only	unknown
+007acf50	289	-					0.00	none	en-only	unknown
+007ad080	281	-					0.00	none	en-only	unknown
+007ad1a0	172	APP.dll	1015fb20	ImeCandidates_Draw	187	unmatched	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.92
+007ad250	184	-					0.00	none	en-only	unknown
+007ad310	37	-					0.00	none	en-only	unknown
+007ad340	105	-					0.00	none	en-only	unknown
+007ad3b0	91	APP.dll	1015fac0	ImeCandidates_WidestWidth	94	matched:menu_list.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.97
+007ad410	134	APP.dll	1015fda0	TextInput_Begin	116	matched:ime.cpp	0.72	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.87
+007ad4a0	6	APP.dll	1015d510	Ime_IsOpen	10	matched:ime.cpp	0.67	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.60
+007ad4b0	100	-					0.00	none	en-only	unknown
+007ad520	18	-					0.00	none	en-only	unknown
+007ad540	13	-					0.00	none	en-only	unknown
+007ad550	305	-					0.00	none	en-only	unknown
+007ad690	1778	sound3d.dll	1005011d		1290	unmatched	0.39	medium	features	shared i2, 1 rare
+007add90	17	-					0.00	none	en-only	unknown
+007addb0	23	-					0.00	none	en-only	unknown
+007addd0	321	-					0.00	none	en-only	unknown
+007adf20	71	-					0.00	none	en-only	unknown
+007adf70	24	-					0.00	none	en-only	unknown
+007adf90	115	-					0.00	none	en-only	unknown
+007ae010	36	-					0.00	none	en-only	unknown
+007ae040	90	-					0.00	none	en-only	unknown
+007ae0a0	316	sound3d.dll	1005fdf1	QueryInterface	68	unmatched	0.37	medium	features	shared c1, 1 rare
+007ae1e0	274	-					0.00	none	en-only	unknown
+007ae300	36	-					0.00	none	en-only	unknown
+007ae330	645	sound3d.dll	1000a8a0		103	unmatched	0.23	low	features	shared i1, 1 rare
+007ae5c0	1332	APP.dll	10142790	Input::Update	846	unmatched	0.47	medium	features	shared c2,i2, 1 rare
+007aeb00	794	sound3d.dll	1001da8a	Format	293	unmatched	0.38	medium	features	shared c1, 1 rare
+007aee30	154	APP.dll	10142700	Input::Rumble	131	matched:input_font.cpp	0.51	medium	features	shared f1,i2, 0 rare
+007aeed0	9	-					0.00	none	en-only	unknown
+007aef40	133	APP.dll	1013e0c0	Path_CreateDirectories	161	matched:path_util.cpp	0.18	low	features	shared c1, 1 rare
+007aefd0	159	sound3d.dll	100522e0	ATL::operator+	112	unmatched	0.54	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.70
+007af070	32	APP.dll	1015fe70	Config_GetInt	35	matched:config_ini.cpp	0.35	medium	features	shared c1, 1 rare
+007af090	416	APP.dll	101603c0	SystemSav_ReadRecord	1218	unmatched	0.62	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.34
+007af230	32	sound3d.dll	1005d5ff	FID_conflict:GetProfileIntW	105	unmatched	0.22	low	features	shared c1, 1 rare
+007af250	37	sound3d.dll	1005d668		302	unmatched	0.14	low	features	shared c1, 1 rare
+007af2a0	196	APP.dll	1015fea0	SystemSav_WriteRecord	1060	matched:system_sav.cpp	0.48	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.18
+007af370	43	APP.dll	1015fe20	Config_SetInt	74	matched:config_ini.cpp	0.52	medium	features	shared c2, 2 rare
+007af3b0	23	sound3d.dll	100595ec		136	unmatched	0.19	low	features	shared c1, 1 rare
+007af3e0	22	-					0.00	none	en-only	unknown
+007af400	26	-					0.00	none	en-only	unknown
+007af420	169	APP.dll	1015cd70	DemoRecording::RecordFrame	442	matched:demo_record.cpp	0.52	medium	features	shared i8, 7 rare
+007af4d0	196	APP.dll	1015cc90	DemoRecording::Load	224	matched:demo_record.cpp	0.74	high	features	shared c3,i3, 0 rare
+007af5c0	171	APP.dll	1015cf30	DemoRecording::PlayFrame	349	matched:demo_record.cpp	0.57	medium	features	shared i8, 7 rare
+007af670	196	-					0.00	none	en-only	unknown
+007af740	454	-					0.00	none	en-only	unknown
+007af920	144	-					0.00	none	en-only	unknown
+007af9b0	46	-					0.00	none	en-only	unknown
+007af9e0	211	-					0.00	none	en-only	unknown
+007afac0	236	-					0.00	none	en-only	unknown
+007afbb0	214	-					0.00	none	en-only	unknown
+007afc90	207	-					0.00	none	en-only	unknown
+007afd60	167	-					0.00	none	en-only	unknown
+007afe10	155	-					0.00	none	en-only	unknown
+007afeb0	207	-					0.00	none	en-only	unknown
+007aff80	181	-					0.00	none	en-only	unknown
+007b0040	175	-					0.00	none	en-only	unknown
+007b00f0	194	-					0.00	none	en-only	unknown
+007b01c0	349	-					0.00	none	en-only	unknown
+007b0330	255	-					0.00	none	en-only	unknown
+007b0440	153	-					0.00	none	en-only	unknown
+007b04e0	4579	-					0.00	none	en-only	unknown
+007b16e0	236	-					0.00	none	en-only	unknown
+007b17d0	288	-					0.00	none	en-only	unknown
+007b18f0	24489	sound3d.dll	10038b70		5373	unmatched	0.34	low	features	shared f5,i4, 1 rare
+007b78b0	289	-					0.00	none	en-only	unknown
+007b79e0	277	-					0.00	none	en-only	unknown
+007b7b00	327	-					0.00	none	en-only	unknown
+007b7c50	311	-					0.00	none	en-only	unknown
+007b7d90	89	-					0.00	none	en-only	unknown
+007b7df0	824	-					0.00	none	en-only	unknown
+007b8130	46	-					0.00	none	en-only	unknown
+007b8160	64	-					0.00	none	en-only	unknown
+007b81a0	288	-					0.00	none	en-only	unknown
+007b82c0	232	-					0.00	none	en-only	unknown
+007b83b0	288	-					0.00	none	en-only	unknown
+007b84d0	45	-					0.00	none	en-only	unknown
+007b8510	314	-					0.00	none	en-only	unknown
+007b8650	15	-					0.00	none	en-only	unknown
+007b8660	45	-					0.00	none	en-only	unknown
+007b8690	272	-					0.00	none	en-only	unknown
+007b87a0	18	-					0.00	none	en-only	unknown
+007b87c0	282	-					0.00	none	en-only	unknown
+007b88e0	232	-					0.00	none	en-only	unknown
+007b89d0	288	-					0.00	none	en-only	unknown
+007b8af0	1068	Packs.dll	10004fb0	BMPPack	1195	unmatched	0.75	high	features	shared i2, 1 rare
+007b8f30	729	-					0.00	none	en-only	unknown
+007b9210	495	-					0.00	none	en-only	unknown
+007b9400	412	-					0.00	none	en-only	unknown
+007b95a0	339	Packs.dll	10002bc0		340	unmatched	0.87	high	features	shared i10, 1 rare
+007b9700	294	-					0.00	none	en-only	unknown
+007b9830	624	Packs.dll	10003e60		681	unmatched	0.79	high	features	shared i4, 1 rare
+007b9ab0	1184	-					0.00	none	en-only	unknown
+007b9f60	67	-					0.00	none	en-only	unknown
+007b9fb0	65	-					0.00	none	en-only	unknown
+007ba000	102	-					0.00	none	en-only	unknown
+007ba070	301	Packs.dll	10003490		350	unmatched	0.86	high	features	shared i3, 2 rare
+007ba1a0	75	-					0.00	none	en-only	unknown
+007ba1f0	587	Packs.dll	10003260		552	unmatched	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.94
+007ba440	1182	Packs.dll	10001000		1470	unmatched	0.64	high	features	shared i1, 0 rare
+007ba8f0	536	-					0.00	none	en-only	unknown
+007bab10	83	-					0.00	none	en-only	unknown
+007bab70	451	Packs.dll	10003600		466	unmatched	0.95	high	features	shared i2, 1 rare
+007bad40	505	Packs.dll	10004120		656	unmatched	0.55	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.77
+007baf40	831	Packs.dll	100015c0		901	unmatched	0.92	high	features	shared i3, 1 rare
+007bb280	547	-					0.00	none	en-only	unknown
+007bb4b0	75	-					0.00	none	en-only	unknown
+007bb500	124	Packs.dll	10001950		124	unmatched	0.44	medium	features	shared i2, 1 rare
+007bb580	174	-					0.00	none	en-only	unknown
+007bb630	670	Packs.dll	10004540		737	unmatched	0.81	high	features	shared i4, 1 rare
+007bb8d0	118	-					0.00	none	en-only	unknown
+007bb950	1659	-					0.00	none	en-only	unknown
+007bbfe0	476	-					0.00	none	en-only	unknown
+007bc1c0	465	-					0.00	none	en-only	unknown
+007bc3a0	206	-					0.00	none	en-only	unknown
+007bc480	67	-					0.00	none	en-only	unknown
+007bc4d0	2028	Packs.dll	10002180		2600	unmatched	0.83	high	features	shared i4, 4 rare
+007bccc0	67	-					0.00	none	en-only	unknown
+007bcd10	598	Packs.dll	10006e90	ExecPack	585	unmatched	0.88	high	features	shared i5, 5 rare
+007bcf70	126	Packs.dll	100070e0	ExecUnpack	129	unmatched	0.65	high	features	shared i2, 1 rare
+007bcff0	118	-					0.00	none	en-only	unknown
+007bd070	72	-					0.00	none	en-only	unknown
+007bd0c0	90	-					0.00	none	en-only	unknown
+007bd120	100	-					0.00	none	en-only	unknown
+007bd190	76	-					0.00	none	en-only	unknown
+007bd1e0	89	Packs.dll	10006e30		81	unmatched	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.91
+007bd240	1235	Packs.dll	10006a40		972	unmatched	0.55	medium	features	shared i2, 0 rare
+007bd730	93	-					0.00	none	en-only	unknown
+007bd790	212	Packs.dll	10006950		235	unmatched	0.77	high	features	shared i2, 1 rare
+007bd870	288	Packs.dll	100066d0		321	unmatched	0.78	high	features	shared i3, 2 rare
+007bd990	838	Packs.dll	100063c0		764	unmatched	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.91
+007bdd20	445	Packs.dll	10005c00	BMPLoad	588	unmatched	0.47	medium	features	shared i2, 0 rare
+007bdee0	477	sound3d.dll	10002e70		553	unmatched	0.40	medium	callgraph	neighbours 1 of 2 mapped agree, size ratio 0.86
+007be0c0	243	-					0.00	none	en-only	unknown
+007be1c0	238	-					0.00	none	en-only	unknown
+007be2b0	561	-					0.00	none	en-only	unknown
+007be4f0	398	SoundArc.dll	0040f79d	___crtGetLocaleInfoA	297	unmatched	0.34	low	features	shared c1,i1, 1 rare
+007be690	373	sound3d.dll	10048f0d	__strupr	253	unmatched	0.35	medium	features	shared c1,i1, 1 rare; also inlines sound3d.dll:1002b22e
+007be810	132	sound3d.dll	100029e0		74	unmatched	0.66	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.56
+007be8b0	41	sound3d.dll	10001440		36	unmatched	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.88
+007be8e0	116	sound3d.dll	100040d0		107	unmatched	0.67	high	features	shared c1,i2, 0 rare
+007be960	26	-					0.00	none	en-only	unknown
+007be980	166	sound3d.dll	100030a0		210	unmatched	0.76	high	features	shared c1,i6, 0 rare; also inlines sound3d.dll:10001470
+007bea30	105	sound3d.dll	10002970		106	unmatched	0.78	high	features	shared i4, 0 rare
+007beaa0	257	APP.dll	101615d0	ItmDescramble	264	unmatched	0.72	high	features	shared c2,i1,s2, 1 rare
+007bebb0	380	APP.dll	101602d0	File_Checksum	141	matched:file_check.cpp	0.50	medium	features	shared c3, 0 rare
+007bed30	524	sound3d.dll	100024b0		961	unmatched	0.66	high	features	shared f1,i11, 3 rare
+007bef40	477	-					0.00	none	en-only	unknown
+007bf120	45	sound3d.dll	10002d30		46	unmatched	0.60	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.98
+007bf150	28	-					0.00	none	en-only	unknown
+007bf170	958	sound3d.dll	10003640		1076	unmatched	0.62	high	features	shared c4,i2,s3, 6 rare
+007bf540	141	sound3d.dll	10001170		145	unmatched	0.91	high	features	shared c2,i2, 2 rare
+007bf5d0	90	-					0.00	none	en-only	unknown
+007bf630	50	sound3d.dll	10001130		50	unmatched	0.61	high	callgraph	neighbours 2 of 3 mapped agree, size ratio 1.00
+007bf670	192	sound3d.dll	10001000		211	unmatched	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.91
+007bf740	384	sound3d.dll	10001ce0		470	unmatched	0.72	high	features	shared i11, 0 rare
+007bf8c0	437	sound3d.dll	10001ec0		413	unmatched	0.81	high	features	shared i11, 0 rare
+007bfa80	673	sound3d.dll	10004140		590	unmatched	0.95	high	features	shared c1,i16, 6 rare
+007bfd30	335	sound3d.dll	1001faa0	__alldiv	170	unmatched	0.35	medium	callgraph	neighbours 1 of 2 mapped agree, size ratio 0.51
+007bfe80	884	sound3d.dll	10004860		950	unmatched	0.71	high	features	shared c1,i11,s2, 3 rare
+007c0200	406	sound3d.dll	10003cb0		452	unmatched	0.89	high	features	shared c3,i11, 4 rare
+007c03a0	429	sound3d.dll	10004590		447	unmatched	0.83	high	features	shared c3,i8, 1 rare
+007c0550	264	sound3d.dll	10004750		260	unmatched	0.84	high	features	shared c3,i8, 1 rare
+007c0660	481	sound3d.dll	10004390		507	unmatched	0.85	high	features	shared c3,i7, 0 rare
+007c0850	1785	sound3d.dll	10004c20		2148	unmatched	0.89	high	features	shared c7,i21, 8 rare
+007c0f50	573	sound3d.dll	10003e80		592	unmatched	0.98	high	features	shared i8, 3 rare
+007c1190	46	sound3d.dll	100028d0		47	unmatched	0.57	medium	features	shared i3, 0 rare
+007c11c0	98	sound3d.dll	10002900		99	unmatched	0.83	high	features	shared i5, 0 rare
+007c1230	289	sound3d.dll	10002a30		256	unmatched	0.87	high	features	shared c2,i2, 2 rare
+007c1360	224	sound3d.dll	10002b30		285	unmatched	0.73	high	features	shared c1,i13, 0 rare
+007c1440	26	-					0.00	none	en-only	unknown
+007c1460	180	sound3d.dll	10002c50		222	unmatched	0.74	high	features	shared c1,i10, 0 rare
+007c1520	168	sound3d.dll	10001be0		210	unmatched	0.74	high	features	shared i6, 1 rare
+007c15d0	117	-					0.00	none	en-only	unknown
+007c1650	38	-					0.00	none	en-only	unknown
+007c1680	49	-					0.00	none	en-only	unknown
+007c16d0	64	-					0.00	none	en-only	unknown
+007c1710	31	-					0.00	none	en-only	unknown
+007c1730	32	-					0.00	none	en-only	unknown
+007c1750	156	-					0.00	none	en-only	unknown
+007c17f0	38	-					0.00	none	en-only	unknown
+007c1820	49	-					0.00	none	en-only	unknown
+007c1860	49	-					0.00	none	en-only	unknown
+007c18a0	49	-					0.00	none	en-only	unknown
+007c18e0	49	-					0.00	none	en-only	unknown
+007c1930	64	-					0.00	none	en-only	unknown
+007c1970	31	-					0.00	none	en-only	unknown
+007c1990	32	-					0.00	none	en-only	unknown
+007c19b0	32	-					0.00	none	en-only	unknown
+007c19d0	32	-					0.00	none	en-only	unknown
+007c19f0	73	-					0.00	none	en-only	unknown
+007c1a40	32	-					0.00	none	en-only	unknown
+007c1a60	102	sound3d.dll	100058a0		68	unmatched	0.85	high	features	shared i9, 0 rare
+007c1ad0	6	-					0.00	none	en-only	unknown
+007c1ae0	62	-					0.00	none	en-only	unknown
+007c1b20	168	sound3d.dll	100080d0		63	unmatched	0.47	medium	features	shared i3, 1 rare
+007c1bd0	272	sound3d.dll	10005b40		279	unmatched	0.86	high	features	shared i12, 0 rare
+007c1ce0	404	sound3d.dll	10008360		512	unmatched	0.73	high	features	shared c1,i9, 2 rare
+007c1e80	111	sound3d.dll	100058f0		116	unmatched	0.90	high	callgraph	neighbours 7 of 7 mapped agree, size ratio 0.96
+007c1ef0	426	sound3d.dll	100060b0		414	unmatched	0.93	high	features	shared c1,i14, 0 rare
+007c20a0	1290	sound3d.dll	10006250		1190	unmatched	0.66	high	features	shared c4,i3, 0 rare
+007c25b0	640	sound3d.dll	10007dd0		693	unmatched	0.89	high	features	shared c1,i26, 2 rare
+007c2830	189	sound3d.dll	100081e0		197	unmatched	0.83	high	features	shared c1,i11, 0 rare
+007c28f0	226	sound3d.dll	10008110		208	unmatched	0.85	high	features	shared c1,i10, 0 rare
+007c29e0	218	sound3d.dll	100082b0		161	unmatched	0.76	high	features	shared i9, 0 rare
+007c2ac0	4121	sound3d.dll	10006810		4140	unmatched	0.91	high	features	shared c1,f9,i40, 5 rare
+007c3ae0	30	-					0.00	none	en-only	unknown
+007c3b00	553	sound3d.dll	10005e30		628	unmatched	0.90	high	callgraph	neighbours 6 of 6 mapped agree, size ratio 0.88
+007c3d30	252	sound3d.dll	10006700		262	unmatched	0.85	high	features	shared c1,i7, 0 rare
+007c3e30	35	-					0.00	none	en-only	unknown
+007c3e60	339	sound3d.dll	10005990		305	unmatched	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.90
+007c3fc0	87	sound3d.dll	10005ad0		85	unmatched	0.80	high	features	shared i5, 0 rare
+007c4020	410	sound3d.dll	10007c50		382	unmatched	0.87	high	features	shared i12, 0 rare
+007c41c0	272	sound3d.dll	10007b50		243	unmatched	0.81	high	features	shared i12, 0 rare
+007c42d0	555	sound3d.dll	10007840		774	unmatched	0.66	high	features	shared f6,i7, 0 rare
+007c4510	152	sound3d.dll	10005cd0		170	unmatched	0.76	high	features	shared f1,i4, 0 rare
+007c45b0	98	sound3d.dll	10005c60		102	unmatched	0.82	high	callgraph	neighbours 5 of 6 mapped agree, size ratio 0.96
+007c4620	90	sound3d.dll	10005dd0		88	unmatched	0.53	medium	callgraph	neighbours 2 of 4 mapped agree, size ratio 0.98
+007c4680	46	sound3d.dll	10005da0		43	unmatched	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.93
+007c4760	360	-					0.00	none	en-only	unknown
+007c48e0	29	sound3d.dll	10008f10	MixClose	29	unmatched	0.47	medium	features	shared c1, 1 rare
+007c4900	1848	sound3d.dll	10008890	MixOpen	1663	unmatched	0.98	high	features	shared c3,i6, 6 rare
+007c5040	346	-					0.00	none	en-only	unknown
+007c51e0	814	sound3d.dll	1000a3a0		830	unmatched	0.96	high	features	shared c4,i3, 0 rare
+007c5530	76	sound3d.dll	1001b19e		31	unmatched	0.44	medium	features	shared c2, 0 rare
+007c5580	79	sound3d.dll	10009460	IStopSE	78	unmatched	0.58	medium	features	shared c2,i1, 0 rare
+007c55d0	51	sound3d.dll	1000a130	IGetPos	52	unmatched	0.60	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.98
+007c5610	273	sound3d.dll	1000a6f0	IInit	262	unmatched	0.92	high	features	shared c3,i1, 3 rare
+007c5750	149	APP.dll	10001a90	SoundArc_PlayStream	173	matched:app_0002.cpp	0.57	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.86
+007c57f0	91	sound3d.dll	1000a0d0	IFadeOutEx	82	unmatched	0.58	medium	features	shared c2,i1, 0 rare
+007c5850	149	-					0.00	none	en-only	unknown
+007c58f0	91	sound3d.dll	1005b2f4	DeleteValues	89	unmatched	0.44	medium	features	shared c2, 0 rare
+007c5950	94	sound3d.dll	10009ef0	IPlayB	102	unmatched	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.92
+007c59b0	169	-					0.00	none	en-only	unknown
+007c5a60	240	APP.dll	100016c0	SoundArc_PlayFile	256	unmatched	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.94
+007c5b50	154	sound3d.dll	10009940	IPlayFadeBEx	107	unmatched	0.55	medium	features	shared c2,i1, 0 rare
+007c5bf0	165	sound3d.dll	100095c0	IPlaySEB	163	unmatched	0.66	high	features	shared c2,i1, 0 rare
+007c5ca0	76	sound3d.dll	10009830	IStopAllSE	79	unmatched	0.42	medium	callgraph	neighbours 1 of 2 mapped agree, size ratio 0.96
+007c5d10	215	sound3d.dll	1000a2b0	IRelease	215	unmatched	0.90	high	features	shared c3,i1, 3 rare
+007c5e00	96	sound3d.dll	1000a1f0	ISetSEVolume	97	unmatched	0.58	medium	features	shared c2,i1, 0 rare
+007c5e60	208	APP.dll	100017c0	SoundArc_Message235	207	matched:app_0002.cpp	0.75	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 1.00
+007c5f30	69	sound3d.dll	10009fb0	ISetLoopPos	76	unmatched	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.91
+007c5f80	86	-					0.00	none	en-only	unknown
+007c5ff0	61	sound3d.dll	10009670	ISetSEPos	69	unmatched	0.58	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.88
+007c6030	36	-					0.00	none	en-only	unknown
+007c6060	96	sound3d.dll	1000a000	ISetBGMVol	90	unmatched	0.58	medium	features	shared c2,i1, 0 rare
+007c60c0	79	sound3d.dll	1000a080	IFadeOut	77	unmatched	0.58	medium	features	shared c2,i1, 0 rare
+007c6110	77	sound3d.dll	10009f60	IPlayStop	77	unmatched	0.58	medium	features	shared c2,i1, 0 rare
+007c6180	54	sound3d.dll	1000a1b0	IVolFade	58	unmatched	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.93

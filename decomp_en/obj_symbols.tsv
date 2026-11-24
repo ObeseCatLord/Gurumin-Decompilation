@@ -1,0 +1,7 @@
+# mangled name<TAB>EN address (C++ symbols the build compares)
+# flag tests (flag_tests/*.cpp, NOTES "Compile flags")
+?Step@Counter@@QAEHXZ	005a8cd0
+??0Thing@@QAE@XZ	005a0fa0
+# matched source (src/)
+?Find@Node@@QAEPAU1@PBDH@Z	007532c0
+_Map_RunFrameScript	005dc5c0

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+<style>
+.bg { fill: #1e2127; }
+.title { font: 600 16px sans-serif; fill: #ffffff; }
+.label { font: 13px sans-serif; fill: #d0d4da; }
+.value { font: 600 13px sans-serif; fill: #ffffff; }
+.detail { font: 11px sans-serif; fill: #9aa1ab; }
+.track { fill: #333842; }
+</style>
+<rect width="600" height="200" rx="10" class="bg"/>
+<text x="20" y="30" class="title">Gurumin (JP PC) APP.dll matching decompilation</text>
+<text x="20" y="60" class="label">Functions matched</text><text x="580" y="60" class="value" text-anchor="end">0.10%</text><rect x="20" y="68" width="400" height="12" rx="6" class="track"/><rect x="20" y="68" width="0.4" height="12" rx="6" fill="#4caf50"/><text x="430" y="79" class="detail">2 / 2034</text><text x="20" y="110" class="label">Code matched (bytes)</text><text x="580" y="110" class="value" text-anchor="end">0.00%</text><rect x="20" y="118" width="400" height="12" rx="6" class="track"/><rect x="20" y="118" width="0.0" height="12" rx="6" fill="#2196f3"/><text x="430" y="129" class="detail">94 / 2,080,360</text><text x="20" y="160" class="label">Fuzzy match (bytes)</text><text x="580" y="160" class="value" text-anchor="end">0.00%</text><rect x="20" y="168" width="400" height="12" rx="6" class="track"/><rect x="20" y="168" width="0.0" height="12" rx="6" fill="#ff9800"/><text x="430" y="179" class="detail">weighted by similarity</text>
+</svg>

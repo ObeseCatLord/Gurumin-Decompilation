@@ -12,8 +12,9 @@ Source: `Gurumin\Gurumin JP\` (retail JP install). Pristine copies + SHA-256 in 
 | `bin\APP8.dll` | 2,359,296 | 7.0 / 2006-05-09 | same code, D3D8 build (`.data1` section extra) |
 | `Packs/sound3d/Update2/SoundArc/PADDLL.dll` | small | 2004 | helper DLLs, later |
 
-The English Steam `game.exe` (6 MB, linker 12.0 / VS2013, 2015) is a rebuild and **cannot be byte-matched** from this
-toolchain; it is out of scope for matching. Modern-hardware work should target the JP code base (or a separate layer).
+The English Steam `game.exe` (6 MB, linker 12.0 / VS2013 Update 4, 2015) is a rebuild with its own matching
+project in `decomp_en/` (cl 18.00.31101, flags `/O2 /Oy- /GS- /EHsc`; read `decomp_en/NOTES.md` and
+`decomp_en/HANDOFF.md`). JP compiler habits below do not apply to it.
 
 ## Compiler (decoded Rich header)
 APP.dll / APP8.dll: bulk of objects built with product build **9466** (Visual Studio .NET 2002, cl 13.00.9466, linker 7.00):

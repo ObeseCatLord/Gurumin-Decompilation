@@ -6,6 +6,8 @@
 
 #include "anim_model.h"
 
+struct DrawList;   // the list the node drawing queues into (node.h)
+
 // Number of model records in the bank.
 const int MODEL_BANK_SIZE = 16;
 // Shadow render targets, lens flare textures and crossfade render targets of the bank.

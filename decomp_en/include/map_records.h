@@ -59,4 +59,16 @@ extern "C" float Map_RouteLength(int map, int costScale);
 // EN 0x5edd60 (JP 0x10049b00).
 extern "C" int Map_RoutePosition(int map, int part, float t, Vec4 *out, int costScale);
 
+// Number of entries of g_mapRecords that describe maps. EN 0x0092d014 (JP DAT_10216dc4).
+extern "C" int g_mapEntryCount;
+// Index of the map record of the map being played. EN 0x00916f70 (JP DAT_1020c2c0).
+extern "C" int g_currentMapEntry;
+// Bytes of an icon file name in g_mapIconNames.
+const int MAP_ICON_NAME_SIZE = 0x10;
+// The icon file names (index MapEntry::icon). EN 0x00848610 (JP DAT_101d65b0).
+extern "C" char g_mapIconNames[][MAP_ICON_NAME_SIZE];
+
+// Returns the texture slot of the current map's icon, or 0 when no entry has the current map's id. EN 0x609b20 (JP 0x1001e240).
+extern "C" int Map_IconTexture(void);
+
 #endif

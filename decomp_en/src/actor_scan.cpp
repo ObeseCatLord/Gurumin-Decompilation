@@ -94,7 +94,8 @@ extern "C" int Object_SlowNearBlocker(const Vec4 *position, Vec4 *velocity)
             float distanceAfter = delta.Length2D();
             if (distance < BLOCKER_RANGE && distance > distanceAfter)
             {
-                velocity->Copy(*velocity * BLOCKER_SLOWDOWN);
+                float slowdown = BLOCKER_SLOWDOWN;
+                velocity->Copy(*velocity * slowdown);
                 return 0;
             }
         }

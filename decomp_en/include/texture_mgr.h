@@ -18,8 +18,8 @@ const int BLEND_MODE_UNSET = -1;
 const int RENDER_BLEND_MODE = 0;
 // Render_Command code that sets the texture addressing of stage 0 (value 0 = wrap).
 const int RENDER_TEXTURE_ADDRESS = 2;
-// Render_Command code that turns the depth test on (value 1) or off (0).
-const int RENDER_DEPTH_TEST = 9;
+// Render_Command code that turns depth writes on (value 1) or off (0).
+const int RENDER_DEPTH_WRITE = 9;
 // Render_Command codes that clear the target to colour `value` (4) and end the scene to begin a new one (6).
 const int RENDER_CLEAR = 4;
 const int RENDER_FLUSH_SCENE = 6;

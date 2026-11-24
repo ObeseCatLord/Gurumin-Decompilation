@@ -45,7 +45,10 @@ const int SOUND_SOURCE_OGG = 5;     // Ogg Vorbis data decoded by an OggReader
 struct SoundSource
 {
     int decoderOpen;                // 0x000: non-zero while the ACM decoder buffers and streams exist
-    void *decodeBuffer[4];          // 0x004: decoder buffers (0x004, 0x008, 0x00c, 0x010)
+    WAVEFORMATEX *adpcmFormat;      // 0x004: ADPCM format of the compressed data (allocated with the decoder)
+    WAVEFORMATEX *pcmFormat;        // 0x008: PCM format the ADPCM data decodes to
+    WAVEFORMATEX *streamAdpcmFormat;    // 0x00c: ADPCM format suggested for the streamed PCM format
+    WAVEFORMATEX *streamPcmFormat;  // 0x010: PCM format of the streamed data
     char m_0014[0x40 - 0x14];       // 0x014: not used by ported code yet
     HACMSTREAM acmStreamA;          // 0x040: ACM stream paired with headerA
     HACMSTREAM acmStreamB;          // 0x044: ACM stream paired with headerB
@@ -78,6 +81,11 @@ struct SoundSource
     SoundSource();
     // Destructor: frees the decoder and the decoded data, closes the file. EN 0x7be8e0.
     ~SoundSource();
+    // Allocates and fills the ACM formats and stream headers of the decoder (not when `skip` is set). Returns 1,
+    // or 0 when skipped. EN 0x7bfa80.
+    int InitDecoder(int skip);
+    // Opens a sound file and decides by the end of its name how it is read (wave, compressed, Ogg, raw). EN 0x7bfe80.
+    int OpenSource(const char *path);
     // Opens a file in the compressed layout and measures its decoded size. EN 0x7c0550.
     int OpenCompressed(const char *path);
     // Copies the next `count` decoded bytes of the sound to `destination` (decoding as needed). EN 0x7c0850.
@@ -133,7 +141,8 @@ struct SoundVoice : SoundSource
     DWORD fadeLastTick;             // 0x1e8: GetTickCount at the last fade step
     int fadeRemainingMs;            // 0x1ec: milliseconds the fade still has to run (0 = no fade)
     int thirdFlag[3];               // 0x1f0: state of each third of the DirectSound buffer (refill bookkeeping)
-    char m_01fc[0x204 - 0x1fc];     // 0x1fc: not used by ported code yet
+    int m_01fc;                     // 0x1fc: not used by ported code yet
+    DWORD playStartTick;            // 0x200: GetTickCount when playback started
     int m_0204;                     // 0x204: not used by ported code yet
     PCMWAVEFORMAT bufferFormat;     // 0x208: format of the DirectSound buffer (the buffer holds three seconds)
     WaveFileHeader waveHeader;      // 0x218: header of the sound data being played
@@ -142,7 +151,7 @@ struct SoundVoice : SoundSource
     int usesSharedDevice;           // 0x24c: non-zero when the device belongs to another voice (not released here)
     IDirectSoundBuffer *primaryBuffer;   // 0x250
     int usesSharedPrimary;          // 0x254: non-zero when the primary buffer belongs to another voice
-    IDirectSoundBuffer *buffer;     // 0x258: the secondary buffer being played
+    IDirectSoundBuffer8 *buffer;    // 0x258: the secondary buffer being played
     IDirectSound3DBuffer *buffer3d; // 0x25c
     IDirectSound3DListener *listener;    // 0x260
 
@@ -192,7 +201,7 @@ struct SoundVoice : SoundSource
     // Returns the play position in samples. EN 0x7c1bd0.
     int GetPlayPosition();
     // Starts playing the sound file `path` (looping flag, start sample, loop start and end samples). EN 0x7c25b0.
-    int Play(const char *path, int looping, int startSample, int loopStartSample, int loopEndSample);
+    int Play(const char *path, int looping, int startSample, int loopStartSample, unsigned loopEndSample);
     // Fills part of the DirectSound buffer with the next sound data: locks `length` bytes at `offset`, reads (looping
     // back to the loop start at the end of the data, or padding with silence and stopping at the end of a one-shot
     // sound) and unlocks. `reserved` is not used. Returns 0 when the lock fails, else 1. EN 0x7c3b00.

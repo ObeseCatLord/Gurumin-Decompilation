@@ -66,6 +66,7 @@ enum CharStat
     STAT_HEALTH = 0,          // 0x04: hit points left
     STAT_MAX_HEALTH = 1,      // 0x08: initial value of the health (restored when the slot is reused)
     STAT_EFFECT_COLOUR = 3,   // 0x10: colour of the effects the character starts
+    STAT_VALUE_4 = 4,         // 0x14: saved with the colour when Char_UnpackParameter switches the kind
     STAT_PICKUPS = 6,         // 0x1c: guarded by the anti-tamper copies
     STAT_GUARDED_B = 7        // 0x20: guarded by the anti-tamper copies
 };
@@ -88,12 +89,16 @@ struct CharRecord
     int m_00a8;                              // 0xa8: tested on the previous slot by Chars_ReloadModels (0 = reload this slot)
     char m_00ac[0xb8 - 0xac];                // 0xac: not used by EN code yet
     int money;                               // 0xb8: money carried (guarded by the anti-tamper copies)
-    char m_00bc[0xf0 - 0xbc];                // 0xbc: not used by EN code yet
+    char m_00bc[0xd8 - 0xbc];                // 0xbc: not used by EN code yet
+    int packedParameter;                     // 0xd8: packed script value (formation digits, mode digits; see Char_UnpackParameter)
+    char m_00dc[0xf0 - 0xdc];                // 0xdc: not used by EN code yet
     int params[CHAR_PARAM_COUNT];            // 0xf0: by CharParam index
     char m_0130[0x140 - 0x130];              // 0x130: position
     char switchesHeld;                       // 0x140: number of switches the character is holding
     char defeated;                           // 0x141: 1 once the character is marked defeated
-    char m_0142[CHAR_RECORD_SIZE - 0x142];   // 0x142: held flag and name (not used by EN code yet)
+    char m_0142;                             // 0x142: not used by EN code yet
+    char colourByte;                         // 0x143: colour value Char_UnpackParameter saves before it switches the kind
+    char m_0144[CHAR_RECORD_SIZE - 0x144];   // 0x144: held flag and name (not used by EN code yet)
 };
 
 // The behaviour state of a character slot (0x40 bytes); every behaviour keeps its own variables in `values`.
@@ -123,6 +128,16 @@ extern "C" int g_charPhase[CHAR_SLOT_COUNT];               // EN 0x00915cb8 (JP 
 extern "C" char g_charKind[CHAR_SLOT_COUNT];               // EN 0x00a35bc8 (JP DAT_1021f3c0): kind of each slot (3 = enemy)
 extern "C" int g_charGroup[CHAR_GROUP_COUNT];              // EN 0x0091f818 (JP DAT_10255f10): group of each character, -1 = none
 extern "C" unsigned char g_charSpawnFlag[CHAR_SLOT_COUNT];   // EN 0x009e1bd0 (JP DAT_10315350): a per-character flag, cleared when a slot is reused
+// Saved looks of characters that Char_UnpackParameter switched to kind CHAR_KIND_PACKED (restored later).
+extern "C" char g_charKindSwitched[CHAR_SLOT_COUNT];        // EN 0x0091ddb8 (JP DAT_1030ce38): 1 once the character's kind was switched
+extern "C" int g_charBaseKind[CHAR_SLOT_COUNT];             // EN 0x0091deb8 (JP DAT_1030b668): kind before the switch (-1 = kind 0)
+extern "C" int g_charSavedColourByte[CHAR_SLOT_COUNT];      // EN 0x0091e2b8 (JP DAT_104679a0): CharRecord::colourByte before the switch
+extern "C" int g_charSavedEffectColour[CHAR_SLOT_COUNT];    // EN 0x0091e970 (JP DAT_10314ec0): stats[STAT_EFFECT_COLOUR] before the switch
+extern "C" int g_charSavedStat4[CHAR_SLOT_COUNT];           // EN 0x0091ed70 (JP DAT_1021f440): stats[STAT_VALUE_4] before the switch
+// g_charRecords kind a character takes while its packed parameter holds a non-zero mode (0x62).
+const int CHAR_KIND_PACKED = 0x62;
+// Unpacks CharRecord::packedParameter of character `index` into its state (formation, behaviour). EN 0x6d1fb0 (JP 0x1001b5b0).
+extern "C" int Char_UnpackParameter(int index);
 extern "C" const char g_partyCharacters[PARTY_SIZE];        // EN 0x00848850 (JP DAT_101d67f0): slots 0, 13, 15, 58, 20
 extern "C" Matrix4 g_characterNodeMatrices[CHAR_SLOT_COUNT][CHAR_NODE_MATRIX_COUNT];   // EN 0x015ad660 (JP DAT_10868838): saved node matrices of each character; [0][0] of character 0 is the matrix the item stand sparkle follows
 extern "C" int g_charEffectHandle[CHAR_SLOT_COUNT];        // EN 0x009e2078 (JP DAT_10219770): effect handle of each slot

@@ -90,7 +90,22 @@ extern "C" int g_shotPointZ;                    // EN 0x0133331c (JP DAT_10c6357
 extern "C" int Camera_ItemStand(void);
 // Camera_Orbit: the shot that circles the player. EN 0x64d890.
 extern "C" int Camera_Orbit(void);
+// Places the camera at heading `angle` around the target at its current ground distance and height. EN 0x7465f0 (JP 0x1016bdf0).
+extern "C" int Camera_PlaceAtHeading(float angle);
 // Camera_Ease: the follow shot that eases towards the followed node. EN 0x64c790.
 extern "C" int Camera_Ease(void);
+
+// Camera state cleared with the player (Player_ResetMotion) and the camera (Camera_Reset).
+const int CAMERA_GROUND_UNKNOWN = -100;          // g_cameraGroundHeight value before a ground height was measured
+extern "C" int g_cameraGroundHeight;             // EN 0x00908a20 (JP DAT_10203444): ground height cache, CAMERA_GROUND_UNKNOWN = unknown
+extern "C" float g_cameraTargetLift;             // EN 0x01664678 (JP DAT_1101dde4): how far the camera target is lifted (0 or up to 120)
+extern "C" float g_cameraEyePitch;               // EN 0x01664440 (JP DAT_1101de18): pitch the free camera lifts its eye by (radians, 0 = none)
+extern "C" char g_cameraPushRightFrames;         // EN 0x0162ef62 (JP DAT_10fabe8c): frames the follow camera keeps pushing right
+extern "C" char g_cameraPushLeftFrames;          // EN 0x0162ef63 (JP DAT_10faaa80): frames the follow camera keeps pushing left
+extern "C" int g_cameraState1664448;             // EN 0x01664448 (JP DAT_1101d888): not recovered, cleared with the camera
+extern "C" int g_cameraState1664fe0;             // EN 0x01664fe0 (JP DAT_1101d898): not recovered, cleared with the camera
+
+// Zeroes the camera vectors and the per-frame camera state of a new player position. EN 0x70bc30 (JP 0x1016a8f0).
+extern "C" int Player_ResetMotion(void);
 
 #endif

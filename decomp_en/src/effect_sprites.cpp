@@ -23,9 +23,9 @@ int EffectManager::DrawSpriteA(int index, const Matrix4 &view, const Matrix4 *ca
     int type = g_effectSpritesA[index].type;
     Render_Command(RENDER_BLEND_MODE, 0, 0);
     if (g_effectDefs[type].depthTest != 0)
-        Render_Command(RENDER_DEPTH_TEST, 1, 0);
+        Render_Command(RENDER_DEPTH_WRITE, 1, 0);
     else
-        Render_Command(RENDER_DEPTH_TEST, 0, 0);
+        Render_Command(RENDER_DEPTH_WRITE, 0, 0);
     if (g_effectDefs[type].kind == EFFECT_KIND_SPRITE || g_effectDefs[type].kind == EFFECT_KIND_SPRITE_ALT)
     {
         Vec4 screen;
@@ -83,9 +83,9 @@ int EffectManager::DrawSpriteB(int index, const Matrix4 &view, const Matrix4 *ca
     int type = g_effectSpritesB[index].type;
     Render_Command(RENDER_BLEND_MODE, 0, 0);
     if (g_effectDefs[type].depthTest != 0)
-        Render_Command(RENDER_DEPTH_TEST, 1, 0);
+        Render_Command(RENDER_DEPTH_WRITE, 1, 0);
     else
-        Render_Command(RENDER_DEPTH_TEST, 0, 0);
+        Render_Command(RENDER_DEPTH_WRITE, 0, 0);
     if (g_effectDefs[type].kind == EFFECT_KIND_SPRITE || g_effectDefs[type].kind == EFFECT_KIND_SPRITE_ALT)
     {
         Vec4 screen;

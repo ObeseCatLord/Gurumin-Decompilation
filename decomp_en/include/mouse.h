@@ -33,6 +33,7 @@ struct Mouse
     int GetState(MousePoint *outPosition, char *outLeft, char *outRight, char *outMiddle, int *outWheel,
                  char *outExtra1, char *outExtra2);  // EN 0x7aa330
     int Init(int window, int callback, int user);    // EN 0x7aa810
+    int SetCursorGamePos(int x, int y);              // EN 0x7aa8f0 (JP 0x10001090): moves the Windows cursor to a 640x480 game position
 };
 
 #endif

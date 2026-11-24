@@ -245,7 +245,8 @@ struct AnimModel
     int StepMotion();                                                    // EN 0x70bea0 (JP 0x10161c00): advances the motion channel one frame
     int AddMotionKey(int frame, float value);                            // EN 0x70af70 (JP 0x10161b90)
     int SetPendingPush(float x, float y, float z, char flag);            // EN 0x73f940 (JP 0x101628b0)
-    int ClearTrackC();                                                   // EN 0x741bd0 (JP 0x10161a60)
+    int StepPath();                                                      // EN 0x70bf40 (JP 0x10161c80): moves the model along track C one frame
+    int ClearTrackC();                                                // EN 0x741bd0 (JP 0x10161a60)
     int ClearMotionKeys();                                               // EN 0x741c10 (JP 0x10161b60)
     int ClearTrackB();                                                   // EN 0x741fe0 (JP 0x10161f30)
     int ApplyMaterialSwap(int count);                                    // EN 0x71ac90 (JP 0x10161a20)

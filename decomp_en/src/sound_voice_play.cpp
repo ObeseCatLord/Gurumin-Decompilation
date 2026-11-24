@@ -5,7 +5,7 @@
 #include "sound_engine.h"
 #include "sound_voice.h"
 
-// First data byte after the wave header: loops seek back here when no loop start is set.
+// loopStartByte value of a voice that has no loop start (a loop then restarts at the first data byte).
 const unsigned SOUND_NO_LOOP_START = 0xffffffff;
 
 // Fills `length` bytes of the DirectSound buffer at `offset` with the next sound data. A one-shot sound that ends
@@ -24,7 +24,9 @@ int SoundVoice::FillBuffer(unsigned length, int reserved, unsigned offset)
     if (looping == 0)
     {
         int position = GetPosition();
-        if (position + firstBytes > dataEnd)
+        if (position + firstBytes <= dataEnd)
+            ReadData(first, firstBytes);
+        else
         {
             int remaining = dataEnd - position;
             if (remaining != 0)
@@ -40,51 +42,45 @@ int SoundVoice::FillBuffer(unsigned length, int reserved, unsigned offset)
             }
             memset((char *)first + remaining, 0, position - dataEnd + firstBytes);
         }
-        else
-            ReadData(first, firstBytes);
         if (second != 0)
         {
             position = GetPosition();
-            if (position + secondBytes > dataEnd)
+            if (position + secondBytes <= dataEnd)
+                ReadData(second, secondBytes);
+            else
             {
                 int remaining = dataEnd - position;
                 if (remaining != 0)
                     ReadData(second, remaining);
                 memset((char *)second + (dataEnd - position), 0, position - dataEnd + secondBytes);
             }
-            else
-                ReadData(second, secondBytes);
         }
     }
     else
     {
         int position = GetPosition();
-        void *target = first;
-        unsigned count = firstBytes;
-        if (position + firstBytes > dataEnd)
+        if (position + firstBytes <= dataEnd)
+            ReadData(first, firstBytes);
+        else
         {
             ReadData(first, dataEnd - position);
-            if (loopStartByte == SOUND_NO_LOOP_START)
-                SeekTo(WAVE_HEADER_BYTES);
-            else
+            if (loopStartByte != SOUND_NO_LOOP_START)
                 SeekTo(loopStartByte + WAVE_HEADER_BYTES);
-            count = position - dataEnd + firstBytes;
-            target = (char *)first + (dataEnd - position);
+            else
+                SeekTo(WAVE_HEADER_BYTES);
+            ReadData((char *)first + (dataEnd - position), position - dataEnd + firstBytes);
         }
-        ReadData(target, count);
         if (second != 0)
         {
             position = GetPosition();
-            target = second;
-            count = secondBytes;
-            if (position + secondBytes > dataEnd)
+            if (position + secondBytes <= dataEnd)
+                ReadData(second, secondBytes);
+            else
             {
                 ReadData(second, dataEnd - position);
                 SeekTo(WAVE_HEADER_BYTES);
-                count = position - dataEnd + secondBytes;
-                target = (char *)second + (dataEnd - position);
+                ReadData((char *)second + (dataEnd - position), position - dataEnd + secondBytes);
             }
-            ReadData(target, count);
         }
     }
     buffer->Unlock(first, firstBytes, second, secondBytes);
@@ -153,4 +149,92 @@ int SoundVoice::UpdateBuffer()
         thirdFlag[2] = 1;
     }
     return 1;
+}
+
+// DirectSound buffer flags: position tracking that follows the real play cursor, volume and pan control; the
+// placement bits follow the engine's buffer mode (2 = hardware, 1 = software, 0 = driver's choice).
+const DWORD SOUND_BUFFER_FLAGS_BASE = DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN;
+const int SOUND_BUFFER_MODE_HARDWARE = 2;
+const int SOUND_BUFFER_MODE_SOFTWARE = 1;
+// Seconds of sound the buffer holds (it is refilled a third at a time).
+const int SOUND_BUFFER_SECONDS = 3;
+// Bits per byte.
+const int SOUND_BITS_PER_BYTE = 8;
+
+// Starts playing the sound file `path`: stops what the voice played, opens the file and reads its wave header,
+// creates the DirectSound buffer for the format (three seconds long), converts the loop and start positions from
+// samples to bytes, fills the first two thirds of the buffer and starts it looping. Nothing plays when
+// `loopEndSample` is 0. Returns 1 when playing, else 0. Called by the play commands (at once or with a fade).
+int SoundVoice::Play(const char *path, int looping, int startSample, int loopStartSample, unsigned loopEndSample)
+{
+    if (directSound != 0 && primaryBuffer != 0)
+    {
+        if (IsPlaying() != 0)
+            Stop();
+        if (loopEndSample > 0)
+        {
+            if (decoderOpen == 0)
+                InitDecoder(0);
+            if (OpenSource(path) != 0)
+            {
+                if (ReadData(&waveHeader, WAVE_HEADER_BYTES) != 0)
+                {
+                    DSBUFFERDESC description;
+                    memset(&bufferFormat, 0, sizeof(bufferFormat));
+                    bufferFormat.wf.nSamplesPerSec = waveHeader.sampleRate;
+                    bufferFormat.wf.wFormatTag = WAVE_FORMAT_PCM;
+                    bufferFormat.wf.nChannels = (waveHeader.channels > 1) + 1;
+                    bufferFormat.wf.nBlockAlign = waveHeader.blockAlign;
+                    bufferFormat.wf.nAvgBytesPerSec = waveHeader.blockAlign * waveHeader.sampleRate;
+                    bufferFormat.wBitsPerSample = waveHeader.bitsPerSample;
+                    memset(&description, 0, sizeof(description));
+                    description.dwSize = sizeof(DSBUFFERDESC);
+                    description.dwBufferBytes = bufferFormat.wf.nAvgBytesPerSec;
+                    description.lpwfxFormat = (LPWAVEFORMATEX)&bufferFormat;
+                    if (g_soundBufferMode == SOUND_BUFFER_MODE_HARDWARE)
+                        description.dwFlags = SOUND_BUFFER_FLAGS_BASE | DSBCAPS_LOCHARDWARE;
+                    else
+                        description.dwFlags = SOUND_BUFFER_FLAGS_BASE |
+                                              (g_soundBufferMode == SOUND_BUFFER_MODE_SOFTWARE) * DSBCAPS_LOCSOFTWARE;
+                    description.dwBufferBytes = description.dwBufferBytes * SOUND_BUFFER_SECONDS;
+                    if (buffer == 0)
+                    {
+                        IDirectSoundBuffer *temporary;
+                        directSound->CreateSoundBuffer(&description, &temporary, 0);
+                        if (temporary == 0)
+                            return 0;
+                        temporary->QueryInterface(IID_IDirectSoundBuffer8, (void **)&buffer);
+                        temporary->Release();
+                        if (buffer == 0)
+                            return 0;
+                    }
+                    unsigned bits = bufferFormat.wBitsPerSample;
+                    unsigned channels = bufferFormat.wf.nChannels;
+                    loopStartByte = (bits * loopStartSample / SOUND_BITS_PER_BYTE) * channels;
+                    unsigned endByte = (bits * loopEndSample / SOUND_BITS_PER_BYTE) * channels;
+                    if (dataSize < endByte)
+                        endByte = dataSize;
+                    loopEndByte = endByte;
+                    dataEnd = endByte + WAVE_HEADER_BYTES;
+                    if (dataEnd == WAVE_HEADER_BYTES)
+                        *(int *)0 = 1;
+                    SeekTo((bits * startSample / SOUND_BITS_PER_BYTE) * channels + WAVE_HEADER_BYTES);
+                    this->looping = looping;
+                    buffer->SetCurrentPosition(0);
+                    FillBuffer(bufferFormat.wf.nAvgBytesPerSec * 2, 0, 0);
+                    playStartTick = GetTickCount();
+                    thirdFlag[0] = 0;
+                    thirdFlag[1] = 1;
+                    thirdFlag[2] = 1;
+                    playing = 1;
+                    buffer->Restore();
+                    primaryBuffer->Restore();
+                    buffer->Play(0, 0, DSBPLAY_LOOPING);
+                    return 1;
+                }
+                CloseSource();
+            }
+        }
+    }
+    return 0;
 }

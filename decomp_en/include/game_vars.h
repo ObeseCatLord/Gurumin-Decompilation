@@ -55,4 +55,9 @@ extern "C" void ColourBlend_Step(void);
 // Starts a fade to (r, g, b, a) over `frames` frames. EN 0x645960.
 extern "C" void ColourFade_Start(int frames, float r, float g, float b, float a);
 
+// Non-zero = voices are off: sounds requested as optional are skipped. EN 0x00bc87a7 (JP DAT_104c0332).
+extern "C" char g_voicesOff;
+// Plays `sound` at character `index`'s position at full volume (see char_sound.cpp). EN 0x649cd0 (JP 0x10065b10).
+extern "C" int Character_PlaySound(int index, int sound, int always, int optional);
+
 #endif

@@ -122,8 +122,6 @@ const float SCREEN_CENTRE_Y = 240.0f;
 // How far a disc's step moves it along x and y per unit of step.
 const float FLARE_STEP_X = 32.0f;
 const float FLARE_STEP_Y = 24.0f;
-// Render_Command values: blend modes and the depth-write switch.
-const int RENDER_DEPTH_WRITE = 9;
 
 // For every flare point collected this frame draws eight discs from the lens textures on the line from the point
 // through the screen centre: each with its size (half-width in 640x480 pixels, scaled by the point's brightness),
@@ -225,7 +223,7 @@ int ModelBank::DrawShadows(Node *scene, DrawList *list, Matrix4 *view, int a3)
 }
 
 // Like DrawShadows, drawing each shadow with the caster's shadow matrix raised 6.1 units, set as `scene`'s world
-// matrix, and with the depth test off around it. A caster reset here also takes its shadow matrix from its world
+// matrix, and with the depth writes off around it. A caster reset here also takes its shadow matrix from its world
 // matrix. Returns 0 when shadows are off or there is no scene, else 1. Called by the map top view drawing.
 int ModelBank::DrawShadowsInto(Node *scene, DrawList *list, Matrix4 *view, int a3)
 {
@@ -256,12 +254,12 @@ int ModelBank::DrawShadowsInto(Node *scene, DrawList *list, Matrix4 *view, int a
             {
                 scene->worldMatrix = litModels[casters[i]]->shadowMatrix;
                 scene->worldMatrix.Translate(0, 0, SHADOW_INTO_LIFT);
-                Render_Command(RENDER_DEPTH_TEST, 0, 0);
+                Render_Command(RENDER_DEPTH_WRITE, 0, 0);
                 scene->DrawShadow(list, view, a3, &casterPosition[i], &casterParams[i], shadows[i],
                                   litModels[casters[i]]->uniformScale, (int)casterSize[i],
                                   litModels[casters[i]]->loadedRoot->bounds.w, litModels[casters[i]],
                                   litModels[casters[i]]->alpha);
-                Render_Command(RENDER_DEPTH_TEST, 1, 0);
+                Render_Command(RENDER_DEPTH_WRITE, 1, 0);
             }
         }
     }
@@ -283,12 +281,12 @@ int ModelBank::DrawShadowsInto(Node *scene, DrawList *list, Matrix4 *view, int a
             {
                 scene->worldMatrix = litModels[casters[i]]->shadowMatrix;
                 scene->worldMatrix.Translate(0, 0, SHADOW_INTO_LIFT);
-                Render_Command(RENDER_DEPTH_TEST, 0, 0);
+                Render_Command(RENDER_DEPTH_WRITE, 0, 0);
                 scene->DrawShadow(list, view, a3, &casterPosition[i], &casterParams[i], shadowTexture,
                                   litModels[casters[i]]->uniformScale, (int)casterSize[i],
                                   litModels[casters[i]]->loadedRoot->bounds.w, litModels[casters[i]],
                                   litModels[casters[i]]->alpha);
-                Render_Command(RENDER_DEPTH_TEST, 1, 0);
+                Render_Command(RENDER_DEPTH_WRITE, 1, 0);
             }
         }
     }

@@ -641,3 +641,29 @@ _SoundEngine_GetMixerVolume	007c4760
 ?UpdateBuffer@SoundVoice@@QAEHXZ	007c1ef0
 ?DrawShadows@ModelBank@@QAEHPAUNode@@PAUDrawList@@PAUMatrix4@@H@Z	0072a420
 ?DrawShadowsInto@ModelBank@@QAEHPAUNode@@PAUDrawList@@PAUMatrix4@@H@Z	0072a710
+
+# game (batch 9)
+_Flock_Atan2	006e2110
+_Attach_Atan2	006e5ab0
+_Overlay_DrawFullScreen	005e0560
+?InitDecoder@SoundSource@@QAEHH@Z	007bfa80
+??1Panel@@QAE@XZ	005a10d0
+??1Node@@QAE@XZ	007496d0
+?SetCursorGamePos@Mouse@@QAEHHH@Z	007aa8f0
+_Path_CreateDirectories	007aef40
+?Play@SoundVoice@@QAEHPBDHHHI@Z	007c25b0
+_Camera_PlaceAtHeading	007465f0
+?RegisterEvent@Game@@QAEHH@Z	005a1f00
+_Names_Set	007a5ca0
+_Input_Rumble	007aee30
+_Char_IdleWatchPlayer	006d59e0
+_Player_ResetMotion	0070bc30
+?StepPath@AnimModel@@QAEHXZ	0070bf40
+?Decode@OggReader@@QAEHPAD@Z	007bed30
+_Char_OutsideLimit	005c1770
+_Char_UnpackParameter	006d1fb0
+_Map_IconTexture	00609b20
+?ReadHeaders@OggReader@@QAEHXZ	007bf740
+?ReadPcm@OggReader@@QAEHPADH@Z	007c0f50
+_Character_PlaySound	00649cd0
+?OpenStream@OggReader@@QAEHXZ	007bf8c0

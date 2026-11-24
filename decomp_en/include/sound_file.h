@@ -138,19 +138,17 @@ inline LONG MmioFile::Seek(LONG position, int origin)
 {
     if (isPlain != 0)
         return mmioSeek(handle, position, origin);
-    int base;
     if (origin == 0)
-        base = offset;
-    else
     {
-        if (origin == 1)
-        {
-            mmioSeek(handle, position, 1);
-            return -1;
-        }
-        base = offset + size;
+        mmioSeek(handle, offset + position, 0);
+        return -1;
     }
-    mmioSeek(handle, base + position, 0);
+    if (origin == 1)
+    {
+        mmioSeek(handle, position, 1);
+        return -1;
+    }
+    mmioSeek(handle, offset + size + position, 0);
     return -1;
 }
 

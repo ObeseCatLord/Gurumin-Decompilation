@@ -43,3 +43,11 @@ address	status	reason
 006de0c0	open	Enemy_DropInWhenNear: 1111 vs 1119 bytes, same register-pressure wall as Enemy_DropIn (original keeps 20 in esi and spills index*0x249c and the model pointer)
 006d0f20	open	Npc_RunToMarker: 1469 vs 1474 bytes; matches except that the original keeps the shared told-to-react store inside both marker branches (ours hoists it before the test) and stores state 2 after the wake call
 00752190	open	Node::DrawShadow: only difference is register choice at the large-caster frame (original loads casterSize into xmm1 and copies it with movaps before the subtraction; ours uses xmm0 and no copy), 3 bytes shorter; two spellings tried
+007bf170	open	MmioFile::Open: 183 bytes off; stack slot order of the path buffers and the tail layout differ
+007c1ce0	open	SoundVoice::InitDevice: 38 bytes off; order of the DSBUFFERDESC zero stores differs
+007c42d0	open	SoundVoice::UpdatePanFromListener: 166 bytes off; instruction scheduling of the pan computation differs
+007c25b0	open	SoundVoice::Play: 537 bytes off; original keeps loopEndSample in memory where ours picks a register
+007bed30	open	OggReader::Decode: same code except the original hoists the gain into xmm2 and stores it back to the member in every channel pass (a store of the value just read); no honest spelling found
+007bf740	open	OggReader::ReadHeaders: same calls and order; register allocation differs (original keeps this in esi, page in edi, stream in ebx and recomputes the member addresses in the loop; ours hoists the addresses into frame slots)
+007c0f50	open	OggReader::ReadPcm: logic ported (351 bytes of diff); original keeps the remaining count in ebx and the request size in edi (ours the reverse) and tests the stream position through different jumps
+007bf8c0	open	OggReader::OpenStream: same calls as ReadHeaders plus info init and DSP/block init; same register allocation wall as ReadHeaders (457 vs original size)

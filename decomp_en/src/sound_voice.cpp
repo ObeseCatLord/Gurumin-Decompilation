@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "engine_memory.h"
+#include "sound_arc.h"
 #include "sound_engine.h"
 #include "sound_ogg.h"
 #include "sound_voice.h"
@@ -152,10 +153,10 @@ SoundSource::SoundSource()
     file.isPlain = 0;
     m_0174 = 0;
     decodedPosition = 0;
-    decodeBuffer[0] = 0;
-    decodeBuffer[2] = 0;
-    decodeBuffer[1] = 0;
-    decodeBuffer[3] = 0;
+    adpcmFormat = 0;
+    streamAdpcmFormat = 0;
+    pcmFormat = 0;
+    streamPcmFormat = 0;
     m_019c = 0;
     acmStreamA = 0;
     acmStreamB = 0;
@@ -204,25 +205,25 @@ int SoundSource::FreeDecoder()
         acmStreamClose(acmStreamC, 0);
         acmStreamC = 0;
     }
-    if (decodeBuffer[1] != 0)
+    if (pcmFormat != 0)
     {
-        g_engineFree(decodeBuffer[1]);
-        decodeBuffer[1] = 0;
+        g_engineFree(pcmFormat);
+        pcmFormat = 0;
     }
-    if (decodeBuffer[0] != 0)
+    if (adpcmFormat != 0)
     {
-        g_engineFree(decodeBuffer[0]);
-        decodeBuffer[0] = 0;
+        g_engineFree(adpcmFormat);
+        adpcmFormat = 0;
     }
-    if (decodeBuffer[3] != 0)
+    if (streamPcmFormat != 0)
     {
-        g_engineFree(decodeBuffer[3]);
-        decodeBuffer[3] = 0;
+        g_engineFree(streamPcmFormat);
+        streamPcmFormat = 0;
     }
-    if (decodeBuffer[2] != 0)
+    if (streamAdpcmFormat != 0)
     {
-        g_engineFree(decodeBuffer[2]);
-        decodeBuffer[2] = 0;
+        g_engineFree(streamAdpcmFormat);
+        streamAdpcmFormat = 0;
     }
     if (acmSourceBuffer != 0)
     {
@@ -696,5 +697,93 @@ int SoundSource::OpenCompressed(const char *path)
     dataSize = (int)((__int64)scaled / ratio) + WAVE_HEADER_BYTES;
     m_0174 = 1;
     isCompressed = 1;
+    return 1;
+}
+
+// Bytes of each ACM format block, and of the compressed and decoded halves of the stream conversion buffers.
+const int ACM_FORMAT_BLOCK_BYTES = 0x400;
+const int ACM_SOURCE_BUFFER_BYTES = 0x1da60;
+const int ACM_DEST_BUFFER_BYTES = 0x1da60;
+// Compressed bytes converted at a time, and the decoded bytes they give.
+const int ACM_CONVERT_SOURCE_BYTES = 0x5000;
+const int ACM_CONVERT_DEST_BYTES = 0x1c6d8;
+// Formats of the ACM decoder: 16-bit stereo PCM at 44.1 kHz, and MS ADPCM with 2048 byte blocks.
+const int ACM_PCM_CHANNELS = 2;
+const int ACM_PCM_BITS = 16;
+const int ACM_PCM_BLOCK_ALIGN = 4;
+const int ACM_PCM_SAMPLE_RATE = 44100;
+const int ACM_PCM_BYTES_PER_SECOND = 176400;
+const int ACM_ADPCM_BITS = 4;
+const int ACM_ADPCM_BLOCK_ALIGN = 0x800;
+const int ACM_ADPCM_BYTES_PER_SECOND = 44359;
+const int ACM_ADPCM_EXTRA_BYTES = 0x20;
+// acmFormatSuggest flags: the suggested format keeps the wave format tag and the channel count.
+const DWORD ACM_SUGGEST_TAG_AND_CHANNELS = ACM_FORMATSUGGESTF_WFORMATTAG | ACM_FORMATSUGGESTF_NCHANNELS;
+
+// Allocates the decoder's ACM formats and conversion buffers and fills the two stream headers. Does nothing (returns
+// 0) when `skip` is set, as the engine does for a voice that only plays plain data. Marks the decoder open and
+// returns 1. If ACM cannot suggest the format for streamed data, sound effects are switched off. Called when a
+// voice starts a sound.
+int SoundSource::InitDecoder(int skip)
+{
+    decoderOpen = 0;
+    FreeDecoder();
+    adpcmFormat = 0;
+    streamAdpcmFormat = 0;
+    pcmFormat = 0;
+    streamPcmFormat = 0;
+    acmStreamA = 0;
+    acmStreamB = 0;
+    acmStreamC = 0;
+    pcmBuffer = 0;
+    acmDestBuffer = 0;
+    acmSourceBuffer = 0;
+    if (skip != 0)
+        return 0;
+    pcmFormat = (WAVEFORMATEX *)g_engineAlloc(ACM_FORMAT_BLOCK_BYTES, "");
+    adpcmFormat = (WAVEFORMATEX *)g_engineAlloc(ACM_FORMAT_BLOCK_BYTES, "");
+    streamPcmFormat = (WAVEFORMATEX *)g_engineAlloc(ACM_FORMAT_BLOCK_BYTES, "");
+    streamAdpcmFormat = (WAVEFORMATEX *)g_engineAlloc(ACM_FORMAT_BLOCK_BYTES, "");
+    acmSourceBuffer = g_engineAlloc(ACM_SOURCE_BUFFER_BYTES, "");
+    acmDestBuffer = g_engineAlloc(ACM_DEST_BUFFER_BYTES, "");
+    pcmFormat->wFormatTag = WAVE_FORMAT_PCM;
+    pcmFormat->wBitsPerSample = ACM_PCM_BITS;
+    pcmFormat->nChannels = ACM_PCM_CHANNELS;
+    pcmFormat->nBlockAlign = ACM_PCM_BLOCK_ALIGN;
+    pcmFormat->nSamplesPerSec = ACM_PCM_SAMPLE_RATE;
+    pcmFormat->nAvgBytesPerSec = ACM_PCM_BYTES_PER_SECOND;
+    pcmFormat->cbSize = 0;
+    streamPcmFormat->wFormatTag = WAVE_FORMAT_PCM;
+    streamPcmFormat->wBitsPerSample = ACM_PCM_BITS;
+    streamPcmFormat->nChannels = ACM_PCM_CHANNELS;
+    streamPcmFormat->nBlockAlign = ACM_PCM_BLOCK_ALIGN;
+    streamPcmFormat->nSamplesPerSec = ACM_PCM_SAMPLE_RATE;
+    streamPcmFormat->nAvgBytesPerSec = ACM_PCM_BYTES_PER_SECOND;
+    streamPcmFormat->cbSize = 0;
+    adpcmFormat->wFormatTag = WAVE_FORMAT_ADPCM;
+    adpcmFormat->wBitsPerSample = ACM_ADPCM_BITS;
+    adpcmFormat->nChannels = ACM_PCM_CHANNELS;
+    adpcmFormat->nBlockAlign = ACM_ADPCM_BLOCK_ALIGN;
+    adpcmFormat->nSamplesPerSec = ACM_PCM_SAMPLE_RATE;
+    adpcmFormat->nAvgBytesPerSec = ACM_ADPCM_BYTES_PER_SECOND;
+    adpcmFormat->cbSize = ACM_ADPCM_EXTRA_BYTES;
+    acmFormatSuggest(0, adpcmFormat, pcmFormat, ACM_FORMAT_BLOCK_BYTES, ACM_SUGGEST_TAG_AND_CHANNELS);
+    memset(streamAdpcmFormat, 0, ACM_FORMAT_BLOCK_BYTES);
+    streamAdpcmFormat->wFormatTag = WAVE_FORMAT_ADPCM;
+    if (acmFormatSuggest(0, streamPcmFormat, streamAdpcmFormat, ACM_FORMAT_BLOCK_BYTES, ACM_FORMATSUGGESTF_WFORMATTAG) != 0)
+        g_soundArcDisabled = 1;
+    memset(&headerA, 0, sizeof(headerA));
+    headerA.cbStruct = sizeof(headerA);
+    headerA.pbSrc = (LPBYTE)acmSourceBuffer;
+    headerA.cbSrcLength = ACM_CONVERT_SOURCE_BYTES;
+    headerA.pbDst = (LPBYTE)acmDestBuffer;
+    headerA.cbDstLength = ACM_CONVERT_DEST_BYTES;
+    memset(&headerB, 0, sizeof(headerB));
+    headerB.cbStruct = sizeof(headerB);
+    headerB.pbSrc = (LPBYTE)acmSourceBuffer;
+    decoderOpen = 1;
+    headerB.cbSrcLength = ACM_CONVERT_SOURCE_BYTES;
+    headerB.pbDst = (LPBYTE)acmDestBuffer;
+    headerB.cbDstLength = ACM_CONVERT_DEST_BYTES;
     return 1;
 }

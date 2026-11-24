@@ -7,7 +7,7 @@ Per function: read `tools/fn.py` / `tools/asm.py`, write the source in the match
 with `tools/variants.py` and `tools/sbs.py`; after about five failed spellings record it in `open.tsv` and move on.
 Give it a readable name in `symbols.tsv` (and `obj_symbols.tsv` for class methods) once its role is clear.
 
-## 1. Walls to retry (340)
+## 1. Walls to retry (343)
 
 Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry with the plainest source first.
 
@@ -212,6 +212,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100e25f0` 19570 — Bs003_Update (bs003_update.cpp, 14640 vs 19570 bytes, EH frame): complete compiling draft, not iterated; 5 KB short: the original repeats the node-pose/facing block in states 0/1 and the main pass (the draft shares helpers); breath/beam vectors, sound positions and the final follow-vector SetPosition guessed from Ghidra; companion record at index-1 (Ghidra bases one record before the tables)
 - [ ] `100e7280` 25057 — NeoGalaxy_Update (neo_galaxy_update.cpp, 17616 vs 25057 bytes): complete draft; ring effects of states 0x28/0x29/0x2a and the three-body ring geometry approximated (Ghidra and asm disagree on the rotation arguments); effect matrices built with helper statics instead of the original inline Matrix4 sequences; effect layouts of states 2, 3, 0x2a and 8 step 0x78 and the wall-pull ray cast inexact; two dead distance computations at the top omitted
 - [ ] `100ed9b0` 1258 — ListBank::CompileStatement (listbank.cpp, 1264 vs 1258 bytes): all but the int/float/string tail matches; the original puts the string-test jne to the call block, then the shared error block, the float declare and the call block last, without cross-jumping the int/float DeclareFromText tails; every spelling gives call-first (1264) or merged declares (1248)
+- [ ] `100edea0` 31560 — Prince_Update (prince_update.cpp, dispatcher 2048 bytes vs the original's 31560-byte function with gotos): complete draft with 17 static state handlers; Vec4 operation shapes inferred (Ghidra dropped ecx/hidden returns); arena-edge test rewritten as a cross-product test of triangle (2150,-620),(-2150,-620),(0,3100); teleport target, state-12 flight counter and hand/weapon effect geometry inferred; ending's slot index+1 read as index; TestScriptFlag(0x1c7) inlined here but out of line in the original. Next: fold the handlers back into one function
 - [ ] `100f5a80` 14960 — Scene_Frame (scene_frame.cpp, 14000 vs 14960 bytes): rule-clean complete draft; the original has one more 16-byte Vec4 local (frame 0x228 vs 0x218) so all stack slots shift, the DAT_10c64f78 setter does not thread the bank/gauge test, the scripted-walk block layout is unverified, and the people loop, camera chain and tail are not yet compared
 - [ ] `100f9670` 7639 — Char_UpdateByKind (char_update.cpp, 8176 vs 7639 bytes, draft): esi/edi swapped (model vs slot offset), the pause globals DAT_104bfe1c/DAT_104c0135 and the greeting counter are cached in registers in the original, the quaternion temporaries sit elsewhere, the case bodies of the big kind switch are laid out differently, goto rememberMotion; tidy-up before any match: the kind steps use words[WORD_*] index macros instead of named CharState members (typed-members rule)
 - [ ] `100fb6d0` 223 — ListBank::LoadText: structure identical; register allocation differs (original: out in eax, quote flag in ebx, text base in esi; ours spills the quote flag); text[out]-only, while-loop and declaration orders tried
@@ -220,6 +221,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `100fda40` 4958 — Map_SetupFromEntry (map_setup_entry.cpp, 4976 vs 4958 bytes): (1) the DAT_10254110 fill loop is a signed pointer loop (jl) in the original (ours jb, or a zero-based counter); (2) the DAT_104c02dc byte store is hoisted via al instead of an immediate after DAT_104c02b8; (3) the DAT_10edbe0c clear loop has an extra pad/edi; (4) model loop induction variables/stack slots and the mp_609/env2 strcpy + Texture_LoadIti address scheduling differ, then register drift. Node callbacks 0x1000c720/0x1000c620 installed with function-pointer casts (0x1000c720 is declared differently in character_draw.cpp)
 - [ ] `100fedd0` 6739 — Script_SystemCommand (script_system_command.cpp, 6736 vs 6739 bytes, first-pass draft): the flag-count loops use a down-counter plus strength-reduced &flags[i]/&flags[-i] pointers and a dead up-counter (ours one index); the 0x9c42 slot loops use a byte offset and an 8x unrolled 32-slot test; each reload block keeps its own Matrix4 (frame 0x124 vs our 0xf0); DAT_104c0230 is accessed as a 16-bit word (needs a byte/word overlay in ui_vars.h); Tracker::M_10001010 duplicates Obj::M_10001010
 - [ ] `101011b0` 13173 — Script_ValueCommand (value_command.cpp, 10928 vs 13173 bytes): first draft, logic complete but not shaped; the original's frame keeps three Vec4 and a Matrix4 constructed at entry (omitted); TestScriptFlag is an out-of-line call with ecx=0x10874848 (ours inlines Game::TestScriptFlag); 13-byte text lines staged through a stack buffer; per-slot statement pairs unrolled; FUN_1005ce80 called with 3 args (header) where the original pushes 4
+- [ ] `10104640` 32656 — Bs002_Update (bs002_update.cpp, 21776 vs 32656 bytes): complete compiling draft, behaviours still simplified: claw-run trail, arm-glow and stagger splash positions, the balloon-blast tail loop (lacks the 0.25 factor), vector maths hidden in FUN_101ac* (RotateZ(heading) assumed), DAT_1042d918 bone nodes; states 0xc..0xf and 100 and the stagger frame table not read in detail; options.owner may be index+100
 - [ ] `1010c650` 23098 — Bs001_Update (bs001_update.cpp, 12096 vs 23098 bytes, EH frame): complete compiling draft, not iterated; ~11 KB short. Ghidra hides this/args of the Vec4, Matrix4, AnimModel::Push and SetPosition calls, so the move-state vector arithmetic is guessed; defeat-scene camera swing, partner-sync block, punch/claw/smash/chase (merged into one case) and knock-back bounce simplified; three inlined Enemy_PlayVoice copies written as calls; the fade-in alpha reads the fade-out counter as in the original
 - [ ] `10112140` 10038 — Menu_Main (menu_main.cpp, 10048 vs 10038 bytes): structure and frame (0x200) match through the difficulty and save-list blocks; residue: hoisted esi=0x218/ebp=1 constants at the top, the c7e0/c7e4 goto-shaped join into the load-list build, the shop mode-3 chain (a redundant ==3 re-test in the original), map-start tail order, final close sequence; Game::FindSlot stays out of line, so a file-local forceinline FindWindowSlot repeats its loop
 - [ ] `10115cd0` 2163 — ItemDictionary_Update (item_dictionary.cpp, 2176 bytes, 119 off): only the prologue register choice differs (original loads the DAT_104bf8bc flag into eax after push eax with the constant 1 in ecx and later in ebp; ours loads the flag into ecx before push -1 with 1 in eax, so mov [x],eax is 1 byte shorter and a nop shifts the first loop); obtained[4] (frame 0x3c0), function-scope locals, x==0/!x/local flag, store orders and the fade ladder all tried. FUN_101603c0 is int* here but unsigned* in save_write.cpp (original sar)
@@ -309,6 +311,7 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `10187520` 3712 — EffectManager::DrawLight (effect_light.cpp, rule-clean, EffectLight points/widths/colours typed, ScreenVertex fields named): full logic drafted; frame 0x1614 vs 0x160c and ebp pushed in the prologue (the original pushes it after the first dispatch), light base in ebp instead of ebx, kinds 7/9 share one call, vertex pointer stepping differs.
 - [ ] `101883b0` 221 — EffectManager::RemoveOwnedBy: identical except the original loads id into eax before the compare (cl 13.00 here folds it into cmp [esi+8], ebx); >= 0 and -1 < forms tried
 - [ ] `10188580` 325 — EffectManager::Update: identical apart from the light loop registers (original keeps the frame in edx and the end in ecx); declaration orders tried
+- [ ] `10189530` 30969 — EffectManager::DrawRecord (effect_draw_record.cpp, rule-clean draft split into static per-kind helpers; the 576-byte member body is only the switch vs the original's 30969-byte monolith): not tuned; unverified: sin/cos pair 0x101b2b84/0x101b2ce4, hidden ECX of the Vec4 Copy calls, flare vertex layout, Project vs TransformCoord per kind, disc matrix. Next: inline the helpers back into one body and match block by block per kind
 - [ ] `10190e30` 884 — EffectManager::Draw: flow, calls and the record checks in place; scheduling residue (the 0x244 table constant, the pushes shared by the crash and draw blocks hoisted above the test) and the sprite loops keep first/end in ebp/edi in the original
 - [ ] `10192520` 1233 — BoxSphere_Overlap (box_overlap.cpp, rule-clean): 4 bytes off, only the first view's point.y = sphereOffset->y + sphere->y (the original loads the offset first; either source order gives sphere first here, the top view's identical sum comes out right; same wall as 0x10192c90). The edge tests must be written !(distance >= radiusSquared) for the original's test ah,1 jumps
 - [ ] `10192c90` 975 — CylinderSphere_Overlap (box_overlap.cpp, rule-clean): 25 bytes off; the original adds sphere->y + sphereOffset->y in that order (fld [ebx+4]) at all three point.y assignments, cl 13.00 here picks offset first whatever the source order (x and z come out right); also two stack slots (radius, sphereRadius) differ
@@ -367,11 +370,8 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 - [ ] `1000cfa1` 1656 bytes (float, loops 1, calls 36)
 - [ ] `100b2900` 2848 bytes (float, loops 4, calls 70)
 
-## 5. Very large functions (over 3000 bytes) (6)
+## 5. Very large functions (over 3000 bytes) (3)
 
-- [ ] `10189530` 30969 bytes (float, loops 57, calls 592)
-- [ ] `100edea0` 31560 bytes (float, loops 89, calls 691)
-- [ ] `10104640` 32656 bytes (float, loops 36, calls 706)
 - [ ] `10151ba0` 43163 bytes (float, loops 10, calls 1169)
 - [ ] `100d24a0` 54584 bytes (float, loops 52, calls 1380)
 - [ ] `1011d810` 107161 bytes (float, loops 119, calls 2245)
@@ -381,13 +381,14 @@ Reasons written before the switch to cl 13.00 describe VS2003 behaviour; retry w
 Read the matched source and its callers, then add `address<TAB>Name<TAB>evidence` to `symbols.tsv`.
 
 
-## 7. Comment pass (28 files)
+## 7. Comment pass (31 files)
 
 Every function gets a comment saying what it does, who calls it and what its fields/constants mean; every
 file gets a header comment. Comments never change the compiled bytes (tools/annotate.py helps).
 
 - [ ] `src/bgm_update.cpp`: 2 of 3 functions without a comment
 - [ ] `src/bs001_update.cpp`: 2 of 8 functions without a comment
+- [ ] `src/bs002_update.cpp`: 2 of 16 functions without a comment
 - [ ] `src/bs003_update.cpp`: 3 of 12 functions without a comment
 - [ ] `src/bs004_update.cpp`: 2 of 12 functions without a comment
 - [ ] `src/bs005_update.cpp`: 1 of 7 functions without a comment
@@ -397,6 +398,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/doppler_loops.cpp`: 1 of 2 functions without a comment
 - [ ] `src/drifter.cpp`: 1 of 2 functions without a comment
 - [ ] `src/drill_claws.cpp`: 1 of 2 functions without a comment
+- [ ] `src/effect_draw_record.cpp`: 2 of 18 functions without a comment
 - [ ] `src/enemy_pod_lobber.cpp`: 1 of 2 functions without a comment
 - [ ] `src/game_main.cpp`: 2 of 8 functions without a comment
 - [ ] `src/homing_shots.cpp`: 1 of 2 functions without a comment
@@ -407,6 +409,7 @@ file gets a header comment. Comments never change the compiled bytes (tools/anno
 - [ ] `src/node_world_ik.cpp`: 2 of 7 functions without a comment
 - [ ] `src/player_frame.cpp`: 1 of 2 functions without a comment
 - [ ] `src/player_path_walk.cpp`: 1 of 2 functions without a comment
+- [ ] `src/prince_update.cpp`: 18 of 44 functions without a comment
 - [ ] `src/route_carrier.cpp`: 0 of 2 functions without a comment, no header
 - [ ] `src/route_follow.cpp`: 0 of 0 functions without a comment, no header
 - [ ] `src/scene_command_ids.cpp`: 1 of 3 functions without a comment

@@ -29,6 +29,7 @@ struct CharState
             union                                 // 0x00
             {
                 int flierPoint;           // route_flier.cpp: the route point the flier last reached
+                int targetSlot;           // target_race.cpp (slots 0x3c..0x43, one per target): character slot of the target, 0 = free
                 int state;                        // behaviour step: 0 = not started yet, then per behaviour
                 int turn;                         // damage_zone.cpp: turn counter of the zone
                 int counterValue;                 // digit_counter.cpp: the value shown (0..1000)
@@ -43,6 +44,8 @@ struct CharState
                     union                         // 0x04
                     {
                         int flierMode;            // route_flier.cpp: 0 = waiting for a route, 1 = flying, 2 = vanishing
+                        int pounceStep;           // enemy_pounce_breath.cpp: step of state 10 (0 = roars, 1 = chases, 2 = pounces, 3 = breathes); in state 1 the frame the whirl begins
+                        int dropHeight;           // target_race.cpp (target): height the target falls from (900, 30 less each frame to -150)
                         int wait;                 // frames in the current step (or until the next voice line)
                         int gatePrevious;         // npc_gate_carrier.cpp: the route point before gatePoint
                         int scriptRunning;        // char_script.cpp: 1 while the character's script runs
@@ -57,10 +60,13 @@ struct CharState
                         int driftSignX;           // drifter.cpp (state 0): non-zero = the x step is added, else subtracted
                         int orbitForward;         // drifter.cpp (state 1): non-zero = the spin angles grow, else they shrink
                         // (route_follow.cpp uses `wait` for the frames left at a pause point)
+                        int swoopStep;                    // enemy_hop_spit.cpp: 0 = turning left, 1 = turning right, 2 = hopping at the player, 3 = resting, 4 = spitting
                     };
                     union                         // 0x08
                     {
                         int flierRoute;           // route_flier.cpp: the map record whose route it flies (record 5 flies the other way)
+                        int stepFrames;           // enemy_pounce_breath.cpp: frames counted in the current step
+                        int rivalHit;             // target_race.cpp (target): 1 once a rival destroyed it (scores for the rivals)
                         int talk;                 // talk id (script number * 100 + line) or the behaviour's
                                                   // parameter from the map (distance, speed limit, ...)
                         int pausing;              // enemy_chase.cpp: 1 = pausing instead of chasing
@@ -93,10 +99,13 @@ struct CharState
                         int startHeight;          // perch_swooper.cpp: height (whole units) of the player when it took off
                         int sightBlocked;         // enemy_shy_ghost.cpp: 1 = a wall blocks the line to the player (looked up every 15th frame)
                         int rayLength0;           // rolling_tire.cpp: length of ray 0 (outermost left, whole units, -1 = not cast yet)
+                        int debrisMarker;          // dodge_debris.cpp: marker slot (0x5c..0x7b) whose position the piece takes over and whose death destroys it
                     };
                     union                         // 0x0c
                     {
                         int flierFrames;          // route_flier.cpp: frames left of the vanishing (counted down from 5)
+                        int noticed;              // enemy_pounce_breath.cpp: 1 once it noticed the player (or was hit)
+                        int edgeAhead;             // enemy_chase_lunge.cpp: 1 = no ground ahead of it (a ledge), tested every 3rd to 10th frame by slot
                         int range;                // char_move.cpp: distance at which a waiting character reacts
                         int count;                // enemy_react.cpp: frames counted towards the next action
                         int pauseFrames;          // enemy_chase.cpp
@@ -142,6 +151,8 @@ struct CharState
                         int strafeFrames;         // enemy_shy_ghost.cpp: sidestep timer, positive = drifting one way (counts down), negative = the other (counts up)
                         int huntFrames;           // enemy_roam_spit.cpp: 0 = not hunting, else frames since the hunt began (counted to 150, then back to 0)
                         int rayLength1;           // rolling_tire.cpp: length of ray 1
+                        int debrisShown;           // dodge_debris.cpp: 1 while the piece's node is shown
+                        int updating;                     // enemy_hop_spit.cpp: 1 while its update runs (the others of its kind do not wake it then)
                     };
                     union                         // 0x10
                     {
@@ -149,9 +160,11 @@ struct CharState
                                                   // raised (Npc_RideAlarm), attacks left to chain
                                                   // (Enemy_ShoveAndBlast)
                         int running;              // enemy_chase.cpp: 1 = running (faster) after the player was far
+                        int overPit;               // enemy_chase_lunge.cpp: 1 = it was over the pit area (mode 2) and keeps falling
                         int strafeMode;           // breath_enemy.cpp: 0 = circles left, 1 = right, 2 = holds, 3 and 4 = also hold
                         int swingingBack;         // enemy_pendulum.cpp: 1 while swinging back
                         int nextPoint;            // route_carrier.cpp: the route point headed for
+                        int partnerFade;          // partner_follow.cpp: frames of the fade out/in (0..15)
                         int downMode;             // companion_update.cpp (companion slot): 0 = active,
                         int passenger;            // npc_gate_carrier.cpp: slot of the enemy it carries (0 = none)
                                                   // 1 = reviving, 2 = recovering, 10 and above = going down
@@ -177,10 +190,15 @@ struct CharState
                         int circleSide;           // enemy_hover_strike.cpp: which way it circles the player (1 = right, 0 = left; re-rolled every 120 frames)
                         int bodyRadius;           // enemy_roam_spit.cpp: how far (x 2.5) the other roamers steer clear of this character
                         int rayLength2;           // rolling_tire.cpp: length of ray 2 (straight ahead)
+                        int debrisPartnerA;        // dodge_debris.cpp: slot of the first piece this one is linked to (0 = none)
+                        int groundHeight;                 // enemy_hop_spit.cpp: height of the ground (or of the pit floor) below it, whole units
                     };
                     union                         // 0x14
                     {
                         int flierGround;          // route_flier.cpp: height of the ground under it in whole units (-5000 = none)
+                        int seenHealth;           // enemy_pounce_breath.cpp: the health it last saw (a change wakes it)
+                        int circleFrames;          // enemy_chase_lunge.cpp: frames left of circling round an obstacle (30 after a lunge that ended near the player)
+                        int rivalState;           // target_race.cpp (rival slots 0x3a, 0x3b): 0 = appear, 1 = run at a target, 2 = look for one, 3 = pounce, 4 = stunned
                         int alarmFlashes;         // char_move.cpp: alarm flashes so far (Npc_RideAlarm)
                         int swing;                // enemy_pendulum.cpp: angle change per frame
                         int reversed;             // route_carrier.cpp, route_follow.cpp: 1 while walking the route
@@ -215,10 +233,14 @@ struct CharState
                         int fadeStep;             // enemy_cast_teleport.cpp: step of the teleport fade (15 counts down to 1, then up to 15)
                         int alerted;              // enemy_shy_ghost.cpp: 1 once it has shown itself to the player
                         int rayLength3;           // rolling_tire.cpp: length of ray 3
+                        int debrisPartnerB;        // dodge_debris.cpp: slot of the second piece this one is linked to (0 = none)
                     };
                     union                         // 0x18
                     {
                         int flierReady;           // route_flier.cpp: 1 once its wing node was found
+                        int nodesFound;           // enemy_pounce_breath.cpp: 1 once its spine and mouth nodes were looked up
+                        int circleDirection;       // enemy_chase_lunge.cpp: frames left of circling one way (positive = left, negative = right)
+                        int rivalFrames;          // target_race.cpp (rival): frames in the current state
                         int fall;                 // enemy_pendulum.cpp: drop speed (more negative each frame)
                         int speed;                // route_carrier.cpp: units per frame (from the route's first
                                                   // point)
@@ -242,10 +264,13 @@ struct CharState
                         int castMotion;           // enemy_cast_teleport.cpp: motion to play (1 = back off, 2 = idle, 5 = advance)
                         int hoverBase;            // enemy_hover_strike.cpp: height of the ground below it (or of the player, plus 75, where it has none)
                         int rayLength4;           // rolling_tire.cpp: length of ray 4 (outermost right)
+                        int probeFrames;                  // enemy_hop_spit.cpp: frames since the last sight probe (every 10th; 30 puts it on the ground)
                     };
                     union                         // 0x1c
                     {
                         int flierLastX;           // route_flier.cpp: x of its position last frame (whole units)
+                        int frameTick;             // enemy_chase_lunge.cpp: frames counted since it was set up (starts at its slot); staggers the probes between enemies
+                        int rivalTarget;          // target_race.cpp (rival): target slot (0x3c..0x43) it runs at or pounces on
                         int sightState;           // enemy_cast_teleport.cpp: 0 = player not seen, 1 = seen, 2 = seen in the line of sight
                         int hoverGrounded;        // enemy_hover_strike.cpp: 1 = hoverBase is ground the probe found (it floats 75 to 150 above it), 0 = none
                         int rider;                // route_carrier.cpp, npc_hover_carrier.cpp: character carried (0 = none)
@@ -265,10 +290,13 @@ struct CharState
                         int motionFrameSaved;      // enemy_hover_shooter.cpp: motion frame kept while it flies (motion 7)
                         int airFrames;            // enemy_chase_hop.cpp: frames airborne (the hop eases with it), 0 once it lands
                         int turnDirection;        // rolling_tire.cpp: 0 = straight on, 1 / 2 = veering one way / the other
+                        int obstacleDistance;             // enemy_hop_spit.cpp: distance to the obstacle the last probe found ahead (-1 = none)
                     };
                     union                         // 0x20
                     {
                         int flierLastY;           // route_flier.cpp: y of its position last frame (whole units)
+                        int halted;                // enemy_chase_lunge.cpp: 1 = it stopped chasing (blocked or at a ledge) and re-tests the way every 60th frame
+                        int rivalStuckFrames;     // target_race.cpp (rival): frames its way was blocked while running
                         int pointPause;           // route_carrier.cpp: frames to wait at a route point
                         int hopRequests;          // enemy_strafe.cpp (Enemy_HopAndStrafe): frames counted
                                                   // towards the next hop
@@ -287,10 +315,13 @@ struct CharState
                         int specialFrames;         // partner_skill.cpp (slot 11): frames counted since its skill started
                         int hurtFrames;           // enemy_shy_ghost.cpp: frames since it was hit (counted up to 46, then it sinks away; counted down while not hit)
                         int driveFrames;          // rolling_tire.cpp: frames driven in the current heading (negative after a bounce)
+                        int obstacleAhead;                // enemy_hop_spit.cpp: 1 when the last probe found an obstacle ahead
                     };
                     union                         // 0x24
                     {
                         int flierLastZ;           // route_flier.cpp: z of its position last frame (whole units)
+                        int hiddenFrames;          // enemy_chase_lunge.cpp: frames it is held out of play (colours blanked, no shadow), counted down
+                        int rivalSkipTarget;      // target_race.cpp (rival): the target it gave up on (not picked again at once)
                         int m_0024;
                         int zoneActiveFrom;        // area_zone.cpp: first frame of the cycle in which the zone acts
                         int sinkLimit;            // map_cursor_walk.cpp: set to -40 while the character is not sinking
@@ -301,10 +332,13 @@ struct CharState
                         int sparkCooldown;        // npc_tricks.cpp: frames before the next spark effect (counted down from 10)
                         int specialPhase;          // partner_skill.cpp: step of the partner skill (0 = ready, 1 = starts, then counts up; 1000 and above = the long one of slot 7)
                         int bumpCooldown;         // rolling_tire.cpp: frames left (10 after a bounce) in which it may not pick a new veer
+                        int shadowHeight;                 // enemy_hop_spit.cpp: height of its shadow, kept between the ground lookups
                     };
                     union                         // 0x28
                     {
                         int flierStillFrames;     // route_flier.cpp: frames it moved less than 10 units (it vanishes after 30)
+                        int sightFrames;          // enemy_pounce_breath.cpp: 300 while the way to the player is free, counted down
+                        int walkerSetUp;           // enemy_chase_lunge.cpp: -1 once its head and spine nodes were looked up
                         int fadeActions;          // route_carrier.cpp: bit n set = fade out at a point with
                                                   // action n
                         int skipGroundProbe;      // non-zero = skip the ground probe of a shot (0x1001a590)
@@ -323,10 +357,14 @@ struct CharState
                         int shotDelayMin;          // enemy_hover_shooter.cpp: frames before a shot may come (30)
                         int retreatFrames;        // breath_enemy.cpp: frames left of a failed retreat (state 5 ends when it runs out)
                         int wallAhead;            // rolling_tire.cpp: 1 = the 500-unit look-ahead hit the world
+                        int attackCooldown;               // enemy_hop_spit.cpp: frames before it may start to spit again
                     };
                     union                         // 0x2c
                     {
                         int m_002c;
+                        int probeDelay;          // enemy_pounce_breath.cpp: frames to the next sight probe (10 after one)
+                        int farewellFrames;       // partner_follow.cpp: frames left of the farewell message (60 at the start; it leaves at 1)
+                        int dazeFrames;            // enemy_chase_lunge.cpp: frames it stands dazed facing the player (sparkle effect every second frame), counted down
                         int cursorNode;           // map_cursor_walk.cpp: the route node the character heads for
                         int headingTo;            // route_step.cpp: heading (degrees) at the route's last point
                         int vanishFrames;         // marker_rider.cpp: frames left of the vanishing once the marker fell
@@ -341,6 +379,8 @@ struct CharState
                     union                         // 0x30
                     {
                         int m_0030;
+                        int probeResult;         // enemy_pounce_breath.cpp: result of the last sight probe (0 free, 2 = a step with a height)
+                        int colourStep;            // enemy_chase_lunge.cpp: 0 = normal, 1 = colours blanked while hidden, 2 = identification colours restored
                         int zoneEffectFrame;       // area_zone.cpp: the frame of the cycle that starts the effect
                         int markerPhase;          // marker_rider.cpp: 0 = new, 1 = riding (flags set), 2 = vanishing
                         int arrivalHold;          // map_cursor.cpp: frames left in which the cursor counts as
@@ -353,6 +393,8 @@ struct CharState
                     union                         // 0x34
                     {
                         int m_0034;
+                        int probeHeight;         // enemy_pounce_breath.cpp: height the last sight probe found (whole units)
+                        int shotRate;              // enemy_chase_lunge.cpp: 0 = never spits, 1..7 = it spits every (8 - this) * 10 frames
                         int zoneSound;             // area_zone.cpp: sound played with the effect (0 = none)
                         int cursorKind;           // map_cursor_walk.cpp: kind of the node last reached (MapCursor_Step)
                         int arrivalAction;        // npc_patrol.cpp: action of the last route point reached
@@ -371,11 +413,14 @@ struct CharState
             union                                 // 0x38
             {
                 int sawPlayer;                    // 1 once the character saw the player (or was told to react)
+                int leapAngle;           // enemy_pounce_breath.cpp: start heading of the whirl in 1/100000 radians
+                int volleyTimer;           // enemy_chase_lunge.cpp: frames since its last spit
                 int zoneSoundDelay;               // area_zone.cpp: frames before that sound plays (0 = at once)
                 int cursorPrevious;               // map_cursor_walk.cpp: the node reached before (MapCursor_Step)
                 int releasable;                   // npc_approach.cpp: non-zero = the release flag ends the approach
                 int buttonLiftOff;                // hikari_button.cpp: non-zero = the button light is switched off (blue, held still)
                 int rayPlayerGap3;                // rolling_tire.cpp: the same for ray 3 (overlays sawPlayer)
+                int groundRetries;                // enemy_hop_spit.cpp: times it was lifted because no ground was found below it (stops at 21)
             };
             union                                 // 0x3c
             {
@@ -383,6 +428,8 @@ struct CharState
                                                   // setting it switches behaviour
                 int zoneTracking;                 // area_zone.cpp (type 8): 1 once the follow height was taken
                 int rayPlayerGap4;                // rolling_tire.cpp: the same for ray 4 (overlays behaviour)
+                int turnRate;                    // enemy_pounce_breath.cpp: heading change of the whirl in 1/100000 radians (a sign flag while it wanders; overlays behaviour)
+                int groundSetUp;                  // enemy_hop_spit.cpp: 1 once its first ground lookup is done (overlays behaviour; kind 4 is picked by the slot kind)
             };
         };
         struct

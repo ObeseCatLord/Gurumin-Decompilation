@@ -350,9 +350,11 @@ struct Node
                            Vec4 *closest);                // 0x10191ec0
     int M_10194f40(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b, int depth);  // 0x10194f40
     int StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b);     // 0x101a2370
-    // 0x1019f340: tests a moving model (probe points) against this collision node (model_params.cpp).
-    int M_1019f340(int mask, Matrix4 *world, int a, float reach, float *nearest, Vec4 *probe, int probeCount, int *hitCount,
-                   Vec4 *hitPoint, Vec4 *hitNormal, int limit, int *out12, int c, int *d, int e);
+    // 0x1019f340 (node_probe_collide.cpp): tests probe spheres against the meshes of `node` and its children; see the
+    // definition.
+    int CollideProbesWithMesh(unsigned int mask, Matrix4 *world, Node *node, float reach, float *nearest, Vec4 *probes,
+                              int probeCount, int *probeIndex, Vec4 *hitPoint, Vec4 *hitNormal, unsigned int flags,
+                              int *hitFlag, int resolve, int *hitMatrix, int *skipped);
     int UpdateVisibleCells();                             // 0x10199be0 (visibility.cpp)
     int TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matrix4 *matrix);  // 0x10199cd0
 };

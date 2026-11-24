@@ -628,3 +628,12 @@ _Enemy_IsBusy	100e1c40
 ?Enemy_RollingTire@@YAHHD@Z	100a4440
 ?Enemy_StalkAndStrike@@YAHHH@Z	100a9240
 ?Char_LaserZone@@YAHH@Z	1002d4e0
+?FUN_10173550@@YAHPBD0H@Z	10173550
+?Map15_UpdateTargetRace@@YAHXZ	1007dab0
+?FUN_10062e70@@YAHPBUVec4@@HH@Z	10062e70
+?Enemy_ChaseLungeAndSpit@@YAHHH@Z	10076790
+?Partner_Follow@@YAHHH@Z	100e0320
+?Enemy_PounceAndBreathe@@YAHH@Z	100675d0
+?CollideProbesWithMesh@Node@@QAEHIPAUMatrix4@@PAU1@MPAMPAUVec4@@HPAH33I4H44@Z	1019f340
+?DodgeGame_UpdateGolemPiece@@YAHH@Z	1005fc00
+?Enemy_WanderHopAndSpit@@YAHH@Z	10065bf0

@@ -1,5 +1,5 @@
 // Steps and tuning of the barrage enemies (behaviour numbers of Enemy_UpdateBehaviour 0x100bcb30, enemy_barrage.cpp):
-// enemies that walk with the common enemy behaviour (FUN_10076790) and now and then stop to call down a barrage of
+// enemies that walk with the common enemy behaviour (Enemy_ChaseLungeAndSpit) and now and then stop to call down a barrage of
 // effects on the player. Their CharState words: `state` = BARRAGE_RUNNING while the barrage runs (else 0), `wait` =
 // frames since the barrage started.
 #ifndef GURUMIN_BARRAGE_ENEMY_H

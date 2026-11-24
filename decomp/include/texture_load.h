@@ -5,7 +5,7 @@
 #include <string.h>
 
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);  // builds the data path of `name`
-extern "C" int FUN_10173550(const char *path, const char *alphaPath, int flags);  // Texture_LoadBmp
+int FUN_10173550(const char *path, const char *alphaPath, int reload);        // Texture_LoadBmp (texture_load_bmp.cpp)
 extern "C" int FUN_10174ce0(const char *path, int a, int b);                      // Texture_LoadIti
 
 // Loads texture `name` and returns its texture handle: ".iti" names go to the ITI loader, everything else to the

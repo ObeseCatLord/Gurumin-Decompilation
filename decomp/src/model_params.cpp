@@ -274,8 +274,8 @@ int AnimModel::IsClearOfMap(const Vec4 *offset)
     DAT_11b002c0 = collisionFilter;
     DAT_11b002c8 = 1;
     int hitCount = 0;
-    int hit = collider->M_1019f340(0x4000000, &matrix, m_231c, colliderReach, &nearest, probe, 1, &hitCount, &hitPoint, &hitNormal, 0,
-                                   &out12, 0, 0, 0);
+    int hit = collider->CollideProbesWithMesh(0x4000000, &matrix, dropCollider, colliderReach, &nearest, probe, 1,
+                                              &hitCount, &hitPoint, &hitNormal, 0, &out12, 0, 0, 0);
     DAT_11b002c8 = 0;
     DAT_11b002c0 = 0;
     return hit == 0;
@@ -299,8 +299,8 @@ int AnimModel::IsClearOfMapLimited(const Vec4 *offset)
     DAT_11b002c0 = collisionFilter;
     DAT_11b002c8 = 1;
     int hitCount = 0;
-    int hit = collider->M_1019f340(-1, &matrix, m_231c, colliderReach, &nearest, probe, 1, &hitCount, &hitPoint, &hitNormal, m_2390,
-                                   &out12, 0, 0, 0);
+    int hit = collider->CollideProbesWithMesh(-1, &matrix, dropCollider, colliderReach, &nearest, probe, 1,
+                                              &hitCount, &hitPoint, &hitNormal, m_2390, &out12, 0, 0, 0);
     DAT_11b002c8 = 0;
     DAT_11b002c0 = 0;
     return hit == 0;

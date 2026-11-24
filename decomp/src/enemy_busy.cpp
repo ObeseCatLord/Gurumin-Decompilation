@@ -64,7 +64,7 @@ int Enemy_IsBusy(int index)
     // the queue: move up when the place ahead is free, else follow the enemy there
     if (DAT_10c66cf4 == index)
     {
-        FUN_100e0320(index, 0);
+        Partner_Follow(index, 0);
         if (DAT_10c66cd4 > 0 && --DAT_10c66cd4 == 0)
             DAT_1020b430[index].fadeOut = 1;
         return 1;
@@ -72,7 +72,7 @@ int Enemy_IsBusy(int index)
     if (DAT_10c66cf0 == index)
     {
         if (DAT_10c66cf4 > 0)
-            FUN_100e0320(index, DAT_10c66cf4);
+            Partner_Follow(index, DAT_10c66cf4);
         else
         {
             DAT_10c66cf4 = index;
@@ -83,7 +83,7 @@ int Enemy_IsBusy(int index)
     if (DAT_10c66cec == index)
     {
         if (DAT_10c66cf0 > 0)
-            FUN_100e0320(index, DAT_10c66cf0);
+            Partner_Follow(index, DAT_10c66cf0);
         else
         {
             DAT_10c66cf0 = index;
@@ -94,7 +94,7 @@ int Enemy_IsBusy(int index)
     if (DAT_10c66ce8 == index)
     {
         if (DAT_10c66cec > 0)
-            FUN_100e0320(index, DAT_10c66cec);
+            Partner_Follow(index, DAT_10c66cec);
         else
         {
             DAT_10c66cec = index;

@@ -5,7 +5,7 @@
 #include "game.h"
 
 extern "C" const char *FUN_1013f8a0(const char *name, int unused);
-extern "C" int FUN_10173550(const char *path, const char *alphaPath, int flags);
+int FUN_10173550(const char *path, const char *alphaPath, int reload);  // Texture_LoadBmp
 
 #define DATA(name) FUN_1013f8a0(name, 0)
 

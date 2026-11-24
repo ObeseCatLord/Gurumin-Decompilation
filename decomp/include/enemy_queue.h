@@ -1,6 +1,6 @@
 // The enemy queue (enemy_busy.cpp): up to four enemies wait in a line (DAT_10c66cf4 at the front, then DAT_10c66cf0,
 // DAT_10c66cec, DAT_10c66ce8; 0 = empty place). Each step an enemy moves up one place when the place ahead is free,
-// else it follows the enemy ahead (FUN_100e0320). DAT_10c66cd8 is the enemy that leaves the line and fades out.
+// else it follows the enemy ahead (Partner_Follow). DAT_10c66cd8 is the enemy that leaves the line and fades out.
 #ifndef GURUMIN_ENEMY_QUEUE_H
 #define GURUMIN_ENEMY_QUEUE_H
 
@@ -21,8 +21,9 @@ extern "C" int DAT_10c66cd4;   // frames until the front enemy starts to leave (
 #define QUEUE_FREE_MAP 999              // on this map every enemy's AnimModel::mode is cleared each frame
 #define QUEUE_KEEP_TARGET 10000         // DAT_104bf888 = slot + this: the slot is kept as a target
 
-// 0x100e0320: moves enemy `index` along the queue behind enemy `ahead` (0 = it is at the front). Returns 0.
-extern "C" int FUN_100e0320(int index, int ahead);
+// 0x100e0320 (partner_follow.cpp; C++ linkage: the original has an EH frame): one frame of the partner `index` in the
+// line, following `ahead` (0 = the player at the front). Returns 0.
+int Partner_Follow(int index, int ahead);
 // 0x100e1c40 (enemy_busy.cpp): non-zero = skip the enemy's AI this frame.
 extern "C" int Enemy_IsBusy(int index);
 

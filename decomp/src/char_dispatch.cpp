@@ -13,6 +13,7 @@
 
 #include "char_tables.h"
 #include "char_vars.h"
+#include "enemy_chase_lunge.h"
 
 extern "C" int FUN_1010c650(int index);
 extern "C" int FUN_10011f80(int index);
@@ -87,11 +88,10 @@ extern "C" int FUN_1009e2d0(int index)
 
 // Enemy behaviour updaters selected by DAT_1020b230 (one value per character slot).
 extern "C" int FUN_100aa820(int index, int variant);
-extern "C" int FUN_10076790(int index, int variant);
 extern "C" int FUN_1001d2d0(int index);
 
 // 0x100bcb30. Runs the behaviour updater of character `index` chosen by its behaviour number in DAT_1020b230
-// (1..17 and 99; any other number uses FUN_10076790 variant 0). Returns 0.
+// (1..17 and 99; any other number uses Enemy_ChaseLungeAndSpit variant 0). Returns 0.
 extern "C" int FUN_100bcb30(int index)
 {
     switch (DAT_1020b230[index])
@@ -123,7 +123,7 @@ extern "C" int FUN_100bcb30(int index)
         Enemy_PerchAndSwoop(index);
         return 0;
     case 11:
-        FUN_10076790(index, 1);
+        Enemy_ChaseLungeAndSpit(index, 1);
         return 0;
     case 12:
         Enemy_AimedShots(index);
@@ -147,7 +147,7 @@ extern "C" int FUN_100bcb30(int index)
         FUN_1001d2d0(index);
         return 0;
     default:
-        FUN_10076790(index, 0);
+        Enemy_ChaseLungeAndSpit(index, 0);
         return 0;
     }
 }

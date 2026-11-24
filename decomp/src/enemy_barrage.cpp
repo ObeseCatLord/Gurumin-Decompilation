@@ -1,5 +1,5 @@
 // Barrage enemies: behaviour numbers of Enemy_UpdateBehaviour 0x100bcb30 (char_dispatch.cpp) that walk with the
-// common enemy behaviour (FUN_10076790) and now and then stop to call down a barrage of effects on the player.
+// common enemy behaviour (Enemy_ChaseLungeAndSpit) and now and then stop to call down a barrage of effects on the player.
 
 #include <math.h>
 #include "vec4.h"
@@ -23,6 +23,7 @@
 #include "char_vars.h"
 
 #include "barrage_enemy.h"
+#include "enemy_chase_lunge.h"
 
 #include "strafe_enemy.h"
 
@@ -30,7 +31,6 @@ extern "C" int FUN_1013f880(void);                                          // t
 extern "C" int FUN_10065b10(int index, int sound, int always, int optional);  // Character_PlaySound
 extern "C" int FUN_1001d8b0(int index, int effect, Vec4 position, int parent, int unused, const Matrix4 *owner,
                             int value, int frame, const Matrix4 *matrix, const void *options);  // Char_StartEffect
-extern "C" int FUN_10076790(int index, int variant);                        // the common enemy behaviour
 Matrix4 RotationZ(float angle);                                             // 0x101b1b40
 Matrix4 RotationX(float angle);                                             // 0x101b1ad0
 extern "C" int FUN_1001bfb0(int index, float maxTurn);                      // Char_LimitTurn (char_turn.cpp)
@@ -109,7 +109,7 @@ int Enemy_CallBarrage(int index)
     }
     else
     {
-        FUN_10076790(index, 0);
+        Enemy_ChaseLungeAndSpit(index, 0);
         if (DAT_10db6ee8[index].motion->layer != BARRAGE_BLOCKING_LAYER &&
             DAT_10db6ee8[index].motion->blending == 0 && FUN_1013f880() % 10000 < BARRAGE_CHANCE)
         {
@@ -224,7 +224,7 @@ int Enemy_SpinFire(int index)
     }
     else
     {
-        FUN_10076790(index, 0);
+        Enemy_ChaseLungeAndSpit(index, 0);
         if (DAT_10db6ee8[index].motion->layer != BARRAGE_BLOCKING_LAYER &&
             DAT_10db6ee8[index].motion->blending == 0 && FUN_1013f880() % 10000 < BARRAGE_CHANCE)
         {
@@ -529,7 +529,7 @@ int Enemy_CallBursts(int index, int variant)
     }
     else
     {
-        FUN_10076790(index, 0);
+        Enemy_ChaseLungeAndSpit(index, 0);
         if (DAT_10db6ee8[index].motion->layer != BARRAGE_BLOCKING_LAYER &&
             DAT_10db6ee8[index].motion->blending == 0 && FUN_1013f880() % 10000 < BARRAGE_CHANCE)
         {

@@ -35,7 +35,7 @@ struct RegionPoint
     char pad_006c[4];
     int morphStart;           // 0x70: frame counter value when the morph began
     int morphing;             // 0x74: non-zero while it blends towards the vertex
-    char pad_0078[4];
+    int facing;               // 0x78: 1 when the offset was lifted instead of the tint darkened (set by the light morph)
 };
 // Map region, 0x44 bytes.
 struct MapRegion
@@ -57,5 +57,10 @@ struct MapRegion
 extern "C" MapRegion *DAT_104c03c0;
 extern "C" int DAT_104c03c4;               // non-zero once the regions are in use (0 = all invisible)
 extern "C" int DAT_102028e0;               // texture slot of the "@moya" node (the haze of the water regions)
+
+extern "C" int DAT_1020c370[];                // per light point: the frame its flood front starts at
+
+// 0x10062e70 (region_light.cpp): starts the flood (lighting != 0) or drain (0) morph around `lightCount` light points.
+int FUN_10062e70(const Vec4 *lights, int lightCount, int lighting);
 
 #endif

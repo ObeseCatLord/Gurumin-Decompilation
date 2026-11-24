@@ -274,9 +274,10 @@ Vec4 *ModelBank::LightForRoot(Node *root, Vec4 *position, Vec4 *target)
 #include "texture_object.h"
 
 #include "render_vars.h"
+#include "texture_load.h"
 
 extern "C" const char *FUN_1013f8a0(const char *name, int folder);   // builds the data path of `name`
-extern "C" int FUN_10173550(const char *path, const char *alphaPath, int flags);  // Texture_LoadBmp
+
 extern "C" int FUN_10175c90(const char *name, int width, int height, const unsigned char *pixels, int alpha,
                             int flags);                              // Texture_CreateFromPixels
 extern "C" void FUN_1013f070(int mode, int a, int b);                // sets a 2D/3D render state

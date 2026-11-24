@@ -12,8 +12,8 @@
 #include "map_vars.h"
 #include "dodge_game.h"
 #include "mole_game.h"
+#include "target_race.h"
 
-extern "C" void FUN_1007dab0(void);
 extern "C" void FUN_1007f1e0(void);
 
 // 0x100bd960 (Map_UpdateSpecial). While the map timer runs, calls the map's own update (maps 0x15..0x18). When it
@@ -26,7 +26,7 @@ int Map_UpdateSpecial()
         switch (DAT_10c62ed0)
         {
         case 0x15:
-            FUN_1007dab0();
+            Map15_UpdateTargetRace();
             break;
         case 0x16:
             Map16_UpdateDodgeGame();

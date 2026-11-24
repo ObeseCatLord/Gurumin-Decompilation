@@ -147,9 +147,9 @@ int AnimModel::LiftProbes(float *nearest, Vec4 *probes, int probeCount, AnimMode
             hitData = 0;
             if (mapTested == 0)
                 DAT_11b002c8 = 1;
-            result = collider->M_1019f340(-1, &matrix, m_231c, colliderReach, &nearestHit, probes, probeCount,
-                                          &probeIndex, &hitPoint, &hitNormal, m_023c | flags, &hit, extra,
-                                          &hitData, 0);
+            result = collider->CollideProbesWithMesh(-1, &matrix, dropCollider, colliderReach, &nearestHit, probes,
+                                                     probeCount, &probeIndex, &hitPoint, &hitNormal, m_023c | flags,
+                                                     &hit, extra, &hitData, 0);
             if (mapTested == 0)
             {
                 DAT_11b002c8 = 0;

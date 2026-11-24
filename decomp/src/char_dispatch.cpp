@@ -14,6 +14,7 @@
 #include "char_tables.h"
 #include "char_vars.h"
 #include "enemy_chase_lunge.h"
+#include "claw_enemy.h"
 
 extern "C" int FUN_1010c650(int index);
 extern "C" int FUN_10011f80(int index);
@@ -87,7 +88,6 @@ extern "C" int FUN_1009e2d0(int index)
 }
 
 // Enemy behaviour updaters selected by DAT_1020b230 (one value per character slot).
-extern "C" int FUN_100aa820(int index, int variant);
 extern "C" int FUN_1001d2d0(int index);
 
 // 0x100bcb30. Runs the behaviour updater of character `index` chosen by its behaviour number in DAT_1020b230
@@ -104,11 +104,11 @@ extern "C" int FUN_100bcb30(int index)
         return 0;
     case 3:
     case 5:
-        FUN_100aa820(index, 2);
+        Enemy_StalkAndClaw(index, 2);
         return 0;
     case 4:
     case 6:
-        FUN_100aa820(index, 1);
+        Enemy_StalkAndClaw(index, 1);
         return 0;
     case 7:
         Enemy_StalkAndDashSlash(index);

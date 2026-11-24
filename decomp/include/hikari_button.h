@@ -7,7 +7,6 @@
 #include "char_hikari.h"
 
 #define HIKARI_WIDE_UNIT 100000        // route point kind 10 packs x * 100000 + y
-#define HIKARI_RELATIVE_WRAP 10000.0f   // negative relative coordinates (route point kinds 6, 7, 9, 10) are taken modulo this
 #define BUTTON_NODE "Box01"            // the button's model node
 #define BUTTON_MODEL "O_015k.it3"      // loaded as a child of the light when it has no button node yet
 #define BUTTON_MODEL_SIZE 0x40

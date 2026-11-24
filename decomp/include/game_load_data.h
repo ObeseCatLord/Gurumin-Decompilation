@@ -6,35 +6,9 @@
 #include <windows.h>
 
 #include "char_slot.h"
+#include "map_tables.h"
 #include "matrix4.h"
 #include "vec4.h"
-
-// Number of records MapData_Load reads for the character table.
-#define MAP_CHARACTER_NAME_LENGTH 0x40
-#define MAP_CHARACTER_MODEL_NODE_LENGTH 0x20
-
-// One 0x174-byte record of the character table of map.txt (DAT_10918e60, count DAT_109276e0). Game_LoadData copies
-// its fields into the slot (CharSlot) and the per-slot tables with the record's id as index.
-struct MapCharacter
-{
-    int id;                                   // 0x00: slot the record fills
-    char name[MAP_CHARACTER_NAME_LENGTH];     // 0x04: display name
-    char label[MAP_CHARACTER_NAME_LENGTH];    // 0x44: copied to CharSlot::m_0165
-    int kind;                                 // 0x84: CharSlot::kind
-    int speedPercent;                         // 0x88: motion speed in percent (CharSlot::speedScale = this / 100)
-    int m_008c;                               // 0x8c: CharSlot::m_00a0
-    int m_0090;
-    int faceSet;                              // 0x94: CharSlot::faceSet
-    char slotKind;                            // 0x98: DAT_1021f3c0
-    char pad_0099[3];
-    int params[4];                            // 0x9c: CharSlot::params
-    int m_00ac;
-    int m_00b0;                               // 0xb0: DAT_102192c0
-    int m_00b4;                               // 0xb4: DAT_102108e8
-    char pad_00b8[0x5c];
-    char modelNode[MAP_CHARACTER_MODEL_NODE_LENGTH];  // 0x114: DAT_1021a3c0
-    char pad_0134[0x40];
-};
 
 // One 0xc0-byte record of the character statistics table of map.txt (DAT_10927744), indexed by the character id.
 struct MapCharacterStats

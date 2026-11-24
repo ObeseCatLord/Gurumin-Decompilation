@@ -68,6 +68,7 @@ Matrix4 Transpose(const Matrix4 &matrix);   // 0x101b1090: rows and columns swap
 // 0x101b1910: splits a matrix into its scale, rotation quaternion and translation.
 void DecomposeMatrix(const Matrix4 *matrix, Vec4 *scale, Vec4 *rotation, Vec4 *translation);
 Vec4 QuatFromMatrix(const Matrix4 &matrix);   // 0x101ae2a0: rotation quaternion (x, y, z, w) of the rotation block
+Vec4 QuatMultiply(const Vec4 &a, const Vec4 &b);   // 0x101aec90: product of two quaternions (x, y, z, w)
 Matrix4 RotationMatrix(const Vec4 &quaternion);   // 0x101b08c0: rotation block from a quaternion (x, y, z, w)
 
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);   // 0x101ae060: to -1..1 screen space

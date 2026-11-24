@@ -38,7 +38,7 @@ extern "C" int FUN_101011b0(int id, int value);
 #include "char_equip_models.h"
 extern "C" int FUN_1001b5b0(int index);
 extern "C" int FUN_1016b230(const char *text);
-extern "C" int FUN_100f9670(int slot);
+#include "char_update.h"
 
 #define PI_APPROX 3.1415f                // pi as the game writes it
 
@@ -392,7 +392,7 @@ extern "C" int FUN_100fb7b0(void)
         {
             int kind = DAT_10daaae8[slot].kind;
             if (kind == 0x20 || kind == 0x23 || kind == 0x24 || kind == 0x2f || kind == 0x58)
-                FUN_100f9670(slot);
+                Char_UpdateByKind(slot);
         }
     }
     if (DAT_10daaae8[3].kind != KIND_FOLLOWER)

@@ -13,6 +13,7 @@
 #define HIKARI_START_KIND 2           // the route point kind the light starts from
 #define HIKARI_COORD_UNIT 10000       // coordinates are packed as x * 10000 + y
 #define HIKARI_COORD_LIMIT 5000
+#define HIKARI_RELATIVE_WRAP 10000.0f   // negative relative coordinates (route point kinds 6, 7, 9, 10) are taken modulo this
 #define HIKARI_IDLE_SPEED 10          // speed counter while it waits
 #define HIKARI_TOP_SPEED 90
 #define HIKARI_SLOW_SCALE 3.33333f    // below this distance per counter step the light slows down

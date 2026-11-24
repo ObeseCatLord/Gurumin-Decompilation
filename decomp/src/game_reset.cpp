@@ -647,11 +647,11 @@ extern "C" void FUN_1003e710(void)
   memset(DAT_10255b08, 0, SWITCH_HOLD_SLOTS_CLEARED * sizeof(DAT_10255b08[0]));
   memset(DAT_1030bbf8, 0, SWITCH_HOLD_SLOTS_CLEARED * sizeof(DAT_1030bbf8[0]));
   DAT_1032d6a0 = 0;
-  DAT_1030c478 = 0;
+  DAT_1030c478[0] = 0;
   DAT_1030c479 = 0;
   DAT_1030c47a = 0;
   DAT_1030c47b = 0;
-  DAT_1049f1f8 = 0;
+  DAT_1049f1f8[0] = 0;
   DAT_1049f1f9 = 0;
   DAT_1049f1fa = 0;
   DAT_1049f1fb = 0;

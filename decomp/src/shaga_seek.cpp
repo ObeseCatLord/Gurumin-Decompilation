@@ -13,8 +13,8 @@
 #include "char_vars.h"
 #include "map_vars.h"
 #include "shaga.h"
+#include "claw_enemy.h"
 
-extern "C" int FUN_100aa820(int index, int variant);   // the enemy's normal behaviour
 extern "C" int FUN_1013f880(void);                     // the game's random number
 
 // Kind given to an enemy that found a shaga to go to.
@@ -45,7 +45,7 @@ extern "C" int FUN_1013f880(void);                     // the game's random numb
 #define SHAGA_SIGHT_MASK 4
 
 // 0x100d2110 (Enemy_SeekShaga). Character behaviour of enemy `index`: clears its "seeking" flag (DAT_10255a88) and
-// runs the normal behaviour (FUN_100aa820) unless the enemy was hit. On its frame of every SHAGA_SEEK_PERIOD, while
+// runs the normal behaviour (Enemy_StalkAndClaw) unless the enemy was hit. On its frame of every SHAGA_SEEK_PERIOD, while
 // its step is below SHAGA_SEEK_MAX_STEP, it lists the visitable shaga slots (model loaded, timer in
 // (SHAGA_TIMER_MIN, 0), kind not skipped; a pair kind also needs a visitable partner of the paired kind), picks one
 // at random and tests the line from the enemy to it. When the line is clear the enemy's state gets the target code
@@ -57,7 +57,7 @@ extern "C" int FUN_100d2110(int index)
     DAT_10255a88[index] = 0;
     if (DAT_102550e0[index] != 0)
         return 0;
-    FUN_100aa820(index, 0);
+    Enemy_StalkAndClaw(index, 0);
     if (DAT_104c0380 % SHAGA_SEEK_PERIOD != index % SHAGA_SEEK_PERIOD)
         return 0;
     if (DAT_1020b430[index].state >= SHAGA_SEEK_MAX_STEP)

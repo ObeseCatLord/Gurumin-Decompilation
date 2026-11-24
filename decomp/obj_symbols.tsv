@@ -644,3 +644,11 @@ _Enemy_IsBusy	100e1c40
 ?Scene_DrawFrame@@YAXH@Z	10038c10
 ?DrawGradient@TextureObject@@QAEHHHHHIIMM@Z	10143bc0
 ?FUN_100404e0@@YAHHHHHHHH@Z	100404e0
+?Enemy_StalkAndClaw@@YAHHH@Z	100aa820
+?Enemy_PodLobber@@YAHH@Z	10070200
+?Char_HikariWarp@@YAHHH@Z	1002ae70
+?FieldItemMenu_Draw@@YAHXZ	1003c570
+?DrillClaws_Update@@YAHXZ	1008fea0
+?SoccerGame_UpdateCpuPlayer@@YAHHHHHH@Z	10032240
+?LoadMapData@Game@@QAEHPBDP6AX0H@Z@Z	10002440
+?Char_UpdateByKind@@YAHH@Z	100f9670

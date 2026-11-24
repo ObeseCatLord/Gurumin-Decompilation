@@ -85,7 +85,7 @@ extern "C" int DAT_103088b4;
 extern "C" int DAT_1030b660;                              // map to enter
 extern "C" int DAT_1030b664;
 extern "C" char DAT_1030b868;
-extern "C" char DAT_1030c478;
+extern "C" char DAT_1030c478[8];                     // cursor row the item menu keeps for each DAT_104bfd74
 extern "C" char DAT_1030c479;
 extern "C" char DAT_1030c47a;
 extern "C" char DAT_1030c47b;
@@ -126,7 +126,7 @@ extern "C" unsigned char DAT_10468430[0x60];          // per ground object: dig 
 extern "C" int DAT_104684b0[115];
 extern "C" int DAT_104687b0;
 extern "C" char DAT_1049ef8c;
-extern "C" char DAT_1049f1f8;
+extern "C" char DAT_1049f1f8[8];                     // scroll position the item menu keeps for each DAT_104bfd74
 extern "C" char DAT_1049f1f9;
 extern "C" char DAT_1049f1fa;
 extern "C" char DAT_1049f1fb;

@@ -2,6 +2,7 @@
 
 #include "object.h"
 #include "node.h"
+#include "map_tables.h"
 
 struct FontRenderer;   // font_renderer.h
 struct Tracker;        // tracker.h
@@ -13,9 +14,17 @@ struct GameTrigger
     int flags[4];               // script flags that must be set (negative = must be clear, 0 = no condition)
     int value;                  // 0x14: event id (for map events)
     char name[0x10];            // 0x18: event name, e.g. "GAMEOVER", "KSKON", "TALK", "OPEN"
-    int argument;               // 0x28: what the event reacts to (for example the character or object id)
-    int ids[5];                 // 0x2c: with `argument`, the six ids a "DEAD" event waits for
-    char pad_0040[0x88];
+    union
+    {
+        struct
+        {
+            int argument;       // 0x28: what the event reacts to (for example the character or object id)
+            int ids[5];         // 0x2c: with `argument`, the six ids a "DEAD" event waits for
+            int extra[2];       // 0x40
+        };
+        int values[8];          // 0x28: the numbers of an event line (map events read six, triggers eight)
+    };
+    char labels[8][0x10];       // 0x48: the string read before each number
 };
 
 // Per-window entry table: 0x80 menu entries (a pointer to the variable an entry sets, or for value entries the
@@ -59,9 +68,11 @@ struct GameNamedEntry
     int flags[4];               // script flags that must pass (see TestScriptFlag)
     char name[0x20];            // 0x14: map name used by scripts
     char file[0x20];            // 0x34
-    char title[0x50];           // 0x54
+    char title[0x40];           // 0x54
+    int m_0094[3];              // 0x94
+    int m_00a0;
     int value;                  // 0xa4
-    char pad_00a8[0x40];
+    char text[2][0x20];         // 0xa8
 };
 
 // The game object: global instance DAT_104b7200. Holds menu textures, HUD state, the script variable tables and
@@ -152,17 +163,45 @@ struct Game : Object
     float m_7668[3];            // 0x7668: per-window fade
     char pad_7674[0x11f4];
     Node m_8868[0x20];          // 0x8868: menu model nodes, destroyed in ~Game
-    char pad_39c68[0x5c1ac];
+    char pad_39c68[0x2b2a8];    // 0x39c68: up to 0x64f10 the map tables are described by MapFront (map_front.h)
+    union                       // 0x64f10: the battle table (32 groups) overlaps the three tables that follow its first four groups
+    {
+        MapBattleEntry battle[0x20][0x20];
+        struct
+        {
+            MapBattleEntry battleHead[4][0x20];
+            MapBgmEntry bgm[0x40];              // 0x66b10
+            MapFaceFrame faceFrame[0x80];       // 0x67710
+            MapSeEntry se[1100];                // 0x67910
+        };
+    };
+    int mapVersion;             // 0x78c10
+    char pad_78c14[0x44];
+    MapBtMotEntry btMot[127];   // 0x78c58
+    char pad_81d34[0xe0];
+    MapAbilityEntry ability[0x80];  // 0x81e14
+    MapUsdgEntry usdg[0x100];   // 0x93e14
     GameNamedEntry m_95e14[0x100];
     int m_a4614;
-    char pad_a4618[0xaf114];
+    MapCharacter charTable[160];        // 0xa4618
+    int charCount;                      // 0xb2e98
+    MapStatusEntry status[160];         // 0xb2e9c
+    int pad_ba69c;
+    MapCharPos charPos[256];            // 0xba6a0
+    int charPosCount;                   // 0xc9aa0
+    MapMonsterPos charMonsPos[1440];    // 0xc9aa4
+    int charMonsPosCount;               // 0x11f724
+    MapObjAnime objAnime[0x400];        // 0x11f728
+    int objAnimeCount;                  // 0x153728
     GameTrigger triggers[3400]; // 0x15372c: event triggers of the loaded map
     int triggerCount;           // 0x1f976c
     GameTrigger queuedTriggers[2000];  // 0x1f9770: triggers of queued events (see IsQueuedEventReady)
     int queuedTriggerCount;     // 0x25b1f0
     GameTrigger mapEvents[2000];// 0x25b1f4: named map events
     int mapEventCount;          // 0x2bcc74
-    char pad_2bcc78[0x130d04];
+    int pad_2bcc78;
+    MapCharMotion charMot[0x40];        // 0x2bcc7c
+    char *scripts[0x1000];              // 0x3e997c: the "#Script" sections, allocated by LoadMapData
     char *text;                 // 0x3ed97c: script text being tokenised
     int pos;                    // 0x3ed980: read position in `text`
     int end;                    // 0x3ed984: text length

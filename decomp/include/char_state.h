@@ -20,6 +20,26 @@ struct Shove
     int frames;                   // frames left + 10000 * (non-zero = keep its motion)
 };
 
+// The football (map 0x18) CPU player's state (soccer_ai.cpp): which of the three roles the player has, whether it
+// goes for the ball, and the counters of its jump and of its sidestep around other players and the goal nets.
+struct SoccerState
+{
+    int role;                     // 0x00: 0 = not picked yet, 1 = ball chaser, 2 = back player, 3 = forward player
+    int pursuing;                 // 0x04: 1 = going for the ball, 0 = keeping its post
+    int idleDelay;                // 0x08: frames to stand still before the idle motion starts
+    int roleOwner[3];             // 0x0c: per role (1..3, team 0): the slot of the player holding it
+    int jumpSpeed;                // 0x18: vertical speed of the jump in progress (0 = none)
+    int jumpCooldown;             // 0x1c: frames before the next jump
+    int netSide;                  // 0x20: way round the goal net: 0 = none, 1/2 = along y, 3/4 = along x
+    int sidestep;                 // 0x24: way round another player: 0 = none, 1 = one side, 2 = the other
+    int sidestepFrames;           // 0x28: frames the sidestep side is held
+    int sidestepSwitch;           // 0x2c: frames the other player has been in the way (flips the side at 30)
+    int netFrames;                // 0x30: frames spent sliding along the net (flips the way at 90)
+    int delayA;                   // 0x34: counts down every frame
+    int delayB;                   // 0x38: counts down every frame while positive
+    int pad_003c;
+};
+
 struct CharState
 {
     union
@@ -43,6 +63,7 @@ struct CharState
                 {
                     union                         // 0x04
                     {
+                        int podFrames;              // enemy_pod_lobber.cpp: frames since the state began (state 2 counts the lob step 1..30, state 3 up to 99)
                         int flierMode;            // route_flier.cpp: 0 = waiting for a route, 1 = flying, 2 = vanishing
                         int pounceStep;           // enemy_pounce_breath.cpp: step of state 10 (0 = roars, 1 = chases, 2 = pounces, 3 = breathes); in state 1 the frame the whirl begins
                         int dropHeight;           // target_race.cpp (target): height the target falls from (900, 30 less each frame to -150)
@@ -64,6 +85,7 @@ struct CharState
                     };
                     union                         // 0x08
                     {
+                        int podGrowth;              // enemy_pod_lobber.cpp: 0 = hidden, 1..29 fading in or out, 150 = fully there
                         int flierRoute;           // route_flier.cpp: the map record whose route it flies (record 5 flies the other way)
                         int stepFrames;           // enemy_pounce_breath.cpp: frames counted in the current step
                         int rivalHit;             // target_race.cpp (target): 1 once a rival destroyed it (scores for the rivals)
@@ -103,6 +125,7 @@ struct CharState
                     };
                     union                         // 0x0c
                     {
+                        int podHideFrames;          // enemy_pod_lobber.cpp: frames left of the flicker that hides the model (level 9 only)
                         int flierFrames;          // route_flier.cpp: frames left of the vanishing (counted down from 5)
                         int noticed;              // enemy_pounce_breath.cpp: 1 once it noticed the player (or was hit)
                         int edgeAhead;             // enemy_chase_lunge.cpp: 1 = no ground ahead of it (a ledge), tested every 3rd to 10th frame by slot
@@ -156,6 +179,7 @@ struct CharState
                     };
                     union                         // 0x10
                     {
+                        int podMotion;              // enemy_pod_lobber.cpp: motion the model plays (0 idle, 1 lobbing, 2 growing, 4 lobbing)
                         int action;               // char_move.cpp: marker to run to (Npc_RunToMarker), alarm
                                                   // raised (Npc_RideAlarm), attacks left to chain
                                                   // (Enemy_ShoveAndBlast)
@@ -195,6 +219,7 @@ struct CharState
                     };
                     union                         // 0x14
                     {
+                        int podRipeness;            // enemy_pod_lobber.cpp: frames counted while it idles; raises the chance a pod starts growing
                         int flierGround;          // route_flier.cpp: height of the ground under it in whole units (-5000 = none)
                         int seenHealth;           // enemy_pounce_breath.cpp: the health it last saw (a change wakes it)
                         int circleFrames;          // enemy_chase_lunge.cpp: frames left of circling round an obstacle (30 after a lunge that ended near the player)
@@ -238,6 +263,7 @@ struct CharState
                     union                         // 0x18
                     {
                         int flierReady;           // route_flier.cpp: 1 once its wing node was found
+                        int previousState;        // enemy_stalk_claw.cpp: the behaviour step of the last frame (the claw steps 3 and 4 blend from step 3 or 4)
                         int nodesFound;           // enemy_pounce_breath.cpp: 1 once its spine and mouth nodes were looked up
                         int circleDirection;       // enemy_chase_lunge.cpp: frames left of circling one way (positive = left, negative = right)
                         int rivalFrames;          // target_race.cpp (rival): frames in the current state
@@ -378,6 +404,7 @@ struct CharState
                     };
                     union                         // 0x30
                     {
+                        int podNodesFound;          // enemy_pod_lobber.cpp: 1 once the pod nodes of the model were looked up
                         int m_0030;
                         int probeResult;         // enemy_pounce_breath.cpp: result of the last sight probe (0 free, 2 = a step with a height)
                         int colourStep;            // enemy_chase_lunge.cpp: 0 = normal, 1 = colours blanked while hidden, 2 = identification colours restored
@@ -392,6 +419,7 @@ struct CharState
                     };
                     union                         // 0x34
                     {
+                        int podPiecesLive;          // enemy_pod_lobber.cpp: lobbed pods still flying this frame
                         int m_0034;
                         int probeHeight;         // enemy_pounce_breath.cpp: height the last sight probe found (whole units)
                         int shotRate;              // enemy_chase_lunge.cpp: 0 = never spits, 1..7 = it spits every (8 - this) * 10 frames
@@ -440,6 +468,7 @@ struct CharState
             int laserHits;                    // laser_zone.cpp: beam pairs that ended while the player stood in the box
             int laserPattern[12];             // laser_zone.cpp: per beam pair: 0 = free, else flag * 10000 + speed * 100 + type
         };
+        SoccerState soccer;                       // soccer_ai.cpp: a football CPU player
         int words[0x10];                          // the whole block by index (resets and copies)
         Shove shoves[4];                          // char_shove.cpp: the slot's scripted shoves
     };

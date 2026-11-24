@@ -36,6 +36,13 @@ extern "C" void *g_switchHeldObject[SWITCH_HOLD_SLOTS];    // EN 0x009180e0 (JP 
 extern "C" int g_switchHolder[SWITCH_HOLD_SLOTS];          // EN 0x009183d0 (JP DAT_10255b08): holder of each hold slot
 extern "C" short g_objectSwitchState[SWITCH_HOLD_SLOTS];   // EN 0x00b919e0 (JP DAT_10254838): per-object switch state; SWITCH_HELD_BONUS is added while held
 
+extern "C" int g_switchEffectStarted[SWITCH_HOLD_SLOTS];   // EN 0x009188e0 (JP DAT_1042e0a8): 1 once the hold slot's effect was started
+extern "C" int g_switchEffectKind[SWITCH_HOLD_SLOTS];      // EN 0x0091ba70 (JP DAT_10219fc0): effect kind of each hold slot (0, 1 or 2)
+extern "C" unsigned int g_gameFrames;                      // EN 0x00a1ddfc (JP DAT_104bf890): frames since the game started
+
+// Starts the effects of the switch objects held near the camera. EN 0x5ac530 (JP Switch_UpdateEffects).
+extern "C" int Switch_UpdateEffects(void);
+
 // Lets go of what character slot `holder` holds. EN 0x5c9fd0 (JP 0x10057b90).
 extern "C" int Switch_Release(int holder);
 

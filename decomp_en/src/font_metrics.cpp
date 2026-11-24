@@ -2,8 +2,7 @@
 #include <string.h>
 
 #include "font_renderer.h"
-
-extern "C" float g_fontScaleDivisor;   // EN 0x00908b20: divisor applied to bitmap-font text widths (starts at 1.0)
+#include "render.h"
 
 // FontRenderer::TextWidth: width in pixels of `text` drawn at `scale`: measured with the bitmap font when one is
 // loaded (DrawString also returns the width, which is then divided by the font scale divisor), otherwise with the
@@ -16,5 +15,5 @@ int FontRenderer::TextWidth(const char *text, float scale)
         GetTextExtentPoint32A(dc, text, strlen(text), &size);
         return (int)((float)size.cx * scale);
     }
-    return (int)((float)DrawString(0, 0, 0, text, 0, 0) * scale / g_fontScaleDivisor);
+    return (int)((float)DrawString(0, 0, 0, text, 0, 0) * scale / g_screenWidthDivisor);
 }

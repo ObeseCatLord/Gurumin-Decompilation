@@ -7,4 +7,7 @@ extern "C" int g_renderQueueMatrixCount;  // EN 0x0217fd94 (JP DAT_11b002b8): en
 extern "C" int g_renderQueueExtraCount;   // EN 0x0217fd90 (JP DAT_11b044dc): entries used in the extra-data pool
 extern "C" int g_renderQueueCount;        // EN 0x0217fb48 (JP DAT_11b044d0): nodes queued
 
+// Empties the queue and its pools. Returns 0. EN 0x74a4f0.
+extern "C" int RenderQueue_Clear();
+
 #endif

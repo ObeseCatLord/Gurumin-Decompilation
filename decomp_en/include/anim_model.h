@@ -11,6 +11,8 @@ struct Node;
 
 // Layers of a Playback (layer numbers above PLAYBACK_LAYER_COUNT - 1 are rejected).
 const int PLAYBACK_LAYER_COUNT = 0x90;
+// Layer number meaning "none" (Playback::layer, slot layers).
+const int PLAYBACK_NO_LAYER = -1;
 // Motion slots per layer.
 const int PLAYBACK_SLOT_COUNT = 16;
 // Bytes of a Playback block.
@@ -46,6 +48,8 @@ const float PUSH_IDLE_FACTOR = 0.55f;
 // Snapping works in tenths of a unit; four candidate slots (three used).
 const float SNAP_UNITS_PER_WORLD_UNIT = 10.0f;
 const int SNAP_CANDIDATE_COUNT = 4;
+// AnimModel::shadowOpacity of a model that has just been placed.
+const unsigned char SHADOW_OPACITY_PLACED = 15;
 // Highest hold weight.
 const float HOLD_WEIGHT_MAX = 0.9f;
 
@@ -63,6 +67,8 @@ const unsigned int MAP_COLLISION_ANY = 0xffffffff;
 extern "C" Node *g_modelFileRoots[MODEL_FILE_ENTRIES];
 // World matrix of each model file entry (the AnimModel::matrix of its model). EN 0x01663d70 (JP DAT_10ff19e8).
 extern "C" Matrix4 *g_modelFileMatrices[MODEL_FILE_ENTRIES];
+// Matrix reset to the identity every time a model is placed. EN 0x01ee48b0 (JP DAT_118e69a8).
+extern "C" Matrix4 g_placementMatrix;
 // Collision filter of the model-against-world test that runs now (a model's collisionFilter). EN 0x0217fb00 (JP DAT_11b002c0).
 extern "C" int g_collisionFilter;
 // 1 while a model-against-world test runs. EN 0x0217fafe (JP DAT_11b002c8).
@@ -97,12 +103,24 @@ struct AnimModel;
 struct Playback
 {
     int headerFlag;                    // 0x0000: first word of the state (cleared when the player gets a helmet)
-    char m_0004[0x1c - 4];             // 0x0004: not yet named
+    float framePosition;               // 0x0004: frame position (-1 while blending)
+    float speed;                       // 0x0008: playback speed (1 = normal)
+    unsigned char m_000c;              // 0x000c: not yet named
+    char pad_000d[3];                  // 0x000d
+    int m_0010;                        // 0x0010: not yet named
+    int m_0014;                        // 0x0014: not yet named
+    int m_0018;                        // 0x0018: not yet named
     int layer;                         // 0x001c: the layer that plays now
-    char m_0020[0x2c - 0x20];          // 0x0020: not yet named
+    int frame;                         // 0x0020: current motion frame
+    int m_0024;                        // 0x0024: not yet named
+    int m_0028;                        // 0x0028: not yet named
     void *slotSource[16];              // 0x002c: motion source of each slot
     int slotLayer[16];                 // 0x006c: layer each slot plays
-    char m_00ac[0xbec - 0xac];         // 0x00ac: not yet named
+    int layerActive[PLAYBACK_LAYER_COUNT];   // 0x00ac: 1 while the layer is active
+    int m_02ec[PLAYBACK_LAYER_COUNT];        // 0x02ec: not yet named
+    int layerLast[PLAYBACK_LAYER_COUNT];     // 0x052c: last frame of each layer
+    int m_076c[PLAYBACK_LAYER_COUNT];        // 0x076c: not yet named
+    int m_09ac[PLAYBACK_LAYER_COUNT];        // 0x09ac: not yet named
     int endState;                      // 0x0bec: PLAYBACK_END_REACHED once the playback has reached its end
     char m_0bf0[0x1070 - 0xbf0];       // 0x0bf0: not yet named
     int slotOffsetX[PLAYBACK_LAYER_COUNT][PLAYBACK_SLOT_COUNT];  // 0x1070: x offset per layer and slot
@@ -128,9 +146,15 @@ struct AnimModel
     char uiAnimStarted;           // 0x076: set to 1 by UiAnim_Play (read on the first model only)
     char m_0077[0x84 - 0x77];     // 0x077: not yet named
     unsigned char speedDivisor;   // 0x084: slows every motion of this model down (0 = no division)
-    char m_0085[0x21c - 0x85];    // 0x085: not yet named
+    char m_0085[0xb0 - 0x85];       // 0x85: not yet named
+    float placeHeight;       // 0xb0: height the model was placed at (SetPosition, Teleport)
+    char m_00b4[0x1d4 - 0xb4];       // 0xb4: not yet named
+    int m_01d4;              // 0x1d4: cleared when the model is placed
+    char m_01d8[0x21c - 0x1d8];       // 0x1d8: not yet named
     Vec4 scale;                   // 0x21c: model scale (x, y, z)
-    char m_022c[0x248 - 0x22c];   // 0x22c: not yet named
+    char m_022c[0x23c - 0x22c];       // 0x22c: not yet named
+    int m_023c;              // 0x23c: cleared when the model is placed
+    char m_0240[0x248 - 0x240];       // 0x240: not yet named
     float holdWeight;             // 0x248: blend weight while holding (at most HOLD_WEIGHT_MAX)
     char m_024c[0x260 - 0x24c];   // 0x24c: not yet named
     float uniformScale;           // 0x260: scale of the whole model (1 for bank models)
@@ -144,7 +168,8 @@ struct AnimModel
         int switchNode;           // 0x270: node id of the switch this character works (switch characters only)
         int bankIndex;            // 0x270: a model-bank record's own index in the bank (bank models only)
     };
-    char m_0274[0x294 - 0x274];   // 0x274: not yet named
+    char m_0274[0x290 - 0x274];       // 0x274: not yet named
+    float m_0290;            // 0x290: cleared when the model is placed
     int walkingRoute;             // 0x294: 1 while the character walks a route (cleared when the player gets a helmet)
     Playback *playback;           // 0x298: the motion playback state (allocated on first use)
     float speedScale;             // 0x29c: motion speed scale
@@ -180,18 +205,30 @@ struct AnimModel
     Matrix4 matrix;               // 0x2328: world matrix; the translation row (m[12..14]) is the position
     int motionFrame;              // 0x2368: frame of the motion file shown now
     float verticalSpeed;          // 0x236c: vertical speed (positive = rising)
-    char m_2370[0x2384 - 0x2370]; // 0x2370: not yet named
+    float placedHeight;      // 0x2370: height the model was placed at (copy of placeHeight)
+    int m_2374;              // 0x2374: cleared when the model is placed
+    char m_2378;             // 0x2378: cleared when the model is placed
+    char m_2379;             // 0x2379: cleared when the model is placed
+    unsigned char shadowOpacity; // 0x237a: shadow opacity (SHADOW_OPACITY_PLACED when placed, 0 = no shadow)
+    char m_237b;                  // 0x237b: not yet named
+    float m_237c;            // 0x237c: 1 when the model is placed
+    char m_2380[0x2384 - 0x2380];       // 0x2380: not yet named
     int collisionResult;          // 0x2384: collision result, cleared before each update (UpdateCollision)
     int speedChangeFrames;        // 0x2388: frames since the speed change (1 once one is pending)
     int idleMotionEnabled;        // 0x238c: non-zero = the model plays its idle motion now and then (Char_RandomIdle)
     int collisionLimit;           // 0x2390: limit of the map collision tests (99999 = none)
-    char m_2394[0x2398 - 0x2394]; // 0x2394: not yet named
+    int m_2394;              // 0x2394: 1 when the model is placed
     Vec4 holdOffset;              // 0x2398: position relative to the held model
     Vec4 move;                    // 0x23a8: movement impulse applied by the next update (Push)
     Vec4 velocity;                // 0x23b8: current movement
-    char m_23c8[0x23d8 - 0x23c8]; // 0x23c8: not yet named
+    Vec4 m_23c8;             // 0x23c8: cleared when the model is placed
     Vec4 moveStep;                // 0x23d8: this frame's movement: x, y scaled by speedScale, z the vertical step
-    char m_23e8[0x247c - 0x23e8]; // 0x23e8: not yet named
+    Vec4 m_23e8;             // 0x23e8: cleared when the model is placed
+    Vec4 m_23f8;             // 0x23f8: cleared when the model is placed
+    Vec4 m_2408;             // 0x2408: cleared when the model is placed
+    char m_2418[0x2434 - 0x2418];       // 0x2418: not yet named
+    Matrix4 shadowMatrix;    // 0x2434: matrix the shadow is drawn with (Teleport moves it with the model)
+    char m_2474[0x247c - 0x2474];       // 0x2474: not yet named
     float heading;                // 0x247c: angle the character faces now
     float targetHeading;         // 0x2480: angle the character turns towards
     char m_2484[0x2494 - 0x2484]; // 0x2484: not yet named
@@ -202,6 +239,8 @@ struct AnimModel
     int SetMotionOptions(int playing, int looping);                      // EN 0x745c00 (JP 0x10161be0)
     int SetTrackBOptions(int playing, int looping);                      // EN 0x7469b0 (JP 0x10161f60)
     int AddTrackCKey(int frame, float x, float y, float z);              // EN 0x70ad20 (JP 0x10161af0)
+    int AddTrackCKeyFlagged(int frame, float x, float y, float z, char flag);   // EN 0x70ad90 (JP 0x10161a90)
+    int StepMotion();                                                    // EN 0x70bea0 (JP 0x10161c00): advances the motion channel one frame
     int AddMotionKey(int frame, float value);                            // EN 0x70af70 (JP 0x10161b90)
     int SetPendingPush(float x, float y, float z, char flag);            // EN 0x73f940 (JP 0x101628b0)
     int ClearTrackC();                                                   // EN 0x741bd0 (JP 0x10161a60)

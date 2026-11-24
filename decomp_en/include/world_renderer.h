@@ -212,6 +212,6 @@ extern "C" int g_worldFrameD;   // EN 0x0166443c (JP DAT_1101de14)
 extern "C" int g_scriptedCameraSlot;   // EN 0x01664670 (JP DAT_1101de34): scripted camera slot in use, reset when a scene starts
 extern "C" float g_lightScale;         // EN 0x00908b00 (JP DAT_10203420): strength of the scene light, 1.0 when a scene starts
 
-extern "C" WorldRenderer g_world;  // the world (JP DAT_10c68000; EN address not yet identified)
+extern "C" WorldRenderer g_world;  // the world (EN 0x013390f8, JP DAT_10c68000)
 
 #endif

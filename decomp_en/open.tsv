@@ -17,3 +17,24 @@ address	status	reason
 007c5750	open	SoundArc_PlayStream: 8 diffs; EN stores the command (0x65) before the stream value in every spelling
 006d68b0	open	Npc_Idle: same length, only the push esi position (original pushes inside the state==1 branch)
 006d5dd0	open	Npc_WaitFacingAway: 633 vs 649 bytes, register allocation differs from the prologue
+005c24a0	open	Char_ProbeSideLedge: 4 bytes, local distance reloaded into xmm1 (original xmm0)
+005c20e0	open	Char_ProbeSideStep: 4 bytes, same distance register difference
+005bf520	open	Enemy_TurnToPlayer: 149 diffs; EN keeps a targetHeading store in each clamp branch with a shared tail, ours merges them
+00635010	open	Regions_CollideRay: 715 diffs; EN reloads the box z values after storing depthLow in the min/max select
+00750450	open	Node::RemoveChild: 1 diff, the inlined strcpy loop addresses [ecx + ebx - 1] in the original, [ebx + ecx - 1] in ours
+00754e20	open	Node::CylindersOverlap: 8 diffs, dx/dy temporaries live in swapped xmm2/xmm3 registers
+007a9db0	open	CreateShortcut: 14 diffs, the original splits the path into the parameter's own stack slot (drive buffer at [ebp+8]) so its frame is 4 bytes smaller; ours has a local drive buffer
+00739250	open	WorldRenderer::SetModelState: the original reloads this->models after every limit store (ours keeps it in ecx); NodeSaved::limitMin/Max are floats, tried literal and named limits
+007c5850	open	SoundArc_PlayStreamFade: 8 diffs; the command store is scheduled after the stream store (as in 7c5750)
+007c59b0	open	SoundArc_PlayStreamFadeEx: 8 diffs; same store-order issue as 7c5750
+007c5a60	open	SoundArc_PlayFile: EN keeps the queue index in a byte and recomputes slot*0x1c0 for the tick store; every spelling keeps one pointer
+007c1bd0	open	SoundVoice::GetPlayPosition: EN reloads thirdFlag each test and re-initialises the uninitialised correction at three join points
+007c4020	open	SoundVoice::SetPosition: float stores and constants scheduled in another order
+007c41c0	open	SoundVoice::UpdatePosition: 55 diffs, constant stores scheduled after the position math
+007c1520	open	OggReader::FeedSync: matches except ebx/edi swapped (this in edi, size in ebx)
+007bf5d0	open	MmioFile::Seek: EN keeps the seek base in the origin register (eax)
+007c5f80	open	SoundEngine_SetOptions: store of the tens digit scheduled after the second division
+005beb30	open	Enemy_BackAwayFromPlayer: 1000 vs 994 bytes, only the move.x/move.y *= speedScale pair differs (original multiplies both then stores y then x); tried x-first, y-first, scale-on-left, float temporaries
+00729610	open	ModelBank::DrawLensFlares: ~281 diffs; constant hoisting of 240.0/320.0 around the DrawScreenCopy calls
+007a4ef0	open	Render_SetSamplerState: 104 vs 111; original has two cache stores and two rets, GetSamplerState writes into the parameter slot
+0071c740	open	Texture_CreateCopy: 12 diffs; strcpy temp register al/cl swapped, epilogue

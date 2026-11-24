@@ -53,4 +53,26 @@ extern "C" int Npc_WaitFacingAway(int index);
 // Sets the movement impulse of character `index` from (x, y, z). EN 0x5b98a0 (JP 0x100241e0).
 extern "C" int Character_SetMove(int index, float x, float y, float z);
 
+// Wakes the enemies within `radius` of character `index` (the third argument is 0 for every caller seen so far). EN 0x6ac0e0 (JP 0x1001b670).
+extern "C" int Enemies_WakeNearby(int index, float radius, int unknown);
+// Keeps NPC `index` idling until the player comes near, then makes it face the player and talk. EN 0x6d6220 (JP 0x100b58a0).
+extern "C" int Npc_TalkWhenNear(int index, int wakeEnemies);
+
+// Starts the alert reaction of NPC `index` once it sees the player. EN 0x6c3210 (JP 0x100b5f80).
+int Npc_AlertWhenSeen(int index);
+
+// Like Npc_AlertWhenSeen, and turns to face the player at once. EN 0x6c34f0 (JP 0x100b5c30).
+int Npc_TurnWhenSeen(int index);
+
+// An NPC that waits underground and rises when the player comes near. EN 0x6b0d60 (JP 0x100b3430).
+int Npc_RiseWhenSeen(int index);
+
+// A door that swings about its hinge. EN 0x6ae950 (JP 0x10048b70).
+int Char_SwingDoor(int index);
+
+// The motion playback of the enemy that moved last (left there for the scripts; cleared at the start of each move). EN 0x0162ef64 (JP DAT_1101d880).
+extern "C" Playback *g_lastEnemyPlayback;
+// An enemy that follows the player and blasts. EN 0x699f20 (JP 0x1009dfd0).
+extern "C" int Enemy_FollowAndBlast(int index);
+
 #endif

@@ -4,6 +4,19 @@
 #ifndef GURUMIN_EN_GAME_H
 #define GURUMIN_EN_GAME_H
 
+struct FontRenderer;   // the text renderer the menus draw with
+
+#include "node.h"
+
+// Base of the game objects: empty, with an out-of-line destructor (EN 0x76f0e0, folded with ~Matrix4 by the linker).
+struct Object
+{
+    ~Object();
+};
+
+// Number of menu model nodes a Game owns.
+const int MENU_NODE_COUNT = 0x20;
+
 // Number of menu window slots a Game keeps open at once.
 const int MENU_SLOT_COUNT = 3;
 // Returned by Game::FindSlot when the window id is not open.
@@ -13,6 +26,9 @@ const int MENU_RESULT = 0x80;
 const int MENU_ENTRY_COUNT = 0x82;
 // Bytes of the per-window flag arrays (cursorRemembered, savedCursor).
 const int MENU_FLAG_BYTES = 0x258;
+// The two per-window-id arrays as ints, and how many of them the menu reset clears.
+const int MENU_CURSOR_MEMORY_INTS = MENU_FLAG_BYTES * 2 / 4;
+const int MENU_CURSOR_CLEAR_INTS = 200;
 // Number of script flags (index 0 is always set).
 const int SCRIPT_FLAG_COUNT = 4000;
 // Highest valid script flag index.
@@ -74,9 +90,35 @@ struct GameNamedEntry
 };
 
 // The game object: menu windows, the script variable tables and the script flags.
-struct Game
+struct Game : Object
 {
-    char m_0000[0xa4];                      // 0x000: textures and HUD state (not used by EN code yet)
+    int m_0000;                             // 0x000: reset to 0 with the menus (not yet named)
+    int m_0004;                             // 0x004: reset to 0 with the menus (not yet named)
+    int texMenu1;                           // 0x008: texture slot of the menu sheet 1 (digits, cursor, debug font)
+    int texMenu4;                           // 0x00c: texture slot of the alternative panel frame
+    int m_0010;                             // 0x010: texture slot, -1 (unused)
+    int texMenu2;                           // 0x014: texture slot of menu sheet 2
+    int texMenu5;                           // 0x018: texture slot of menu sheet 5
+    int texBalloon5;                        // 0x01c: texture slot of speech balloon 5
+    int texBalloon6;                        // 0x020: texture slot of speech balloon 6
+    int texFrame;                           // 0x024: texture slot of the frame sheet
+    char m_0028[0x2c - 0x28];               // 0x028: not used by EN code yet
+    int texMap01;                           // 0x02c: texture slot of map sheet 1
+    int texMap02;                           // 0x030: texture slot of map sheet 2
+    int texUdChip;                          // 0x034: texture slot of the up/down chip sheet
+    int texWaku01;                          // 0x038: texture slot of the HUD frame sheet (digit strip rows 0, 16 and 64-80)
+    int texWaku02;                          // 0x03c: texture slot of the second HUD sheet (digit strip rows 16-48)
+    int texWaku03;                          // 0x040: texture slot of the third HUD sheet
+    int texWaku04;                          // 0x044: texture slot of the fourth HUD sheet
+    int texIcon01;                          // 0x048: texture slot of the item icon sheet
+    int texWaku05;                          // 0x04c: texture slot of the fifth HUD sheet
+    char m_0050[0x7c - 0x50];               // 0x050: not used by EN code yet
+    int texBalloon7;                        // 0x07c: texture slot of speech balloon 7
+    int texMenu15;                          // 0x080: texture slot of the panel fill
+    int texMenu14;                          // 0x084: texture slot of the panel frame
+    int activeWindow;                       // 0x088: window slot that has the cursor (reset to 0 with the menus)
+    int windowVisible[MENU_SLOT_COUNT];     // 0x08c: non-zero while the window slot is shown
+    int windowFade[MENU_SLOT_COUNT];        // 0x098: fade-in counter of the window slot (0 to 32)
     int windowId[MENU_SLOT_COUNT];          // 0x0a4: id of the menu window in each slot
     char m_00b0[0xe0 - 0xb0];               // 0x0b0: window geometry (not used by EN code yet)
     int lastEntry[MENU_SLOT_COUNT];         // 0x0e0: index of the last entry added to the window
@@ -87,18 +129,40 @@ struct Game
     char m_0134[0x140 - 0x134];             // 0x134: not used by EN code yet
     int windowCursor[MENU_SLOT_COUNT];      // 0x140: cursor position in the window
     char m_014c[0x1dc - 0x14c];             // 0x14c: not used by EN code yet
-    char cursorRemembered[MENU_FLAG_BYTES]; // 0x1dc: per window id: non-zero when its cursor is remembered
-    char savedCursor[MENU_FLAG_BYTES];      // 0x434: per window id: the remembered cursor position
-    char m_068c[0x69c - 0x68c];             // 0x68c: not used by EN code yet
+    union                                   // 0x1dc: the per-window-id cursor memory, cleared together when the menus reset
+    {
+        struct
+        {
+            char cursorRemembered[MENU_FLAG_BYTES]; // 0x1dc: per window id: non-zero when its cursor is remembered
+            char savedCursor[MENU_FLAG_BYTES];      // 0x434: per window id: the remembered cursor position
+        };
+        int cursorMemory[MENU_CURSOR_MEMORY_INTS];   // the same bytes as ints (the reset clears the first MENU_CURSOR_CLEAR_INTS)
+    };
+    char m_068c[0x690 - 0x68c];             // 0x68c: not used by EN code yet
+    int m_0690;                             // 0x690: reset to 0 when the menu textures load (not yet named)
+    char m_0694[0x69c - 0x694];             // 0x694: not used by EN code yet
     char labels[MENU_SLOT_COUNT][MENU_ENTRY_SLOTS][MENU_LABEL_SIZE];  // 0x69c: item label of each window entry (empty = free)
     GameMenuItems menuItems[MENU_SLOT_COUNT];  // 0x579c: per-window entries and result pointer
     int entryKind[MENU_SLOT_COUNT][MENU_ENTRY_COUNT];       // 0x5db4: entry kind (MenuEntryKind)
     int entryMax[MENU_SLOT_COUNT][MENU_ENTRY_COUNT];        // 0x63cc: range entries' upper value (-1 for the others)
     int entryMin[MENU_SLOT_COUNT][MENU_ENTRY_COUNT];        // 0x69e4: range entries' lower value
-    char m_6ffc[0x7654 - 0x6ffc];           // 0x6ffc: entry highlights (not used by EN code yet)
+    int menuTexturesLoaded;                 // 0x6ffc: set to 1 when the menu textures are loaded
+    char m_7000[0x7630 - 0x7000];           // 0x7000: entry highlights (not used by EN code yet)
+    int cursorTargetX;                      // 0x7630: x the menu cursor moves towards
+    int cursorTargetY;                      // 0x7634: y the menu cursor moves towards
+    int cursorX;                            // 0x7638: x the menu cursor is drawn at
+    int cursorY;                            // 0x763c: y the menu cursor is drawn at
+    int m_7640;                             // 0x7640: reset to 0 with the menus (not yet named)
+    int m_7644;                             // 0x7644: reset to 0 with the menus (not yet named)
+    int m_7648;                             // 0x7648: reset to 0 with the menus (not yet named)
+    int m_764c;                             // 0x764c: reset to 0 with the menus (not yet named)
+    int m_7650;                             // 0x7650: reset to 0 with the menus (not yet named)
     void (*captionCallback[MENU_SLOT_COUNT])(int cursor, char *caption);  // 0x7654: writes the caption of the entry under the cursor
     void (*menuSoundCallback)(int sound);   // 0x7660: plays a menu sound (MENU_SOUND_*)
-    char m_7664[0x95e14 - 0x7664];          // 0x7664: menu models and map tables (not used by EN code yet)
+    FontRenderer *textRenderer;             // 0x7664: the text renderer the menus draw with
+    char m_7668[0x8868 - 0x7668];           // 0x7668: not used by EN code yet
+    Node menuNodes[MENU_NODE_COUNT];        // 0x8868: nodes of the menu models
+    char m_39c68[0x95e14 - 0x39c68];        // 0x39c68: menu tables and map tables (not used by EN code yet)
     GameNamedEntry namedEntries[NAMED_ENTRY_COUNT];  // 0x95e14: named map table
     int namedEntryCount;                    // 0xa4614: entries in use
     char m_a4618[0x15372c - 0xa4618];       // 0xa4618: map character tables (not used by EN code yet)
@@ -146,6 +210,13 @@ struct Game
     int ForEachActiveTrigger(int (*callback)(GameTrigger *trigger));   // EN 0x5cb610
     int IsQueuedEventReady();                       // EN 0x5e2f00
     int RunQueuedEvents(int (*callback)(GameTrigger *trigger));   // EN 0x5ca890
+    ~Game();                                                               // EN 0x5a1150
+    void ResetMenus();                                                     // EN 0x63f480 (JP 0x10007f20)
+    int LoadMenuTextures(FontRenderer *renderer);                          // EN 0x5f2970 (JP LoadMenuTextures)
+    int DrawPanel(int x, int y, int w, int h, float z, float alpha);       // EN 0x5e27f0 (JP DrawPanel)
+    int DrawPanelAlt(int x, int y, int w, int h, float z, float alpha);    // EN 0x5e2730
+    int DrawCursor(int x, int y, float fade, int frame);                   // EN 0x5cd420
+    int DrawLabelledNumber(int value, int x, int y, float z, float fade, float scale, float alpha);  // EN 0x5dec10
 };
 
 // Slot of the open window `id`, or MENU_SLOT_NONE (inline in the original, expanded in every window function).

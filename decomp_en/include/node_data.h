@@ -33,6 +33,7 @@ struct NodeExtra
     KeyTrack *scaleOverride;            // 0x6c: used instead of the scale track when set
     int m_0070[4];                      // 0x70: not used by EN code yet (cleared by Init)
 
+    Matrix4 AnimatedMatrix(int frame);   // EN 0x731970 (JP 0x101693f0): the node's matrix sampled from the tracks at `frame`
     void Init();                   // EN 0x7419a0 (JP 0x10169660): empty tracks with their default keys
     void Clear();                  // EN 0x740dd0 (JP 0x10169620): frees the tracks' arrays and drops the overrides
 };

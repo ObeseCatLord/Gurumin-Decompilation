@@ -5,6 +5,9 @@
 
 #include <windows.h>
 
+// <windows.h> turns DrawText into DrawTextA; the renderer's own method keeps its name.
+#undef DrawText
+
 const int FONT_TEXT_SLOTS = 0x20;     // text textures cached by the renderer
 const int FONT_TEXT_SIZE = 0x100;     // bytes of the text kept for each slot
 
@@ -28,6 +31,19 @@ struct FontRenderer
     int TextWidth(const char *text, float scale);    // EN 0x7a10e0 (JP 0x1014fd30): width of `text` in pixels
     // EN 0x7a2c60 (JP 0x1014f590): lays out `text` and returns the pen position after its last character.
     int DrawString(int color, int x, int y, const char *text, unsigned short size, int fixedAdvance);
+    // EN 0x78fd50 (JP 0x101501f0): draws `text` at (x, y) in `colour` (0xRRGGBB) at `depth`, faded by `alpha` and scaled.
+    int DrawText(int x, int y, const char *text, int colour, float depth, float alpha, float scale);
+    // EN 0x790d10 (JP 0x101508d0): DrawText with a dark brown outline when outlines are on.
+    int DrawOutlined(int x, int y, const char *text, int colour, float depth, float alpha, float scale);
+    // EN 0x790bc0 (JP 0x101509b0): DrawOutlined with the outline in `outlineColour`.
+    int DrawOutlinedIn(int x, int y, const char *text, int colour, float depth, float alpha, float scale,
+                       int outlineColour);
 };
+
+// Non-zero when outlined text draws its outline (EN 0x00908a3c, JP DAT_10202b20).
+extern "C" int g_textOutlineEnabled;
+
+// The game's text renderer (EN 0x00924d68, JP DAT_1020e538).
+extern "C" FontRenderer g_textRenderer;
 
 #endif

@@ -30,6 +30,8 @@ extern "C" char g_messageSubtext[MESSAGE_SUBTEXT_SIZE]; // EN 0x00a208b0 (JP DAT
 // Looping sounds (game_state.cpp).
 extern "C" short g_soundLoopHandle[SOUND_LOOP_COUNT];   // EN 0x009e26a8 (JP DAT_10447338): handle of each looping sound while it plays
 extern "C" int g_soundMuted;                            // EN 0x00a1515c (JP DAT_104c01b0): non-zero = no sound effects
+extern "C" int g_musicSetting;                          // EN 0x0090864c (JP DAT_102027d8): music volume setting of the options menu
+extern "C" long (*g_soundArcSetMusicAttenuation)(long volume);   // EN 0x009094b0 (JP FUN_10001b70): lowers the music by `volume` hundredths
 extern "C" void (*g_soundArcStopLoop)(int handle);      // EN 0x009094ac (JP FUN_10001c50): stops a looping sound
 
 // Full-screen colour fade (game_state.cpp).

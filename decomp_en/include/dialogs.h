@@ -45,6 +45,7 @@ extern "C" int g_overlayModelValueD;                         // EN 0x00920880 (J
 extern "C" int g_overlayModelValueE;                         // EN 0x0092087c (JP DAT_104c03d8)
 extern "C" int g_overlayModelValueF;                         // EN 0x00920884 (JP DAT_104c03e0)
 extern "C" int g_overlayModelValueG;                         // EN 0x00920b18 (JP DAT_104c03e4)
+extern "C" int g_overlayPages[OVERLAY_TEXTURE_COUNT];        // EN 0x00920990 (JP DAT_1030c908): script flag of each page (0 = no page)
 extern "C" int g_overlayTextures[OVERLAY_TEXTURE_COUNT];     // EN 0x00920e48 (JP DAT_1030b870): texture slots of the overlay, -1 = none
 
 // Labels of the yes/no dialog's two choices ("Yes" and "No"). EN 0x84a674, 0x84a678.

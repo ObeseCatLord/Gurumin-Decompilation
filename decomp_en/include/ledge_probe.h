@@ -18,6 +18,8 @@ const float LEDGE_START_UP = 10.0f;
 const float LEDGE_GROUND_DEPTH = 100000.0f;
 const float LEDGE_NO_GROUND = -200000.0f;
 const float LEDGE_GROUND_MARGIN = 10.0f;
+// Start height of Char_ProbeSideStep above the character.
+const float STEP_START_UP = 40.0f;
 const float LEDGE_PULL_BACK = 10.0f;
 const float LEDGE_BEYOND_WALL = 100.0f;
 const float LEDGE_DROP_REACH = 1000.0f;
@@ -31,4 +33,8 @@ const float LEDGE_NO_WALL = -1.0f;
 // floored height of that ground above the wall hit, or 1 without ground there. Returns 0 without ground or wall
 // (*wallDistance = -1 when the ground was found). EN 0x5c24a0.
 extern "C" int Char_ProbeSideLedge(int index, Vec4 *wall, Vec4 *ground, float *wallDistance, float *height, float *drop, float reach);
+// Like Char_ProbeSideLedge, starting 40 units above the character and probing for ground on both sides of the wall hit.
+// Returns 1 without near ground or when the far ground is not higher, 2 with *height set, 0 without ground or wall. EN 0x5c20e0.
+extern "C" int Char_ProbeSideStep(int index, Vec4 *wall, Vec4 *ground, float *wallDistance, float *height, float *drop, float reach);
+
 #endif

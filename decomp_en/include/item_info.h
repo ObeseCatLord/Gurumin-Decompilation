@@ -13,8 +13,17 @@ const int ITEM_TYPE_EQUIPMENT = 1;
 struct ItemInfo
 {
     int type;                                  // 0x00: 1 = equipment with a level and abilities (a helmet), 4 = stacks to 99
-    char m_0004[ITEM_INFO_SIZE - 4];           // 0x04: not yet named
+    char m_0004[0x18 - 4];                     // 0x04: not yet named
+    int icon;                                  // 0x18: cell of the item icon sheet (8 icons per row)
+    char m_001c[ITEM_INFO_SIZE - 0x1c];        // 0x1c: not yet named
 };
+
+// Inventory slots held by the player (JP DAT_1042e2a8).
+const int INVENTORY_SLOT_COUNT = 0x40;
+extern "C" int g_inventory[INVENTORY_SLOT_COUNT];           // EN 0x00a36468 (JP DAT_1042e2a8): item number held in each inventory slot
+
+// Draws the icon of the item in inventory slot `slot` as a 16x16 sprite at (x, y).
+extern "C" int Item_DrawIcon(int x, int y, int slot, float alpha);          // EN 0x5e28b0 (JP 0x1000c200)
 
 extern "C" ItemInfo g_itemTable[];                          // EN 0x00f5e458 (JP DAT_1088e6b0): the item table, by item number
 extern "C" char g_itemModelPaths[][ITEM_MODEL_PATH_SIZE];   // EN 0x00fc6534 (JP DAT_108f678c): model path of each item

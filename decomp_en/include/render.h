@@ -29,6 +29,7 @@ extern "C" int g_quitRequested;                                  // EN 0x021e361
 extern "C" int g_renderToBackBuffer;                             // EN 0x021e47d8 (JP DAT_10f65484): non-zero = render to the back buffer (no swap target)
 extern "C" unsigned long g_renderStateCache[RENDER_STATE_COUNT]; // EN 0x021e8e88 (JP DAT_10f623d0): last value set for each render state
 extern "C" unsigned long g_textureStageStateCache[][TEXTURE_STAGE_STATE_COUNT]; // EN 0x021e9288: last value set per stage and state
+extern "C" unsigned long g_samplerStateCache[][TEXTURE_STAGE_STATE_COUNT];  // EN 0x021ed288 (JP DAT_10f141e0): last value set per sampler and state
 extern "C" TextureObject *g_stage0Texture;                       // EN 0x021e47ec (JP DAT_10f6550c): texture bound to stage 0
 extern "C" TextureObject *g_stage1Texture;                       // EN 0x021e47f0 (JP DAT_10f65510): texture bound to stage 1
 extern "C" char g_textureNamesAux[TEXTURE_SLOT_COUNT][TEXTURE_NAME_SIZE]; // EN 0x016152d0 (JP DAT_10f8dbb8): second name table, cleared with the first
@@ -39,6 +40,7 @@ extern "C" int g_pooledBytesTotal;                               // EN 0x021fd75
 
 extern "C" int g_backBufferWidth;                                // EN 0x00908b14 (JP DAT_10202b34): back buffer width in pixels
 extern "C" int g_backBufferHeight;                               // EN 0x00908b18 (JP DAT_10202b38): back buffer height in pixels
+extern "C" float g_screenWidthDivisor;                             // EN 0x00908b20: 640x480 widths are divided by this on a wider screen (1.0 at 4:3): bitmap-font text, HUD digit advances, centred 2D
 extern "C" int g_deviceBackBufferWidth;                          // EN 0x00908b0c (JP DAT_10202b24): back buffer width set at device creation
 extern "C" int g_deviceBackBufferHeight;                         // EN 0x00908b10 (JP DAT_10202b28): back buffer height set at device creation
 // Render target state (JP: decomp/include/render_vars.h).
@@ -67,6 +69,11 @@ extern "C" IUnknown *g_dynamicVertexBuffer2D;                     // EN 0x021a36
 extern "C" int g_splitScreen;                                     // EN 0x021e3610 (JP DAT_10f65480): 0 = whole screen, 1 = left half, 2 = right half
 extern "C" int g_stageBindingsReset;                              // EN 0x021e3614 (JP DAT_10f6548c): set to 0 whenever the texture stages are unbound by a target reset
 extern "C" int g_swapTargetInUse;                                 // EN 0x021e8d4c (JP DAT_10f65490): swap target in use (0 or 1)
+extern "C" int g_swapTargetSaved;                                 // EN 0x021e8d50 (JP DAT_10f65494): swap target in use before a screen transition started
+extern "C" int g_transitionsEnabled;                              // EN 0x00908b34 (JP DAT_10203344): non-zero = screen transitions are allowed
+extern "C" int g_transitionMode;                                  // EN 0x021a34c0 (JP DAT_10f654c0): transition mode, 0 = none running
+extern "C" int g_transitionModeShown;                             // EN 0x021a34b8 (JP DAT_10f654c4): transition mode the frame is drawn with
+extern "C" char g_transitionCapturing;                            // EN 0x021a3606 (JP DAT_10f65500): 1 while a transition captures the frame
 extern "C" float g_maxViewportSize;                               // EN 0x00908b1c (JP DAT_10202b18): largest viewport size (width and height)
 extern "C" int g_drawCallCount;                                  // EN 0x021fdd04: draw calls issued this frame
 
@@ -141,6 +148,7 @@ inline void Render_CloseScene()
 extern "C" void Render_FillRect(int left, int top, int right, int bottom, int colour, float depth, float alpha);  // EN 0x792750: fills a rectangle of the 640x480 screen
 extern "C" int Render_EndScene(void);            // EN 0x79f890 (JP 0x1013ed60): ends the open scene
 extern "C" int Render_BeginScene(void);          // EN 0x77c060 (JP 0x1013ed20): starts a new scene
+extern "C" int Render_SetSamplerState(unsigned long sampler, unsigned long type, unsigned long value);  // EN 0x7a4ef0 (JP 0x1013f000)
 extern "C" int Render_SetRenderState(unsigned long state, unsigned long value);  // EN 0x7a4b90 (JP 0x1013ef30)
 extern "C" int Render_SetTextureStageState(unsigned long stage, unsigned long type, unsigned long value);  // EN 0x7a5980
 extern "C" void Render_UnbindTexture0(void);     // EN 0x7a5950 (JP 0x10143b50)

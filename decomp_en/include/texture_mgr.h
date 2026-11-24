@@ -4,6 +4,12 @@
 #ifndef GURUMIN_EN_TEXTURE_MGR_H
 #define GURUMIN_EN_TEXTURE_MGR_H
 
+#ifdef TEXTURE_MGR_OUT_OF_LINE
+#define TEXTURE_MGR_INLINE
+#else
+#define TEXTURE_MGR_INLINE inline
+#endif
+
 struct IDirect3DTexture9;
 struct IDirect3DBaseTexture9;
 struct IDirect3DSurface9;
@@ -16,6 +22,18 @@ const int TEXTURE_NAME_SIZE = 0x40;
 const int BLEND_MODE_UNSET = -1;
 // Render_Command code that sets the blend mode.
 const int RENDER_BLEND_MODE = 0;
+// Render_Command code that sets the texture addressing of stage 0 (value 0 = wrap).
+const int RENDER_TEXTURE_ADDRESS = 2;
+// Render_Command codes that clear the target to colour `value` (4) and end the scene to begin a new one (6).
+const int RENDER_CLEAR = 4;
+const int RENDER_FLUSH_SCENE = 6;
+// Horizontal placement of a 640x480 rectangle on a wider screen (DrawTinted's last argument).
+const int ASPECT_STRETCH = 0;   // stretched with the screen
+const int ASPECT_CENTRE = 1;    // keeps its 4:3 width, centred
+const int ASPECT_LEFT = 2;      // keeps its 4:3 width, left edge scaled
+// Blend modes of RENDER_BLEND_MODE: source alpha / inverse source alpha (the default), and added to the target.
+const int BLEND_ALPHA = 0;
+const int BLEND_ADD = 1;
 // Vertices per triangle.
 const int TRIANGLE_VERTICES = 3;
 
@@ -54,15 +72,20 @@ struct TextureObject
     int poolIndex;                // 0x14: buffer pool index of the frames
     int m_0018;                   // 0x18: not yet named
     int poolSlot;                 // 0x1c: non-zero when the frames live in the buffer pool
-    char m_0020[0x2c - 0x20];     // 0x20: source pixels and alpha (not split up yet)
+    int sourceAlpha;              // 0x20: alpha of the source image: a pixel buffer or an ALPHA_* mode
+    const unsigned char *sourcePixels;   // 0x24: kept source pixels (0 = none kept)
+    int m_0028;                   // 0x28: not yet named
     int sourceWidth;              // 0x2c: width of the source image
     int sourceHeight;             // 0x30: height of the source image
     int generatedAlpha;      // 0x34: 1 when the alpha is generated: rebuilt after a device reset
 
+    // Creates the texture from width x height pixels (RGB, or `alpha` as the alpha image or mode). Returns non-zero when it
+    // was created. EN 0x71c410.
+    int Create(int width, int height, const void *pixels, int alpha, int flags);
     int BindStage0();                                       // EN 0x7a58b0 (JP 0x1014b670): binds to stage 0 unless already bound
     int BindStage1();                                       // EN 0x7a5840 (JP 0x1014b6e0): binds to stage 1 unless already bound
     int BeginRenderTo(int width, int height, int offset);   // EN 0x7a4bf0 (JP 0x10143870)
-    int UpdateImage(int value);                             // EN 0x746550 (JP 0x10169f70): BeginRenderTo with the source size
+    int UpdateImage(int value);                             // EN 0x746550 (JP 0x10169f70): BeginRenderTo with the source size (inline below)
     int Release();                                          // EN 0x7a3e50 (JP 0x1014f520): frees the Direct3D texture and surface, forgets bindings
     void Unload();                                          // EN 0x740ea0 (JP 0x10169e40): frees the kept image and the texture
     int DrawTriangles(const void *vertices, int triangles); // EN 0x77ee90 (JP 0x1014bb70)
@@ -72,6 +95,16 @@ struct TextureObject
                      float alpha, float angle, float red, float green, float blue);  // EN 0x78ed90 (JP 0x1014c960)
     int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
                  float alpha, float angle);                 // EN 0x7918b0 (JP 0x1014bc60)
+    // EN 0x78ae20 (JP 0x1014c430): draws the cell (u0, v0)-(u1, v1) into the rectangle, faded by `alpha`, turned by `angle`.
+    // `aspect` is an ASPECT_* value: how the rectangle is placed on a screen wider than 4:3.
+    int DrawTinted(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
+                   float alpha, float angle, float grey, int aspect);
+    // The panel frame and fill draws (9-slice frame and background of a menu panel); the parameters are the rectangle,
+    // depth, alpha, a textured flag and a border size.
+    int DrawFrame(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);     // EN 0x797f30 (JP 0x1014d4e0 family)
+    int DrawFrameAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);  // EN 0x7955c0
+    int DrawFill(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);      // EN 0x798980 (JP 0x1014ce40)
+    int DrawFillAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);   // EN 0x799230
     int Write16(int x, int y, int rowPixels, int rows, int pitch, const void *bits);  // EN 0x77d2e0 (JP 0x1014f060)
     int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);  // EN 0x77d030 (JP 0x1014ef20)
     int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,
@@ -88,6 +121,12 @@ struct TriangleBatch
     TextureObject *texture;  // 0x10: texture to draw with (0 = nothing to draw)
     int blendMode;           // 0x14: render mode passed to Render_Command while drawing (BLEND_MODE_UNSET = none yet)
 
+    // Points the batch at `buffer` of `capacity` vertices (inline in EN code; JP 0x10172a80).
+    void SetBuffer(ScreenVertex *buffer, int capacityVertices)
+    {
+        vertices = buffer;
+        capacity = capacityVertices;
+    }
     int Reset();                                                         // EN 0x741ae0 (JP 0x10172aa0)
     // EN 0x70afe0 (JP 0x10172cb0): appends a quad (two triangles) from (left, top) to (right, bottom) at depth z with
     // texture coordinates (u0, v0)-(u1, v1), the alpha and two colours; the corners are turned by `rotation` when not 0.
@@ -126,8 +165,27 @@ extern "C" int Textures_ReleaseGenerated(void);
 // Recreates those textures after a device reset (not ported yet). EN 0x73fb80 (JP 0x10173510).
 extern "C" int Textures_RestoreGenerated(void);
 
+// Creates a render-target texture called `name` of width x height from `pixels` (one source pixel for targets), with
+// the given alpha mode, and returns its slot. EN 0x71c5b0 (JP 0x10175c90).
+extern "C" int Texture_CreateFromPixels(const char *name, int width, int height, unsigned char *pixels, int alpha, int flags);
+
+// Like Texture_CreateFromPixels with the size, pixels and alpha taken from `source` (all white when it kept no pixels).
+// Returns the slot, or -1. EN 0x71c740 (JP 0x10175a90).
+extern "C" int Texture_CreateCopy(const char *name, const TextureObject *source, int flags);
+
+// Loads a .bmp texture (with an optional alpha image) and returns its slot. EN 0x737ac0 (JP 0x10173550).
+extern "C" int Texture_LoadBmp(const char *path, const char *alphaPath, int reload);
+
+// Loads the texture called `name` from the data folder: an .iti file when the name ends in "iti", else a .bmp with the
+// optional alpha image `alphaName` (0 = none). Returns its slot. EN 0x609bf0 (JP 0x1001e1a0).
+extern "C" int Texture_Load(const char *name, const char *alphaName);
+
 // Loads the texture file `path` (an .iti file) and returns its slot; `a` and `b` are the load options. EN 0x736f60 (JP 0x10174ce0).
 extern "C" int Texture_LoadIti(const char *path, int a, int b);
+
+// Draws texture slot `slot` into a screen rectangle from a source rectangle in texture pixels; 0 for a negative slot.
+extern "C" int Texture_DrawSpritePixels(int slot, int left, int top, int right, int bottom, float u0, float v0, float u1,
+                                        float v1, float z, float alpha, float angle);   // EN 0x71d180 (JP 0x101616e0)
 
 extern "C" int Render_Command(int command, int value, int extra);   // EN 0x7a4f60 (JP 0x1013f070)
 
@@ -161,6 +219,47 @@ __forceinline int TextureSlot_Release(int slot, int force)
         g_textureNames[slot][0] = 0;
     }
     return g_textureRefCount[slot];
+}
+
+// TriangleBatch::SetBlend, AddQuad and TextureObject::UpdateImage are inline in the original: callers expand them and
+// the code that calls the out-of-line copies (effect record drawing 0x71e010, not ported yet) keeps them in the exe.
+// texture_mgr.cpp defines TEXTURE_MGR_OUT_OF_LINE to keep out-of-line copies for the byte comparison until that caller
+// is ported.
+
+// Calls BeginRenderTo with the size of the source image and `value`.
+TEXTURE_MGR_INLINE int TextureObject::UpdateImage(int value)
+{
+    return BeginRenderTo(sourceWidth, sourceHeight, value);
+}
+
+// Switches the batch to blend mode `mode`, flushing the queued triangles when the mode changes.
+TEXTURE_MGR_INLINE int TriangleBatch::SetBlend(int mode, int unused)
+{
+    if (blendMode != BLEND_MODE_UNSET)
+    {
+        if (blendMode != mode)
+            Flush();
+        blendMode = mode;
+        return 0;
+    }
+    blendMode = mode;
+    return 0;
+}
+
+// Queues a textured quad (two triangles, six vertices) with `newTexture`, flushing first when the texture changes or
+// the buffer is full. Returns 0. Called by the effect record drawing.
+TEXTURE_MGR_INLINE int TriangleBatch::AddQuad(TextureObject *newTexture, float left, float top, float right, float bottom, float u0,
+                                  float v0, float u1, float v1, float z, float alpha, float r, float g, float b,
+                                  float r2, float g2, float b2, float rotation)
+{
+    g_pendingBatches++;
+    if (texture != 0 && texture != newTexture)
+        Flush();
+    texture = newTexture;
+    if (count + TRIANGLE_VERTICES * 2 >= capacity)
+        Flush();
+    AppendQuad(left, top, right, bottom, u0, v0, u1, v1, z, alpha, r, g, b, r2, g2, b2, rotation);
+    return 0;
 }
 
 extern "C" int Texture_BindStage1(int index);   // EN 0x7469d0 (JP 0x101610b0): binds slot `index` to stage 1 (negative = unbind)

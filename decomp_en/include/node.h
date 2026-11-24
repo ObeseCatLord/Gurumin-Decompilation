@@ -18,7 +18,9 @@ struct VertexPack;
 struct Material;
 struct TextureRef;
 struct VisData;
+struct DrawList;
 struct AnimModel;
+struct GameFile;
 
 // Node::flags bits whose meaning is known.
 enum NodeFlags
@@ -38,6 +40,7 @@ enum NodeFlags
     NODE_FLAG_SKIP_SUBTREE = 0x8000,       // the subtree is not updated or drawn (also the "special pass" marker)
     NODE_FLAG_TEMPORARY_A = 0x40000,       // temporary saved state: undone and freed by ReleaseSavedStates
     NODE_FLAG_TEMPORARY_B = 0x80000,       // second temporary saved state
+    NODE_FLAG_ANIMATED = 0x100000,         // animated through its `extra` tracks (matrices sampled from them)
     NODE_FLAG_TARGET_TRACKING = 0x400000   // tracks a target (saved matrix restored by RestoreState400000)
 };
 
@@ -155,6 +158,8 @@ extern "C" int g_updatePassFrame;
 
 // The default object a node in the target-tracking state follows. EN 0x0218e670 (JP DAT_11b07118).
 extern "C" char g_defaultTargetObject[];
+// Called with the path before a model file is loaded when set (the host's load notification). EN 0x021e482c (JP DAT_10f65538).
+extern "C" void (*g_modelLoadNotify)(const char *path, int a);
 // Non-zero = the segment tests also look at skinned nodes. EN 0x0217b8d4 (JP DAT_11b04510).
 extern "C" int g_testSkinnedNodes;
 
@@ -304,13 +309,32 @@ struct Node
     int CastSegment(const char *tag, unsigned int mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
     // EN 0x7609a0 (JP 0x101aaa20): casts the ray from `from` to `to` against this node's meshes (tag filter, flags, mask); fills `hit`, and `t` (may be 0). Returns 1 on a hit.
     int CastRay(const char *tag, int flags, unsigned int mask, Vec4 *to, Vec4 *from, Vec4 *hit, float *t);
+    // EN 0x750a50 (JP 0x10199e20): queues this node tree for drawing into `list` with `view`, the lights `lights`, pass mask `pass` (-1 = all), fade colour `fade` and `flag`.
+    int QueueDraw(DrawList *list, Matrix4 *view, const void *lights, int pass, Vec4 *fade, int flag);
     int BindLinks(Node *root, Node **list, int *count);   // EN 0x76d770 (JP 0x1019eeb0): links nodes and bones under `root`
     Node *AddChild(const char *childName, int position);  // EN 0x74ebb0 (JP 0x101abc30): creates a child at `position` (appended when negative or past the end)
-    int SetupSkins(Node *root);            // EN 0x76dbe0 (JP 0x101ab9d0)
+    int SetupSkins(Node *root);            // EN 0x76dbe0 (JP 0x101ab9d0): stores bind poses and inverse bone matrices for the skinned nodes of this subtree
     int CopyBindPoses();                   // EN 0x76e130 (JP 0x10191770)
     int CollectTrackingNodes(Node **list, int *count);    // EN 0x76ea90 (JP 0x10191920): nodes in state 0x4000 (up to 8)
     int LinkToChasing(Node *const *nodes, int count);     // EN 0x76d6e0 (JP 0x10191990)
     int StoreLinks(Node **list, int *count);              // EN 0x76eb70 (JP 0x10191870)
+    int ScanChunks(GameFile *file, int arg);              // EN 0x7587c0 (JP 0x101a4a60): reads the INFO/MAN2 chunks of a model file
+    int ParseChunks(GameFile *file, int a, int b, int keySum, unsigned int keyCheck);   // EN 0x755ef0 (JP 0x101a58a0): reads the model's chunks, checking them against the name key sum and xor
+    // EN 0x755580 (JP 0x10193060): 1 when the bounding spheres boundsA and boundsB (centre x/y/z, radius w), each moved by its offset, overlap well; the vectors between the moved centres go to aToB and bToA when given. `this` is not used.
+    int SpheresOverlap(const Vec4 *boundsA, const Vec4 *offsetA, const Vec4 *boundsB, const Vec4 *offsetB, Vec4 *aToB, Vec4 *bToA);
+    // EN 0x75a770 (JP 0x1019f210): looks for nodes below this one whose bounding sphere overlaps the sphere of `radius` around `center`; hits are appended to `found` (when given). Returns 1 on a hit.
+    int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);
+    int WeldVertices();                    // EN 0x75b920 (JP 0x1019e610): merges equal vertices in every pack
+    int SortPacks();                       // EN 0x75bef0 (JP 0x1019c690): opaque packs first, then those with vertex alpha
+    // EN 0x753820 (JP 0x10199380): searches this subtree for `bone`, accumulating world matrices (this node's matrix for `frame` times `parent`); the bone's matrix is stored in `work` and returned, 0 when the subtree does not hold it.
+    Matrix4 *FindBone(Node *bone, Matrix4 *parent, Matrix4 *work, int frame);
+    Matrix4 BoneMatrix(Node *bone, int frame);   // EN 0x753a20 (JP 0x101a23b0): world matrix of `bone` below this node, the identity when it is not found
+    // EN 0x754250 (JP 0x10191fd0): moves box `first` by `firstOffset` and box `second` by `secondOffset` and returns 1 when they overlap on all three axes; on overlap the centre difference goes to `centreDelta` and its negation to `negatedDelta` (when given). `this` is not used.
+    int BoxesOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *second, const Vec4 *secondOffset, Vec4 *centreDelta, Vec4 *negatedDelta);
+    // EN 0x754e20 (JP 0x10192a00): the same test for upright cylinders inscribed in the boxes.
+    int CylindersOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *second, const Vec4 *secondOffset, Vec4 *delta, Vec4 *negatedDelta);
+    // EN 0x754480 (JP 0x10192200): box `first` against the upright cylinder inscribed in box `second`.
+    int BoxCylinderOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec4 *second, const Vec4 *secondOffset, Vec4 *delta, Vec4 *negatedDelta);
     int PreScanFile(const char *path, int arg);           // EN 0x759100 (JP 0x101abd60): loads a model file into this node tree
     int CopyMesh(Node *source, int slot);                 // EN 0x74ddc0 (JP 0x1019b350): gives this node the (shared or copied) mesh of `source`
     int MoveToParent(Node *newParent, int position);      // EN 0x74a050: moves this node under `newParent` at `position` among its children

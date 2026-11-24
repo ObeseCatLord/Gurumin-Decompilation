@@ -17,6 +17,11 @@ const int BONE_CONSTANT_REGISTER = 11;
 // Registers one bone takes (the first three rows of its transposed matrix).
 const int BONE_REGISTERS = 3;
 
+// Bytes of the mesh object (SlotTable) a node allocates after its packs changed.
+const int SLOT_TABLE_SIZE = 0x50;
+// SlotTable::bufferSlot of a mesh that does not come from a shared model file.
+const int NO_BUFFER_SLOT = -1;
+
 struct SlotTable
 {
     int textureSlot;          // 0x00: texture slot the mesh buffers live in (negative = none)

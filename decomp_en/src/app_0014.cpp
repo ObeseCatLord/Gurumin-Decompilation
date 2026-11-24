@@ -2,7 +2,11 @@
 #include <windows.h>
 
 #include "app_0014.h"
+#include "engine.h"
 #include "listbank.h"
+#include "mmv_player.h"
+#include "scene_start.h"
+#include "texture_mgr.h"
 
 // Month and day numbers of the seasonal events.
 const int MONTH_JANUARY = 1;
@@ -55,4 +59,20 @@ extern "C" int Script_UnpackVar(int index, int *high, int *low)
         return 1;
     }
     return 0;
+}
+
+// Folder argument of Path_Data for the movie files.
+const int PATH_FOLDER_MOVIE = 0;
+
+// Opens movie `name` in the movie player, decodes its first frame into the movie texture slot and records the movie's
+// frame count. `secondPalette` picks the palette the frame is drawn with. Returns 1. Called by the scene host callback
+// when a scene movie starts.
+extern "C" int Movie_PlayToTexture(const char *name, int secondPalette)
+{
+    g_moviePlayer.Open(Path_Data(name, PATH_FOLDER_MOVIE));
+    g_moviePlayer.DecodeNextFrame();
+    g_moviePlayer.DrawToTexture(&g_textures[g_movieTextureSlot], secondPalette);
+    g_movieFrameCount = g_moviePlayer.size;
+    g_movieFramesDecoded = 1;
+    return 1;
 }

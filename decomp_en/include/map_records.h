@@ -45,6 +45,13 @@ inline int SignedField(int value)
     return value;
 }
 
+// Reads point `point` of route `route` for walker `walker`: stores its action (low two bits), value and group in
+// *outAction, *outValue and *outGroup. When `position` lies within `radius` of the point on all three axes the walker
+// moves on (see ROUTE_ACTION_*). Stores the point it heads for in *outPoint and that point's coordinates in `position`.
+// Returns 1-3 for the actions 1-3 when the point was reached, else 0. EN 0x5edb90 (JP 0x1002f320).
+extern "C" int Route_Follow(int walker, int route, int point, int *outPoint, float *position, int *outAction,
+                            int *outValue, int *outGroup, int radius);
+
 // Length of the route of map record `map` (walked until a point ends it and back), plus each point's extra cost
 // times `costScale`. EN 0x5ebf60 (JP 0x10049990).
 extern "C" float Map_RouteLength(int map, int costScale);

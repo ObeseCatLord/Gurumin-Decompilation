@@ -3,6 +3,8 @@
 #ifndef GURUMIN_EN_MMV_PLAYER_H
 #define GURUMIN_EN_MMV_PLAYER_H
 
+struct TextureObject;
+
 // A file the movie is streamed from.
 struct MovieFile
 {
@@ -32,8 +34,19 @@ struct MmvPlayer
 
     void ReadFrame();                    // EN 0x7a9750: next frame of a looping movie
     void ReadFrameOnce();                // EN 0x7a9610: next frame of a movie that plays once
+    void Open(const char *path);         // EN 0x7a8f90 (JP 0x10160a90): opens the movie file
+    // EN 0x7a8ec0 (JP 0x10160960): copies the current frame into `target` using the first palette, or the second one
+    // when `secondPalette` is non-zero.
+    int DrawToTexture(const TextureObject *target, int secondPalette);
     void DecodeNextFrame();              // EN 0x7a9850 (JP 0x10161050)
     void Close();                        // EN 0x7a9860 (JP 0x101609b0)
 };
+
+extern "C" MmvPlayer g_moviePlayer;       // EN 0x00da7480 (JP DAT_10f08ab0): the movie player of the scene movies
+extern "C" int g_movieTextureSlot;        // EN 0x00908130 (JP DAT_10202478): texture slot the scene movie is drawn into
+extern "C" int g_movieFrameCount;         // EN 0x0091fe18 (JP DAT_104bfe74): frame count of the scene movie
+
+// Opens movie `name`, decodes its first frame into the movie texture slot and records the frame count. Returns 1. EN 0x603a10.
+extern "C" int Movie_PlayToTexture(const char *name, int secondPalette);
 
 #endif

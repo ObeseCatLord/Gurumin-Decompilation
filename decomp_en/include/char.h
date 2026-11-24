@@ -30,6 +30,8 @@ const int CHARSTATE_CAMERA_FRAMES = 2;
 const int CHARSTATE_NPC_WAIT = 0;
 const int CHARSTATE_NPC_TALK = 1;
 const int CHARSTATE_NPC_RANGE = 2;       // distance at which a waiting NPC reacts to the player
+// CharState::values index of the flag a route walker keeps: non-zero = walking the route backwards.
+const int CHARSTATE_ROUTE_REVERSED = 4;
 // Characters in the party table (g_partyCharacters).
 const int PARTY_SIZE = 5;
 // Number of entries of the group table.
@@ -63,6 +65,7 @@ enum CharStat
 {
     STAT_HEALTH = 0,          // 0x04: hit points left
     STAT_MAX_HEALTH = 1,      // 0x08: initial value of the health (restored when the slot is reused)
+    STAT_EFFECT_COLOUR = 3,   // 0x10: colour of the effects the character starts
     STAT_PICKUPS = 6,         // 0x1c: guarded by the anti-tamper copies
     STAT_GUARDED_B = 7        // 0x20: guarded by the anti-tamper copies
 };
@@ -110,6 +113,7 @@ struct ModelPath
 
 extern "C" CharRecord g_charRecords[CHAR_SLOT_COUNT];      // EN 0x00f381e0 (JP DAT_10daaae8)
 extern "C" CharState g_charState[CHAR_SLOT_COUNT];         // EN 0x009160e0 (JP DAT_1020b430)
+extern "C" int g_charGroupTimer[CHAR_SLOT_COUNT];       // EN 0x0091f618 (JP DAT_102199b8): set to 2 when an NPC notices the player
 extern "C" int g_charToldToReact[CHAR_SLOT_COUNT];         // EN 0x00920260 (JP DAT_10210b30): non-zero = told to react
 extern "C" char g_charTalkPending[CHAR_SLOT_COUNT];        // EN 0x009e1890 (JP DAT_10255a88): cleared while an NPC idles
 extern "C" int g_charPhase[CHAR_SLOT_COUNT];               // EN 0x00915cb8 (JP DAT_10210d30): non-zero = busy; 2 = finished

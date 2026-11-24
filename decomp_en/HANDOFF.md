@@ -34,9 +34,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-24, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 324 of 2,034 game functions (52,210 of 2,080,360 bytes, 2.51 %) |
-| Matched under the rules | 324 |
-| Queue | section 2 about 380 left; open.tsv: 14 |
+| Matched | 421 of 2,034 game functions (76,409 of 2,080,360 bytes, 3.67 %) |
+| Matched under the rules | 421 |
+| Queue | section 2: 246 left (mostly 500+ bytes); section 3: 482; section 4: 867; open.tsv: 18 |
 
 ## State
 - Pipeline verified; batches 1-4 matched Node (29+), Vec4/Matrix4/Box, containers, AnimModel channels, camera,
@@ -55,7 +55,11 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   commit on origin/master with a temporary index (`GIT_INDEX_FILE=tmp git read-tree origin/master`, `git diff --binary
   HEAD~1 HEAD | git apply --cached`, `git write-tree`, `git commit-tree -p origin/master`), push it, then `git reset
   --soft <new>` and `git reset <new> -- <paths the remote changed>`.
-- Batch 7 ownership: game worker = node/anim/char/game headers and their sources; engine worker = vec4, containers,
+- Push helper: scratchpad `push_onto_remote.sh` does the temporary-index rebuild above (recreate it if the scratchpad
+  was cleared).
+- Batch 8 workers: render/UI, characters/scene nodes, misc new files; ADDITIVE header edits allowed for all, via the
+  Edit tool (scripted bulk edits of shared headers were denied by the permission classifier).
+- (old) Batch 7 ownership: game worker = node/anim/char/game headers and their sources; engine worker = vec4, containers,
   texture_mgr, render, slot_table, buffer_pool, engine, ime, world files; misc worker = only the new files it creates.
 
 ## Next steps

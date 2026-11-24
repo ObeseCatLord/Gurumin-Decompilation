@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Highest override matrix a negative frame of FindBone can pick.
+const int BONE_FRAME_LIMIT = 15;
+
 // Node::Find: the index-th node called `name` in the subtree; a leading '@' turns it into a prefix search
 // ("@Spot" finds Spot01, Spot02, ...). Called by the model, effect and map code to find attachment points.
 Node *Node::Find(const char *name, int index)
@@ -1322,4 +1325,160 @@ int Node::MoveToParent(Node *newParent, int position)
     strcpy(parentName, newParent->name);
     newParent->childCount++;
     return 1;
+}
+
+// Node::SortPacks: drops this node's mesh when it was its last user, copies the packs and their index lists into new
+// arrays (first those whose material has alpha 1, then the others), frees the old ones and gives the node a new, empty
+// mesh. Returns 0 for a node without packs, else 1.
+int Node::SortPacks()
+{
+    int i;
+    if (packCount == 0)
+        return 0;
+    if (mesh != 0 && MeshCache_Release(mesh) == 0)
+    {
+        mesh->Release();
+        g_engineFree(mesh);
+        mesh = 0;
+    }
+    VertexPack *newPacks = (VertexPack *)g_engineAlloc(packCount * sizeof(VertexPack), "vp");
+    IndexList *newLists = (IndexList *)g_engineAlloc(packCount * sizeof(IndexList), "vpi");
+    for (i = 0; i < packCount; i++)
+    {
+        newPacks[i].Init();
+        newLists[i].Init();
+    }
+    int count = 0;
+    for (i = 0; i < packCount; i++)
+    {
+        if (materials[packs[i].material].alpha == 1.0f)
+        {
+            newPacks[count].CopyFrom(&packs[i]);
+            newLists[count].CopyFrom(&indexLists[i]);
+            count++;
+        }
+    }
+    for (i = 0; i < packCount; i++)
+    {
+        if (materials[packs[i].material].alpha != 1.0f)
+        {
+            newPacks[count].CopyFrom(&packs[i]);
+            newLists[count].CopyFrom(&indexLists[i]);
+            count++;
+        }
+    }
+    FreePackData(packs, packCount);
+    FreeIndexListData(indexLists, packCount);
+    if (packs != 0)
+        g_engineFree(packs);
+    if (indexLists != 0)
+        g_engineFree(indexLists);
+    packs = newPacks;
+    indexLists = newLists;
+    mesh = (SlotTable *)g_engineAlloc(SLOT_TABLE_SIZE, "CVPCObjB");
+    mesh->Reset();
+    mesh->bufferSlot = NO_BUFFER_SLOT;
+    return 1;
+}
+
+// Node::FindBone: searches this subtree for the node `bone`, accumulating world matrices: this node's matrix for `frame`
+// (a negative frame -1-n picks override matrix n, at most BONE_FRAME_LIMIT; animated nodes sample their extra data;
+// otherwise the override matrix of the frame, clamped to the last one, or the local matrix) times `parent`. The bone's
+// matrix is stored in `work` and returned; 0 when the subtree does not hold it. Called by BoneMatrix.
+Matrix4 *Node::FindBone(Node *bone, Matrix4 *parent, Matrix4 *work, int frame)
+{
+    Matrix4 accumulated;
+    if (frame < 0)
+    {
+        int index = -1 - frame;
+        accumulated = frameMatrices[index > BONE_FRAME_LIMIT ? BONE_FRAME_LIMIT : index] * *parent;
+    }
+    else if ((flags & NODE_FLAG_ANIMATED) && extra != 0)
+        accumulated = extra->AnimatedMatrix(frame) * *parent;
+    else if (frameMatrices != 0)
+    {
+        accumulated = frameMatrices[frameMatrixCount > frame ? frame : frameMatrixCount - 1] * *parent;
+    }
+    else
+        accumulated = matrix * *parent;
+    if (bone == this)
+    {
+        *work = accumulated;
+        return work;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        Matrix4 *found = children[i]->FindBone(bone, &accumulated, work, frame);
+        if (found != 0)
+            return found;
+    }
+    return 0;
+}
+
+// Node::BoneMatrix: returns the world matrix of `bone` in this model's tree, starting from the identity; when no child
+// has the bone, the identity itself. Called by SetupSkins and the bone attachments.
+Matrix4 Node::BoneMatrix(Node *bone, int frame)
+{
+    Matrix4 parent;
+    parent = IdentityMatrix();
+    Matrix4 work;
+    for (int i = 0; i < childCount; i++)
+    {
+        Matrix4 *found = children[i]->FindBone(bone, &parent, &work, frame);
+        if (found != 0)
+            return *found;
+    }
+    return parent;
+}
+
+// Node::SetupSkins: for every skinned node of this subtree: stores its bind pose (its animated matrix when it is
+// animated through its extra data, else its local matrix or the override), looks up its bone by name in `root` (not
+// itself) and stores the inverse of the bone's world matrix. Returns 1. Called after a model is loaded.
+int Node::SetupSkins(Node *root)
+{
+    if (skinned != 0)
+    {
+        if ((flags & NODE_FLAG_ANIMATED) && extra != 0)
+            skin->bindPoses[0] = extra->AnimatedMatrix(0);
+        else if (frameMatrixCount != 0)
+            skin->bindPoses[0] = *frameMatrices;
+        else
+            skin->bindPoses[0] = matrix;
+        skin->bone = root->Find(skin->boneName, 0);
+        if (skin->bone == this)
+            skin->bone = 0;
+        if (skin->bone != 0)
+            skin->inverseBone = InverseMatrix(skin->bone->BoneMatrix(this, 0));
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->SetupSkins(root);
+    return 1;
+}
+
+// Node::RemoveChild: removes `child` from the child list (destroying it, as Release does, unless `keep`) and closes
+// the gap in the child and child name lists. Returns 0. Called by the model code when an attached model goes away.
+int Node::RemoveChild(Node *child, int keep)
+{
+    int i;
+    for (i = 0; i < childCount; i++)
+    {
+        if (child == children[i])
+            break;
+    }
+    if (i == childCount)
+        return 0;
+    if (keep == 0)
+    {
+        children[i]->Release();
+        g_engineFree(children[i]);
+    }
+    int j;
+    for (j = i; j < childCount - 1; j++)
+    {
+        children[j] = children[j + 1];
+        strcpy(childNames[j], childNames[j + 1]);
+    }
+    childCount--;
+    children[j] = 0;
+    return 0;
 }

@@ -2,6 +2,8 @@
 
 #include <d3d9.h>
 
+// Keep out-of-line copies of TriangleBatch::SetBlend, AddQuad and TextureObject::UpdateImage here (see texture_mgr.h).
+#define TEXTURE_MGR_OUT_OF_LINE
 #include "render.h"
 #include "texture_mgr.h"
 
@@ -19,20 +21,6 @@ int TriangleBatch::Reset()
     blendMode = BLEND_MODE_UNSET;
     texture = 0;
     return 1;
-}
-
-// Switches the batch to blend mode `mode`, flushing the queued triangles when the mode changes.
-int TriangleBatch::SetBlend(int mode, int unused)
-{
-    if (blendMode != BLEND_MODE_UNSET)
-    {
-        if (blendMode != mode)
-            Flush();
-        blendMode = mode;
-        return 0;
-    }
-    blendMode = mode;
-    return 0;
 }
 
 // Queues `count` vertices for `texture`, flushing first when the texture changes or the buffer is full.
@@ -158,28 +146,6 @@ extern "C" int Texture_BindStage0(int index)
     if (g_textureNames[index][0] != 0)
         g_textures[index].BindStage0();
     return index;
-}
-
-// Calls BeginRenderTo with the size of the source image and `value`.
-int TextureObject::UpdateImage(int value)
-{
-    return BeginRenderTo(sourceWidth, sourceHeight, value);
-}
-
-// TriangleBatch::AddQuad: queues a textured quad (two triangles, six vertices) with `texture`, flushing first when
-// the texture changes or the buffer is full. Returns 0. Called by the 2D drawing code.
-int TriangleBatch::AddQuad(TextureObject *newTexture, float left, float top, float right, float bottom, float u0,
-                           float v0, float u1, float v1, float z, float alpha, float r, float g, float b, float r2,
-                           float g2, float b2, float rotation)
-{
-    g_pendingBatches++;
-    if (texture != 0 && texture != newTexture)
-        Flush();
-    texture = newTexture;
-    if (count + TRIANGLE_VERTICES * 2 >= capacity)
-        Flush();
-    AppendQuad(left, top, right, bottom, u0, v0, u1, v1, z, alpha, r, g, b, r2, g2, b2, rotation);
-    return 0;
 }
 
 // Textures_ReleaseGenerated: releases the Direct3D data of every texture whose alpha is generated, so

@@ -229,3 +229,40 @@ int AnimModel::SetSlotSource(void *source, int slot, int layer)
     }
     return 1;
 }
+
+// Adds key (x, y, z) at `frame` to track C with key flag `flag` and widens its frame range.
+int AnimModel::AddTrackCKeyFlagged(int frame, float x, float y, float z, char flag)
+{
+    trackC.keys.flags[trackC.keys.Set(frame, x, y, z, 0)] = flag;
+    if (trackC.last < frame + 1)
+        trackC.last = frame + 1;
+    if (trackC.first > frame)
+        trackC.first = frame;
+    return 0;
+}
+
+// Advances the motion channel by one frame while it plays: samples the motion frame for the current channel frame,
+// shows it (also on the playback object) and moves on. At the end the channel loops back to its first frame, or stops
+// on the last one. Returns 0.
+int AnimModel::StepMotion()
+{
+    if (motion.playing != 0)
+    {
+        float frameValue, y, z, w;
+        motion.keys.Sample(motion.frame, &frameValue, &y, &z, &w, 0);
+        motionFrame = (int)frameValue;
+        if (playback != 0)
+            playback->frame = motionFrame;
+        if (++motion.frame >= motion.last)
+        {
+            if (motion.looping != 0)
+            {
+                motion.frame = motion.first;
+                return 0;
+            }
+            motion.playing = 0;
+            motion.frame--;
+        }
+    }
+    return 0;
+}

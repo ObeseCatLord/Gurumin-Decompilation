@@ -27,6 +27,7 @@ struct Vec4
     float Distance(const Vec4 &other);               // EN 0x773270 (JP 0x101ac590)
     float DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b);  // EN 0x772cc0 (JP 0x101acd90): squared distance to the segment a-b
     float DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest);  // EN 0x772ea0 (JP 0x101acdf0): distance to the segment a-b, closest point in `closest`
+    float DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2);   // EN 0x7734d0 (JP 0x101acc60): squared x/y distance to the segment (x1, y1)-(x2, y2)
     float DistanceZWeighted(const Vec4 &other);      // EN 0x7736f0 (JP 0x101ac5f0)
     int InRect(const Box2 *box);                     // EN 0x7749d0 (JP 0x101ac7c0): inside the box's x/y rectangle
     int InBox(const Box2 *box);                      // EN 0x774a10 (JP 0x101ac6e0)
@@ -81,6 +82,16 @@ struct Matrix4
     Matrix4 operator*(const Matrix4 &other) const;  // EN 0x76f230 (JP 0x101b0670): this transformed by `other` (row vectors)
     void SetRotationZ(float angle);               // EN 0x77a1a0 (JP 0x101ae710): rotation about the z axis in the upper-left 3x3
 };
+
+// Rotation matrix looking from `eye` to `target` with `up` and roll `roll` (EN 0x77aea0, JP 0x101b1c20).
+Matrix4 LookAt(Vec4 eye, Vec4 target, Vec4 *up, float roll);
+// `a` transformed by `b` (EN 0x7768e0, JP 0x101b10f0).
+Matrix4 Multiply(const Matrix4 &a, const Matrix4 &b);
+// Inverse of `matrix` (EN 0x774f00, JP 0x101b0d40).
+Matrix4 InverseMatrix(const Matrix4 &matrix);
+// The identity matrix by value (EN 0x774950, JP 0x101b0ba0).
+Matrix4 RotationY(float angle);   // EN 0x779290 (JP 0x101b1bb0): turn of `angle` radians about y
+Matrix4 IdentityMatrix();
 
 // Transforms `point` by `matrix` and divides x/y/z by the resulting w (perspective divide); the result's w is that w
 // (EN 0x77a4a0, JP 0x101ae060).

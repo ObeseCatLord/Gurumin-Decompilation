@@ -53,6 +53,7 @@ extern "C" int Camera_AddTrackedPosition(int index);
 // Shot cameras (camera_follow.cpp): the goals and the smoothed vectors of the script-driven shots.
 extern "C" int g_cameraShotStarted;              // EN 0x009159e8 (JP DAT_104c0358): 1 once the shot's vectors were set up
 extern "C" Node *g_cameraFollowNode;             // EN 0x0091da28 (JP DAT_104c039c): the node the camera follows (0 = none)
+extern "C" int g_cameraSmoothingLocked;      // EN 0x009159e4 (JP DAT_104c0354): non-zero = the listener update leaves the camera vectors alone
 extern "C" Vec4 g_cameraPositionGoal;            // EN 0x015ad640 (JP DAT_10866d98): where the camera position moves to
 extern "C" Vec4 g_cameraTargetGoal;              // EN 0x0147ba88 (JP DAT_10edbd48): where the camera target moves to
 extern "C" Vec4 g_cameraTargetNow;               // EN 0x01d8f690 (JP DAT_118e6cb8): the camera target this frame

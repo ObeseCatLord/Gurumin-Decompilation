@@ -13,6 +13,8 @@ struct NodeSaved;
 struct NodeSkin;
 struct IndexList;
 struct Channel;
+struct SlotTable;
+struct VertexPack;
 struct AnimModel;
 
 // Node::flags bits whose meaning is known.
@@ -58,10 +60,14 @@ struct Node
 {
     char name[NODE_NAME_SIZE];     // 0x000: the node's name ("fire..." / "thun..." set the element)
     char m_0040[0x64 - 0x40];      // 0x040: not used by EN code yet
-    int packCount;                 // 0x064: vertex packs of the mesh (also the entries of triangleSpheres)
-    char m_0068[0x70 - 0x68];      // 0x068: not used by EN code yet
+    int packCount;                 // 0x064: vertex packs of the mesh (also the entries of triangleSpheres; -1 = none, see ReplaceMaterial)
+    VertexPack *packs;             // 0x068: the mesh's vertex packs (0 = none)
+    char m_006c[0x70 - 0x6c];      // 0x06c: not used by EN code yet
     IndexList *triangleSpheres;    // 0x070: one sphere list per pack (0 = none)
-    char m_0074[0xa0 - 0x74];      // 0x074: not used by EN code yet
+    char m_0074[0x90 - 0x74];      // 0x074: not used by EN code yet
+    int materialCount;             // 0x090: entries of the material table
+    char m_0094[0x9c - 0x94];      // 0x094: not used by EN code yet
+    SlotTable *mesh;                // 0x09c: the built mesh buffers (0 = none)
     int drawMode;                  // 0x0a0: render mode of the node
     char m_00a4[0xa8 - 0xa4];      // 0x0a4: not used by EN code yet
     int hasCollision;              // 0x0a8: non-zero when the node has collision
@@ -137,6 +143,7 @@ struct Node
     int ClearHasCollision();               // EN 0x76a5b0 (JP 0x101944d0)
 
     // Animation.
+    int ReplaceMaterial(int key, int count);  // EN 0x74a370 (JP 0x1019e830): material swap on the subtree
     int CycleChild();                      // EN 0x755650 (JP 0x10194ee0)
     int RestartColourPlugs(const char *motion, int frames);  // EN 0x76adb0
     int TagElements();                     // EN 0x76b200 (JP 0x10191e50)

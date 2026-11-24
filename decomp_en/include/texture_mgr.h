@@ -5,6 +5,9 @@
 #define GURUMIN_EN_TEXTURE_MGR_H
 
 struct ScreenVertex;   // transformed screen vertex (0x20 bytes)
+struct IDirect3DTexture9;
+struct IDirect3DBaseTexture9;
+struct IDirect3DSurface9;
 
 // Number of texture slots.
 const int TEXTURE_SLOT_COUNT = 1600;
@@ -20,9 +23,23 @@ const int TRIANGLE_VERTICES = 3;
 // A texture object (0x38 bytes) owning a Direct3D texture; only the members EN code has used are named.
 struct TextureObject
 {
-    char m_0000[0x34];       // 0x00: Direct3D texture, surface, size, pool and source pixels (not split up yet)
+    IDirect3DTexture9 *texture;   // 0x00: the Direct3D texture
+    IDirect3DSurface9 *surface;   // 0x04: surface of a render-target texture, may be 0
+    int width;                    // 0x08: texture width in pixels
+    int height;                   // 0x0c: texture height in pixels
+    int m_0010;                   // 0x10: not yet named
+    int poolIndex;                // 0x14: buffer pool index of the frames
+    int m_0018;                   // 0x18: not yet named
+    int poolSlot;                 // 0x1c: non-zero when the frames live in the buffer pool
+    char m_0020[0x2c - 0x20];     // 0x20: source pixels and alpha (not split up yet)
+    int sourceWidth;              // 0x2c: width of the source image
+    int sourceHeight;             // 0x30: height of the source image
     int generatedAlpha;      // 0x34: 1 when the alpha is generated: rebuilt after a device reset
 
+    int BindStage0();                                       // EN 0x7a58b0 (JP 0x1014b670): binds to stage 0 unless already bound
+    int BindStage1();                                       // EN 0x7a5840 (JP 0x1014b6e0): binds to stage 1 unless already bound
+    int BeginRenderTo(int width, int height, int offset);   // EN 0x7a4bf0 (JP 0x10143870)
+    int UpdateImage(int value);                             // EN 0x746550 (JP 0x10169f70): BeginRenderTo with the source size
     void Unload();                                          // EN 0x740ea0 (JP 0x10169e40): frees the kept image and the texture
     int DrawTriangles(const void *vertices, int triangles); // EN 0x77ee90 (JP 0x1014bb70)
 };
@@ -55,6 +72,10 @@ struct TextureManager
 
 extern "C" int Render_Command(int command, int value, int extra);   // EN 0x7a4f60 (JP 0x1013f070)
 
+// Returns the texture to draw for a pooled texture (the buffer pool keeps its frames). EN 0x7a11e0 (JP 0x10148590).
+extern "C" IDirect3DBaseTexture9 *TexturePool_Get(int poolIndex, IDirect3DTexture9 *texture, int width, int height, int slot);
+
+extern "C" int g_textureBindCount;                                  // EN 0x021e4824 (JP DAT_10f141d4): texture binds this frame
 extern "C" int g_pendingBatches;                                    // EN 0x0166f410: batches still pending this frame
 extern "C" char g_textureNames[TEXTURE_SLOT_COUNT][TEXTURE_NAME_SIZE];  // EN 0x0168c7d0: slot names (empty = free)
 extern "C" char g_textureRefCount[TEXTURE_SLOT_COUNT];              // EN 0x0162e2d0: references per slot
@@ -66,5 +87,8 @@ extern "C" int Texture_ReloadMissing(void);
 // Releases one reference to texture slot `slot`; unloads it when the count reaches zero or `force` is set. Returns the
 // remaining count, or -1 for an unused slot (EN 0x748470).
 extern "C" int Texture_Release(int slot, int force);
+
+extern "C" int Texture_BindStage1(int index);   // EN 0x7469d0 (JP 0x101610b0): binds slot `index` to stage 1 (negative = unbind)
+extern "C" int Texture_BindStage0(int index);   // EN 0x746a10 (JP 0x10161070): binds slot `index` to stage 0 (negative = unbind)
 
 #endif

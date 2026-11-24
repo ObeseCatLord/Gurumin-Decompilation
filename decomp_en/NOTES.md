@@ -82,3 +82,17 @@ confidence levels are documented in the script.
 `decomp_en/include/` holds the EN declarations; each type is declared once there. A JP header may be included from
 the EN tree only once its layout is proven identical in EN (a matched EN function that uses its fields at the JP
 offsets); record such headers here. None so far: `Node` is declared again in EN with only the methods used so far.
+
+## Porting habits found in batches 1-2 (2026-11-24)
+- **Map labels are often off by a neighbour** for tiny methods (same size, same callees): Save/Restore pairs swapped
+  (Node flags and render mode), `Vec4::Distance` mapped to the default constructor, `Normalized3` to `Copy`,
+  `Ime_IsOpen`/`TextInput_End` shorter in EN. Name every function by what the EN bytes do.
+- Several JP `void` functions return `int 0` in EN (`xor eax, eax` before `ret`): `RenderQueue_Clear`,
+  `AnimModel::ClearTrackB/C`, `ClearMotionKeys`. Declare them `int` and `return 0`.
+- EN sums squares as `dy*dy + dx*dx + dz*dz` (JP source: `dz*dz + dy*dy + dx*dx`); JP helper calls that EN inlines
+  can change scheduling, so write the arithmetic directly when the helper does not exist in EN.
+- Tail-recursive JP loops: `Node::GetLinkedRoot` matches only written recursively (the compiler makes the loop).
+  `Node::GetLastFrame` re-reads `childCount` in the loop condition (no hoisted local).
+- File-local `static` helpers survive when the JP twin had them (`IndexLists_Free` in `FreeExtraIndexLists`).
+- Node layout: the EN offsets of every field used so far equal the JP offsets (sizeof 0x18a0 from the effect-node
+  pool stride); `decomp_en/include/node.h` carries the JP names.

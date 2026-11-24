@@ -1,5 +1,7 @@
 // Animated model channels and queued push (EN build). Ported from the matched JP source decomp/src/anim_model.cpp.
 #include "anim_model.h"
+#include "node.h"
+#include "engine_memory.h"
 
 // Sets track C's two playback options (playing flag and loop flag).
 int AnimModel::SetTrackCOptions(int playing, int looping)
@@ -91,4 +93,53 @@ int AnimModel::ClearTrackB()
     trackB.frame = 0;
     trackB.playing = 0;
     return 0;
+}
+
+// AnimModel::ApplyMaterialSwap: applies material swap `count` to both swap nodes (key -1 = every subset). Returns 1.
+int AnimModel::ApplyMaterialSwap(int count)
+{
+    if (count > 0)
+    {
+        if (swapNode1 != 0)
+            swapNode1->ReplaceMaterial(-1, count);
+        if (swapNode2 != 0)
+            swapNode2->ReplaceMaterial(-1, count);
+    }
+    return 1;
+}
+
+// AnimModel::SetMoveStep: sets the model's movement for this frame: x and y scaled by the model's speed scale, z (the
+// vertical step) as it is. Called by flying enemies.
+int AnimModel::SetMoveStep(float x, float y, float z)
+{
+    moveStep.x = x * speedScale;
+    moveStep.z = z;
+    moveStep.y = y * speedScale;
+    return 0;
+}
+
+// AnimModel::IsPlaybackAtEnd: 1 when the motion playback has reached its end (creates the playback on first use).
+int AnimModel::IsPlaybackAtEnd()
+{
+    if (playback == 0)
+    {
+        playback = (Playback *)g_engineAlloc(PLAYBACK_SIZE, "");
+        playback->Init();
+        playback->BindModel(this);
+    }
+    return playback->endState == PLAYBACK_END_REACHED;
+}
+
+// AnimModel::SetLayer: starts layer `layer` on the motion playback with the frame range first..last (creates the
+// playback on first use). Returns 1.
+int AnimModel::SetLayer(int layer, int a, int first, int last, int b, int c)
+{
+    if (playback == 0)
+    {
+        playback = (Playback *)g_engineAlloc(PLAYBACK_SIZE, "");
+        playback->Init();
+        playback->BindModel(this);
+    }
+    playback->SetLayer(layer, a, first, last, b, c);
+    return 1;
 }

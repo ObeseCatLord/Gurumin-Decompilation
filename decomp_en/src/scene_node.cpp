@@ -2,6 +2,7 @@
 #include "node.h"
 #include "node_data.h"
 #include "index_list.h"
+#include "slot_table.h"
 #include "motion_list.h"
 #include <string.h>
 #include "engine_memory.h"
@@ -310,5 +311,21 @@ int Node::FreeSaved()
         g_engineFree(saved);
         saved = 0;
     }
+    return 1;
+}
+
+// Node::ReplaceMaterial: runs the material swap on this node's mesh when it has materials and packed data (or no
+// packs at all with packCount -1), then on every child. Returns 1. Called by AnimModel::ApplyMaterialSwap.
+int Node::ReplaceMaterial(int key, int count)
+{
+    if (materialCount != 0)
+    {
+        if (packCount == -1 && packs == 0 && mesh != 0)
+            mesh->ReplaceMaterial(key, count);
+        else if (packCount != 0 && packs != 0 && mesh != 0)
+            mesh->ReplaceMaterial(key, count);
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->ReplaceMaterial(key, count);
     return 1;
 }

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "camera.h"
+#include "effect_nodes.h"
 
 // Camera_SetMode2: switches the camera to control mode 2. Called through the script command table.
 extern "C" int Camera_SetMode2(void)
@@ -54,5 +55,16 @@ extern "C" int Camera_LookAt(const Vec4 *eye, const Vec4 *target, Matrix4 *view,
     Camera_SetMatrices(eye, target, view, projection, 0.0f);
     g_cameraEye.Copy(*eye);
     g_cameraTarget.Copy(*target);
+    return 0;
+}
+
+// EffectNodes_ReleaseAll: releases every used node of the effect node pool. Called when the effects are unloaded.
+extern "C" int EffectNodes_ReleaseAll(void)
+{
+    for (int i = 0; i < EFFECT_NODE_COUNT; i++)
+    {
+        if (g_effectNodeLoaded[i] != 0)
+            g_effectNodes[i].Release();
+    }
     return 0;
 }

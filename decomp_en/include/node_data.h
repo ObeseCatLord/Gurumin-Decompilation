@@ -23,9 +23,16 @@ struct NodeExtra
 // A node's saved-state block (`Node::saved`): a saved matrix and the rotation limits used when the node tracks a target.
 struct NodeSaved
 {
-    char m_0000[0x24];             // 0x00: not used by EN code yet
+    char m_0000[0x20];             // 0x00: not used by EN code yet
+    int state;                     // 0x20: saved state (0 = nothing saved)
     Matrix4 matrix;                // 0x24: the saved matrix restored by the node
-    char m_0064[NODE_SAVED_SIZE - 0x64];  // 0x64: not used by EN code yet
+    char m_0064[0x78 - 0x64];      // 0x64: not used by EN code yet
+    float limitMin[3];             // 0x78: lowest rotation per axis (radians)
+    char m_0084[0x88 - 0x84];      // 0x84: not used by EN code yet
+    float limitMax[3];             // 0x88: highest rotation per axis
+    char m_0094[0xb8 - 0x94];      // 0x94: not used by EN code yet
+    int m_00b8;                    // 0xb8: not recovered (cleared by Reset)
+    char m_00bc[NODE_SAVED_SIZE - 0xbc];  // 0xbc: not used by EN code yet
 
     void Reset();                  // EN 0x741950 (JP 0x10166870 ViewLimits::Reset): rotation limits back to +-45 degrees
 };

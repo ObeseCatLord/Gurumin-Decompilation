@@ -1,5 +1,8 @@
 // EN texture slots, the 2D triangle batch and renderer shutdown (JP twins: texture_mgr.cpp, tri_batch.cpp).
 
+#include <d3d9.h>
+
+#include "render.h"
 #include "texture_mgr.h"
 
 // Unloads all textures and shuts the renderer down. Called when the game exits.
@@ -13,8 +16,8 @@ void TextureManager::UnloadAndShutdown()
 int TriangleBatch::Reset()
 {
     count = 0;
-    texture = 0;
     blendMode = BLEND_MODE_UNSET;
+    texture = 0;
     return 1;
 }
 
@@ -91,7 +94,8 @@ extern "C" int Texture_Release(int slot, int force)
 {
     if (slot == -1 || g_textureNames[slot][0] == 0)
         return -1;
-    char refs = --g_textureRefCount[slot];
+    g_textureRefCount[slot]--;
+    char refs = g_textureRefCount[slot];
     if (force != 0 || refs == 0)
     {
         g_textureRefCount[slot] = 0;
@@ -99,4 +103,75 @@ extern "C" int Texture_Release(int slot, int force)
         g_textureNames[slot][0] = 0;
     }
     return g_textureRefCount[slot];
+}
+
+// Binds this texture to stage 0 unless it is bound there already. Pooled textures fetch their frame from the buffer
+// pool first. Returns 1.
+int TextureObject::BindStage0()
+{
+    if (g_stage0Texture != this)
+    {
+        g_textureBindCount++;
+        if (poolSlot != 0)
+        {
+            IDirect3DBaseTexture9 *pooled = TexturePool_Get(poolIndex, texture, width, height, poolSlot);
+            g_d3dDevice->SetTexture(0, pooled);
+            g_stage0Texture = this;
+            return 1;
+        }
+        g_d3dDevice->SetTexture(0, texture);
+        g_stage0Texture = this;
+    }
+    return 1;
+}
+
+// Binds this texture to stage 1 (multi-texturing) unless it is bound there already. Returns 1.
+int TextureObject::BindStage1()
+{
+    if (g_stage1Texture != this)
+    {
+        g_textureBindCount++;
+        if (poolSlot != 0)
+        {
+            IDirect3DBaseTexture9 *pooled = TexturePool_Get(poolIndex, texture, width, height, poolSlot);
+            g_d3dDevice->SetTexture(1, pooled);
+            g_stage1Texture = this;
+            return 1;
+        }
+        g_d3dDevice->SetTexture(1, texture);
+        g_stage1Texture = this;
+    }
+    return 1;
+}
+
+// Texture_BindStage1: binds texture slot `index` to stage 1 (a negative index unbinds). Returns the index or -1.
+extern "C" int Texture_BindStage1(int index)
+{
+    if (index < 0)
+    {
+        Render_UnbindTexture1();
+        return -1;
+    }
+    if (g_textureNames[index][0] != 0)
+        g_textures[index].BindStage1();
+    return index;
+}
+
+// Texture_BindStage0: binds texture slot `index` to stage 0 (a negative index unbinds). Returns the index or -1.
+extern "C" int Texture_BindStage0(int index)
+{
+    if (index < 0)
+    {
+        Render_UnbindTexture0();
+        return -1;
+    }
+    if (g_textureNames[index][0] != 0)
+        g_textures[index].BindStage0();
+    return index;
+}
+
+// Calls BeginRenderTo with the size of the source image and `value`.
+int TextureObject::UpdateImage(int value)
+{
+    return BeginRenderTo(sourceWidth, sourceHeight, value);
 }

@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 17.50% of code, 851 of 1212 functions |
-| Matched under the rules | 17.46% of code, 850 of the 851 matched functions |
-| Fuzzy match | 29.05% |
+| Matched | 17.94% of code, 853 of 1212 functions |
+| Matched under the rules | 17.90% of code, 852 of the 853 matched functions |
+| Fuzzy match | 30.44% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -136,6 +136,13 @@ function) and node_world.cpp (0) still break rule 2.
   Enemy_StalkAndDashSlash 100af1b0 (15 stack-slot lines). Npc_PerchOnNeighbour/Map17_UpdateMoleGame retried, notes added.
   A new header declaration clashed with a local `void` one in app_0012.cpp (7 lost until removed): grep for local
   declarations of any function a new header declares.
+- Batch 337: Shaga_Update 0x10042a30 matched; Npc_HoverCarrier 0x10048050 matched by a retry (Vec4 operators take
+  const float&, so a lea of a float temporary is the literal, not a named local; block-scope the floats). Drafts:
+  Enemy_PerchAndSwoop 100a5960 (two slots swapped), Char_DropEquipment 100615f0 (four slots permuted), Game_LoadData
+  100cb0c0, Map16_UpdateDodgeGame 10053020 (1 byte, register permutation), Debug_DrawShape 10145ba0, Scene_HostCallback
+  10092af0 (8 bytes, zero stores in the slot reset). Enemy_StalkAndDashSlash down to 10 lines, Char_RouteFlier to 1832.
+  Loose ends: scene_start.cpp passes FUN_10092af0 (WorldCallback should be (int, int *)); frame_step.cpp declares
+  Game_LoadData separately from FUN_100cb0c0.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

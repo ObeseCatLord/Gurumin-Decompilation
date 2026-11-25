@@ -33,7 +33,7 @@ Needs MinGW-w64 (`i686-w64-mingw32-g++` and `x86_64-w64-mingw32-g++`), and CMake
 The first build clones OpenXR-SDK (pinned commit) into `build/openxr-sdk` and builds the Khronos loader
 (`tools/build_openxr_loader.sh`; `REBUILD_OPENXR_LOADER=1` rebuilds it). The Wine tests create a D3D9 window, so run
 them with a display (`xvfb-run -a ./tests/run_tests.sh` when headless). Tests that need your own game files are
-skipped unless `GURUMIN_STOCK_DIR` points at the game folder. CI builds the same files on every push (artifact
+skipped unless `GURUMIN_STOCK_DIR` points at the game folder. CI builds the same files on pushes to master and pull requests (artifact
 `mod-en`, see `../.github/workflows/build.yml`). `tools/package.py` makes the release ZIP (it downloads the Windows
 Python embeddable runtime).
 
@@ -49,24 +49,24 @@ knows and can restore them with `--action restore`). On Linux / Steam Deck set t
 The mod addresses the game by RVA from `game.exe`'s base; the EN virtual address is `0x400000 + RVA`. Names come from
 `../decomp_en/jp_en_map.tsv` (JP name carried over, with its confidence) and `../decomp_en/obj_symbols.tsv`.
 
-| RVA | EN VA | Mod's use | decomp_en name |
+| RVA | EN VA | Mod's hook (detour) | decomp_en name |
 |---|---|---|---|
-| 0x1a992a | 0x5a992a | camera view build caller (return address the camera hook checks) | call site inside `Camera_Refresh` (0x5a90c0) |
-| 0x312f90 | 0x712f90 | free/orbit camera update | `Camera_Update` |
-| 0x37aea0 | 0x77aea0 | free/orbit camera view | `LookAt` |
-| 0x379200 | 0x779200 | free/orbit camera pitch | `Vec4::RotateX` |
-| 0x1d3360 | 0x5d3360 | free/orbit camera world pass | `Scene_DrawFrame` |
-| 0x1c9750 | 0x5c9750 | water reflection matrix | `Map_BuildTopView` |
-| 0x31c5b0 | 0x71c5b0 | shadow texture allocate | `Texture_CreateFromPixels` |
-| 0x3a4bf0 | 0x7a4bf0 | shadow render-target binder | `TextureObject::BeginRenderTo` (medium confidence) |
-| 0x38d310 | 0x78d310 | depth-of-field target copy | unnamed |
-| 0x390e70 | 0x790e70 | depth-of-field focus combine | `TextureObject_DrawBlurred` |
-| 0x37fbe0 | 0x77fbe0 | projected screen quad | `TextureObject::DrawQuad` |
-| 0x375320 | 0x775320 | VR culling | `View_ContainsPoint` |
-| 0x350a50 | 0x750a50 | model draw (interpolation) | `Node::QueueDraw` |
-| 0x3528b0 | 0x7528b0 | model draw, fading | `Node::QueueDrawFading` |
-| 0x351ee0 | 0x751ee0 | shadow receiver | `Node::Draw` |
-| 0x3a4360 | 0x7a4360 | skinning upload | `MeshData::UploadBones` |
-| 0x325f40 | 0x725f40 | particle / effect draw | `EffectManager::Draw` |
-| 0x1defb0 | 0x5defb0 | screen fade | `Fade_Draw` |
-| 0x37a4a0 | 0x77a4a0 | HUD vector projection | `Project` |
+| 0x1a992a | 0x5a992a | return address of the camera view build, checked by the camera code | call site inside `Camera_Refresh` (0x5a90c0) |
+| 0x312f90 | 0x712f90 | `cameraUpdateHook` | `Camera_Update` |
+| 0x37aea0 | 0x77aea0 | `cameraViewHook` | `LookAt` |
+| 0x379200 | 0x779200 | `cameraPitchHook` | `Vec4::RotateX` |
+| 0x1d3360 | 0x5d3360 | `cameraWorldHook` | `Scene_DrawFrame` |
+| 0x1c9750 | 0x5c9750 | `reflectionMatrixHook` (water reflection) | `Map_BuildTopView` |
+| 0x31c5b0 | 0x71c5b0 | `shadowAllocateHook` | `Texture_CreateFromPixels` |
+| 0x3a4bf0 | 0x7a4bf0 | `shadowBindHook` | `TextureObject::BeginRenderTo` (medium confidence) |
+| 0x38d310 | 0x78d310 | `targetCopyHook` | unnamed |
+| 0x390e70 | 0x790e70 | `focusCombineHook` | `TextureObject_DrawBlurred` |
+| 0x37fbe0 | 0x77fbe0 | `projectedQuadHook` | `TextureObject::DrawQuad` |
+| 0x375320 | 0x775320 | `vrCullHook` | `View_ContainsPoint` |
+| 0x350a50 | 0x750a50 | `modelDrawHook` | `Node::QueueDraw` |
+| 0x3528b0 | 0x7528b0 | `modelDrawThirdHook` | `Node::QueueDrawFading` |
+| 0x351ee0 | 0x751ee0 | `shadowReceiverHook` | `Node::Draw` |
+| 0x3a4360 | 0x7a4360 | `skinHook` | `MeshData::UploadBones` (obj_symbols: `SlotTable::UploadBones`) |
+| 0x325f40 | 0x725f40 | `particleDrawHook` | `EffectManager::Draw` |
+| 0x1defb0 | 0x5defb0 | `fadeHook` | `Fade_Draw` |
+| 0x37a4a0 | 0x77a4a0 | `vectorHook` | `Project` |

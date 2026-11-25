@@ -88,8 +88,8 @@ with zoom, 6DoF VR on PC VR, Linux/Proton and Steam Deck, and standalone VR on t
 ### Builds
 CI ([`.github/workflows/build.yml`](.github/workflows/build.yml)) builds the JP mod DLL (`mod-jp`), the EN mod with
 its VR host (`mod-en`) and the modding tools as one program for Windows x64, Linux x64 and Linux arm64
-(`GuruminModTools-windows-x64`, `-linux-x64`, `-linux-arm64`) on every push and pull request; download them from the
-run's artifacts.
+(`GuruminModTools-windows-x64`, `-linux-x64`, `-linux-arm64`) on pushes to master and on pull requests; download
+them from the run's artifacts.
 
 ### Documentation (`docs/`)
 `MODDING_MAP.md` (start here: costumes, anti-cheat guards, render states, sound, menu images), `MODDING_FILES.md`

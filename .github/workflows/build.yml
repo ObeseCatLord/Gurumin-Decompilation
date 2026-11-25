@@ -1,6 +1,6 @@
 name: Build
 
-# Builds the mod DLLs and the modding tools on every push and pull request and keeps them as artifacts of the run:
+# Builds the mod DLLs and the modding tools on pushes to master and pull requests and keeps them as artifacts of the run:
 #   mod-jp                       mod/build/d3d9.dll for the Japanese PC release, its ini and install/uninstall scripts
 #   mod-en                       mod_en/dist: Gurumin Enhanced Rendering for the English Steam release (d3d9.dll proxy,
 #                                GuruminModern.ini, GuruminVR/ x64 OpenXR host and loader)
@@ -18,6 +18,7 @@ permissions:
 jobs:
   mod-jp:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -39,6 +40,7 @@ jobs:
 
   mod-en:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: mod_en
@@ -72,12 +74,14 @@ jobs:
             !mod_en/dist/*.o
       - name: Install Wine (32-bit) and Xvfb
         continue-on-error: true
+        timeout-minutes: 10
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends wine64 wine32:i386 xvfb
+          sudo apt-get install -y --no-install-recommends wine wine64 wine32:i386 xvfb
       - name: Windows tests under Wine (best effort)
         continue-on-error: true
+        timeout-minutes: 5
         env:
           WINEDEBUG: -all
         run: |
@@ -100,6 +104,7 @@ jobs:
             artifact: GuruminModTools-linux-arm64
             program: GuruminModTools
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     defaults:
       run:
         shell: bash
@@ -143,12 +148,14 @@ jobs:
         run: python tools/build_exe.py
       - name: Smoke test (the window stays open for 10 s)
         if: runner.os == 'Linux'
+        timeout-minutes: 2
         run: |
           set +e
           xvfb-run -a timeout 10 ./dist/${{ matrix.program }}
           status=$?
           [ $status -eq 124 ] || { echo "GuruminModTools exited early with status $status"; exit 1; }
       - name: Start the program without a window
+        timeout-minutes: 2
         # Lists every command the GUI builds (imports all bundled tools; no window).
         run: ./dist/${{ matrix.program }} --print-commands > print-commands.txt
       - uses: actions/upload-artifact@v4

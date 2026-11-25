@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     name: linux-${{ matrix.arch }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install build dependencies
         run: |
@@ -48,7 +48,7 @@ jobs:
           build/port/gurumin_port --probe
 
       - name: Upload binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: gurumin-port-linux-${{ matrix.arch }}
           path: |

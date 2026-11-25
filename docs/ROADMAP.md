@@ -16,10 +16,10 @@ along; the notes record what is already known so the work can start from there.
 ### Rendering and modern hardware
 The PC release targets 2006 hardware; modern machines can lift its limits.
 - Higher framerates, wide and ultrawide resolutions, proportional HUD, FXAA, higher-resolution shadows. The MIT-licensed
-  **Gurumin Enhanced Rendering** mod (ObeseCatLord, local copy `..\Gurumin EN Enhanced Rendering Mod\`, v1.1.0) already
-  does this for the Steam EN build through a d3d9 proxy, with render interpolation over the game's 30 Hz simulation.
-  Option: port its features onto the decompiled JP code, or bundle it and expose its settings in our configurator.
-  Keep its licence and credit.
+  **Gurumin Enhanced Rendering** mod (ObeseCatLord) does this for the Steam EN build through a d3d9 proxy, with render
+  interpolation over the game's 30 Hz simulation, FXAA, a free/orbit camera and OpenXR VR. Its source is now bundled
+  in `mod_en/` (v1.3.0, MIT; CI builds it). Next: port its features onto the decompiled JP code, and expose its
+  settings in our configurator. Keep its licence and credit.
 - PSP-exclusive costumes: the Enhanced Rendering mod links the separate PSP Outfits mods (dinput8 proxy). Support
   loading them when the user supplies the files (never ship them).
 

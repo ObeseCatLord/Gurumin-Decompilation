@@ -34,9 +34,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 642 of 2,034 game functions (141,592 of 2,080,360 bytes, 6.81 %) |
-| Matched under the rules | 642 |
-| Queue | 82 walls, 99 with a matched JP twin (mostly 500+ bytes), 376 mapped to unmatched JP, 835 EN-only; open.tsv ~50 near-misses |
+| Matched | 701 of 2,034 game functions (153,871 of 2,080,360 bytes, 7.40 %) |
+| Matched under the rules | 701 |
+| Queue | 108 walls, 66 with a matched JP twin (mostly 700+ bytes), 361 mapped to unmatched JP, 798 EN-only; open.tsv ~70 near-misses |
 
 ## State
 - Batches 1-11 matched Node, Vec4/Matrix4/Box, containers, AnimModel, camera, IME, engine/render, texture manager,
@@ -55,7 +55,8 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 - Never add address-taking tables or macros that only force COMDAT emission.
 - Blocked: launcher (164 EN-only functions) needs the VS2013 MFC headers (Express has no `VCtlmfc`; NOTES);
   `Game::~Game` 0x5a1150 needs Node dtor + EN Object base.
-- Batch 11 workers stopped on the weekly API limit; their partial work is committed. Lists still open in the
+- Batch 11b (701) committed all three batch-11 workers. EN-only: CRT math wrappers, string.h overloads and Steam SDK
+  CCallback slots are library code (skip); many small ctors/dtors wait for their class layouts. Lists still open in the
   scratchpad: list_sec2b, rest of list_sec3b, list_sec3c, list_sec4.
 
 ## Next steps

@@ -84,6 +84,8 @@
 #include "world.h"
 
 #include "game_load_data.h"
+#include "debris.h"
+#include "char_equipment.h"
 
 #include "player_frame.h"
 
@@ -240,6 +242,64 @@
 #define OVERLAY_TEXTURE_SLOT_COUNT 0x22
 // Characters whose models the frame updates (DAT_10db6ee8[0..MODEL_UPDATE_COUNT-1]).
 #define MODEL_UPDATE_COUNT 124
+#define FADE_OUT_FLOOR_HEIGHT 240.0f    // a fading model never rises above its slot's spot plus this
+#define FADE_OUT_DIVISOR 6.0f           // DAT_10467f28 (the model's fade strength) scale
+#define FADE_OUT_BASE 0.5
+#define FADE_OUT_FRAMES 15.0            // frames the colour takes to dim
+#define ENEMY_SPARK_PERIOD 10           // frames between the sparks of a hurt enemy
+#define ENEMY_SPARK_BURST_PERIOD 0x3c
+#define ENEMY_SPARK_OWNER 0x1226
+#define EFFECT_ENEMY_SPARK 0x65
+#define EFFECT_ENEMY_SPARK_BURST 0x226
+#define EFFECT_ENEMY_SMOKE 0x868
+#define HIT_FLASH_RISE 4.0f             // DAT_10f08080 z: the flashing enemy's offset rises by this each frame
+#define HIT_FLASH_PULSE_DIVISOR 2.0f
+#define HIT_FLASH_FRAMES 20.0
+#define HIT_FLASH_STEP 0.4f
+#define HIT_FLASH_MAX 1.3f
+#define HIT_FLASH_START 0x14
+#define ENEMY_GONE 2
+#define ENEMY_DEFEATED 3                // the enemy has no health left; its death is handled this step
+#define ENEMY_FADE_START 4              // states 5..13 fade the model out
+#define ENEMY_FADE_END 14
+#define FADE_ALPHA_DIVISOR 10.0f
+#define GONE_X -200000.0f               // a gone enemy's model waits here (minus GONE_SPACING per slot)
+#define GONE_SPACING 500.0f
+#define FIRST_ENEMY_SLOT 0x3a
+#define TOSS_LAST_TARGET_SLOT 0x5c
+#define TOSS_TARGET_RANGE 3000          // the defeated enemy is thrown at another one within this distance
+#define TOSS_TARGET_KIND_A 0x63
+#define TOSS_TARGET_ALIGNMENT 0.7f      // dot product the direction to the target needs with the player's view
+#define TOSS_NUDGE 0.1f
+#define TOSS_HOLD_WEIGHT 0.1f
+#define TOSS_CARRIER_LIMIT 200
+#define DEFEATED_FROM_ABOVE (-0x65)     // DAT_10467ba0 marks of the way the enemy was defeated
+#define DEFEATED_BURST (-100)
+#define COMBO_MAX 99
+#define COMBO_SHOW_A 8
+#define COMBO_SHOW_B 0x3c
+#define SOUND_ENEMY_DEFEATED 0x37a
+#define COIN_BONUS_FACTOR 1.5f
+#define COIN_FLAGS_BOTH 0x30000000      // DAT_104c02c8 bits of the helmet: both coin bonuses
+#define COIN_FACTOR_BOTH 3.0f
+#define COIN_FLAG_DOUBLE 0x20000000
+#define COIN_FLAG_BONUS 0x10000000
+#define COIN_GAME_OVER_LIMIT 5          // the coins drop by a fifth for each game over, down to the minimum
+#define ENEMY_DYING 1                   // DAT_10210d30 states of an enemy slot
+#define ENEMY_TOSSED 1000               // defeated and flying away
+#define TOSS_STEPS_PER_FRAME 2
+#define TOSS_SWEEP_COUNT 5              // directions tried to slide along
+#define TOSS_DROP 0.1                   // the first direction points this much lower
+#define TOSS_TURN 0.5236f               // the side directions are turned by this angle
+#define TOSS_REACH 19.0f                // distance a toss step moves
+#define TOSS_WALL_RADIUS 50.0f          // first radius of the wall test (grows by TOSS_WALL_RADIUS_STEP)
+#define TOSS_WALL_RADIUS_STEP 10.0f
+#define TOSS_STOP_SPEED 0.1             // the toss ends when every component of the direction is below this
+#define TOSS_CEILING 6000.0f
+#define TOSS_FLOOR_X -100000.0f
+#define TOSS_PIECE_LIFT 50.0f
+#define TOSS_SPIN 0.5f
+#define ENEMY_DISTANCE_START 99999.0f   // closestEnemy before any enemy was measured
 // Tracks below this number drive the beat counter DAT_1032d6a0.
 #define BGM_TRACK_LIMIT 0xff
 // Beat counter: BGM_BEAT_STEPS steps per BGM_BEAT_SAMPLES / BgmTrack::m_002c samples.
@@ -1003,6 +1063,26 @@ static __forceinline void SteerLeanAndSpeed(float moveX, float moveY)
     }
 }
 
+// The 15 pieces a defeated enemy bursts into at `at`, thrown along `direction` (three places in the enemy code).
+static __forceinline void BurstIntoPieces(const Vec4 &at, const Vec4 *direction, int slot)
+{
+    FUN_1000df10(at.x + 5.0f, at.y, at.z + 50.0f, direction, 100, slot);
+    FUN_1000df10(at.x, at.y + 5.0f, at.z + 55.0f, direction, 100, slot);
+    FUN_1000df10(at.x - 4.0f, at.y, at.z + 50.0f, direction, 100, slot);
+    FUN_1000df10(at.x + 8.0f, at.y + 5.0f, at.z + 55.0f, direction, 100, slot);
+    FUN_1000df10(at.x - 5.0f, at.y, at.z + 50.0f, direction, 100, slot);
+    FUN_1000df10(at.x, at.y + 7.0f, at.z + 55.0f, direction, 100, slot);
+    FUN_1000df10(at.x - 5.0f, at.y - 5.0f, at.z + 50.0f, direction, 100, slot);
+    FUN_1000df10(at.x + 5.0f, at.y, at.z + 45.0f, direction, 100, slot);
+    FUN_1000df10(at.x - 4.0f, at.y + 7.0f, at.z + 55.0f, direction, 100, slot);
+    FUN_1000df10(at.x + 5.0f, at.y - 5.0f, at.z + 60.0f, direction, 100, slot);
+    FUN_1000df10(at.x - 5.0f, at.y + 10.0f, at.z + 55.0f, direction, 100, slot);
+    FUN_1000df10(at.x + 10.0f, at.y - 5.0f, at.z + 55.0f, direction, 100, slot);
+    FUN_1000df10(at.x - 5.0f, at.y - 10.0f, at.z + 40.0f, direction, 100, slot);
+    FUN_1000df10(at.x + 4.0f, at.y + 7.0f, at.z + 55.0f, direction, 100, slot);
+    FUN_1000df10(at.x + 10.0f, at.y - 10.0f, at.z + 65.0f, direction, 100, slot);
+}
+
 // 0x1011d810 (the in-game frame). Mode 1 of the frame step. The first call resets the mode's globals (DAT_104bf8bc
 // was 0 until then). Each call computes how many engine ticks have passed since the last one (at most
 // MAX_CATCH_UP_TICKS, otherwise one); every tick polls the input (and records or replays it), runs the main menu and
@@ -1038,6 +1118,8 @@ extern "C" int FUN_1011d810(void)
     int modelCount;
     int modelPos;
     int modelIdx;
+    float closestEnemy;
+    int enemyClose;
     int i;
     unsigned char flag0155;
     unsigned int greetings;
@@ -6361,6 +6443,8 @@ movementDone:;
             DAT_104bfdd8 = 0;
         }
         DAT_104bf888 = 0;
+        closestEnemy = ENEMY_DISTANCE_START;
+        enemyClose = 0;
         if (DAT_104bfdc8 == 0)
             DAT_104bfdd0 = 0;
         if (DAT_10255f08 != 0)
@@ -6383,19 +6467,509 @@ movementDone:;
                 DAT_104c01f0 = 0;
                 if (DAT_10db6ee8[modelIdx].root != 0)
                 {
-                    // STAGE 8: the model's fade timers and its pending removal, pseudo.c lines 8984-9022
+                    if (DAT_10253e98[modelIdx] != 0)
+                        DAT_10253e98[modelIdx]--;
+                    if (DAT_102239d0[modelIdx] != 0)
+                    {
+                        // fading out: the model sinks to the floor of its slot and its colour dims
+                        if (DAT_10db6ee8[modelIdx].m_238c != 0)
+                            DAT_102239d0[modelIdx] = 1;
+                        float sinkFloor = DAT_108377c8[modelIdx].z + FADE_OUT_FLOOR_HEIGHT;
+                        DAT_10db6ee8[modelIdx].matrix.m[MATRIX_TRANSLATION_X] = DAT_108377c8[modelIdx].x;
+                        DAT_10db6ee8[modelIdx].matrix.m[MATRIX_TRANSLATION_Y] = DAT_108377c8[modelIdx].y;
+                        if (DAT_10db6ee8[modelIdx].matrix.m[MATRIX_TRANSLATION_Z] > sinkFloor)
+                            DAT_10db6ee8[modelIdx].matrix.m[MATRIX_TRANSLATION_Z] = sinkFloor;
+                        DAT_102239d0[modelIdx]--;
+                        DAT_10db6ee8[modelIdx].m_022c.Set(
+                            ((float)DAT_10467f28[modelIdx] / FADE_OUT_DIVISOR + FADE_OUT_BASE) * DAT_102239d0[modelIdx] / FADE_OUT_FRAMES,
+                            0, 0, 0);
+                        DAT_102550e0[modelIdx]++;
+                        if (DAT_102239d0[modelIdx] == 0 && DAT_10255a88[modelIdx] != 0)
+                        {
+                            DAT_10db6ee8[modelIdx].m_022c.Set(0, 0, 0, 0);
+                            DAT_102550e0[modelIdx] = 1;
+                            DAT_10db6ee8[modelIdx].HoldAtSpine(0, 0);
+                            DAT_10210b30[modelIdx] = 1;
+                        }
+                    }
+                    if (DAT_102550e0[modelIdx] != 0 && --DAT_102550e0[modelIdx] == 0 && DAT_10255a88[modelIdx] != 0)
+                        DAT_10210b30[modelIdx] = 1;
                     if (modelIdx > 0 && DAT_104bfe6c == 0 && DAT_104bfeb0 == 0)
                     {
-                        if (DAT_1021f3c0[modelIdx] == 3 && modelIdx > 0x39)
+                        // an enemy of slot kind 3 acts here unless the frame is an event's (then the general code below runs)
+                        if (DAT_1021f3c0[modelIdx] == 3 && modelIdx > 0x39
+                            && !((DAT_10210d30[modelIdx] == 0 && DAT_104c0094 != 0) || DAT_104c0095 != 0 || DAT_104c0135 != 0))
                         {
-                            // STAGE 9: the enemy behaviours (slot kind 3), pseudo.c lines 9026-9683
+                            if (tick != ticks - 1 && DAT_1065cb90 == 0)
+                                goto modelTail;
+                            if (DAT_103153b0[modelIdx] != 0)
+                            {
+                                DAT_103153b0[modelIdx]--;
+                                if (DAT_10daaae8[modelIdx].stats[STAT_HEALTH] < 1)
+                                    DAT_103153b0[modelIdx] = 0;
+                                else if (DAT_104bf890 % ENEMY_SPARK_PERIOD == 0)
+                                {
+                                    Vec4 sparkAt;
+                                    sparkAt.Fill(0.0f);
+                                    if (DAT_10db6ee8[modelIdx].spineNode != 0)
+                                    {
+                                        DAT_10daaa80.Start(EFFECT_ENEMY_SPARK, sparkAt, -1, -1, &DAT_10db6ee8[modelIdx].spineNode->worldMatrix, 0, 0, 0,
+                                                           0, 0);
+                                        if (DAT_104bf890 % ENEMY_SPARK_BURST_PERIOD == 0)
+                                        {
+                                            EffectOptions burstOptions;
+                                            burstOptions.m_0000 = 1;
+                                            burstOptions.m_0004 = 4;
+                                            burstOptions.m_0008 = 1.0f;
+                                            burstOptions.m_000e = 5;
+                                            burstOptions.m_001c = 1;
+                                            burstOptions.owner = ENEMY_SPARK_OWNER;
+                                            Vec4 burstAt;
+                                            burstAt.Fill(0.0f);
+                                            DAT_10daaa80.Start(EFFECT_ENEMY_SPARK_BURST, burstAt, -1, 0, 0, 0, 0, &DAT_10db6ee8[modelIdx].matrix,
+                                                               &burstOptions, 0);
+                                        }
+                                    }
+                                }
+                            }
+                            if (DAT_10219770[modelIdx] != 0)
+                            {
+                                DAT_10219770[modelIdx]--;
+                                if (DAT_10daaae8[modelIdx].stats[STAT_HEALTH] < 1)
+                                    DAT_10219770[modelIdx] = 0;
+                                else if (DAT_104bf890 % ENEMY_SPARK_PERIOD == 0 && DAT_10db6ee8[modelIdx].spineNode != 0)
+                                {
+                                    Vec4 smokeAt;
+                                    smokeAt.Fill(0.0f);
+                                    smokeAt.Copy(DAT_10db6ee8[modelIdx].spineNode->worldMatrix.GetTranslation());
+                                    DAT_10daaa80.Start(EFFECT_ENEMY_SMOKE, smokeAt, -1, -1, 0, 0, 0, 0, 0, 0);
+                                }
+                            }
+                            if (DAT_1020d4c0[modelIdx] == 0
+                                || (DAT_102239d0[modelIdx] == 0 && DAT_10daaae8[modelIdx].stats[STAT_HEALTH] < 1))
+                            {
+                                // the hit flash: the model's tint pulses while the flash frames run down
+                                if (DAT_1021b940[modelIdx] != 0)
+                                {
+                                    unsigned int flashAge = DAT_104bf890 - DAT_1030c998[modelIdx];
+                                    DAT_10f08080[modelIdx].z = DAT_10f08080[modelIdx].z + HIT_FLASH_RISE;
+                                    char flashFrames = DAT_1021b940[modelIdx];
+                                    double pulse = cos((float)flashAge / HIT_FLASH_PULSE_DIVISOR);
+                                    DAT_1021b940[modelIdx] = flashFrames - 1;
+                                    DAT_10447bd0[modelIdx].value =
+                                        (float)((int)flashFrames / HIT_FLASH_FRAMES * DAT_1021b9c0[modelIdx] * pulse);
+                                    if (DAT_1021b940[modelIdx] <= 0)
+                                    {
+                                        DAT_10447bd0[modelIdx].value = 0;
+                                        DAT_1021b940[modelIdx] = 0;
+                                    }
+                                }
+                                else
+                                {
+                                    DAT_10447bd0[modelIdx].value = DAT_10447bd0[modelIdx].value + HIT_FLASH_STEP;
+                                    if (HIT_FLASH_MAX < DAT_10447bd0[modelIdx].value)
+                                        DAT_10447bd0[modelIdx].value = HIT_FLASH_MAX;
+                                    DAT_1021b9c0[modelIdx] = DAT_10447bd0[modelIdx].value;
+                                    DAT_1021b940[modelIdx] = HIT_FLASH_START;
+                                    DAT_1030c998[modelIdx] = DAT_104bf890;
+                                }
+                            }
+                            int enemyState = DAT_10210d30[modelIdx];
+                            if (enemyState == ENEMY_TOSSED)
+                            {
+                                // a defeated enemy flies away: it slides along its direction, bounces off walls and bursts
+                                for (int tossStep = 0; tossStep < TOSS_STEPS_PER_FRAME; tossStep++)
+                                {
+                                    Vec4 startAt;
+                                    startAt.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+                                    Vec4 sweep[TOSS_SWEEP_COUNT];
+                                    Vec4 probe;
+                                    int sweepTry = 0;
+                                    if (DAT_10467ba0[modelIdx] != 0)
+                                    {
+                                        probe.Copy(DAT_10db6ee8[DAT_10467ba0[modelIdx]].matrix.GetTranslation() + DAT_108387c8[modelIdx]);
+                                        DAT_10db6ee8[modelIdx].SetPosition(probe.x, probe.y, probe.z);
+                                    }
+                                    else
+                                    {
+                                        sweep[1].Copy(DAT_10836470[modelIdx]);
+                                        sweep[0].Copy(sweep[1]);
+                                        sweep[0].z = sweep[1].z - TOSS_DROP;
+                                        Vec4 turned;
+                                        sweep[2].Copy(*FUN_101ae1c0(&turned, &sweep[1], -TOSS_TURN));
+                                        sweep[3].Copy(*FUN_101ae250(&turned, &sweep[1], TOSS_TURN));
+                                        sweep[4].Copy(*FUN_101ae250(&turned, &sweep[1], -TOSS_TURN));
+                                        Vec4 noOffset;
+                                        noOffset.Fill(0.0f);
+                                        do
+                                        {
+                                            probe.Copy(sweep[sweepTry] * TOSS_REACH + startAt);
+                                            DAT_10db6ee8[modelIdx].SetPosition(probe.x, probe.y, probe.z);
+                                            if (DAT_10db6ee8[modelIdx].IsClearOfMapLimited(&noOffset) != 0)
+                                                break;
+                                            sweepTry++;
+                                        } while (sweepTry < TOSS_SWEEP_COUNT);
+                                        if (sweepTry == 0)
+                                        {
+                                            DAT_10836470[modelIdx].Copy(sweep[0]);
+                                            DAT_10836470[modelIdx].Normalized3();
+                                        }
+                                        else if (sweepTry == TOSS_SWEEP_COUNT)
+                                        {
+                                            if (--DAT_1030c480[modelIdx] != 0)
+                                            {
+                                                // every way is blocked: find the wall and reflect off it
+                                                Matrix4 wallSpace;
+                                                wallSpace.SetIdentity();
+                                                Vec4 wallNormal;
+                                                Vec4 wallPoint;
+                                                float wallRadius = 0.0f;
+                                                DAT_10db6ee8[modelIdx].SetPosition(startAt.x, startAt.y, startAt.z);
+                                                DAT_10db6ee8[modelIdx].matrix.SetTranslation(startAt);
+                                                wallPoint.Copy(startAt);
+                                                int wallTry = 0;
+                                                do
+                                                {
+                                                    float depth[4];
+                                                    if (DAT_10db6ee8[0].dropCollider->Query(&wallSpace, &wallPoint, wallRadius + TOSS_WALL_RADIUS,
+                                                                                            &wallNormal, depth, 0, 0) != 0)
+                                                        break;
+                                                    wallTry++;
+                                                    wallRadius = wallRadius + TOSS_WALL_RADIUS_STEP;
+                                                } while (wallTry < TOSS_SWEEP_COUNT);
+                                                if (wallTry == TOSS_SWEEP_COUNT)
+                                                {
+                                                    DAT_10836470[modelIdx].x = -DAT_10836470[modelIdx].x;
+                                                    DAT_10836470[modelIdx].y = -DAT_10836470[modelIdx].y;
+                                                    DAT_10836470[modelIdx].z = -DAT_10836470[modelIdx].z;
+                                                }
+                                                else
+                                                {
+                                                    DAT_10836470[modelIdx].RotateByDirection(wallNormal);
+                                                    DAT_10836470[modelIdx].Normalized3();
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if ((fabs(DAT_10836470[modelIdx].x) < TOSS_STOP_SPEED && fabs(DAT_10836470[modelIdx].y) < TOSS_STOP_SPEED
+                                         && fabs(DAT_10836470[modelIdx].z) < TOSS_STOP_SPEED)
+                                        || sweepTry == TOSS_SWEEP_COUNT
+                                        || DAT_10db6ee8[modelIdx].matrix.m[MATRIX_TRANSLATION_Z] > TOSS_CEILING
+                                        || DAT_10db6ee8[modelIdx].matrix.m[MATRIX_TRANSLATION_X] < TOSS_FLOOR_X
+                                        || (DAT_10467ba0[modelIdx] != 0 && DAT_10210d30[DAT_10467ba0[modelIdx]] != ENEMY_TOSSED))
+                                    {
+                                        // the toss ends: the model bursts into pieces
+                                        DAT_10db6ee8[modelIdx].HoldAtSpine(0, 0);
+                                        probe.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+                                        Vec4 pieceDirection;
+                                        pieceDirection.Copy(probe);
+                                        pieceDirection.z = pieceDirection.z + TOSS_PIECE_LIFT;
+                                        pieceDirection.Copy(pieceDirection - DAT_10836fc8[modelIdx]);
+                                        BurstIntoPieces(probe, &pieceDirection, modelIdx);
+                                        DAT_10210d30[modelIdx] = ENEMY_DYING;
+                                        break;
+                                    }
+                                    DAT_10db6ee8[modelIdx].holdState = 1;
+                                    DAT_10db6ee8[modelIdx].holdAngle = DAT_10db6ee8[modelIdx].holdAngle + TOSS_SPIN;
+                                    EffectOptions trailOptions;
+                                    if (DAT_104c0173 == 0)
+                                    {
+                                        trailOptions.m_0004 = DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                                        trailOptions.m_0008 = 1.5f;
+                                    }
+                                    else
+                                    {
+                                        trailOptions.m_0004 = -DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                                        trailOptions.m_0008 = 2.25f;
+                                    }
+                                    trailOptions.m_001c = 1;
+                                    trailOptions.m_0000 = 1;
+                                    trailOptions.settings[4] = 1;
+                                    trailOptions.settings[5] = 1;
+                                    trailOptions.settings[7] = (char)modelIdx;
+                                    trailOptions.m_000e = 5;
+                                    trailOptions.settings[0] = 8;
+                                    trailOptions.settings[1] = 8;
+                                    FUN_10093cc0(probe.x, probe.y, probe.z, DAT_10db6ee8[modelIdx].colliderReach + 10.0f, &trailOptions);
+                                }
+                            }
+                            else
+                            {
+                                if (enemyState == ENEMY_DYING)
+                                    DAT_10210d30[modelIdx] = ENEMY_FADE_START;
+                                if (enemyState == ENEMY_DYING || enemyState > ENEMY_FADE_START)
+                                {
+                                    // fading out: the colour turns red and the model dims until it is moved away
+                                    DAT_10210d30[modelIdx]++;
+                                    DAT_10db6ee8[modelIdx].alpha = (float)(ENEMY_FADE_END - DAT_10210d30[modelIdx]) / FADE_ALPHA_DIVISOR;
+                                    DAT_10db6ee8[modelIdx].m_022c.Set(1.0f, 0.2f, 0.2f, 0);
+                                    if (DAT_10210d30[modelIdx] >= ENEMY_FADE_END)
+                                    {
+                                        DAT_10db6ee8[modelIdx].m_022c.Fill(0.0f);
+                                        DAT_10daaae8[modelIdx].m_00a8 = 0;
+                                        DAT_10210d30[modelIdx] = ENEMY_GONE;
+                                        DAT_10db6ee8[modelIdx].Teleport(GONE_X - (float)modelIdx * GONE_SPACING, 0, 0);
+                                        DAT_1020d4c0[modelIdx] = 0;
+                                    }
+                                    if (DAT_10315350[modelIdx] == 0)
+                                    {
+                                        if (DAT_10daaae8[modelIdx].kind >= 100)
+                                            FUN_101148b0(modelIdx);
+                                        else
+                                            FUN_100f9670(modelIdx);
+                                    }
+                                }
+                                else if (DAT_104bfdf0 == 0 && enemyState == 0
+                                         && (DAT_102550e0[modelIdx] == 0 || DAT_102239d0[modelIdx] == 0)
+                                         && DAT_10daaae8[modelIdx].stats[STAT_HEALTH] < 1)
+                                {
+                                    // out of health: the death starts on the next step
+                                    DAT_10210d30[modelIdx] = ENEMY_DEFEATED;
+                                    DAT_10315350[modelIdx] = 0;
+                                }
+                            }
+                            if (DAT_10210d30[modelIdx] != ENEMY_DEFEATED)
+                            {
+                                if (DAT_104bfe1c == 0 && DAT_10210d30[modelIdx] == 0)
+                                {
+                                    if (DAT_104686b0[modelIdx] != 0)
+                                        DAT_104686b0[modelIdx]--;
+                                    if (DAT_1020d4c0[modelIdx] != 0)
+                                    {
+                                        // the hurt colour steps from dark grey to red as the display state counts down
+                                        if (DAT_102239d0[modelIdx] == 0)
+                                        {
+                                            if (DAT_1020d4c0[modelIdx] == 1)
+                                                DAT_10db6ee8[modelIdx].m_022c.Set(0.2f, 0.2f, 0.2f, 0);
+                                            if (DAT_1020d4c0[modelIdx] == 2)
+                                                DAT_10db6ee8[modelIdx].m_022c.Set(0.5f, 0.5f, 0.5f, 0);
+                                            if (DAT_1020d4c0[modelIdx] == 3)
+                                                DAT_10db6ee8[modelIdx].m_022c.Set(0.8f, 0.8f, 0.8f, 0);
+                                            if (DAT_1020d4c0[modelIdx] == 4)
+                                                DAT_10db6ee8[modelIdx].m_022c.Set(1.0f, 1.0f, 1.0f, 0);
+                                            if (DAT_1020d4c0[modelIdx] == 5)
+                                                DAT_10db6ee8[modelIdx].m_022c.Set(1.0f, 0.2f, 0.2f, 0);
+                                            if (DAT_1020d4c0[modelIdx] == 6)
+                                                DAT_10db6ee8[modelIdx].m_022c.Set(1.0f, 0, 0, 0);
+                                        }
+                                        char displayState = DAT_1020d4c0[modelIdx];
+                                        DAT_1020d4c0[modelIdx] = displayState - 1;
+                                        if (DAT_102239d0[modelIdx] == 0 && (char)(displayState - 1) == 0)
+                                            DAT_10db6ee8[modelIdx].m_022c.Fill(0.0f);
+                                    }
+                                    Vec4 playerAt;
+                                    Vec4 enemyAt;
+                                    playerAt.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                                    enemyAt.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+                                    float distance = (enemyAt - playerAt).Length();
+                                    if (DAT_104bfdf0 == 0 && modelIdx == DAT_102024ac && DAT_10db6ee8[modelIdx].headNode != 0)
+                                    {
+                                        closestEnemy = distance;
+                                        DAT_10802ac8.Copy(DAT_10db6ee8[modelIdx].headNode->parent->worldMatrix.GetTranslation());
+                                        enemyClose = 1;
+                                    }
+                                    if (DAT_10315350[modelIdx] == 0
+                                        && (DAT_10254310[modelIdx] != 0 || DAT_10255a88[modelIdx] == 0 || DAT_102550e0[modelIdx] == 0)
+                                        && (DAT_10219770[modelIdx] == 0 || (DAT_104bf890 & 1) == 0))
+                                        goto dispatchByKind;
+                                }
+                                goto modelTail;
+                            }
+                            if (DAT_1021f9c0[modelIdx] == 0)
+                            {
+                                if (DAT_10315350[modelIdx] == 0)
+                                    goto dispatchByKind;
+                                goto modelTail;
+                            }
+                            {
+                                // the enemy is defeated: it is thrown at the nearest other enemy in front of the player
+                                DAT_10874848.MarkKilled(DAT_10daaae8[modelIdx].routeRecord);
+                                DAT_10210d30[modelIdx] = ENEMY_TOSSED;
+                                DAT_10210b30[modelIdx] = 1;
+                                DAT_10db6ee8[modelIdx].root->M_10194730(0, -1);
+                                Vec4 here;
+                                here.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+                                Vec4 playerPos;
+                                playerPos.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                                int bestDistance = TOSS_TARGET_RANGE;
+                                int bestTarget = 0;
+                                Vec4 toTarget;
+                                Vec4 targetDirection;
+                                Vec4 aim;
+                                aim.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation() - playerPos);
+                                aim.Normalized3();
+                                for (int target = FIRST_ENEMY_SLOT; target < TOSS_LAST_TARGET_SLOT; target++)
+                                {
+                                    if (DAT_104bfe30 == 0 && (DAT_1021f3c0[target] == TOSS_TARGET_KIND_A || DAT_1021f3c0[target] == 3)
+                                        && DAT_10daaae8[target].stats[STAT_BUSY] == 0 && DAT_10daaae8[target].stats[STAT_HEALTH] > 0)
+                                    {
+                                        toTarget.Copy(DAT_1020e338[target]->GetTranslation() - playerPos);
+                                        int targetDistance = (int)toTarget.Length();
+                                        targetDirection.Copy(toTarget);
+                                        targetDirection.Normalized3();
+                                        if (DAT_10daaae8[target].m_0141 == 0 && targetDistance < bestDistance
+                                            && Vec3_Dot(&aim, &targetDirection) > TOSS_TARGET_ALIGNMENT)
+                                        {
+                                            bestDistance = targetDistance;
+                                            bestTarget = target;
+                                        }
+                                    }
+                                }
+                                Vec4 &tossDirection = DAT_10836470[modelIdx];
+                                if (bestTarget == 0)
+                                {
+                                    tossDirection.Copy(here - DAT_10db6ee8[0].matrix.GetTranslation());
+                                    tossDirection.Normalized3();
+                                    if (tossDirection.x == 0 && tossDirection.y == 0)
+                                        tossDirection.x = TOSS_NUDGE;
+                                    tossDirection.Normalized3();
+                                }
+                                else
+                                {
+                                    tossDirection.Copy(DAT_10db6ee8[bestTarget].matrix.GetTranslation() - here);
+                                    tossDirection.Normalized3();
+                                }
+                                char carrier = DAT_10467ba0[modelIdx];
+                                if (carrier == DEFEATED_FROM_ABOVE)
+                                {
+                                    DAT_10467ba0[modelIdx] = 0;
+                                    tossDirection.Set(0, 0, -1.0f, 0);
+                                    DAT_10db6ee8[modelIdx].HoldAtSpine(1, TOSS_HOLD_WEIGHT);
+                                    DAT_10db6ee8[modelIdx].FaceAwayFrom(&DAT_10db6ee8[0]);
+                                    DAT_10467510[modelIdx] = 1;
+                                    DAT_1030c480[modelIdx] = 1;
+                                }
+                                else if (carrier == DEFEATED_BURST)
+                                {
+                                    DAT_10467ba0[modelIdx] = 0;
+                                    DAT_10db6ee8[modelIdx].HoldAtSpine(0, 0);
+                                    here.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+                                    Vec4 pieceDirection;
+                                    pieceDirection.Copy(here);
+                                    pieceDirection.z = pieceDirection.z + TOSS_PIECE_LIFT;
+                                    pieceDirection.Copy(pieceDirection - DAT_10836fc8[modelIdx]);
+                                    BurstIntoPieces(here, &pieceDirection, modelIdx);
+                                    // two more passes of the last five pieces
+                                    for (int again = 0; again < 2; again++)
+                                    {
+                                        FUN_1000df10(here.x - 5.0f, here.y + 10.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                        FUN_1000df10(here.x + 10.0f, here.y - 5.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                        FUN_1000df10(here.x - 5.0f, here.y - 10.0f, here.z + 40.0f, &pieceDirection, 100, modelIdx);
+                                        FUN_1000df10(here.x + 4.0f, here.y + 7.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                        FUN_1000df10(here.x + 10.0f, here.y - 10.0f, here.z + 65.0f, &pieceDirection, 100, modelIdx);
+                                    }
+                                    DAT_10210d30[modelIdx] = ENEMY_DYING;
+                                }
+                                else if (carrier < 1 || carrier >= TOSS_CARRIER_LIMIT)
+                                {
+                                    if (carrier == 0)
+                                    {
+                                        DAT_10db6ee8[modelIdx].HoldAtSpine(1, TOSS_HOLD_WEIGHT);
+                                        DAT_10db6ee8[modelIdx].FaceAwayFrom(&DAT_10db6ee8[0]);
+                                        DAT_10467510[modelIdx] = 1;
+                                        DAT_1030c480[modelIdx] = 1;
+                                    }
+                                    else
+                                    {
+                                        DAT_10467ba0[modelIdx] = 0;
+                                        DAT_10db6ee8[modelIdx].HoldAtSpine(0, 0);
+                                        here.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+                                        Vec4 pieceDirection;
+                                        pieceDirection.Copy(here);
+                                        pieceDirection.z = pieceDirection.z + TOSS_PIECE_LIFT;
+                                        pieceDirection.Copy(pieceDirection - DAT_10836fc8[modelIdx]);
+                                        BurstIntoPieces(here, &pieceDirection, modelIdx);
+                                        DAT_10210d30[modelIdx] = ENEMY_DYING;
+                                    }
+                                }
+                                else
+                                {
+                                    // a model of slot `carrier` holds it: it rides along and counts a hit for the carrier
+                                    DAT_10db6ee8[modelIdx].Hold(1, TOSS_HOLD_WEIGHT, &DAT_10db6ee8[carrier]);
+                                    DAT_10db6ee8[modelIdx].FaceAwayFrom(&DAT_10db6ee8[0]);
+                                    DAT_10467510[modelIdx] = 1;
+                                    DAT_1030c480[carrier]++;
+                                    DAT_108387c8[modelIdx].Copy(DAT_10db6ee8[carrier].matrix.GetTranslation()
+                                                                - DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+                                    DAT_104c0114 = DAT_104c0114 + 1;
+                                    if (DAT_104c0114 > COMBO_MAX)
+                                        DAT_104c0114 = COMBO_MAX;
+                                    DAT_104c011a = COMBO_SHOW_A;
+                                    DAT_104c011b = COMBO_SHOW_B;
+                                }
+                                FUN_1003ad20(SOUND_ENEMY_DEFEATED, &DAT_10836fc8[modelIdx], 1.0f);
+                                FUN_100615f0(modelIdx, 1, 0);
+                                FUN_100615f0(modelIdx, 1, 0);
+                                FUN_100615f0(modelIdx, 1, 0);
+                                // the coins it drops: scaled by the bonuses and the game overs so far
+                                int coins = DAT_10daaae8[modelIdx].coins;
+                                if (DAT_10daaae8[modelIdx].stats[STAT_COIN_BONUS] != 0)
+                                    coins = (int)(coins * COIN_BONUS_FACTOR);
+                                if ((DAT_104c02c8 & COIN_FLAGS_BOTH) == COIN_FLAGS_BOTH)
+                                    coins = (int)(coins * COIN_FACTOR_BOTH);
+                                else if ((DAT_104c02c8 & COIN_FLAG_DOUBLE) != 0)
+                                    coins = (int)(coins * 2.0f);
+                                else if ((DAT_104c02c8 & COIN_FLAG_BONUS) != 0)
+                                    coins = (int)(coins * COIN_BONUS_FACTOR);
+                                int dropped = ((COIN_GAME_OVER_LIMIT - DAT_10c64000 > 0 ? COIN_GAME_OVER_LIMIT - DAT_10c64000 : 0) * coins) / COIN_GAME_OVER_LIMIT;
+                                if (dropped < 1)
+                                    dropped = 1;
+                                while (dropped != 0)
+                                {
+                                    if (dropped >= 500)
+                                    {
+                                        FUN_1000dd90(here.x, here.y, here.z + 50.0f, 0x56);
+                                        dropped -= 500;
+                                    }
+                                    else if (dropped >= 100)
+                                    {
+                                        FUN_1000dd90(here.x, here.y, here.z + 50.0f, 0x55);
+                                        dropped -= 100;
+                                    }
+                                    else if (dropped >= 0x32)
+                                    {
+                                        FUN_1000dd90(here.x, here.y, here.z + 50.0f, 0x54);
+                                        dropped -= 0x32;
+                                    }
+                                    else if (dropped >= 10)
+                                    {
+                                        FUN_1000dd90(here.x, here.y, here.z + 50.0f, 0x53);
+                                        dropped -= 10;
+                                    }
+                                    else if (dropped >= 5)
+                                    {
+                                        FUN_1000dd90(here.x, here.y, here.z + 50.0f, 0x52);
+                                        dropped -= 5;
+                                    }
+                                    else if (dropped > 0)
+                                    {
+                                        FUN_1000dd90(here.x, here.y, here.z + 50.0f, 0x51);
+                                        dropped--;
+                                    }
+                                }
+                                FUN_1013f880();
+                                if (DAT_10315350[modelIdx] != 0)
+                                    goto modelTail;
+                            }
                         }
                         else
                         {
-                            // STAGE 10: the other slot kinds and the per-kind dispatch, pseudo.c lines 9686-10956
+                            // STAGE 10: the other slot kinds, pseudo.c lines 9686-10956 (gotos: dispatchByKind = LAB_10132b5f,
+                            // dispatchBaseKind = LAB_10135df2; the code ends with `goto modelTail`)
+                            goto modelTail;
+                        }
+                    dispatchByKind:
+                        // the per-kind update of the slot (kinds from 100 have their own)
+                        if (DAT_10daaae8[modelIdx].kind >= 100)
+                            FUN_101148b0(modelIdx);
+                        else
+                        {
+                        dispatchBaseKind:
+                            FUN_100f9670(modelIdx);
                         }
                     }
                 }
+            modelTail:;
                 // STAGE 11: the player's own update and the others' tail work (label LAB_10135f91), pseudo.c lines 10960-11281
             }
         }

@@ -502,7 +502,7 @@ passesDone:
             Vec4 position = DAT_10db6ee8[character].matrix.GetTranslation();
             DAT_10f66948.Copy(DAT_10f08080[character] + position);
             if (character >= CHARACTER_AREA_COLOUR_FIRST)
-                DAT_10f655c4 = DAT_10447bd0[character];
+                DAT_10f655c4 = DAT_10447bd0[character].bits;
             if (DAT_1020d438[character] != 0)
                 DAT_10f655c4 = 0;
             if (character < CHARACTER_OWN_LIGHT_COUNT)

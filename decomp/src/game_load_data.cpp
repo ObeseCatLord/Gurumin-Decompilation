@@ -444,7 +444,7 @@ loadData:
         DAT_10daaa80.LoadDefinitions(FUN_1013f8a0("ef_oka.efx", 0));
         DAT_104c0320 = PROGRESS_COSTUME;
         FUN_1000fb80(0, 0);
-        DAT_1101de40[0] = FUN_10093cc0;
+        DAT_1101de40[0] = (HostCallback)FUN_10093cc0;
         DAT_1101de40[1] = FUN_1005c250;
         DAT_1101de40[3] = FUN_10010040;
         DAT_1101de40[4] = FUN_1000ff80;

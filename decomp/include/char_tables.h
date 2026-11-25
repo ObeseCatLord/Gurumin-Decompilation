@@ -49,7 +49,7 @@ extern "C" char DAT_1021f6c0[CHAR_SLOT_COUNT];
 extern "C" int DAT_1021f740[CHAR_SLOT_COUNT];             // frames the prompt stays; key prompt frames left
 extern "C" char DAT_1021f940[CHAR_SLOT_COUNT];
 extern "C" char DAT_1021f9c0[CHAR_SLOT_COUNT];
-extern "C" char DAT_102239d0[CHAR_SLOT_COUNT];
+extern "C" unsigned char DAT_102239d0[CHAR_SLOT_COUNT];   // frames of the fade-out left (0 = not fading)
 extern "C" int DAT_10253a58[CHAR_SLOT_COUNT];
 extern "C" int DAT_10253c58[CHAR_SLOT_COUNT];
 extern "C" unsigned char DAT_10253e98[CHAR_SLOT_COUNT];   // frames of protection left after a lava or trap hit (lava_hazard.cpp)

@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 50.1636,
+  "fuzzy_match_percent": 50.1888,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -4249,7 +4249,7 @@
   {
    "name": "app/char_equipment",
    "measures": {
-    "fuzzy_match_percent": 98.0,
+    "fuzzy_match_percent": 92.1538,
     "total_code": "4264",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -4274,14 +4274,14 @@
     {
      "name": ".text",
      "size": "4264",
-     "fuzzy_match_percent": 98.0
+     "fuzzy_match_percent": 92.1538
     }
    ],
    "functions": [
     {
      "name": "?FUN_100615f0@@YAHHHH@Z",
      "size": "4264",
-     "fuzzy_match_percent": 98.0,
+     "fuzzy_match_percent": 92.1538,
      "metadata": {
       "virtual_address": "268834288"
      }
@@ -10065,7 +10065,7 @@
   {
    "name": "app/field_item_menu_draw",
    "measures": {
-    "fuzzy_match_percent": 36.8523,
+    "fuzzy_match_percent": 36.8739,
     "total_code": "8384",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -10090,14 +10090,14 @@
     {
      "name": ".text",
      "size": "8384",
-     "fuzzy_match_percent": 36.8523
+     "fuzzy_match_percent": 36.8739
     }
    ],
    "functions": [
     {
      "name": "?FieldItemMenu_Draw@@YAHXZ",
      "size": "8384",
-     "fuzzy_match_percent": 36.8523,
+     "fuzzy_match_percent": 36.8739,
      "metadata": {
       "virtual_address": "268682608"
      }
@@ -10627,7 +10627,7 @@
   {
    "name": "app/game_frame",
    "measures": {
-    "fuzzy_match_percent": 33.9637,
+    "fuzzy_match_percent": 34.5995,
     "total_code": "107161",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -10652,14 +10652,14 @@
     {
      "name": ".text",
      "size": "107161",
-     "fuzzy_match_percent": 33.9637
+     "fuzzy_match_percent": 34.5995
     }
    ],
    "functions": [
     {
      "name": "_FUN_1011d810",
      "size": "107161",
-     "fuzzy_match_percent": 33.9637,
+     "fuzzy_match_percent": 34.5995,
      "metadata": {
       "virtual_address": "269604880"
      }

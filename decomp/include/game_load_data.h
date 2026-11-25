@@ -88,7 +88,8 @@ extern "C" int DAT_10f654e4;                              // 1 = screen-size cro
 typedef int (*HostCallback)();
 extern "C" HostCallback DAT_1101de40[5];
 
-extern "C" int FUN_10093cc0();
+struct EffectOptions;
+extern "C" int FUN_10093cc0(float x, float y, float z, float size, EffectOptions *options);   // effect hit test (host callback 0)
 extern "C" int FUN_1005c250();
 extern "C" int FUN_10010040();
 extern "C" int FUN_1000ff80();

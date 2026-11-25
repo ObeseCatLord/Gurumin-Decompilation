@@ -30,6 +30,7 @@ enum CharStat
                               // owner's value (companion_update.cpp); saved with STAT_EFFECT_PARAM (char_score.cpp)
     STAT_PICKUPS = 6,         // 0x1c: the player's pickup counter, 0..99 (pickups.cpp; guarded by anti_tamper.cpp)
     STAT_GUARDED_B = 7,       // 0x20: guarded by the anti-tamper check
+    STAT_COIN_BONUS = 11,     // 0x30: coins a defeated enemy drops (multiplied by the helmet's coin bonus)
     STAT_BUSY = 13            // 0x38: set to 1 while an enemy is dragged into a pit (char_pit.cpp)
 };
 

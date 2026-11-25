@@ -51,7 +51,7 @@ int FUN_1000c720(Matrix4 *view, const Matrix4 &projection, Vec4 *defaultLight)
             {
                 DAT_10f66948.Copy(DAT_10f08080[slot] + position);
                 if (slot >= FIRST_AREA_COLOUR_SLOT)
-                    DAT_10f655c4 = DAT_10447bd0[slot];
+                    DAT_10f655c4 = DAT_10447bd0[slot].bits;
                 if (DAT_1020d438[slot] != 0)
                     DAT_10f655c4 = 0;
                 if (slot < FIRST_UNLIT_SLOT)
@@ -73,7 +73,7 @@ int FUN_1000c720(Matrix4 *view, const Matrix4 &projection, Vec4 *defaultLight)
                 Vec4 position = DAT_10db6ee8[slot].matrix.GetTranslation();
                 DAT_10f66948.Copy(DAT_10f08080[slot] + position);
                 if (slot >= FIRST_AREA_COLOUR_SLOT)
-                    DAT_10f655c4 = DAT_10447bd0[slot];
+                    DAT_10f655c4 = DAT_10447bd0[slot].bits;
                 if (DAT_1020d438[slot] != 0)
                     DAT_10f655c4 = 0;
                 if (slot < FIRST_UNLIT_SLOT)

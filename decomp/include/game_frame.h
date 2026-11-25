@@ -78,4 +78,17 @@ extern "C" float DAT_102023e0[0x1f];         // the same for the other push side
 extern "C" float DAT_102027f4;               // 1.0 normally, 2.0 while the leap runs at double speed
 extern "C" Vec4 DAT_1065cb18;                // last non-zero value of the model's m_0090
 extern "C" int FUN_1016b400(float *outX, float *outY, float x, float y);   // 0x1016b400 (camera_orbit.cpp, Camera_TurnInput)
+
+// Per character slot (0..0x7f), used by the enemy code of the frame.
+extern "C" Vec4 DAT_108377c8[0x80];          // where the model rests while it fades out
+extern "C" int DAT_10467f28[0x80];           // fade strength of the model
+extern "C" char DAT_1021b940[0x80];          // frames of the hit flash left
+extern "C" float DAT_1021b9c0[0x80];         // the tint value the hit flash started from
+extern "C" unsigned int DAT_1030c998[0x80];  // DAT_104bf890 at the moment of the last hit
+extern "C" Vec4 DAT_10836470[0x80];          // direction the defeated enemy is thrown in
+extern "C" Vec4 DAT_108387c8[0x80];          // offset of a carried enemy from its carrier
+extern "C" Vec4 *FUN_101ae1c0(Vec4 *out, const Vec4 *direction, float angle);   // 0x101ae1c0: `direction` turned by -angle round the vertical axis
+extern "C" Vec4 *FUN_101ae250(Vec4 *out, const Vec4 *direction, float angle);   // 0x101ae250: `direction` turned by +angle round the vertical axis
+extern "C" int FUN_100f9670(int index);      // 0x100f9670 (Char_UpdateByKind)
+extern "C" int FUN_101148b0(int index);      // 0x101148b0 (char_dispatch.cpp): per-kind update of kinds from 100
 #endif

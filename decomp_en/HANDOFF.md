@@ -31,46 +31,37 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 - Near-misses go to `open.tsv` (`<EN address><TAB>open<TAB><reason>`) after about five honest spellings; move on.
 - Keep each file's own line endings (the `.bat` files are CRLF, the rest LF).
 
-## Progress (2026-11-24, `progress/en/report.json`)
+## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 569 of 2,034 game functions (123,569 of 2,080,360 bytes, 5.94 %) |
-| Matched under the rules | 569 |
-| Queue | regenerate with gen_queue.py; open.tsv: ~40 near-misses |
+| Matched | 642 of 2,034 game functions (141,592 of 2,080,360 bytes, 6.81 %) |
+| Matched under the rules | 642 |
+| Queue | 82 walls, 99 with a matched JP twin (mostly 500+ bytes), 376 mapped to unmatched JP, 835 EN-only; open.tsv ~50 near-misses |
 
 ## State
-- Pipeline verified; batches 1-4 matched Node (29+), Vec4/Matrix4/Box, containers, AnimModel channels, camera,
-  IME, engine/render (IDirect3DDevice9 vtable offsets), slot table, texcache, MMV, texture manager, mesh cache,
-  model bank, Game script flags and windows, mouse, config, buffer pool, colour fades, DShow, window proc.
-- Header ownership is per worker; headers live in `include/` (node.h, anim_model.h, vec4.h, texture_mgr.h,
-  render.h, slot_table.h, game.h, char.h, ...). Grep `include/` before declaring any type.
-- `port_jp.py` finds JP sources named `M_<address>` (fixed in batch 1).
-- Worker rules for briefs: scratchpad `worker_rules.txt` pattern (rules + tools + habits); give each worker
-  15-20 functions of one JP area plus the headers it owns. Resume a worker for 2-3 rounds, then start a fresh one
-  (contexts pass 250K tokens by round 4).
-- Not applied yet: `apply_jp_names.bat` (EN Ghidra names).
-- Blocked: `Game::~Game` 0x5a1150 needs a Node destructor (0x7496d0) and an EN Object base (0x76f0e0).
-
-- **Push when the remote moved** (CI commits progress meters; other sessions keep dirty files, never stash): build the
-  commit on origin/master with a temporary index (`GIT_INDEX_FILE=tmp git read-tree origin/master`, `git diff --binary
-  HEAD~1 HEAD | git apply --cached`, `git write-tree`, `git commit-tree -p origin/master`), push it, then `git reset
-  --soft <new>` and `git reset <new> -- <paths the remote changed>`.
-- Workers must never `git stash`/reset/checkout (one did a stash/pop in batch 9; no loss). Rule is in worker_rules.
-- Push helper: scratchpad `push_onto_remote.sh` does the temporary-index rebuild above (recreate it if the scratchpad
-  was cleared).
-- Batch 8 workers: render/UI, characters/scene nodes, misc new files; ADDITIVE header edits allowed for all, via the
-  Edit tool (scripted bulk edits of shared headers were denied by the permission classifier).
-- AddQuad/SetBlend out-of-line copies come from the effect-sprite callers (0x725440/0x725990); their only other
-  original caller is the 29 KB 0x71e010.
-- Never add address-taking tables or data that only force COMDAT emission (one was removed from sound_file.cpp).
-- Sound engine (0x7be000-0x7c6220, JP sound3d not matched) is ported from Ghidra + EN bytes: 67 matched in batch 8.
-- (old) Batch 7 ownership: game worker = node/anim/char/game headers and their sources; engine worker = vec4, containers,
-  texture_mgr, render, slot_table, buffer_pool, engine, ime, world files; misc worker = only the new files it creates.
+- Batches 1-11 matched Node, Vec4/Matrix4/Box, containers, AnimModel, camera, IME, engine/render, texture manager,
+  mesh/model bank (incl. lighting, shadows), Game script, mouse, config, MMV, GameFile, sound engine (0x7be000-0x7c6220,
+  ported from Ghidra + EN bytes), Steam cloud/user/text input, matrix builders, enemy AI, screen fade, menus.
+- **Gate discipline:** read the build's PROGRESS/RULES lines and check_matches output BEFORE staging; stop on any LOST
+  that is not a verified rename. Commit e26943f was pushed with a report from a worker's mid-edit header breakage
+  (555, 83 LOST); 63004d4 repaired it. Chain the commit with `&&` after the gate, never `;`.
+- Headers live in `include/`, one owner per worker; ADDITIVE edits by anyone via the Edit tool, then rebuild the
+  includers. Grep `include/` for a type or an EN data address before declaring it.
+- Worker rules: scratchpad `worker_rules.txt` (rules, tools, habits, checks before reporting). Give each worker 15-20
+  functions of one area; resume a worker for 2-3 rounds, then start a fresh one (contexts grow past 250K).
+- Workers never `git stash`/reset/checkout/switch; never sed -i over shared files; backslash strings only via Edit/Write.
+- Push: plain push usually works now (CI no longer commits meters). Fallback: scratchpad `push_onto_remote.sh`
+  (temporary-index rebuild on origin/master, then soft reset).
+- Never add address-taking tables or macros that only force COMDAT emission.
+- Blocked: launcher (164 EN-only functions) needs the VS2013 MFC headers (Express has no `VCtlmfc`; NOTES);
+  `Game::~Game` 0x5a1150 needs Node dtor + EN Object base.
+- Batch 11 workers stopped on the weekly API limit; their partial work is committed. Lists still open in the
+  scratchpad: list_sec2b, rest of list_sec3b, list_sec3c, list_sec4.
 
 ## Next steps
-1. Section 2 of `QUEUE.md` by JP file: scene_node (37 left), char_move (18), model_params (17, AnimModel),
-   app_0003/app_0010/actor_scan, model_bank, collide_query, char_effects/attach, then the larger files.
-2. Section 3 (JP twin unmatched) and 4 (EN-only) after section 2 thins out.
+1. Section 2 rest (99, large): FontRandom_Load, File_Checksum, then by JP file.
+2. Section 3 small/medium functions (JP twin unmatched; port from Ghidra + EN bytes).
+3. Section 4 EN-only outside the launcher.
 
 ## Continuation prompt
 "Continue the Gurumin EN (Steam) matching decompilation. cd to the repository, read `decomp_en/HANDOFF.md`

@@ -157,7 +157,9 @@ struct Playback
 
 struct AnimModel
 {
-    char m_0000[0x70];            // 0x000: not yet named
+    char m_0000[0x12];            // 0x000: not yet named
+    char m_0012;                  // 0x012: set to 2 every frame by the hovering characters
+    char m_0013[0x70 - 0x13];     // 0x013: not yet named
     int collisionFilter;          // 0x070: collision filter of the model's world tests (g_collisionFilter while they run)
     char m_0074[0x76 - 0x74];     // 0x074: not yet named
     char uiAnimStarted;           // 0x076: set to 1 by UiAnim_Play (read on the first model only)
@@ -186,11 +188,18 @@ struct AnimModel
     {
         int switchNode;           // 0x270: node id of the switch this character works (switch characters only)
         int bankIndex;            // 0x270: a model-bank record's own index in the bank (bank models only)
+        int scriptFlag;           // 0x270: script flag set when an enemy is destroyed, 0 = none (Enemy_Destroy)
     };
-    int burst;                        // 0x274: 1 once the balloon burst (balloon slots only)
+    union
+    {
+        int burst;                    // 0x274: 1 once the balloon burst (balloon slots only)
+        int leftModel;                // 0x274: index of the model an enemy leaves behind when destroyed (g_leftModelPaths)
+    };
     int blastAngle;                   // 0x278: direction of the last blast on the balloon, in thousandths of a radian
     int blastPush;                    // 0x27c: strength of the last blast push on the balloon
-    char m_0280[0x290 - 0x280];       // 0x280: not yet named
+    char m_0280[0x288 - 0x280];       // 0x280: not yet named
+    int defeatState;                  // 0x288: set to 6 when the character is destroyed (Enemy_Destroy)
+    int defeatCancel;                 // 0x28c: cleared when destroyed; set again by a script to cancel the removal
     float m_0290;            // 0x290: cleared when the model is placed
     int walkingRoute;             // 0x294: 1 while the character walks a route (cleared when the player gets a helmet)
     Playback *playback;           // 0x298: the motion playback state (allocated on first use)
@@ -264,7 +273,8 @@ struct AnimModel
 
     int SetTrackCOptions(int playing, int looping);                      // EN 0x743960 (JP 0x10161b40)
     int SetMotionOptions(int playing, int looping);                      // EN 0x745c00 (JP 0x10161be0)
-    int SetTrackBOptions(int playing, int looping);                      // EN 0x7469b0 (JP 0x10161f60)
+    int RunRootCall(int a, int b);                                       // EN 0x73f750: calls Node::UnrecoveredCall on the node tree, 0 when there is none
+    int SetTrackBOptions(int playing, int looping);                   // EN 0x7469b0 (JP 0x10161f60)
     int AddTrackCKey(int frame, float x, float y, float z);              // EN 0x70ad20 (JP 0x10161af0)
     int AddTrackCKeyFlagged(int frame, float x, float y, float z, char flag);   // EN 0x70ad90 (JP 0x10161a90)
     int StepMotion();                                                    // EN 0x70bea0 (JP 0x10161c00): advances the motion channel one frame

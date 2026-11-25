@@ -17,6 +17,10 @@ const int KEY_PROMPT_COUNT = 0x100;
 extern "C" Game g_dialogGame;
 // First character of the dialog message text (0 = no message). EN 0x00a20c80 (JP DAT_1020e0f8).
 extern "C" char g_dialogMessage[];
+// First character of the banner text drawn at the upper left (0 = none). EN 0x00a20c40 (JP DAT_10210ae8).
+extern "C" char g_bannerText[];
+// Fade-in counter of the banners, 15 = fully visible. EN 0x00a20c3c (JP DAT_104bf8d8).
+extern "C" int g_bannerFade;
 // Sound engine call that stops its looping sounds; non-zero when it did something. EN 0x009094c4 (JP FUN_10001b40).
 extern "C" int (*g_soundArcStopLoops)(void);
 // Ring of the last values pushed by History_Push, and the next write index. EN 0x00908134, 0x00920028.
@@ -26,6 +30,13 @@ extern "C" int g_historyNext;
 extern "C" int g_keyPromptShown[KEY_PROMPT_COUNT];
 extern "C" int g_keyPromptKey[KEY_PROMPT_COUNT];
 extern "C" int g_keyPromptFrames[KEY_PROMPT_COUNT];
+// Balloon sheet slots of g_dialogGame indexed by sheet: 0 = texBalloon5, 1 = texBalloon6, 0x18 = texBalloon7 (the original
+// indexes the Game object's texture slots as an array, EN 0x00a152b4 = g_dialogGame + 0x1c; JP DAT_104b721c).
+extern "C" int g_dialogGameSlots[];
+// Size of the key prompt balloon in pixels (the drawn cell is half of it plus 15). EN 0x00a1ddf0 (JP DAT_104bf88c).
+extern "C" int g_keyPromptSize;
+// Draws the key prompt balloon above every character that has one. Returns 0. EN 0x5cdcd0 (JP 0x1000d6b0).
+extern "C" int KeyPrompt_DrawAll(const Matrix4 *view);
 
 // Texture slots held by the overlay mode, and the bytes of its state block.
 const int OVERLAY_TEXTURE_COUNT = 0x22;
@@ -47,6 +58,11 @@ extern "C" int g_overlayModelValueF;                         // EN 0x00920884 (J
 extern "C" int g_overlayModelValueG;                         // EN 0x00920b18 (JP DAT_104c03e4)
 extern "C" int g_overlayPages[OVERLAY_TEXTURE_COUNT];        // EN 0x00920990 (JP DAT_1030c908): script flag of each page (0 = no page)
 extern "C" int g_overlayTextures[OVERLAY_TEXTURE_COUNT];     // EN 0x00920e48 (JP DAT_1030b870): texture slots of the overlay, -1 = none
+extern "C" Vec4 g_overlayCameraEye;                          // EN 0x01337498 (JP DAT_10c66edc): camera position the overlay model is drawn from
+extern "C" Vec4 g_overlayCameraTarget;                       // EN 0x015e9a90 (JP DAT_10edbdf8): point the overlay camera looks at
+extern "C" float g_overlayProgress;                          // EN 0x00920e20 (JP DAT_104c03ec): opening progress of the overlay, 0..1
+// Draws the overlay model, if any, from the overlay camera. Returns 0. EN 0x5e2320 (JP 0x100236c0).
+int Overlay_DrawModel();
 
 // Labels of the yes/no dialog's two choices ("Yes" and "No"). EN 0x84a674, 0x84a678.
 extern "C" const char g_textYes[];

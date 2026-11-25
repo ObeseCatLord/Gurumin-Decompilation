@@ -9,6 +9,7 @@
 #include "render_queue.h"
 #include "containers.h"
 #include "mesh_cache.h"
+#include "node_cache.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1480,5 +1481,22 @@ int Node::RemoveChild(Node *child, int keep)
     }
     childCount--;
     children[j] = 0;
+    return 0;
+}
+
+// NodePool_ReleaseAll: releases and frees every cached model tree (the 0x80-entry cache of loaded model files). Returns
+// 0. Lives in this file because the original inlines Node::Release into it. Called when the game shuts the model
+// cache down.
+extern "C" int NodePool_ReleaseAll(void)
+{
+    for (int i = 0; i < NODE_CACHE_SIZE; i++)
+    {
+        if (g_cachedNodes[i] != 0)
+        {
+            g_cachedNodes[i]->Release();
+            g_engineFree(g_cachedNodes[i]);
+            g_cachedNodes[i] = 0;
+        }
+    }
     return 0;
 }

@@ -45,7 +45,8 @@ struct SlotTable
     int built;                // 0x48: 1 once the buffers are filled
     int bufferSlot;           // 0x4c: shared model file this mesh was loaded from (negative = none)
 
-    int SetRange(int newFirst, int newLast);            // EN 0x77bf40 (JP 0x10146d90)
+    SlotTable();                                        // EN 0x77be10: a reset table
+    int SetRange(int newFirst, int newLast);          // EN 0x77bf40 (JP 0x10146d90)
     int SetMaterial(int index, int value);              // EN 0x77cfa0 (JP 0x101476e0)
     int ReplaceMaterial(int key, int value);            // EN 0x77cf50 (JP 0x10147690)
     int Reset();                                        // EN 0x7a4010 (JP 0x10145a10): no texture slot, no entries, every pointer cleared

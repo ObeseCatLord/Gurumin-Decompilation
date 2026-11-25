@@ -133,6 +133,21 @@ extern "C" void Steam_UnlockAchievement(const char *name);
 extern "C" void Steam_GetEnteredText(char *text, unsigned size);
 // Opens the on-screen text input and remembers that it is open. EN 0x00646a90.
 extern "C" void Steam_ShowTextInput(const char *description, unsigned maxCharacters);
+// Steam callback payload GamepadTextInputDismissed_t (callback id 714, 8 bytes).
+struct GamepadTextInputDismissed {
+    bool submitted;                // 0x00: true when the player confirmed the text
+    unsigned int submittedLength;  // 0x04: length of the submitted text
+};
+
+// Receiver of the on-screen text input callback (the game's CCallback target).
+struct TextInputReceiver {
+    char *submittedOut;            // 0x00: where the "text was submitted" flag is stored
+    // EN 0x7a9d00: copies the flag out and marks the input as dismissed (g_steamTextInputShown = 2).
+    void OnDismissed(const GamepadTextInputDismissed *result);
+};
+// Value of g_steamTextInputShown once the on-screen input was dismissed.
+const int STEAM_TEXT_INPUT_DISMISSED = 2;
+
 // Set once the on-screen text input has been shown. EN 0x00924d50.
 extern int g_steamTextInputShown;
 

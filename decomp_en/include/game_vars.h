@@ -17,6 +17,9 @@ const int SOUND_LOOP_COUNT = 0x44c;
 const short SOUND_LOOP_FREE = -11;
 
 extern "C" signed char g_itemStock[ITEM_COUNT];   // EN 0x009e3400 (JP DAT_103150c0): stock per item id, saved with the game
+extern "C" char g_itemChanged[ITEM_COUNT];            // EN 0x009e3480: 1 = the stock of this item changed (set by Inventory_Add)
+// Adds *amount of item *index (see inventory_add.cpp). EN 0x5ec460 (JP 0x10012130).
+extern "C" int Inventory_Add(int *index, int *amount);
 
 // Message window state (game_state.cpp).
 extern "C" int g_messageFrames;                   // EN 0x00b493e0 (JP DAT_104bfd4c): frames the message stays up

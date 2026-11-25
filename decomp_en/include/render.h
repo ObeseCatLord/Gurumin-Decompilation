@@ -68,6 +68,8 @@ extern "C" IDirect3DSurface9 *g_savedDepthSurface;                // EN 0x021a35
 extern "C" IUnknown *g_dynamicVertexBuffer2D;                     // EN 0x021a3600 (JP DAT_10f654ac): dynamic vertex buffer of the 2D drawing code
 extern "C" int g_splitScreen;                                     // EN 0x021e3610 (JP DAT_10f65480): 0 = whole screen, 1 = left half, 2 = right half
 extern "C" int g_stageBindingsReset;                              // EN 0x021e3614 (JP DAT_10f6548c): set to 0 whenever the texture stages are unbound by a target reset
+// Unbinds the texture stages and restores the saved render target and viewport (render_restore.cpp). EN 0x7a4160 (JP 0x1014b390).
+extern "C" void Render_RestoreTarget(void);
 extern "C" int g_swapTargetInUse;                                 // EN 0x021e8d4c (JP DAT_10f65490): swap target in use (0 or 1)
 extern "C" int g_swapTargetSaved;                                 // EN 0x021e8d50 (JP DAT_10f65494): swap target in use before a screen transition started
 extern "C" int g_transitionsEnabled;                              // EN 0x00908b34 (JP DAT_10203344): non-zero = screen transitions are allowed

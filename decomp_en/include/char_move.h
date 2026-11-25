@@ -55,8 +55,9 @@ extern "C" int Npc_WaitFacingAway(int index);
 // Sets the movement impulse of character `index` from (x, y, z). EN 0x5b98a0 (JP 0x100241e0).
 extern "C" int Character_SetMove(int index, float x, float y, float z);
 
-// Wakes the enemies within `radius` of character `index` (the third argument is 0 for every caller seen so far). EN 0x6ac0e0 (JP 0x1001b670).
-extern "C" int Enemies_WakeNearby(int index, float radius, int unknown);
+// Wakes the enemies within `radius` of character `index`. `count` behaviour numbers follow (0 = wake every enemy; callers pass 1 and
+// 15 to wake only enemies with behaviour 15). EN 0x6ac0e0 (JP 0x1001b670).
+extern "C" int Enemies_WakeNearby(int index, float radius, int count, ...);
 // Keeps NPC `index` idling until the player comes near, then makes it face the player and talk. EN 0x6d6220 (JP 0x100b58a0).
 extern "C" int Npc_TalkWhenNear(int index, int wakeEnemies);
 

@@ -75,6 +75,17 @@ struct MultiTexVertex
 };
 
 // A texture object (0x38 bytes) owning a Direct3D texture; only the members EN code has used are named.
+// TextureObject::Create alpha argument: no alpha image, or one of the two generated alpha kinds (any larger value is a
+// pointer to an alpha image: one byte per pixel at every third byte of an RGB-sized buffer).
+const int TEXTURE_ALPHA_NONE = 0;
+const int TEXTURE_ALPHA_GENERATED_1 = 1;
+const int TEXTURE_ALPHA_GENERATED_2 = 2;
+// Largest width or height of a texture.
+const int TEXTURE_MAX_SIDE = 0x800;
+// Bytes per pixel of the RGB source images, and the share of speckled pixels (alpha kept when random & 7 < 2).
+const int TEXTURE_SOURCE_BYTES = 3;
+const int TEXTURE_SPECKLE_MASK = 7;
+const int TEXTURE_SPECKLE_KEEP = 2;
 struct TextureObject
 {
     IDirect3DTexture9 *texture;   // 0x00: the Direct3D texture
@@ -87,7 +98,8 @@ struct TextureObject
     int poolSlot;                 // 0x1c: non-zero when the frames live in the buffer pool
     int sourceAlpha;              // 0x20: alpha of the source image: a pixel buffer or an ALPHA_* mode
     const unsigned char *sourcePixels;   // 0x24: kept source pixels (0 = none kept)
-    int m_0028;                   // 0x28: not yet named
+    char hasOwnAlpha;             // 0x28: 1 when the source has an alpha image of its own (not generated)
+    char m_0029[3];               // 0x29: padding
     int sourceWidth;              // 0x2c: width of the source image
     int sourceHeight;             // 0x30: height of the source image
     int generatedAlpha;      // 0x34: 1 when the alpha is generated: rebuilt after a device reset

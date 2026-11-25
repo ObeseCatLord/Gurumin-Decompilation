@@ -35,6 +35,7 @@ struct Vec4
     void RotateX(float angle);                       // EN 0x779200 (JP 0x101ac440): rotates the y/z part about the x axis
     void RotateY(float angle);                       // EN 0x779300 (JP 0x101ac3a0): rotates the x/z part about the y axis
     int InBoxMargin(const Box2 *box, float margin);  // EN 0x774b10 (JP 0x101ac740): inside the box grown by `margin`
+    int InBoxAspect(const Box2 *box, float aspect);  // EN 0x774a70 (EN-only widescreen variant of InBox, not ported yet): InBox with the x range scaled by 1 / aspect around the box centre (aspect 1 = the box itself)
 
     Vec4 operator+(const Vec4 &other) const;         // EN 0x76f720 (JP 0x101ac9e0)
     Vec4 operator-(const Vec4 &other) const;         // EN 0x76f6d0 (JP 0x101aca40)

@@ -28,7 +28,8 @@ struct EffectModel
     int changed;        // 0xb04: 1 after a key or the rotation was changed
 
     EffectModel();      // EN 0x5a0fa0 (JP 0x1000be40): members construct themselves
-    int Free();       // EN 0x63f320 (JP 0x1000be10): releases the model, the slot is free again
+    ~EffectModel();     // EN 0x5a1140: members destroy themselves (the matrix has the only real destructor)
+    int Free();     // EN 0x63f320 (JP 0x1000be10): releases the model, the slot is free again
     void AddKey(int frame, float x, float y, float z);        // inline: adds a position key
     void SetRotation(float x, float y, float z);              // inline: sets the rotation in degrees
     int DrawKeyed(Matrix4 &view, Matrix4 &camera);            // EN 0x5a8790 (JP 0x10037b40): plays one frame with the key frames applied
@@ -59,5 +60,9 @@ extern "C" int EffectModel_Place(const char *path, float x, float y, float z, in
 // Same with a colour. EN 0x5a1e10.
 extern "C" int EffectModel_PlaceColoured(const char *path, float x, float y, float z, int start, float ox, float oy,
                                          float oz, const Vec4 &colour);
+
+// Queues every visible effect model slot for drawing: through the camera view, or through its own fixed camera. Returns 0.
+// EN 0x5cbd30 (JP EffectModel::Draw 0x1000baf0, called for every slot).
+int MeshSlots_DrawAll(void);
 
 #endif

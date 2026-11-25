@@ -50,6 +50,10 @@ const int TRIGGER_ANY_MAP = 9999;
 // Bytes of the script token buffer.
 const int SCRIPT_TOKEN_SIZE = 0x80;
 
+// Ids a DEAD event waits for besides its argument.
+const int TRIGGER_ID_COUNT = 5;
+// Highest killed-list index (ids above it count as the last entry).
+const int KILLED_LAST = 0x5f;
 // Event trigger (0xc8 bytes): runs when its map matches and all four script flags pass.
 struct GameTrigger
 {
@@ -57,8 +61,16 @@ struct GameTrigger
     int flags[4];               // 0x04: script flags that must be set (negative = must be clear, 0 = no condition)
     int value;                  // 0x14: event id (for map events)
     char name[0x10];            // 0x18: event name, e.g. "GAMEOVER", "KSKON", "TALK", "OPEN"
-    int argument;               // 0x28: what the event reacts to (for example the character or object id)
-    char m_002c[0xc8 - 0x2c];   // 0x2c: more event numbers and their labels (not used by EN code yet)
+    union
+    {
+        struct
+        {
+            int argument;               // 0x28: what the event reacts to (for example the character or object id)
+            int ids[TRIGGER_ID_COUNT];  // 0x2c: more ids a "DEAD" event waits for (all of them and `argument` must be killed)
+        };
+        int watched[TRIGGER_ID_COUNT + 1];   // 0x28: argument and ids as one list (the DEAD event checks all six)
+    };
+    char m_0040[0xc8 - 0x40];   // 0x40: more event numbers and their labels (not used by EN code yet)
 };
 
 // Entries a menu window can hold and the bytes of an entry's label.
@@ -190,6 +202,8 @@ struct Game : Object
     int FindNamedConstant(const char *name);        // EN 0x5e7ba0 (JP FindConstant)
     int SetWindowCallbackValue(int id, void (*callback)(int cursor, char *caption));  // EN 0x643390
     int SetWindowResult(int id, int *result);       // EN 0x6433e0
+    int SetCursorRemembered(int id, char value);    // EN 0x6458c0: sets cursorRemembered[id]
+    int SetValue7650(int value);                   // EN 0x643370: stores m_7650 (not named yet)
     int OpenWindow(int id, int x, int y, int width, int height);   // EN 0x5c9560 (JP 0x100084b0)
     int CloseWindow(int id);                        // EN 0x5ca0e0
     int SetWindowCursor(int id, int value);         // EN 0x6465e0
@@ -202,6 +216,7 @@ struct Game : Object
     int RaiseTalkEvents(int argument);              // EN 0x63c7c0
     int RaiseOpenEvents(int argument);              // EN 0x63c730
     int RaiseGameOverEvents();                      // EN 0x63c3e0
+    int MarkKilled(int id);                         // EN 0x63c170 (JP 0x10054770): marks `id` killed and raises the DEAD events whose ids are all killed
     int RaiseDoorEvents(int argument, int on);      // EN 0x63c2c0
     int RaiseLeverEvents(int argument, int on);     // EN 0x63c4f0
     int RaiseFireEvents(int argument, int on);      // EN 0x63c610
@@ -216,6 +231,7 @@ struct Game : Object
     int DrawPanel(int x, int y, int w, int h, float z, float alpha);       // EN 0x5e27f0 (JP DrawPanel)
     int DrawPanelAlt(int x, int y, int w, int h, float z, float alpha);    // EN 0x5e2730
     int DrawCursor(int x, int y, float fade, int frame);                   // EN 0x5cd420
+    int DrawDebugText(const char *text, int x, int y);   // EN 0x5e05b0 (JP 0x100091d0): draws `text` with the 8x16 debug font of menu sheet 1
     int DrawLabelledNumber(int value, int x, int y, float z, float fade, float scale, float alpha);  // EN 0x5dec10
 };
 

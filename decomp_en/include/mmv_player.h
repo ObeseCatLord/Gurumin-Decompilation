@@ -3,10 +3,18 @@
 #ifndef GURUMIN_EN_MMV_PLAYER_H
 #define GURUMIN_EN_MMV_PLAYER_H
 
+#include <stddef.h>
+
 struct TextureObject;
 
-// MmvPlayer::state value of a movie that is loaded but not playing.
+// MmvPlayer::state value of a movie that is loaded but not playing, and of one that played its last frame.
 const int MMV_STOPPED = 0;
+const int MMV_FINISHED = 2;
+// Movie type that is cut short, and how many frames it plays.
+const int MMV_TYPE_SHORT = 6;
+const int MMV_SHORT_FRAMES = 7;
+// Largest frame record that can be streamed from a file, and the buffer it is read into (EN 0x02201100).
+const unsigned int MMV_STREAM_MAX = 0x25800;
 
 // A file the movie is streamed from.
 struct MovieFile
@@ -15,6 +23,7 @@ struct MovieFile
     char name[0x20];  // 0x04: file name
 
     void Close();     // EN 0x7a8aa0 (JP 0x101b2330)
+    size_t Read(void *buffer, size_t size, size_t count);   // EN 0x7a8b20: fread from the open file
 };
 
 struct MmvPlayer
@@ -30,7 +39,8 @@ struct MmvPlayer
     void *m_003c;          // 0x3c: not yet named (non-zero while the file is open)
     short width;           // 0x40: movie width in pixels
     short height;          // 0x42: movie height in pixels
-    char m_0044[0x4a - 0x44];  // 0x44: movie type
+    char m_0044[0x48 - 0x44];  // 0x44: not yet named
+    short type;            // 0x48: movie type (type 6 plays only its first MMV_TYPE6_FRAMES frames)
     char ownsFrame;        // 0x4a: 1 when `frame` was allocated by the player
     char playing;          // 0x4b: 1 while the player holds a movie
     char state;            // 0x4c: playback state (MMV_STOPPED after Open)
@@ -54,6 +64,7 @@ struct MmvPlayer
 };
 
 extern "C" MmvPlayer g_moviePlayer;       // EN 0x00da7480 (JP DAT_10f08ab0): the movie player of the scene movies
+extern "C" unsigned char g_movieStreamBuffer[MMV_STREAM_MAX];   // EN 0x02201100: one frame record streamed from the movie file
 extern "C" int g_movieTextureSlot;        // EN 0x00908130 (JP DAT_10202478): texture slot the scene movie is drawn into
 extern "C" int g_movieFrameCount;         // EN 0x0091fe18 (JP DAT_104bfe74): frame count of the scene movie
 

@@ -21,6 +21,11 @@ extern "C" char g_textureFileNames[TEXTURE_FILE_COUNT][FILE_NAME_SIZE];   // EN 
 // Bytes of video memory the engine counts for its textures (16 bit pixels with all mip levels). EN 0x0166d000 (JP DAT_1101d874).
 extern "C" int g_textureMemoryBytes;
 
+// Adds a reference to a shared texture file and returns the new count. EN 0x70b690.
+extern "C" int TextureFile_AddRef(const TextureRef *texture);
+// Returns 0 when a free entry exists in the texture file name table, -1 when it is full. EN 0x70bbe0.
+extern "C" int TextureNames_FindFree(void);
+
 // Releases one reference to a shared texture file (freeing the name at 0). Returns the remaining count. EN 0x71cf00.
 extern "C" int TextureFile_Release(const TextureRef *texture);
 

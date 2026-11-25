@@ -100,6 +100,34 @@ int EffectManager::RemoveOfType(int type)
     return 0;
 }
 
+// Stops every running effect whose start options name `owner` (character index + 100), including the effects attached
+// to it. Called when a character is removed or its effects must end. Returns 0. EN 0x747b50 (JP 0x101883b0).
+int EffectManager::RemoveOwnedBy(int owner)
+{
+    for (int list = 0; list < EFFECT_LIST_COUNT; list++)
+    {
+        for (int i = g_effectListFirst[list]; i > -1; i = g_effectRecords[i].next)
+        {
+            if (g_effectRecords[i].id > -1 && g_effectRecords[i].options.owner == owner)
+            {
+                g_effectRecords[i].id = EFFECT_NONE;
+                if (g_effectRecords[i].prev == -1)
+                    g_effectListFirst[list] = g_effectRecords[i].next;
+                else
+                    g_effectRecords[g_effectRecords[i].prev].next = g_effectRecords[i].next;
+                if (g_effectRecords[i].next != -1)
+                    g_effectRecords[g_effectRecords[i].next].prev = g_effectRecords[i].prev;
+                else
+                    g_effectListLast[list] = g_effectRecords[i].prev;
+                if (g_effectRecords[i].light != EFFECT_NO_LIGHT)
+                    g_effectLights[g_effectRecords[i].light].active = 0;
+                RemoveChildren(i);
+            }
+        }
+    }
+    return 0;
+}
+
 // Full initialisation at load time: the colour becomes white, the effect batch is bound to its buffer, the used nodes
 // of the effect node pool are released, every table is cleared and marked free, the lists are emptied, the six group
 // offsets set and the default definition added. The sixth offset is uninitialised in the original, as in Reset.

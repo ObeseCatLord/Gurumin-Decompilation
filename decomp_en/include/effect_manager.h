@@ -202,6 +202,7 @@ struct EffectManager
     int DrawSpriteB(int index, const Matrix4 &view, const Matrix4 *camera);
     int RemoveChildren(int parent);   // EN 0x747950 (JP 0x10172260): stops every effect attached to record `parent`
     int RemoveOfType(int type);       // EN 0x747a50 (JP 0x10188490): stops every effect whose definition has type `type`
+    int RemoveOwnedBy(int owner);     // EN 0x747b50 (JP 0x101883b0): stops every effect started by `owner` (character index + 100)
     // Full initialisation at load time: Reset plus the node pool release and the effect definitions. Returns 0. EN 0x734e60 (JP 0x101842a0).
     int Init();
     int AddDefaultDefinition();   // EN 0x73ede0 (JP 0x1016f900): adds the default effect definition to the table (not ported yet)

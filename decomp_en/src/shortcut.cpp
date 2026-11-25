@@ -55,3 +55,36 @@ HRESULT __stdcall CreateShortcut(const char *target, const char *linkFile, const
     CoUninitialize();
     return result;
 }
+
+// Characters of the desktop path buffer and of the shortcut path.
+const int SHORTCUT_PATH_SIZE = 0x104;
+
+// Deletes the desktop shortcut called `name` (the file "<desktop folder>\<name>.lnk"). The desktop folder comes from
+// the shell (an empty path when the shell cannot be asked). Always returns 0. Called by the uninstaller menu.
+// EN 0x7a9f00 (JP 0x1013e260).
+int __stdcall DeleteDesktopShortcut(const char *name)
+{
+    char desktop[SHORTCUT_PATH_SIZE];
+    char path[SHORTCUT_PATH_SIZE];
+    IMalloc *allocator;
+    LPITEMIDLIST list;
+
+    memset(desktop, 0, sizeof(desktop));
+    memset(path, 0, sizeof(path));
+    if (SHGetMalloc(&allocator) >= 0)
+    {
+        SHGetSpecialFolderLocation(GetDesktopWindow(), CSIDL_DESKTOP, &list);
+        SHGetPathFromIDListA(list, desktop);
+    }
+    size_t length = strlen(desktop);
+    if (desktop[length - 1] != SHORTCUT_PATH_SEPARATOR)
+    {
+        desktop[length] = SHORTCUT_PATH_SEPARATOR;
+        desktop[strlen(desktop) + 1] = 0;   // the original terminates one byte after the end (harmless: the buffer is zeroed)
+    }
+    strcpy(path, desktop);
+    strcat(path, name);
+    strcat(path, ".lnk");
+    DeleteFileA(path);
+    return 0;
+}

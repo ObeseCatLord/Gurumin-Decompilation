@@ -20,6 +20,7 @@ extern "C" char g_titleCaptionText[CAPTION_TEXT_SIZE]; // EN 0x01664ac0 (JP DAT_
 extern "C" int g_titleCaptionTimer;                    // EN 0x01664abc (JP DAT_1101d9b8): title caption timer, 0 = just started
 
 
+#include "containers.h"
 #include "node.h"
 #include "vec4.h"
 
@@ -32,9 +33,11 @@ extern "C" int g_cameraPathCount;           // EN 0x01664694 (JP DAT_1101d89c): 
 extern "C" int g_cameraMoveFramesLeft;      // EN 0x016646a0 (JP DAT_1101d8a8): frames left in the camera move
 extern "C" Vec4 g_cameraEye;                // EN 0x021ffed8 (JP DAT_10f65688): camera position
 extern "C" Vec4 g_cameraTarget;             // EN 0x02200ee8 (JP DAT_10f668e8): camera target
+extern "C" Vec4 g_cameraTargetMapPass;      // EN 0x021ffe68 (JP DAT_10f66908): camera target while the map pass is running
 
-// Collects the camera paths of move `moveId` into *pathCount. EN 0x744e40 (JP 0x1016ac90).
-extern "C" int Camera_CollectPaths(int moveId, int moveIdAgain, int *pathCount);
+// Adds every camera path in the node tree under `node` to the path tables at *pathCount (`root` is the tree names are
+// looked up under; the function calls itself for the children). Returns 0. EN 0x744e40 (JP 0x1016ac90).
+int Camera_CollectPaths(Node *root, Node *node, int *pathCount);
 
 // Builds the view and projection matrices for a camera at `eye` looking at `target`. EN 0x759300 (JP 0x10194360).
 int Camera_SetMatrices(const Vec4 *eye, const Vec4 *target, Matrix4 *view, Matrix4 *projection, float roll);
@@ -66,6 +69,17 @@ extern "C" Vec4 g_cameraPreviousTarget;          // EN 0x01611c58 (JP DAT_10f08a
 extern "C" Vec4 g_cameraOrbitCentre;            // EN 0x015e9da8 (JP DAT_108393d8): the point the orbit shot circles (w: its heading)
 extern "C" Vec4 g_cameraPlayerPosition;         // EN 0x0147ba78 (JP DAT_10da93f0): the orbit centre, the player's position
 extern "C" Node *g_cameraDriftNode;             // EN 0x0091500c (JP DAT_1021c624): a node the orbit target drifts towards (0 = none)
+
+// Two-character shot (Camera_Between): the script's parameters.
+const float BETWEEN_HEAD_OFFSET = 35.0f;         // goal height above a character's head node
+const float BETWEEN_BODY_OFFSET = 75.0f;         // goal height above a character without a head node
+const float BETWEEN_AHEAD = -600.0f;             // y of the target goal behind the first character when there is no second one
+const float BETWEEN_BELOW = -60.0f;              // z of that target goal
+const float BETWEEN_NO_POSITION = -20000.0f;     // position goal x at or below this: the position goal was not set
+const float BETWEEN_RISE_PER_CENT = 0.01f;       // one per cent
+extern "C" Vec4 g_cameraBetweenParams;           // EN 0x00daa850 (JP DAT_10da93e0): x = first character, y = second (negative = none), z = per cent of the distance the target goal rises
+// Camera_Between: the shot between two characters. EN 0x64d540 (JP 0x10019d80).
+extern "C" int Camera_Between(void);
 
 // Item stand shot (Camera_ItemStand).
 const int ITEM_STAND_SPARKLE_EFFECT = 0x75f;      // effect started above the target goal every ITEM_STAND_SPARKLE_PERIOD frames
@@ -105,7 +119,76 @@ extern "C" char g_cameraPushLeftFrames;          // EN 0x0162ef63 (JP DAT_10faaa
 extern "C" int g_cameraState1664448;             // EN 0x01664448 (JP DAT_1101d888): not recovered, cleared with the camera
 extern "C" int g_cameraState1664fe0;             // EN 0x01664fe0 (JP DAT_1101d898): not recovered, cleared with the camera
 
+// More camera state cleared by Camera_Reset (uses not recovered yet; the JP twin's names are given where the JP order
+// identifies them).
+const float CAMERA_RESET_RATE = 12.0f;           // g_cameraRate after the reset
+const int CAMERA_SHOT_SLOT_COUNT = 4;            // scripted-camera slots (one easing exponent each)
+extern "C" int g_cameraState1664418;             // EN 0x01664418 (JP DAT_1101de20)
+extern "C" char g_cameraFlag1664468;             // EN 0x01664468 (JP DAT_10faa678)
+extern "C" char g_cameraFlag162ef61;             // EN 0x0162ef61 (JP DAT_1101de38)
+extern "C" float g_cameraRate;                   // EN 0x009089e8 (JP DAT_10203450): 12 after the reset
+extern "C" float g_cameraScale;                  // EN 0x00908a1c (JP DAT_10203448): 1 after the reset
+extern "C" int g_cameraState1664444;             // EN 0x01664444 (JP DAT_10fe01d0)
+extern "C" float g_cameraShotEase[CAMERA_SHOT_SLOT_COUNT];   // EN 0x009089f0 (JP DAT_10203454..60): easing exponent of each scripted camera slot, 1 after the reset
+extern "C" int g_cameraState166444c;             // EN 0x0166444c (JP DAT_1101de28)
+extern "C" int g_cameraState1664450;             // EN 0x01664450 (JP DAT_1101de2c)
+extern "C" int g_cameraCounter9089ec;            // EN 0x009089ec (JP DAT_10203440): 1 after the reset
+extern "C" int g_cameraState1664fd0;             // EN 0x01664fd0 (JP DAT_1101d890): 1 while a path camera runs
+extern "C" int g_cameraState1664178;             // EN 0x01664178 (JP DAT_1101d894)
+extern "C" int g_cameraState166469c;             // EN 0x0166469c (JP DAT_1101d8a4): the current path
+extern "C" int g_cameraState16646a4;             // EN 0x016646a4 (JP DAT_1101d8ac)
+extern "C" int g_cameraState1664204;             // EN 0x01664204 (JP DAT_1101d8b0)
+extern "C" int g_cameraState1664ab8;             // EN 0x01664ab8 (JP DAT_1101d8b4)
+extern "C" int g_cameraState1664fe4;             // EN 0x01664fe4 (JP DAT_1101ddd0)
+extern "C" int g_cameraState166cfec;             // EN 0x0166cfec (JP DAT_1101ddd4)
+extern "C" int g_cameraState166cff0;             // EN 0x0166cff0 (JP DAT_1101ddd8)
+extern "C" float g_cameraState1664210;           // EN 0x01664210 (JP DAT_1101dddc)
+extern "C" int g_cameraState166cff4;             // EN 0x0166cff4 (JP DAT_1101dde0[0].m_0000)
+extern "C" int g_cameraState1664200;             // EN 0x01664200 (JP DAT_1101dde8)
+extern "C" int g_cameraState1664208;             // EN 0x01664208 (JP DAT_1101ddec)
+extern "C" float g_cameraScale9089e4;            // EN 0x009089e4 (JP DAT_1020344c): 1 after the reset
+extern "C" int g_cameraState1664a30;             // EN 0x01664a30 (JP DAT_1101ddf0)
+extern "C" float g_cameraPathFrame;              // EN 0x016646a8 (JP DAT_1101c800): frame of the path
+extern "C" int g_cameraState1664214;             // EN 0x01664214 (JP DAT_10ff19e0)
+extern "C" int g_cameraState166cfe8;             // EN 0x0166cfe8 (JP DAT_1101872c)
+extern "C" int g_cameraState1664fd4;             // EN 0x01664fd4 (JP DAT_11018734)
+extern "C" int g_cameraState166cff8;             // EN 0x0166cff8 (JP DAT_11018728)
+extern "C" int g_cameraState166cffc;             // EN 0x0166cffc (JP DAT_10ff2ff4)
+extern "C" int g_cameraState1664680;             // EN 0x01664680 (JP DAT_10feb3d8)
+extern "C" float g_cameraTargetPathDistance;     // EN 0x0166420c (JP DAT_10ff2ff0): distance of the camera target to the path frame
+// Vec4 values cleared by Camera_Reset (JP names in the comments).
+extern "C" Vec4 g_cameraPushOffset;              // EN 0x0217b640 (JP DAT_11af3f58): the camera-space push of the player (x, y; z is 0)
+extern "C" Vec4 g_cameraPositionCopyB;           // EN 0x0217b5c0 (JP DAT_11af3e38)
+extern "C" Vec4 g_cameraTargetCopyB;             // EN 0x01ee4910 (JP DAT_118e6c88)
+extern "C" Vec4 g_cameraPositionCopyC;           // EN 0x0217b5d0 (JP DAT_11af3e48)
+extern "C" Vec4 g_cameraTargetCopyC;             // EN 0x01ee4920 (JP DAT_118e6c98)
+extern "C" Vec4 g_cameraPositionCopyD;           // EN 0x0217b5e0 (JP DAT_11af3e58)
+extern "C" Vec4 g_cameraTargetCopyD;             // EN 0x01ee4930 (JP DAT_118e6ca8)
+extern "C" Vec4 g_cameraVectorSpare;             // EN 0x01da7eb0 (JP DAT_118e6cd8)
+
+// Clears the camera globals: vectors, goals, blend and cut counters. EN 0x741c50 (JP 0x1016a980).
+extern "C" int Camera_Reset(void);
+
 // Zeroes the camera vectors and the per-frame camera state of a new player position. EN 0x70bc30 (JP 0x1016a8f0).
 extern "C" int Player_ResetMotion(void);
+
+// Camera path tables (filled by Camera_CollectPaths, one entry per path).
+// Settings of a camera path (0x10 bytes).
+struct PathSettings
+{
+    int m_0000;      // 0x00: copied from Node::m_187c of the path node
+    int m_0004;      // 0x04: copied from Node::m_187d of the path node
+    int m_0008;      // 0x08: 1 when the path or its target node has the flag 0x20
+    int m_000c;      // 0x0c: 1 when the target node has the flag 0x10
+};
+extern "C" KeyTrack g_pathCameraTracks[];       // EN 0x01ee4630 (JP DAT_11af3928): per path: the camera position track
+extern "C" KeyTrack g_pathTargetTracks[];       // EN 0x01ee4960 (JP DAT_118e69f8): the position track of each path's target
+extern "C" KeyTrack g_pathSecondTracks[];       // EN 0x01ee4be0 (JP DAT_118e96f8): the track of the "...b" node
+extern "C" KeyTrack g_pathSecondTargetTracks[]; // EN 0x0217b650 (JP DAT_11af3ba8): the second target track
+extern "C" int g_pathIds[];                     // EN 0x01664a38 (JP DAT_10f8d938): id of each path
+extern "C" int g_pathActive[];                  // EN 0x01664180 (JP DAT_11018740): 1 = active
+extern "C" int g_pathHasSecondTarget[];         // EN 0x01664930 (JP DAT_11018628): 1 = has a second target
+extern "C" int g_pathHasSecondNode[];           // EN 0x016649b0 (JP DAT_10fdeb10): 1 = has a "...b" node
+extern "C" PathSettings g_pathSettings[];       // EN 0x01664730 (JP DAT_10ff17e0)
 
 #endif

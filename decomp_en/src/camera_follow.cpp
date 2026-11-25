@@ -148,3 +148,63 @@ extern "C" int Camera_ItemStand(void)
     g_cameraPreviousTarget.Copy(g_cameraTargetNow);
     return 0;
 }
+
+// Camera_Between: a two-character shot. The position goal is the head of the character given by g_cameraBetweenParams.x
+// (35 units above its head node, or 75 above it without one), the target goal the head of character
+// g_cameraBetweenParams.y the same way, or 600 units ahead of and 60 below the first when that is negative. The target
+// goal rises by g_cameraBetweenParams.z per cent of the distance between them. The target and position then move 20 %
+// towards their goals plus 80 % towards their previous values, and the copies are refreshed. Returns 0. Called every
+// frame while the camera runs this shot.
+extern "C" int Camera_Between(void)
+{
+    if (g_cameraShotStarted == 0)
+    {
+        Camera_SetMode2();
+        g_cameraShotStarted = 1;
+    }
+    int first = (int)(g_cameraBetweenParams.x + 0.5f);
+    first = first > 0 ? first : 0;
+    float rounded = g_cameraBetweenParams.y < 0.0f ? g_cameraBetweenParams.y - 0.5f : g_cameraBetweenParams.y + 0.5f;
+    int second = (int)rounded;
+    if (g_characterModels[first].headNode != 0)
+    {
+        g_cameraPositionGoal.Copy(g_characterModels[first].headNode->worldMatrix.GetTranslation());
+        g_cameraPositionGoal.z += BETWEEN_HEAD_OFFSET;
+    }
+    else
+    {
+        g_cameraPositionGoal.Copy(g_characterModels[first].matrix.GetTranslation());
+        g_cameraPositionGoal.z += BETWEEN_BODY_OFFSET;
+    }
+    if (second < 0)
+    {
+        g_cameraTargetGoal.Fill(0.0f);
+        g_cameraTargetGoal.y = BETWEEN_AHEAD;
+        g_cameraTargetGoal.z = BETWEEN_BELOW;
+        g_cameraTargetGoal.RotateZ(-g_characterModels[first].heading);
+        g_cameraTargetGoal.Copy(g_cameraTargetGoal + g_cameraPositionGoal);
+    }
+    else if (g_characterModels[second].headNode != 0)
+    {
+        g_cameraTargetGoal.Copy(g_characterModels[second].headNode->worldMatrix.GetTranslation());
+        g_cameraTargetGoal.z += BETWEEN_HEAD_OFFSET;
+    }
+    else
+    {
+        g_cameraTargetGoal.Copy(g_characterModels[second].matrix.GetTranslation());
+        g_cameraTargetGoal.z += BETWEEN_BODY_OFFSET;
+    }
+    if (g_cameraPositionGoal.x > BETWEEN_NO_POSITION)
+        g_cameraTargetGoal.z += (g_cameraPositionGoal - g_cameraTargetGoal).Length() * g_cameraBetweenParams.z * BETWEEN_RISE_PER_CENT;
+    g_cameraTargetNow.Copy(g_cameraTargetNow + (g_cameraTargetGoal - g_cameraTargetNow) * 0.2f +
+                           (g_cameraPreviousTarget - g_cameraTargetNow) * 0.8f);
+    g_cameraPositionNow.Copy(g_cameraPositionNow + (g_cameraPositionGoal - g_cameraPositionNow) * 0.2f +
+                             (g_cameraPreviousPosition - g_cameraPositionNow) * 0.8f);
+    g_cameraTargetCopy.Copy(g_cameraTargetNow);
+    g_cameraPositionCopy.Copy(g_cameraPositionNow);
+    g_cameraTarget.Copy(g_cameraTargetNow);
+    g_cameraEye.Copy(g_cameraPositionNow);
+    g_cameraPreviousPosition.Copy(g_cameraPositionNow);
+    g_cameraPreviousTarget.Copy(g_cameraTargetNow);
+    return 0;
+}

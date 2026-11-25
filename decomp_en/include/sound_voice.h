@@ -40,6 +40,9 @@ const int WAVE_HEADER_BYTES = 0x2c;
 const int SOUND_SOURCE_ACM = 4;     // data converted by an ACM codec
 const int SOUND_SOURCE_OGG = 5;     // Ogg Vorbis data decoded by an OggReader
 
+// Progress callback of SoundSource::ConvertFile: the file path, the bytes just handled and the percent done.
+typedef void (*SoundConvertProgress)(const char *path, int bytes, int percent);
+
 // The data source of a voice (0x1a4 bytes): file, ACM decoder or Ogg Vorbis reader. Fields not used by a ported
 // function yet are placeholders.
 struct SoundSource
@@ -58,7 +61,7 @@ struct SoundSource
     ACMSTREAMHEADER headerB;        // 0x0f4
     void *acmDestBuffer;            // 0x148: converted data
     void *acmSourceBuffer;          // 0x14c: compressed data read from the file
-    void *progressCallback;         // 0x150: conversion progress callback
+    SoundConvertProgress progressCallback;   // 0x150: conversion progress callback
     int readPosition;               // 0x154: position the voice reads next
     int sourceKind;                 // 0x158: kind of source (4 and 5 = Ogg Vorbis)
     MmioFile file;                  // 0x15c: the sound file (a plain file or a section of an archive)
@@ -102,6 +105,9 @@ struct SoundSource
     int GetPosition();
     // True when the whole sound has been read. EN 0x7bf120.
     bool IsAtEnd();
+    // Converts a compressed sound file to a wave file with the ACM codec, reporting progress. Returns 1, or 0 when a
+    // file cannot be opened. EN 0x7bebb0.
+    int ConvertFile(const char *path, const char *outPath, SoundConvertProgress progress);
 };
 
 // Header of the decoded wave data in canonical RIFF/WAVE layout (0x2c bytes).

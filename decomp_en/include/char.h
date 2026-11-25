@@ -80,30 +80,58 @@ enum CharParam
     PARAM_MODEL = 3           // 0xfc: model definition of the character (index into g_modelPaths)
 };
 
+// Four floats with a copy assignment of its own (EN 0x76f1d0, the same code as Vec4::Copy).
+struct ParamVector
+{
+    float x;    // x component
+    float y;    // y component
+    float z;    // z component
+    float w;    // w component
+    ParamVector &operator=(const ParamVector &other);   // EN 0x76f1d0
+};
+
 // A character slot record (0x188 bytes). Layout and names follow the JP CharSlot (decomp/include/char_slot.h).
 struct CharRecord
 {
     int m_0000;                              // 0x00: not used by EN code yet
     int stats[CHAR_STAT_COUNT];              // 0x04: health and other values by CharStat index
-    char m_0044[0x9c - 0x44];                // 0x44: not used by EN code yet
+    int m_0044[CHAR_STAT_COUNT];             // 0x44: not used by EN code yet
+    int m_0084;                              // 0x84: 1 = released by its group
+    int m_0088;                              // 0x88: not used by EN code yet
+    int m_008c;                              // 0x8c: not used by EN code yet
+    int m_0090;                              // 0x90: not used by EN code yet
+    int faceSet;                             // 0x94: face set of the character, -1 = no face animation
+    int m_0098;                              // 0x98: 0x1d while held
     int kind;                                // 0x9c: behaviour kind
     int sharesModel;                         // 0xa0: non-zero = shares the previous slot's model; the actor scans only count slots where it is 0
     int m_00a4;                              // 0xa4: not used by EN code yet
     int m_00a8;                              // 0xa8: tested on the previous slot by Chars_ReloadModels (0 = reload this slot)
-    char m_00ac[0xb8 - 0xac];                // 0xac: not used by EN code yet
+    int m_00ac;                              // 0xac: not used by EN code yet
+    int routeRecord;                         // 0xb0: the map record whose route the character walks
+    int m_00b4;                              // 0xb4: not used by EN code yet
     int money;                               // 0xb8: money carried (guarded by the anti-tamper copies)
-    char m_00bc[0xd8 - 0xbc];                // 0xbc: not used by EN code yet
+    int m_00bc;                              // 0xbc: not used by EN code yet
+    int m_00c0;                              // 0xc0: not used by EN code yet
+    int m_00c4;                              // 0xc4: not used by EN code yet
+    int m_00c8;                              // 0xc8: not used by EN code yet
+    int helmet;                              // 0xcc: the helmet item worn (slot 0)
+    int costume;                             // 0xd0: the player's costume (slot 0)
+    int twoHanded;                           // 0xd4: set for the two-handed weapons
     int packedParameter;                     // 0xd8: packed script value (formation digits, mode digits; see Char_UnpackParameter)
-    char m_00dc[0xf0 - 0xdc];                // 0xdc: not used by EN code yet
+    int m_00dc;                              // 0xdc: not used by EN code yet
+    int m_00e0;                              // 0xe0: not used by EN code yet
+    int m_00e4;                              // 0xe4: not used by EN code yet
+    int m_00e8;                              // 0xe8: not used by EN code yet
+    float speedScale;                        // 0xec: motion speed scale given to the model when it is loaded
     int params[CHAR_PARAM_COUNT];            // 0xf0: by CharParam index
-    char m_0130[0x140 - 0x130];              // 0x130: position
+    ParamVector position;                    // 0x130: position
     char switchesHeld;                       // 0x140: number of switches the character is holding
     char defeated;                           // 0x141: 1 once the character is marked defeated
     char m_0142;                             // 0x142: not used by EN code yet
     char colourByte;                         // 0x143: colour value Char_UnpackParameter saves before it switches the kind
     char heldFlag;                           // 0x144: kept in the CharState while the character is held
     char name[CHAR_NAME_SIZE];               // 0x145: display name (message boxes show it as the speaker)
-    char m_0165[CHAR_RECORD_SIZE - 0x165];   // 0x165: not used by EN code yet
+    char m_0165[CHAR_NAME_SIZE];             // 0x165: not used by EN code yet
 };
 
 // A shove: a timed step applied to a character or a look target (the shoves view of a CharState, 0x10 bytes).
@@ -182,7 +210,10 @@ extern "C" int g_alwaysPlaceOnGround;   // EN 0x00908388 (JP DAT_102022b8): non-
 // ground point (or to the bottom of the world when nothing is hit). Runs when g_alwaysPlaceOnGround or `force` is set. Returns 0. EN 0x645770.
 extern "C" int Char_PlaceOnGround(int index, int force);
 extern "C" ModelPath g_modelPaths[];                       // EN 0x01201270 (JP DAT_10b314c8): the model file of each model number
-extern "C" int g_sceneTimer;                               // EN 0x009e33a0 (JP DAT_104c00d0): scene timer
+// Bytes of one entry of g_leftModelPaths.
+const int LEFT_MODEL_PATH_SIZE = 0x124;
+extern "C" char g_leftModelPaths[][LEFT_MODEL_PATH_SIZE];   // EN 0x00f64440 (JP DAT_10894698): model files an enemy leaves behind when destroyed (AnimModel::leftModel)
+extern "C" int g_sceneTimer;                              // EN 0x009e33a0 (JP DAT_104c00d0): scene timer
 extern "C" int g_gameOverValue;                            // EN 0x00a150b8 (JP DAT_104c0198): value stored by the game-over start
 
 struct EffectOptions;
@@ -233,6 +264,7 @@ extern "C" char g_charInPlay[CHAR_SLOT_COUNT];                       // EN 0x009
 extern "C" int g_waveEnemiesAlive;                                    // EN 0x01333350 (JP DAT_10c635a8): wave enemies still alive
 extern "C" char g_waveGrid[WAVE_GRID_SIZE][WAVE_GRID_SIZE];           // EN 0x0091e740 (JP DAT_1049efb0): character in each wave slot (0 = empty)
 extern "C" CharMarker g_charMarkers[CHAR_SLOT_COUNT];                 // EN 0x0147b258 (JP DAT_10867e18): where a character in play was placed
+extern "C" int g_wakeRadiusShort;                                     // EN 0x013364b8 (JP DAT_10c66710): non-zero = Enemies_WakeNearby uses a radius of 300
 // Retires a wave enemy: moves it out of the world and records it in the wave grid. EN 0x6d64e0 (JP 0x1001b7b0).
 extern "C" int Char_RetireWaveEnemy(int index);
 

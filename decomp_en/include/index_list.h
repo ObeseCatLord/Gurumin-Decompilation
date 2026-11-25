@@ -15,7 +15,9 @@ struct IndexList
         Vec4 *spheres;   // 0x04: sphere list: centre and radius (w) of each triangle
     };
 
-    int Resize(int newCount);       // EN 0x7721a0: reallocates the index buffer, contents not kept
+    IndexList();                    // EN 0x77be70: an empty list
+    void InitSpheres();             // EN 0x778830: clears the buffer pointer of a sphere list allocated raw (identical to Init)
+    int Resize(int newCount);      // EN 0x7721a0: reallocates the index buffer, contents not kept
     int ResizeSpans(int newCount);  // EN 0x7721f0: reallocates the sphere buffer (16 bytes per entry), contents not kept
     void Init();                    // EN 0x778820 (JP 0x101ad1b0): clears the buffer pointer of a list allocated raw
     int CopyFrom(const IndexList *source);  // EN 0x771fa0 (JP 0x101ad160): copies an index list; returns 0 for an empty source

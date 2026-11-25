@@ -62,6 +62,7 @@ struct ModelBank
 
     ModelBank();                                 // EN 0x70a120 (JP 0x1017c8e0): builds the vector tables and model records, bank off
     int Reset();                                 // EN 0x740e20 (JP model_bank.cpp)
+    int Enable();                                // EN 0x734b50 (JP 0x101649c0): empties the bank like Reset, gives the spare lighting entry its default lights and turns the bank on
     int CreateTextures();                        // EN 0x7343a0 (JP 0x1017c160): loads the shadow and lens textures, creates the render targets
     int DrawLensFlares();                        // EN 0x729610 (JP 0x10166520)
     int DrawShadows(Node *scene, DrawList *list, Matrix4 *view, int a3);       // EN 0x72a420 (JP 0x10165e00)

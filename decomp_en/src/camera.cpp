@@ -34,16 +34,16 @@ extern "C" int Caption_SetTitle(const char *text)
     return 0;
 }
 
-// Camera_StartMove: starts camera move `moveId`: resets the move state, collects the move's paths and runs it for
-// CAMERA_MOVE_FRAMES frames. Called through the script command table.
-extern "C" int Camera_StartMove(int moveId)
+// Camera_StartMove: starts a camera move: resets the move state, collects the camera paths of the node tree `root` and
+// runs the move for CAMERA_MOVE_FRAMES frames. Called through the script command table.
+extern "C" int Camera_StartMove(Node *root)
 {
     int pathCount;
     g_cameraMoveReset = 0;
     g_cameraMoveSelected = -1;
     pathCount = 0;
     g_cameraMoveStep = 0;
-    Camera_CollectPaths(moveId, moveId, &pathCount);
+    Camera_CollectPaths(root, root, &pathCount);
     g_cameraPathCount = pathCount;
     g_cameraMoveFramesLeft = CAMERA_MOVE_FRAMES;
     return 0;

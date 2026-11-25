@@ -2,7 +2,9 @@
 
 #include <string.h>
 
+#include "engine.h"
 #include "engine_memory.h"
+#include "model_bank.h"
 #include "render.h"
 #include "texture_mgr.h"
 
@@ -53,4 +55,71 @@ extern "C" int Texture_CreateCopy(const char *name, const TextureObject *source,
         }
     }
     return -1;
+}
+
+// Creates the texture from width x height RGB `pixels` (at most TEXTURE_MAX_SIDE on each side). `alpha` is
+// TEXTURE_ALPHA_NONE, a generated kind or a pointer to alpha pixels (one per RGB triple). Unless the shared textures are
+// loading (or the alpha is generated) the pixels and the alpha pixels are kept in copies so the texture can be rebuilt
+// after a device reset. With `flags` set the alpha is speckled: one pixel in four at random keeps its alpha (a new
+// alpha buffer when there was none). Returns 0 for a bad size, else the result of Upload. Called by
+// Texture_CreateFromPixels and Texture_CreateCopy. EN 0x71c410 (JP 0x10169c60).
+int TextureObject::Create(int width, int height, const void *pixels, int alpha, int flags)
+{
+    if (width > TEXTURE_MAX_SIDE)
+        return 0;
+    if (height > TEXTURE_MAX_SIDE)
+        return 0;
+    if (alpha == TEXTURE_ALPHA_GENERATED_1 || alpha == TEXTURE_ALPHA_GENERATED_2)
+        generatedAlpha = 1;
+    else
+        generatedAlpha = 0;
+    hasOwnAlpha = 0;
+    if (generatedAlpha == 0 && alpha != TEXTURE_ALPHA_NONE)
+        hasOwnAlpha = 1;
+    sourcePixels = 0;
+    sourceAlpha = 0;
+    sourceWidth = width;
+    sourceHeight = height;
+    if (width <= 0 || height <= 0)
+        return 0;
+    if (g_sharedTextureLoading == 0 || generatedAlpha != 0)
+    {
+        if (alpha > TEXTURE_ALPHA_GENERATED_2 || alpha == TEXTURE_ALPHA_NONE)
+        {
+            int size = width * height * TEXTURE_SOURCE_BYTES;
+            sourcePixels = (unsigned char *)g_engineAlloc(size, "m_rgb");
+            g_engineCopy((void *)sourcePixels, pixels, size);
+            if (alpha != TEXTURE_ALPHA_NONE && alpha != TEXTURE_ALPHA_GENERATED_1)
+            {
+                sourceAlpha = (int)g_engineAlloc(size, "m_al");
+                g_engineCopy((void *)sourceAlpha, (const void *)alpha, size);
+            }
+        }
+        if (alpha == TEXTURE_ALPHA_GENERATED_1)
+            sourceAlpha = TEXTURE_ALPHA_GENERATED_1;
+        if (alpha == TEXTURE_ALPHA_GENERATED_2)
+            sourceAlpha = TEXTURE_ALPHA_GENERATED_2;
+    }
+    int size;
+    if (flags != 0 && alpha != TEXTURE_ALPHA_GENERATED_1 && alpha != TEXTURE_ALPHA_GENERATED_2)
+    {
+        if (alpha == TEXTURE_ALPHA_NONE)
+        {
+            unsigned char *speckles = (unsigned char *)g_engineAlloc(size = width * height * TEXTURE_SOURCE_BYTES, "m_al");
+            alpha = (int)speckles;
+            sourceAlpha = alpha;
+            for (int i = 0; i < size; i += TEXTURE_SOURCE_BYTES)
+                speckles[i] = (Random() & TEXTURE_SPECKLE_MASK) >= TEXTURE_SPECKLE_KEEP ? 0 : -1;
+        }
+        else
+        {
+            size = width * height * TEXTURE_SOURCE_BYTES;
+            for (int i = 0; i < size; i += TEXTURE_SOURCE_BYTES)
+            {
+                if ((Random() & TEXTURE_SPECKLE_MASK) >= TEXTURE_SPECKLE_KEEP)
+                    ((unsigned char *)alpha)[i] = 0;
+            }
+        }
+    }
+    return Upload(width, height, (unsigned char *)pixels, (const unsigned char *)alpha);
 }

@@ -266,7 +266,9 @@ struct Node
     Node *FindRecursive(const char *name, int *skip);          // EN 0x7531d0 (JP 0x10191a30)
     Node *FindPrefixRecursive(const char *prefix, int *skip);  // EN 0x753240 (JP 0x10191c30)
     // Same lookups with the second pair of finders, which ignore the name prefixes of special nodes.
-    Node *Find2(const char *name, int index);                          // EN 0x753740 (JP 0x1019ed10)
+    Node *FindPrefixNode(const char *prefix);                          // EN 0x7533a0: first node whose name starts with `prefix` (no skip count)
+    Node *FindPrefixNodeRecursive(const char *prefix);                 // EN 0x753330: the search behind FindPrefixNode (children last to first)
+    Node *Find2(const char *name, int index);                       // EN 0x753740 (JP 0x1019ed10)
     Node *FindRecursiveStripped(const char *name, int *skip);          // EN 0x753590 (JP 0x10191aa0)
     Node *FindPrefixRecursiveStripped(const char *prefix, int *skip);  // EN 0x753660 (JP 0x10191b60)
 
@@ -311,8 +313,15 @@ struct Node
     int CastSegment2(const char *tag, unsigned int mask, Vec4 *from, Vec4 *to, Vec4 *hit, float *t);
     // EN 0x7609a0 (JP 0x101aaa20): casts the ray from `from` to `to` against this node's meshes (tag filter, flags, mask); fills `hit`, and `t` (may be 0). Returns 1 on a hit.
     int CastRay(const char *tag, int flags, unsigned int mask, Vec4 *to, Vec4 *from, Vec4 *hit, float *t);
+    // EN 0x755750 (JP 0x1019dca0): ray-triangle test (front face only) for the ray from `origin` along `direction` and the triangle a-b-c; on a hit
+    // *hitT is the distance along the ray in units of `direction`, the hit point replaces `a` (x, y, z) and *texU / *texV are the texture
+    // coordinates at the hit point interpolated from uvA..uvC. Returns 1 on a hit, else 0. Does not use `this`.
+    int IntersectTriangle(const Vec4 *origin, const Vec4 *direction, Vec4 *a, Vec4 *b, const Vec4 *c, float *hitT, float *texU, float *texV,
+                          const Vec4 *uvA, const Vec4 *uvB, const Vec4 *uvC);
     // EN 0x750a50 (JP 0x10199e20): queues this node tree for drawing into `list` with `view`, the lights `lights`, pass mask `pass` (-1 = all), fade colour `fade` and `flag`.
     int QueueDraw(DrawList *list, Matrix4 *view, const void *lights, int pass, Vec4 *fade, int flag);
+    // Same function (EN 0x750a50) called with the world matrix of the node tree in the first argument.
+    int QueueDraw(Matrix4 *world, Matrix4 *view, const void *lights, int pass, Vec4 *fade, int flag);
     int BindLinks(Node *root, Node **list, int *count);   // EN 0x76d770 (JP 0x1019eeb0): links nodes and bones under `root`
     Node *AddChild(const char *childName, int position);  // EN 0x74ebb0 (JP 0x101abc30): creates a child at `position` (appended when negative or past the end)
     int SetupSkins(Node *root);            // EN 0x76dbe0 (JP 0x101ab9d0): stores bind poses and inverse bone matrices for the skinned nodes of this subtree
@@ -411,9 +420,12 @@ struct Node
     void RestoreRenderMode();              // EN 0x76a940 (JP 0x10191e10): savedDrawMode back into drawMode
     int ClearFlags(unsigned int bits);     // EN 0x750320 (JP 0x1019b1b0)
     int SetFlags(unsigned int bits);       // EN 0x76b730 (JP 0x1019b130)
+    int SetOwnFlags(unsigned int bits);    // EN 0x76b710: sets `bits` in this node only (no recursion)
+    int ClearOwnFlags(unsigned int bits);  // EN 0x750300: clears `bits` in this node only (no recursion)
     int SetRenderMode(int mode);           // EN 0x76d330 (JP 0x1019b050)
     int SetModel(AnimModel *owner);        // EN 0x76d420 (JP 0x1019b230)
-    int ClearHasCollision();               // EN 0x76a5b0 (JP 0x101944d0)
+    int UnrecoveredCall(int a, int b);     // EN 0x75f180: large routine (1420 bytes) not recovered yet; called by AnimModel::RunRootCall
+    int ClearHasCollision();             // EN 0x76a5b0 (JP 0x101944d0)
 
     // Animation.
     int ReplaceMaterial(int key, int count);  // EN 0x74a370 (JP 0x1019e830): material swap on the subtree

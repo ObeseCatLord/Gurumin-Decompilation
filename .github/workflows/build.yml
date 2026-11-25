@@ -1,0 +1,158 @@
+name: Build
+
+# Builds the mod DLLs and the modding tools on every push and pull request and keeps them as artifacts of the run:
+#   mod-jp                       mod/build/d3d9.dll for the Japanese PC release, its ini and install/uninstall scripts
+#   mod-en                       mod_en/dist: Gurumin Enhanced Rendering for the English Steam release (d3d9.dll proxy,
+#                                GuruminModern.ini, GuruminVR/ x64 OpenXR host and loader)
+#   GuruminModTools-<os>-<arch>  the modding GUI as one program (Windows x64, Linux x64, Linux arm64), with both mods
+# No game files are used or produced. This workflow never commits.
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mod-jp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install zig
+        run: python -m pip install ziglang
+      - name: Build mod/build/d3d9.dll
+        run: sh mod/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mod-jp
+          if-no-files-found: error
+          path: |
+            mod/build/d3d9.dll
+            mod/gurumin_mod.ini
+            mod/install.bat
+            mod/uninstall.bat
+
+  mod-en:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mod_en
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MinGW-w64 and CMake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends mingw-w64 cmake
+          # Use the posix thread model (std::thread/std::mutex in the OpenXR loader), as on the author's toolchain.
+          for arch in i686 x86_64; do
+            for tool in gcc g++; do
+              sudo update-alternatives --set $arch-w64-mingw32-$tool /usr/bin/$arch-w64-mingw32-$tool-posix || true
+            done
+          done
+      - name: Cache the OpenXR-SDK checkout
+        uses: actions/cache@v4
+        with:
+          path: mod_en/build/openxr-sdk
+          key: openxr-sdk-${{ hashFiles('mod_en/tools/build_openxr_loader.sh') }}
+      - name: Build (d3d9.dll, VR host, OpenXR loader)
+        run: ./build.sh
+      - name: Tests (Python, portable C++; Windows tests compiled only)
+        run: GURUMIN_SKIP_WINE=1 ./tests/run_tests.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mod-en
+          if-no-files-found: error
+          path: |
+            mod_en/dist/
+            !mod_en/dist/*.o
+      - name: Install Wine (32-bit) and Xvfb
+        continue-on-error: true
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wine64 wine32:i386 xvfb
+      - name: Windows tests under Wine (best effort)
+        continue-on-error: true
+        env:
+          WINEDEBUG: -all
+        run: |
+          xvfb-run -a wine build/tests/antialias_test.exe
+          xvfb-run -a wine build/tests/native_render_test.exe
+
+  tools:
+    needs: [mod-jp, mod-en]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: GuruminModTools-windows-x64
+            program: GuruminModTools.exe
+          - os: ubuntu-latest
+            artifact: GuruminModTools-linux-x64
+            program: GuruminModTools
+          - os: ubuntu-24.04-arm
+            artifact: GuruminModTools-linux-arm64
+            program: GuruminModTools
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Tk and Xvfb (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libtk8.6 xvfb
+      - name: Install PyInstaller and Pillow
+        run: python -m pip install pyinstaller pillow
+      - name: Check Tkinter
+        run: python -c "import tkinter; tkinter.Tcl(); print('Tk', tkinter.TkVersion)"
+      - name: Test the tools
+        # test_itm_tool.py round-trips the .itm files under the folders it is given; CI has no game files, so this
+        # only checks that every tool compiles and the test imports.
+        run: |
+          python -m compileall -q tools
+          python tools/test_itm_tool.py
+      - name: Build tools/native/iti_unpack.exe (Windows)
+        if: runner.os == 'Windows'
+        # 32-bit, like the game's packs.dll that it loads.
+        run: |
+          python -m pip install ziglang
+          python -m ziglang cc -target x86-windows-gnu -O2 -o tools/native/iti_unpack.exe tools/native/iti_unpack.c
+      - name: Get the JP mod
+        uses: actions/download-artifact@v4
+        with:
+          name: mod-jp
+          path: mod
+      - name: Get the EN mod
+        uses: actions/download-artifact@v4
+        with:
+          name: mod-en
+          path: mod_en/dist
+      - name: Build the program
+        run: python tools/build_exe.py
+      - name: Smoke test (the window stays open for 10 s)
+        if: runner.os == 'Linux'
+        run: |
+          set +e
+          xvfb-run -a timeout 10 ./dist/${{ matrix.program }}
+          status=$?
+          [ $status -eq 124 ] || { echo "GuruminModTools exited early with status $status"; exit 1; }
+      - name: Start the program without a window
+        # Lists every command the GUI builds (imports all bundled tools; no window).
+        run: ./dist/${{ matrix.program }} --print-commands > print-commands.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          if-no-files-found: error
+          path: dist/${{ matrix.program }}

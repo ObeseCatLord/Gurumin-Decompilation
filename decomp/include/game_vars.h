@@ -46,13 +46,13 @@ extern "C" float DAT_102027e4;
 extern "C" float DAT_102027e8;
 extern "C" char DAT_10202800;
 extern "C" int DAT_10202808[0x10];                        // texture slots of the HUD (released here)
-extern "C" int DAT_1020aee8;
+extern "C" float DAT_1020aee8;
 extern "C" int DAT_1020b22c;
 extern "C" int DAT_1020d430;
 extern "C" char DAT_1020d438[0x80];                       // per character slot: non-zero = drawn without the area colour (DAT_10f655c4 stays 0)
 extern "C" int DAT_1020d4b8;
 extern "C" int DAT_1020d5c8[0x20];
-extern "C" int DAT_1020d648;
+extern "C" float DAT_1020d648;
 extern "C" EffectHold DAT_1020dcf8[EFFECT_HOLD_COUNT];
 extern "C" char DAT_1020e0f8[];                           // second banner text (empty = none)
 extern "C" int DAT_10210b28;
@@ -226,7 +226,7 @@ extern "C" int DAT_104bfe34;
 extern "C" int DAT_104bfe38;
 extern "C" int DAT_104bfe3c;
 extern "C" int DAT_104bfe40;
-extern "C" int DAT_104bfe44;
+extern "C" Node *DAT_104bfe44;                          // the obstacle node the player leaps over
 extern "C" char DAT_104bfe48;
 extern "C" int DAT_104bfe4c;
 extern "C" int DAT_104bfe50;

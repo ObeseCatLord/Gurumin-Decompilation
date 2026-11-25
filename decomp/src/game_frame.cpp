@@ -841,6 +841,168 @@ static __forceinline bool TrailBlockedAhead(Vec4 &probe, Vec4 &probeLow, double 
 #define MOTION_PICKUP 0xf
 #define TIMED_EVENT_BASE 500
 
+// Movement with nothing held in the hands: run speed, lean (spinAngle) and the carried-object push.
+#define SOUND_CARRY_PUSH 0x379
+#define MOTION_SWIM_START 0x1d
+#define MOTION_SLIDE 0x85
+#define MOTION_STAND 0x10
+#define MOTION_CARRY_LEFT 0x11
+#define MOTION_CARRY_RIGHT 0x12
+#define SLIDE_HURRY_TICK 9              // DAT_104c0301 counts the slide's ticks; earlier ticks blend 5 frames, later ones 2
+#define MOVE_STEP_LENGTH 8.0f           // the steer direction is scaled to this many units per tick
+#define SLIDE_SCALE 0.6f
+#define WALK_SCALE 0.7f
+#define RUN_SPEED_FALLOFF 0.2f
+#define RUN_SPEED_BUILDUP 0.1f
+#define RUN_SPEED_MAX 2.5f
+#define LEAN_EASE_FAST 0.1f
+#define LEAN_EASE_SLOW 0.05f
+#define LEAN_TURN_STEP 0.03f
+#define LEAN_TURN_MARGIN 0.04f
+#define LEAN_TURN_LIMIT 0.3f
+#define LEAN_TURN_SPAN 0.6666667f       // turn angle (radians) that gives the full lean limit
+#define TURN_DEAD_ZONE 0.09817187488079071   // turns smaller than this (pi / 32) do not lean
+#define TURN_SHARP_LIMIT 2.0943334102630615  // turns of more than this (about 120 degrees) only ease the lean back
+#define CARRY_MOTION_BLEND 2
+#define CARRY_SHOVE_FIRST 0x10          // DAT_104bfdcc counts the carry action down from 0x1e to 0
+#define CARRY_PUSH_FRAME 0x1e
+#define CARRY_SNAP_FRAME 0xe
+#define CARRY_RESET_FRAME 100
+#define CARRY_DRAG_FRAME 10
+#define CARRY_SETTLE_FRAME 8
+#define CARRY_GRID 75.0f                // carried objects sit on a grid of this size; a push moves one cell
+#define CARRY_SIDE_PUSH 2.0f
+#define CARRY_SHOVE_SCALE 1.34f
+#define CARRY_DRAG_SCALE 0.2f
+#define CARRY_SNAP_SCALE 0.5f
+#define CARRY_LIFT 30.0f
+
+// The run speed multiplier falls by 0.2 per tick down to 1.0.
+static __forceinline void RunSpeedFalloff(void)
+{
+    DAT_102027ec = DAT_102027ec - RUN_SPEED_FALLOFF;
+    if (DAT_102027ec < 1.0f)
+        DAT_102027ec = 1.0f;
+}
+
+// The lean of the player's model (spinAngle) returns to zero by `rate` per tick. Returns true when it is within
+// `rate` of zero, where the caller sets it to exactly zero.
+static __forceinline bool LeanEasesBack(float rate)
+{
+    if (DAT_10db6ee8[0].spinAngle > 0.0f)
+        DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle - rate;
+    if (DAT_10db6ee8[0].spinAngle < 0.0f)
+        DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle + rate;
+    return fabs(DAT_10db6ee8[0].spinAngle) < rate;
+}
+
+#define EFFECT_SWING_DUST 0x2da
+#define SOUND_LEAP_LAND 0x377
+#define SOUND_GRUNT_BASE 0x85
+#define LEAP_STAGE_LOOK 5               // DAT_104bfe40: the leap's stage counter (0 = not leaping)
+#define LEAP_STAGE_CLIMB_END 0x32
+#define LEAP_STAGE_RISE_END 0x46
+#define LEAP_STAGE_FALL_END 0x5a
+#define LEAP_STAGE_DONE 100
+#define LEAP_CURVE_LENGTH 28
+#define LEAP_HEIGHT_SCALE 10.0f
+#define LEAP_REACH_LIMIT 130.0f         // beyond this distance from the obstacle the player vaults over it
+#define LEAP_VAULT_STEER 5.0f
+#define LEAP_PUSH_X 0.3f
+#define LEAP_PUSH_Y 0.4f
+#define LEAP_SNAP_STEP 37.5f
+#define LEAP_SNAP_OFFSET 10.0f
+#define LEAP_FACE_TURN 3.1415f
+#define LEAP_DRIFT_FAST 1.1f
+#define LEAP_DRIFT_LIFT 0.54f
+#define SWIM_MIN_FRAME 0x10
+#define SWIM_DEPTH_OFFSET 60.0f
+#define SWIM_RISE_LIMIT 12.0f
+#define SWIM_PUSH_SCALE 1.4f
+#define RUN_SPEED_MIN 1.0f
+#define CARRY_NEAR_HEIGHT 50.0f
+#define CARRY_NEAR_DISTANCE 155.0f
+#define SWING_STEP_SCALE 1.4f
+#define SWING_PROBE_LIFT 5.0f
+#define SWING_MAX_BLOCKED_STEPS 4
+#define SMOOTH_OLD 0.7f
+#define SMOOTH_NEW 0.3f
+#define SPEED_SCALE_SLOW 0.5f
+#define MOTION_SPEED_SLOW 0.6f
+#define MOTION_SPEED_TOP 2.5f           // run speed that plays the motion at its normal speed
+#define AIR_STEP_DECAY 6                // DAT_104bf8c4 falls by this much per tick
+
+#define MOTION_BOUNCE 1
+#define BOUNCE_LEAN_LIMIT 0.7f          // a gust bounce leans the model toward its side up to this far
+#define BOUNCE_LEAN_STEP 0.15f
+#define CARRY_DROP_DISTANCE 150.0f      // a carried object further away than this is let go
+#define SWIM_SHALLOW_LIMIT 9.0f
+
+// Run speed rises by 0.1 per tick up to 2.5 while the player steers.
+static __forceinline void RunSpeedBuildup(void)
+{
+    if (RUN_SPEED_MIN <= DAT_102027ec)
+    {
+        if (DAT_102027ec < RUN_SPEED_MAX)
+            DAT_102027ec = DAT_102027ec + RUN_SPEED_BUILDUP;
+    }
+    else
+    {
+        DAT_102027ec = RUN_SPEED_MIN;
+        DAT_102027ec = DAT_102027ec + RUN_SPEED_BUILDUP;
+    }
+    if (DAT_102027ec > RUN_SPEED_MAX)
+        DAT_102027ec = RUN_SPEED_MAX;
+}
+
+// Steering with a held direction: the model leans against the change of the walk direction (spinAngle follows the turn,
+// kept inside +-limit) and the run speed builds up; sharp turns and no turn ease the lean back instead.
+static __forceinline void SteerLeanAndSpeed(float moveX, float moveY)
+{
+    float previousAngle = (float)atan2(DAT_10866de8.x, DAT_10866de8.y);
+    float newAngle = (float)atan2(moveX, moveY);
+    float turn = FUN_101ac810(previousAngle, newAngle);
+    if (fabs(turn) >= TURN_DEAD_ZONE)
+    {
+        if (fabs(turn) < TURN_SHARP_LIMIT)
+        {
+            float limit = (float)fabs(turn) / LEAN_TURN_SPAN * LEAN_TURN_LIMIT;
+            float lowLimit;
+            if (limit > LEAN_TURN_LIMIT)
+                limit = LEAN_TURN_LIMIT;
+            if (turn <= 0.0f)
+            {
+                if (turn < 0.0f)
+                    DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle + LEAN_TURN_STEP;
+            }
+            else
+                DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle - LEAN_TURN_STEP;
+            if (limit + LEAN_TURN_MARGIN < DAT_10db6ee8[0].spinAngle)
+                DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle - LEAN_TURN_STEP;
+            if (limit < DAT_10db6ee8[0].spinAngle)
+                DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle - LEAN_TURN_STEP;
+            lowLimit = -limit;
+            if (DAT_10db6ee8[0].spinAngle < lowLimit - LEAN_TURN_MARGIN)
+                DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle + LEAN_TURN_STEP;
+            if (DAT_10db6ee8[0].spinAngle < lowLimit)
+                DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle + LEAN_TURN_STEP;
+            RunSpeedBuildup();
+        }
+        else
+        {
+            if (LeanEasesBack(LEAN_EASE_SLOW))
+                DAT_10db6ee8[0].spinAngle = 0.0f;
+            RunSpeedFalloff();
+        }
+    }
+    else
+    {
+        if (LeanEasesBack(LEAN_EASE_SLOW))
+            DAT_10db6ee8[0].spinAngle = 0.0f;
+        RunSpeedBuildup();
+    }
+}
+
 // 0x1011d810 (the in-game frame). Mode 1 of the frame step. The first call resets the mode's globals (DAT_104bf8bc
 // was 0 until then). Each call computes how many engine ticks have passed since the last one (at most
 // MAX_CATCH_UP_TICKS, otherwise one); every tick polls the input (and records or replays it), runs the main menu and
@@ -5490,7 +5652,707 @@ trailDone:
                 DAT_104c02e4 = 0;
             }
         }
-        // STAGE 7: the events, the carried object and the model list, pseudo.c lines 7861-8944
+        // Movement with nothing held in the hands: the carried object's push, the run, leap and swim states, and the
+        // easing of the lean and the run speed.
+        if (DAT_104bfdf0 == 0)
+        {
+            float moveX;
+            float moveY;
+            float inverseLength;
+            if (DAT_104bfdcc == 0 && steerX == 0.0f && steerY == 0.0f && DAT_104bf8c4 == 0 && DAT_104bfe30 == 0)
+                goto movementDone;
+            if (DAT_104bfdcc != 0 || steerX != 0.0f || steerY != 0.0f || DAT_104bf8c4 != 0)
+            {
+                if (DAT_104bfe1c != 0)
+                {
+                    FUN_1003ad20(SOUND_ITEM_LIST_CLOSE, 0, 1.0f);
+                    if (DAT_104bfe1c != 0)
+                        CloseItemList();
+                }
+                if (DAT_102024b0 > -1 && DAT_104bfdf0 == 0)
+                {
+                    DAT_104bfd74 = DAT_102024b0;
+                    DAT_1020249c = DAT_102024b0;
+                }
+                DAT_102024b0 = -1;
+            }
+            if (DAT_104bfe4c != 0 && DAT_10468128 == 0 && DAT_10db6ee8[0].m_229c == 0)
+                DAT_10db6ee8[0].PlayMotion(MOTION_SWIM_START, 0, 5, 1.0f);
+            if (DAT_104c0300 != 0 && DAT_10468128 == 0 && DAT_10db6ee8[0].m_229c == 0)
+                DAT_10db6ee8[0].PlayMotion(MOTION_SLIDE, 0, DAT_104c0301 < SLIDE_HURRY_TICK ? 5 : 2, 1.0f);
+            if (DAT_104bfd0c == 0)
+                FUN_1016b400(&moveX, &moveY, steerX, steerY);
+            else
+            {
+                moveX = steerX;
+                moveY = steerY;
+            }
+            inverseLength = (float)(1.0 / sqrt((double)(moveX * moveX + moveY * moveY)));
+            moveX = inverseLength * moveX * MOVE_STEP_LENGTH;
+            moveY = inverseLength * moveY * MOVE_STEP_LENGTH;
+            if (steerX == 0.0f && steerY == 0.0f)
+            {
+                // No steering: the carry action, the slide and the standing pose; every path ends at settleCheck.
+                if (DAT_104bfe30 != 0)
+                    goto leapStart;
+                if (DAT_104bfdc8 == 0)
+                {
+                    if (DAT_104bfe4c != 0)
+                        goto swimOrSlide;
+                    if (DAT_104c0300 == 0)
+                    {
+                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_STAND, 0, 5, 1.0f);
+                        goto leapCheck;
+                    }
+                slideNoSteer:
+                    DAT_10db6ee8[DAT_104bf8b4].Push(moveX * SLIDE_SCALE, moveY * SLIDE_SCALE, 0.0f);
+                    RunSpeedFalloff();
+                    if (LeanEasesBack(LEAN_EASE_FAST))
+                    {
+                        DAT_10866de8.Fill(0.0f);
+                        DAT_10db6ee8[0].spinAngle = 0.0f;
+                    }
+                }
+                else
+                {
+                carryAction:
+                    if (DAT_104bfdcc != 0)
+                    {
+                        if (DAT_104bfddc == 0 && (DAT_104bfdd0 == 1 || DAT_104bfdd0 == 2))
+                        {
+                            // Choose the side the object is pushed to from the walk direction.
+                            Vec4 playerToCarried;
+                            Vec4 stepDirection;
+                            playerToCarried.Copy(DAT_10db9210.GetTranslation() -
+                                                 DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation());
+                            stepDirection.Set(moveX, moveY, 0.0f, 0.0f);
+                            playerToCarried.Normalized3();
+                            stepDirection.Normalized3();
+                            if (DAT_104bfdcc > CARRY_DRAG_FRAME)
+                            {
+                                float side = Vec3_Dot(&playerToCarried, &stepDirection);
+                                DAT_104bfddc = 1;
+                                if (0.0f <= side)
+                                {
+                                    DAT_104bfdd4 = 0;
+                                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_CARRY_RIGHT, 0, CARRY_MOTION_BLEND, 1.0f);
+                                }
+                                else
+                                {
+                                    DAT_104bfdd4 = 1;
+                                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_CARRY_LEFT, 0, CARRY_MOTION_BLEND, 1.0f);
+                                }
+                            }
+                            if (DAT_104bfdd0 == 1)
+                            {
+                                DAT_1020d648 = 0.0f;
+                                DAT_1020aee8 = moveX <= 0.0f ? -CARRY_SIDE_PUSH : CARRY_SIDE_PUSH;
+                            }
+                            else
+                            {
+                                DAT_1020aee8 = 0.0f;
+                                DAT_1020d648 = moveY <= 0.0f ? -CARRY_SIDE_PUSH : CARRY_SIDE_PUSH;
+                            }
+                        }
+                        DAT_10db6ee8[DAT_104bfdd8].m_02a0 = 1;
+                        DAT_10db6ee8[DAT_104bf8b4].m_02a0 = 1;
+                        // Frames 0x1d..0x10: both models slide along the push direction.
+                        if (DAT_104bfdcc >= CARRY_SHOVE_FIRST && DAT_104bfdcc < CARRY_PUSH_FRAME)
+                        {
+                            DAT_10db6ee8[DAT_104bfdd8].m_0075 = 1;
+                            DAT_10db6ee8[0].m_0075 = 1;
+                            if (DAT_104bfdd4 == 0)
+                            {
+                                DAT_10db6ee8[DAT_104bfdd8].SetMoveStep(
+                                    DAT_1020aee8 * DAT_10202360[DAT_104bfdcc] * CARRY_SHOVE_SCALE,
+                                    DAT_1020d648 * DAT_10202360[DAT_104bfdcc] * CARRY_SHOVE_SCALE, 0.0f);
+                                DAT_10db6ee8[DAT_104bf8b4].SetMoveStep(
+                                    DAT_1020aee8 * DAT_10202360[DAT_104bfdcc - 2] * CARRY_SHOVE_SCALE,
+                                    DAT_1020d648 * DAT_10202360[DAT_104bfdcc - 2] * CARRY_SHOVE_SCALE, 0.0f);
+                            }
+                            else
+                            {
+                                DAT_10db6ee8[DAT_104bfdd8].SetMoveStep(
+                                    DAT_1020aee8 * DAT_102023e0[DAT_104bfdcc - 2] * CARRY_SHOVE_SCALE,
+                                    DAT_1020d648 * DAT_102023e0[DAT_104bfdcc - 2] * CARRY_SHOVE_SCALE, 0.0f);
+                                DAT_10db6ee8[DAT_104bf8b4].SetMoveStep(
+                                    DAT_1020aee8 * DAT_102023e0[DAT_104bfdcc] * CARRY_SHOVE_SCALE,
+                                    DAT_1020d648 * DAT_102023e0[DAT_104bfdcc] * CARRY_SHOVE_SCALE, 0.0f);
+                            }
+                            DAT_10db6ee8[DAT_104bfdd8].velocity.Fill(0.0f);
+                            DAT_10db6ee8[DAT_104bf8b4].velocity.Fill(0.0f);
+                        }
+                        // Frame 0x1e: test whether the player and the object both have room for the push, then commit.
+                        if (DAT_104bfdcc == CARRY_PUSH_FRAME)
+                        {
+                            Vec4 pushStep;
+                            int pushOrder[2];
+                            int clearCount;
+                            int mover;
+                            if (DAT_1020aee8 > 0.0f)
+                                pushStep.Set(CARRY_GRID, 0.0f, 0.0f, 0.0f);
+                            if (DAT_1020aee8 < 0.0f)
+                                pushStep.Set(-CARRY_GRID, 0.0f, 0.0f, 0.0f);
+                            if (DAT_1020d648 > 0.0f)
+                                pushStep.Set(0.0f, CARRY_GRID, 0.0f, 0.0f);
+                            if (DAT_1020d648 < 0.0f)
+                                pushStep.Set(0.0f, -CARRY_GRID, 0.0f, 0.0f);
+                            if (DAT_104bfdd4 == 0)
+                            {
+                                pushOrder[1] = DAT_104bfdd8;
+                                pushOrder[0] = 0;
+                            }
+                            else
+                            {
+                                pushOrder[0] = DAT_104bfdd8;
+                                pushOrder[1] = 0;
+                            }
+                            Vec4 playerStart = DAT_10db9210.GetTranslation();
+                            Vec4 carriedStart = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
+                            Matrix4 unusedMatrix;
+                            unusedMatrix.SetIdentity();
+                            clearCount = 0;
+                            for (i = 0; i < 2; i++)
+                            {
+                                Vec4 noOffset;
+                                Vec4 liftOffset;
+                                noOffset.Fill(0.0f);
+                                liftOffset.Set(0.0f, 0.0f, CARRY_LIFT, 0.0f);
+                                mover = pushOrder[i];
+                                Vec4 moverAt = DAT_10db6ee8[mover].matrix.GetTranslation();
+                                if (mover == 0)
+                                    DAT_10db6ee8[mover].matrix.SetTranslation(
+                                        moverAt + (pushStep * CARRY_GRID).Divided(CARRY_GRID));
+                                else
+                                {
+                                    DAT_10db6ee8[mover].matrix.SetTranslation(moverAt + pushStep);
+                                    DAT_10db6ee8[mover].SnapPosition(CARRY_GRID, 0.0f);
+                                }
+                                if ((i == 1 || DAT_10db6ee8[mover].IsClearAny(&noOffset) != 0 ||
+                                     DAT_10db6ee8[mover].IsClearAny(&liftOffset) != 0) &&
+                                    (DAT_10db6ee8[mover].IsClearOfMapLimited(&noOffset) != 0 ||
+                                     DAT_10db6ee8[mover].IsClearOfMapLimited(&liftOffset) != 0))
+                                    clearCount = clearCount + 1;
+                                DAT_10db6ee8[mover].root->UpdateWorld(DAT_10db6ee8[mover].matrix,
+                                                                      DAT_10db6ee8[mover].motionFrame);
+                            }
+                            DAT_10db9210.SetTranslation(playerStart);
+                            DAT_10db6ee8[DAT_104bfdd8].matrix.SetTranslation(carriedStart);
+                            if (clearCount == 2)
+                            {
+                                Vec4 soundAt = DAT_10db9210.GetTranslation();
+                                FUN_1003ad20(SOUND_CARRY_PUSH, &soundAt, 1.0f);
+                            }
+                            else
+                            {
+                                DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
+                                DAT_10db6ee8[0].m_0075 = 0;
+                                DAT_104bfddc = 0;
+                                DAT_104bfdcc = 0;
+                                DAT_10db6ee8[0].PlayMotion(MOTION_STAND, 0, 5, 1.0f);
+                                DAT_10db6ee8[DAT_104bfdd8].m_02a0 = 0;
+                            }
+                            DAT_10db6ee8[pushOrder[0]].root->UpdateWorld(DAT_10db6ee8[pushOrder[0]].matrix,
+                                                                         DAT_10db6ee8[pushOrder[0]].motionFrame);
+                            DAT_10db6ee8[pushOrder[1]].root->UpdateWorld(DAT_10db6ee8[pushOrder[1]].matrix,
+                                                                         DAT_10db6ee8[pushOrder[1]].motionFrame);
+                        }
+                        DAT_104bfdcc = DAT_104bfdcc - 1;
+                        if (DAT_104bfdcc == CARRY_RESET_FRAME)
+                            goto carryFinish;
+                        if (DAT_104bfdcc < CARRY_DRAG_FRAME + 1)
+                        {
+                            if (DAT_104bfdcc < CARRY_SETTLE_FRAME)
+                                goto carryFinish;
+                            // Frames 10..8: the player is drawn toward the object.
+                            DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
+                            DAT_10db6ee8[0].m_0075 = 0;
+                            Vec4 playerToObject;
+                            playerToObject.Copy(DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation() -
+                                                DAT_10db9210.GetTranslation());
+                            DAT_10db6ee8[DAT_104bf8b4].SetMoveStep(playerToObject.x * CARRY_DRAG_SCALE,
+                                                                   playerToObject.y * CARRY_DRAG_SCALE, 0.0f);
+                        }
+                        else if (DAT_104bfdcc < CARRY_SNAP_FRAME + 1)
+                        {
+                            // Frames 14..11: the object settles onto its grid cell.
+                            Vec4 before = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
+                            DAT_10db6ee8[DAT_104bfdd8].SnapPosition(CARRY_GRID, 0.0f);
+                            Vec4 after = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
+                            DAT_10db6ee8[DAT_104bfdd8].SetMoveStep((after.x - before.x) * CARRY_SNAP_SCALE,
+                                                                   (after.y - before.y) * CARRY_SNAP_SCALE, 0.0f);
+                            DAT_10db6ee8[DAT_104bfdd8].matrix.SetTranslation(before);
+                        }
+                        goto carryEasing;
+                    carryFinish:
+                        DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
+                        DAT_10db6ee8[0].m_0075 = 0;
+                        DAT_104bfddc = 0;
+                        DAT_104bfdcc = 0;
+                        {
+                            Vec4 noOffset;
+                            noOffset.Fill(0.0f);
+                            Vec4 objectAt = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
+                            DAT_10db6ee8[DAT_104bfdd8].SnapPosition(CARRY_GRID, 0.0f);
+                            if (DAT_10db6ee8[DAT_104bfdd8].IsClearAny(&noOffset) == 0 ||
+                                DAT_10db6ee8[DAT_104bfdd8].IsClearOfMapLimited(&noOffset) == 0)
+                                DAT_10db6ee8[DAT_104bfdd8].matrix.SetTranslation(objectAt);
+                        }
+                        bool putDown = DAT_104c0074 != 0;
+                        DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
+                        DAT_10db6ee8[0].m_0075 = 0;
+                        if (putDown)
+                        {
+                            DAT_10db6ee8[DAT_104bfdd8].SnapPosition(CARRY_GRID, 0.0f);
+                            DAT_104c0074 = 0;
+                            DAT_104bfdc8 = 0;
+                            DAT_104bfdcc = 0;
+                            DAT_104bfdd0 = 0;
+                            DAT_104c0090 = 1;
+                        }
+                    }
+                carryEasing:
+                    RunSpeedFalloff();
+                    if (LeanEasesBack(LEAN_EASE_FAST))
+                    {
+                        DAT_10866de8.Fill(0.0f);
+                        DAT_10db6ee8[0].spinAngle = 0.0f;
+                    }
+                }
+                goto settleCheck;
+            }
+            // Steering: walk, leap over an obstacle, swim or slide.
+            if (DAT_104bfdc8 == 0)
+            {
+                if (DAT_104bfe30 == 0)
+                {
+                    if ((DAT_104c00e0 == 0 || DAT_104c00e8 != 0x30) && DAT_104c02e4 == 0 && DAT_104c02ed == 0 &&
+                        DAT_104c0300 == 0)
+                        DAT_10db6ee8[DAT_104bf8b4].M_101629b0(moveX, moveY);
+                    if (DAT_104c00e0 != 0 && DAT_104c00f4 > 0 && DAT_104c02e4 == 0)
+                        DAT_102199b0 = DAT_10db6ee8[DAT_104bf8b4].targetHeading;
+                leapCheck:
+                    if (DAT_104bfe30 == 0)
+                        goto carryCheck;
+                }
+            leapStart:
+                // The leap over an obstacle (DAT_104bfe44 is its node): the stage counter runs the approach (0-4), the
+                // look (5), the climb (6-0x31), the rise and fall along the leap curve and the landing.
+                float leapCurve[LEAP_CURVE_LENGTH];
+                float leapAngle;
+                leapCurve[0] = 0.4f;
+                leapCurve[1] = 0.5f;
+                leapCurve[2] = 0.3f;
+                leapCurve[3] = 0.3f;
+                leapCurve[4] = 0.3f;
+                leapCurve[5] = 0.6f;
+                leapCurve[6] = 1.0f;
+                leapCurve[7] = 1.8f;
+                leapCurve[8] = 1.8f;
+                leapCurve[9] = 1.2f;
+                leapCurve[10] = 0.5f;
+                leapCurve[11] = 0.0f;
+                leapCurve[12] = 0.0f;
+                leapCurve[13] = 0.0f;
+                leapCurve[14] = 0.6f;
+                leapCurve[15] = 0.8f;
+                leapCurve[16] = 1.0f;
+                leapCurve[17] = 1.0f;
+                leapCurve[18] = 1.0f;
+                leapCurve[19] = 1.0f;
+                leapCurve[20] = 1.0f;
+                leapCurve[21] = 1.2f;
+                leapCurve[22] = 1.2f;
+                leapCurve[23] = 0.8f;
+                leapCurve[24] = 0.0f;
+                leapCurve[25] = 0.0f;
+                leapCurve[26] = 0.0f;
+                leapCurve[27] = 0.0f;
+                DAT_104bfe38 = 1;
+                DAT_104bfe34 = 0;
+                if (DAT_104bfe40 < LEAP_STAGE_LOOK)
+                {
+                    Vec4 toObstacle;
+                    Vec4 obstacleAt;
+                    DAT_10db6ee8[0].PlayMotion(0x14, 0, 3, 1.0f);
+                    DAT_104bfe40 = DAT_104bfe40 + 1;
+                    toObstacle.Copy(DAT_10db9210.GetTranslation());
+                    obstacleAt.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
+                    toObstacle.Copy(obstacleAt - toObstacle);
+                    DAT_10db6ee8[0].Push(toObstacle.x * LEAP_PUSH_X, toObstacle.y * LEAP_PUSH_Y, 0.0f);
+                    leapAngle = (float)atan2(toObstacle.x, toObstacle.y);
+                    goto leapFace;
+                }
+                if (DAT_104bfe40 != LEAP_STAGE_LOOK)
+                {
+                    if (DAT_104bfe40 < LEAP_STAGE_CLIMB_END)
+                    {
+                        Vec4 climbAt;
+                        Vec4 obstacleAt;
+                        DAT_104bfe40 = DAT_104bfe40 + 1;
+                        climbAt.Copy(DAT_10db9210.GetTranslation());
+                        obstacleAt.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
+                        if (DAT_104bfe40 == 0x1f)
+                            DAT_10836c84.Copy((obstacleAt - climbAt).Divided(20.0f));
+                        if (DAT_104bfe40 < 0x2c)
+                        {
+                            if (DAT_104bfe40 > 0x25)
+                            {
+                                climbAt.x = DAT_10836c84.x * LEAP_DRIFT_FAST + climbAt.x;
+                                climbAt.y = DAT_10836c84.y * LEAP_DRIFT_FAST + climbAt.y;
+                            }
+                            if (DAT_104bfe40 < 0x25)
+                                climbAt.z = DAT_10836c84.z * LEAP_DRIFT_LIFT + climbAt.z;
+                            DAT_10db6ee8[0].SetPosition(climbAt.x, climbAt.y, climbAt.z);
+                            DAT_10db6ee8[0].targetHeading = (float)atan2(DAT_10836c84.x, DAT_10836c84.y) + LEAP_FACE_TURN;
+                            DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
+                        }
+                        if (DAT_104bfe40 == 0x2d)
+                            DAT_10836c84.Copy((obstacleAt - climbAt).Divided(5.0f));
+                        if (DAT_104bfe40 < 0x2d)
+                        {
+                            climbAt.Copy(obstacleAt - climbAt);
+                            leapAngle = (float)atan2(climbAt.x, climbAt.y);
+                        }
+                        else
+                        {
+                            climbAt.Copy(climbAt + DAT_10836c84);
+                            DAT_10db6ee8[0].SetPosition(climbAt.x, climbAt.y, climbAt.z);
+                            leapAngle = (float)atan2(DAT_10836c84.x, DAT_10836c84.y);
+                        }
+                        goto leapFace;
+                    }
+                    if (DAT_104bfe40 == LEAP_STAGE_CLIMB_END)
+                    {
+                    leapEnd:
+                        DAT_104bfe30 = 0;
+                        DAT_10db6ee8[DAT_104bf8b4].mode = 1;
+                        DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
+                        goto leapEasing;
+                    }
+                    if (DAT_104bfe40 < LEAP_STAGE_RISE_END)
+                    {
+                        Vec4 playerAt;
+                        Vec4 obstacleAt;
+                        float rise;
+                        DAT_104bfe40 = DAT_104bfe40 + 1;
+                        DAT_10db6ee8[0].m_238c = 1;
+                        if (DAT_102027f4 == 1.0f)
+                            rise = leapCurve[DAT_104bfe40 - 60];
+                        else
+                            rise = leapCurve[DAT_104bfe40 * 2 - 129] + leapCurve[DAT_104bfe40 * 2 - 130];
+                        DAT_10db6ee8[0].Push(0.0f, 0.0f, rise * LEAP_HEIGHT_SCALE);
+                        DAT_10db6ee8[0].m_238c = 0;
+                        playerAt.Copy(DAT_10db9210.GetTranslation());
+                        obstacleAt.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
+                        playerAt.Copy(obstacleAt - playerAt);
+                        leapAngle = (float)atan2(playerAt.x, playerAt.y);
+                        goto leapFace;
+                    }
+                    if (DAT_104bfe40 == LEAP_STAGE_RISE_END)
+                        goto leapLand;
+                    if (DAT_104bfe40 < LEAP_STAGE_FALL_END)
+                    {
+                        Vec4 playerAt;
+                        Vec4 obstacleAt;
+                        float fall;
+                        if (DAT_10db6ee8[0].m_0d48 != 0)
+                            goto leapEnd;
+                        DAT_104bfe40 = DAT_104bfe40 + 1;
+                        DAT_10db6ee8[0].m_238c = 1;
+                        if (DAT_102027f4 == 1.0f)
+                            fall = leapCurve[DAT_104bfe40 - 66] * -LEAP_HEIGHT_SCALE;
+                        else
+                            fall = leapCurve[DAT_104bfe40 * 2 - 154] * -LEAP_HEIGHT_SCALE -
+                                   leapCurve[DAT_104bfe40 * 2 - 153] * LEAP_HEIGHT_SCALE;
+                        DAT_10db6ee8[0].Push(0.0f, 0.0f, fall);
+                        DAT_10db6ee8[0].m_0d48 = 0;
+                        DAT_10db6ee8[0].m_238c = 0;
+                        playerAt.Copy(DAT_10db9210.GetTranslation());
+                        obstacleAt.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
+                        playerAt.Copy(obstacleAt - playerAt);
+                        leapAngle = (float)atan2(playerAt.x, playerAt.y);
+                        goto leapFace;
+                    }
+                    if (DAT_104bfe40 == LEAP_STAGE_FALL_END)
+                    {
+                    leapLand:
+                        {
+                            Vec4 landAt = DAT_10db9210.GetTranslation();
+                            FUN_1003ad20(SOUND_LEAP_LAND, &landAt, 1.0f);
+                        }
+                        DAT_10db6ee8[0].SnapHeight(LEAP_SNAP_STEP, LEAP_SNAP_OFFSET);
+                        DAT_104bfe40 = 0x62;
+                        goto leapEasing;
+                    }
+                    if (DAT_104bfe40 < LEAP_STAGE_DONE)
+                    {
+                        DAT_104bfe40 = DAT_104bfe40 + 1;
+                        goto leapEasing;
+                    }
+                    // Stage 100: wait for the steer to start the next vault, or turn round when too far away.
+                    {
+                        Vec4 waitAt;
+                        Vec4 obstacleNow;
+                        waitAt.Copy(DAT_10db9210.GetTranslation());
+                        obstacleNow.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
+                        if (LEAP_REACH_LIMIT <= waitAt.Distance(obstacleNow))
+                        {
+                            if (steerY > LEAP_VAULT_STEER)
+                            {
+                                DAT_104bfe48 = DAT_104bfe48 + 1;
+                                DAT_102027f4 = 2.0f;
+                                DAT_10db6ee8[DAT_104bf8b4].PlayMotion((DAT_104bfe48 & 1) == 0 ? 0x16 : 0x17, 2, 2, 2.0f);
+                                DAT_104bfe40 = 0x41;
+                                Vec4 resumeAt = DAT_10db9210.GetTranslation();
+                                DAT_10db6ee8[0].SetPosition(resumeAt.x, resumeAt.y, resumeAt.z);
+                            }
+                            else if (steerY < -LEAP_VAULT_STEER)
+                            {
+                                DAT_104bfe48 = DAT_104bfe48 + 1;
+                                DAT_102027f4 = 2.0f;
+                                DAT_10db6ee8[DAT_104bf8b4].PlayMotion((DAT_104bfe48 & 1) == 0 ? 0x16 : 0x17, 2, 2, 2.0f);
+                                DAT_104bfe40 = 0x55;
+                                Vec4 resumeAt = DAT_10db9210.GetTranslation();
+                                DAT_10db6ee8[0].SetPosition(resumeAt.x, resumeAt.y, resumeAt.z);
+                            }
+                        }
+                        else
+                        {
+                            DAT_104bfe40 = 0x1e;
+                            DAT_10db6ee8[0].PlayMotion(0x1a, 2, 5, 1.0f);
+                            Vec4 resumeAt = DAT_10db9210.GetTranslation();
+                            DAT_10db6ee8[0].SetPosition(resumeAt.x, resumeAt.y, resumeAt.z);
+                        }
+                        {
+                            Vec4 playerAt;
+                            Vec4 obstacleAt;
+                            playerAt.Copy(DAT_10db9210.GetTranslation());
+                            obstacleAt.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
+                            playerAt.Copy(obstacleAt - playerAt);
+                            leapAngle = (float)atan2(playerAt.x, playerAt.y);
+                        }
+                    }
+                leapFace:
+                    DAT_10db6ee8[0].targetHeading = leapAngle + LEAP_FACE_TURN;
+                    DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
+                    goto leapEasing;
+                }
+                // Stage 5: the look ends; take the vault or wait.
+                DAT_10db6ee8[0].SnapHeight(LEAP_SNAP_STEP, LEAP_SNAP_OFFSET);
+                if (DAT_10db6ee8[0].m_238c == 0)
+                    DAT_104bfe40 = LEAP_STAGE_DONE;
+                else
+                {
+                    Vec4 groundAt = DAT_10db9210.GetTranslation();
+                    DAT_10db6ee8[0].SetPosition(groundAt.x, groundAt.y, groundAt.z);
+                    DAT_104bfe48 = DAT_104bfe48 + 1;
+                    DAT_10db6ee8[0].m_0d48 = 0;
+                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion((DAT_104bfe48 & 1) == 0 ? 0x16 : 0x17, 2, 5, 1.0f);
+                    DAT_104bfe40 = 0x3c;
+                }
+            leapEasing:
+                RunSpeedFalloff();
+                if (LeanEasesBack(LEAN_EASE_FAST))
+                {
+                    DAT_10866de8.Fill(0.0f);
+                    DAT_10db6ee8[0].spinAngle = 0.0f;
+                }
+            }
+            else
+            {
+                if (DAT_104bfe30 != 0)
+                    goto leapStart;
+                if (DAT_104bfe4c == 0 && DAT_104c0300 == 0 && DAT_104bfdcc == 0)
+                {
+                    DAT_104bfdcc = CARRY_PUSH_FRAME;
+                    if (DAT_104bfea9 == 0)
+                    {
+                        Vec4 gruntAt = DAT_10db9210.GetTranslation();
+                        int gruntPick = FUN_1013f880() % 2;
+                        if (DAT_104c0332 == 0)
+                            FUN_1003ad20(gruntPick + SOUND_GRUNT_BASE, &gruntAt, 1.0f);
+                    }
+                    DAT_104bfea9 = 1;
+                    goto leapCheck;
+                }
+            carryCheck:
+                if (DAT_104bfdc8 != 0)
+                    goto carryAction;
+            swimOrSlide:
+                if (DAT_104c0300 != 0)
+                    goto slideNoSteer;
+                if (DAT_104bfe4c != 0)
+                {
+                    if (DAT_104bfe54 >= SWIM_MIN_FRAME)
+                    {
+                        float depth;
+                        float lift;
+                        DAT_10db6ee8[0].m_238c = 1;
+                        depth = ((DAT_104bfe24 - SWIM_DEPTH_OFFSET) - DAT_10db6ee8[0].matrix._43) - 1.0f;
+                        if (depth > SWIM_RISE_LIMIT || depth > 0.0f)
+                            lift = depth <= SWIM_RISE_LIMIT ? depth : SWIM_RISE_LIMIT;
+                        else
+                            lift = 0.0f;
+                        DAT_10db6ee8[DAT_104bf8b4].Push(moveX * SWIM_PUSH_SCALE, moveY * SWIM_PUSH_SCALE, lift);
+                        DAT_10db6ee8[0].m_238c = 0;
+                    }
+                    RunSpeedFalloff();
+                    if (LeanEasesBack(LEAN_EASE_FAST))
+                    {
+                        DAT_10866de8.Fill(0.0f);
+                        DAT_10db6ee8[0].spinAngle = 0.0f;
+                    }
+                    goto settleCheck;
+                }
+                if (DAT_104c00e0 != 0)
+                {
+                    // Swinging: the model walks slowly while the swing runs, only if the step is clear.
+                    Vec4 swingStep;
+                    Vec4 swingProbe;
+                    if (moveInput == 1)
+                    {
+                        SteerLeanAndSpeed(moveX, moveY);
+                        swingStep.Set(DAT_102027ec * moveX, DAT_102027ec * moveY, 0.0f, 0.0f);
+                    }
+                    else
+                    {
+                        if (LeanEasesBack(LEAN_EASE_SLOW))
+                            DAT_10db6ee8[0].spinAngle = 0.0f;
+                        swingStep.Set(moveX * WALK_SCALE, moveY * WALK_SCALE, 0.0f, 0.0f);
+                        RunSpeedFalloff();
+                    }
+                    swingProbe.Set(swingStep.x * SWING_STEP_SCALE, swingStep.y * SWING_STEP_SCALE, swingStep.z + SWING_PROBE_LIFT,
+                                   swingStep.w);
+                    if (DAT_104c00e0 == 0 && DAT_104bfe1c == 0 && DAT_104c00d0 == 0 && DAT_1032d69c == 1 && DAT_104bfe6c == 0)
+                        DAT_10db6ee8[0].motion->m_0008 = DAT_102027ec / MOTION_SPEED_TOP;
+                    if (DAT_10db6ee8[DAT_104bf8b4].IsClearAny(&swingProbe) != 0 && DAT_104c00e0 < SWING_MAX_BLOCKED_STEPS)
+                        DAT_10db6ee8[DAT_104bf8b4].Push(swingStep.x, swingStep.y, 0.0f);
+                    goto settleCheck;
+                }
+                if (moveInput == 1)
+                {
+                    SteerLeanAndSpeed(moveX, moveY);
+                    if (DAT_104c00e0 == 0 && DAT_104bfe1c == 0 && DAT_104c00d0 == 0 && DAT_1032d69c == 1 && DAT_104bfe6c == 0)
+                        DAT_10db6ee8[0].motion->m_0008 = DAT_102027ec / MOTION_SPEED_TOP;
+                    DAT_10db6ee8[DAT_104bf8b4].Push(DAT_102027ec * moveX, DAT_102027ec * moveY, 0.0f);
+                }
+                else
+                {
+                    if (LeanEasesBack(LEAN_EASE_SLOW))
+                        DAT_10db6ee8[0].spinAngle = 0.0f;
+                    DAT_10db6ee8[DAT_104bf8b4].Push(moveX * WALK_SCALE, moveY * WALK_SCALE, 0.0f);
+                    RunSpeedFalloff();
+                }
+                if (DAT_10db6ee8[0].m_238c == 0 && DAT_10db6ee8[0].m_229c < 6 && DAT_10db6ee8[0].m_0090.x != 0.0f)
+                {
+                    DAT_1065cb18.Copy(DAT_10db6ee8[0].m_0090);
+                    DAT_104c02ed = 3;
+                    if (DAT_104c01d0 != 0)
+                        goto settleSlow;
+                    if (DAT_104c01d8 == 0 && DAT_104c01cc == 0 && DAT_104c01c8 == 0 && DAT_10db6ee8[0].hitSolid == 0)
+                    {
+                        Vec4 dustAt;
+                        dustAt.Copy(DAT_10db9210.GetTranslation());
+                        DAT_10daaa80.Start(EFFECT_SWING_DUST, dustAt, -1, 0, 0, 0, 0, 0, 0, 0);
+                        goto settleCheck;
+                    }
+                settleCommon:
+                    DAT_10db6ee8[0].speedScale = 1.0f;
+                }
+                else
+                {
+                settleCheck:
+                    if (DAT_104c01d0 == 0)
+                        goto settleCommon;
+                settleSlow:
+                    if (DAT_104c00e0 == 0 && DAT_104bfe1c == 0 && DAT_104c00d0 == 0 && DAT_1032d69c == 1 && DAT_104bfe6c == 0)
+                    {
+                        DAT_10db6ee8[0].speedScale = SPEED_SCALE_SLOW;
+                        DAT_10db6ee8[0].motion->m_0008 = MOTION_SPEED_SLOW;
+                    }
+                }
+                DAT_10edbd38.x = moveX;
+                DAT_10edbd38.y = moveY;
+                DAT_10866de8.x = DAT_10866de8.x * SMOOTH_OLD + moveX * SMOOTH_NEW;
+                DAT_10866de8.y = DAT_10866de8.y * SMOOTH_OLD + moveY * SMOOTH_NEW;
+                if (DAT_104bfdc8 != 0)
+                {
+                    DAT_10866de8.Fill(0.0f);
+                    if (fabs(DAT_10db9210.GetTranslation().z - DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation().z) <= CARRY_NEAR_HEIGHT &&
+                        DAT_10db9210.GetTranslation().Distance(DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation()) <= CARRY_NEAR_DISTANCE)
+                        goto movementTail;
+                    DAT_104c0074 = 1;
+                }
+            }
+        movementTail:
+            DAT_104bf8c4 = DAT_104bf8c4 - AIR_STEP_DECAY;
+            if (DAT_104bf8c4 < 1)
+                DAT_104bf8c4 = 0;
+        }
+movementDone:;
+        // The player follows a gust (DAT_104c02ed counts its ticks), the carried object is let go when it is out of
+        // reach, and the model stays at the water surface while swimming without steering.
+        if (DAT_104bfd0c != 0 && LeanEasesBack(LEAN_EASE_SLOW))
+            DAT_10db6ee8[0].spinAngle = 0.0f;
+        if (DAT_104c02ed != 0)
+        {
+            if (DAT_10db6ee8[0].m_238c == 0 && DAT_104c00e0 == 0)
+            {
+                DAT_104c02ed = DAT_104c02ed - 1;
+                DAT_10db6ee8[0].PlayMotion(MOTION_BOUNCE, 0, 5, 1.0f);
+                DAT_10db6ee8[0].targetHeading = (float)atan2(DAT_10db6ee8[0].m_00a0.x, DAT_10db6ee8[0].m_00a0.y) + LEAP_FACE_TURN;
+                if (DAT_1065cb18.x < 0.0f && DAT_10db6ee8[0].spinAngle > -BOUNCE_LEAN_LIMIT)
+                    DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle - BOUNCE_LEAN_STEP;
+                if (DAT_1065cb18.x > 0.0f && DAT_10db6ee8[0].spinAngle < BOUNCE_LEAN_LIMIT)
+                    DAT_10db6ee8[0].spinAngle = DAT_10db6ee8[0].spinAngle + BOUNCE_LEAN_STEP;
+            }
+            else
+            {
+                DAT_10db6ee8[0].hitSolid = 0;
+                DAT_104c02ed = 0;
+            }
+        }
+        DAT_10db6ee8[0].m_0013 = DAT_104c02ed;
+        if (DAT_104bfdc8 != 0 && DAT_104bfdd8 > 0)
+        {
+            if (DAT_10db9210.GetTranslation().Distance(DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation()) > CARRY_DROP_DISTANCE &&
+                DAT_104bfdc8 != 0)
+            {
+                DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
+                DAT_10db6ee8[0].m_0075 = 0;
+                DAT_104bfdc8 = 0;
+                DAT_104bfdcc = 0;
+                DAT_104c0090 = 1;
+            }
+        }
+        if (DAT_104c01e0 != 0)
+        {
+            DAT_10866de8.Fill(0.0f);
+            DAT_10db6ee8[0].spinAngle = 0.0f;
+        }
+        if (steerX == 0.0f && steerY == 0.0f)
+        {
+            RunSpeedFalloff();
+            if (LeanEasesBack(LEAN_EASE_FAST))
+            {
+                DAT_10866de8.Fill(0.0f);
+                DAT_10db6ee8[0].spinAngle = 0.0f;
+            }
+            if (DAT_104bfe4c != 0 && (DAT_10468128 != 0 || DAT_10db6ee8[0].m_229c > 8) && DAT_104bfe54 >= SWIM_MIN_FRAME)
+            {
+                float depth;
+                float lift;
+                DAT_10db6ee8[0].m_238c = 1;
+                depth = ((DAT_104bfe24 - SWIM_DEPTH_OFFSET) - DAT_10db6ee8[0].matrix._43) - 1.0f;
+                if (depth > SWIM_SHALLOW_LIMIT || depth > 0.0f)
+                    lift = depth <= SWIM_SHALLOW_LIMIT ? depth : SWIM_SHALLOW_LIMIT;
+                else
+                    lift = 0.0f;
+                DAT_10db6ee8[DAT_104bf8b4].Push(0.0f, 0.0f, lift);
+                DAT_10db6ee8[0].m_238c = 0;
+            }
+        }
 
         DAT_104c0098 = 0;
         if (DAT_104bfdc8 == 0)

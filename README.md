@@ -74,7 +74,9 @@ movies made at 2x or 4x their original size at the original size on screen with 
 ([`docs/MOVIES_HD.md`](docs/MOVIES_HD.md)). `mmv_tool.py encode` and the GUI make an HD movie from larger frames
 on their own, and the GUI's repackage adds the DLL to `out\`. Install by hand with
 `mod\install.bat "C:\path\to\Gurumin"`. Widescreen and any resolution are in the same DLL but parked and off
-([`docs/DISPLAY_MOD.md`](docs/DISPLAY_MOD.md)).
+([`docs/DISPLAY_MOD.md`](docs/DISPLAY_MOD.md)). An orbit camera (right stick or mouse, zoom) and higher-resolution
+dynamic shadows, ported from Gurumin Enhanced Rendering, are also in it, off by default and untested on the JP game
+([`docs/CAMERA_SHADOWS_JP.md`](docs/CAMERA_SHADOWS_JP.md)).
 
 ### English Steam release: Enhanced Rendering mod (`mod_en/`)
 The MIT-licensed **Gurumin Enhanced Rendering** mod by ObeseCatLord (v1.3.0) for the English Steam `game.exe`

@@ -20,6 +20,8 @@ The PC release targets 2006 hardware; modern machines can lift its limits.
   interpolation over the game's 30 Hz simulation, FXAA, a free/orbit camera and OpenXR VR. Its source is now bundled
   in `mod_en/` (v1.3.0, MIT; CI builds it). Next: port its features onto the decompiled JP code, and expose its
   settings in our configurator. Keep its licence and credit.
+  Started: its orbit camera and higher-resolution shadows are ported to the JP mod DLL, untested on the JP game
+  ([CAMERA_SHADOWS_JP.md](CAMERA_SHADOWS_JP.md)).
 - PSP-exclusive costumes: the Enhanced Rendering mod links the separate PSP Outfits mods (dinput8 proxy). Support
   loading them when the user supplies the files (never ship them).
 

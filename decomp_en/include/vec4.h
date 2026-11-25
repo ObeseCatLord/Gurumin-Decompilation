@@ -81,6 +81,7 @@ struct Matrix4
     void Translate(float x, float y, float z);      // EN 0x776ed0 (JP 0x101adec0)
     Matrix4 operator*(const Matrix4 &other) const;  // EN 0x76f230 (JP 0x101b0670): this transformed by `other` (row vectors)
     void SetRotationZ(float angle);               // EN 0x77a1a0 (JP 0x101ae710): rotation about the z axis in the upper-left 3x3
+    float Heading() const;                        // EN 0x774300 (JP 0x101b0a80): angle of the matrix's x axis in the x/y plane (atan2 of y over x)
 };
 
 // Rotation matrix looking from `eye` to `target` with `up` and roll `roll` (EN 0x77aea0, JP 0x101b1c20).

@@ -767,3 +767,7 @@ _Bgm_StartStream	0063e6d0
 ?Bgm_Play@@YAHHH@Z	005a5500
 # section 3 small (batch 11)
 _Char_RetireWaveEnemy	006d64e0
+_ImeCandidates_Draw	007ad1a0
+??0ModelInstance@@QAE@XZ	00709d80
+?FontRandom_Load@@YAHF@Z	007a4280
+?Heading@Matrix4@@QBEMXZ	00774300

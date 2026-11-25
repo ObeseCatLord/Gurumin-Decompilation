@@ -3,8 +3,10 @@
 #include <windows.h>
 #include <mmsystem.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "engine.h"
+#include "game_file.h"
 #include "render.h"
 
 // FrameTimer_ResetNext2: next-frame deadline = now + one frame; returns 0. Called when the main loop restarts.
@@ -63,4 +65,29 @@ extern "C" int Random(void)
 extern "C" int Render_SetRenderState(unsigned long state, unsigned long value)
 {
     return RenderState_Set(state, value);
+}
+
+// Bytes of the random table file (fontr.dat).
+const int RANDOM_TABLE_FILE_SIZE = RANDOM_TABLE_SIZE * sizeof(int);
+// Data folder number of fontr.dat.
+const int RANDOM_TABLE_FOLDER = 0;
+
+// FontRandom_Load: loads the 256 KB table fontr.dat into the random table, or fills it with rand() when the file is
+// missing. Also stores `value` as the position in the table. C++ linkage: the GameFile local needs an exception
+// frame. Called at start-up. Lives here because the original inlines Path_Data into it.
+int FontRandom_Load(short value)
+{
+    g_randomPosition = value;
+    GameFile file;
+    if (file.Open(Path_Data("fontr.dat", RANDOM_TABLE_FOLDER), "rb") != 0)
+    {
+        file.Read(g_randomTable, 1, RANDOM_TABLE_FILE_SIZE);
+        file.Close();
+    }
+    else
+    {
+        for (int i = 0; i < RANDOM_TABLE_SIZE; i++)
+            g_randomTable[i] = rand();
+    }
+    return 0;
 }

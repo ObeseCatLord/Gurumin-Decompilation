@@ -5,8 +5,9 @@ Re-run after each batch (finished items drop out). Per function: `python tools/p
 the JP twin's matched source, the EN callees with their JP names and the EN disassembly (`--brief` makes a
 subagent brief). Low-confidence map rows: check the twin before porting.
 
-## 1. Walls to retry (76)
+## 1. Walls to retry (82)
 
+- [ ] `005a5500` — Bgm_Play: 31 diffs, frame 0x15c vs 0x154; the original keeps the header check word in the dead parameter slot [ebp+8] (index lives only in esi after the first test) while ours gives index/track its own local; five spellings tried (param modified in place, separate track local, declaration orders)
 - [ ] `005beb30` — Enemy_BackAwayFromPlayer: 1000 vs 994 bytes, only the move.x/move.y *= speedScale pair differs (original multiplies both then stores y then x); tried x-first, y-first, scale-on-left, float temporaries
 - [ ] `005bf520` — Enemy_TurnToPlayer: 149 diffs; EN keeps a targetHeading store in each clamp branch with a shared tail, ours merges them
 - [ ] `005c0ca0` — Party_BlocksMove: only the load of the 0.25 tolerance constant (before the andpd in the original, after it here) differs; tried comparison direction, local turn, AbsFloat helper, fabsf
@@ -24,6 +25,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0063fc10` — Sound_PlayEffect: EN hoists cvtps2pd of the volume to the top; 507 vs 519 bytes
 - [ ] `00642ca0` — Steam_UnlockAchievement: 4 bytes; same mov eax/jmp eax slot-call form
 - [ ] `00643b20` — ListBank::DeclareFunction: 21 diffs; first source copy should reuse the parameter slot, one cmp scheduled earlier
+- [ ] `00644970` — Message_Open: stores and the three-register split differ; ours takes slot*0x280 into esi and spills the line pointers (original rematerialises lines 1-3 as [edi+base+N] and keeps only line 4 in ebx, slot in esi); locals-per-line and direct-index spellings tried
 - [ ] `00645ad0` — ListBank::DeclareVariable: original keeps `this` in ebx and lays out the type 0/1 block before type 2; ours spills this to the stack
 - [ ] `00646ae0` — Char_SetHelmetModel: bytes equal except one duplicated epilogue after the if chain (nested ifs and one && chain tried)
 - [ ] `00649c00` — Object_SlowNearBlocker: 8 diffs, same length; the original loads distance into xmm0 and 400.0 into xmm1 before the first comiss (ours the reverse) and builds 0.05f in the distanceAfter stack slot; eight spellings tried (nested ifs, continue, local range, reordered tests, local slowdown)
@@ -47,16 +49,20 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00750450` — Node::RemoveChild: 1 diff, the inlined strcpy loop addresses [ecx + ebx - 1] in the original, [ebx + ecx - 1] in ours
 - [ ] `00752190` — Node::DrawShadow: 1453 vs 1456, casterSize register choice (movaps xmm0,xmm1 copy)
 - [ ] `00754e20` — Node::CylindersOverlap: 8 diffs, dx/dy temporaries live in swapped xmm2/xmm3 registers
+- [ ] `007550b0` — Node::CylinderSphereOverlap: 6 bytes off, three adds of point.y load sphere->y first where the original loads the offset first (z already flips the right way); source operand order and statement order make no difference
 - [ ] `0076f810` — KeyTrack::Insert: shift loop matches with a local values pointer, but the original keeps the frame argument in ebx and count in edx (lea ebx,[edx-1]); tried member-wise, Vec4 copy, local count, while loop
+- [ ] `007703f0` — KeyBank::Sample (int frame): not attempted past reading; four Spline calls are inlined with the t factor shared and spilled, float schedule too fragile (JP Spline itself is unmatched)
 - [ ] `00775320` — View_ContainsPoint: 6 bytes off, one subss placement in the behind-camera branch
 - [ ] `00777410` — Vec3_Normalized: 8 bytes off, xmm0/xmm2 numbering of x and y only
 - [ ] `00777770` — PerspectiveMatrix: first 200 bytes match; tail stores m[10] and m[14] in a different order (farPlane*nearPlane operand order)
 - [ ] `00779300` — Vec4::RotateY: 9 bytes off, xmm2/xmm3 numbering only (RotateX matches with the same form)
 - [ ] `00779400` — Vec4::RotateZ: 17 bytes off; y*cos is scheduled before x*sin so the products land in swapped xmm registers; six spellings tried (JP form, operand flips, cos/sin locals in both orders)
 - [ ] `00779540` — KeyTrack::Set: Vec4 shift loop; original copies four dwords without reloading values; member-wise copy reloads [edi+8]
+- [ ] `0077d950` — TextureObject::Upload: pixel loops match; this/height swap esi/edi and the original spills one pointer less (frame 0x10, ours 0x18); pointer and offset spellings tried
 - [ ] `0078ae20` — EN rewrite of JP DrawTinted (extra mode argument, widescreen globals); port from the EN bytes, not JP
 - [ ] `0078bc00` — EN rewrite of JP SwapTarget_DrawPreview (back-buffer RECT, device vtable +0x88); port from the EN bytes
 - [ ] `0078ce10` — TextureObject::DrawThroughShader: 1187 vs 1279; original recomputes u - 1/512 for every store
+- [ ] `00792370` — Render_DrawGradientQuad (stdcall, 8 args): 110 bytes off, only the scheduling of the x/y scale multiplies and stores; six orderings of the y/x statements and local-vs-chain spellings tried
 - [ ] `007955c0` — DrawFrame: EN differs from JP (stage alpha before colour, second pass, stage-1 tail); JP draft 2550 vs 2138 bytes
 - [ ] `007a2790` — FontRenderer::DrawStringToBuffer: 1559 vs 1224; original tail-merges the digit/punctuation branches, y kept in edx
 - [ ] `007a3be0` — FontSet::Release: scheduling (fonts[0] loaded before the DeleteObject pointer; ends with lea eax,[edi+1])
@@ -84,16 +90,11 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007c5a60` — SoundArc_PlayFile: EN keeps the queue index in a byte and recomputes slot*0x1c0 for the tick store; every spelling keeps one pointer
 - [ ] `007c5f80` — SoundEngine_SetOptions: store of the tens digit scheduled after the second division
 
-## 2. JP twin matched: port the JP source (104 functions, 191500 bytes)
+## 2. JP twin matched: port the JP source (99 functions, 190424 bytes)
 
-- [ ] `0071dd90` 16 bytes <- APP.dll `10184160` WorldRenderer::DrawScreenOverlays [decomp/src/world_caption.cpp] (high 0.90)
-- [ ] `0063e6d0` 144 bytes <- APP.dll `10010480` Bgm_StartStream [decomp/src/bgm_stream.cpp] (high 0.74)
 - [ ] `007a5ca0` 146 bytes <- APP.dll `1013e6f0` Names_Set [decomp/src/names_od.cpp] (high 0.61)
-- [ ] `00709d80` 211 bytes <- APP.dll `101728c0` ModelInstance::ModelInstance [decomp/src/anim_channels.cpp] (medium 0.59)
-- [ ] `007a4280` 217 bytes <- APP.dll `1014b1c0` FontRandom_Load [decomp/src/type_parse.cpp] (high 0.67)
 - [ ] `007bebb0` 380 bytes <- APP.dll `101602d0` File_Checksum [decomp/src/file_check.cpp] (medium 0.50)
 - [ ] `005e2f00` 427 bytes <- APP.dll `10054a60` Game::RaiseGameOverEvents [decomp/src/app_0003.cpp] (medium 0.57)
-- [ ] `005a5500` 488 bytes <- APP.dll `1003aef0` Bgm_Play [decomp/src/bgm_play.cpp] (medium 0.57)
 - [ ] `005f50b0` 496 bytes <- APP.dll `100541f0` Enemy_Destroy [decomp/src/enemy_destroy.cpp] (high 0.99)
 - [ ] `005cc8c0` 505 bytes <- APP.dll `1000cc30` Hud_DrawNameBanners [decomp/src/name_banners.cpp] (high 0.94)
 - [ ] `00602f70` 516 bytes <- APP.dll `1000fb80` Loading_Tick [decomp/src/loading_tick.cpp] (high 1.00)
@@ -191,7 +192,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007ab210` 7222 bytes <- APP.dll `1015d520` Text_ToFullWidth [decomp/src/text_fullwidth.cpp] (high 0.65)
 - [ ] `005d3360` 7715 bytes <- APP.dll `10038c10` Scene_DrawFrame [decomp/src/scene_draw.cpp] (high 0.85)
 
-## 3. JP twin not matched yet (381 functions, 1463605 bytes)
+## 3. JP twin not matched yet (376 functions, 1458126 bytes)
 
 - [ ] `006eab60` 10 bytes <- sound3d.dll `1004be9d`  (medium 0.35)
 - [ ] `007af3b0` 23 bytes <- sound3d.dll `100595ec`  (low 0.19)
@@ -314,11 +315,9 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005c1080` 689 bytes <- APP.dll `100ba040` Npc_PlayGreeting (high 0.95)
 - [ ] `00778ed0` 690 bytes <- APP.dll `101b1290` Vec4::RotateAxis (high 0.61)
 - [ ] `005ba770` 693 bytes <- APP.dll `100e21a0` Enemy_DefaultStep (high 0.84)
-- [ ] `00644970` 704 bytes <- APP.dll `10056260` Message_Open (low 0.23)
 - [ ] `005c9c50` 712 bytes <- APP.dll `1005dbf0` Player_TakeDamage (high 0.89)
 - [ ] `005ca1d0` 713 bytes <- APP.dll `10054550` Sound_PlayDelayed (medium 0.36)
 - [ ] `005a5e10` 735 bytes <- APP.dll `1002a490` Block_Update (high 0.99)
-- [ ] `0077d950` 763 bytes <- APP.dll `1014f1f0` TextureObject::Upload (high 0.86)
 - [ ] `005b43f0` 780 bytes <- APP.dll `1000e870` AntiTamper_Check (high 0.97)
 - [ ] `007aeb00` 794 bytes <- sound3d.dll `1001da8a` Format (medium 0.38)
 - [ ] `00773f20` 801 bytes <- APP.dll `101b17a0`  (high 0.73)
@@ -344,7 +343,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00602730` 967 bytes <- APP.dll `10051190` MapCursor_Step (high 0.70)
 - [ ] `006b33f0` 969 bytes <- APP.dll `100d2110`  (high 0.95)
 - [ ] `00774f00` 981 bytes <- APP.dll `101b0d40`  (high 0.90)
-- [ ] `00792370` 987 bytes <- APP.dll `10143bc0` Render_DrawGradientQuad (high 0.71)
 - [ ] `005be740` 995 bytes <- APP.dll `10027630` Enemy_ChasePlayer (high 0.97)
 - [ ] `005e75f0` 1014 bytes <- APP.dll `10055ee0` Player_KnockBack (high 0.96)
 - [ ] `0074fcf0` 1026 bytes <- APP.dll `1019e120` Node::BuildCollisionSpheres (high 0.74)
@@ -368,7 +366,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00603180` 1200 bytes <- APP.dll `1003b6e0` Costume_LoadPlayerModel (high 0.86)
 - [ ] `00646df0` 1204 bytes <- APP.dll `10014d30` Helmet_FaceSettings (high 0.77)
 - [ ] `00654b60` 1212 bytes <- APP.dll `10034210` Move_SweepToWorld (high 0.61)
-- [ ] `007550b0` 1224 bytes <- APP.dll `10192c90` Node::CylinderSphereOverlap (high 0.66)
 - [ ] `005e29a0` 1228 bytes <- APP.dll `10038070` DrawItemPreview (high 0.64)
 - [ ] `007bd240` 1235 bytes <- Packs.dll `10006a40`  (medium 0.55)
 - [ ] `006eda40` 1240 bytes <- Packs.dll `1000f696`  (low 0.26)
@@ -416,7 +413,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0073e6e0` 1771 bytes <- APP.dll `1016b6c0` Camera_TrackPathFrame (high 0.88)
 - [ ] `007ad690` 1778 bytes <- sound3d.dll `1005011d`  (medium 0.39)
 - [ ] `007c0850` 1785 bytes <- sound3d.dll `10004c20`  (high 0.89)
-- [ ] `007703f0` 1801 bytes <- APP.dll `101af4c0` KeyBank::Sample (high 0.79)
 - [ ] `006d52c0` 1809 bytes <- APP.dll `100b7b10` Npc_Lookout (high 0.98)
 - [ ] `007c4900` 1848 bytes <- sound3d.dll `10008890` MixOpen (high 0.98)
 - [ ] `005bddd0` 1851 bytes <- APP.dll `10026d80` Enemy_WanderNearHome (high 0.93)

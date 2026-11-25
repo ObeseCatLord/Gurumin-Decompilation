@@ -23,3 +23,35 @@ extern "C" int ImeCandidates_WidestWidth(FontRenderer *renderer)
     }
     return widest;
 }
+
+// Draws the visible candidates one under the other, starting at (x, y) with CANDIDATE_LINE_HEIGHT between lines; the
+// selected candidate is drawn in `selectedColour`, the others in `colour`. Does nothing (returns 0) while text input is
+// inactive. Called by the name entry screens. EN 0x7ad1a0 (JP 0x1015fb20).
+extern "C" int ImeCandidates_Draw(FontRenderer *renderer, int x, int y, int colour, int selectedColour)
+{
+    if (g_textInputActive == 0)
+        return 0;
+    if (g_candidateLines[0].text[0] != 0)
+    {
+        const char *line = g_candidateLines[0].text;
+        int i = 0;
+        while (true)
+        {
+            int visible = CANDIDATES_PER_PAGE;
+            int remaining = g_candidateTotal - g_candidatePage * g_candidatePageSize - g_candidateFirstOffset;
+            if (remaining < visible)
+                visible = remaining;
+            if (i >= visible)
+                break;
+            renderer->DrawText(x, y, line,
+                               (g_candidateFirstOffset + g_candidatePage * g_candidatePageSize + i == g_candidateSelected)
+                                   ? selectedColour
+                                   : colour,
+                               0, 1.0f, 1.0f);
+            i++;
+            line += CANDIDATE_TEXT_SIZE;
+            y += CANDIDATE_LINE_HEIGHT;
+        }
+    }
+    return 1;
+}

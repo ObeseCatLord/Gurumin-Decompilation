@@ -4,6 +4,7 @@
 #define GURUMIN_EN_MENU_LIST_H
 
 #include "font_renderer.h"
+#include "ime.h"
 
 // Candidates shown on one page at most.
 const int CANDIDATES_PER_PAGE = 9;
@@ -24,7 +25,14 @@ extern "C" int g_candidatePageSize;           // EN 0x0222808c (JP DAT_10f66ab0)
 extern "C" int g_candidatePage;               // EN 0x02228090 (JP DAT_10f66de8): current page
 extern "C" CandidateLine g_candidateLines[];  // EN 0x02227050 (JP DAT_10f67008): the candidate strings of the page
 
+// Vertical distance between two candidate lines when they are drawn.
+const int CANDIDATE_LINE_HEIGHT = 16;
+extern "C" int g_candidateSelected;           // EN 0x02228094: index of the selected candidate in the whole list
+
 // Width in pixels of the widest visible candidate. EN 0x7ad3b0 (JP 0x1015fac0).
 extern "C" int ImeCandidates_WidestWidth(FontRenderer *renderer);
+
+// Draws the visible candidates at (x, y), the selected one in `selectedColour`. EN 0x7ad1a0 (JP 0x1015fb20).
+extern "C" int ImeCandidates_Draw(FontRenderer *renderer, int x, int y, int colour, int selectedColour);
 
 #endif

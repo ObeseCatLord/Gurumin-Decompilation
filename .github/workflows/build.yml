@@ -20,15 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install zig
         run: python -m pip install ziglang
       - name: Build mod/build/d3d9.dll
         run: sh mod/build.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: mod-jp
           if-no-files-found: error
@@ -45,7 +45,7 @@ jobs:
       run:
         working-directory: mod_en
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install MinGW-w64 and CMake
         run: |
           sudo apt-get update
@@ -57,7 +57,7 @@ jobs:
             done
           done
       - name: Cache the OpenXR-SDK checkout
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: mod_en/build/openxr-sdk
           key: openxr-sdk-${{ hashFiles('mod_en/tools/build_openxr_loader.sh') }}
@@ -65,7 +65,7 @@ jobs:
         run: ./build.sh
       - name: Tests (Python, portable C++; Windows tests compiled only)
         run: GURUMIN_SKIP_WINE=1 ./tests/run_tests.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: mod-en
           if-no-files-found: error
@@ -109,8 +109,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install Tk and Xvfb (Linux)
@@ -135,12 +135,12 @@ jobs:
           python -m pip install ziglang
           python -m ziglang cc -target x86-windows-gnu -O2 -o tools/native/iti_unpack.exe tools/native/iti_unpack.c
       - name: Get the JP mod
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: mod-jp
           path: mod
       - name: Get the EN mod
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: mod-en
           path: mod_en/dist
@@ -158,7 +158,7 @@ jobs:
         timeout-minutes: 2
         # Lists every command the GUI builds (imports all bundled tools; no window).
         run: ./dist/${{ matrix.program }} --print-commands > print-commands.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.artifact }}
           if-no-files-found: error

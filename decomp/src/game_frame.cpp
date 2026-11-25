@@ -795,6 +795,38 @@ static __forceinline bool TrailBlockedAhead(Vec4 &probe, Vec4 &probeLow, double 
 #define PIT_EXIT_SPEED 0.4f             // m_237c after leaving the pit
 #define PIT_SPLASH_MIN_SPEED 2.0f       // entering slower than this makes no splash
 #define PIT_SINK_TICKS 0x10             // ticks the player is pushed down after entering
+#define PIT_MODEL_COUNT 0x7c            // models 0..0x7b get pit effects
+#define PIT_MODEL_GONE_X (-50000.0f)    // models parked below this x are skipped
+#define STAT_PIT_SKIP 14                // CharSlot::stats entry: non-zero = no pit effects for this slot
+#define PIT_SURFACE_MARGIN 10.0f        // a foot this close to the floor height touches the water
+#define PIT_RIPPLE_HEIGHT 13.0f         // height of the ripples above the floor height
+#define PIT_CONTACT_HEIGHT 20.0f        // the head or neck splashes below this
+#define PIT_WAKE_RANGE 110.0f           // the body must be within this of the floor height for wake and ripples
+#define SPLASH_DROP 10.0f               // the neck splash starts this much lower
+#define SPLASH_REACH 25.0f              // and this far ahead of the player
+#define WAKE_REACH 50.0f                // the wake starts this far ahead
+#define PIT_COSTUME_SAFE 0xc            // costume that is never hurt by the water
+#define PIT_PROTECT_FRAMES 0x3c         // DAT_10253e98: protection frames after a hit
+#define PIT_HEAL_FLASH 8                // DAT_104c011d: HUD flash value when the water heals
+#define EFFECT_SWAN_WATER 0xc7f
+#define EFFECT_PIT_SPLASH 0x9b
+#define EFFECT_PIT_RIPPLE 0x3d
+#define EFFECT_PIT_WAKE 0xad
+#define SOUND_PIT_WALK 0x36f
+#define SOUND_PIT_SWIM 0x36e
+#define SOUND_PIT_SWIM_PERIOD 12        // swimming strokes sound every this many frame pairs
+#define SWING_ROCK_REACH 100.0f         // a rock this close to the player bursts
+#define SWING_ROCK_DAMAGE 10            // and hurts the player by this much
+#define EFFECT_ROCK_BURST 0x5eb
+#define EFFECT_SWING_LANDING 0x695
+#define SWING_DROP_ACCEL 3.0f           // DAT_104c0214: the camera drop speeds up by this per frame
+#define SWING_PLAYER_LIFT 1.2f          // the player rides this multiple of the drop above the frame
+#define SWING_PLAYER_HEIGHT 80.0f       // plus this
+#define SWING_TRUCK_LIFT 0.9f           // the truck node rides this multiple of the drop
+#define SWING_TURN_ROUND 3.1415f        // the player faces the other way on the forward swing
+#define SWING_BURST_LEAD 2              // the landing bursts sit this many frames ahead of (or behind) the current one
+#define SWING_BURST_SIDE 40.0f          // to the right (and left) of the frame
+#define SWING_BURST_HEIGHT 10.0f        // above it
 #define PIT_SINK_SPEED_SCALE 2.4f
 #define PIT_SPLASH_LIFT 20.0f
 #define PIT_SPLASH_REACH 50.0f
@@ -5065,7 +5097,146 @@ trailDone:
                     DAT_10db6ee8[0].root->children[1]->m_0298.y = 0.0f;
             }
         }
-        // STAGE 6c: the pit effects (DAT_104bfe28 != 0, every other frame), pseudo.c lines 7177-7337
+        // Pit effects, every other frame: ripples and splashes where the characters touch the surface
+        if (DAT_104bfe28 != 0 && (DAT_104bf890 & 1) == 0)
+        {
+            if (DAT_104c0268 != 0)
+            {
+                EffectOptions options;
+                options.list = 1;
+                options.flags = 1;
+                DAT_10daaa80.Start(EFFECT_SWAN_WATER, DAT_104c0264->worldMatrix.GetTranslation(), -1, 0, 0, 0, 0, 0, &options, 0);
+            }
+            for (int pitModel = 0; pitModel < PIT_MODEL_COUNT; pitModel++)
+            {
+                if ((pitModel == 0 || DAT_1021f3c0[pitModel] == 3) && DAT_10daaae8[pitModel].stats[STAT_PIT_SKIP] == 0
+                    && DAT_10db6ee8[pitModel].root != 0
+                    && DAT_10db6ee8[pitModel].matrix.m[MATRIX_TRANSLATION_X] > PIT_MODEL_GONE_X)
+                {
+                    // The point where the model's foot (alternating toe nodes) touches the water
+                    Vec4 surfaceAt;
+                    Node *toe = DAT_10db6ee8[pitModel].toeNodes[(DAT_104bf890 >> 1) & 1];
+                    surfaceAt.Copy(toe != 0 ? toe->worldMatrix.GetTranslation()
+                                            : DAT_10db6ee8[pitModel].matrix.GetTranslation());
+                    if (surfaceAt.z < DAT_104bfe24 + PIT_SURFACE_MARGIN)
+                    {
+                        int surfaceY = (int)surfaceAt.y;
+                        int surfaceX = (int)surfaceAt.x;
+                        if (surfaceX >= (int)DAT_104d29e8.x && surfaceY >= (int)DAT_104d29e8.y
+                            && surfaceX <= (int)DAT_104d29f8.x && surfaceY <= (int)DAT_104d29f8.y)
+                        {
+                            surfaceAt.Copy(surfaceAt);
+                            surfaceAt.z = DAT_104bfe24 + PIT_RIPPLE_HEIGHT;
+                            Vec4 bodyAt;
+                            bodyAt.Copy(DAT_10db6ee8[pitModel].matrix.GetTranslation());
+                            if (pitModel == 0)
+                            {
+                                // The player: the splash at the feet (or the head when swimming) and the wake
+                                DAT_104687b4 = 0;
+                                if (DAT_104bfe4c != 0)
+                                {
+                                    Node *head = DAT_10db6ee8[0].headNode;
+                                    surfaceAt.Copy(head != 0 ? head->worldMatrix.GetTranslation()
+                                                             : DAT_10db6ee8[0].matrix.GetTranslation());
+                                    if ((DAT_104bf890 & 6) == 0 && surfaceAt.z < DAT_104bfe24 + PIT_CONTACT_HEIGHT)
+                                    {
+                                        Vec4 splashAt;
+                                        Node *neck = DAT_10db6ee8[0].headNode->parent;
+                                        splashAt.Copy(neck != 0 ? neck->worldMatrix.GetTranslation()
+                                                                : DAT_10db6ee8[0].matrix.GetTranslation());
+                                        splashAt.z = splashAt.z - SPLASH_DROP;
+                                        splashAt.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI)
+                                                         * SPLASH_REACH
+                                                     + splashAt.x;
+                                        splashAt.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI)
+                                                         * SPLASH_REACH
+                                                     + splashAt.y;
+                                        EffectOptions options;
+                                        options.list = 1;
+                                        options.flags = 1;
+                                        DAT_10daaa80.Start(EFFECT_PIT_SPLASH, splashAt, -1, 0, 0, 0, ((DAT_104bf890 >> 1) % 3) * -2,
+                                                           0, &options, 0);
+                                        // Standing in the water this deep hurts (or heals) the player
+                                        if (surfaceAt.z < DAT_104bfe24 + PIT_CONTACT_HEIGHT - SPLASH_DROP && DAT_104686b0[0] == 0
+                                            && DAT_10253e98[0] == 0 && DAT_104bfe1c == 0)
+                                        {
+                                            if (DAT_10c655f0 == PIT_COSTUME_SAFE
+                                                || ((DAT_104c02c8 & 3) != 3 && (DAT_104c02c8 & 2) != 0))
+                                            {
+                                                FUN_10011aa0(0, 1);
+                                                DAT_10253e98[0] = PIT_PROTECT_FRAMES;
+                                            }
+                                            else if ((DAT_104c02c8 & 3) == 3)
+                                            {
+                                                FUN_10011aa0(0, 1);
+                                                DAT_10253e98[0] = PIT_PROTECT_FRAMES;
+                                                int health = DAT_10daaae8[0].stats[STAT_HEALTH] + 1;
+                                                if (DAT_10daaae8[0].stats[STAT_MAX_HEALTH] < health)
+                                                    health = DAT_10daaae8[0].stats[STAT_MAX_HEALTH];
+                                                if (DAT_10daaae8[0].stats[STAT_HEALTH] != health)
+                                                    DAT_104c011d = PIT_HEAL_FLASH;
+                                                DAT_10daaae8[0].stats[STAT_HEALTH] = health;
+                                                FUN_1000e750();
+                                            }
+                                            else
+                                                FUN_1005dbf0((DAT_104c02c8 & 1) == 0 ? 4 : 2);
+                                        }
+                                    }
+                                    surfaceAt.z = DAT_104bfe24 + PIT_RIPPLE_HEIGHT;
+                                }
+                                if (DAT_104bfe24 - PIT_WAKE_RANGE < bodyAt.z)
+                                {
+                                    if (DAT_104c02dc == 0)
+                                    {
+                                        EffectOptions options;
+                                        options.flags = 1;
+                                        options.angle = DAT_10db6ee8[DAT_104bf8b4].targetHeading + HALF_PI;
+                                        DAT_10daaa80.Start(EFFECT_PIT_RIPPLE, surfaceAt, -1, 0, 0, 0,
+                                                           ((DAT_104bf890 >> 1) % 3) * -2, 0, &options, 0);
+                                    }
+                                    if (steerX != 0.0f || steerY != 0.0f)
+                                    {
+                                        if ((DAT_104bf890 & 6) == 0)
+                                        {
+                                            Vec4 wakeAt;
+                                            wakeAt.Copy(surfaceAt);
+                                            wakeAt.z = DAT_104bfe24 + PIT_CONTACT_HEIGHT;
+                                            wakeAt.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI)
+                                                           * WAKE_REACH
+                                                       + wakeAt.x;
+                                            wakeAt.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - HALF_PI)
+                                                           * WAKE_REACH
+                                                       + wakeAt.y;
+                                            EffectOptions options;
+                                            options.flags = 1;
+                                            DAT_10daaa80.Start(EFFECT_PIT_WAKE, wakeAt, -1, -1, 0, 0, 0, 0, &options, 0);
+                                        }
+                                        if (DAT_104c01d8 == 0)
+                                        {
+                                            if (DAT_104bfe4c == 0)
+                                            {
+                                                if ((DAT_104bf890 & 6) == 0)
+                                                    FUN_1003ad20(SOUND_PIT_WALK, &DAT_10db6ee8[0].matrix.GetTranslation(), 1.0f);
+                                            }
+                                            else if ((DAT_104bf890 >> 1) % SOUND_PIT_SWIM_PERIOD == 0)
+                                                FUN_1003ad20(SOUND_PIT_SWIM, &DAT_10db6ee8[0].matrix.GetTranslation(), 1.0f);
+                                        }
+                                    }
+                                }
+                            }
+                            else if (DAT_104bfe24 - PIT_WAKE_RANGE < bodyAt.z)
+                            {
+                                // Other models: a ripple at the surface
+                                EffectOptions options;
+                                options.flags = 1;
+                                DAT_10daaa80.Start(EFFECT_PIT_RIPPLE, surfaceAt, -1, 0, 0, 0, ((DAT_104bf890 >> 1) % 3) * -2, 0,
+                                                   &options, 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         // Item-menu pad state and the screen shift of the overlay mode
         if (DAT_104c009a == 0)
         {
@@ -5171,7 +5342,102 @@ trailDone:
                 DAT_10db6ee8[DAT_104bf8b4].mode = 2;
             DAT_1021a360 = 0;
         }
-        // STAGE 6d: the camera and the world (the look-at swing DAT_104c01e0), pseudo.c lines 7474-7808
+        // The camera swing: the camera node's animation frames (DAT_104c01dc) play forwards (DAT_104c01e0 > 0) or
+        // backwards while the player model, and the truck node, ride its matrices
+        if (DAT_104c01e0 != 0)
+        {
+            CloseEventOverlay();
+            // A rolling rock (the "IWA" matrices) that reaches the player hurts and bursts
+            for (int rock = 0; rock < DAT_104c0218; rock++)
+            {
+                if (DAT_10467208[rock] != 0
+                    && DAT_10467208[rock]->GetTranslation().Distance(DAT_10db6ee8[0].matrix.GetTranslation())
+                           < SWING_ROCK_REACH)
+                {
+                    DAT_10467208[rock] = 0;
+                    DAT_10daaa80.Start(EFFECT_ROCK_BURST, DAT_10db6ee8[0].matrix.GetTranslation(), -1, -1, 0, 0, 0, 0, 0, 0);
+                    FUN_1005dbf0(SWING_ROCK_DAMAGE);
+                    break;
+                }
+            }
+            DAT_104c01dc->frameSource = &DAT_104c01e4;
+            DAT_10db6ee8[0].SetPosition(0, 0, 0);
+            Matrix4 unusedMatrix;
+            Matrix4 swingFrame = DAT_104c01dc->frameMatrices[DAT_104c01e4];
+            DAT_104c0214 = DAT_104c0214 + SWING_DROP_ACCEL;
+            DAT_104c0210 = DAT_104c0210 - DAT_104c0214;
+            if (DAT_104c0210 <= 0.0f)
+            {
+                DAT_104c0214 = 0.0f;
+                DAT_104c0210 = 0.0f;
+            }
+            if (DAT_104c01e0 > 0)
+            {
+                // Forwards: the player, turned round, and the truck follow the frame, lowered by the drop
+                DAT_10db6ee8[0].matrix =
+                    (TranslationMatrix(0, 0, DAT_104c0210 * SWING_PLAYER_LIFT + SWING_PLAYER_HEIGHT) * RotationZ(SWING_TURN_ROUND))
+                    * swingFrame;
+                if (DAT_104c021c != 0)
+                    DAT_104c021c->matrix = (TranslationMatrix(0, 0, DAT_104c0210 * SWING_TRUCK_LIFT) * RotationZ(0)) * swingFrame;
+                if (DAT_104bfe1c == 0 && DAT_1032d69c != 0 && DAT_104c0135 == 0)
+                    DAT_104c01e4 = DAT_104c01e4 + 1;
+                if (DAT_104c01e4 >= DAT_104c01dc->frameMatrixCount)
+                {
+                    DAT_104c01e0 = 0;
+                    DAT_10db6ee8[0].m_0076 = 0;
+                    DAT_11018734 = 1;
+                    DAT_1101de30 = 1;
+                }
+                if (DAT_104c0210 == 0.0f)
+                {
+                    // Landed: the two dust bursts, a little ahead of the frame two steps on
+                    Matrix4 burst;
+                    int burstFrame = DAT_104c01e4 + SWING_BURST_LEAD < DAT_104c01dc->frameMatrixCount
+                                         ? DAT_104c01e4 + SWING_BURST_LEAD
+                                         : DAT_104c01dc->frameMatrixCount;
+                    burst = DAT_104c01dc->frameMatrices[burstFrame];
+                    burst = (TranslationMatrix(SWING_BURST_SIDE, 0, DAT_104c0210 + SWING_BURST_HEIGHT) * RotationZ(0)) * burst;
+                    Vec4 burstAt;
+                    burstAt.Fill(0.0f);
+                    DAT_10daaa80.Start(EFFECT_SWING_LANDING, burstAt, -1, -1, 0, 0, 0, &burst, 0, 0);
+                    burstFrame = DAT_104c01e4 + SWING_BURST_LEAD < DAT_104c01dc->frameMatrixCount
+                                     ? DAT_104c01e4 + SWING_BURST_LEAD
+                                     : DAT_104c01dc->frameMatrixCount;
+                    burst = DAT_104c01dc->frameMatrices[burstFrame];
+                    burst = (TranslationMatrix(-SWING_BURST_SIDE, 0, DAT_104c0210 + SWING_BURST_HEIGHT) * RotationZ(0)) * burst;
+                    DAT_10daaa80.Start(EFFECT_SWING_LANDING, burstAt, -1, -1, 0, 0, 0, &burst, 0, 0);
+                }
+            }
+            else
+            {
+                // Backwards: the same, facing the other way and stepping the frame down
+                DAT_10db6ee8[0].matrix =
+                    (TranslationMatrix(0, 0, DAT_104c0210 * SWING_PLAYER_LIFT + SWING_PLAYER_HEIGHT) * RotationZ(0)) * swingFrame;
+                if (DAT_104c021c != 0)
+                    DAT_104c021c->matrix = (TranslationMatrix(0, 0, DAT_104c0210 * SWING_TRUCK_LIFT) * RotationZ(0)) * swingFrame;
+                if (DAT_104bfe1c == 0 && DAT_1032d69c != 0 && DAT_104c0135 == 0)
+                    DAT_104c01e4 = DAT_104c01e4 - 1;
+                if (DAT_104c01e4 < 1)
+                {
+                    DAT_104c01e0 = 0;
+                    DAT_10db6ee8[0].m_0076 = 0;
+                    DAT_11018734 = 1;
+                    DAT_1101de30 = 1;
+                }
+                if (DAT_104c0210 == 0.0f)
+                {
+                    Matrix4 burst;
+                    burst = DAT_104c01dc->frameMatrices[DAT_104c01e4 - SWING_BURST_LEAD > 0 ? DAT_104c01e4 - SWING_BURST_LEAD : 0];
+                    burst = (TranslationMatrix(SWING_BURST_SIDE, 0, DAT_104c0210 + SWING_BURST_HEIGHT) * RotationZ(0)) * burst;
+                    Vec4 burstAt;
+                    burstAt.Fill(0.0f);
+                    DAT_10daaa80.Start(EFFECT_SWING_LANDING, burstAt, -1, -1, 0, 0, 0, &burst, 0, 0);
+                    burst = DAT_104c01dc->frameMatrices[DAT_104c01e4 - SWING_BURST_LEAD > 0 ? DAT_104c01e4 - SWING_BURST_LEAD : 0];
+                    burst = (TranslationMatrix(-SWING_BURST_SIDE, 0, DAT_104c0210 + SWING_BURST_HEIGHT) * RotationZ(0)) * burst;
+                    DAT_10daaa80.Start(EFFECT_SWING_LANDING, burstAt, -1, -1, 0, 0, 0, &burst, 0, 0);
+                }
+            }
+        }
         // Hit-stop counters of the walking gesture (DAT_104c0330 / DAT_104c0331 run out and reset)
         if (DAT_104c00e0 == 0 &&
             ((DAT_104c0330 > 2 && (DAT_104c0330 = DAT_104c0330 + 1, DAT_104c0330 > GESTURE_LONG_TICKS)) ||

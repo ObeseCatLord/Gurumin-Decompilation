@@ -381,7 +381,7 @@ extern "C" int DAT_104c020c;
 extern "C" float DAT_104c0210;
 extern "C" float DAT_104c0214;
 extern "C" int DAT_104c0218;
-extern "C" int DAT_104c021c;
+extern "C" Node *DAT_104c021c;   // the truck node that rides the camera swing (map_trigger_setup.cpp)
 extern "C" char DAT_104c0224;
 extern "C" char DAT_104c022e;
 extern "C" unsigned char DAT_104c0232;

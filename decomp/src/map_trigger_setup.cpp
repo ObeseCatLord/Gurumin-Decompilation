@@ -460,7 +460,7 @@ int Map_SetUpTrigger(GameTrigger *trigger)
         TagNodeRegion(node, &node->matrix);
         DAT_1021b548[DAT_104bfdc4] = node;
         DAT_104bfdc4++;
-        DAT_104c021c = (int)node;
+        DAT_104c021c = node;
     }
     if (strcmp(trigger->name, "HORI") == 0)
     {

@@ -15,3 +15,4 @@ tools/native/*.exe
 tools/native/*.obj
 dist/
 build/pyinstaller/
+build/port/

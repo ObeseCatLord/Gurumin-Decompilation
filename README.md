@@ -113,3 +113,5 @@ Decompilation and naming come first. Planned once they are far enough along (det
   languages.
 - An all-in-one GUI tool (exe) for the file tools, with a model viewer and OBJ import/replacement.
 - A texture glossary, and a `textures` folder for loose texture overrides.
+- A native (non-Windows) build that grows with the decompilation: [`port/`](port/README.md) compiles matched,
+  portable decomp files unchanged for Linux x64 and arm64 and tests them in CI (not playable yet).

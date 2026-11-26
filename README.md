@@ -120,6 +120,10 @@ change follows (typed struct members instead of fixed offsets, each type declare
 fakematches, commented source) and the build commands. `CLAUDE.md` points Claude Code there; `NOTES.md` holds the
 findings so far. You need your own copy of the game and VS .NET 2002 (cl 13.00.9466).
 
+The English Steam release is the easiest place to start: most of its functions have an already matched JP twin to
+port. [`decomp_en/CONTRIBUTING.md`](decomp_en/CONTRIBUTING.md) covers the setup (your Steam copy, VS2013 Community
+Update 4) and the per-function workflow, including how to claim a function with a draft pull request.
+
 ## Roadmap
 Decompilation and naming come first. Planned once they are far enough along (details in
 [`docs/ROADMAP.md`](docs/ROADMAP.md)):

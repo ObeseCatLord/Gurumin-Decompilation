@@ -155,7 +155,7 @@ const int BLEND_ROTATION = 1;
 // Non-zero while an important model changes motion (read by the blending and playback code). EN 0x0217fafc (JP DAT_11b04508).
 extern "C" char g_importantMotionChange;
 // out = a blended towards b by t (mode BLEND_ROTATION interpolates the rotation). EN 0x771830 (JP 0x101b1420).
-extern "C" Matrix4 *MatrixBlend(Matrix4 *out, Matrix4 a, Matrix4 b, int t, int mode);
+extern "C" int MatrixBlend(Matrix4 *out, Matrix4 a, Matrix4 b, int t, int mode);
 
 // Non-zero = the frame plugs of the nodes are not read (UpdateWorld keeps the frame it was given). EN 0x0217fae0 (JP DAT_11b044ec).
 extern "C" int g_framePlugsDisabled;
@@ -275,6 +275,7 @@ struct Node
     // Same lookups with the second pair of finders, which ignore the name prefixes of special nodes.
     Node *FindPrefixNode(const char *prefix);                          // EN 0x7533a0: first node whose name starts with `prefix` (no skip count)
     Node *FindPrefixNodeRecursive(const char *prefix);                 // EN 0x753330: the search behind FindPrefixNode (children last to first)
+    Node *FindParentOf(const Node *child);                             // EN 0x7533b0 (EN-only): the node of this subtree that has `child` in its child list, 0 when none
     Node *Find2(const char *name, int index);                       // EN 0x753740 (JP 0x1019ed10)
     Node *FindRecursiveStripped(const char *name, int *skip);          // EN 0x753590 (JP 0x10191aa0)
     Node *FindPrefixRecursiveStripped(const char *prefix, int *skip);  // EN 0x753660 (JP 0x10191b60)
@@ -394,6 +395,9 @@ struct Node
     int SetColourB(unsigned char value, unsigned int mask);  // EN 0x76afb0 (JP 0x10194730)
     int SetColourC(char value, unsigned int mask);           // EN 0x76b180 (JP 0x10194630)
     int EnterTargetState(void *target);    // EN 0x76b410 (JP 0x101948f0)
+    int EnterCollisionSphereState();       // EN 0x76b330 (EN-only): saves the matrix and sets NODE_FLAG_COLLISION_SPHERE (leaves the other saved states first)
+    int EnterTwoBoneState();               // EN 0x76b3a0 (EN-only): the same for NODE_FLAG_TWO_BONE_LIMB
+    int EnterChasingState();               // EN 0x76b4c0 (EN-only): the same for NODE_FLAG_CHASING
 
     // On-demand blocks.
     int AllocSaved();                      // EN 0x76b2f0 (JP 0x101947b0)

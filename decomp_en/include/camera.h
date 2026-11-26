@@ -115,6 +115,14 @@ extern "C" int Camera_PlaceAtHeading(float angle);
 // Camera_Ease: the follow shot that eases towards the followed node. EN 0x64c790.
 extern "C" int Camera_Ease(void);
 
+// Camera shift shot (Camera_Shift, camera_shift.cpp): the offsets g_cameraPlayerPosition (position) and g_cameraOrbitCentre
+// (target) move towards the shift goals while a shift runs and shrink otherwise; the goals follow the offsets.
+extern "C" int g_cameraShiftFrames;              // EN 0x009159ec (JP DAT_104c035c): frames left of the running shift, 0 = none
+extern "C" Vec4 g_cameraShiftPosition;           // EN 0x013388d8 (JP DAT_10802be8): the camera position the shift moves to
+extern "C" Vec4 g_cameraShiftTarget;             // EN 0x00daa720 (JP DAT_10c67ff0): the camera target the shift moves to
+// Camera_Shift: the shot that shifts the camera by offsets. Returns 0. EN 0x64caf0 (JP 0x10019310).
+extern "C" int Camera_Shift(void);
+
 // Camera state cleared with the player (Player_ResetMotion) and the camera (Camera_Reset).
 const int CAMERA_GROUND_UNKNOWN = -100;          // g_cameraGroundHeight value before a ground height was measured
 extern "C" int g_cameraGroundHeight;             // EN 0x00908a20 (JP DAT_10203444): ground height cache, CAMERA_GROUND_UNKNOWN = unknown

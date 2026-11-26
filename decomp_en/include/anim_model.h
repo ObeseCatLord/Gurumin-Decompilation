@@ -114,6 +114,12 @@ struct MotionChannels
 
 struct AnimModel;
 
+// What a motion slot points at: a source that is in use while `busy` is non-zero (JP MotionSource).
+struct MotionSource
+{
+    int busy;   // 0x00: non-zero while the source is in use
+};
+
 // The motion playback state of a model (0x7c84 bytes): layers of frame ranges and per-slot offsets. Allocated on
 // first use through AnimModel::GetPlayback. Only the members EN code has used are named.
 struct Playback
@@ -130,7 +136,7 @@ struct Playback
     int frame;                         // 0x0020: current motion frame
     int m_0024;                        // 0x0024: not yet named
     int m_0028;                        // 0x0028: not yet named
-    void *slotSource[16];              // 0x002c: motion source of each slot
+    MotionSource *slotSource[16];      // 0x002c: motion source of each slot
     int slotLayer[16];                 // 0x006c: layer each slot plays
     int layerActive[PLAYBACK_LAYER_COUNT];   // 0x00ac: 1 while the layer is active
     int m_02ec[PLAYBACK_LAYER_COUNT];        // 0x02ec: not yet named
@@ -157,7 +163,11 @@ struct Playback
     int Play(int layer, int a, int b, float speed);                    // EN 0x71add0 (JP 0x1016a2e0): starts a motion on a layer
     int SetSlotSource(void *source, int slot, int layer);              // EN 0x745460: sets the motion source and layer of slot `slot`; 0 when a value is out of range
     int SetFollowUp(int layer, int index, int value);                  // EN 0x745550: sets follow-up entry `index` of layer `layer`; 0 when out of range
+    int Advance();                                                     // EN 0x73eff0 (JP 0x1016a480): steps the playback one frame (model_state.cpp)
 };
+
+// Non-zero while the frame code suspends random idle motions (the helmet regeneration pause). EN 0x0162ef60 (JP DAT_1101d87c).
+extern "C" char g_idleMotionsSuspended;
 
 struct AnimModel
 {
@@ -295,6 +305,7 @@ struct AnimModel
     int AddMotionKey(int frame, float value);                            // EN 0x70af70 (JP 0x10161b90)
     int SetPendingPush(float x, float y, float z, char flag);            // EN 0x73f940 (JP 0x101628b0)
     int StepPath();                                                      // EN 0x70bf40 (JP 0x10161c80): moves the model along track C one frame
+    int StepTrackB();                                                    // EN 0x70c030 (EN-only, anim_model_track_b.cpp): advances track B one frame (samples it, loops or stops at the end)
     int Unload();                                                        // EN 0x740c40 (JP 0x10162c50): frees the node tree and motion buffer and resets position and state, returns 1
     int ResetState();                                                    // EN 0x7413f0 (JP 0x10161f80): resets the model's motion and pose state
     int ClearTrackC();                                                // EN 0x741bd0 (JP 0x10161a60)

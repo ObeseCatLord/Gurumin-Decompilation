@@ -94,3 +94,24 @@ Node *Node::FindPrefixNodeRecursive(const char *prefix)
     }
     return 0;
 }
+
+// Returns the node of this subtree that has `child` in its child list (this node first, then the children in order),
+// 0 when `child` is not in the subtree. Calls itself on the children. No direct caller outside the recursion.
+Node *Node::FindParentOf(const Node *child)
+{
+    for (int i = 0; i < childCount; i++)
+    {
+        if (children[i] == child)
+            return this;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        if (children[i] != 0)
+        {
+            Node *found = children[i]->FindParentOf(child);
+            if (found != 0)
+                return found;
+        }
+    }
+    return 0;
+}

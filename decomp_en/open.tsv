@@ -249,3 +249,11 @@ address	status	reason
 007b7d90	blocked	method of an unrecovered owner class (fields 0x58-0x64); callee 0x7906d0 (11 args on g_textWindowSetting, really a FontRenderer*) has no signature yet.
 007ad4b0	open	ascii text input begin: not ported, needs ascii_input.h and the unported callback 0x7ad550 it installs.
 007ad550	open	ascii text input callback: not ported.
+0073f770	open	WorldRenderer::OffsetKeysFromA: original stores LowestMessageId's (unused) result into the dead stack slot of the firstId parameter, which also moves firstId to edi; a plain call (or an unused local) compiles to no store.
+00742020	open	WorldRenderer::OffsetKeysFromB: same dead store of LowestMessageId's result into the firstId parameter slot as 0x73f770.
+007a8d10	open	GameFile::WritePicture: bytes equal except the order of the handle reload and the stack cleanup after the first fwrite (original: add esp, then mov eax,[esi]; ours hoists the reload and threads the skip jump to the return); the same shape matches in WriteCompressed.
+006b33f0	open	Char_StartShagaLink (char_shaga_link.cpp): body and idiv/div CSE match the original; register allocation differs (original keeps index in edi and 50 in esi, state offset in [ebp-8] and count in [ebp-4]; ours swaps them), same wall as JP Enemy_SeekShaga.
+00774f00	open	InverseMatrix (matrix_inverse.cpp): arithmetic matches in shape; the local result matrix is zeroed inline with the Matrix4() pattern and has no EH frame, but Matrix4() here is an out-of-line ctor with a dtor (call plus unwind frame); needs a Matrix4 with inline ctor and no dtor in this TU.
+005be740	open	Enemy_ChasePlayer (enemy_chase.cpp): all but two spots identical; the original loads -heading before storing step.y, computes the speed pointer with lea, and multiplies move.x then move.y sequentially off one speedScale register (ours interleaves); same wall as JP.
+0073eff0	open	Playback::Advance (model_state.cpp): everything matches except that the original inlines Playback::Play (restart=1, blend 14) into the idle-motion path while ours calls it; the out-of-line Play is itself open.
+005f4b40	open	ListBank::FindVariable (listbank_find_variable.cpp): 183 bytes differ; first loop keeps count in esi and this in ebx (ours swapped), and the inline ReportError blocks of the array branch are laid out differently (dimension check jump polarity).

@@ -24,6 +24,13 @@ struct GameFile
     // EN 0x7a8d80 (EN-only, game_file.cpp): packs `count` * `size` bytes of `source` with the Packs compressor and writes the
     // packed size (4 bytes) and the packed data to the open file; returns what the last write returned, 0 when no file is open.
     size_t WriteCompressed(const unsigned char *source, int count, int size);
+    // EN 0x7a8c30 (EN-only, game_file_packs.cpp): reads a packed block (4-byte packed size, then the data) from the open file, unpacks it and
+    // copies `count` * `size` bytes to `destination` when it is not 0; returns what the read of the packed data returned, 0 when no file is open.
+    size_t ReadCompressed(void *destination, int count, int size);
+    // EN 0x7a8bb0 (EN-only, game_file_packs.cpp): reads a packed picture block, decodes it and copies `width` * `height` * 3 bytes to `destination`.
+    size_t ReadPicture(void *destination, int width, int height);
+    // EN 0x7a8d10 (EN-only, game_file_packs.cpp): packs `width` x `height` pixels with the picture encoder and writes the packed size (4 bytes) and the packed data; returns what the last write returned, 0 when no file is open.
+    size_t WritePicture(const unsigned char *pixels, int width, int height);
 };
 
 // Copies the file name of `path` without directory and extension into `out`. EN 0x7a8930 (JP 0x10161120).

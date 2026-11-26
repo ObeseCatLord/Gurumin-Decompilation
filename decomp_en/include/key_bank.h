@@ -16,6 +16,8 @@ struct KeyInterpolator
 
 const int KEY_BANK_SIZE = 0x80;     // keys a bank holds
 const char KEY_FLAG_MOTION = 4;     // key flag: the key is a motion frame
+const int KEY_SAMPLE_POSITION = 0;  // KeyBank::Sample flags: plain component-wise interpolation
+const int KEY_SAMPLE_ROTATION = 1;  // KeyBank::Sample flags: the values are quaternions
 
 struct KeyBank
 {

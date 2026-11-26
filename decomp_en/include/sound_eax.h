@@ -35,12 +35,14 @@ const unsigned long EAX_BUFFER_REVERB_MIX = 1;
 
 extern "C" const GUID g_eaxListenerPropertySet;   // EN 0x00861ebc: DSPROPSETID of the EAX 1.0 listener properties
 extern "C" const GUID g_eaxBufferPropertySet;     // EN 0x00861eec: DSPROPSETID of the EAX 1.0 buffer properties
+extern "C" const GUID g_ksPropertySetInterfaceId;   // EN 0x00861f8c: IID_IKsPropertySet
 
 // The EAX properties of one sound source (a DirectSound buffer).
 struct EaxBuffer
 {
     IKsPropertySet *propertySet;   // 0x00: the buffer's property set (0 = EAX not available)
 
+    EaxBuffer *Attach(IUnknown *buffer);   // EN 0x7c15d0 (EN-only, sound_eax_attach.cpp): asks `buffer` for its property set and keeps it only when both buffer properties are readable and writable; returns this
     float GetReverbMix();          // EN 0x7c1680: the reverb mix, EAX_FLOAT_UNAVAILABLE when the read fails
     int SupportsProperty(unsigned long property);   // EN 0x7c16d0: 1 when the driver can both read and write buffer property `property`
 };

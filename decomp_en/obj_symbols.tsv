@@ -1110,3 +1110,38 @@ _Enemy_DragToPit	006abe50
 _Packs_EncodeBand	007bb630
 _Npc_PlayGreeting	005c1080
 _Enemy_DefaultStep	005ba770
+# section 3 B (batch 16)
+_Char_StartShagaLink	006b33f0
+?InverseMatrix@@YA?AUMatrix4@@ABU1@@Z	00774f00
+_Enemy_ChasePlayer	005be740
+?Advance@Playback@@QAEHXZ	0073eff0
+?FindVariable@ListBank@@QAEHPBDPAH11@Z	005f4b40
+# EN-only high (batch 16)
+?FindParentOf@Node@@QAEPAU1@PBU1@@Z	007533b0
+?EnterCollisionSphereState@Node@@QAEHXZ	0076b330
+?EnterTwoBoneState@Node@@QAEHXZ	0076b3a0
+?EnterChasingState@Node@@QAEHXZ	0076b4c0
+# section 3 A (batch 16)
+_MatrixBlend	00771830
+?KeyHasRpkLine@WorldRenderer@@QAEHH@Z	007354e0
+?OffsetKeysFromA@WorldRenderer@@QAEHHMMM@Z	0073f770
+?OffsetKeysFromB@WorldRenderer@@QAEHHMMMM@Z	00742020
+?SetKeyCommandBField@WorldRenderer@@QAEHHH@Z	0071ad50
+?SetKeyCommandAField@WorldRenderer@@QAEHHH@Z	0071acd0
+?InsertMessageLine@WorldRenderer@@QAEHH@Z	0073ef10
+?AssignValue@ListBank@@QAEHPBDPBUScriptValue@@D@Z	00646750
+?StepTrackB@AnimModel@@QAEHXZ	0070c030
+?SetSlotOffset@AnimModel@@QAEHHHHH@Z	007464d0
+_Packs_WriteStream	007baf40
+_MotionCache_SetNames	00746230
+?ReadCompressed@GameFile@@QAEIPAXHH@Z	007a8c30
+?ReadPicture@GameFile@@QAEIPAXHH@Z	007a8bb0
+?WritePicture@GameFile@@QAEIPBEHH@Z	007a8d10
+_Npc_GreetWhenNear	006d5a80
+_Render_PresentComposedToWindow@4	007a81a0
+_Render_UnbindAllTextures	007a57c0
+?GetCompositionString@ImeContext@@QAEHPAD@Z	007aaee0
+_Npc_WatchForPlayer	006b37c0
+?Attach@EaxBuffer@@QAEPAU1@PAUIUnknown@@@Z	007c15d0
+_Camera_Shift	0064caf0
+_Textures_SaveAllItp	007427f0

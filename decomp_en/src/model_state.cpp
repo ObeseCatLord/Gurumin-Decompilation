@@ -1,5 +1,7 @@
 // Playback state init and effect option defaults (EN build). Ported from the matched JP source decomp/src/model_state.cpp.
 #include "anim_model.h"
+#include "char_move.h"
+#include "engine.h"
 #include "effect_options.h"
 #include "node.h"
 #include <string.h>
@@ -199,5 +201,184 @@ int Playback::Play(int layerIndex, int restart, int blendFrames, float playSpeed
     layer = PLAYBACK_BLEND_LAYER;
     frame = -1;
     framePosition = -1.0f;
+    return 1;
+}
+
+// Chance (out of PLAYBACK_CHANCE_RANGE) is slotOffsetX; the random idle motion waits PLAYBACK_IDLE_COOLDOWN frames.
+const int PLAYBACK_CHANCE_RANGE = 1000;
+const int PLAYBACK_IDLE_COOLDOWN = 0x82;
+// Blend frames of the random idle motion, and of a layer that chains to another (forwards, backwards).
+const int PLAYBACK_IDLE_BLEND_FRAMES = 14;
+const int PLAYBACK_CHAIN_BLEND_FRAMES = 5;
+const int PLAYBACK_CHAIN_BLEND_FRAMES_END = 8;
+// Follow-up values of m_076c: stay on the last frame / keep stepping back by one step.
+const int PLAYBACK_FOLLOW_HOLD = -2;
+const int PLAYBACK_FOLLOW_NONE = -1;
+
+// Playback::Advance: steps the playback by one frame. While blending it counts the frame down and, once the blend is
+// over, switches to nextLayer. Otherwise a random idle motion may start first (each slot's chance, out of 1000, is
+// slotOffsetX; the motion is slotOffsetY, only when no slot source of that layer is busy). Then the frame moves by the
+// layer's speed (layerDirection) in the current direction (m_0024: 0 forwards, 1 backwards). Passing the end of the
+// layer plays the layer in m_0e30 (blended), holds (m_076c = -2), loops, or continues on layer m_076c. Returns 1.
+// Called every frame for each model with a playback.
+int Playback::Advance()
+{
+    int i = 0;
+    if (m_0018 != 0)
+        return 1;
+    int current = layer;
+    if (current == PLAYBACK_NO_LAYER)
+        return 1;
+    if (blending != 0)
+    {
+        frame--;
+        framePosition = (float)frame;
+        if (frame <= -1 - m_0014)
+        {
+            current = nextLayer;
+            blending = 0;
+            layer = current;
+            frame = m_02ec[current];
+            framePosition = (float)frame;
+            endState = m_09ac[current];
+        }
+        return 1;
+    }
+    if (m_000c > 0)
+        m_000c--;
+    if (g_idleMotionsSuspended == 0 && m_000c == 0)
+    {
+        for (i = 0; i < PLAYBACK_SLOT_COUNT; i++)
+        {
+            if (slotOffsetX[current][i] != 0 && Random() % PLAYBACK_CHANCE_RANGE <= slotOffsetX[current][i])
+            {
+                int slot = 0;
+                while (slotSource[slot] == 0 || slotSource[slot]->busy != 0 ||
+                       slotLayer[slot] != slotOffsetY[current][i])
+                {
+                    slot++;
+                    if (slot >= PLAYBACK_SLOT_COUNT)
+                    {
+                        m_000c = PLAYBACK_IDLE_COOLDOWN;
+                        endState = 0;
+                        m_7c78 = current;
+                        Play(slotOffsetY[current][i], 1, PLAYBACK_IDLE_BLEND_FRAMES, 1.0f);
+                        m_7c78 = current;
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+    float step = (float)layerDirection[current];
+    if (m_0024 == 0)
+    {
+        framePosition = step * speed + framePosition;
+        frame = (int)framePosition;
+        if (layerDirection[current] < 0 && frame < layerLast[current])
+        {
+            if (m_0e30[current] != -1)
+            {
+                endState = 0;
+                int rewound = frame;
+                rewound -= layerDirection[current];
+                frame = rewound;
+                layer = -1;
+                framePosition = (float)rewound;
+                Playback *saved = g_lastEnemyPlayback;
+                g_lastEnemyPlayback = 0;
+                Play(m_0e30[current], 0, PLAYBACK_CHAIN_BLEND_FRAMES, 1.0f);
+                g_lastEnemyPlayback = saved;
+                return 1;
+            }
+            int follow = m_076c[current];
+            if (follow == PLAYBACK_FOLLOW_HOLD)
+            {
+                current = layer;
+                frame = layerLast[current];
+                m_0024 = 1;
+                framePosition = (float)frame;
+                endState = m_09ac[current];
+            }
+            else
+            {
+                m_0024 = 0;
+                if (follow == PLAYBACK_FOLLOW_NONE)
+                {
+                    frame = frame - layerDirection[current];
+                    framePosition = (float)frame;
+                }
+                else
+                {
+                    current = m_076c[current];
+                    layer = current;
+                    int first = m_02ec[current];
+                    frame = first;
+                    framePosition = (float)first;
+                    endState = m_09ac[current];
+                }
+            }
+        }
+        if (layerDirection[current] > 0 && frame > layerLast[current])
+        {
+            if (m_0e30[current] != -1)
+            {
+                endState = 0;
+                int rewound = frame;
+                rewound -= layerDirection[current];
+                frame = rewound;
+                layer = -1;
+                framePosition = (float)rewound;
+                Playback *saved = g_lastEnemyPlayback;
+                g_lastEnemyPlayback = 0;
+                Play(m_0e30[current], 0, PLAYBACK_CHAIN_BLEND_FRAMES_END, 1.0f);
+                g_lastEnemyPlayback = saved;
+                return 1;
+            }
+            int follow = m_076c[current];
+            if (follow == PLAYBACK_FOLLOW_HOLD)
+            {
+                int last = layerLast[layer];
+                m_0024 = 1;
+                frame = last;
+                framePosition = (float)frame;
+                endState = m_09ac[layer];
+                return 1;
+            }
+            m_0024 = 0;
+            if (follow == PLAYBACK_FOLLOW_NONE)
+            {
+                frame = frame - layerDirection[current];
+                framePosition = (float)frame;
+                return 1;
+            }
+            layer = m_076c[current];
+            frame = m_02ec[layer];
+            framePosition = (float)frame;
+            endState = m_09ac[layer];
+        }
+    }
+    else
+    {
+        framePosition = framePosition - step * speed;
+        frame = (int)framePosition;
+        int direction = layerDirection[current];
+        if (direction < 0 && frame > m_02ec[current])
+        {
+            int first = m_02ec[layer];
+            m_0024 = 0;
+            frame = first;
+            framePosition = (float)frame;
+            endState = m_09ac[layer];
+            return 1;
+        }
+        if (direction > 0 && frame < m_02ec[current])
+        {
+            frame = m_02ec[layer];
+            m_0024 = 0;
+            framePosition = (float)frame;
+            endState = m_09ac[layer];
+        }
+    }
     return 1;
 }

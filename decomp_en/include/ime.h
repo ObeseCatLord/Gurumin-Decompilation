@@ -22,6 +22,7 @@ struct ImeContext
     int GetConversion(DWORD *conversion, DWORD *sentence);              // EN 0x7aad50 (JP 0x1015d140)
     int SetConversion(const DWORD *conversion, const DWORD *sentence);  // EN 0x7aafd0 (JP 0x1015d160)
     int GetResultString(char *out);                                     // EN 0x7aacc0 (JP ImeContext::GetResultString): copies the finished text into `out`
+    int GetCompositionString(char *out);                                // EN 0x7aaee0 (EN-only, ime_composition.cpp): copies the text still being composed into `out`
     int GetModeText(char *out);                                         // EN 0x7aad70 (JP 0x1015d180): writes the input mode label into `out`
     DWORD LoadCandidates();                                             // EN 0x7aac30 (JP 0x1015d430)
 };

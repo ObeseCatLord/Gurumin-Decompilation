@@ -12,7 +12,7 @@ int Playback::SetSlotSource(void *source, int slot, int layer)
         return 0;
     if (source == 0)
         return 0;
-    slotSource[slot] = source;
+    slotSource[slot] = static_cast<MotionSource *>(source);
     slotLayer[slot] = layer;
     return 1;
 }

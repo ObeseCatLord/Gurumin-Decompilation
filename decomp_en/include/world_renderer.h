@@ -229,6 +229,13 @@ struct WorldRenderer
     int FindKeyCommandAWithPosition(int key);   // EN 0x72e340 (EN-only, world_message_scan.cpp): the first line of key `key` for which ScanLineCommandA finds both a result and a position (-1 when none)
     int KeyHasRlkLine(int key);                 // EN 0x735470 (EN-only, world_message_scan.cpp): 1 when a line of key `key` starts with "RLK"
     int KeyHasRopLine(int key);                 // EN 0x735700 (EN-only, world_message_scan.cpp): 1 when a line of key `key` starts with "ROP"
+    int KeyHasRpkLine(int key);                 // EN 0x7354e0 (EN-only, world_message_keys.cpp): 1 when a line of key `key` starts with "RPK" or "RP2"
+    int ApplyKeyOffsetsA(int key, int firstId, float x, float y, float z);   // EN 0x747010 (not ported yet): edits the movement commands of key `key` (three floats)
+    int ApplyKeyOffsetsB(int key, int firstId, float a, float b, float c, float d);   // EN 0x7472b0 (not ported yet): the same with the four-value form
+    int OffsetKeysFromA(int firstId, float x, float y, float z);   // EN 0x73f770 (EN-only, world_message_keys.cpp): ApplyKeyOffsetsA on every key whose highest id is at least `firstId`
+    int OffsetKeysFromB(int firstId, float a, float b, float c, float d);   // EN 0x742020 (EN-only, world_message_keys.cpp): ApplyKeyOffsetsB on those keys
+    int SetKeyCommandBField(int key, int value);   // EN 0x71ad50 (EN-only, world_message_keys.cpp): writes `value` into the field ScanLineCommandB found, on every line of key `key` that has one
+    int SetKeyCommandAField(int key, int value);   // EN 0x71acd0 (EN-only, world_message_keys.cpp): the same for ScanLineCommandA
     int CountMessageKeys();                  // EN 0x731db0 (not ported yet): number of keys in the message lines, cached in the table (-9999 = not counted yet)
     int InsertMessageLine(int position);     // EN 0x73ef10 (not ported yet): inserts an empty line (id -1) before line `position` and counts it; returns 1
     int LowestMessageId(int key);            // EN 0x72e990 (not ported yet): smallest id among the lines of key `key` (10000 when it has none), cached for keys below 1000

@@ -16,4 +16,8 @@ extern "C" int Npc_PlayGreeting(void);
 // show a greeting balloon. Returns 0. EN 0x5c1840 (JP 0x100b8220).
 extern "C" int Npc_Greet(int index);
 
+// Idle NPC that reacts when the player comes near: speaks now and then, and when it reacts wakes nearby enemies, plays a sound,
+// shows a prompt and turns to the player. Returns 0. EN 0x6d5a80 (JP 0x100b5550, see npc_greet_near.cpp).
+extern "C" int Npc_GreetWhenNear(int index);
+
 #endif

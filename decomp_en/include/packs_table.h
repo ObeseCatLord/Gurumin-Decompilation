@@ -9,6 +9,21 @@
 typedef int (*PacksCompressFunction)(const unsigned char *input, int *output, int length);
 extern "C" PacksCompressFunction g_packsCompress;
 
+// The decompressor entry of the table: unpacks `length` packed bytes of `input` into `output`. EN 0x02226904.
+typedef int (*PacksUncompressFunction)(const unsigned char *input, unsigned char *output, int length);
+extern "C" PacksUncompressFunction g_packsUncompress;
+
+// The picture decoder entry of the table: decodes `length` bytes of packed picture data into `output` (3 bytes per
+// pixel), reporting the width and height through the last two arguments. EN 0x02226908.
+typedef int (*PacksPictureDecodeFunction)(const unsigned char *input, int length, unsigned char *output, int *width, int *height);
+extern "C" PacksPictureDecodeFunction g_packsPictureDecode;
+
+// The picture encoder entry of the table: packs `width` x `height` pixels into `output` and stores the packed size in
+// `packedSize`; `quality` is always PACKS_PICTURE_QUALITY. EN 0x0222690c.
+typedef int (*PacksPictureEncodeFunction)(const unsigned char *pixels, int width, int height, int quality, void *output, int *packedSize);
+extern "C" PacksPictureEncodeFunction g_packsPictureEncode;
+const int PACKS_PICTURE_QUALITY = 0x100;   // fourth argument of the picture encoder
+
 // Width and height the image reader reports for the image it opened: they go in and out of the reader's calls. EN
 // 0x02226924 and 0x02226928.
 extern "C" int g_packsImageWidth;

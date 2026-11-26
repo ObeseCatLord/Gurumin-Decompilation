@@ -244,7 +244,7 @@ int AnimModel::SetSlotSource(void *source, int slot, int layer)
     Playback *state = playback;
     if (layer <= PLAYBACK_LAST_SOURCE_LAYER && slot <= PLAYBACK_LAST_SLOT_SOURCE && source != 0)
     {
-        state->slotSource[slot] = source;
+        state->slotSource[slot] = static_cast<MotionSource *>(source);
         state->slotLayer[slot] = layer;
     }
     return 1;

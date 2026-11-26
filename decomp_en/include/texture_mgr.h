@@ -122,6 +122,7 @@ struct TextureObject
     int CaptureRgbRows(unsigned char *out);                 // EN 0x7a0060 (JP CaptureRgbRows): reads the render target back as 24-bit pixels, row by row
     int Release();                                          // EN 0x7a3e50 (JP 0x1014f520): frees the Direct3D texture and surface, forgets bindings
     void Unload();                                          // EN 0x740ea0 (JP 0x10169e40): frees the kept image and the texture
+    int SaveItp(const char *path);                          // EN 0x742b70 (not ported yet): writes the texture to the .itp file `path`
     int DrawTriangles(const void *vertices, int triangles); // EN 0x77ee90 (JP 0x1014bb70)
     int DrawStrip(ScreenVertex *vertices, int count);        // EN 0x77e360 (JP 0x1014ba20)
     int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);  // EN 0x78a950 (JP 0x1014b750)
@@ -239,6 +240,9 @@ extern "C" char g_textureNames[TEXTURE_SLOT_COUNT][TEXTURE_NAME_SIZE];  // EN 0x
 extern "C" char g_textureRefCount[TEXTURE_SLOT_COUNT];              // EN 0x0162e2d0: references per slot
 extern "C" char g_textureKept[TEXTURE_SLOT_COUNT];                  // EN 0x0162e910: 1 = keep across a map change
 extern "C" TextureObject g_textures[TEXTURE_SLOT_COUNT];            // EN 0x01d8f6a0: every texture slot
+
+// Writes every named texture slot to "<folder>\<name>.itp". Returns 1. EN 0x7427f0 (texture_save_itp.cpp).
+extern "C" int Textures_SaveAllItp(const char *folder);
 
 // After a map change: unloads every texture that was not marked as kept and has no generated alpha (EN 0x747c70).
 extern "C" int Texture_ReloadMissing(void);

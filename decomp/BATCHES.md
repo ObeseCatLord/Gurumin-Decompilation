@@ -419,3 +419,18 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 355 | 38 | match | Sonnet subagents: MeshData::DrawLit draft; Bs006_Update drafted in 4 stages; 858 matched, fuzzy 48.03% |
 | 356 | 38 | match | Sonnet subagent: Message_DrawLabels and Image_HalveRgb drafts; 4 fragments folded; 858 matched, fuzzy 48.03% |
 | 357 | 38 | match | Sonnet subagents: CompileCall and RunScriptFrames structural passes, DrawLit frame study; 858 matched |
+| 358 | 38 | match | in-game frame 0x1011d810 skeleton; 858 matched |
+| 359 | 38 | match | in-game frame 0x1011d810 stage 1a; 858 matched |
+| 360 | 38 | match | in-game frame stage 1b; 858 matched |
+| 361 | 38 | match | in-game frame stage 2; 858 matched |
+| 362 | 38 | match | in-game frame stage 3; 858 matched |
+| 363 | 38 | match | in-game frame stage 4a; 858 matched |
+| 364 | 38 | match | in-game frame stage 4b; 858 matched |
+| 365 | 38 | match | in-game frame stage 4c (ItemText pad fix); 858 matched |
+| 366 | 38 | match | in-game frame stage 5; 858 matched |
+| 367 | 38 | match | in-game frame stage 6 first part; 858 matched |
+| 368 | 38 | match | in-game frame stages 6c-6d; 858 matched |
+| 369 | 38 | match | in-game frame stage 7; 858 matched |
+| 370 | 38 | match | in-game frame stages 8-9; 858 matched |
+| 371 | 38 | match | in-game frame stage 10; 858 matched |
+| 372 | 38 | match | in-game frame stages 11-12: first complete draft; 858 matched |

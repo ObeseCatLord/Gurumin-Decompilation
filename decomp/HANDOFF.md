@@ -20,7 +20,7 @@ reading it, then `AGENTS.md`.
 | Fully linked | 0.00% of code (151 of 264 units complete) |
 | Matched | 20.08% of code, 858 of 1212 functions |
 | Matched under the rules | 20.05% of code, 857 of the 858 matched functions |
-| Fuzzy match | 51.09% |
+| Fuzzy match | 50.09% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -214,6 +214,18 @@ function) and node_world.cpp (0) still break rule 2.
   inline helpers do not enlarge the frame; cl 13.00 keeps block locals in unique slots only inside a switch body or a
   loop span, which the original lacks (open.tsv). 0x1011d810 (in-game frame) skeleton in game_frame.cpp with 12 STAGE
   markers (plan in the scratchpad w1d810/STAGES.md), being filled stage by stage.
+- Batches 358-372: the in-game frame 0x1011d810 (game_frame.cpp) drafted stage by stage, one Sonnet agent per
+  ~500-1000 pseudo lines, each splice gated by build_all + check_matches. First complete draft: 101280 bytes vs about
+  107 KB, not yet compared as a whole (open.tsv lists the known gaps). Lessons: (1) a split pad must add up to the old
+  pad exactly (ItemText lost FUN_1003c370 until fixed; size checks now on ItemText, AttackRecord, GimmickSlot);
+  (2) agents mapped AnimModel methods onto addresses already matched as ModelObject methods (0x10162f20, 0x10164090):
+  keep the declaration, drop the second obj_symbols row - ModelObject and AnimModel look like two views of one
+  struct and should be merged; (3) never sed -i or rewrite a whole file (an agent destroyed game_frame.cpp once);
+  (4) check new global arrays against their neighbours (the shove tables first overlapped).
+  Cleanup left: DAT_1088e650 declared in gimmick_slot.h and item_dictionary.h with two types (hidden by an #ifndef),
+  local declarations of FUN_1000f360/FUN_10016500/FUN_10011aa0/FUN_100f9670/FUN_101148b0 in several files, the
+  `*(int *)&shift.z` cast in stage 4c (MoveTowards probably takes a float).
+  Commit progress/jp/progress.svg together with report.json from the same build_all run (CI no longer commits it).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

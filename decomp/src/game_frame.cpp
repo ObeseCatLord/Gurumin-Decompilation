@@ -2563,11 +2563,17 @@ sceneStateDone:
                 Vec4 digger = DAT_10db6ee8[0].matrix.GetTranslation();
                 DAT_104bfdb0 = 0;
                 FUN_1003ad20(0x35f, &DAT_10db6ee8[0].matrix.GetTranslation(), 1.0f);
-                int digRadius = DAT_104bfd64 == 0 ? DIG_RADIUS_SHORT : DIG_RADIUS_LONG;
-                FUN_1003bc60((int)(cos(DIG_HEADING) * DIG_REACH + (digger.x - DAT_10edbd38.x * 2.0f)),
-                             (int)(sin(DIG_HEADING) * DIG_REACH + (digger.y - DAT_10edbd38.y * 2.0f)), 1, digRadius);
-                if (DAT_104bfd64 != 0)
+                if (DAT_104bfd64 == 0)
+                {
+                    FUN_1003bc60((int)(cos(DIG_HEADING) * DIG_REACH + (digger.x - DAT_10edbd38.x * 2.0f)),
+                                 (int)(sin(DIG_HEADING) * DIG_REACH + (digger.y - DAT_10edbd38.y * 2.0f)), 1, DIG_RADIUS_SHORT);
+                }
+                else
+                {
+                    FUN_1003bc60((int)(cos(DIG_HEADING) * DIG_REACH + (digger.x - DAT_10edbd38.x * 2.0f)),
+                                 (int)(sin(DIG_HEADING) * DIG_REACH + (digger.y - DAT_10edbd38.y * 2.0f)), 1, DIG_RADIUS_LONG);
                     DAT_104bfd60 = DAT_104bfd64 * DIG_LONG_FRAMES + DIG_END_FRAME;
+                }
             }
             if (DAT_104bfd60 == DAT_104bfd64 * DIG_LONG_FRAMES + DIG_END_FRAME)
             {
@@ -3741,11 +3747,13 @@ walkNeedsGreeting:
                     if (DAT_104c0155 == 0)
                     {
                         DAT_10db6ee8[DAT_104bf8b4].m_237c = 0.4f;
+                        DAT_10db6ee8[DAT_104bf8b4].velocity.Set(0.0f, 0.0f, 0.0f, 0.0f);
                         DAT_10db6ee8[DAT_104bf8b4].m_238c = 1;
                         goto walkBlendDone;
                     }
 walkResetBlend:
                     DAT_10db6ee8[DAT_104bf8b4].m_237c = 0.4f;
+                    DAT_10db6ee8[DAT_104bf8b4].velocity.Set(0.0f, 0.0f, 0.0f, 0.0f);
 walkBlendDone:;
                 }
                 if (DAT_10db6ee8[DAT_104bf8b4].m_238c != 0)
@@ -4941,25 +4949,22 @@ swingStepDone:
                         else
                         {
 chargeRetreat:
-                            if (DAT_104c0108 < CHARGE_LONG_FRAMES)
-                            {
-                                if (DAT_104c0108 < CHARGE_MIN_FRAMES)
-                                    DAT_104c0108 = DAT_104c0108 - 4;
-                                else
-                                {
-                                    DAT_104c0108 = 0;
-                                    DAT_104c0190 = 0;
-                                    DAT_1049ef8c = 0;
-                                    FUN_1005ce80(0x13, 0, 0, 0);
-                                }
-                            }
-                            else
+                            if (DAT_104c0108 >= CHARGE_LONG_FRAMES)
                             {
                                 DAT_104c0108 = 0;
                                 DAT_104c0190 = 0;
                                 DAT_1049ef8c = 0;
                                 FUN_1005ce80(0x30, 0, 0, 0);
                             }
+                            else if (DAT_104c0108 >= CHARGE_MIN_FRAMES)
+                            {
+                                DAT_104c0108 = 0;
+                                DAT_104c0190 = 0;
+                                DAT_1049ef8c = 0;
+                                FUN_1005ce80(0x13, 0, 0, 0);
+                            }
+                            else
+                                DAT_104c0108 = DAT_104c0108 - 4;
                         }
                         if (DAT_104c0108 > CHARGE_MAX_FRAMES)
                             DAT_104c0108 = CHARGE_MAX_FRAMES;
@@ -6008,38 +6013,61 @@ trailDone:
                 carryAction:
                     if (DAT_104bfdcc != 0)
                     {
-                        if (DAT_104bfddc == 0 && (DAT_104bfdd0 == 1 || DAT_104bfdd0 == 2))
+                        if (DAT_104bfddc == 0)
                         {
-                            // Choose the side the object is pushed to from the walk direction.
-                            Vec4 playerToCarried;
-                            Vec4 stepDirection;
-                            playerToCarried.Copy(DAT_10db9210.GetTranslation() -
-                                                 DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation());
-                            stepDirection.Set(moveX, moveY, 0.0f, 0.0f);
-                            playerToCarried.Normalized3();
-                            stepDirection.Normalized3();
-                            if (DAT_104bfdcc > CARRY_DRAG_FRAME)
-                            {
-                                float side = Vec3_Dot(&playerToCarried, &stepDirection);
-                                DAT_104bfddc = 1;
-                                if (0.0f <= side)
-                                {
-                                    DAT_104bfdd4 = 0;
-                                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_CARRY_RIGHT, 0, CARRY_MOTION_BLEND, 1.0f);
-                                }
-                                else
-                                {
-                                    DAT_104bfdd4 = 1;
-                                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_CARRY_LEFT, 0, CARRY_MOTION_BLEND, 1.0f);
-                                }
-                            }
                             if (DAT_104bfdd0 == 1)
                             {
+                                // Choose the side the object is pushed to from the walk direction.
+                                Vec4 playerToCarried;
+                                Vec4 stepDirection;
+                                playerToCarried.Copy(DAT_10db9210.GetTranslation() -
+                                                     DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation());
+                                stepDirection.Set(moveX, moveY, 0.0f, 0.0f);
+                                playerToCarried.Normalized3();
+                                stepDirection.Normalized3();
+                                if (DAT_104bfdcc > CARRY_DRAG_FRAME)
+                                {
+                                    float side = Vec3_Dot(&playerToCarried, &stepDirection);
+                                    DAT_104bfddc = 1;
+                                    if (0.0f <= side)
+                                    {
+                                        DAT_104bfdd4 = 0;
+                                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_CARRY_RIGHT, 0, CARRY_MOTION_BLEND, 1.0f);
+                                    }
+                                    else
+                                    {
+                                        DAT_104bfdd4 = 1;
+                                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_CARRY_LEFT, 0, CARRY_MOTION_BLEND, 1.0f);
+                                    }
+                                }
                                 DAT_1020d648 = 0.0f;
                                 DAT_1020aee8 = moveX <= 0.0f ? -CARRY_SIDE_PUSH : CARRY_SIDE_PUSH;
                             }
-                            else
+                            else if (DAT_104bfdd0 == 2)
                             {
+                                // Choose the side the object is pushed to from the walk direction.
+                                Vec4 playerToCarried;
+                                Vec4 stepDirection;
+                                playerToCarried.Copy(DAT_10db9210.GetTranslation() -
+                                                     DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation());
+                                stepDirection.Set(moveX, moveY, 0.0f, 0.0f);
+                                playerToCarried.Normalized3();
+                                stepDirection.Normalized3();
+                                if (DAT_104bfdcc > CARRY_DRAG_FRAME)
+                                {
+                                    float side = Vec3_Dot(&playerToCarried, &stepDirection);
+                                    DAT_104bfddc = 1;
+                                    if (0.0f <= side)
+                                    {
+                                        DAT_104bfdd4 = 0;
+                                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_CARRY_RIGHT, 0, CARRY_MOTION_BLEND, 1.0f);
+                                    }
+                                    else
+                                    {
+                                        DAT_104bfdd4 = 1;
+                                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(MOTION_CARRY_LEFT, 0, CARRY_MOTION_BLEND, 1.0f);
+                                    }
+                                }
                                 DAT_1020aee8 = 0.0f;
                                 DAT_1020d648 = moveY <= 0.0f ? -CARRY_SIDE_PUSH : CARRY_SIDE_PUSH;
                             }
@@ -6111,8 +6139,14 @@ trailDone:
                                 mover = pushOrder[i];
                                 Vec4 moverAt = DAT_10db6ee8[mover].matrix.GetTranslation();
                                 if (mover == 0)
-                                    DAT_10db6ee8[mover].matrix.SetTranslation(
-                                        moverAt + (pushStep * CARRY_GRID).Divided(CARRY_GRID));
+                                {
+                                    if (DAT_104bfdd4 == 0)
+                                        DAT_10db6ee8[mover].matrix.SetTranslation(
+                                            moverAt + (pushStep * CARRY_GRID).Divided(CARRY_GRID));
+                                    else
+                                        DAT_10db6ee8[mover].matrix.SetTranslation(
+                                            moverAt + (pushStep * CARRY_GRID).Divided(CARRY_GRID));
+                                }
                                 else
                                 {
                                     DAT_10db6ee8[mover].matrix.SetTranslation(moverAt + pushStep);
@@ -7059,14 +7093,16 @@ movementDone:;
                                     pieceDirection.Copy(pieceDirection - DAT_10836fc8[modelIdx]);
                                     BurstIntoPieces(here, &pieceDirection, modelIdx);
                                     // two more passes of the last five pieces
-                                    for (int again = 0; again < 2; again++)
-                                    {
-                                        FUN_1000df10(here.x - 5.0f, here.y + 10.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
-                                        FUN_1000df10(here.x + 10.0f, here.y - 5.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
-                                        FUN_1000df10(here.x - 5.0f, here.y - 10.0f, here.z + 40.0f, &pieceDirection, 100, modelIdx);
-                                        FUN_1000df10(here.x + 4.0f, here.y + 7.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
-                                        FUN_1000df10(here.x + 10.0f, here.y - 10.0f, here.z + 65.0f, &pieceDirection, 100, modelIdx);
-                                    }
+                                    FUN_1000df10(here.x - 5.0f, here.y + 10.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x + 10.0f, here.y - 5.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x - 5.0f, here.y - 10.0f, here.z + 40.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x + 4.0f, here.y + 7.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x + 10.0f, here.y - 10.0f, here.z + 65.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x - 5.0f, here.y + 10.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x + 10.0f, here.y - 5.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x - 5.0f, here.y - 10.0f, here.z + 40.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x + 4.0f, here.y + 7.0f, here.z + 55.0f, &pieceDirection, 100, modelIdx);
+                                    FUN_1000df10(here.x + 10.0f, here.y - 10.0f, here.z + 65.0f, &pieceDirection, 100, modelIdx);
                                     DAT_10210d30[modelIdx] = ENEMY_DYING;
                                 }
                                 else if (carrier < 1 || carrier >= TOSS_CARRIER_LIMIT)

@@ -152,10 +152,10 @@ static __forceinline Node *Bs006Bone(int which)
 int Bs006_Update(int index)
 {
     AnimModel &ending = DAT_10db6ee8[BS006_ENDING_MODEL];
-    int armed = 0;
 
     DAT_10daaae8[index].m_0141 = 1;
     DAT_10db6ee8[index].uniformScale = 0.05f;
+    int armed = 0;
     DAT_104c0110 = index;
     DAT_10255a88[index] = 0;
     if (DAT_104bfe1c != 0)
@@ -172,10 +172,7 @@ int Bs006_Update(int index)
         int sparkSpread = 0;
         DAT_104c00c8 = 1;
         if (DAT_104bfe78 != 0)
-        {
-            DAT_104c00c8 = 1;
             return 0;
-        }
         DAT_10db6ee8[index].PlayMotion(0x19, 0, 0xf, 1.0f);
         DAT_10daaae8[index].m_0141 = 1;
         DAT_10db6ee8[0].shadowHidden = 0;

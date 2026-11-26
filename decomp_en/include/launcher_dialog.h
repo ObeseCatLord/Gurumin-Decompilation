@@ -16,9 +16,15 @@
 // Turn that one declaration into an unnamed zero-width bit-field so the layout matches the exe; the macro is removed
 // again right after the includes. MFC code that uses the member is in the MFC library, not in these headers.
 #define m_bClosedByEndDialog :0
+#include "launcher.h"   // the launcher helpers that need no MFC (Launcher_SaveSettings, ...)
 #include <afxwin.h>
 #include <afxcmn.h>
+#include <uxtheme.h>   // SetWindowTheme (the launcher links uxtheme.lib)
 #undef m_bClosedByEndDialog
+
+// The layout rule the macro above establishes (MFC objects in the exe: CDialog is 0x94 bytes, a control wrapper 0x74).
+static_assert(sizeof(CDialog) == 0x94, "CDialog must be 0x94 bytes like the MFC the exe was built with");
+static_assert(sizeof(CButton) == 0x74, "control wrappers are 0x74 bytes");
 
 // ---- Dialog template ids (RT_DIALOG resources of the exe) ------------------------------------------------------
 enum LauncherDialogId {
@@ -200,6 +206,8 @@ protected:
     afx_msg void OnUseBackBuffer();                                       // EN 0x006f1290
     afx_msg void OnSelchangeCombo415();                                   // EN 0x006f1300
     afx_msg void OnCombo401();                                            // EN 0x006f1540 (does nothing)
+    virtual BOOL OnInitDialog();                                          // EN 0x006ea3d0
+    virtual BOOL PreTranslateMessage(MSG *pMsg);                          // EN 0x006ea660
     DECLARE_MESSAGE_MAP()
 };
 
@@ -393,6 +401,10 @@ protected:
 // ---- Main launcher dialog (RT_DIALOG 102) and its tab control -------------------------------------------------------
 const int IDD_LAUNCHER_DIALOG = 0x66;   // "Gurumin Ver.1.4 (STEAM)" main dialog template (CCongigDlg)
 const int IDC_LAUNCHER_TAB = 0x3e8;     // tab control holding the Graphics, Network, Keyboard and Pad pages
+const int IDC_GROUP_GRAPHICS = 0x42c;   // "Graphics" group box of the graphics page
+const int IDC_GROUP_AUDIO = 0x42d;      // "Audio" group box of the graphics page
+const int IDC_LAUNCHER_START = 3;       // "Start Game" button
+const int IDC_LAUNCHER_RESET = 0x3ff;   // "Reset To Default" button
 const int IDC_LAUNCHER_HELP = 0x400;    // "Help" button (opens manual.pdf)
 extern HBRUSH g_launcherPageBrush;      // brush the network page returns for its control colours (EN 0x0090897c, NULL)
 const int IDM_ABOUTBOX = 0x10;          // system-menu command that opens the About box (CAboutDlg)
@@ -446,11 +458,222 @@ protected:
     afx_msg void OnPaint();                                               // EN 0x006ea450
     afx_msg HCURSOR OnQueryDragIcon();                                    // EN 0x006ea510
     afx_msg void OnHelp();                                                // EN 0x006e9080 (Help button)
+    afx_msg void OnStartGame();                                           // EN 0x006e90d0 ("Start Game" button)
+    afx_msg void OnCloseButton();                                         // EN 0x006e9160 ("Close" button, IDOK)
+    afx_msg void OnCancelButton();                                        // EN 0x006e90a0 ("Cancel" button, IDCANCEL)
+    afx_msg void OnClose();                                               // EN 0x006e91f0 (window close box)
+    afx_msg void OnResetDefaults();                                       // EN 0x006e9060 ("Reset To Default" button)
+    afx_msg void OnTcnSelchange(NMHDR *pNMHDR, LRESULT *pResult);         // EN 0x006ea520 (tab changed)
+public:
+    // Shows the page for tab `page` (0 title, 1 graphics, 2 pad, 3 keyboard) and hides the others. EN 0x006ea830.
+    void ShowPage(int page);
+protected:
+    virtual void DoDataExchange(CDataExchange *pDX);              // EN 0x006e70b0
+    virtual BOOL PreTranslateMessage(MSG *pMsg);                  // EN 0x006ea620
+    DECLARE_MESSAGE_MAP()
+};
+
+// ---- Control ids of the gamepad page (RT_DIALOG 129) ----------------------------------------------------------------
+// The page has twelve visible lists (one per action, same layout as the keyboard page), a "Set" button next to each,
+// and hidden lists that hold the assigned button index; only the ids the reconstructed code uses are named, by value.
+enum LauncherPadControlId {
+    IDC_PAD_3EB = 0x3eb,
+    IDC_PAD_3EC = 0x3ec,
+    IDC_PAD_3ED = 0x3ed,
+    IDC_PAD_3EE = 0x3ee,
+    IDC_PAD_3F9 = 0x3f9,
+    IDC_PAD_3FB = 0x3fb,
+    IDC_PAD_3FD = 0x3fd,
+    IDC_PAD_3FE = 0x3fe,
+    IDC_PAD_3FF = 0x3ff,
+    IDC_PAD_400 = 0x400,
+    IDC_PAD_401 = 0x401,
+    IDC_PAD_402 = 0x402,
+    IDC_PAD_403 = 0x403,
+    IDC_PAD_404 = 0x404,
+    IDC_PAD_405 = 0x405,
+    IDC_PAD_406 = 0x406,
+    IDC_PAD_407 = 0x407,
+    IDC_PAD_408 = 0x408,
+    IDC_PAD_409 = 0x409,
+    IDC_PAD_40A = 0x40a,
+    IDC_PAD_40B = 0x40b,
+    IDC_PAD_40C = 0x40c,
+    IDC_PAD_40D = 0x40d,
+    IDC_PAD_40F = 0x40f,
+    IDC_PAD_410 = 0x410,
+    IDC_PAD_411 = 0x411,
+    IDC_PAD_412 = 0x412,
+    IDC_PAD_414 = 0x414,
+    IDC_PAD_415 = 0x415,
+    IDC_PAD_417 = 0x417,
+    IDC_PAD_418 = 0x418,
+    IDC_PAD_41A = 0x41a,
+    IDC_PAD_41B = 0x41b,
+    IDC_PAD_41C = 0x41c,
+    IDC_PAD_41D = 0x41d,
+    IDC_PAD_41E = 0x41e,
+    IDC_PAD_421 = 0x421,
+    IDC_PAD_423 = 0x423,
+    IDC_PAD_424 = 0x424,
+    IDC_PAD_425 = 0x425,
+    IDC_PAD_426 = 0x426,
+    IDC_PAD_427 = 0x427,
+    IDC_PAD_428 = 0x428,
+    IDC_PAD_429 = 0x429,
+    IDC_PAD_42A = 0x42a
+};
+
+// The twelve visible button lists of the gamepad page, one per action (positions in the dialog template).
+enum LauncherPadListId {
+    IDC_PAD_LIST_DASH = 0x3ef,             // "Dash"
+    IDC_PAD_LIST_MOVE_LEFT = 0x3f0,        // "Move Left"
+    IDC_PAD_LIST_MOVE_FORWARD = 0x3f1,     // "Move Forward"
+    IDC_PAD_LIST_ATTACK = 0x3f2,           // "Attack / OK / Action"
+    IDC_PAD_LIST_CAMERA_FORWARD = 0x3f3,   // "Camera: Show Forward"
+    IDC_PAD_LIST_MOVE_RIGHT = 0x3f5,       // "Move Right"
+    IDC_PAD_LIST_MOVE_BACKWARD = 0x3f6,    // "Move Backward"
+    IDC_PAD_LIST_JUMP = 0x3f7,             // "Jump / Cancel"
+    IDC_PAD_LIST_CAMERA_ENEMY = 0x3f8,     // "Camera: Show Enemy"
+    IDC_PAD_LIST_CAMERA_LEFT = 0x3fa,      // "Camera: Show Left"
+    IDC_PAD_LIST_MENU = 0x416,             // "Menu On / Off"
+    IDC_PAD_LIST_CAMERA_RIGHT = 0x419      // "Camera: Show Right"
+};
+
+// Gamepad button assignment page (dialog template IDD_PAD_DIALOG). Every exchanged value is an int field of the
+// ClassWizard kind (list row, check state, slider position); the "Set" buttons, one list, two sliders and further
+// buttons are subclassed as CWnd members.
+class CPadDlg : public CDialog {
+public:
+    CPadDlg(CWnd *pParent = NULL);   // EN 0x006ed470
+
+    enum { IDD = IDD_PAD_DIALOG };
+
+    int m_list3fe;                      // 0x094 list selection of id 0x3fe
+    int m_list407;                      // 0x098 list selection of id 0x407
+    int m_list412;                      // 0x09c list selection of id 0x412
+    int m_list410;                      // 0x0a0 list selection of id 0x410
+    int m_list40f;                      // 0x0a4 list selection of id 0x40f
+    int m_list415;                      // 0x0a8 list selection of id 0x415
+    int m_list418;                      // 0x0ac list selection of id 0x418
+    int m_list3ff;                      // 0x0b0 list selection of id 0x3ff
+    int m_list400;                      // 0x0b4 list selection of id 0x400
+    int m_list401;                      // 0x0b8 list selection of id 0x401
+    int m_list402;                      // 0x0bc list selection of id 0x402
+    int m_list403;                      // 0x0c0 list selection of id 0x403
+    int m_list404;                      // 0x0c4 list selection of id 0x404
+    int m_list405;                      // 0x0c8 list selection of id 0x405
+    int m_list406;                      // 0x0cc list selection of id 0x406
+    int m_00d0;                         // 0x0d0 set to -1 by the constructor, not exchanged
+    int m_00d4;                         // 0x0d4 not touched by the reconstructed functions
+    int m_00d8;                         // 0x0d8 not touched by the reconstructed functions
+    int m_00dc;                         // 0x0dc not touched by the reconstructed functions
+    int m_00e0;                         // 0x0e0 not touched by the reconstructed functions
+    int m_00e4;                         // 0x0e4 not touched by the reconstructed functions
+    int m_00e8;                         // 0x0e8 set to -1 by the constructor, not exchanged
+    int m_00ec;                         // 0x0ec set to -1 by the constructor, not exchanged
+    int m_00f0;                         // 0x0f0 set to -1 by the constructor, not exchanged
+    int m_00f4;                         // 0x0f4 set to -1 by the constructor, not exchanged
+    int m_00f8;                         // 0x0f8 set to -1 by the constructor, not exchanged
+    int m_00fc;                         // 0x0fc set to -1 by the constructor, not exchanged
+    int m_0100;                         // 0x100 set to -1 by the constructor, not exchanged
+    int m_0104;                         // 0x104 set to -1 by the constructor, not exchanged
+    int m_0108;                         // 0x108 set to -1 by the constructor, not exchanged
+    int m_list3ee;                      // 0x10c list selection of id 0x3ee
+    int m_0110;                         // 0x110 not touched by the reconstructed functions
+    CButton m_btn41a;                   // 0x114 control for id 0x41a
+    CButton m_btn417;                   // 0x188 control for id 0x417
+    CButton m_btn414;                   // 0x1fc control for id 0x414
+    CButton m_btn411;                   // 0x270 control for id 0x411
+    CButton m_btn3fb;                   // 0x2e4 control for id 0x3fb
+    CButton m_btn3f9;                   // 0x358 control for id 0x3f9
+    CButton m_btn3ed;                   // 0x3cc control for id 0x3ed
+    CButton m_btn3fd;                   // 0x440 control for id 0x3fd
+    CButton m_btn40b;                   // 0x4b4 control for id 0x40b
+    CButton m_btn40c;                   // 0x528 control for id 0x40c
+    CButton m_btn3ec;                   // 0x59c control for id 0x3ec
+    CButton m_btn409;                   // 0x610 control for id 0x409
+    CButton m_btn408;                   // 0x684 control for id 0x408
+    CButton m_btn40a;                   // 0x6f8 control for id 0x40a
+    CButton m_btn40d;                   // 0x76c control for id 0x40d
+    int m_check41a;                     // 0x7e0 check state of id 0x41a
+    int m_check417;                     // 0x7e4 check state of id 0x417
+    int m_check414;                     // 0x7e8 check state of id 0x414
+    int m_check411;                     // 0x7ec check state of id 0x411
+    int m_check3fb;                     // 0x7f0 check state of id 0x3fb
+    int m_check3f9;                     // 0x7f4 check state of id 0x3f9
+    int m_check3ed;                     // 0x7f8 check state of id 0x3ed
+    int m_check3fd;                     // 0x7fc check state of id 0x3fd
+    int m_check40b;                     // 0x800 check state of id 0x40b
+    int m_check40c;                     // 0x804 check state of id 0x40c
+    int m_check3ec;                     // 0x808 check state of id 0x3ec
+    int m_check409;                     // 0x80c check state of id 0x409
+    int m_check408;                     // 0x810 check state of id 0x408
+    int m_check40a;                     // 0x814 check state of id 0x40a
+    int m_check40d;                     // 0x818 check state of id 0x40d
+    int m_check41b;                     // 0x81c check state of id 0x41b
+    int m_check41c;                     // 0x820 check state of id 0x41c
+    int m_check41d;                     // 0x824 check state of id 0x41d
+    CString m_text421;                  // 0x828 text of id 0x421
+    CComboBox m_combo3ee;               // 0x82c control for id 0x3ee
+    int m_check41e;                     // 0x8a0 check state of id 0x41e
+    int m_pos423;                       // 0x8a4 slider position of id 0x423
+    CSliderCtrl m_slider423;            // 0x8a8 control for id 0x423
+    int m_check424;                     // 0x91c check state of id 0x424
+    int m_check425;                     // 0x920 check state of id 0x425
+    CButton m_btn424;                   // 0x924 control for id 0x424
+    int m_check426;                     // 0x998 check state of id 0x426
+    CButton m_btn426;                   // 0x99c control for id 0x426
+    int m_check427;                     // 0xa10 check state of id 0x427
+    CButton m_btn427;                   // 0xa14 control for id 0x427
+    int m_check428;                     // 0xa88 check state of id 0x428
+    CButton m_btn428;                   // 0xa8c control for id 0x428
+    int m_check3eb;                     // 0xb00 check state of id 0x3eb
+    CSliderCtrl m_slider429;            // 0xb04 control for id 0x429
+    int m_pos429;                       // 0xb78 slider position of id 0x429
+    CButton m_btn42a;                   // 0xb7c control for id 0x42a
+    int m_check42a;                     // 0xbf0 check state of id 0x42a
+
+    // Returns true when the player should not start: a pad list is still on row 0 and the player refused the
+    // default input setup offered by the warning box. EN 0x006ed900.
+    bool IsStartRefused(CWnd *owner);
+
+protected:
+    virtual void DoDataExchange(CDataExchange *pDX);   // EN 0x006eda40
+    afx_msg HBRUSH OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor);   // EN 0x006e92c0
+    afx_msg void OnPaint();                                               // EN 0x006efae0 (paints nothing)
+    afx_msg void OnDestroy();                                             // EN 0x006ef790
+    virtual BOOL PreTranslateMessage(MSG *pMsg);                          // EN 0x006efbf0
     DECLARE_MESSAGE_MAP()
 };
 
 // Loads the launcher settings from bin\gurumin.def into the global configuration. `section` 0 loads everything,
 // 1 only the pad assignments, 2 only the keyboard assignments (EN 0x006e81d0, not yet reconstructed).
 void Launcher_LoadConfig(int section);
+
+// The page dialogs the main dialog shows in its tab control; they are global objects of the launcher.
+extern CNetDlg g_netPage;       // network page (EN 0x01612750)
+extern CPadDlg g_padPage;       // gamepad page, tab 2 (EN 0x016127f0)
+extern CKbDlg g_kbPage;         // keyboard page, tab 3 (EN 0x016133e8)
+extern CVideoDlg g_videoPage;   // graphics page, tab 1 (EN 0x016134c8)
+extern CTitDlg g_titlePage;     // title page, tab 0 (EN 0x01614770)
+
+// Launcher exit state shared by the main dialog's button handlers.
+extern bool g_launcherStartGame;    // true when the launcher closes to start the game (EN 0x016126b0)
+extern int g_launcherClosing;       // set to 1 by every handler that closes the launcher (EN 0x016126a8)
+extern int g_launcherCancelled;     // set to 1 when the launcher is cancelled (EN 0x016126ac)
+
+// Sizes of the dialog classes, from the m_nObjectSize of their CRuntimeClass in the exe (CAdvancedOptionDlg, CInstDlg,
+// CKbDlg, CTitDlg, CTabCtrl2) and from the stride of their last member otherwise.
+static_assert(sizeof(CAdvancedOptionDlg) == 0x224, "CAdvancedOptionDlg size");
+static_assert(sizeof(CVideoDlg) == 0x1204, "CVideoDlg size");
+static_assert(sizeof(CInstDlg) == 0x94, "CInstDlg size");
+static_assert(sizeof(CKbDlg) == 0xd0, "CKbDlg size");
+static_assert(sizeof(CNetDlg) == 0x9c, "CNetDlg size");
+static_assert(sizeof(COseDlg) == 0x9c, "COseDlg size");
+static_assert(sizeof(CTitDlg) == 0x1f0, "CTitDlg size");
+static_assert(sizeof(CTabCtrl2) == 0x74, "CTabCtrl2 size");
+static_assert(sizeof(CCongigDlg) == 0x110, "CCongigDlg size");
+static_assert(sizeof(CPadDlg) == 0xbf4, "CPadDlg size");
 
 #endif

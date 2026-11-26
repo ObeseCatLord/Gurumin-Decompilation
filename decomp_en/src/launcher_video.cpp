@@ -235,3 +235,25 @@ void CVideoDlg::OnAdvancedOption()
     CAdvancedOptionDlg dlg(this);
     dlg.DoModal();
 }
+
+// Strips the visual-style theme from the two group boxes so their captions draw over the page bitmap, then lets the
+// dialog show. Called by MFC when the page is created.
+BOOL CVideoDlg::OnInitDialog()
+{
+    CDialog::OnInitDialog();
+    CWnd *graphicsGroup = GetDlgItem(IDC_GROUP_GRAPHICS);
+    if (graphicsGroup != NULL) {
+        SetWindowTheme(graphicsGroup->m_hWnd, L" ", L" ");
+    }
+    CWnd *audioGroup = GetDlgItem(IDC_GROUP_AUDIO);
+    if (audioGroup != NULL) {
+        SetWindowTheme(audioGroup->m_hWnd, L" ", L" ");
+    }
+    return TRUE;
+}
+
+// Message pre-processing: the default processing.
+BOOL CVideoDlg::PreTranslateMessage(MSG *pMsg)
+{
+    return CDialog::PreTranslateMessage(pMsg);
+}

@@ -1,6 +1,6 @@
 // EN-only launcher/config dialog ("Gurumin Ver.1.4 (STEAM)", Graphics / Audio settings), Falcom code on top of static MFC.
-// MFC itself is library code and is not declared here: the VS2013 install on the build machine (WDExpress) ships no
-// atlmfc headers, so only the pieces that do not need MFC types are reconstructed (see launcher.cpp).
+// This header holds the pieces that need no MFC types; the MFC dialog classes are in launcher_dialog.h (the only header
+// that includes the MFC headers), which includes this one.
 #ifndef GURUMIN_EN_LAUNCHER_H
 #define GURUMIN_EN_LAUNCHER_H
 
@@ -16,5 +16,10 @@ extern "C" int Launcher_SettingToListRow(int setting);
 // Converts a list-box row into the stored setting value (rows from 7 on are two settings higher).
 // Called by the launcher dialog when it saves its settings. EN 0x006eb5e0.
 extern "C" int Launcher_ListRowToSetting(int row);
+
+// Writes the launcher settings back to the configuration file. Stubbed out in the Steam build (the settings are
+// written elsewhere): it only returns 0. Called by the main dialog's Start, Close, Cancel and close-box handlers.
+// EN 0x006efc30.
+extern "C" int Launcher_SaveSettings();
 
 #endif

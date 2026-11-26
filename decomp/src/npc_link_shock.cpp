@@ -189,7 +189,7 @@ int FUN_100460d0(int index)
             DAT_10daaae8[index].m_0141 = (char)linkFirst;
             DAT_1020b430[index].shockFrames = 1;
         }
-        if (linkFirst != 0 || DAT_1020b430[index].talk % 10 == 0)
+        if (DAT_1049f0c8[DAT_1020b430[index].linkIndex].first != 0 || DAT_1020b430[index].talk % 10 == 0)
         {
             if (DAT_1020b430[index].talk % 10 == 0)
                 return 0;

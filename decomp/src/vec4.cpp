@@ -223,7 +223,7 @@ int Vec4::InTriangle(const Vec4 &a, const Vec4 &b, const Vec4 &c)
     float u = Vec3_Dot(&ac, &ac) * Vec3_Dot(&ap, &ab) - Vec3_Dot(&ac, &ab) * Vec3_Dot(&ap, &ac);
     if (!(u > 0.0f))
         return 0;
-    float v = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ap, &ac) - Vec3_Dot(&ab, &ac) * Vec3_Dot(&ap, &ab);
+    float v = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ap, &ac) - Vec3_Dot(&ap, &ab) * Vec3_Dot(&ab, &ac);
     if (!(v > 0.0f))
         return 0;
     float denominator = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ac, &ac) - Vec3_Dot(&ab, &ac) * Vec3_Dot(&ab, &ac);

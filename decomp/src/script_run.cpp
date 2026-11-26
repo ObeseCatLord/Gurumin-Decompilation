@@ -57,7 +57,7 @@ int ListBank::RunStatements(char wantType, int openBraces)
         sawBlock = 1;
     }
     condition = 0;
-    while (text + textLength > cursor[depth])
+    while (cursor[depth] < text + textLength)
     {
         if (failed != 0)
             return 0;

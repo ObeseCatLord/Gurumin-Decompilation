@@ -18,8 +18,8 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 20.72% of code, 887 of 1212 functions |
-| Matched under the rules | 20.69% of code, 886 of the 887 matched functions |
+| Matched | 20.76% of code, 889 of 1212 functions |
+| Matched under the rules | 20.72% of code, 888 of the 889 matched functions |
 | Fuzzy match | 50.68% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
@@ -262,6 +262,10 @@ function) and node_world.cpp (0) still break rule 2.
   Save_ReadSlotInfo can use `CharSlot record;`). DrawQuad 1 byte, CompileStatement 6 bytes, three 2-line walls.
 - Batch 383: the Copy -> operator= rename was tried and reverted (it loses Node::Clone: the original Vec4 is
   block-copyable; 0x101acc20 belongs to a second type, ParamVector stays). NOTES.md "Vec4 is block-copyable".
+- Batch 384: near misses 2 matched (887 -> 889: InTriangle via an exhaustive Dot-order permutation script in the
+  w384i scratchpad, Vis_IsCharacterVisible via a boxes pointer local). Large walls (1600-4000) gave none: they are
+  mostly register choice and slot order (NOTES "Stack-slot order of locals"). The remaining queue is walls only;
+  exhaustive expression-order permutation is the lever still paying off on near misses.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

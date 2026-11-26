@@ -445,3 +445,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 381 | 38 | match | wall retries 700-1600 bytes (4 matched); 887 matched |
 | 382 | 38 | notes | zero-register rule, Vec4 operator= finding; no new matches; 887 matched |
 | 383 | 38 | notes | Vec4 operator= rename tried and reverted (Node::Clone); ParamVector is a real second type; 887 matched |
+| 384 | 38 | match | near misses (2 matched); large walls none; 889 matched |

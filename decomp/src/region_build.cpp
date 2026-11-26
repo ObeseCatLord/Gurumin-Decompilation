@@ -78,11 +78,11 @@ extern "C" int FUN_10020560()
                 DAT_104c03c0[region].vertices[v].baseTint.w = DAT_104c03c0[region].vertices[v].tint.w;
                 DAT_104c03c0[region].vertices[v].nearness = 1.0f;
                 DAT_104c03c0[region].points[v].morphing = 0;
-                if (DAT_104c03c0[region].vertices[v].x < boxMin.x)
+                if (boxMin.x > DAT_104c03c0[region].vertices[v].x)
                     boxMin.x = DAT_104c03c0[region].vertices[v].x;
-                if (DAT_104c03c0[region].vertices[v].y < boxMin.y)
+                if (boxMin.y > DAT_104c03c0[region].vertices[v].y)
                     boxMin.y = DAT_104c03c0[region].vertices[v].y;
-                if (DAT_104c03c0[region].vertices[v].z < boxMin.z)
+                if (boxMin.z > DAT_104c03c0[region].vertices[v].z)
                     boxMin.z = DAT_104c03c0[region].vertices[v].z;
                 if (boxMax.x < DAT_104c03c0[region].vertices[v].x)
                     boxMax.x = DAT_104c03c0[region].vertices[v].x;

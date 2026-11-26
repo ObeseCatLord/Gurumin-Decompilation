@@ -609,3 +609,10 @@ other huge drafts (Bs00x_Update, DrawLit, RunScriptFrames) for the same gap.
 - So the original Vec4 has no user-declared operator= (trivially copyable), while CharSlot's position has a type
   whose operator= is 0x101acc20: ParamVector in include/char_slot.h is most likely a real second original type.
   Keep it; do not merge it into Vec4. The rename was reverted (script and notes: scratchpad w383v).
+
+## Stack-slot order of locals (cl 13.00, batches 381-384)
+- cl 13.00 orders frame slots by reference count; locals with equal counts go later-declared = lower address.
+  Many walls whose code matches but whose `[esp+..]` offsets differ are this (tools/sbs.py normalises offsets and
+  hides them; scratchpad w381d/strict.py keeps them). Levers that worked: a local of its own instead of reusing one
+  (Npc_RideBehindMarker), declaration order when counts are equal. When the original needs a reference-count order
+  no plausible source gives, record it and move on.

@@ -20,7 +20,7 @@ reading it, then `AGENTS.md`.
 | Fully linked | 0.00% of code (151 of 264 units complete) |
 | Matched | 20.08% of code, 858 of 1212 functions |
 | Matched under the rules | 20.05% of code, 857 of the 858 matched functions |
-| Fuzzy match | 50.09% |
+| Fuzzy match | 50.54% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -226,6 +226,14 @@ function) and node_world.cpp (0) still break rule 2.
   local declarations of FUN_1000f360/FUN_10016500/FUN_10011aa0/FUN_100f9670/FUN_101148b0 in several files, the
   `*(int *)&shift.z` cast in stage 4c (MoveTowards probably takes a float).
   Commit progress/jp/progress.svg together with report.json from the same build_all run (CI no longer commits it).
+- Batches 373-376: compare passes. In-game frame: C++ linkage (?FUN_1011d810@@YAHXZ) gives the original EH
+  prologue (NOTES "Linkage and EH frames"; Game_LoadData 0x100cb0c0 got the same fix), call sites 1920 -> 1943 of
+  1945, frame 0x486c vs 0x490c (open.tsv has the next steps). Bs006_Update: direct table indexing instead of cached
+  references cut its diff from 15295 to 4437 lines (the same change gave 0-14% on Bs001/002/004/005, Prince,
+  NeoGalaxy; none on Bs003 and Enemy_UpdateFighter); three zero-initialised locals at the top caused the 0/1
+  register hoist. Scratchpad helpers for the in-game frame (w1d810): tgt20.py/tgt20f.py call-sequence diff,
+  slots20.py stack-slot counts, rep20.py exact-snippet CRLF replace.
+- Paused after batch 376 at the orchestrator's request (external PRs being merged outside decomp/).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

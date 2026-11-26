@@ -122,7 +122,7 @@ findings so far. You need your own copy of the game and VS .NET 2002 (cl 13.00.9
 
 The English Steam release is the easiest place to start: most of its functions have an already matched JP twin to
 port. [`decomp_en/CONTRIBUTING.md`](decomp_en/CONTRIBUTING.md) covers the setup (your Steam copy, VS2013 Community
-Update 4) and the per-function workflow, including how to claim a function with a draft pull request.
+Update 4 (download [here](https://download.microsoft.com/download/7/1/B/71BA74D8-B9A0-4E6C-9159-A8335D54437E/vs2013.4_ce_enu.iso))) and the per-function workflow, including how to claim a function with a draft pull request.
 
 ## Roadmap
 Decompilation and naming come first. Planned once they are far enough along (details in

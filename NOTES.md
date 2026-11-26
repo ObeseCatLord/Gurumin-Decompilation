@@ -600,3 +600,12 @@ other huge drafts (Bs00x_Update, DrawLit, RunScriptFrames) for the same gap.
   named local read later, a parameter, a value used in the else arm or returned); a dead temporary stays `test`.
 - So an original `cmp eax,ebx` on a dead value points to a second use we have not reconstructed; ours hoisting a
   zero the original lacks means too many zero uses across a call. Tests: scratchpad w382z (z1..z8.cpp).
+
+## Vec4 is block-copyable; 0x101acc20 belongs to a second type (batch 383)
+- Renaming Vec4::Copy (0x101acc20) to a user-declared `void Vec4::operator=(const Vec4 &)` (the original returns w
+  in eax, not this) keeps CharSlot::operator= and FUN_1003e710, but every struct holding Vec4 members then copies
+  member by member through the operator instead of rep movsd: Node::Clone (`*saved = *source->saved`, NodeSaved
+  with Vec4 fields) and MeshData::UploadBones lose their matches.
+- So the original Vec4 has no user-declared operator= (trivially copyable), while CharSlot's position has a type
+  whose operator= is 0x101acc20: ParamVector in include/char_slot.h is most likely a real second original type.
+  Keep it; do not merge it into Vec4. The rename was reverted (script and notes: scratchpad w383v).

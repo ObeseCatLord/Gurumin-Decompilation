@@ -45,9 +45,19 @@ struct DamageZone
     int offFlag;                  // 0x3c: script flag that turns the zone off (0 = none)
 };
 
+// A map record read as a camera point: where on the camera path it lies and which background movie it shows.
+struct CameraPoint
+{
+    int pad_0000;            // 0x00: not used
+    int frame;               // 0x04: frame of the camera path
+    int pad_0008;            // 0x08: not used
+    int movie;               // 0x0c: movie number (index into g_movieNames), -1 = none
+};
+
 // One record of the table (0x100 bytes).
 union MapRecord
 {
+    CameraPoint camera;                      // the record as a camera point
     DamageZone zone;                         // the record as a damage zone
     RoutePoint points[MAP_RECORD_ROWS];      // a route or per-state values
     MapEntry entry;                          // the record as a map entry

@@ -183,6 +183,71 @@ const int PACKS_ARITH_SHIFT = 16;
 // at EN 0x7b9830).
 extern "C" unsigned int Packs_ArithDecode(const unsigned char *data, unsigned int probability);
 
+// ---- Coefficient band decoder (src/packs_band.cpp) ----
+
+// Highest value of the arithmetic code range (the decoder's initial high end). EN 0x0222b164.
+extern "C" unsigned int g_arithMax;
+// Bits of the code value read before the first decision. EN 0x00909508.
+extern "C" int g_arithValueBits;
+// Cells in one scan block (a 16 x 16 block of coefficients) and the offsets of each cell from the block's corner.
+const int PACKS_BAND_CELLS = 256;
+const int PACKS_BAND_BLOCK = 16;
+extern "C" int g_packsCellX[PACKS_BAND_CELLS];   // EN 0x00909510: column offset of each cell, in scan order
+extern "C" int g_packsCellY[PACKS_BAND_CELLS];   // EN 0x00909910: row offset of each cell, in scan order
+// Largest probability handed to Packs_ArithDecode and the divisor offset of the probability formula.
+const unsigned int PACKS_BAND_PROBABILITY_MAX = 0xfffe;
+const unsigned int PACKS_BAND_PROBABILITY_BIAS = 0x10000;
+// Weight scale of a band's activity (bytes of the band header are out of 256).
+const int PACKS_BAND_WEIGHT_ONE = 0x100;
+
+// Header of one coefficient band: the activity of its first cell and two weights (out of 256).
+struct PacksBandHeader
+{
+    unsigned char scale;     // 0x00: 0 = the band is empty, else its starting activity is scale to the fourth power
+    unsigned char gain;      // 0x01: how much a decoded coefficient raises the activity (out of 256)
+    unsigned char keep;      // 0x02: how much of the previous activity is kept (out of 256)
+};
+
+// Decodes one band of width x height coefficients from `data` into `output` (rows `stride` apart). An empty band is
+// filled with zeros. Cells are visited block by block in scan order; the probability of each one follows an activity
+// that is updated from the previous coefficient. Leaves the bit position of the data in g_packsReadPosition. EN 0x7b9830,
+// called by the plane decoders at EN 0x7ba000 and 0x7bc1c0.
+extern "C" void Packs_DecodeBand(const unsigned char *data, short *output, int width, int height, int stride,
+                                 const PacksBandHeader *band);
+
+// ---- Coefficient band encoder (src/packs_encode_band.cpp) ----
+
+// State of the arithmetic encoder (the counterpart of the decoder state above): the range limits, the top and the largest
+// value of the code range, the number of undecided bits waiting after a shift, and the low and high end of the interval.
+extern "C" unsigned int g_encodeQuarter;       // EN 0x0222b188
+extern "C" unsigned int g_encodeHalf;          // EN 0x0222b18c
+extern "C" unsigned int g_encodeThreeQuarters; // EN 0x0222b190
+extern "C" unsigned int g_encodeTop;           // EN 0x0222b194
+extern "C" unsigned int g_encodeMax;           // EN 0x0222b198
+extern "C" int g_encodePending;                // EN 0x0222b1a0: bits waiting for the interval to settle
+extern "C" unsigned int g_encodeLow;           // EN 0x0222b1a4
+extern "C" unsigned int g_encodeHigh;          // EN 0x0222b1a8
+extern "C" int g_encodeExtraBits;              // EN 0x0222b184: bits added to the pending count when a band ends
+// Runs of zeros are coded as a count, other values as a 4-bit run length minus one plus an 11-bit magnitude and a sign.
+const int PACKS_RUN_BITS = 4;
+const unsigned int PACKS_RUN_MASK = 0xf;
+const unsigned int PACKS_MAGNITUDE_MASK = 0x7ff;
+const int PACKS_SIGN_SHIFT = 15;
+const int PACKS_MAGNITUDE_SHIFT = 11;
+
+// Measures the packed coefficients `data` (`count` cells) and fills the band header `band` (scale, gain and keep weights).
+// EN 0x7ba440 (JP Packs.dll 0x10001000).
+extern "C" int Packs_MeasureBand(PacksBandHeader *band, const unsigned short *data, int count);
+// Encodes one decision `bit` of probability `probability` (16 bits) into `output`. EN 0x7b9400.
+extern "C" void Packs_EncodeBit(int bit, unsigned int probability, unsigned char *output);
+// Ends the code stream: writes the bits that settle the interval. EN 0x7bb580.
+extern "C" void Packs_EncodeFlush(int bit, unsigned char *output);
+// Encodes `count` packed coefficients `data` into `output`, preceded by the band header: runs of zeros and values
+// follow the same activity model as Packs_DecodeBand. Returns the number of packed cells used. EN 0x7bb630, called by the
+// plane encoders at EN 0x7bb280 and 0x7bb8d0.
+extern "C" int Packs_EncodeBand(const unsigned short *data, unsigned char *output, int count, int reserved,
+                                PacksBandHeader *band);
+
 // ---- Image container loader (src/packs_bmp.cpp) ----
 
 // File mode, magic numbers (colour image only / colour image followed by an alpha image) and bytes per pixel of the
@@ -281,5 +346,24 @@ extern "C" void Packs_WriteBit(int bit, unsigned char *output);
 extern "C" void Packs_LzWriteZeroFlag(void);
 // Returns the next bit of the packed stream, refilling 16 bits at a time. EN 0x7bd190. Called by Packs_DecodeBlock.
 extern "C" int Packs_ReadStreamBit(void);
+// Starts the next flag bit of the compressor's flag word like Packs_LzWriteZeroFlag, but sets it. EN 0x7bd0c0. Called by the
+// compressor at EN 0x7bd240 and EN 0x7bcff0.
+extern "C" void Packs_LzWriteOneFlag(void);
+// Reads `count` bits of the packed stream with Packs_ReadStreamBit, first bit highest, and returns them as a number. EN
+// 0x7bd120. Called by Packs_DecodeBlock.
+extern "C" int Packs_ReadStreamBits(int count);
+
+// Start of the bytes the compressor is matching in (candidate positions are offsets into it). EN 0x0222b1bc.
+extern "C" unsigned char *g_packsLzBlockStart;
+// Bytes the hash of a candidate already guarantees to be equal, where the match comparison starts.
+const unsigned int PACKS_LZ_HASHED_BYTES = 2;
+// Length of the match between the bytes at `candidate` of g_packsLzBlockStart and the bytes at PacksLzState::data: counts equal
+// bytes from PACKS_LZ_HASHED_BYTES on, at most up to `maxLength` and not past the end of the input. EN 0x7bd730.
+extern "C" unsigned int Packs_LzMatchLength(unsigned short candidate, unsigned short maxLength);
+
+// Decodes the three bands of one block row, one into each of the three planes (the plane offset `offset` is counted in
+// samples), with the first three band entries of `bands`. EN 0x7ba000.
+extern "C" void Packs_DecodePlaneBands(const unsigned char *data, short *planeFirst, short *planeSecond, short *planeThird,
+                                       int offset, int width, int height, int stride, const PacksBandEntry *bands);
 
 #endif

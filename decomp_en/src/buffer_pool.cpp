@@ -170,3 +170,40 @@ extern "C" int MeshBuffers_Create(IDirect3DVertexBuffer9 **vertexBuffer, int ver
     *indexBuffer = g_slotTextureB[slot];
     return slot;
 }
+
+// Reserves the first free entry of the surface pool and returns its index, or -1 when all SURFACE_POOL_SIZE entries are
+// in use. Called when a pooled texture is created.
+extern "C" int BufferPool_Alloc(void)
+{
+    int index;
+    for (index = 0; index < SURFACE_POOL_SIZE; index++)
+    {
+        if (g_pooledSurfaceUsed[index] == 0)
+            break;
+    }
+    if (index == SURFACE_POOL_SIZE)
+        return -1;
+    g_pooledSurfaceUsed[index] = 1;
+    return index;
+}
+
+// Releases the surface of pool entry `index` and takes its bytes off the pooled total, but keeps the entry itself
+// reserved (in use, no reservation flag). Out-of-range and free entries are ignored. Returns 0. No direct caller.
+extern "C" int SurfacePool_ReleaseSurface(int index)
+{
+    if (index < 0)
+        return 0;
+    if (index >= SURFACE_POOL_SIZE)
+        return 0;
+    if (g_pooledSurfaceUsed[index] == 0)
+        return 0;
+    if (g_pooledSurfaces[index] != 0)
+    {
+        g_pooledSurfaces[index]->Release();
+        g_pooledBytesTotal -= g_pooledSurfaceBytes[index];
+    }
+    g_pooledSurfaces[index] = 0;
+    g_pooledSurfaceUsed[index] = 1;
+    g_pooledSurfaceReserved[index] = 0;
+    return 0;
+}

@@ -50,3 +50,28 @@ extern "C" int Char_PushAwayFrom(int strength, char flag, int index, const Vec4 
     }
     return 0;
 }
+
+// Pushes character `index` away from character `otherIndex` (or from `point` when it is given) with the fixed strength
+// PUSH_STRENGTH_FROM_CHARACTER, passing `flag` on with the push. Character 0 is not pushed while the scene timer is set,
+// and nothing happens when the two stand exactly on the same spot. Returns 0. Called by the script command that pushes a
+// character away and by the scene code (EN 0x5e30b0, 0x5c3430).
+extern "C" int Char_PushAwayFromCharacter(char flag, int index, int otherIndex, const Vec4 *point)
+{
+    if (index == 0 && otherIndex == 0)
+        return 0;
+    Vec4 direction = g_characterModels[index].matrix.GetTranslation();
+    Vec4 from = g_characterModels[otherIndex].matrix.GetTranslation();
+    if (point != 0)
+        from.Copy(*point);
+    if (index != 0 || g_sceneTimer == 0)
+    {
+        direction.Copy(direction - from);
+        if (direction.x != 0.0f || direction.y != 0.0f || direction.z != 0.0f)
+        {
+            direction.Normalized3();
+            direction.Copy(direction * (float)PUSH_STRENGTH_FROM_CHARACTER);
+            g_characterModels[index].SetPendingPush(direction.x, direction.y, 0, flag);
+        }
+    }
+    return 0;
+}

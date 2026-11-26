@@ -77,3 +77,48 @@ extern "C" int Texture_FindByName(const char *name)
     }
     return -1;
 }
+
+// First byte of an RLE record of a frame: skip that many output pixels (second byte), or repeat a pixel (third byte)
+// that many times (second byte). Any other byte is one literal pixel.
+const unsigned char MMV_RLE_SKIP = 0xfc;
+const unsigned char MMV_RLE_RUN = 0xfd;
+
+// MmvPlayer::DecodeFrameRle: decodes the frame record at `data` into the 8-bit frame buffer: `recordSize` bytes of
+// literal pixels, skips (MMV_RLE_SKIP, count) that leave the pixels under them alone, and runs (MMV_RLE_RUN, count,
+// pixel). Called by the frame readers (EN 0x7a8f90, 0x7a93c0, 0x7a9610, 0x7a9750).
+void MmvPlayer::DecodeFrameRle(int recordSize)
+{
+    unsigned char *out = (unsigned char *)frame;
+    const unsigned char *in = data;
+    do
+    {
+        unsigned char code = *in;
+        if (code == MMV_RLE_SKIP)
+        {
+            unsigned char skip = in[1];
+            in += 2;
+            recordSize -= 2;
+            out += skip;
+        }
+        else if (code == MMV_RLE_RUN)
+        {
+            recordSize -= 3;
+            unsigned char count = in[1];
+            unsigned char pixel = in[2];
+            do
+            {
+                *out = pixel;
+                count--;
+                out++;
+            } while (count != 0);
+            in += 3;
+        }
+        else
+        {
+            *out = code;
+            recordSize--;
+            in++;
+            out++;
+        }
+    } while (recordSize != 0);
+}

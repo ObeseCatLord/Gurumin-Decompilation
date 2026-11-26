@@ -8,3 +8,9 @@
 ModelInstance::ModelInstance()
 {
 }
+
+// ModelInstance::~ModelInstance: empty; the compiler destroys the three matrices (previous, local, world) in reverse
+// declaration order. Called where a model instance is destroyed.
+ModelInstance::~ModelInstance()
+{
+}

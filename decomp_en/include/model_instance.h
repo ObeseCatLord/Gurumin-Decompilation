@@ -29,6 +29,7 @@ struct ModelInstance
     EffectOptions state;                        // 0x194: effect options of the model
 
     ModelInstance();                            // EN 0x709d80 (JP 0x101728c0)
+    ~ModelInstance();                           // EN 0x70a240 (EN-only, anim_channels.cpp): destroys the three matrices, last to first
 };
 
 #endif

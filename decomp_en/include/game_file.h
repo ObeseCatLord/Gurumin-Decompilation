@@ -21,6 +21,9 @@ struct GameFile
     int AtEnd();                         // EN 0x7a8a90: feof on the open file
     int Size();                        // EN 0x7a8cd0: current file position (the length after a seek to the end)
     size_t Read(void *buffer, size_t size, size_t count);   // EN 0x7a8b20: fread from the open file
+    // EN 0x7a8d80 (EN-only, game_file.cpp): packs `count` * `size` bytes of `source` with the Packs compressor and writes the
+    // packed size (4 bytes) and the packed data to the open file; returns what the last write returned, 0 when no file is open.
+    size_t WriteCompressed(const unsigned char *source, int count, int size);
 };
 
 // Copies the file name of `path` without directory and extension into `out`. EN 0x7a8930 (JP 0x10161120).

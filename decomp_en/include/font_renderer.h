@@ -10,6 +10,7 @@
 
 const int FONT_TEXT_SLOTS = 0x20;     // text textures cached by the renderer
 const int FONT_TEXT_SIZE = 0x100;     // bytes of the text kept for each slot
+const int FONT_MAX_MEASURED_WIDTH = 1000;   // widest text (in pixels, before scaling) MeasureWindowsText reports
 
 struct FontRenderer
 {
@@ -30,6 +31,9 @@ struct FontRenderer
     int digitAdvance;                                // 0x2398: pen advance in pixels of a digit in proportional text
 
     int TextWidth(const char *text, float scale);    // EN 0x7a10e0 (JP 0x1014fd30): width of `text` in pixels
+    // EN 0x7a1170 (EN-only, font_metrics.cpp): measures `text` with the Windows font (width cut to FONT_MAX_MEASURED_WIDTH
+    // before scaling); the scaled width goes to *width and the scaled height to *height. Returns 1.
+    int MeasureWindowsText(const char *text, float scale, int *width, int *height);
     // EN 0x7a3980 (JP 0x10145380): advance in pixels of one Shift-JIS character `code` (bytes in memory order). The
     // other arguments mirror DrawGlyph's list and are not used.
     int GlyphWidth(int colour, int x, int y, unsigned short code, int unused, int unusedAgain);

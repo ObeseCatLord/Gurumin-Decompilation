@@ -33,6 +33,25 @@ int KeyTrack::HasFrame(int frame)
     return 0;
 }
 
+// Takes key `index` out of the track: the keys after it move up one place and the count drops by one. Returns 0.
+// Called when a key is moved to another frame (EN 0x777010).
+int KeyTrack::RemoveAt(int index)
+{
+    count--;
+    for (int i = index; i < count; i++)
+    {
+        frames[i] = frames[i + 1];
+        Vec4 *key = &values[i];
+        const Vec4 *next = &values[i + 1];
+        key->x = next->x;
+        key->y = next->y;
+        key->z = next->z;
+        key->w = next->w;
+        flags[i] = flags[i + 1];
+    }
+    return 0;
+}
+
 // Frees the three arrays and empties the track (the arrays come from the C heap, unlike the engine allocator's).
 void KeyTrack::Free()
 {
@@ -318,6 +337,37 @@ int MotionList::AddEntry(int id, int value, const char *name, int extra)
     names[entryCount][MOTION_NAME_SIZE - 1] = 0;
     extras[entryCount] = extra;
     entryCount++;
+    return 1;
+}
+
+// Makes this an empty list: the signature, the starting flags, no items and one entry named "NoName" (id 0, value 60,
+// extra 0) that entryCount does not count. Returns 1. Called by the constructor of the plug owner (EN 0x76ef30).
+int MotionList::Init()
+{
+    m_0000 = MOTION_LIST_SIGNATURE;
+    m_0004 = MOTION_LIST_START_FLAGS;
+    count = 0;
+    entryCount = 0;
+    strcpy(names[0], "NoName");
+    ids[0] = 0;
+    values[0] = MOTION_FIRST_ENTRY_VALUE;
+    extras[0] = 0;
+    return 1;
+}
+
+// Overwrites entry `index` (0 up to and including entryCount) with `id`, `value`, `name` (cut to the entry size) and
+// `extra`. Returns 0 when the index is below 0 or above entryCount, else 1. No direct caller.
+int MotionList::SetEntry(int index, int id, int value, const char *name, int extra)
+{
+    if (index > entryCount)
+        return 0;
+    if (index < 0)
+        return 0;
+    ids[index] = id;
+    values[index] = value;
+    extras[index] = extra;
+    strncpy(names[index], name, MOTION_NAME_SIZE - 1);
+    names[index][MOTION_NAME_SIZE - 1] = 0;
     return 1;
 }
 

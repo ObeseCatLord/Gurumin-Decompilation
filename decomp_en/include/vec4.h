@@ -136,6 +136,10 @@ Matrix4 RotationMatrix(const Vec4 &quaternion);
 // (EN 0x77a4a0, JP 0x101ae060).
 Vec4 Project(const Vec4 &point, const Matrix4 &matrix);
 
+// Rotates `*point` by `angle` radians about `*axis` (the axis is scaled by sin(angle / 2) in place) and returns the
+// projected result (EN 0x778b60, JP 0x101b16f0; src/vec4_axis_rotation.cpp).
+Vec4 RotatePointAboutAxis(Vec4 *axis, float angle, const Vec4 *point);
+
 // Transforms the direction `v` by the rotation part of `matrix` (no translation); the result's w is 0
 // (EN 0x77a2a0, JP 0x101ae130).
 Vec4 TransformNormal(const Vec4 &v, const Matrix4 &matrix);

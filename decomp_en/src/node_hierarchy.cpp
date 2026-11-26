@@ -1,4 +1,5 @@
 // Node child list and subtree searches (EN build, EN-only: no JP twin found).
+#include <string.h>
 #include "node.h"
 
 // Collects the nodes of this subtree that are in the collision-sphere state and links them to the chasing nodes (the
@@ -57,5 +58,39 @@ int Node::ReplaceDrawMode(int from, int to)
         drawMode = to;
     for (int i = 0; i < childCount; i++)
         children[i]->ReplaceDrawMode(from, to);
+    return 0;
+}
+
+// Appends this node to `list` when it is in the collision-sphere state (NODE_FLAG_COLLISION_SPHERE), then does the same
+// for every child subtree. The list holds NODE_TRACKED_MAX nodes: the count stops one short, so later nodes overwrite the
+// last entry. Returns 1. Called by Rebuild-style passes (LinkTrackingNodes, Rebuild); calls itself on the children.
+int Node::CollectTrackingNodes(Node **list, int *count)
+{
+    if ((flags & NODE_FLAG_COLLISION_SPHERE) != 0)
+    {
+        list[*count] = this;
+        if (*count < NODE_TRACKED_MAX - 1)
+            (*count)++;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->CollectTrackingNodes(list, count);
+    return 1;
+}
+
+// Returns the first node of this subtree whose name starts with `prefix` (case-insensitive): this node first, then the
+// children from last to first. 0 when there is none. Called by FindPrefixNode; calls itself on the children.
+Node *Node::FindPrefixNodeRecursive(const char *prefix)
+{
+    if (_strnicmp(name, prefix, strlen(prefix)) == 0)
+        return this;
+    for (int i = childCount - 1; i >= 0; i--)
+    {
+        if (children[i] != 0)
+        {
+            Node *found = children[i]->FindPrefixNodeRecursive(prefix);
+            if (found != 0)
+                return found;
+        }
+    }
     return 0;
 }

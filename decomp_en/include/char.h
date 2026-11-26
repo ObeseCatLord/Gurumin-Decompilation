@@ -34,6 +34,16 @@ extern "C" int Object_SpawnModel(const char *path, int x, int y, int z);
 // keep in their state values. Returns 0. Called by the script command that removes characters (EN 0x6883a0). EN 0x647a80
 // (see object_lookup.cpp).
 extern "C" int Objects_ClearReferencesInRange(int first, int last);
+// Matrix4::m elements (the w column) in which a reference holder saves the four scale values of an attached character.
+const int NODE_MATRIX_SCALE_X = 3;
+const int NODE_MATRIX_SCALE_Y = 7;
+const int NODE_MATRIX_SCALE_Z = 11;
+const int NODE_MATRIX_SCALE_W = 15;
+// Stores `character` in the first free state value of a reference holder object, saves `offset` and the scale values as that
+// value's node matrix, and reports the object slot and value index. Returns 1, or 0 when none is free. EN 0x6460b0 (see
+// object_attach.cpp). Called by the script command that attaches a character to an object (EN 0x6883a0).
+extern "C" int Object_AddReference(int character, const Matrix4 *offset, int *objectSlot, int *valueIndex, float scaleX,
+                                   float scaleY, float scaleZ, float scaleW);
 // Object_IsNearPoint: half size of the object's square and of the point's square.
 const float OBJECT_NEAR_HALF_SIZE = 125.0f;
 const float POINT_NEAR_HALF_SIZE = 25.0f;
@@ -92,6 +102,7 @@ enum CharStat
     STAT_MAX_HEALTH = 1,      // 0x08: initial value of the health (restored when the slot is reused)
     STAT_EFFECT_COLOUR = 3,   // 0x10: colour of the effects the character starts
     STAT_VALUE_4 = 4,         // 0x14: saved with the colour when Char_UnpackParameter switches the kind
+    STAT_BUSY = 13,           // 0x38: set to 1 while the character is dragged into a pit (Enemy_DragToPit)
     STAT_PICKUPS = 6,         // 0x1c: guarded by the anti-tamper copies
     STAT_GUARDED_B = 7        // 0x20: guarded by the anti-tamper copies
 };

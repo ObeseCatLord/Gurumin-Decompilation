@@ -32,6 +32,10 @@ extern "C" int g_candidateSelected;           // EN 0x02228094: index of the sel
 // Width in pixels of the widest visible candidate. EN 0x7ad3b0 (JP 0x1015fac0).
 extern "C" int ImeCandidates_WidestWidth(FontRenderer *renderer);
 
+// Width in pixels of the widest candidate of the page measured with the Windows font at 0.8 scale (ime_candidate_width.cpp).
+// EN 0x7ad340.
+extern "C" int ImeCandidates_WidestWindowsWidth(FontRenderer *renderer);
+
 // Draws the visible candidates at (x, y), the selected one in `selectedColour`. EN 0x7ad1a0 (JP 0x1015fb20).
 extern "C" int ImeCandidates_Draw(FontRenderer *renderer, int x, int y, int colour, int selectedColour);
 

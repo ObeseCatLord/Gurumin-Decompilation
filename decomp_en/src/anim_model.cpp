@@ -1,4 +1,5 @@
 // Animated model channels and queued push (EN build). Ported from the matched JP source decomp/src/anim_model.cpp.
+#include <math.h>
 #include "anim_model.h"
 #include "node.h"
 #include "engine_memory.h"
@@ -25,6 +26,25 @@ int AnimModel::SetTrackBOptions(int playing, int looping)
     trackB.playing = playing;
     trackB.looping = looping;
     return 0;
+}
+
+// Adds key `value` at `frame` to track B and widens its frame range. Returns 0. No direct caller.
+int AnimModel::AddTrackBKey(int frame, float value)
+{
+    trackB.keys.Set(frame, value, 0, 0, 0);
+    if (trackB.last < frame)
+        trackB.last = frame;
+    if (trackB.first > frame)
+        trackB.first = frame;
+    return 0;
+}
+
+// Points the model's target heading away from the direction (x, y): the angle of the direction plus a half turn (the
+// model then turns towards it). Returns 1. Called by the scene script commands that turn a character.
+int AnimModel::FaceDirection(float x, float y)
+{
+    targetHeading = (float)atan2(x, y) + ANGLE_HALF_TURN;
+    return 1;
 }
 
 // Adds key (x, y, z) at `frame` to track C and widens its frame range.
@@ -227,6 +247,22 @@ int AnimModel::SetSlotSource(void *source, int slot, int layer)
         state->slotSource[slot] = source;
         state->slotLayer[slot] = layer;
     }
+    return 1;
+}
+
+// AnimModel::SetFollowUp: sets follow-up entry `index` of layer `layer` of the motion playback (creates the playback on
+// first use). Layers above PLAYBACK_LAYER_COUNT - 1 and entries above PLAYBACK_FOLLOWUP_COUNT - 1 are ignored. Returns 1.
+// Called by the scene script command DIS.
+int AnimModel::SetFollowUp(int layer, int index, int value)
+{
+    if (playback == 0)
+    {
+        playback = (Playback *)g_engineAlloc(PLAYBACK_SIZE, "");
+        playback->Init();
+        playback->BindModel(this);
+    }
+    if (layer <= PLAYBACK_LAYER_COUNT - 1 && index <= PLAYBACK_FOLLOWUP_COUNT - 1)
+        playback->layerParams[layer][index] = value;
     return 1;
 }
 

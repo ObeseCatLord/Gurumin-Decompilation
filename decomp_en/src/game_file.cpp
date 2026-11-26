@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "file_temp_buffers.h"
 #include "game_file.h"
+#include "packs_table.h"
 
 const int PATH_BUFFER_SIZE = 0x400;     // longest path Path_GetBaseName copes with
 const int BASE_NAME_CLEARED_BYTES = 8;  // bytes of the output cleared before the name is copied
@@ -96,5 +98,20 @@ extern "C" int Path_GetBaseName(char *out, const char *path)
         dot = strlen(copy);
     copy[dot] = 0;
     strcpy(out, copy + nameStart);
+    return 0;
+}
+
+// GameFile::WriteCompressed: packs `count` * `size` bytes of `source` into the first scratch buffer with the Packs
+// compressor, then writes the packed size as a 4-byte value followed by the packed bytes (`count` holds the packed size
+// from the compression on). Returns the number of bytes the last write stored, or 0 when no file is open.
+size_t GameFile::WriteCompressed(const unsigned char *source, int count, int size)
+{
+    if (handle == 0)
+        return 0;
+    count = g_packsCompress(source, (int *)g_fileTempBuffer1, count * size);
+    if (handle != 0)
+        fwrite(&count, 1, sizeof(count), handle);
+    if (handle != 0)
+        return fwrite(g_fileTempBuffer1, 1, count, handle);
     return 0;
 }

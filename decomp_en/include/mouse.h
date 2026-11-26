@@ -38,6 +38,7 @@ struct Mouse
     int Init(int window, MouseCursorCallback callback, int user);    // EN 0x7aa810
     int ReportCursor();                              // EN 0x7aa2a0 (JP 0x100014b0): sends the cursor position in game coordinates to the callback
     int SetCursorGamePos(int x, int y);              // EN 0x7aa8f0 (JP 0x10001090): moves the Windows cursor to a 640x480 game position
+    int PointInRect(const MousePoint *point, int left, int top, int width, int height);   // EN 0x7aa870: the thiscall view of Mouse_PointInRect (the cursor code loads ecx with g_mouse before the call)
 };
 
 // 1 when `point` lies inside (borders included) the rectangle with top-left corner (left, top) and size width x height

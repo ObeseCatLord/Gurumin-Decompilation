@@ -19,3 +19,24 @@ extern "C" unsigned int Packs_LzCountRun(void)
     }
     return run;
 }
+
+// Packs_LzMatchLength: the length of the match between the bytes at `candidate` of the input and the bytes at
+// PacksLzState::data. Counting starts at PACKS_LZ_HASHED_BYTES (the hash guarantees the first two) and stops at the first
+// differing byte, at `maxLength` or when the candidate's position passes the end of the input. Called by the compressor.
+extern "C" unsigned int Packs_LzMatchLength(unsigned short candidate, unsigned short maxLength)
+{
+    unsigned int length = PACKS_LZ_HASHED_BYTES;
+    const unsigned char *earlier = g_packsLzBlockStart + candidate;
+    if (length < maxLength)
+    {
+        do
+        {
+            if (g_packsLzPosition + length >= g_packsLzState->length)
+                break;
+            if (earlier[length] != g_packsLzState->data[length])
+                break;
+            length++;
+        } while (length < maxLength);
+    }
+    return length;
+}

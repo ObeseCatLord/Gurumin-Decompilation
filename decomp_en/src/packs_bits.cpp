@@ -66,3 +66,32 @@ extern "C" int Packs_ReadStreamBit(void)
     g_packsWordReader.buffer >>= 1;
     return bit;
 }
+
+// Moves the compressor to the next flag bit and sets it. When all 16 bits of the flag word are used, a new flag word is
+// reserved at the output first (both the output pointer and the byte count advance by 2). Called by the compressor.
+extern "C" void Packs_LzWriteOneFlag(void)
+{
+    g_packsFlagWriter.mask <<= 1;
+    if (g_packsFlagWriter.mask == 0)
+    {
+        g_packsFlagWriter.word = g_packsLzState->outputWord;
+        g_packsFlagWriter.mask = 1;
+        *g_packsFlagWriter.word = 0;
+        g_packsLzState->outputWord++;
+        g_packsLzState->outputBytes += PACKS_WORD_BYTES;
+    }
+    *g_packsFlagWriter.word |= g_packsFlagWriter.mask;
+}
+
+// Reads `count` bits of the packed stream, the first one ending up highest, and returns them as a number. Called by
+// Packs_DecodeBlock.
+extern "C" int Packs_ReadStreamBits(int count)
+{
+    int value = 0;
+    while (count != 0)
+    {
+        value = value * 2 + Packs_ReadStreamBit();
+        count--;
+    }
+    return value;
+}

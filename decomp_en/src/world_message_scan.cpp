@@ -1,4 +1,5 @@
 // Searching the lines of a message key for script commands (EN build, EN-only message editor: no JP twin).
+#include <string.h>
 #include "world_renderer.h"
 
 // Result of the scanners when a line (or key) has no command of the wanted kind.
@@ -179,4 +180,59 @@ int WorldRenderer::FindKeyCommandK(int key)
             return found;
     }
     return NO_COMMAND;
+}
+
+// Position ScanLineCommandA is given to fill; it stays at this value when the line has no position.
+const int NO_POSITION = -1;
+
+// WorldRenderer::FindKeyCommandAWithPosition: as FindKeyCommandA, but only a line for which ScanLineCommandA returns
+// a result and also fills in a position counts. Called by the message editor.
+int WorldRenderer::FindKeyCommandAWithPosition(int key)
+{
+    int line = FindMessageLine(key);
+    int end = FindMessageLine(key + 1);
+    if (end == NO_COMMAND)
+        end = messageCount;
+    for (; line < end; line++)
+    {
+        int position = NO_POSITION;
+        int found = ScanLineCommandA(line, &position);
+        if (found != NO_COMMAND && position != NO_POSITION)
+            return found;
+    }
+    return NO_COMMAND;
+}
+
+// Characters of the "RLK" and "ROP" command tags that start a message line.
+const int MESSAGE_TAG_LENGTH = 3;
+
+// WorldRenderer::KeyHasRlkLine: 1 when any line of key `key` (from where the key starts up to where key + 1 starts, or the
+// end of the table) begins with "RLK". Called by the message editor.
+int WorldRenderer::KeyHasRlkLine(int key)
+{
+    int start = FindMessageLine(key);
+    int end = FindMessageLine(key + 1);
+    if (end == NO_COMMAND)
+        end = messageCount;
+    for (int line = start; line < end; line++)
+    {
+        if (memcmp(messages[line], "RLK", MESSAGE_TAG_LENGTH) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+// WorldRenderer::KeyHasRopLine: as KeyHasRlkLine for lines that begin with "ROP".
+int WorldRenderer::KeyHasRopLine(int key)
+{
+    int start = FindMessageLine(key);
+    int end = FindMessageLine(key + 1);
+    if (end == NO_COMMAND)
+        end = messageCount;
+    for (int line = start; line < end; line++)
+    {
+        if (memcmp(messages[line], "ROP", MESSAGE_TAG_LENGTH) == 0)
+            return 1;
+    }
+    return 0;
 }

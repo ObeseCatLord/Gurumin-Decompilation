@@ -281,6 +281,8 @@ struct Game : Object
     int MoveCursor();                                                      // EN 0x5a9e40 (JP 0x10009050): moves the menu cursor towards its target
     int DrawDebugText(const char *text, int x, int y);   // EN 0x5e05b0 (JP 0x100091d0): draws `text` with the 8x16 debug font of menu sheet 1
     int DrawLabelledNumber(int value, int x, int y, float z, float fade, float scale, float alpha);  // EN 0x5dec10
+    int DrawNumberRow13(int value, int x, int y, float z, float fade, float scale, float alpha);  // EN 0x5dea80 (game_numbers.cpp): `value` centred on (x, y) in the digit row 13 of menu sheet 1
+    int DrawNumberRow12(int value, int x, int y, float z, float fade, float scale, float alpha);  // EN 0x5dee20 (game_numbers.cpp): the same with digit row 12
 };
 
 // Slot of the open window `id`, or MENU_SLOT_NONE (inline in the original, expanded in every window function).

@@ -2,6 +2,8 @@
 #ifndef GURUMIN_EN_ENEMY_AI_H
 #define GURUMIN_EN_ENEMY_AI_H
 
+#include "vec4.h"
+
 // CharState::state value of an enemy whose behaviour finished: the picker chooses the next one.
 const int ENEMY_STATE_FINISHED = -1;
 // Behaviour numbers of the updaters (CharState::state values 0, 1 and 2).
@@ -32,6 +34,17 @@ extern "C" int Enemy_PickAction_40_25_35(int index);   // EN 0x5b99a0
 extern "C" int Enemy_PickAction_60_10_30(int index);   // EN 0x5b9b10
 extern "C" int Enemy_PickAction_60_20_20(int index);   // EN 0x5b9a10 (ai_pick.cpp)
 extern "C" int Enemy_PickAction_20_60_20(int index);   // EN 0x5b9b80 (ai_pick.cpp)
+
+// Resting place of character 20 (the spot it returns to after the talk slide). EN 0x00da8020 (JP DAT_10803118).
+extern "C" Vec4 g_npcRestingPlace;
+// While non-zero (and g_scenePlayMotionStop is 0) character 11 plays motion 10. EN 0x013353f4 (JP DAT_10c6564c).
+extern "C" int g_scenePlayMotion;
+// Stops the motion g_scenePlayMotion asks for. EN 0x013353f0 (JP DAT_10c65648).
+extern "C" int g_scenePlayMotionStop;
+// The default enemy step: character 14 hides on early maps, character 20 slides while talked to, busy characters do
+// nothing, a few characters restart their behaviour, the rest turn to the player, idle and pick an action. Returns 0.
+// EN 0x5ba770 (JP 0x100e21a0).
+extern "C" int Enemy_DefaultStep(int index);
 
 // Updaters of the enemy kinds A, C and D; each returns 0. EN 0x5ba630, 0x5baa30, 0x5baac0.
 extern "C" int Enemy_UpdateAI_A(int index);   // EN 0x5ba630 (JP 0x100e2080)

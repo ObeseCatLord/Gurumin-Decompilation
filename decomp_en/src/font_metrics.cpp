@@ -17,3 +17,17 @@ int FontRenderer::TextWidth(const char *text, float scale)
     }
     return (int)((float)DrawString(0, 0, 0, text, 0, 0) * scale / g_screenWidthDivisor);
 }
+
+// FontRenderer::MeasureWindowsText: measures `text` with the Windows font through GetTextExtentPoint32A, cuts the width
+// to FONT_MAX_MEASURED_WIDTH and stores width and height multiplied by `scale` in *width and *height. Returns 1. Called
+// by the text window layout code.
+int FontRenderer::MeasureWindowsText(const char *text, float scale, int *width, int *height)
+{
+    SIZE size;
+    GetTextExtentPoint32A(dc, text, strlen(text), &size);
+    if (size.cx > FONT_MAX_MEASURED_WIDTH)
+        size.cx = FONT_MAX_MEASURED_WIDTH;
+    *width = (int)((float)size.cx * scale);
+    *height = (int)((float)size.cy * scale);
+    return 1;
+}

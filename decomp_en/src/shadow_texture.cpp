@@ -3,6 +3,7 @@
 // for its matrix temporaries.
 #include "model_bank.h"
 #include "node.h"
+#include "shadow_objects.h"
 #include "texture_mgr.h"
 #include "vec4.h"
 #include "visibility.h"
@@ -178,5 +179,25 @@ int Node::DrawShadow(DrawList *list, Matrix4 *view, int a3, const Vec4 *casterPo
     Render_Command(RENDER_TEXTURE_ADDRESS, 0, 0);
     if (visibilityCells != 0)
         g_regionsOnlyEnabled = 0;
+    return 1;
+}
+
+// ShadowPass_DrawNearbyObjects: draws the object slots near the shadow centre (shadowX, shadowY, shadowZ) with the shadow
+// pass arguments of the caster `model`, so objects standing next to a character cast onto the same shadow. Returns 1. Not
+// called directly.
+extern "C" int ShadowPass_DrawNearbyObjects(DrawList *list, Matrix4 *view, int a3, const Matrix4 *shadowMatrix, float shadowX,
+                                            float shadowY, float shadowZ, int shadowTexture, float shadowScale, int shadowSize,
+                                            const Vec4 *lightDirection, float modelSize, AnimModel *model, float alpha)
+{
+    Vec4 centre;
+    centre.Set(shadowX, shadowY, shadowZ, 0);
+    for (int slot = OBJECT_SLOT_FIRST; slot < ENEMY_SLOT_END; slot++)
+    {
+        if (model != &g_characterModels[slot] && g_characterModels[slot].root != 0 &&
+            g_characterModels[slot].matrix.m[MATRIX_TRANSLATION_X] > MODEL_NOT_IN_WORLD_X &&
+            (centre - g_characterModels[slot].matrix.GetTranslation()).Length2D() < SHADOW_OBJECT_RANGE)
+            g_characterModels[slot].root->Draw(list, view, 0, shadowMatrix, shadowX, shadowY, shadowZ, shadowTexture, shadowScale, shadowSize,
+                              lightDirection, modelSize, model, alpha);
+    }
     return 1;
 }

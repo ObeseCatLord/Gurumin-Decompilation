@@ -19,5 +19,10 @@ extern "C" int Char_PlayMotionFile(int index, const char *path, int start, int e
 extern "C" void Chars_ReloadModels(void);
 // Pushes character `index` away from `point` with `strength`. Returns 0. EN 0x602b00.
 extern "C" int Char_PushAwayFrom(int strength, char flag, int index, const Vec4 *point);
+// Strength of the push Char_PushAwayFromCharacter gives.
+const int PUSH_STRENGTH_FROM_CHARACTER = 15;
+// Pushes character `index` away from character `otherIndex` (or from `point` when it is not 0) with the fixed strength
+// PUSH_STRENGTH_FROM_CHARACTER. Returns 0. EN 0x602c00 (char_motion.cpp).
+extern "C" int Char_PushAwayFromCharacter(char flag, int index, int otherIndex, const Vec4 *point);
 
 #endif

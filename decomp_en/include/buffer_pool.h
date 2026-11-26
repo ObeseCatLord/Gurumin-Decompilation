@@ -27,6 +27,9 @@ extern "C" int g_pooledBytesBudget;                        // EN 0x00909344 (JP 
 
 // Reserves a free entry of the surface pool and returns its index. EN 0x7a1080 (JP 0x10148410).
 extern "C" int BufferPool_Alloc(void);
+// Releases the surface of pool entry `index` but keeps the entry reserved (in use, no reservation flag); out-of-range or
+// free entries are ignored. Returns 0. EN 0x77e240 (EN-only, buffer_pool.cpp).
+extern "C" int SurfacePool_ReleaseSurface(int index);
 // Clears all texture slot tables and the VRAM total. EN 0x77bf70 (JP 0x10147700).
 extern "C" void BufferPool_Clear(void);
 // Releases the surface of pool entry `index` and frees the entry (`width` and `height` are passed by callers but

@@ -34,9 +34,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 862 of 2,034 game functions (179,085 of 2,080,360 bytes, 8.61 %) |
-| Matched under the rules | 862 |
-| Queue | 162 walls, 40 with a matched JP twin (1,500+ bytes, low yield), 307 mapped to unmatched JP, 606 EN-only; open.tsv ~160 (incl. library/blocked rows, which leave the queue) near-misses |
+| Matched | 897 of 2,034 game functions (185,824 of 2,080,360 bytes, 8.93 %) |
+| Matched under the rules | 897 |
+| Queue | see QUEUE.md header (after batch 15); open.tsv ~160 (incl. library/blocked rows, which leave the queue) near-misses |
 
 ## State
 - Batches 1-11 matched Node, Vec4/Matrix4/Box, containers, AnimModel, camera, IME, engine/render, texture manager,
@@ -58,6 +58,10 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 - Lever to test: `Game::TestScriptFlag` is inline in game.h, but the original calls it out of line (0x5ec240) from
   DamageZone_Update 0x63ac70 and Route_FollowGates 0x5ee110; some callers may inline it. Also `small_b11.h` is a
   catch-all header from batch 11: split its declarations into area headers when convenient.
+- Type puns to clean up (batch 15): DShowStream::EndStreams casts to `IDirectDrawMediaStreamLike *` for vtable slot 8
+  (declare slot 8 on the interface instead); Packs_DecodePlaneBands casts between two band views (make one type).
+- Paused after batch 15 at the orchestrator's request (external PR 3 brings the EN launcher, matched with VS2013
+  Community MFC, into decomp_en/). On resume: rebase onto origin/master, rebuild, check the launcher rows in QUEUE.
 - Never add address-taking tables or macros that only force COMDAT emission.
 - Blocked: launcher (164 EN-only functions) needs the VS2013 MFC headers (Express has no `VCtlmfc`; NOTES);
   `Game::~Game` 0x5a1150 needs Node dtor + EN Object base.

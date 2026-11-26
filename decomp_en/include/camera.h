@@ -18,6 +18,8 @@ const int CAPTION_TEXT_SIZE = 0x100;       // bytes of the title caption buffer
 extern "C" int g_cameraMode;                           // EN 0x01664a34 (JP DAT_1101de1c): camera control mode (CameraMode)
 extern "C" char g_titleCaptionText[CAPTION_TEXT_SIZE]; // EN 0x01664ac0 (JP DAT_1101d8b8): title caption text
 extern "C" int g_titleCaptionTimer;                    // EN 0x01664abc (JP DAT_1101d9b8): title caption timer, 0 = just started
+// Sets the title caption text and restarts its timer. Returns 0. EN 0x746be0 (camera.cpp).
+extern "C" int Caption_SetTitle(const char *text);
 
 
 #include "containers.h"

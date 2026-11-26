@@ -84,6 +84,9 @@ const float MATERIAL_BLANK_ALPHA = 0.0f;
 // Material::m_0174 of a blank material.
 const float MATERIAL_BLANK_VALUE = 255.0f;
 
+// Bit MarkMaterialEdges sets in the first edge flag of every material of a subtree.
+const char MATERIAL_EDGE_MARKED = 2;
+
 // A mesh material (0x180 bytes).
 struct Material
 {
@@ -372,6 +375,11 @@ struct Node
     int CopyAnimation(Node *source, int slot);  // EN 0x74e180 (JP 0x1019b890): gives this node the animation (plugs, tracks, matrices) of `source`
     int ComputeBounds();                   // EN 0x75bb30 (JP 0x1019d8e0): recomputes the node's bounding sphere and box
     int SetMaterialValue(const char *material, int value);  // EN 0x74a400 (JP 0x1019e8c0)
+    int SetMaterials(const Material *source, int count);    // EN 0x74f170 (EN-only, node_materials.cpp): replaces the material table with a copy of `count` materials from `source`; returns 1
+    int MarkMaterialEdges();                                // EN 0x76ad50 (EN-only, node_materials.cpp): sets MATERIAL_EDGE_MARKED on the first edge flag of every material of this subtree; returns 0
+    // EN 0x7594b0 (not ported yet): moves the packs of `source` whose material name starts with `materialPrefix` (and the ones that do not start with `otherPrefix`) into this node's packs; works on skinned nodes only.
+    int MergeMaterialPacks(Node *source, const char *materialPrefix, const char *otherPrefix);
+    int MergeMaterialPacksInSubtree(Node *source, const char *materialPrefix, const char *otherPrefix);   // EN 0x759a60 (EN-only, node_materials.cpp): MergeMaterialPacks on every skinned node of this subtree; returns 0
     void ReleaseTexture();                 // EN 0x769e30 (JP 0x10191210)
     void ReleaseMesh();                    // EN 0x769eb0 (JP 0x101913f0)
     void ReleaseUniqueMeshData();          // EN 0x7507e0 (JP 0x10191280)

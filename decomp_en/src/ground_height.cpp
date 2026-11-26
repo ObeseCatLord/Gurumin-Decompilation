@@ -1,6 +1,10 @@
 // Ground height maps of the map's ground objects (EN build). Ported from the matched JP source decomp/src/ground_height.cpp.
+#include <math.h>
+
 #include "engine.h"
 #include "ground_height.h"
+#include "head_look.h"
+#include "node.h"
 #include "vec4.h"
 
 // Samples per side of a ground object's height map.
@@ -114,4 +118,82 @@ extern "C" void Ground_BuildHeights(int slot, int style)
     for (int i = 0; i < HEIGHT_GRID; i++)
         for (int j = 0; j < HEIGHT_GRID; j++)
             g_groundHeightsCopy[slot][j][i] = g_groundHeights[slot][j][i];
+}
+
+// The samples of one object that are visited: columns -5..5 and rows -5..7 around the point's grid cell.
+const int HEIGHT_FIRST_COLUMN = -5;
+const int HEIGHT_END_COLUMN = 6;
+const int HEIGHT_FIRST_ROW = -5;
+const int HEIGHT_END_ROW = 8;
+// Index of the sample at column 0, row 0 in g_groundHeights (the visited columns and rows start below zero).
+const int HEIGHT_ORIGIN = 7;
+// Samples farther than this from the point are ignored.
+const float HEIGHT_REACH = 72.0f;
+// Weight of a sample at the point; it drops by HEIGHT_WEIGHT_FALLOFF per unit of x plus y distance.
+const float HEIGHT_WEIGHT_PEAK = 60.0f;
+const float HEIGHT_WEIGHT_FALLOFF = 0.2f;
+// Samples with a weight at or below this are ignored.
+const float HEIGHT_WEIGHT_MIN = 1.0f;
+// Samples at or below this are missing.
+const float HEIGHT_MISSING = -200.0f;
+// Result when no sample counts.
+const float HEIGHT_NONE = -5000.0f;
+// Start value of the nearest-object search.
+const float HEIGHT_FAR = 99999.0f;
+
+// Picks the ground object nearest to the player and averages its height samples around (x, y): the samples within 72
+// units of the point on the 25-unit grid whose weight (60 minus a fifth of the x and y distances) is above 1, ignoring
+// missing samples (-200 and below). Returns the average plus the object's base height, or -5000 when there is no
+// object or no sample. Called by the ground follow code at EN 0x60cb10.
+extern "C" float Ground_HeightAt(int x, int y)
+{
+    Vec4 player;
+    Vec4 position;
+    player.Copy(g_characterModels[PLAYER_SLOT].matrix.GetTranslation());
+    int found = 0;
+    g_nearestGroundObject = -1;
+    float best = HEIGHT_FAR;
+    for (int i = 0; i < GROUND_OBJECT_SLOTS; i++)
+    {
+        if (g_groundObjects[i] == 0)
+            continue;
+        position.Copy(g_groundObjects[i]->matrix.GetTranslation());
+        float distance = position.Distance(player);
+        if (found == 0 || distance < best)
+        {
+            found = 1;
+            g_nearestGroundObject = i;
+            best = distance;
+        }
+    }
+    if (g_nearestGroundObject < 0)
+        return HEIGHT_NONE;
+    Node *ground = g_groundObjects[g_nearestGroundObject];
+    x -= (int)ground->matrix.m[MATRIX_TRANSLATION_X];
+    y -= (int)ground->matrix.m[MATRIX_TRANSLATION_Y];
+    int count = 0;
+    float sum = 0.0f;
+    for (int row = HEIGHT_FIRST_ROW; row < HEIGHT_END_ROW; row++)
+    {
+        for (int column = HEIGHT_FIRST_COLUMN; column < HEIGHT_END_COLUMN; column++)
+        {
+            int dx = column * HEIGHT_STEP - x;
+            int dy = row * HEIGHT_STEP - y;
+            if ((float)sqrt((float)(dx * dx + dy * dy)) < HEIGHT_REACH)
+            {
+                float spread = (float)fabs((float)column * HEIGHT_STEP - (float)x) +
+                               (float)fabs((float)row * HEIGHT_STEP - (float)y);
+                float weight = HEIGHT_WEIGHT_PEAK - spread * HEIGHT_WEIGHT_FALLOFF;
+                if (0.0f < weight && weight > HEIGHT_WEIGHT_MIN &&
+                    g_groundHeights[g_nearestGroundObject][column + HEIGHT_ORIGIN][row + HEIGHT_ORIGIN] > HEIGHT_MISSING)
+                {
+                    sum += g_groundHeights[g_nearestGroundObject][column + HEIGHT_ORIGIN][row + HEIGHT_ORIGIN];
+                    count++;
+                }
+            }
+        }
+    }
+    if (count == 0)
+        return HEIGHT_NONE;
+    return sum / (float)count + ground->matrix.m[MATRIX_TRANSLATION_Z];
 }

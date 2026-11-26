@@ -17,6 +17,12 @@ const int MOTION_LIST_PLAYS_ITEMS = 1;
 const int MOTION_EXTRA_BACKWARDS = 1;
 const int MOTION_EXTRA_HOLD_LAST = 2;
 
+// Signature ("ANMM") Init stores in MotionList::m_0000, the flags it starts with (MOTION_LIST_PLAYS_ITEMS and the next
+// bit), the name and the value of the first entry of an empty list.
+const int MOTION_LIST_SIGNATURE = 0x4d4d4e41;
+const int MOTION_LIST_START_FLAGS = 3;
+const int MOTION_FIRST_ENTRY_VALUE = 60;
+
 struct MotionList
 {
     int m_0000;                                   // 0x000: not used by EN code yet
@@ -31,6 +37,8 @@ struct MotionList
     int extras[MOTION_ENTRY_COUNT];               // 0xc10: entry extra values
     int AddEntry(int id, int value, const char *name, int extra);       // EN 0x76f9d0 (JP 0x101ad6a0): appends an entry; 0 when all are used
     int Clear();                                                       // EN 0x7722c0 (JP MotionList::Clear)
+    int Init();                                                        // EN 0x778530 (EN-only, containers.cpp): an empty list with the signature, the default flags and one entry "NoName"; returns 1
+    int SetEntry(int index, int id, int value, const char *name, int extra);   // EN 0x77a0b0 (EN-only, containers.cpp): overwrites entry `index` (up to entryCount); 0 when the index is out of range
     int InsertByName(int position, const char *name, int tag);         // EN 0x76fad0 (JP MotionList::InsertByName)
     int FrameAt(int time, int *outItem, int *outEntry);                // EN 0x76fba0 (JP 0x101ad350): frame shown `time` frames after m_0208
 };

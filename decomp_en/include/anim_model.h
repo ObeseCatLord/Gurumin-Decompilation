@@ -287,6 +287,8 @@ struct AnimModel
     int SetMotionOptions(int playing, int looping);                      // EN 0x745c00 (JP 0x10161be0)
     int RunRootCall(int a, int b);                                       // EN 0x73f750: calls Node::UnrecoveredCall on the node tree, 0 when there is none
     int SetTrackBOptions(int playing, int looping);                   // EN 0x7469b0 (JP 0x10161f60)
+    int AddTrackBKey(int frame, float value);                            // EN 0x70b6d0 (EN-only, anim_model.cpp): adds a key to track B and widens its frame range
+    int FaceDirection(float x, float y);                                 // EN 0x746590 (EN-only, anim_model.cpp): turns the model's target heading to the direction (x, y), pointing away from it
     int AddTrackCKey(int frame, float x, float y, float z);              // EN 0x70ad20 (JP 0x10161af0)
     int AddTrackCKeyFlagged(int frame, float x, float y, float z, char flag);   // EN 0x70ad90 (JP 0x10161a90)
     int StepMotion();                                                    // EN 0x70bea0 (JP 0x10161c00): advances the motion channel one frame

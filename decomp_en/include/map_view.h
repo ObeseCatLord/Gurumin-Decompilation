@@ -17,6 +17,8 @@ const float MAP_PROJECTION_W_SCALE = 2.0f;
 extern "C" Node *g_mapNode;
 // Lowest z of the map's box. EN 0x0091d600 (JP DAT_104bfe24).
 extern "C" float g_mapBottomZ;
+// Non-zero when g_mapBottomZ is set (the map has a pit floor). EN 0x0091d604 (JP DAT_104bfe28).
+extern "C" int g_mapBottomValid;
 // Height of the overhead view. EN 0x021a34c4 (JP DAT_10f65594).
 extern "C" float g_topViewHeight;
 // Pit area corners of the map's box. EN 0x013385b8 / 0x013385c8 (JP DAT_104d29e8 / DAT_104d29f8).

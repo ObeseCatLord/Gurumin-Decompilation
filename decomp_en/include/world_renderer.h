@@ -226,6 +226,9 @@ struct WorldRenderer
     int FindKeyCommandI(int key);   // EN 0x72e870
     int FindKeyCommandJ(int key);   // EN 0x72e8f0
     int FindKeyCommandK(int key);   // EN 0x72e940
+    int FindKeyCommandAWithPosition(int key);   // EN 0x72e340 (EN-only, world_message_scan.cpp): the first line of key `key` for which ScanLineCommandA finds both a result and a position (-1 when none)
+    int KeyHasRlkLine(int key);                 // EN 0x735470 (EN-only, world_message_scan.cpp): 1 when a line of key `key` starts with "RLK"
+    int KeyHasRopLine(int key);                 // EN 0x735700 (EN-only, world_message_scan.cpp): 1 when a line of key `key` starts with "ROP"
     int CountMessageKeys();                  // EN 0x731db0 (not ported yet): number of keys in the message lines, cached in the table (-9999 = not counted yet)
     int InsertMessageLine(int position);     // EN 0x73ef10 (not ported yet): inserts an empty line (id -1) before line `position` and counts it; returns 1
     int LowestMessageId(int key);            // EN 0x72e990 (not ported yet): smallest id among the lines of key `key` (10000 when it has none), cached for keys below 1000

@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "display.h"
+#include "camera.h"
+#include "shadows.h"
 
 #define APP_TIMESTAMP 0x44604392u
 #define APP_IMAGE_SIZE 0x1b5c000u
@@ -46,6 +48,7 @@ static const DWORD screen_projection_functions[][2] = {
 };
 
 static HINSTANCE this_module;
+static char ini_path[MAX_PATH];
 static FILE *log_file;
 static BYTE *app_base;
 
@@ -131,7 +134,7 @@ void display_shutdown(void)
 
 static void read_settings(void)
 {
-    char ini[MAX_PATH], text[32];
+    char *ini = ini_path, text[32];
     path_next_to_module("gurumin_mod.ini", ini);
     settings.enabled = GetPrivateProfileIntA("display", "enabled", 0, ini);
     settings.hd_movies = GetPrivateProfileIntA("movies", "hd", 1, ini);
@@ -419,20 +422,26 @@ static void size_window_client(HWND window, int width, int height)
 static HRESULT WINAPI hook_create_device(IDirect3D9 *d3d, UINT adapter, D3DDEVTYPE type, HWND window, DWORD flags,
                                          D3DPRESENT_PARAMETERS *parameters, IDirect3DDevice9 **device)
 {
-    if (parameters && parameters->Windowed)
+    if (settings.enabled && parameters && parameters->Windowed)
         size_window_client(parameters->hDeviceWindow ? parameters->hDeviceWindow : window, screen_width,
                            screen_height);
     HRESULT result = real_create_device(d3d, adapter, type, window, flags, parameters, device);
     log_line("CreateDevice %ux%u windowed=%d flags=%lx -> %08lx", parameters ? parameters->BackBufferWidth : 0,
              parameters ? parameters->BackBufferHeight : 0, parameters ? parameters->Windowed : -1, flags, result);
-    if (SUCCEEDED(result) && device && *device && hud_active)
-        hook_device(*device);
+    if (SUCCEEDED(result) && device && *device)
+    {
+        if (hud_active)
+            hook_device(*device);
+        shadows_device_created(*device);
+        camera_set_window(parameters && parameters->hDeviceWindow ? parameters->hDeviceWindow : window);
+    }
     return result;
 }
 
 void display_hook_direct3d(void *d3d)
 {
-    if (!app_base || !settings.enabled)
+    // The CreateDevice hook serves the display options, the shadow depth buffer and the camera's wheel zoom.
+    if (!app_base || !(settings.enabled || shadows_active() || camera_active()))
         return;
     void **vtable = *(void ***)d3d;
     if (vtable[16] != (void *)hook_create_device)
@@ -456,7 +465,7 @@ void display_before_direct3d(void)
         return;
     done = 1;
     read_settings();
-    log_line("gurumin_mod 0.2.0");
+    log_line("gurumin_mod 0.3.0");
     if (settings.log)
         AddVectoredExceptionHandler(1, log_exception);
     if (!find_app())
@@ -465,6 +474,8 @@ void display_before_direct3d(void)
     files_install(log_line);
     if (settings.hd_movies)
         movies_install(log_line);
+    shadows_install(log_line, ini_path);
+    camera_install(log_line, ini_path);
     if (!settings.enabled)
     {
         log_line("display: off");

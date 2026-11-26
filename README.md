@@ -59,9 +59,9 @@ game's `mod\` folder for the mod DLL. The **Dialogue** tab lists all 4,937 lines
 speaker, messages, menu choices, names, cutscene subtitles), lets you search and edit them and previews each line in
 the game's own font. The game folder is only read. Walkthrough: [`docs/GUI.md`](docs/GUI.md).
 
-No Python? `GuruminModTools.exe` is the same window as one program (Python, Pillow, the tools and the mod DLL
-inside; no game files). Build it with `python tools/build_exe.py` (needs `pip install pyinstaller pillow`); it lands
-in `dist\`.
+No Python? `GuruminModTools.exe` (Windows) or `GuruminModTools` (Linux x64/arm64) is the same window as one program
+(Python, Pillow, the tools and the mod DLLs inside; no game files). Build it with `python tools/build_exe.py` (needs
+`pip install pyinstaller pillow`); it lands in `dist\`. On Linux, 666/667 textures need Wine for `iti_unpack.exe`.
 
 <p align="center"><img src="docs/media/gui_mod.png" alt="Mod tab: exported files sorted by character, their status, install into the game" width="760"></p>
 <p align="center"><img src="docs/media/gui_dialogue.png" alt="Dialogue tab: Hyperbolic's lines, one translated, with the preview in the game's font" width="760"></p>
@@ -74,7 +74,24 @@ movies made at 2x or 4x their original size at the original size on screen with 
 ([`docs/MOVIES_HD.md`](docs/MOVIES_HD.md)). `mmv_tool.py encode` and the GUI make an HD movie from larger frames
 on their own, and the GUI's repackage adds the DLL to `out\`. Install by hand with
 `mod\install.bat "C:\path\to\Gurumin"`. Widescreen and any resolution are in the same DLL but parked and off
-([`docs/DISPLAY_MOD.md`](docs/DISPLAY_MOD.md)).
+([`docs/DISPLAY_MOD.md`](docs/DISPLAY_MOD.md)). An orbit camera (right stick or mouse, zoom) and higher-resolution
+dynamic shadows, ported from Gurumin Enhanced Rendering, are also in it, off by default and untested on the JP game
+([`docs/CAMERA_SHADOWS_JP.md`](docs/CAMERA_SHADOWS_JP.md)).
+
+### English Steam release: Enhanced Rendering mod (`mod_en/`)
+The MIT-licensed **Gurumin Enhanced Rendering** mod by ObeseCatLord (v1.3.0) for the English Steam `game.exe`
+(`game_en_steam.exe` here): a `d3d9.dll` proxy plus an x64 OpenXR host. Any resolution including ultrawide,
+proportional HUD, render interpolation above the game's 30 Hz, FXAA, high-resolution shadows, a free/orbit camera
+with zoom, 6DoF VR on PC VR, Linux/Proton and Steam Deck, and standalone VR on the Steam Frame. Build with
+`mod_en/build.sh` (MinGW-w64); install and the address table (mod hooks ↔ `decomp_en` names) are in
+[`mod_en/README.md`](mod_en/README.md). Releases and full settings:
+[gurumin-enhanced-rendering](https://github.com/ObeseCatLord/gurumin-enhanced-rendering).
+
+### Builds
+CI ([`.github/workflows/build.yml`](.github/workflows/build.yml)) builds the JP mod DLL (`mod-jp`), the EN mod with
+its VR host (`mod-en`) and the modding tools as one program for Windows x64, Linux x64 and Linux arm64
+(`GuruminModTools-windows-x64`, `-linux-x64`, `-linux-arm64`) on pushes to master and on pull requests; download
+them from the run's artifacts.
 
 ### Documentation (`docs/`)
 `MODDING_MAP.md` (start here: costumes, anti-cheat guards, render states, sound, menu images), `MODDING_FILES.md`

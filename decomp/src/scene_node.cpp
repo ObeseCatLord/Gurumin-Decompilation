@@ -1525,7 +1525,7 @@ int Node::M_1019eeb0(Node *root, Node **list, int *count)
                     Node *bone = skin->bones[i];
                     if (bone->skinned == 0 && bone->childCount != 0)
                         chain = 0;
-                    if (i > 0 && chain && bone != 0)
+                    if (i > 0 && chain && skin->bones[i] != 0)
                     {
                         if (bone->skin == 0)
                         {

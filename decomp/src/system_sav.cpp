@@ -221,12 +221,9 @@ extern "C" int FUN_101603c0(const char *path, int index, unsigned int *value)
     SetFileTime(file, &times[0], &times[1], &times[2]);
     if (file != 0)
         CloseHandle(file);
-    if (fromOtherMachine == 0)
-    {
-        if (storedCheck == check && storedSum == sum && read == 4)
-            return 1;
-    }
-    else
+    if (fromOtherMachine == 0 && storedCheck == check && storedSum == sum && read == 4)
+        return 1;
+    if (fromOtherMachine != 0)
     {
         *value = 0;
         return -1;

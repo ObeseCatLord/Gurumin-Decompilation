@@ -82,7 +82,7 @@
 ?CopyPlugData@Node@@QAEHXZ	1019bd10
 ?SetMaterialValue@Node@@QAEHPBDH@Z	1019e8c0
 ??0Node@@QAE@XZ	1019ebc0
-?UpdateVisibleCells@VisNode@@QAEHXZ	10199be0
+?UpdateVisibleCells@Node@@QAEHXZ	10199be0
 ?Copy@Vec4@@QAEXABU1@@Z	101acc20
 ?InBox@Vec4@@QAEHPBUBox2@@@Z	101ac6e0
 ?CopyFrom@VertexPack@@QAEHPBU1@@Z	101ad040

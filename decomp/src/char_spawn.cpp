@@ -59,12 +59,12 @@ extern "C" int FUN_10050510(float a, float b, float c, int kind, int route)
             {
                 if (kind != 0)
                 {
-                    if (route == 0)
+                    if (route != 0)
                     {
-                        if (DAT_10daaae8[slot].kind == kind)
+                        if (DAT_10daaae8[slot].kind == kind && DAT_10daaae8[slot].routeRecord == route)
                             break;
                     }
-                    else if (DAT_10daaae8[slot].kind == kind && DAT_10daaae8[slot].routeRecord == route)
+                    else if (DAT_10daaae8[slot].kind == kind)
                         break;
                 }
                 else if (route != 0 && DAT_10daaae8[slot].routeRecord == route)
@@ -175,9 +175,11 @@ extern "C" int FUN_10050510(float a, float b, float c, int kind, int route)
             if (node != 0)
                 node->SetFlags(NODE_FLAGS_HIDE);
         }
-        int low = 0;
+        int low;
         if (DAT_10daaae8[slot].kind == BASE_KIND_PACKED_GROUP || DAT_1030b668[slot] == BASE_KIND_PACKED_GROUP)
             low = DAT_10daaae8[slot].stats[9] % 100;
+        else
+            low = 0;
         int value = DAT_10daaae8[slot].stats[9];
         FUN_100404e0(slot, value / 10000000 % 100, value / 100000 % 100, value / 1000 % 100, low, 0, 0);
     }

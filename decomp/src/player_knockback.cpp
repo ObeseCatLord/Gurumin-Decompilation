@@ -60,13 +60,11 @@ extern "C" int FUN_10055ee0(void)
                     // Knock back only where the ground below or behind the player is not clear.
                     Vec4 offset;
                     offset.Set(0, 0, -30.0f, 0);
-                    int blocked = !DAT_10db6ee8[DAT_104bf8b4].IsClearOfMap(&offset);
-                    if (!blocked)
+                    knockBack = !DAT_10db6ee8[DAT_104bf8b4].IsClearOfMap(&offset);
+                    if (!knockBack)
                     {
                         offset.Set(0, 0, -20.0f, 0);
-                        blocked = !DAT_10db6ee8[DAT_104bf8b4].IsClear(&offset);
-                        if (!blocked)
-                            knockBack = 0;
+                        knockBack = !DAT_10db6ee8[DAT_104bf8b4].IsClear(&offset);
                     }
                 }
                 if (knockBack)

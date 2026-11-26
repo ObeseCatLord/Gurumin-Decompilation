@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 20.46% of code, 883 of 1212 functions |
-| Matched under the rules | 20.42% of code, 882 of the 883 matched functions |
-| Fuzzy match | 50.64% |
+| Matched | 20.72% of code, 887 of 1212 functions |
+| Matched under the rules | 20.69% of code, 886 of the 887 matched functions |
+| Fuzzy match | 50.68% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -251,6 +251,11 @@ function) and node_world.cpp (0) still break rule 2.
   expansion); split `a || b` early returns into two ifs; explicit per-element stores where the original unrolls a
   fill; loop bounds as expressions instead of locals. In-game frame: ladders highest state first (ratio 0.968).
   build.bat drops `/DV=n` (use `-DV#n`). Playback::Play had a parameter shadowing the member `layer` (fixed).
+- Batch 381: walls of 700-1600 bytes, 4 matched (883 -> 887): a local of its own instead of reusing one (slot
+  swap), result stored straight into the tested variable, return order. tools/sbs.py hides stack-offset swaps
+  (scratchpad w381d/strict.py keeps offsets). VisNode::UpdateVisibleCells renamed to Node:: in obj_symbols.tsv.
+  Recurring residue worth a focused lane: `cmp reg,ebx` (zero register) in the original vs our `test reg,reg`.
+  ParamVector duplicates Vec4 (merge before Save_ReadSlotInfo can use CharSlot record).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

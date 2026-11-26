@@ -110,9 +110,9 @@ extern "C" int FUN_10047a10(int index)
             turn -= 6.283f;
         while (turn < -3.1415f)
             turn += 6.283f;
-        heading = (float)fabs(turn);
+        float settled = (float)fabs(turn);
 
-        if (heading > 0.01756f || (place - self).LengthSquared3() > 4.0f)
+        if (settled > 0.01756f || (place - self).LengthSquared3() > 4.0f)
             DAT_10db6ee8[index].PlayMotion(0, 0, 5, 1.0f);
         else
             DAT_10db6ee8[index].PlayMotion(2, 0, 5, 1.0f);

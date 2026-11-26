@@ -104,6 +104,8 @@
 #include "shaga.h"
 
 #include "texture_manager.h"
+#include "shadow_ground.h"
+#include "gimmick_slot.h"
 
 #include "name_entry.h"
 
@@ -299,6 +301,68 @@
 #define TOSS_FLOOR_X -100000.0f
 #define TOSS_PIECE_LIFT 50.0f
 #define TOSS_SPIN 0.5f
+// A prop the player talks to (slot kind 'E'): talk distance (squared), the phases of its state, the steps and sizes of
+// its moves.
+#define PROP_TALK_DISTANCE_SQUARED 1600.0f
+#define PROP_PHASE_IDLE 100
+#define PROP_FORWARD_FIRST 0xc9         // phases 201..300: steps forward
+#define PROP_FORWARD_END 300
+#define PROP_BACK_FIRST 0x12d           // phases 301..400: backs away
+#define PROP_BACK_END 400
+#define PROP_STEP 12.0f                 // height change per frame of a step
+#define PROP_LEAN_SCALE 0.2f            // the push away from the player per frame
+#define PROP_LEAN_TILT 0.005f           // tilt of the first child per unit of push
+#define PROP_SPOT_OFFSET 500.0f         // the two spots beside it where the player starts a step
+#define PROP_SPOT_RADIUS 150.0f
+#define PROP_TALK_RISE_END 0x5a         // after the first talk it moves aside until here
+#define PROP_TALK_END 0x5c
+#define PROP_TALK_STEP_X 10.0f
+#define PROP_TALK_STEP_Z 8.0f
+// Swaying props (slot kinds 'B', 'z', 'P', ','): the sway's angle per frame left, its unit, and the divisors.
+#define SWAY_FRAME_ANGLE 0.5f
+#define SWAY_ANGLE_UNIT 1000.0f
+#define SWAY_DIVISOR_FLAG -450.0f
+#define SWAY_DIVISOR_POT 130.0f
+#define FLAG_LIFT 20.0f                 // the effect of kind 'B' starts this far above the pit floor
+#define FLAG_RISE_STEP 50.0f
+#define FLAG_FALL_END 0x78              // phase at which the flag has gone up far enough to be dropped
+#define FLAG_DROP_HEIGHT -1050.0f
+#define FLAG_PROBE_HEIGHT 10.0f
+#define FLAG_PHASE_RESET 0xdc
+#define POT_SMASH_KIND 0x86             // the slot kind a smashed pot becomes
+#define POT_SMASH_SOUND 0x33b
+#define POT_SMASH_EVENT 0x1f1
+#define POT_HIDE_X -250000.0f           // the smashed pot's model is parked far away
+#define LAMP_TURN_OFFSET 45.0f          // kind ',': the effect stands this far in front of the player
+#define LAMP_HEADING_SHIFT 1.57075f
+#define LAMP_FIRE_PERIOD 0x5a
+// Props the player can pick up (slot kinds 5, 6, '_'), floor buttons ('M') and markers ('\\').
+#define PICKUP_REACH 300.0f             // the prop is a candidate within this distance
+#define PICKUP_NEAR 150.0f              // and can be picked up within this one
+#define PICKUP_HEIGHT 40.0f
+#define PICKUP_AHEAD 30.0f              // the point ahead of the player the closest prop is chosen for
+#define PICKUP_HEADING_SHIFT 1.57075f
+#define PICKUP_GAP_MIN 40.0f            // m_0267: the prop hangs 40..140 above the player
+#define PICKUP_GAP_MAX 140.0f
+#define PICKUP_STAND_RADIUS 90.0f
+#define PICKUP_CARRY_LINKS 16
+#define PROP_SNAP_STEP 75.0f
+#define PROP_SHADOW_PERIOD 0x1e          // the shadow ground check runs every 30th frame (staggered by slot % 10)
+#define PROP_SHADOW_STAGGER 10
+#define SWAY_FRAME_ANGLE_SLOW 0.3f
+#define SWAY_DIVISOR_STALL 430.0f
+#define SWAY_DIVISOR_SIGN 230.0f
+#define BUTTON_TALK_DISTANCE_SQUARED 400.0f
+#define BUTTON_LEAVE_DISTANCE_SQUARED 3600.0f
+#define BUTTON_SOUND_DOWN 0x37b
+#define BUTTON_SOUND_UP 0x37c
+#define SPOUT_AHEAD 40.0f               // kind 2: the point ahead of the player that the model is tested against
+#define SPOUT_REACH 100.0f
+#define MARKER_FIRST_SLOT 0x5c          // kind '\\': markers are the slots 0x5c..0x7b
+#define MARKER_LAST_SLOT 0x7b
+#define MARKER_CLEAR_DISTANCE_SQUARED 2025.0f
+#define MARKER_CLOSED_FRAME 0x1e
+#define BUTTON_DIM 0.7f                 // the button's scale while it is not at rest
 #define ENEMY_DISTANCE_START 99999.0f   // closestEnemy before any enemy was measured
 // Tracks below this number drive the beat counter DAT_1032d6a0.
 #define BGM_TRACK_LIMIT 0xff
@@ -363,6 +427,110 @@ static __forceinline void CloseEventOverlay(void)
     }
 }
 
+// Starts the player's talk with a prop that pulls the player in: the player turns, the event overlay closes, and
+// the player's offset to the prop is stored (here ends up holding the player's position).
+static __forceinline void StartPropPull(int slot, Vec4 &here)
+{
+    DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
+    FUN_100114a0();
+    DAT_104c0068 = 1;
+    CloseEventOverlay();
+    DAT_104c006c = slot;
+    here.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    DAT_10daaad4.Copy(DAT_10db6ee8[0].matrix.GetTranslation() - here);
+}
+// Sways a prop: while `frames` lasts it counts down and tilts the matrix about x by sin(frames * frameAngle) *
+// frames / divisor, turned by param / 1000 radians about z.
+static __forceinline void SwayProp(Matrix4 &sway, int &frames, int param, float divisor, float frameAngle)
+{
+    sway = RotationX((float)sin(frames * frameAngle) * frames / divisor);
+    frames--;
+    sway = RotationZ(-(float)param / SWAY_ANGLE_UNIT) * sway * RotationZ((float)param / SWAY_ANGLE_UNIT);
+}
+
+// Offers model `slot` (a movable prop) as the object the player picks up next: when it is the closest one to a point
+// just ahead of the player and within reach, DAT_104bfdd8 takes its index and DAT_104bfdd0 the side the player
+// stands on (1 = along x, 2 = along y).
+static __forceinline void OfferPickup(int slot)
+{
+    Vec4 propAt = DAT_10db6ee8[slot].matrix.GetTranslation();
+    float distance = DAT_10db6ee8[0].matrix.GetTranslation().Distance(propAt);
+    if (DAT_104bfdc8 == 0 && distance < PICKUP_REACH)
+    {
+        float apartX = (float)fabs(DAT_10db6ee8[0].matrix.GetTranslation().x - DAT_10db6ee8[slot].matrix.GetTranslation().x);
+        float apartY = (float)fabs(DAT_10db6ee8[0].matrix.GetTranslation().y - DAT_10db6ee8[slot].matrix.GetTranslation().y);
+        float apartZ = (float)fabs(DAT_10db6ee8[0].matrix.GetTranslation().z - DAT_10db6ee8[slot].matrix.GetTranslation().z);
+        Vec4 ahead = DAT_10db6ee8[0].matrix.GetTranslation();
+        ahead.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - PICKUP_HEADING_SHIFT) * PICKUP_AHEAD + ahead.x;
+        ahead.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - PICKUP_HEADING_SHIFT) * PICKUP_AHEAD + ahead.y;
+        float gap = DAT_10db6ee8[slot].matrix.GetTranslation().Distance(ahead);
+        if (gap < DAT_102027e4)
+        {
+            DAT_102027e4 = gap;
+            if (distance < PICKUP_NEAR && apartZ < PICKUP_HEIGHT)
+            {
+                if ((double)apartX <= (double)apartY + (double)apartY)
+                {
+                    if ((double)apartY <= (double)apartX + (double)apartX)
+                        return;
+                    DAT_104bfdd0 = 2;
+                }
+                else
+                    DAT_104bfdd0 = 1;
+                DAT_104bfdd8 = slot;
+                DAT_104c0074 = 0;
+            }
+        }
+    }
+}
+
+// Sets m_0267 of model `slot`: 1 while the player stands within PICKUP_STAND_RADIUS of it and 40..140 units below it.
+static __forceinline void MarkPlayerUnderProp(int slot)
+{
+    Vec4 playerAt = DAT_10db6ee8[0].matrix.GetTranslation();
+    Vec4 propAt = DAT_10db6ee8[slot].matrix.GetTranslation();
+    if (propAt.z <= playerAt.z + PICKUP_GAP_MIN || playerAt.z + PICKUP_GAP_MAX <= propAt.z
+        || playerAt.Distance2D(propAt) >= PICKUP_STAND_RADIUS)
+        DAT_10db6ee8[slot].m_0267 = 0;
+    else
+        DAT_10db6ee8[slot].m_0267 = 1;
+}
+
+// Follows the model that carries model `slot` (up to 16 links): returns 1 when it is DAT_104bfdd8, the model the
+// player holds. (The original re-reads the carrier of the model itself on each link.)
+static __forceinline int IsCarriedByHeld(int slot)
+{
+    int carried = 0;
+    if (DAT_104bfdd8 > 0)
+    {
+        AnimModel *link = &DAT_10db6ee8[slot];
+        int links = 0;
+        do
+        {
+            links++;
+            if (link->m_2418 == 0)
+                break;
+            link = DAT_10db6ee8[slot].m_2418;
+            if (&DAT_10db6ee8[DAT_104bfdd8] == link)
+            {
+                carried = 1;
+                break;
+            }
+        } while (links < PICKUP_CARRY_LINKS);
+    }
+    return carried;
+}
+
+// Puts model `slot` on the ground below it: it is snapped down by PROP_SNAP_STEP and given half of the horizontal
+// move as its step, then put back where it was.
+static __forceinline void SnapPropToGround(int slot)
+{
+    Vec4 before = DAT_10db6ee8[slot].matrix.GetTranslation();
+    DAT_10db6ee8[slot].SnapPosition(PROP_SNAP_STEP, 0);
+    Vec4 after = DAT_10db6ee8[slot].matrix.GetTranslation();
+    DAT_10db6ee8[slot].SetMoveStep((after.x - before.x) * 0.5f, (after.y - before.y) * 0.5f, 0);
+    DAT_10db6ee8[slot].matrix.SetTranslation(before);
+}
 // Fills the ring of recent player positions with the current one.
 static __forceinline void ResetPlayerTrail(void)
 {
@@ -6954,7 +7122,479 @@ movementDone:;
                         }
                         else
                         {
-                            // STAGE 10: the other slot kinds, pseudo.c lines 9686-10956 (gotos: dispatchByKind = LAB_10132b5f,
+char slotKind = DAT_1021f3c0[modelIdx];
+if (slotKind == 0x16 || slotKind == 0x0f)
+    DAT_10db6ee8[modelIdx].root->M_1019b050(0x27);
+else if (slotKind == 'E')
+{
+    // a prop the player can talk to: it steps forward and back (phases 201..400) when the player stands in one of two spots beside it
+    if (DAT_104bfdf0 == 0)
+    {
+        if (DAT_104c0068 == 0 && DAT_10db6ee8[modelIdx].phase == 0)
+        {
+            Vec4 propAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+            float distanceSquared = DAT_10db6ee8[0].matrix.GetTranslation().DistanceSquared(propAt);
+            if (DAT_102024b4 != 0 && DAT_1020b430[modelIdx].sawPlayer == 0 && DAT_104bfdc8 == 0
+                && distanceSquared < PROP_TALK_DISTANCE_SQUARED)
+            {
+                DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
+                FUN_100114a0();
+                DAT_1020b430[modelIdx].behaviour = DAT_10db6ee8[modelIdx].phase + 1;
+                DAT_104c0068 = 1;
+                CloseEventOverlay();
+                DAT_104c006c = modelIdx;
+                DAT_10daaad4.Copy(DAT_10db6ee8[0].matrix.GetTranslation() - propAt);
+                DAT_10db6ee8[modelIdx].phase = 1;
+                DAT_10db6ee8[modelIdx].swayParam = 1;
+                DAT_10db6ee8[modelIdx].swayFrames = 0;
+            }
+        }
+        if (DAT_10db6ee8[modelIdx].phase >= PROP_BACK_FIRST)
+        {
+            // phase 301..400: backs away
+            DAT_10db6ee8[modelIdx].phase = DAT_10db6ee8[modelIdx].phase + 1;
+            Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+            DAT_10db6ee8[modelIdx].SetPosition(here.x, here.y, here.z - PROP_STEP);
+            if (DAT_10db6ee8[modelIdx].phase == PROP_BACK_END)
+            {
+                DAT_10db6ee8[modelIdx].phase = PROP_PHASE_IDLE;
+                DAT_104c0068 = 0;
+            }
+        }
+        else if (DAT_10db6ee8[modelIdx].phase >= PROP_FORWARD_FIRST)
+        {
+            // phase 201..300: steps forward
+            DAT_10db6ee8[modelIdx].phase = DAT_10db6ee8[modelIdx].phase + 1;
+            Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+            DAT_10db6ee8[modelIdx].SetPosition(here.x, here.y, here.z + PROP_STEP);
+            if (DAT_10db6ee8[modelIdx].phase == PROP_FORWARD_END)
+            {
+                DAT_10db6ee8[modelIdx].phase = PROP_PHASE_IDLE;
+                DAT_104c0068 = 0;
+            }
+        }
+        else if (DAT_10db6ee8[modelIdx].phase == PROP_PHASE_IDLE)
+        {
+            // idle: it leans away from the player (a tilt of its first child); a step starts when the player stands
+            // in one of the two spots 500 units to either side
+            DAT_10db6ee8[0].m_02a1 = 1;
+            Vec4 away;
+            Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+            away.Copy(here - DAT_10db6ee8[0].matrix.GetTranslation());
+            float awayScale = PROP_LEAN_SCALE;
+            away.Copy(away * awayScale);
+            DAT_10db6ee8[modelIdx].SetPosition(here.x - away.x, here.y - away.y, here.z);
+            Matrix4 lean;
+            float heading = (float)atan2(-away.x, -away.y);
+            away.z = 0;
+            lean = RotationX(away.Length() * PROP_LEAN_TILT);
+            lean = RotationZ(-heading) * lean * RotationZ(heading);
+            DAT_10db6ee8[modelIdx].root->children[0]->matrix = lean;
+            DAT_1021b548[DAT_10db6ee8[modelIdx].attachedNode]->matrix = DAT_10db6ee8[modelIdx].matrix;
+            Vec4 spotA;
+            Vec4 spotB;
+            spotA.Set(0, -PROP_SPOT_OFFSET, 0, 0);
+            spotB.Set(0, PROP_SPOT_OFFSET, 0, 0);
+            here.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+            here.z = 0;
+            float distanceA = spotA.Distance(here);
+            float distanceB = spotB.Distance(here);
+            if (distanceA >= PROP_SPOT_RADIUS)
+            {
+                if (distanceB >= PROP_SPOT_RADIUS)
+                    DAT_10db6ee8[modelIdx].swayFrames = 0;
+                else if (DAT_10db6ee8[modelIdx].swayFrames == 0 && DAT_10db6ee8[modelIdx].swayParam > 0)
+                {
+                    DAT_10db6ee8[modelIdx].swayFrames = 1;
+                    DAT_10db6ee8[modelIdx].phase = PROP_BACK_FIRST;
+                    DAT_10db6ee8[modelIdx].swayParam = DAT_10db6ee8[modelIdx].swayParam - 1;
+                    StartPropPull(modelIdx, here);
+                }
+            }
+            else if (DAT_10db6ee8[modelIdx].swayFrames == 0 && DAT_10db6ee8[modelIdx].swayParam < 2)
+            {
+                DAT_10db6ee8[modelIdx].swayFrames = 1;
+                DAT_10db6ee8[modelIdx].phase = PROP_FORWARD_FIRST;
+                DAT_10db6ee8[modelIdx].swayParam = DAT_10db6ee8[modelIdx].swayParam + 1;
+                StartPropPull(modelIdx, here);
+            }
+        }
+        else if (DAT_10db6ee8[modelIdx].phase != 0)
+        {
+            // phase 1..92: after the player spoke to it it moves aside for a while, then goes idle
+            DAT_10db6ee8[modelIdx].phase = DAT_10db6ee8[modelIdx].phase + 1;
+            if (DAT_10db6ee8[modelIdx].phase < PROP_TALK_RISE_END)
+            {
+                Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+                DAT_10db6ee8[modelIdx].SetPosition(here.x - PROP_TALK_STEP_X, here.y, here.z - PROP_TALK_STEP_Z);
+            }
+            if (DAT_10db6ee8[modelIdx].phase > PROP_TALK_END)
+            {
+                DAT_104c0068 = 0;
+                DAT_10db6ee8[modelIdx].phase = PROP_PHASE_IDLE;
+            }
+            DAT_1021b548[DAT_10db6ee8[modelIdx].attachedNode]->matrix = DAT_10db6ee8[modelIdx].matrix;
+        }
+    }
+    goto modelTail;
+}
+else if (slotKind == 'B')
+{
+    // a swaying prop that, once hit, rises, is dropped far below and settles on the ground
+    Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+    Matrix4 sway;
+    sway.SetIdentity();
+    if (DAT_10db6ee8[modelIdx].swayFrames != 0)
+    {
+        SwayProp(sway, DAT_10db6ee8[modelIdx].swayFrames, DAT_10db6ee8[modelIdx].swayParam, SWAY_DIVISOR_FLAG,
+                         SWAY_FRAME_ANGLE);
+        here.z = DAT_104bfe24 + FLAG_LIFT;
+        EffectOptions options;
+        options.flags = 1;
+        if (DAT_10db6ee8[modelIdx].phase == 0 && DAT_10db6ee8[modelIdx].swayFrames > 1)
+            DAT_10daaa80.Start(0xc80, here, -1, -1, 0, 0, 0, 0, &options, 0);
+    }
+    if (DAT_10db6ee8[modelIdx].phase != 0)
+    {
+        if (DAT_10db6ee8[modelIdx].phase < FLAG_FALL_END)
+        {
+            here.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+            here.z = here.z + FLAG_RISE_STEP;
+            DAT_10db6ee8[modelIdx].matrix.SetTranslation(here);
+            DAT_10db6ee8[modelIdx].phase = DAT_10db6ee8[modelIdx].phase + 1;
+        }
+        if (DAT_10db6ee8[modelIdx].phase >= FLAG_FALL_END)
+        {
+            here.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+            if (DAT_10db6ee8[modelIdx].phase == FLAG_FALL_END)
+            {
+                here.z = FLAG_DROP_HEIGHT;
+                DAT_10db6ee8[modelIdx].matrix.SetTranslation(here);
+                DAT_10db6ee8[modelIdx].root->children[0]->matrix = TranslationMatrix(0, 0, 0);
+            }
+            Vec4 probe;
+            probe.Set(0, 0, FLAG_PROBE_HEIGHT, 0);
+            if (DAT_10db6ee8[modelIdx].IsClearAny(&probe))
+            {
+                DAT_10db6ee8[modelIdx].matrix.SetTranslation(here + probe);
+                DAT_10db6ee8[modelIdx].phase = DAT_10db6ee8[modelIdx].phase + 1;
+            }
+            if (DAT_10db6ee8[modelIdx].phase >= FLAG_PHASE_RESET)
+                DAT_10db6ee8[modelIdx].phase = 0;
+        }
+    }
+}
+else if (slotKind == 'z')
+{
+    // a pot: it sways when hit; with no cutscene on it smashes into a debris model, scores and is parked away
+    Matrix4 sway;
+    sway.SetIdentity();
+    if (DAT_10db6ee8[modelIdx].swayFrames != 0)
+        SwayProp(sway, DAT_10db6ee8[modelIdx].swayFrames, DAT_10db6ee8[modelIdx].swayParam, SWAY_DIVISOR_POT,
+                         SWAY_FRAME_ANGLE);
+    DAT_10db6ee8[modelIdx].root->children[1]->matrix = sway;
+    if (DAT_10db6ee8[modelIdx].swayFrames != 0 && DAT_104c01e0 == 0 && DAT_10c62ed0 != 0x16 && DAT_10c62ed0 != 0x17
+        && DAT_10c62ed0 != 0x18 && DAT_10c62ed0 != 0x15 && DAT_10c62ed0 != 0x19 && DAT_10c62ed0 != 0x1a
+        && DAT_10c62ed0 != 0x1b && DAT_10c62ed0 != 0x191)
+    {
+        DAT_1021f3c0[modelIdx] = (char)POT_SMASH_KIND;
+        Vec4 smashAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+        DAT_10874848.RegisterEvent(POT_SMASH_EVENT);
+        Vec4 colour;
+        colour.Set(DAT_10db6ee8[modelIdx].scale.x, DAT_10db6ee8[modelIdx].scale.y, DAT_10db6ee8[modelIdx].scale.z, 1.0f);
+        DAT_10c64ad8 = DAT_10c64ad8 + 1;
+        FUN_1000e750();
+                            Vec4 soundAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+                            FUN_1003ad20(POT_SMASH_SOUND, &soundAt, 1.0f);
+        FUN_1003a880("O_061br.it3", smashAt.x, smashAt.y, smashAt.z, 0, 0, 0,
+                     DAT_10db6ee8[modelIdx].targetHeading * 180.0f / 3.1415f, colour);
+        DAT_10db6ee8[modelIdx].SetPosition(POT_HIDE_X, 0, 0);
+    }
+}
+else if (slotKind == 'P')
+{
+    // a hanging prop: it sways when hit
+    Matrix4 sway;
+    sway.SetIdentity();
+    if (DAT_10db6ee8[modelIdx].swayFrames != 0)
+        SwayProp(sway, DAT_10db6ee8[modelIdx].swayFrames, DAT_10db6ee8[modelIdx].swayParam, SWAY_DIVISOR_POT,
+                         SWAY_FRAME_ANGLE);
+    DAT_10db6ee8[modelIdx].root->children[1]->matrix = sway;
+}
+else if (slotKind == ',')
+{
+    // a fire spitter next to the player: every 90th frame it starts a flame effect at its side
+    if (DAT_104bfe1c == 0 && DAT_104c0094 == 0)
+    {
+        if (DAT_10db6ee8[modelIdx].m_0288 > 0)
+            DAT_10db6ee8[modelIdx].m_0288--;
+        Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+        here.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - LAMP_HEADING_SHIFT) * LAMP_TURN_OFFSET + here.x;
+        here.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - LAMP_HEADING_SHIFT) * LAMP_TURN_OFFSET + here.y;
+        Matrix4 unusedPose;
+        unusedPose.SetIdentity();
+        DAT_10db6ee8[modelIdx].m_0294 = 1;
+        DAT_10db6ee8[modelIdx].motionFrame = DAT_104bf8a4;
+        if (DAT_10db6ee8[modelIdx].m_0284 != 0)
+            DAT_10db6ee8[modelIdx].FaceAwayFrom(&DAT_10db6ee8[0]);
+        if (DAT_104bf890 % LAMP_FIRE_PERIOD == 0)
+        {
+            float heading = DAT_10db6ee8[modelIdx].targetHeading;
+            Vec4 muzzle;
+            Matrix4 spin;
+            EffectOptions options;
+            spin = RotationZ(heading);
+            muzzle.Fill(0.0f);
+            muzzle.y = -40.0f;
+            muzzle.z = 60.0f;
+            muzzle.RotateZ(-heading);
+            spin.SetTranslation(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+            spin.m[MATRIX_TRANSLATION_X] += muzzle.x;
+            spin.m[MATRIX_TRANSLATION_Y] += muzzle.y;
+            spin.m[MATRIX_TRANSLATION_Z] += muzzle.z;
+            muzzle.Fill(0.0f);
+            options.m_0000 = 0;
+            options.m_0004 = 10;
+            if (DAT_10c635f8 == 1)
+                options.m_0008 = 0.5f;
+            if (DAT_10c635f8 == 2)
+            {
+                options.m_0008 = 2.0f;
+                if (DAT_10c66cc0 == 1)
+                    options.m_0008 = 3.0f;
+                else if (DAT_10c66cc0 != 0)
+                    options.m_0008 = 24.0f;
+            }
+            options.m_000e = 5;
+            DAT_10daaa80.Start(0x762, muzzle, -1, -1, 0, 0, 8, &spin, &options, 0);
+            DAT_10db6ee8[modelIdx].root->RestartColourPlugs("fire", DAT_104bf8a4);
+        }
+    }
+}
+else if (slotKind == 'Q')
+{
+    // a stall prop in front of the player: it sways when hit
+    if (DAT_10db6ee8[modelIdx].m_0288 > 0)
+        DAT_10db6ee8[modelIdx].m_0288--;
+    Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+    here.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - LAMP_HEADING_SHIFT) * LAMP_TURN_OFFSET + here.x;
+    here.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - LAMP_HEADING_SHIFT) * LAMP_TURN_OFFSET + here.y;
+    Matrix4 sway;
+    sway.SetIdentity();
+    if (DAT_10db6ee8[modelIdx].swayFrames != 0)
+        SwayProp(sway, DAT_10db6ee8[modelIdx].swayFrames, DAT_10db6ee8[modelIdx].swayParam, SWAY_DIVISOR_STALL,
+                 SWAY_FRAME_ANGLE_SLOW);
+    DAT_10db6ee8[modelIdx].root->children[0]->matrix = sway;
+    here.Distance(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
+}
+else if (slotKind == 'M')
+{
+    // a floor button: it turns "down" when the player steps on it and "up" again when the player leaves; the
+    // colour of its box shows whether it can be pressed
+    if (DAT_10db6ee8[modelIdx].phase == 0)
+    {
+        float full = 1.0f;
+        DAT_10db6ee8[modelIdx].scale.Fill(full);
+    }
+    else
+        DAT_10db6ee8[modelIdx].scale.Set(BUTTON_DIM, BUTTON_DIM, BUTTON_DIM, 0);
+    if (DAT_104c0068 == 0)
+    {
+        Vec4 buttonAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+        float distanceSquared = DAT_10db6ee8[0].matrix.GetTranslation().DistanceSquared(buttonAt);
+        if (DAT_10db6ee8[modelIdx].phase == 0 && DAT_102024b4 != 0 && DAT_1020b430[modelIdx].sawPlayer == 0
+            && DAT_104bfdc8 == 0 && distanceSquared < BUTTON_TALK_DISTANCE_SQUARED)
+        {
+            DAT_1020b430[modelIdx].behaviour = DAT_10db6ee8[modelIdx].swayParam + 1;
+            DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
+            FUN_100114a0();
+            DAT_104c006c = modelIdx;
+            DAT_104c0068 = 1;
+            CloseEventOverlay();
+            DAT_10daaad4.Copy(DAT_10db6ee8[0].matrix.GetTranslation() - buttonAt);
+            DAT_10db6ee8[modelIdx].root->Find("button", 0)->RestartColourPlugs("down", DAT_104bf8a4);
+        }
+    }
+    FUN_100f9670(modelIdx);
+    if (DAT_104c0068 == 2 && DAT_104c006c == modelIdx)
+    {
+        Vec4 buttonAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+        float distanceSquared = DAT_10db6ee8[0].matrix.GetTranslation().DistanceSquared(buttonAt);
+        if (BUTTON_LEAVE_DISTANCE_SQUARED < distanceSquared)
+        {
+            DAT_104c0068 = 0;
+            DAT_10db6ee8[modelIdx].root->Find("button", 0)->RestartColourPlugs("up", DAT_104bf8a4);
+        }
+    }
+    bool pressable;
+    if (DAT_104c0068 == 1)
+        pressable = true;
+    else if (DAT_104c0068 == 2 && DAT_104c006c == modelIdx)
+        pressable = false;
+    else
+        pressable = DAT_1020b430[modelIdx].behaviour == 0;
+    int pressState = DAT_104c0068;
+    DAT_10db6ee8[modelIdx].m_0266 = 0;
+    const char *boxMotion;
+    if (!pressable || DAT_102024b4 == 0 || DAT_1020b430[modelIdx].sawPlayer != 0)
+        boxMotion = "stop";
+    else if (pressState == 1 && DAT_104c006c == modelIdx)
+        boxMotion = "red";
+    else
+        boxMotion = "blue";
+    DAT_10db6ee8[modelIdx].root->Find("Box01", 0)->RestartColourPlugs(boxMotion, DAT_104bf8a4);
+    DAT_10db6ee8[modelIdx].motionFrame = DAT_104bf8a4;
+    if (DAT_10db6ee8[modelIdx].swayFrames == 0)
+    {
+        if (DAT_1020b430[modelIdx].behaviour != 0 && DAT_1020b430[modelIdx].heldDown == 0)
+        {
+            Vec4 soundAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+            FUN_1003ad20(BUTTON_SOUND_DOWN, &soundAt, 1.0f);
+        }
+    }
+    if (DAT_10db6ee8[modelIdx].swayFrames != 0)
+    {
+        if (DAT_1020b430[modelIdx].behaviour == 0 && DAT_1020b430[modelIdx].heldDown == 0)
+        {
+            Vec4 soundAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+            FUN_1003ad20(BUTTON_SOUND_UP, &soundAt, 1.0f);
+        }
+    }
+    if (DAT_1020b430[modelIdx].heldDown == 0)
+        DAT_10db6ee8[modelIdx].swayFrames = DAT_1020b430[modelIdx].behaviour;
+}
+else if (slotKind != '\\')
+{
+    if (slotKind == 6)
+    {
+        // a prop that only marks whether the player stands under it
+        DAT_10db6ee8[modelIdx].m_0012 = 2;
+        if (DAT_104bf890 % PROP_SHADOW_PERIOD == modelIdx % PROP_SHADOW_STAGGER && DAT_102022b8 != 0)
+            PlaceShadowOnGroundV2(modelIdx);
+        MarkPlayerUnderProp(modelIdx);
+    }
+    else if (slotKind == '_')
+    {
+        // a pick-up prop: it is offered to the player, kept on the ground and put back where the player holds it
+        float zero = 0;
+        DAT_10db6ee8[modelIdx].velocity.Fill(zero);
+        DAT_10db6ee8[modelIdx].m_02a0 = 1;
+        if (DAT_104bfe4c == 0 && DAT_10db6ee8[0].m_238c != 0)
+            OfferPickup(modelIdx);
+        DAT_10db6ee8[modelIdx].m_0012 = 2;
+        if (DAT_104bf890 % PROP_SHADOW_PERIOD == modelIdx % PROP_SHADOW_STAGGER && DAT_102022b8 != 0)
+            PlaceShadowOnGroundV2(modelIdx);
+        int carried = IsCarriedByHeld(modelIdx);
+        MarkPlayerUnderProp(modelIdx);
+        DAT_10db6ee8[modelIdx].root->M_1019b050(0x27);
+        if ((DAT_104bfdd8 != modelIdx && carried == 0) || DAT_104bfdcc == 0)
+            SnapPropToGround(modelIdx);
+    }
+    else if (slotKind == 5)
+    {
+        // a pick-up prop that sways when hit
+        float zero = 0;
+        DAT_10db6ee8[modelIdx].velocity.Fill(zero);
+        DAT_10db6ee8[modelIdx].m_02a0 = 1;
+        if (DAT_10db6ee8[modelIdx].m_0288 > 0)
+            DAT_10db6ee8[modelIdx].m_0288--;
+        Matrix4 sway;
+        sway.SetIdentity();
+        if (DAT_10db6ee8[modelIdx].m_0288 != 0)
+            SwayProp(sway, DAT_10db6ee8[modelIdx].m_0288, DAT_10db6ee8[modelIdx].m_0284, SWAY_DIVISOR_SIGN, SWAY_FRAME_ANGLE);
+        DAT_10db6ee8[modelIdx].root->children[0]->matrix = sway;
+        if (DAT_104bfe4c == 0 && DAT_10db6ee8[0].m_238c != 0)
+            OfferPickup(modelIdx);
+        DAT_10db6ee8[modelIdx].m_0012 = 2;
+        if (DAT_104bf890 % PROP_SHADOW_PERIOD == modelIdx % PROP_SHADOW_STAGGER && DAT_102022b8 != 0)
+            PlaceShadowOnGroundV2(modelIdx);
+        MarkPlayerUnderProp(modelIdx);
+        int carried = IsCarriedByHeld(modelIdx);
+        DAT_10db6ee8[modelIdx].root->M_1019b050(0x27);
+        if ((DAT_104bfdd8 != modelIdx && carried == 0) || DAT_104bfdcc == 0)
+            SnapPropToGround(modelIdx);
+    }
+    else
+    {
+        if (slotKind == 'F')
+        {
+            Vec4 buttonAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+            float distanceSquared = DAT_10db6ee8[0].matrix.GetTranslation().DistanceSquared(buttonAt);
+            if (DAT_1020b430[modelIdx].behaviour == 0 && DAT_10db6ee8[modelIdx].phase == 0 && DAT_102024b4 != 0
+                && DAT_1020b430[modelIdx].sawPlayer == 0 && DAT_104bfdc8 == 0
+                && distanceSquared < BUTTON_TALK_DISTANCE_SQUARED)
+            {
+                DAT_1020b430[modelIdx].behaviour = DAT_10db6ee8[modelIdx].swayParam + 1;
+                if (DAT_10db6ee8[modelIdx].root->Find("button", 0) != 0)
+                    DAT_10db6ee8[modelIdx].root->Find("button", 0)->RestartColourPlugs("down", DAT_104bf8a4);
+            }
+            goto dispatchBaseKind;
+        }
+        if (slotKind == 'N')
+            FUN_100f9670(modelIdx);
+        else if (slotKind == 2)
+        {
+            // a spout in front of the player: the player's target becomes it
+            Vec4 ahead = DAT_10db6ee8[0].matrix.GetTranslation();
+            ahead.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - LAMP_HEADING_SHIFT) * SPOUT_AHEAD + ahead.x;
+            ahead.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - LAMP_HEADING_SHIFT) * SPOUT_AHEAD + ahead.y;
+            if (DAT_10db6ee8[modelIdx].matrix.GetTranslation().Distance(ahead) < SPOUT_REACH)
+            {
+                DAT_104bf888 = modelIdx + TALK_TARGET_KEEP;
+                if (DAT_104bfd80 == 0 && steerX == 0.0f && steerY == 0.0f)
+                    DAT_104bfd80 = modelIdx;
+                if (DAT_104bfdf0 == 0 && DAT_10db6ee8[modelIdx].headNode != 0)
+                {
+                    DAT_10802ac8.Copy(DAT_10db6ee8[modelIdx].headNode->parent->worldMatrix.GetTranslation());
+                    enemyClose = 1;
+                }
+            }
+            goto dispatchByKind;
+        }
+    }
+}
+else
+{
+    // a marker: while no other marker of the slots 0x5c..0x7b is within 45 units, the gimmick record of its
+    // switch is closed (frame 0x1e) when the way is clear
+    int savedTarget = DAT_104bf888;
+    bool crowded = false;
+    Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+    if (DAT_104bfdcc == 0)
+    {
+        for (int other = MARKER_FIRST_SLOT; other <= MARKER_LAST_SLOT; other++)
+        {
+            if (other != modelIdx)
+            {
+                float distanceSquared = DAT_10db6ee8[other].matrix.GetTranslation().DistanceSquared(here);
+                if (distanceSquared < MARKER_CLEAR_DISTANCE_SQUARED)
+                {
+                    DAT_104bf888 = DAT_10db6ee8[modelIdx].switchNode + 1;
+                    if (DAT_10860cec[DAT_104bf888].frame == 0)
+                        FUN_1005ecb0(0);
+                    DAT_104bf888 = 0;
+                    crowded = true;
+                }
+            }
+        }
+    }
+    if (DAT_104bfdcc != 0 || !crowded)
+    {
+        DAT_104bf888 = DAT_10db6ee8[modelIdx].switchNode + 1;
+        if (DAT_10860cec[DAT_104bf888].frame == MARKER_CLOSED_FRAME)
+        {
+            Vec4 probe;
+            probe = here;
+            probe.Set(0, 0, 1.0f, 0);
+            if (DAT_10db6ee8[modelIdx].IsClearAny(&probe))
+            {
+                DAT_10860cec[DAT_104bf888].frame = MARKER_CLOSED_FRAME;
+                FUN_1005ecb0(0);
+            }
+        }
+    }
+    DAT_104bf888 = savedTarget;
+}
                             // dispatchBaseKind = LAB_10135df2; the code ends with `goto modelTail`)
                             goto modelTail;
                         }

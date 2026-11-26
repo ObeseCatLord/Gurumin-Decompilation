@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 50.1888,
+  "fuzzy_match_percent": 50.1535,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -8835,7 +8835,7 @@
   {
    "name": "app/enemy_pounce_breath",
    "measures": {
-    "fuzzy_match_percent": 39.5427,
+    "fuzzy_match_percent": 39.8114,
     "total_code": "6548",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -8860,14 +8860,14 @@
     {
      "name": ".text",
      "size": "6548",
-     "fuzzy_match_percent": 39.5427
+     "fuzzy_match_percent": 39.8114
     }
    ],
    "functions": [
     {
      "name": "?Enemy_PounceAndBreathe@@YAHH@Z",
      "size": "6548",
-     "fuzzy_match_percent": 39.5427,
+     "fuzzy_match_percent": 39.8114,
      "metadata": {
       "virtual_address": "268858832"
      }
@@ -10627,7 +10627,7 @@
   {
    "name": "app/game_frame",
    "measures": {
-    "fuzzy_match_percent": 34.5995,
+    "fuzzy_match_percent": 34.0162,
     "total_code": "107161",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -10652,14 +10652,14 @@
     {
      "name": ".text",
      "size": "107161",
-     "fuzzy_match_percent": 34.5995
+     "fuzzy_match_percent": 34.0162
     }
    ],
    "functions": [
     {
      "name": "_FUN_1011d810",
      "size": "107161",
-     "fuzzy_match_percent": 34.5995,
+     "fuzzy_match_percent": 34.0162,
      "metadata": {
       "virtual_address": "269604880"
      }

@@ -196,6 +196,13 @@ struct AnimModel
             int blastAngle;   // 0x278: direction of the blast (1/1000 radians)
             int blastPush;    // 0x27c: strength of the push
         };
+        struct
+        {
+            int attachedNode; // 0x270: index of the attached node in DAT_1021b548 that follows this model (game_frame.cpp, the swaying props)
+            int phase;        // 0x274: step of the prop's sway or talk state (0 = at rest, 100 = idle)
+            int swayParam;    // 0x278: sway angle (1/1000 radians) or the number of steps still to take
+            int swayFrames;   // 0x27c: frames of the sway still to run (or a 0/1 flag)
+        };
     };
     int m_0280;               // 0x280: 0 or 1 while the character has not been defeated or moved on
     int m_0284;               // 0x284: set to a random number below 1000 by the "PCON" trigger

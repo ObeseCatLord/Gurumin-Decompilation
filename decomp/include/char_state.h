@@ -493,6 +493,7 @@ struct CharState
                     union                         // 0x1c
                     {
                         int flierLastX;           // route_flier.cpp: x of its position last frame (whole units)
+                        int heldDown;             // game_frame.cpp (kind 'M', a floor button): non-zero while something stands on it
                         int frameTick;             // enemy_chase_lunge.cpp: frames counted since it was set up (starts at its slot); staggers the probes between enemies
                         int rivalTarget;          // target_race.cpp (rival): target slot (0x3c..0x43) it runs at or pounces on
                         int sightState;           // enemy_cast_teleport.cpp: 0 = player not seen, 1 = seen, 2 = seen in the line of sight

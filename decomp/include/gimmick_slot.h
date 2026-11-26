@@ -27,6 +27,8 @@ struct GimmickSlot : Latch
 };
 
 extern "C" GimmickSlot DAT_10860cec[0x41];
+#ifndef GURUMIN_ITEM_DICTIONARY_H   // item_dictionary.h declares the same table with its own record type
 extern "C" ItemName DAT_1088e650[];                       // item names, 0xc0 bytes apart (DAT_1088e670 seen 0x20 later)
+#endif
 
 #endif

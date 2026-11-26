@@ -7031,6 +7031,7 @@ movementDone:;
                                 DAT_10210b30[modelIdx] = 1;
                                 DAT_10db6ee8[modelIdx].root->M_10194730(0, -1);
                                 Vec4 here;
+                                Vec4 retreatPieceDirection;
                                 here.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
                                 Vec4 playerPos;
                                 playerPos.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
@@ -7119,11 +7120,10 @@ movementDone:;
                                         DAT_10467ba0[modelIdx] = 0;
                                         DAT_10db6ee8[modelIdx].HoldAtSpine(0, 0);
                                         here.Copy(DAT_10db6ee8[modelIdx].matrix.GetTranslation());
-                                        Vec4 pieceDirection;
-                                        pieceDirection.Copy(here);
-                                        pieceDirection.z = pieceDirection.z + TOSS_PIECE_LIFT;
-                                        pieceDirection.Copy(pieceDirection - DAT_10836fc8[modelIdx]);
-                                        BurstIntoPieces(here, &pieceDirection, modelIdx);
+                                        retreatPieceDirection.Copy(here);
+                                        retreatPieceDirection.z = retreatPieceDirection.z + TOSS_PIECE_LIFT;
+                                        retreatPieceDirection.Copy(retreatPieceDirection - DAT_10836fc8[modelIdx]);
+                                        BurstIntoPieces(here, &retreatPieceDirection, modelIdx);
                                         DAT_10210d30[modelIdx] = ENEMY_DYING;
                                     }
                                 }

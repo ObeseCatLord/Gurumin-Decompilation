@@ -450,8 +450,9 @@ static __forceinline void SwayProp(Matrix4 &sway, int &frames, int param, float 
 
 // Offers model `slot` (a movable prop) as the object the player picks up next: when it is the closest one to a point
 // just ahead of the player and within reach, DAT_104bfdd8 takes its index and DAT_104bfdd0 the side the player
-// stands on (1 = along x, 2 = along y).
-static __forceinline void OfferPickup(int slot)
+// stands on (1 = along x, 2 = along y). The swaying prop's copy of this code (readPositionsTwice) also fetches both
+// positions once more before computing the point ahead; the result is not used.
+static __forceinline void OfferPickup(int slot, bool readPositionsTwice)
 {
     Vec4 propAt = DAT_10db6ee8[slot].matrix.GetTranslation();
     float distance = DAT_10db6ee8[0].matrix.GetTranslation().Distance(propAt);
@@ -460,6 +461,11 @@ static __forceinline void OfferPickup(int slot)
         float apartX = (float)fabs(DAT_10db6ee8[0].matrix.GetTranslation().x - DAT_10db6ee8[slot].matrix.GetTranslation().x);
         float apartY = (float)fabs(DAT_10db6ee8[0].matrix.GetTranslation().y - DAT_10db6ee8[slot].matrix.GetTranslation().y);
         float apartZ = (float)fabs(DAT_10db6ee8[0].matrix.GetTranslation().z - DAT_10db6ee8[slot].matrix.GetTranslation().z);
+        if (readPositionsTwice)
+        {
+            DAT_10db6ee8[0].matrix.GetTranslation();
+            DAT_10db6ee8[slot].matrix.GetTranslation();
+        }
         Vec4 ahead = DAT_10db6ee8[0].matrix.GetTranslation();
         ahead.x = (float)cos(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - PICKUP_HEADING_SHIFT) * PICKUP_AHEAD + ahead.x;
         ahead.y = (float)sin(-DAT_10db6ee8[DAT_104bf8b4].targetHeading - PICKUP_HEADING_SHIFT) * PICKUP_AHEAD + ahead.y;
@@ -2161,11 +2167,132 @@ int FUN_1011d810(void)
                 {
                     if (DAT_104c00d0 < SCENE_DAMAGE_LIMIT)
                     {
-                        if (DAT_104c00d0 < SCENE_HAND_LIMIT)
+                        if (DAT_104c00d0 >= SCENE_HAND_LIMIT)
                         {
-                            if (DAT_104c00d0 < SCENE_SPARK_LIMIT)
+                            // 5000..10000: a damage state (the player takes damage every time the counter reaches
+                            // SCENE_DAMAGE_TICK) and its recovery.
+                            CloseEventOverlay();
+                            DAT_104c00d0 = DAT_104c00d0 - 1;
+                            if (DAT_104c00d0 == SCENE_DAMAGE_TICK)
                             {
-                                if (DAT_104c00d0 < SCENE_BLANK_LIMIT)
+                                DAT_104c00d0 = 0;
+                                unsigned int damage = 5;
+                                if (DAT_10c635f8 == 1)
+                                    damage = 2;
+                                else if (DAT_10c635f8 == 2)
+                                {
+                                    if (DAT_10c66cc0 == 1)
+                                        damage = 0x14;
+                                    else if (DAT_10c66cc0 == 0)
+                                        damage = 10;
+                                    else
+                                        damage = 0x32;
+                                }
+                                if ((DAT_104c02c8 & HELMET_NO_DAMAGE) == 0)
+                                {
+                                    if ((DAT_104c02c8 & HELMET_HALF_DAMAGE) != 0)
+                                        damage = damage / 2;
+                                }
+                                else
+                                {
+                                    FUN_10011aa0(0, 1);
+                                    damage = 0;
+                                }
+                                FUN_1005dbf0(damage);
+                                DAT_104c00d0 = SCENE_DAMAGE_TICK;
+                                if (DAT_10daaae8[0].stats[STAT_HEALTH] > 0)
+                                    FUN_1000da40(0, 0, 0x1e);
+                            }
+                            else
+                            {
+                                if (DAT_104c00d0 == SCENE_DAMAGE_RECOVER)
+                                {
+                                    DAT_104c0190 = 0;
+                                    DAT_104c0108 = 0;
+                                    DAT_104bfe70 = 0;
+                                    FUN_1000ec70(5, 1.0f, 1.0f, 1.0f, 1.0f);
+                                    ResetPlayerTrail();
+                                    DAT_104687b0 = 1;
+                                    DAT_10db9274 = 1;
+                                    DAT_10db6ee8[0].Teleport(DAT_10daa400[DAT_1030c274].x, DAT_10daa400[DAT_1030c274].y,
+                                                             DAT_10daa400[DAT_1030c274].z);
+                                    DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
+                                    FUN_1016a8e0();
+                                    DAT_11018734 = 1;
+                                    DAT_1101de30 = 1;
+                                }
+                                if (DAT_104c00d0 == SCENE_DAMAGE_END)
+                                    DAT_104c00d0 = 0;
+                            }
+                        }
+                        else
+                        {
+                            if (DAT_104c00d0 >= SCENE_SPARK_LIMIT)
+                            {
+                                // 2000..4999: the left hand glows while the counter is in 2020..2053.
+                                DAT_104c00d0 = DAT_104c00d0 - 1;
+                                CloseEventOverlay();
+                                if (DAT_104c00d0 < SCENE_HAND_END && DAT_104c00d0 > SCENE_HAND_START)
+                                {
+                                    DAT_1101de30 = 1;
+                                    DAT_1020344c = 0.6f;
+                                    Node *hand = DAT_10db6ee8[0].root->Find("Bip01 L Hand", 0);
+                                    Vec4 effectAt;
+                                    effectAt.Fill(0.0f);
+                                    Matrix4 handMatrix;
+                                    handMatrix = DAT_10db6ee8[0].matrix;
+                                    if (hand != 0)
+                                        handMatrix.SetTranslation(hand->worldMatrix.GetTranslation());
+                                    DAT_10daaa80.Start(0x8f02, effectAt, -1, 0, 0, 0, 0, &handMatrix, 0, 0);
+                                }
+                                if (DAT_104c00d0 == SCENE_HAND_FINISH)
+                                {
+                                    DAT_1020344c = 1.0f;
+                                    if (DAT_104c01b0 == 0)
+                                        FUN_10001b70((10 - DAT_102027d8) * 500);
+                                    DAT_104687b0 = 1;
+                                    DAT_104c00d0 = 0;
+                                }
+                            }
+                            else
+                            {
+                                if (DAT_104c00d0 >= SCENE_BLANK_LIMIT)
+                                {
+                                    // 1000..1999: a spark effect at the player while the counter is in 1005..1049.
+                                    CloseEventOverlay();
+                                    if (DAT_104c00d0 < SCENE_SPARK_END && DAT_104c00d0 > SCENE_SPARK_START)
+                                    {
+                                        EffectOptions options;
+                                        int strength = DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
+                                        if ((DAT_104c02c8 & HELMET_FACE_400) != 0)
+                                            options.m_0004 = (int)((float)strength * 2.0f);
+                                        else if ((DAT_104c02c8 & HELMET_FACE_300) == HELMET_FACE_300)
+                                            options.m_0004 = (int)((float)strength * 1.7f);
+                                        else if ((DAT_104c02c8 & HELMET_FACE_200) != 0)
+                                            options.m_0004 = (int)((float)strength * 1.5f);
+                                        else if ((DAT_104c02c8 & HELMET_FACE_100) != 0)
+                                            options.m_0004 = (int)((float)strength * 1.2f);
+                                        else
+                                            options.m_0004 = strength;
+                                        options.m_0008 = 1.0f;
+                                        options.m_001c = 1;
+                                        options.m_0000 = 1;
+                                        options.settings[4] = 0;
+                                        options.m_000e = 5;
+                                        options.settings[5] = 1;
+                                        options.settings[0] = 0x19;
+                                        options.settings[1] = 0xc;
+                                        Vec4 effectAt;
+                                        effectAt.Fill(0.0f);
+                                        Matrix4 playerMatrix;
+                                        playerMatrix = DAT_10db6ee8[0].matrix;
+                                        DAT_10daaa80.Start(0x8ec8, effectAt, -1, 0, 0, 0, 0, &playerMatrix, &options, 0);
+                                    }
+                                    DAT_104c00d0 = DAT_104c00d0 - 1;
+                                    if (DAT_104c00d0 == SCENE_SPARK_FINISH)
+                                        DAT_104c00d0 = 0;
+                                }
+                                else
                                 {
                                     if (DAT_104c00d0 < SCENE_TIMELINE_LIMIT)
                                     {
@@ -2285,127 +2412,6 @@ int FUN_1011d810(void)
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    // 1000..1999: a spark effect at the player while the counter is in 1005..1049.
-                                    CloseEventOverlay();
-                                    if (DAT_104c00d0 < SCENE_SPARK_END && DAT_104c00d0 > SCENE_SPARK_START)
-                                    {
-                                        EffectOptions options;
-                                        int strength = DAT_10daaae8[0].stats[STAT_EFFECT_PARAM];
-                                        if ((DAT_104c02c8 & HELMET_FACE_400) != 0)
-                                            options.m_0004 = (int)((float)strength * 2.0f);
-                                        else if ((DAT_104c02c8 & HELMET_FACE_300) == HELMET_FACE_300)
-                                            options.m_0004 = (int)((float)strength * 1.7f);
-                                        else if ((DAT_104c02c8 & HELMET_FACE_200) != 0)
-                                            options.m_0004 = (int)((float)strength * 1.5f);
-                                        else if ((DAT_104c02c8 & HELMET_FACE_100) != 0)
-                                            options.m_0004 = (int)((float)strength * 1.2f);
-                                        else
-                                            options.m_0004 = strength;
-                                        options.m_0008 = 1.0f;
-                                        options.m_001c = 1;
-                                        options.m_0000 = 1;
-                                        options.settings[4] = 0;
-                                        options.m_000e = 5;
-                                        options.settings[5] = 1;
-                                        options.settings[0] = 0x19;
-                                        options.settings[1] = 0xc;
-                                        Vec4 effectAt;
-                                        effectAt.Fill(0.0f);
-                                        Matrix4 playerMatrix;
-                                        playerMatrix = DAT_10db6ee8[0].matrix;
-                                        DAT_10daaa80.Start(0x8ec8, effectAt, -1, 0, 0, 0, 0, &playerMatrix, &options, 0);
-                                    }
-                                    DAT_104c00d0 = DAT_104c00d0 - 1;
-                                    if (DAT_104c00d0 == SCENE_SPARK_FINISH)
-                                        DAT_104c00d0 = 0;
-                                }
-                            }
-                            else
-                            {
-                                // 2000..4999: the left hand glows while the counter is in 2020..2053.
-                                DAT_104c00d0 = DAT_104c00d0 - 1;
-                                CloseEventOverlay();
-                                if (DAT_104c00d0 < SCENE_HAND_END && DAT_104c00d0 > SCENE_HAND_START)
-                                {
-                                    DAT_1101de30 = 1;
-                                    DAT_1020344c = 0.6f;
-                                    Node *hand = DAT_10db6ee8[0].root->Find("Bip01 L Hand", 0);
-                                    Vec4 effectAt;
-                                    effectAt.Fill(0.0f);
-                                    Matrix4 handMatrix;
-                                    handMatrix = DAT_10db6ee8[0].matrix;
-                                    if (hand != 0)
-                                        handMatrix.SetTranslation(hand->worldMatrix.GetTranslation());
-                                    DAT_10daaa80.Start(0x8f02, effectAt, -1, 0, 0, 0, 0, &handMatrix, 0, 0);
-                                }
-                                if (DAT_104c00d0 == SCENE_HAND_FINISH)
-                                {
-                                    DAT_1020344c = 1.0f;
-                                    if (DAT_104c01b0 == 0)
-                                        FUN_10001b70((10 - DAT_102027d8) * 500);
-                                    DAT_104687b0 = 1;
-                                    DAT_104c00d0 = 0;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // 5000..10000: a damage state (the player takes damage every time the counter reaches
-                            // SCENE_DAMAGE_TICK) and its recovery.
-                            CloseEventOverlay();
-                            DAT_104c00d0 = DAT_104c00d0 - 1;
-                            if (DAT_104c00d0 == SCENE_DAMAGE_TICK)
-                            {
-                                DAT_104c00d0 = 0;
-                                unsigned int damage = 5;
-                                if (DAT_10c635f8 == 1)
-                                    damage = 2;
-                                else if (DAT_10c635f8 == 2)
-                                {
-                                    if (DAT_10c66cc0 == 1)
-                                        damage = 0x14;
-                                    else if (DAT_10c66cc0 == 0)
-                                        damage = 10;
-                                    else
-                                        damage = 0x32;
-                                }
-                                if ((DAT_104c02c8 & HELMET_NO_DAMAGE) == 0)
-                                {
-                                    if ((DAT_104c02c8 & HELMET_HALF_DAMAGE) != 0)
-                                        damage = damage / 2;
-                                }
-                                else
-                                {
-                                    FUN_10011aa0(0, 1);
-                                    damage = 0;
-                                }
-                                FUN_1005dbf0(damage);
-                                DAT_104c00d0 = SCENE_DAMAGE_TICK;
-                                if (DAT_10daaae8[0].stats[STAT_HEALTH] > 0)
-                                    FUN_1000da40(0, 0, 0x1e);
-                            }
-                            else
-                            {
-                                if (DAT_104c00d0 == SCENE_DAMAGE_RECOVER)
-                                {
-                                    DAT_104c0190 = 0;
-                                    DAT_104c0108 = 0;
-                                    DAT_104bfe70 = 0;
-                                    FUN_1000ec70(5, 1.0f, 1.0f, 1.0f, 1.0f);
-                                    ResetPlayerTrail();
-                                    DAT_104687b0 = 1;
-                                    DAT_10db9274 = 1;
-                                    DAT_10db6ee8[0].Teleport(DAT_10daa400[DAT_1030c274].x, DAT_10daa400[DAT_1030c274].y,
-                                                             DAT_10daa400[DAT_1030c274].z);
-                                    DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
-                                    FUN_1016a8e0();
-                                    DAT_11018734 = 1;
-                                    DAT_1101de30 = 1;
-                                }
-                                if (DAT_104c00d0 == SCENE_DAMAGE_END)
-                                    DAT_104c00d0 = 0;
                             }
                         }
                     }
@@ -5286,10 +5292,38 @@ afterPlayerInput:
                         DAT_104c0228 = 0;
                     if (refilled || DAT_104c0228 < TRAIL_PHASE_LIMIT)
                         DAT_104c0228 = DAT_104c0228 + 1;
-                    if (DAT_104c022d == 0)
+                    if (DAT_104c022d != 0)
+                    {
+                        DAT_10db6ee8[0].m_006c = 1;
+                        if ((TrailBack(DAT_104c022c, 2) - DAT_10db6ee8[0].matrix.GetTranslation()).Length2D() > TRAIL_DROP_REACH ||
+                            DAT_104bfe50 != 0 || DAT_104c0300 != 0 || DAT_104bfe4c != 0 || DAT_104bfe30 != 0 || DAT_104c00d0 != 0)
+                        {
+                            DAT_104c022d = 0;
+                            DAT_10db6ee8[0].m_006c = 0;
+                            DAT_104c0228 = 0;
+                        }
+                        else if (DAT_10db6ee8[0].matrix._43 < TrailBack(DAT_104c022c, 2).z - TRAIL_DROP_FALL)
+                        {
+                            TrailBack(DAT_104c022c, 1).Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                            DAT_104c0228 = TRAIL_REPLAY_BASE;
+                            FUN_100114a0();
+                            DAT_104c022d = 0;
+                            if (DAT_104bfdc8 != 0)
+                            {
+                                DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
+                                DAT_10db6ee8[0].m_0075 = 0;
+                                DAT_104bfdc8 = 0;
+                                DAT_104bfdcc = 0;
+                                DAT_104c0090 = 1;
+                            }
+                        }
+                    }
+                    else
                     {
                         // Standing clearly below the trail: slide back up to it
-                        if (DAT_104c0228 < TRAIL_SLIDE_TICKS)
+                        if (DAT_104c0228 >= TRAIL_SLIDE_TICKS)
+                            DAT_10db6ee8[0].m_006c = 0;
+                        else
                         {
                             if (DAT_10db6ee8[0].matrix._43 < TrailBack(DAT_104c022c, 2).z - TRAIL_DROP_MIN)
                             {
@@ -5334,34 +5368,6 @@ afterPlayerInput:
                                     }
                                     DAT_10db6ee8[0].matrix.SetTranslation(savedPos);
                                 }
-                            }
-                        }
-                        else
-                            DAT_10db6ee8[0].m_006c = 0;
-                    }
-                    else
-                    {
-                        DAT_10db6ee8[0].m_006c = 1;
-                        if ((TrailBack(DAT_104c022c, 2) - DAT_10db6ee8[0].matrix.GetTranslation()).Length2D() > TRAIL_DROP_REACH ||
-                            DAT_104bfe50 != 0 || DAT_104c0300 != 0 || DAT_104bfe4c != 0 || DAT_104bfe30 != 0 || DAT_104c00d0 != 0)
-                        {
-                            DAT_104c022d = 0;
-                            DAT_10db6ee8[0].m_006c = 0;
-                            DAT_104c0228 = 0;
-                        }
-                        else if (DAT_10db6ee8[0].matrix._43 < TrailBack(DAT_104c022c, 2).z - TRAIL_DROP_FALL)
-                        {
-                            TrailBack(DAT_104c022c, 1).Copy(DAT_10db6ee8[0].matrix.GetTranslation());
-                            DAT_104c0228 = TRAIL_REPLAY_BASE;
-                            FUN_100114a0();
-                            DAT_104c022d = 0;
-                            if (DAT_104bfdc8 != 0)
-                            {
-                                DAT_10db6ee8[DAT_104bfdd8].m_0075 = 0;
-                                DAT_10db6ee8[0].m_0075 = 0;
-                                DAT_104bfdc8 = 0;
-                                DAT_104bfdcc = 0;
-                                DAT_104c0090 = 1;
                             }
                         }
                     }
@@ -6154,7 +6160,12 @@ trailDone:
                                 liftOffset.Set(0.0f, 0.0f, CARRY_LIFT, 0.0f);
                                 mover = pushOrder[i];
                                 Vec4 moverAt = DAT_10db6ee8[mover].matrix.GetTranslation();
-                                if (mover == 0)
+                                if (mover != 0)
+                                {
+                                    DAT_10db6ee8[mover].matrix.SetTranslation(moverAt + pushStep);
+                                    DAT_10db6ee8[mover].SnapPosition(CARRY_GRID, 0.0f);
+                                }
+                                else
                                 {
                                     if (DAT_104bfdd4 == 0)
                                         DAT_10db6ee8[mover].matrix.SetTranslation(
@@ -6162,11 +6173,6 @@ trailDone:
                                     else
                                         DAT_10db6ee8[mover].matrix.SetTranslation(
                                             moverAt + (pushStep * CARRY_GRID).Divided(CARRY_GRID));
-                                }
-                                else
-                                {
-                                    DAT_10db6ee8[mover].matrix.SetTranslation(moverAt + pushStep);
-                                    DAT_10db6ee8[mover].SnapPosition(CARRY_GRID, 0.0f);
                                 }
                                 if ((i == 1 || DAT_10db6ee8[mover].IsClearAny(&noOffset) != 0 ||
                                      DAT_10db6ee8[mover].IsClearAny(&liftOffset) != 0) &&
@@ -6200,7 +6206,22 @@ trailDone:
                         DAT_104bfdcc = DAT_104bfdcc - 1;
                         if (DAT_104bfdcc == CARRY_RESET_FRAME)
                             goto carryFinish;
-                        if (DAT_104bfdcc < CARRY_DRAG_FRAME + 1)
+                        if (DAT_104bfdcc > CARRY_DRAG_FRAME)
+                        {
+                            if (DAT_104bfdcc < CARRY_SNAP_FRAME + 1)
+                            {
+                                // Frames 14..11: the object settles onto its grid cell.
+                                Vec4 before = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
+                                DAT_10db6ee8[DAT_104bfdd8].SnapPosition(CARRY_GRID, 0.0f);
+                                Vec4 after = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
+                                DAT_10db6ee8[DAT_104bfdd8].SetMoveStep((after.x - before.x) * CARRY_SNAP_SCALE,
+                                                                       (after.y - before.y) * CARRY_SNAP_SCALE, 0.0f);
+                                DAT_10db6ee8[DAT_104bfdd8].matrix.SetTranslation(before);
+                            }
+                            else if (DAT_104bfdcc < CARRY_SETTLE_FRAME)
+                                goto carryFinish;
+                        }
+                        else
                         {
                             if (DAT_104bfdcc < CARRY_SETTLE_FRAME)
                                 goto carryFinish;
@@ -6212,16 +6233,6 @@ trailDone:
                                                 DAT_10db9210.GetTranslation());
                             DAT_10db6ee8[DAT_104bf8b4].SetMoveStep(playerToObject.x * CARRY_DRAG_SCALE,
                                                                    playerToObject.y * CARRY_DRAG_SCALE, 0.0f);
-                        }
-                        else if (DAT_104bfdcc < CARRY_SNAP_FRAME + 1)
-                        {
-                            // Frames 14..11: the object settles onto its grid cell.
-                            Vec4 before = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
-                            DAT_10db6ee8[DAT_104bfdd8].SnapPosition(CARRY_GRID, 0.0f);
-                            Vec4 after = DAT_10db6ee8[DAT_104bfdd8].matrix.GetTranslation();
-                            DAT_10db6ee8[DAT_104bfdd8].SetMoveStep((after.x - before.x) * CARRY_SNAP_SCALE,
-                                                                   (after.y - before.y) * CARRY_SNAP_SCALE, 0.0f);
-                            DAT_10db6ee8[DAT_104bfdd8].matrix.SetTranslation(before);
                         }
                         goto carryEasing;
                     carryFinish:
@@ -6312,10 +6323,10 @@ trailDone:
                 DAT_104bfe34 = 0;
                 if (DAT_104bfe40 < LEAP_STAGE_LOOK)
                 {
-                    Vec4 toObstacle;
-                    Vec4 obstacleAt;
                     DAT_10db6ee8[0].PlayMotion(0x14, 0, 3, 1.0f);
                     DAT_104bfe40 = DAT_104bfe40 + 1;
+                    Vec4 toObstacle;
+                    Vec4 obstacleAt;
                     toObstacle.Copy(DAT_10db9210.GetTranslation());
                     obstacleAt.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
                     toObstacle.Copy(obstacleAt - toObstacle);
@@ -6323,7 +6334,31 @@ trailDone:
                     leapAngle = (float)atan2(toObstacle.x, toObstacle.y);
                     goto leapFace;
                 }
-                if (DAT_104bfe40 != LEAP_STAGE_LOOK)
+                if (DAT_104bfe40 == LEAP_STAGE_LOOK)
+                {
+                    // Stage 5: the look ends; take the vault or wait.
+                    DAT_10db6ee8[0].SnapHeight(LEAP_SNAP_STEP, LEAP_SNAP_OFFSET);
+                    if (DAT_10db6ee8[0].m_238c == 0)
+                        DAT_104bfe40 = LEAP_STAGE_DONE;
+                    else
+                    {
+                        Vec4 groundAt = DAT_10db9210.GetTranslation();
+                        DAT_10db6ee8[0].SetPosition(groundAt.x, groundAt.y, groundAt.z);
+                        DAT_104bfe48 = DAT_104bfe48 + 1;
+                        DAT_10db6ee8[0].m_0d48 = 0;
+                        if ((DAT_104bfe48 & 1) == 0)
+                        {
+                            DAT_10db6ee8[DAT_104bf8b4].PlayMotion(0x16, 2, 5, 1.0f);
+                            DAT_104bfe40 = 0x3c;
+                        }
+                        else
+                        {
+                            DAT_10db6ee8[DAT_104bf8b4].PlayMotion(0x17, 2, 5, 1.0f);
+                            DAT_104bfe40 = 0x3c;
+                        }
+                    }
+                }
+                else
                 {
                     if (DAT_104bfe40 < LEAP_STAGE_CLIMB_END)
                     {
@@ -6349,31 +6384,23 @@ trailDone:
                         }
                         if (DAT_104bfe40 == 0x2d)
                             DAT_10836c84.Copy((obstacleAt - climbAt).Divided(5.0f));
-                        if (DAT_104bfe40 < 0x2d)
-                        {
-                            climbAt.Copy(obstacleAt - climbAt);
-                            leapAngle = (float)atan2(climbAt.x, climbAt.y);
-                        }
-                        else
+                        if (DAT_104bfe40 >= 0x2d)
                         {
                             climbAt.Copy(climbAt + DAT_10836c84);
                             DAT_10db6ee8[0].SetPosition(climbAt.x, climbAt.y, climbAt.z);
                             leapAngle = (float)atan2(DAT_10836c84.x, DAT_10836c84.y);
                         }
+                        else
+                        {
+                            climbAt.Copy(obstacleAt - climbAt);
+                            leapAngle = (float)atan2(climbAt.x, climbAt.y);
+                        }
                         goto leapFace;
                     }
                     if (DAT_104bfe40 == LEAP_STAGE_CLIMB_END)
-                    {
-                    leapEnd:
-                        DAT_104bfe30 = 0;
-                        DAT_10db6ee8[DAT_104bf8b4].mode = 1;
-                        DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
-                        goto leapEasing;
-                    }
+                        goto leapEnd;
                     if (DAT_104bfe40 < LEAP_STAGE_RISE_END)
                     {
-                        Vec4 playerAt;
-                        Vec4 obstacleAt;
                         float rise;
                         DAT_104bfe40 = DAT_104bfe40 + 1;
                         DAT_10db6ee8[0].m_238c = 1;
@@ -6383,6 +6410,8 @@ trailDone:
                             rise = leapCurve[DAT_104bfe40 * 2 - 129] + leapCurve[DAT_104bfe40 * 2 - 130];
                         DAT_10db6ee8[0].Push(0.0f, 0.0f, rise * LEAP_HEIGHT_SCALE);
                         DAT_10db6ee8[0].m_238c = 0;
+                        Vec4 playerAt;
+                        Vec4 obstacleAt;
                         playerAt.Copy(DAT_10db9210.GetTranslation());
                         obstacleAt.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
                         playerAt.Copy(obstacleAt - playerAt);
@@ -6393,11 +6422,15 @@ trailDone:
                         goto leapLand;
                     if (DAT_104bfe40 < LEAP_STAGE_FALL_END)
                     {
-                        Vec4 playerAt;
-                        Vec4 obstacleAt;
                         float fall;
                         if (DAT_10db6ee8[0].m_0d48 != 0)
-                            goto leapEnd;
+                        {
+                        leapEnd:
+                        DAT_104bfe30 = 0;
+                        DAT_10db6ee8[DAT_104bf8b4].mode = 1;
+                        DAT_10db6ee8[0].PlayMotion(2, 1, 5, 1.0f);
+                        goto leapEasing;
+                        }
                         DAT_104bfe40 = DAT_104bfe40 + 1;
                         DAT_10db6ee8[0].m_238c = 1;
                         if (DAT_102027f4 == 1.0f)
@@ -6408,6 +6441,8 @@ trailDone:
                         DAT_10db6ee8[0].Push(0.0f, 0.0f, fall);
                         DAT_10db6ee8[0].m_0d48 = 0;
                         DAT_10db6ee8[0].m_238c = 0;
+                        Vec4 playerAt;
+                        Vec4 obstacleAt;
                         playerAt.Copy(DAT_10db9210.GetTranslation());
                         obstacleAt.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
                         playerAt.Copy(obstacleAt - playerAt);
@@ -6477,19 +6512,6 @@ trailDone:
                     DAT_10db6ee8[0].targetHeading = leapAngle + LEAP_FACE_TURN;
                     DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
                     goto leapEasing;
-                }
-                // Stage 5: the look ends; take the vault or wait.
-                DAT_10db6ee8[0].SnapHeight(LEAP_SNAP_STEP, LEAP_SNAP_OFFSET);
-                if (DAT_10db6ee8[0].m_238c == 0)
-                    DAT_104bfe40 = LEAP_STAGE_DONE;
-                else
-                {
-                    Vec4 groundAt = DAT_10db9210.GetTranslation();
-                    DAT_10db6ee8[0].SetPosition(groundAt.x, groundAt.y, groundAt.z);
-                    DAT_104bfe48 = DAT_104bfe48 + 1;
-                    DAT_10db6ee8[0].m_0d48 = 0;
-                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion((DAT_104bfe48 & 1) == 0 ? 0x16 : 0x17, 2, 5, 1.0f);
-                    DAT_104bfe40 = 0x3c;
                 }
             leapEasing:
                 RunSpeedFalloff();
@@ -7556,7 +7578,48 @@ else if (slotKind == 'M')
     if (DAT_1020b430[modelIdx].heldDown == 0)
         DAT_10db6ee8[modelIdx].swayFrames = DAT_1020b430[modelIdx].behaviour;
 }
-else if (slotKind != '\\')
+else if (slotKind == '\\')
+{
+    // a marker: while no other marker of the slots 0x5c..0x7b is within 45 units, the gimmick record of its
+    // switch is closed (frame 0x1e) when the way is clear
+    int savedTarget = DAT_104bf888;
+    bool crowded = false;
+    Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
+    if (DAT_104bfdcc == 0)
+    {
+        for (int other = MARKER_FIRST_SLOT; other <= MARKER_LAST_SLOT; other++)
+        {
+            if (other != modelIdx)
+            {
+                float distanceSquared = DAT_10db6ee8[other].matrix.GetTranslation().DistanceSquared(here);
+                if (distanceSquared < MARKER_CLEAR_DISTANCE_SQUARED)
+                {
+                    DAT_104bf888 = DAT_10db6ee8[modelIdx].switchNode + 1;
+                    if (DAT_10860cec[DAT_104bf888].frame == 0)
+                        FUN_1005ecb0(0);
+                    DAT_104bf888 = 0;
+                    crowded = true;
+                }
+            }
+        }
+    }
+    if (DAT_104bfdcc != 0 || !crowded)
+    {
+        DAT_104bf888 = DAT_10db6ee8[modelIdx].switchNode + 1;
+        if (DAT_10860cec[DAT_104bf888].frame == MARKER_CLOSED_FRAME)
+        {
+            Vec4 probe = here;
+            probe.Set(0, 0, 1.0f, 0);
+            if (DAT_10db6ee8[modelIdx].IsClearAny(&probe))
+            {
+                DAT_10860cec[DAT_104bf888].frame = MARKER_CLOSED_FRAME;
+                FUN_1005ecb0(0);
+            }
+        }
+    }
+    DAT_104bf888 = savedTarget;
+}
+else
 {
     if (slotKind == 6)
     {
@@ -7573,7 +7636,7 @@ else if (slotKind != '\\')
         DAT_10db6ee8[modelIdx].velocity.Fill(zero);
         DAT_10db6ee8[modelIdx].m_02a0 = 1;
         if (DAT_104bfe4c == 0 && DAT_10db6ee8[0].m_238c != 0)
-            OfferPickup(modelIdx);
+            OfferPickup(modelIdx, false);
         DAT_10db6ee8[modelIdx].m_0012 = 2;
         if (DAT_104bf890 % PROP_SHADOW_PERIOD == modelIdx % PROP_SHADOW_STAGGER && DAT_102022b8 != 0)
             PlaceShadowOnGroundV2(modelIdx);
@@ -7597,7 +7660,7 @@ else if (slotKind != '\\')
             SwayProp(sway, DAT_10db6ee8[modelIdx].m_0288, DAT_10db6ee8[modelIdx].m_0284, SWAY_DIVISOR_SIGN, SWAY_FRAME_ANGLE);
         DAT_10db6ee8[modelIdx].root->children[0]->matrix = sway;
         if (DAT_104bfe4c == 0 && DAT_10db6ee8[0].m_238c != 0)
-            OfferPickup(modelIdx);
+            OfferPickup(modelIdx, true);
         DAT_10db6ee8[modelIdx].m_0012 = 2;
         if (DAT_104bf890 % PROP_SHADOW_PERIOD == modelIdx % PROP_SHADOW_STAGGER && DAT_102022b8 != 0)
             PlaceShadowOnGroundV2(modelIdx);
@@ -7645,47 +7708,6 @@ else if (slotKind != '\\')
             goto dispatchByKind;
         }
     }
-}
-else
-{
-    // a marker: while no other marker of the slots 0x5c..0x7b is within 45 units, the gimmick record of its
-    // switch is closed (frame 0x1e) when the way is clear
-    int savedTarget = DAT_104bf888;
-    bool crowded = false;
-    Vec4 here = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
-    if (DAT_104bfdcc == 0)
-    {
-        for (int other = MARKER_FIRST_SLOT; other <= MARKER_LAST_SLOT; other++)
-        {
-            if (other != modelIdx)
-            {
-                float distanceSquared = DAT_10db6ee8[other].matrix.GetTranslation().DistanceSquared(here);
-                if (distanceSquared < MARKER_CLEAR_DISTANCE_SQUARED)
-                {
-                    DAT_104bf888 = DAT_10db6ee8[modelIdx].switchNode + 1;
-                    if (DAT_10860cec[DAT_104bf888].frame == 0)
-                        FUN_1005ecb0(0);
-                    DAT_104bf888 = 0;
-                    crowded = true;
-                }
-            }
-        }
-    }
-    if (DAT_104bfdcc != 0 || !crowded)
-    {
-        DAT_104bf888 = DAT_10db6ee8[modelIdx].switchNode + 1;
-        if (DAT_10860cec[DAT_104bf888].frame == MARKER_CLOSED_FRAME)
-        {
-            Vec4 probe = here;
-            probe.Set(0, 0, 1.0f, 0);
-            if (DAT_10db6ee8[modelIdx].IsClearAny(&probe))
-            {
-                DAT_10860cec[DAT_104bf888].frame = MARKER_CLOSED_FRAME;
-                FUN_1005ecb0(0);
-            }
-        }
-    }
-    DAT_104bf888 = savedTarget;
 }
                             // dispatchBaseKind = LAB_10135df2; the code ends with `goto modelTail`)
                             goto modelTail;

@@ -72,7 +72,9 @@ extern "C" int FUN_1013f880(void);                // the game's random number
 // Texture_CreateFromPixels and Texture_CreateCopy (texture_create.cpp).
 int TextureObject::Create(int width, int height, const void *pixels, int alpha, int flags)
 {
-    if (width > TEXTURE_MAX_SIDE || height > TEXTURE_MAX_SIDE)
+    if (width > TEXTURE_MAX_SIDE)
+        return 0;
+    if (height > TEXTURE_MAX_SIDE)
         return 0;
     if (alpha == ALPHA_GENERATED_1 || alpha == ALPHA_GENERATED_2)
         generatedAlpha = 1;
@@ -119,8 +121,7 @@ int TextureObject::Create(int width, int height, const void *pixels, int alpha, 
         }
         else
         {
-            int size = width * height * 3;
-            for (int i = 0; i < size; i += 3)
+            for (int i = 0; i < width * height * 3; i += 3)
             {
                 if ((FUN_1013f880() & 7) >= 2)
                     ((unsigned char *)alpha)[i] = 0;

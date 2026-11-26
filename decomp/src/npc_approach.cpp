@@ -26,8 +26,7 @@ extern "C" void FUN_10043cc0(int slot);         // Char_ResetState
 // when releasable, the code's release flag is set. Returns 0.
 extern "C" int FUN_10045ed0(int slot)
 {
-    Vec4 offset;
-    offset = DAT_10db6ee8[0].matrix.GetTranslation() - DAT_10db6ee8[slot].matrix.GetTranslation();
+    Vec4 offset = Vec4(DAT_10db6ee8[0].matrix.GetTranslation() - DAT_10db6ee8[slot].matrix.GetTranslation());
     offset.z *= 2.0f;
     float distance = offset.Length();
     if (DAT_1020b430[slot].approachStarted == 0)

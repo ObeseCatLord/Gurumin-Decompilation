@@ -144,29 +144,21 @@ Vec4 Vec4::operator/(const int &divisor) const
     return result;
 }
 
-// Squared distance between the points (ax, ay) and (bx, by).
-inline float DistanceSquared2D(float ax, float ay, float bx, float by)
-{
-    float dy = ay - by;
-    float dx = ax - bx;
-    return dx * dx + dy * dy;
-}
-
-// Squared distance on the x/y plane from this point to the segment (x1, y1)-(x2, y2): the point is projected onto
-// the line and the projection is clamped to the ends. A segment of zero length counts as its first point.
-// Not byte-identical yet: the shared "first point" exit is placed in the middle in the original (see open.tsv).
+// 0x101acc60. Squared distance on the x/y plane from this point to the segment (x1, y1)-(x2, y2): the point is
+// projected onto the line and the projection is clamped to the ends. A segment of zero length counts as its first
+// point. The three exits spell the squared distance out (the original is not a call to a shared helper).
 float Vec4::DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2)
 {
     if (x1 == x2 && y1 == y2)
-        return DistanceSquared2D(x, y, x1, y1);
+        return (x - x1) * (x - x1) + (y - y1) * (y - y1);
     float dx = x2 - x1;
     float dy = y2 - y1;
     float t = (dx * x + (dy * y - (dy * y1 + dx * x1))) / (dx * dx + dy * dy);
     if (t < 0.0f)
-        return DistanceSquared2D(x, y, x1, y1);
+        return (x - x1) * (x - x1) + (y - y1) * (y - y1);
     if (t > 1.0f)
-        return DistanceSquared2D(x, y, x2, y2);
-    return DistanceSquared2D(x, y, t * dx + x1, t * dy + y1);
+        return (x - x2) * (x - x2) + (y - y2) * (y - y2);
+    return (x - (t * dx + x1)) * (x - (t * dx + x1)) + (y - (t * dy + y1)) * (y - (t * dy + y1));
 }
 
 // Squared distance from this point to the segment a-b (x/y/z): the point is projected onto the line and the
@@ -229,17 +221,15 @@ int Vec4::InTriangle(const Vec4 &a, const Vec4 &b, const Vec4 &c)
     Vec4 ac = c - a;
     Vec4 ap = *this - a;
     float u = Vec3_Dot(&ac, &ac) * Vec3_Dot(&ap, &ab) - Vec3_Dot(&ac, &ab) * Vec3_Dot(&ap, &ac);
-    if (u > 0.0f)
-    {
-        float v = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ap, &ac) - Vec3_Dot(&ab, &ac) * Vec3_Dot(&ap, &ab);
-        if (v > 0.0f)
-        {
-            float denominator = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ac, &ac) - Vec3_Dot(&ab, &ac) * Vec3_Dot(&ab, &ac);
-            if (u + v - denominator < 0.0f)
-                return 1;
-        }
-    }
-    return 0;
+    if (!(u > 0.0f))
+        return 0;
+    float v = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ap, &ac) - Vec3_Dot(&ab, &ac) * Vec3_Dot(&ap, &ab);
+    if (!(v > 0.0f))
+        return 0;
+    float denominator = Vec3_Dot(&ab, &ab) * Vec3_Dot(&ac, &ac) - Vec3_Dot(&ab, &ac) * Vec3_Dot(&ab, &ac);
+    if (!(u + v - denominator < 0.0f))
+        return 0;
+    return 1;
 }
 
 #include "matrix4.h"
@@ -462,15 +452,8 @@ int KeyBank::Set(int frame, float x, float y, float z, float w)
     return i;
 }
 
-// Length of all four components; an inline helper whose float arguments are spilled to the stack (as in
-// vec_math.cpp).
-inline float Length4(float x, float y, float z, float w)
-{
-    return (float)sqrt(x * x + y * y + z * z + w * w);
-}
-
 // 0x101ae950. Rotation quaternion for `angle` radians about `axis` (x, y, z = vector part, w = scalar part),
-// normalised. Note that `axis` itself is scaled by sin(angle / 2) on the way.
+// normalised (the sum of squares starts with z). Note that `axis` itself is scaled by sin(angle / 2) on the way.
 Vec4 QuatFromAxisAngle(Vec4 &axis, float angle)
 {
     Vec4 result;
@@ -479,9 +462,9 @@ Vec4 QuatFromAxisAngle(Vec4 &axis, float angle)
     axis.x = s * axis.x;
     axis.y = s * axis.y;
     axis.z = s * axis.z;
-    float c = (float)cos(half);
-    float length = Length4(axis.z, axis.y, axis.x, c);  // the original sums z*z first
-    result.w = c / length;
+    angle = (float)cos(half);                           // cos(half) is kept in the parameter's slot
+    float length = (float)sqrt(axis.z * axis.z + axis.y * axis.y + axis.x * axis.x + angle * angle);
+    result.w = angle / length;
     result.x = axis.x / length;
     result.y = axis.y / length;
     result.z = axis.z / length;
@@ -510,12 +493,6 @@ float AngleDifference(float a, float b)
     return difference;
 }
 
-// x*x + y*y with the arguments spilled like the other inline length helpers.
-inline float LengthSquared2(float x, float y)
-{
-    return x * x + y * y;
-}
-
 // Mirrors this vector at the plane through the origin with normal `normal`: the vector is turned so that the normal
 // lies along an axis, that component is negated, and the vector is turned back.
 void Vec4::Mirror(const Vec4 &normal)
@@ -523,7 +500,7 @@ void Vec4::Mirror(const Vec4 &normal)
     if (normal.x != 0.0f)
     {
         float yaw = -(float)atan(normal.y / normal.x);
-        float pitch = -(float)atan(normal.z / sqrt(LengthSquared2(normal.y, normal.x)));
+        float pitch = -(float)atan(normal.z / sqrt(normal.y * normal.y + normal.x * normal.x));
         RotateZ(yaw);
         RotateY(-pitch);
         x = -x;
@@ -532,7 +509,7 @@ void Vec4::Mirror(const Vec4 &normal)
         return;
     }
     float roll = -(float)atan(normal.y / normal.z);
-    float pitch = -(float)atan(normal.x / sqrt(LengthSquared2(normal.z, normal.y)));
+    float pitch = -(float)atan(normal.x / sqrt(normal.z * normal.z + normal.y * normal.y));
     RotateX(-roll);
     RotateY(-pitch);
     z = -z;

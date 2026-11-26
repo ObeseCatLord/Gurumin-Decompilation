@@ -75,9 +75,9 @@ void Playback::Init()
     layer = -1;
 }
 
-// Starts animation layer `layer` (0..0x8f) playing from frame `first` to `last` (backwards when last < first) with
+// 0x1016a100 (Playback::SetLayer). Sets up animation layer `layer` (0..0x8f) to play from frame `first` to `last` (backwards when last < first) with
 // the values a, b, c, and resets its per-layer tables. Returns 1, or 0 for a layer number out of range.
-// Not byte-identical yet: the original writes the two 16-entry fills as unrolled stores (see open.tsv).
+// The 16 slot offsets and the 8 used layer parameters are cleared with one store each, as the original does.
 int Playback::SetLayer(int layer, int a, int first, int last, int b, int c)
 {
     if (layer > 0x8f)
@@ -85,14 +85,34 @@ int Playback::SetLayer(int layer, int a, int first, int last, int b, int c)
     m_0e30[layer] = b;
     m_076c[layer] = a;
     m_09ac[layer] = c;
-    m_052c[layer] = last;
     m_02ec[layer] = first;
+    m_052c[layer] = last;
     m_00ac[layer] = 1;
     m_0bf0[layer] = first <= last ? 1 : -1;
-    for (int i = 0; i < 16; i++)
-        slotOffsetX[layer][i] = 0;
-    for (int i = 0; i < 16; i++)
-        layerParams[layer][i] = -2;
+    slotOffsetX[layer][0] = 0;
+    slotOffsetX[layer][1] = 0;
+    slotOffsetX[layer][2] = 0;
+    slotOffsetX[layer][3] = 0;
+    slotOffsetX[layer][4] = 0;
+    slotOffsetX[layer][5] = 0;
+    slotOffsetX[layer][6] = 0;
+    slotOffsetX[layer][7] = 0;
+    slotOffsetX[layer][8] = 0;
+    slotOffsetX[layer][9] = 0;
+    slotOffsetX[layer][10] = 0;
+    slotOffsetX[layer][11] = 0;
+    slotOffsetX[layer][12] = 0;
+    slotOffsetX[layer][13] = 0;
+    slotOffsetX[layer][14] = 0;
+    slotOffsetX[layer][15] = 0;
+    layerParams[layer][0] = -2;
+    layerParams[layer][1] = -2;
+    layerParams[layer][2] = -2;
+    layerParams[layer][3] = -2;
+    layerParams[layer][4] = -2;
+    layerParams[layer][5] = -2;
+    layerParams[layer][6] = -2;
+    layerParams[layer][7] = -2;
     return 1;
 }
 
@@ -152,51 +172,49 @@ int Playback::BindModel(AnimModel *owner)
 // one the current layer chains to (m_076c); a layer listed in the current layer's follow-up table (m_5870) is
 // left to come up by itself (returns 1). Without `blendFrames` the layer starts at once from its first frame;
 // otherwise the playback blends into it over `blendFrames` + 1 frames (at most 15). Returns 1.
-int Playback::Play(int layer, int restart, int blendFrames, float speed)
+int Playback::Play(int newLayer, int restart, int blendFrames, float speed)
 {
-    if (layer < 0 || layer > 0x8f || m_00ac[layer] == 0)
+    if (newLayer < 0 || newLayer > 0x8f || m_00ac[newLayer] == 0
+        || (layer == newLayer && restart == 0 && m_076c[newLayer] != -1)
+        || (m_0bec == 2 && m_7c78 == newLayer))
         return 0;
-    if (layer == layer && restart == 0 && m_076c[layer] != -1)
+    if (layer != -1 && blending != 0 && nextLayer == newLayer && restart == 0)
         return 0;
-    if (m_0bec == 2 && m_7c78 == layer)
-        return 0;
-    if (layer != -1 && blending != 0 && nextLayer == layer && restart == 0)
-        return 0;
-    if (layer != -1 && restart == 0 && layer == m_076c[layer])
+    if (layer != -1 && restart == 0 && layer == m_076c[newLayer])
         return 0;
     if (layer != -1 && restart == 0)
     {
         for (int i = 0; i < 8; i++)
         {
             int from = layer;
-            if (from == 0x90)
+            if (layer == 0x90)
                 from = nextLayer;
-            if (layerParams[from][i] == layer)
+            if (layerParams[from][i] == newLayer)
                 return 1;
         }
     }
     m_7c78 = -1;
-    m_0bec = m_09ac[layer];
+    m_0bec = m_09ac[newLayer];
     m_0024 = 0;
     m_0008 = speed;
     if (blendFrames == 0)
     {
         nextLayer = 0;
         blending = 0;
-        layer = layer;
-        frame = m_02ec[layer];
-        m_0004 = (float)m_02ec[layer];
-        m_0bec = m_09ac[layer];
+        layer = newLayer;
+        frame = m_02ec[newLayer];
+        m_0004 = (float)m_02ec[newLayer];
+        m_0bec = m_09ac[newLayer];
         return 1;
     }
     blending = 1;
-    nextLayer = layer;
+    nextLayer = newLayer;
     if (m_7c80 != 0)
     {
-        if (blendFrames >= 14)
+        if (blendFrames > 13)
             blendFrames = 14;
         DAT_110175f8++;
-        m_7c80->BlendFrames(frame, m_02ec[layer], blendFrames + 1);
+        m_7c80->BlendFrames(frame, m_02ec[newLayer], blendFrames + 1);
         m_0014 = blendFrames;
     }
     layer = 0x90;

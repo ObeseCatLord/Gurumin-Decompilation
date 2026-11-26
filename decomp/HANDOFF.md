@@ -18,9 +18,9 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 20.28% of code, 874 of 1212 functions |
-| Matched under the rules | 20.24% of code, 873 of the 874 matched functions |
-| Fuzzy match | 50.49% |
+| Matched | 20.46% of code, 883 of 1212 functions |
+| Matched under the rules | 20.42% of code, 882 of the 883 matched functions |
+| Fuzzy match | 50.64% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
 `extern` global of its own (`tools/rule_check.py`; build_all prints a `RULES` line). Only npc_greet.cpp (1 matched
@@ -246,6 +246,11 @@ function) and node_world.cpp (0) still break rule 2.
   the original's asm order, identical copy-pasted branches/cases that cl cross-jumps, declaration order of locals,
   `x *= x` in place on a parameter. Prince_Update parked on its frame (open.tsv). Next: more wall-retry lanes from
   QUEUE section 1 (check that a function is not already drafted in another file before writing a new one).
+- Batch 380: wall lanes matched 9 (874 -> 883). New levers: write small float helpers (Length4, LengthSquared2,
+  DistanceSquared2D) out at the call site; `while` instead of `for` for loops inside a branch (TestScriptFlag
+  expansion); split `a || b` early returns into two ifs; explicit per-element stores where the original unrolls a
+  fill; loop bounds as expressions instead of locals. In-game frame: ladders highest state first (ratio 0.968).
+  build.bat drops `/DV=n` (use `-DV#n`). Playback::Play had a parameter shadowing the member `layer` (fixed).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

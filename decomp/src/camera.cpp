@@ -91,13 +91,22 @@ extern "C" int FUN_1016b230(const char *text)
     return 0;
 }
 
-// 1 while an event, effect or fade is running (the game should not accept normal input), else 0.
-// Not byte-identical yet (see open.tsv).
+// 0x1016c300. 1 while an event, effect or fade is running (the game should not accept normal input), else 0.
 extern "C" int FUN_1016c300(void)
 {
-    if (DAT_1101ddf4 != 0 || (DAT_1101de24 != 0 ? DAT_1101de24 != 5 : DAT_10ff1df0 != 0) || DAT_1101ddf0 != 1)
-        return 1;
-    return DAT_1101d890 != 0;
+    if (DAT_1101ddf4 == 0)
+    {
+        if (DAT_1101de24 == 0)
+        {
+            if (DAT_10ff1df0 != 0)
+                return 1;
+        }
+        else if (DAT_1101de24 != 5)
+            return 1;
+        if (DAT_1101ddf0 == 1)
+            return DAT_1101d890 != 0;
+    }
+    return 1;
 }
 
 // Releases every used node of the 0x47e-entry effect node pool.

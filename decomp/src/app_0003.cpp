@@ -1,5 +1,6 @@
 // Script flags, a rectangle test and the script tokenizers (Game::TestScriptFlag is inline in game.h).
 
+#include <stdlib.h>
 #include <string.h>
 #include "game.h"
 
@@ -164,8 +165,7 @@ int Game::ForEachActiveTrigger(int (*callback)(GameTrigger *trigger))
 }
 
 // Registers every map event named "GAMEOVER" whose map is the current one (or 9999 = any) and whose four script
-// flags pass, so the game-over scripts run. Returns 0. Not byte-identical yet: the original walks the list with a
-// pointer to flags[1], ours to flags[0] (see open.tsv).
+// flags pass, so the game-over scripts run. Returns 0.
 int Game::RaiseGameOverEvents()
 {
     for (int i = 0; i < mapEventCount; i++)
@@ -188,25 +188,27 @@ int Game::MarkKilled(int id)
 {
     killed[0] = 1;
     killed[id] = 1;
-    for (int i = 0; i < mapEventCount; i++)
+    GameTrigger *event = mapEvents;
+    for (int i = 0; i < mapEventCount; i++, event++)
     {
-        if (strcmp(mapEvents[i].name, "DEAD") == 0)
+        if (strcmp(event->name, "DEAD") == 0)
         {
-            GameTrigger *event = &mapEvents[i];
             if ((event->map == 9999 || event->map == currentMap) && TestScriptFlag(event->flags[0]) &&
                 TestScriptFlag(event->flags[1]) && TestScriptFlag(event->flags[2]) &&
                 TestScriptFlag(event->flags[3]))
             {
-                char count = killed[event->argument > 0x5e ? 0x5f : event->argument] != 0;
-                if (killed[event->ids[0] > 0x5e ? 0x5f : event->ids[0]] != 0)
+                int count = 0;
+                if (killed[__min(mapEvents[i].argument, 0x5f)] != 0)
                     count++;
-                if (killed[event->ids[1] > 0x5e ? 0x5f : event->ids[1]] != 0)
+                if (killed[__min(mapEvents[i].ids[0], 0x5f)] != 0)
                     count++;
-                if (killed[event->ids[2] > 0x5e ? 0x5f : event->ids[2]] != 0)
+                if (killed[__min(mapEvents[i].ids[1], 0x5f)] != 0)
                     count++;
-                if (killed[event->ids[3] > 0x5e ? 0x5f : event->ids[3]] != 0)
+                if (killed[__min(mapEvents[i].ids[2], 0x5f)] != 0)
                     count++;
-                if (killed[event->ids[4] > 0x5e ? 0x5f : event->ids[4]] != 0)
+                if (killed[__min(mapEvents[i].ids[3], 0x5f)] != 0)
+                    count++;
+                if (killed[__min(mapEvents[i].ids[4], 0x5f)] != 0)
                     count++;
                 if (count == 6)
                     RegisterEvent(event->value);
@@ -291,12 +293,14 @@ int Game::RaiseOpenEvents(int argument)
 }
 
 // 0x10054d50. Same for the "MFIREON" events of `argument` when `on` is 1, else for its "MFIREOFF" events (a fire
-// being lit or put out).
+// being lit or put out). The two walks are while loops: a for loop inside the branch keeps cl 13.00 from expanding
+// TestScriptFlag for the first flag, which the original does in each walk (also in the lever and door versions).
 int Game::RaiseFireEvents(int argument, int on)
 {
     if (on == 1)
     {
-        for (int i = 0; i < mapEventCount; i++)
+        int i = 0;
+        while (i < mapEventCount)
         {
             if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "MFIREON") == 0)
             {
@@ -306,11 +310,13 @@ int Game::RaiseFireEvents(int argument, int on)
                     TestScriptFlag(event->flags[3]))
                     RegisterEvent(event->value);
             }
+            i++;
         }
     }
     else
     {
-        for (int i = 0; i < mapEventCount; i++)
+        int i = 0;
+        while (i < mapEventCount)
         {
             if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "MFIREOFF") == 0)
             {
@@ -320,6 +326,7 @@ int Game::RaiseFireEvents(int argument, int on)
                     TestScriptFlag(event->flags[3]))
                     RegisterEvent(event->value);
             }
+            i++;
         }
     }
     return 0;
@@ -329,7 +336,8 @@ int Game::RaiseLeverEvents(int argument, int on)
 {
     if (on == 1)
     {
-        for (int i = 0; i < mapEventCount; i++)
+        int i = 0;
+        while (i < mapEventCount)
         {
             if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "LEVERON") == 0)
             {
@@ -339,11 +347,13 @@ int Game::RaiseLeverEvents(int argument, int on)
                     TestScriptFlag(event->flags[3]))
                     RegisterEvent(event->value);
             }
+            i++;
         }
     }
     else
     {
-        for (int i = 0; i < mapEventCount; i++)
+        int i = 0;
+        while (i < mapEventCount)
         {
             if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "LEVEROFF") == 0)
             {
@@ -353,6 +363,7 @@ int Game::RaiseLeverEvents(int argument, int on)
                     TestScriptFlag(event->flags[3]))
                     RegisterEvent(event->value);
             }
+            i++;
         }
     }
     return 0;
@@ -363,7 +374,8 @@ int Game::RaiseDoorEvents(int argument, int on)
 {
     if (on == 1)
     {
-        for (int i = 0; i < mapEventCount; i++)
+        int i = 0;
+        while (i < mapEventCount)
         {
             if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "DROPEN") == 0)
             {
@@ -373,11 +385,13 @@ int Game::RaiseDoorEvents(int argument, int on)
                     TestScriptFlag(event->flags[3]))
                     RegisterEvent(event->value);
             }
+            i++;
         }
     }
     else
     {
-        for (int i = 0; i < mapEventCount; i++)
+        int i = 0;
+        while (i < mapEventCount)
         {
             if (mapEvents[i].argument == argument && strcmp(mapEvents[i].name, "DRCLOSE") == 0)
             {
@@ -387,6 +401,7 @@ int Game::RaiseDoorEvents(int argument, int on)
                     TestScriptFlag(event->flags[3]))
                     RegisterEvent(event->value);
             }
+            i++;
         }
     }
     return 0;

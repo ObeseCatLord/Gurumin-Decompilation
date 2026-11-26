@@ -322,7 +322,13 @@ enum LauncherNetControlId {
 enum LauncherTitleControlId {
     IDC_TITLE_ONLINE_UPDATE = 0x3ff,    // "Online Update(&L)" push button
     IDC_TITLE_PROGRESS_A = 0x415,       // first update progress bar
-    IDC_TITLE_PROGRESS_B = 0x419        // second update progress bar
+    IDC_TITLE_VERSION_TEXT = 0x416,     // static text: "Version: yyyy/mm/dd Rev.n"
+    IDC_TITLE_UPDATE_STATUS_B = 0x417,  // static text of the update progress (hidden in this build)
+    IDC_TITLE_UPDATE_STATUS = 0x418,    // static text: update check status message
+    IDC_TITLE_PROGRESS_B = 0x419,       // second update progress bar
+    IDC_TITLE_UPDATE_SERVER = 0x41a,    // static text: "UpdateServer:" label
+    IDC_TITLE_COPYRIGHT = 0x41b,        // static text: copyright line
+    IDC_TITLE_HIDDEN_424 = 0x424        // control hidden at start-up (purpose unknown)
 };
 
 // Network page (dialog template IDD_NET_DIALOG): the lobby server address and the "no patch at start-up" switch.
@@ -348,6 +354,7 @@ class CTitDlg : public CDialog {
 public:
     CTitDlg(CWnd *pParent = NULL);   // EN 0x006f0470
     virtual ~CTitDlg();              // EN 0x006f0510, scalar deleting form 0x006f05c0
+    virtual BOOL OnInitDialog();     // EN 0x006ea250
 
     enum { IDD = IDD_TITLE_DIALOG };
 
@@ -360,6 +367,7 @@ protected:
     afx_msg HBRUSH OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor);   // EN 0x006e9320
     DECLARE_MESSAGE_MAP()
 };
+extern CTitDlg *g_titlePageThis;        // the title page object, set by CTitDlg::OnInitDialog (EN 0x0161274c)
 
 // ---- "Osero" (Othello) mini game page (RT_DIALOG 132): a hidden game on the 128x128 client area --------------------
 enum LauncherOseControlId {

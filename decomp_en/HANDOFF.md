@@ -28,14 +28,21 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   function (what it does, who calls it) and on every field; informative names (carry the JP names over; rename
   `FUN_`/`DAT_` when evidence allows). C-linkage functions get readable names plus an `obj_symbols.tsv` row
   (`_Name<TAB>address`), never `FUN_<JP address>`.
+- **Each batch start:** `gh pr list --repo Tenome/Gurumin-Decompilation --state open`. Draft PRs titled
+  "EN: <address> <name>" are claims (decomp_en/CONTRIBUTING.md): skip those addresses. Non-draft PRs: check out in a
+  worktree under build/wt/ (junction re/bin and re/export; rmdir the junctions before `git worktree remove`), merge
+  onto origin/master, build_all + check_matches (claimed matches confirmed, none lost), AGENTS.md hard rules, no
+  decomp/ or progress/jp/ changes unless intended; merge with `gh pr merge --merge` or leave one comment saying what
+  failed (the planner asked the user to confirm before the first merge/comment). Then regenerate the generated files.
+- **Each batch end:** gen_queue.py also rebuilds jp_en_map.tsv (~12 s); commit jp_en_map.tsv and jp_en_coverage.txt.
 - Near-misses go to `open.tsv` (`<EN address><TAB>open<TAB><reason>`) after about five honest spellings; move on.
 - Keep each file's own line endings (the `.bat` files are CRLF, the rest LF).
 
 ## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 1,004 of 2,006 game functions (202,051 of 2,078,797 bytes, 9.72 %) |
-| Matched under the rules | 1,004 |
+| Matched | 1,040 of 2,006 game functions (208,805 of 2,078,797 bytes, 10.04 %) |
+| Matched under the rules | 1,040 |
 | Queue | see QUEUE.md header (after batch 15); open.tsv ~160 (incl. library/blocked rows, which leave the queue) near-misses |
 
 ## State

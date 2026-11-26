@@ -2,10 +2,6 @@
 #include "joystick_device.h"
 #include "small_b11.h"
 
-// Value a DirectInput enumeration callback returns to go on / to stop.
-const int ENUM_CONTINUE = 1;
-const int ENUM_STOP = 0;
-
 // Stops at the pad that `context->remaining` counts down to: every XInput pad is skipped; for any other one the joystick
 // in use is released, its instance GUID is stored in `context->chosen` and the count is used up one. Passed to
 // EnumDevices by the controller polling.

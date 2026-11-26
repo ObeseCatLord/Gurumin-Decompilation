@@ -6,4 +6,8 @@
 // when the byte sum and xor of the plain data equal `sum` and `check`, else 0. EN 0x71c8d0 (JP 0x101615d0).
 extern "C" int Itm_Descramble(unsigned char *data, int size, char *name, int sum, unsigned int check);
 
+// Scrambles `size` bytes in place with the key made from `name` (upper-cased in place) and stores the byte sum and xor of
+// the plain data in *sum and *check. Returns 1. EN 0x72c190.
+extern "C" int Itm_Scramble(unsigned char *data, int size, char *name, int *sum, unsigned int *check);
+
 #endif

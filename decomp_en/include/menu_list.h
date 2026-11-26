@@ -36,7 +36,26 @@ extern "C" int ImeCandidates_WidestWidth(FontRenderer *renderer);
 // EN 0x7ad340.
 extern "C" int ImeCandidates_WidestWindowsWidth(FontRenderer *renderer);
 
+// Number of candidates of the current page that are visible: the rest of the list after the pages before it, at most
+// CANDIDATES_PER_PAGE. EN 0x7ad310 (ime_candidate_count.cpp). Called by the candidate list drawing and layout.
+extern "C" int ImeCandidates_VisibleCount(void);
+
 // Draws the visible candidates at (x, y), the selected one in `selectedColour`. EN 0x7ad1a0 (JP 0x1015fb20).
 extern "C" int ImeCandidates_Draw(FontRenderer *renderer, int x, int y, int colour, int selectedColour);
+
+// Bytes of one of the three text segments of the text being entered.
+const int INPUT_SEGMENT_SIZE = 0x100;
+// Texts of the second and third segment of the text being entered (the first is g_asciiInputInitial, EN 0x02226b50).
+extern "C" char g_inputSegmentSecond[INPUT_SEGMENT_SIZE];   // EN 0x02226c50: second segment
+extern "C" char g_inputSegmentThird[INPUT_SEGMENT_SIZE];    // EN 0x02226d50: third segment
+extern "C" int g_textInputConverting;   // EN 0x02228070: non-zero while the composition is being converted (draw selects the colours of the segments)
+extern "C" int g_textInputSelecting;    // EN 0x02226940: non-zero while a clause is picked (draw selects the colour of the third segment)
+
+// Draws the three segments of the text being entered one after the other from (x, y): the first in `firstColour`, the
+// second in `secondColour` while converting (else `thirdColour`) and the third in `secondColour` when a clause is
+// picked (else `thirdColour`; while converting the third segment is always `thirdColour`). Returns 0 while text input is
+// inactive, else 1. EN 0x7ace50 (EN-only, ime_text_draw.cpp).
+extern "C" int TextInput_DrawSegments(FontRenderer *renderer, int x, int y, int firstColour, int secondColour,
+                                      int thirdColour);
 
 #endif

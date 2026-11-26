@@ -27,6 +27,7 @@ struct Vec4
     float DistanceSquared(const Vec4 &other);        // EN 0x773440 (JP 0x101ac650)
     float Distance(const Vec4 &other);               // EN 0x773270 (JP 0x101ac590)
     float DistanceSquaredToSegment(const Vec4 &a, const Vec4 &b);  // EN 0x772cc0 (JP 0x101acd90): squared distance to the segment a-b
+    float DistanceToSegment(const Vec4 &a, const Vec4 &b);                // EN 0x772ad0 (not ported yet): distance to the segment a-b, without the closest point
     float DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest);  // EN 0x772ea0 (JP 0x101acdf0): distance to the segment a-b, closest point in `closest`
     float DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2);   // EN 0x7734d0 (JP 0x101acc60): squared x/y distance to the segment (x1, y1)-(x2, y2)
     float DistanceZWeighted(const Vec4 &other);      // EN 0x7736f0 (JP 0x101ac5f0)
@@ -172,6 +173,12 @@ Matrix4 EulerMatrix(const Vec4 *angles);
 // Stores in `result` the vector `source` turned `angle` radians about z (z and w copied) and returns `result`
 // (EN 0x778840, matrix_euler.cpp).
 Vec4 *Vec4_RotatedAboutZ(Vec4 *result, const Vec4 *source, float angle);
+
+// Interpolates between `*a` and `*b` by `t` in all four components and scales the result to length 1 (EN 0x777c10, vec4_nlerp.cpp, EN-only).
+Vec4 Vec4_NormalizedLerp(const Vec4 *a, const Vec4 *b, float t);
+
+// Unit quaternion of a turn of `angle` radians about `*axis`; scales the axis by sin(angle / 2) in place (EN 0x7788c0, vec4_axis_rotation.cpp, EN-only).
+Vec4 Vec4_AxisAngleQuaternion(Vec4 *axis, float angle);
 
 // The quaternion product a * b (EN 0x777880, vec4.cpp).
 Vec4 QuatMultiply(const Vec4 &a, const Vec4 &b);

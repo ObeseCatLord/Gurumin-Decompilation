@@ -46,6 +46,11 @@ extern "C" void Palette_LoadWithAlpha(const PaletteColour *palette);
 // the match distance. EN 0x7491e0 (palette_buckets.cpp).
 extern "C" void Palette_Accumulate(const PaletteColour *pixels, int count);
 
+// qsort comparators of the buckets: largest sumDistance first. EN 0x749270 and its identical twin EN 0x749290
+// (palette_compare.cpp, EN-only); each is passed to qsort by a different caller.
+extern "C" int PaletteBucket_CompareByDistanceDescending(const PaletteBucket *a, const PaletteBucket *b);
+extern "C" int PaletteBucket_CompareByDistanceDescendingTwin(const PaletteBucket *a, const PaletteBucket *b);
+
 // Zeroes the six counters of bucket `index` (everything but the colour channels). EN 0x748a60.
 extern "C" void Palette_ClearBucket(int index);
 // Identical twin of Palette_ClearBucket. EN 0x748ac0.

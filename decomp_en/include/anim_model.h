@@ -412,6 +412,7 @@ struct AnimModel
     int AddMotionSpeed(float speed);                                     // EN 0x73f8a0 (JP 0x101630b0)
     int Teleport(float x, float y, float z);                             // EN 0x745f30 (JP 0x10162420): puts the model at (x, y, z)
     int SetPosition(float x, float y, float z);                          // EN 0x745c60 (JP 0x10162610)
+    int SetPullTarget(Vec4 *target);                                     // EN 0x745b20 (anim_pull_target.cpp, EN-only): draws the model towards `target` for ANIM_PULL_FRAMES frames (0 stops the pull); returns 0
     void PlayMotion(int layer, int a, int b, float speed);               // EN 0x71af60 (JP 0x1017b0e0)
     int SetSlotSource(void *source, int slot, int layer);                // EN 0x7454a0 (JP Playback::SetSlotSource through the model): creates the playback on first use
     int GetPlaybackLayer();                                              // EN 0x72ce30 (JP 0x1017b1c0): the layer that plays now

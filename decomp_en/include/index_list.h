@@ -21,7 +21,8 @@ struct IndexList
     int ResizeSpans(int newCount);  // EN 0x7721f0: reallocates the sphere buffer (16 bytes per entry), contents not kept
     void Init();                    // EN 0x778820 (JP 0x101ad1b0): clears the buffer pointer of a list allocated raw
     int CopyFrom(const IndexList *source);  // EN 0x771fa0 (JP 0x101ad160): copies an index list; returns 0 for an empty source
-    int FreeIndices();  // EN 0x7784d0 (JP 0x101ad0e0): frees the index buffer and sets count and buffer to 0; returns 1
+    void FreeEntries();  // EN 0x76f120 (index_list_free.cpp, EN-only): frees the buffer and sets count and buffer to 0 (a void twin of FreeIndices)
+    int FreeIndices();// EN 0x7784d0 (JP 0x101ad0e0): frees the index buffer and sets count and buffer to 0; returns 1
     int FreeSpheres();  // EN 0x778500: the same for a sphere list (identical code, separate function)
 };
 

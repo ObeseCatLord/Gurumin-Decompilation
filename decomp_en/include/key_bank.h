@@ -34,6 +34,10 @@ struct KeyBank
     int Insert(int frame, float x, float y, float z, float w);   // EN 0x76f900 (JP 0x101ad760): inserts a key, returns its index
     int RemoveFrame(int frame);                                  // EN 0x772920 (key_remove.cpp, EN-only): removes the key at `frame` and moves the later keys up; 1 when found, else 0
     int RemoveAt(int index);                                    // EN 0x772a40 (key_remove.cpp, EN-only): takes key `index` out and moves the later keys up; returns 0
+    int FindFrame(int frame);                                   // EN 0x773bd0 (key_find.cpp, EN-only): index of the key at `frame`, -1 when there is none
+    int MoveFrame(int frame, int newFrame, float x, float y, float z, float w);   // EN 0x776dd0 (key_move.cpp, EN-only): re-keys the key at `frame` to `newFrame` with new values (KEY_UNCHANGED keeps the key's own); 1 when found, else 0
+    int MoveKeyTo(int index, int frame, float x, float y, float z, float w);   // EN 0x777120 (key_move.cpp, EN-only): key `index` gets frame `frame` (kept between its neighbours) and the values; keeps its flags; returns 1
+    int ShiftKey(int index, int offset, float x, float y, float z, float w);   // EN 0x776f10 (key_move.cpp, EN-only): like MoveKeyTo with the frame `offset` after the key's own; returns 1
 };
 
 #endif

@@ -12,7 +12,9 @@ extern "C" char g_healthClampCountB;      // EN 0x00bc887e (JP DAT_104c0348): an
 extern "C" int g_loadDataPending;         // EN 0x00908444 (JP DAT_102026d0): non-zero = the map data still has to be loaded
 extern "C" char g_frameStepDataReady;     // EN 0x00b91c81 (JP DAT_104bfd71): set to 1 by every frame step
 extern "C" char g_pauseMessage;           // EN 0x0092f230 (JP DAT_104bfec0): first byte of the message shown while the game is paused (0 = none)
-extern "C" int g_pauseControls;           // EN 0x00924d54 (JP DAT_10210f30): controller state read while the pause message shows
+// Copies `text` into the pause message buffer (g_pauseMessage). Returns 0. EN 0x5e79f0 (pause_message.cpp, EN-only).
+extern "C" int Pause_SetMessage(const char *text);
+extern "C" int g_pauseControls;          // EN 0x00924d54 (JP DAT_10210f30): controller state read while the pause message shows
 // Per-frame statistics and counters the frame step clears before the game mode runs.
 extern "C" int g_frameCounterA;           // EN 0x0217faf8 (JP DAT_11b044d4)
 extern "C" int g_frameCounterB;           // EN 0x0217b8d8 (JP DAT_11b044d8)

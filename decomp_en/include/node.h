@@ -302,6 +302,10 @@ struct Node
     int TagRegion(const Box2 *boxes, const VisCell *cells, Matrix4 *matrix);  // EN 0x76a130 (JP 0x10199cd0): a region is in use when its cell has neighbours
     int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
                            Vec4 *closest);                         // EN 0x75a660 (JP 0x10191ec0)
+    // EN 0x75a560 (EN-only, node_near_segment.cpp): CollectNearSegment without the closest point.
+    int FindNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount);
+    // EN 0x76ec20 (EN-only, node_vertex_remap.cpp): remaps the first two not recovered values of every vertex of every pack that are not 0 through `codeMap`; returns 0.
+    int RemapVertexCodes(const int *codeMap);
 
     // Special passes (scene_node.cpp).
     int MarkSpecialPass();                 // EN 0x75a900 (JP 0x1019d600)
@@ -312,6 +316,7 @@ struct Node
     // Tree navigation.
     Node *Root();                          // EN 0x7541b0 (JP 0x101992f0)
     Node *GetLinkedRoot();                 // EN 0x754180 (JP 0x10199310)
+    Node *GetSkinChainTop();               // EN 0x753560 (node_skin_chain.cpp, EN-only): the topmost node of the chain of skinned parents above this node (this node when its parent is not skinned); 0 for an unskinned node or a skinned root
     int GetLastFrame();                    // EN 0x754120 (JP 0x10199340)
 
     // Loading and mesh data.

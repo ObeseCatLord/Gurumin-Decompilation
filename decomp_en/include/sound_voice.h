@@ -91,6 +91,10 @@ struct SoundSource
     int OpenSource(const char *path);
     // Opens a file in the compressed layout and measures its decoded size. EN 0x7c0550.
     int OpenCompressed(const char *path);
+    // Opens a wave file: finds its "data" chunk and keeps the format. EN 0x7c0660.
+    int OpenWave(const char *path);
+    // Opens a file stored as a scrambled block (key, sums, decoded size) and checks its key. EN 0x7c03a0.
+    int OpenKeyed(const char *path);
     // Copies the next `count` decoded bytes of the sound to `destination` (decoding as needed). EN 0x7c0850.
     int ReadData(void *destination, unsigned count);
     // Closes the source (decoder and file). EN 0x7be980.

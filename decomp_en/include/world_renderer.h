@@ -205,7 +205,10 @@ struct WorldRenderer
     int GetMessageId(int index);             // EN 0x7334a0: id of line `index` of the character's .itm file
     int SetMessageId(int index, int id);     // EN 0x746ba0: stores the id of line `index`
     int SetMessage(int index, int id, const char *text);   // EN 0x745510: stores the id and the text of line `index`
-    int FindMessageLine(int key);            // EN 0x72c8b0: line number for `key` (not recovered yet)
+    int FindMessageLine(int key);            // EN 0x72c8b0 (EN-only, world_message_lookup.cpp): the line at which key `key` starts: the `key`-th line (from 0) whose first field is "---", -1 when there are fewer keys
+    int GetKeyZimSp2Pair(int key, float *out);   // EN 0x735170 (EN-only, world_message_lookup.cpp): out[0], out[1] = the two numbers of the first "ZIM" (fields 3, 4) or "SP2" (fields 2, 3) line of key `key`; 1 when there is one, else 0
+    int GetKeyRefTriple(int key, float *out);   // EN 0x735280 (EN-only, world_message_lookup.cpp): out[0..2] = the numbers in fields 3 to 5 of the first line of key `key` that starts with "REF", "RE2", "SEF", "SP3" or "CS4"; 1 when there is one, else 0
+    int FindLineField(int line, const char *text, int *fieldOut);   // EN 0x72c7b0 (EN-only, world_message_lookup.cpp): 1 when one of fields 1 to 6 of line `line` equals `text` (its number goes to *fieldOut when given), else 0
     // Finders and writers of the message editor (EN-only; world_message_find.cpp, world_message_highest.cpp, world_message_store.cpp).
     int FindKeyLineOffset(int key, const char *first, const char *second, const char *third);   // EN 0x72c360: position within key `key` of the first line whose first three fields equal the strings (ignoring case; null = any), -1 when none
     int FindKeyLine(int key, const char *first, const char *second, const char *third);         // EN 0x72c450: the same, as a line number of the table
@@ -262,7 +265,10 @@ struct WorldRenderer
     int CountMessageKeys();                  // EN 0x731db0 (not ported yet): number of keys in the message lines, cached in the table (-9999 = not counted yet)
     int InsertMessageLine(int position);     // EN 0x73ef10 (not ported yet): inserts an empty line (id -1) before line `position` and counts it; returns 1
     int RemoveMessageLine(int line);         // EN 0x71c9e0 (world_message_lines.cpp, EN-only): takes line `line` out of the table, moves the later lines up and counts it; returns 0
-    int LowestMessageId(int key);            // EN 0x72e990 (world_message_lines.cpp): smallest id among the lines of key `key` (10000 when it has none), cached for keys below 1000
+    int RemoveKeyedMessage(int key, int offset);   // EN 0x71cbe0 (world_message_key_fields.cpp, EN-only): removes line `offset` of key `key`; returns 0
+    int GetKeyThirdField(int key, char *out);      // EN 0x72e8c0 (world_message_key_fields.cpp, EN-only): copies the third field of the first line of key `key` to `out`; returns 0
+    int SetKeyThirdField(int key, const char *text);   // EN 0x745af0 (world_message_key_fields.cpp, EN-only): replaces the third field of the first line of key `key` with `text`; returns 0
+    int LowestMessageId(int key);          // EN 0x72e990 (world_message_lines.cpp): smallest id among the lines of key `key` (10000 when it has none), cached for keys below 1000
     int DeleteMessageKey(int key);           // EN 0x71ca80 (not ported yet): removes the lines of key `key` and moves the later ones up
     int GetMessageNumber(int key);           // EN 0x72e830 (EN-only, world_message_edit.cpp): second field of the first line of key `key` as a number
     int AddMessageLine(int key);             // EN 0x73efb0 (EN-only, world_message_edit.cpp): adds an empty line at the end of key `key`'s lines; returns the number of lines the key had

@@ -67,4 +67,10 @@ extern "C" int Sound_PlayEffect(int sound, const Vec4 *position, float volume);
 extern "C" int Switch_TurnOn(int slot);
 extern "C" int Switch_TurnOff(int slot);
 
+// First character slot that can be a switch with a door id (the slots below it never are). Switch_FindByDoorId starts here.
+const int SWITCH_FIRST_DOOR_SLOT = 0x5c;
+// Finds the switch slot (SWITCH_FIRST_DOOR_SLOT up to the last character slot) whose door id is `doorId`; -1 when none has
+// it. EN 0x5cb860 (switch_door_lookup.cpp). Called by the script commands that act on a door (EN 0x5c8130, 0x5caa80, 0x5e87d0).
+extern "C" int Switch_FindByDoorId(int doorId);
+
 #endif

@@ -212,4 +212,34 @@ extern "C" int g_pathHasSecondTarget[];         // EN 0x01664930 (JP DAT_1101862
 extern "C" int g_pathHasSecondNode[];           // EN 0x016649b0 (JP DAT_10fdeb10): 1 = has a "...b" node
 extern "C" PathSettings g_pathSettings[];       // EN 0x01664730 (JP DAT_10ff17e0)
 
+// Quads the camera keeps (the tables hold CAMERA_QUAD_COUNT entries of CAMERA_QUAD_SIZE bytes; the entry count is
+// g_cameraState1664fe4, reset by Camera_Reset).
+const int CAMERA_QUAD_COUNT = 64;
+const int CAMERA_QUAD_SIZE = 0x200;
+// Factor that turns the span between two opposite corners into the half diagonal.
+const float CAMERA_QUAD_HALF = 0.5f;
+
+// A corner of a camera quad.
+struct CameraQuadPoint
+{
+    float x;    // 0x00: x
+    float y;    // 0x04: y
+};
+
+// One camera quad: four corners and the half diagonal from the first corner to the third (and its negation).
+struct CameraQuad
+{
+    CameraQuadPoint corner[4];      // 0x00: the four corners
+    float halfDiagonalX;            // 0x20: (corner 2 x - corner 0 x) / 2
+    float halfDiagonalY;            // 0x24: (corner 2 y - corner 0 y) / 2
+    float negHalfDiagonalX;         // 0x28: -halfDiagonalX
+    float negHalfDiagonalY;         // 0x2c: -halfDiagonalY
+    char m_0030[CAMERA_QUAD_SIZE - 0x30];   // 0x30: not recovered
+};
+extern "C" CameraQuad g_cameraQuads[CAMERA_QUAD_COUNT];   // EN 0x01664fe8: the camera quads (g_cameraState1664fe4 are in use)
+
+// Appends a camera quad from the corners (x0, y0), (x1, y1), (x2, y2), (x3, y3) and works out its half diagonal.
+// Returns 0. EN 0x70a700 (EN-only, camera_quads.cpp). No direct caller recovered.
+extern "C" int Camera_AddQuad(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3);
+
 #endif

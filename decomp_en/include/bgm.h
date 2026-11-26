@@ -57,6 +57,12 @@ extern "C" short g_bgmStartOffset;                 // EN 0x009e3390 (JP DAT_104c
 extern "C" int g_bgmPosition;                      // EN 0x009e1604 (JP DAT_10254088): playback position in 44.1 kHz samples
 extern "C" float g_bgmBars[2 * BGM_SPECTRUM_BANDS];   // EN 0x009e12a0 (JP DAT_104bff20): smoothed band levels, left channel then right
 extern "C" int (*g_soundArcGetPosition)(int stream);  // EN 0x009094dc (JP FUN_10001c80): playback position of a music stream
+// Sound engine start-up commands (function pointers into the sound engine; names provisional).
+extern "C" void (*g_soundArcSetWindow)(HWND window);   // EN 0x00909478: gives the sound engine the game window
+extern "C" void (*g_soundArcFinishStart)(void);        // EN 0x009094e0: finishes the sound engine start-up after the window is set
+// Hands the game window to the sound engine and finishes its start-up; `unused` is not read. Returns 1. Called by the
+// game start-up at EN 0x5f2cd0. EN 0x7aa970 (sound_arc_start.cpp, EN-only).
+extern "C" int SoundArc_Start(HWND window, const char *unused);
 // Updates the music: starts the requested track, computes g_bgmPosition and eases the bars. EN 0x5a8d70 (JP 0x1005c680).
 extern "C" int Bgm_Update(void);
 

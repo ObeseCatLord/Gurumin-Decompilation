@@ -256,6 +256,10 @@ function) and node_world.cpp (0) still break rule 2.
   (scratchpad w381d/strict.py keeps offsets). VisNode::UpdateVisibleCells renamed to Node:: in obj_symbols.tsv.
   Recurring residue worth a focused lane: `cmp reg,ebx` (zero register) in the original vs our `test reg,reg`.
   ParamVector duplicates Vec4 (merge before Save_ReadSlotInfo can use CharSlot record).
+- Batch 382: no new matches. Zero-register rule found (NOTES.md "Zero register"). ParamVector -> Vec4 merge loses
+  CharSlot::operator= and FUN_1003e710: 0x101acc20 is really `Vec4 &Vec4::operator=(const Vec4 &)` (we call it
+  Copy, ~2975 call sites). A repo-wide Copy -> operator= rename is its own task (then ParamVector can go and
+  Save_ReadSlotInfo can use `CharSlot record;`). DrawQuad 1 byte, CompileStatement 6 bytes, three 2-line walls.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

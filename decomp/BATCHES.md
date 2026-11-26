@@ -443,3 +443,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 379 | 38 | match | wall retries (16 matched); Prince_Update leap/effect poses, frame parked; 874 matched |
 | 380 | 38 | match | wall retries (9 matched); in-game frame ladder order; 883 matched |
 | 381 | 38 | match | wall retries 700-1600 bytes (4 matched); 887 matched |
+| 382 | 38 | notes | zero-register rule, Vec4 operator= finding; no new matches; 887 matched |

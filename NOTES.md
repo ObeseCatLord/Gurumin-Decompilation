@@ -591,3 +591,12 @@ An `extern "C"` function built here under /GX got no EH frame (no `push -1 / han
 `mov [esp+N], state` writes around temporaries with destructors). When the original has that prologue, give the
 function C++ linkage and map its mangled name in obj_symbols.tsv (in-game frame: `?FUN_1011d810@@YAHXZ`). Check the
 other huge drafts (Bs00x_Update, DrawLit, RunScriptFrames) for the same gap.
+
+## Zero register (cl 13.00, batch 382 experiments)
+- cl 13.00 keeps 0 in a callee-saved register (ebx/edi/esi) only when zero is used on both sides of a call, about
+  6-7 counted uses: stores of 0, `push 0`, and compares of a memory operand with 0. Ten zero stores in one call-free
+  block stay immediates; compares of a value already in a register (`f(x) == 0`) do not count.
+- With the register present, `x == 0` becomes `cmp reg,zreg` only when the compared value is live afterwards (a
+  named local read later, a parameter, a value used in the else arm or returned); a dead temporary stays `test`.
+- So an original `cmp eax,ebx` on a dead value points to a second use we have not reconstructed; ours hoisting a
+  zero the original lacks means too many zero uses across a call. Tests: scratchpad w382z (z1..z8.cpp).

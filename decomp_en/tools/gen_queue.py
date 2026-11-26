@@ -6,13 +6,18 @@ Order (HANDOFF "Standing instructions"):
   3. EN functions mapped to an unmatched JP function, smallest first
   4. EN-only functions (launcher, Steam, unknown), smallest first
 Matched state comes from progress/en/report.json, so run build_all.py --report first. Finished items drop out.
+It first rebuilds jp_en_map.tsv (map_jp_to_en.py, about 12 s) so new JP matches and classify.tsv changes show up;
+--no-map keeps the current map.
 """
-import csv, json, os, re
+import csv, json, os, re, sys
 
 from enimg import EN, REPORT
 
 
 def main():
+    if "--no-map" not in sys.argv:
+        import map_jp_to_en
+        map_jp_to_en.main()
     rows = list(csv.DictReader(open(os.path.join(EN, "jp_en_map.tsv"), encoding="utf-8"), delimiter="\t"))
     percent = {}
     if os.path.exists(REPORT):

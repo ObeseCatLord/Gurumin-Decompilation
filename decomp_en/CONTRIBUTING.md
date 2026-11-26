@@ -7,13 +7,24 @@ the usual job is **porting matched JP source to EN** and fixing what the newer c
 Read [`../AGENTS.md`](../AGENTS.md) first for the rules every change follows. Then read [`NOTES.md`](NOTES.md) for
 the EN compiler habits.
 
+## Where to start
+
+New here? Take your first functions from section 2 of [`QUEUE.md`](QUEUE.md), **"JP twin matched"**.
+- Each of these already has byte-matching JP source. `tools/port_jp.py` hands it to you with the EN disassembly next
+  to it, so the work is mostly adjusting it for the newer compiler.
+- Start with the smallest ones, at the top of the section. They teach the EN compiler's habits quickly.
+- Move on to section 3 (JP twin not matched yet) or section 4 (EN-only) once a few have matched. Those start from
+  Ghidra's output instead of finished source.
+
+Pull requests written with an AI agent are welcome; see [With an AI agent](#with-an-ai-agent).
+
 ## How it works
 
 | File | What it is |
 |---|---|
 | `jp_en_map.tsv` | One row per EN function: its JP twin (module, address, name), the twin's status, and a confidence (`high`/`medium`/`low`/`none`). Made by `tools/map_jp_to_en.py` from shared strings, constants, call sequences and call-graph neighbours. `none` means EN-only (launcher, Steam, unidentified). |
 | `classify.tsv` | Game code vs library code (MFC, ATL, CRT). Only game code is counted and queued. |
-| `QUEUE.md` | The work list, made by `tools/gen_queue.py`: walls worth a retry, then functions whose JP twin is matched, then mapped-but-unmatched twins, then EN-only functions, smallest first. |
+| `QUEUE.md` | The work list, made by `tools/gen_queue.py`: walls worth a retry, then functions whose JP twin is matched, then mapped-but-unmatched twins, then EN-only functions, smallest first. `gen_queue.py` rebuilds `jp_en_map.tsv` first (about 12 s), so JP functions matched since the last run move into section 2. |
 | `open.tsv` | Near-misses: what was tried and what still differs. Read a function's row before starting on it. |
 | `obj_symbols.tsv` | Mangled C++ name → EN address, so the build knows which original function each compiled symbol is. |
 | `../progress/en/report.json` | The progress report (ByteMatch reads it from CI). |
@@ -81,6 +92,10 @@ handles that for you.
 8. **Pull request.** Include the source, header, `obj_symbols.tsv`, `open.tsv`, `progress/en/report.json` and
    `progress/en/progress.svg`. Paste the `PROGRESS` and `check_matches` lines into the description. Keep each
    file's own line endings (see `AGENTS.md`).
+   - Generated files (`jp_en_map.tsv`, `QUEUE.md`, the report) may conflict with other work. That's fine: the
+     maintainer rebuilds them when merging.
+   - Each pull request is checked before it is merged: the build is rerun on top of the latest `master`, every
+     claimed match is confirmed, no existing match may be lost, and the rules below must hold.
 
 ## With an AI agent
 

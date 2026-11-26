@@ -18,6 +18,7 @@ struct VertexPack;
 struct Material;
 struct TextureRef;
 struct VisData;
+struct VisCell;
 struct DrawList;
 struct AnimModel;
 struct GameFile;
@@ -144,6 +145,12 @@ const unsigned char NODE_KIND_REGION_LIMIT = 0x40;
 const int NODE_REGION_COUNT = 0x40;
 // Bounds radius factor of the collision test against a segment (CollectNearSegment).
 const float NODE_SEGMENT_RADIUS_FACTOR = 0.578f;
+
+// Bytes of the buffer a word of a node command text is read into (the longest word is one less than the buffer minus one).
+const int COMMAND_WORD_SIZE = 0x80;
+// Copies the next word of the command text `text` (from index *position on) into `word` and advances *position past it;
+// 1 when a word was read, 0 at the end of the text or when the word is too long. EN 0x7541d0 (node_command_text.cpp).
+extern "C" int __stdcall CommandText_ReadWord(char *word, const char *text, int *position);
 
 // Poses a node keeps: the current one and the stored ones.
 const int NODE_POSE_COUNT = 16;
@@ -284,7 +291,7 @@ struct Node
     int Rename(const char *newName, const char *oldName);          // EN 0x769fa0 (JP 0x1019ed40)
     int SetUniqueName(const char *name);                           // EN 0x76b570 (JP 0x101a52d0)
     void MakeNameUnique();                                         // EN 0x76d540 (JP 0x101a2290)
-    int TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matrix4 *matrix);  // EN 0x76a130 (JP 0x10199cd0)
+    int TagRegion(const Box2 *boxes, const VisCell *cells, Matrix4 *matrix);  // EN 0x76a130 (JP 0x10199cd0): a region is in use when its cell has neighbours
     int CollectNearSegment(int unused, const Vec4 *from, const Vec4 *to, float range, Node **found, int *foundCount,
                            Vec4 *closest);                         // EN 0x75a660 (JP 0x10191ec0)
 
@@ -373,6 +380,11 @@ struct Node
     int ShadeWaveCopy(int phase);          // EN 0x74d5b0 (JP 0x10193d10): wave-shaped normals and lighting of a copy
     int Clone(Node *source, int a, int b); // EN 0x74e640 (JP 0x101a53b0): copies a loaded node tree into this node
     int CopyPlugData();                    // EN 0x749900 (JP 0x1019bd10)
+    int RestorePlugData();                 // EN 0x76a8b0 (node_tree_passes.cpp, EN-only): rebuilds every plug's channel from its private copy; returns 0
+    int StoreLinkedBoneInverses();         // EN 0x76de30 (node_tree_passes.cpp, EN-only): asks the bone of each skinned node's first/second link to store its inverse bone matrix
+    // EN 0x76dec0 (not ported yet): on a bone node: stores its inverse bone matrix as entry *boneIndex of `skinned`'s inverse bones.
+    int StoreInverseBone(Node *skinned, int *boneIndex);
+    int TagRegionsInTree(const Box2 *boxes, const VisCell *cells);   // EN 0x76a200 (node_tree_passes.cpp, EN-only): TagRegion on every command-target node of the subtree (0, 0 = the visibility data of this map root)
     int CopyAnimation(Node *source, int slot);  // EN 0x74e180 (JP 0x1019b890): gives this node the animation (plugs, tracks, matrices) of `source`
     int ComputeBounds();                   // EN 0x75bb30 (JP 0x1019d8e0): recomputes the node's bounding sphere and box
     int SetMaterialValue(const char *material, int value);  // EN 0x74a400 (JP 0x1019e8c0)

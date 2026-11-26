@@ -15,6 +15,13 @@ extern "C" void *(*g_engineCopy)(void *destination, const void *source, int size
 // Blocks the engine allocator hands out and has not got back yet (0 = free slot); its free function finds a block here.
 const int ENGINE_BLOCK_SLOTS = 0x1000;
 extern "C" void *g_engineBlocks[ENGINE_BLOCK_SLOTS];   // EN 0x0219f498
+// Bytes of the caller tag kept for each block slot, and the tags (the `tag` of g_engineAlloc, cut to this size).
+const int ENGINE_BLOCK_TAG_SIZE = 16;
+extern "C" char g_engineBlockTags[ENGINE_BLOCK_SLOTS][ENGINE_BLOCK_TAG_SIZE];   // EN 0x0218f498
+
+// Writes one line "<slot> <tag> <address>" to the text file `path` for every block still in use; nothing is written
+// (no file made) when there are none. EN 0x77bb00 (engine_memory_report.cpp).
+extern "C" void Engine_WriteBlockReport(const char *path);
 
 // The engine's free function (the value start-up stores in g_engineFree): forgets `block` in g_engineBlocks when it is
 // there and frees it. EN 0x77bc20 (engine_memory.cpp).

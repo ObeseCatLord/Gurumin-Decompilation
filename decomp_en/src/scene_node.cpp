@@ -1,6 +1,7 @@
 // Scene node methods (EN build). Ported from the matched JP source decomp/src/scene_node.cpp.
 #include "node.h"
 #include "node_data.h"
+#include "visibility.h"
 #include "index_list.h"
 #include "slot_table.h"
 #include "motion_list.h"
@@ -748,10 +749,10 @@ int Node::Rename(const char *newName, const char *oldName)
     return 1;
 }
 
-// Node::TagRegion: finds the first of the 64 regions (`boxes`, with names in `names`; an empty name = unused) that
+// Node::TagRegion: finds the first of the 64 regions (`boxes`, with their cells in `cells`; a cell without neighbours = unused) that
 // contains the position of `matrix`, or of this node when `matrix` is 0, and prefixes this node's name with
 // "CDL<region>-". Returns 1 when a region was found, else 0. Called while loading a map.
-int Node::TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matrix4 *matrix)
+int Node::TagRegion(const Box2 *boxes, const VisCell *cells, Matrix4 *matrix)
 {
     char tagged[NODE_NAME_SCRATCH_SIZE];
     int i;
@@ -759,7 +760,7 @@ int Node::TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matr
     {
         for (i = 0; i < NODE_REGION_COUNT; i++)
         {
-            if (names[i][0] != 0 && matrix->GetTranslation().InBox(&boxes[i]) != 0)
+            if (cells[i].count != 0 && matrix->GetTranslation().InBox(&boxes[i]) != 0)
             {
                 sprintf(tagged, "CDL%02d-%s", i, name);
                 sprintf(name, tagged);
@@ -771,7 +772,7 @@ int Node::TagRegion(const Box2 *boxes, const char (*names)[NODE_NAME_SIZE], Matr
     {
         for (i = 0; i < NODE_REGION_COUNT; i++)
         {
-            if (names[i][0] != 0 && worldMatrix.GetTranslation().InBox(&boxes[i]) != 0)
+            if (cells[i].count != 0 && worldMatrix.GetTranslation().InBox(&boxes[i]) != 0)
             {
                 sprintf(tagged, "CDL%02d-%s", i, name);
                 sprintf(name, tagged);

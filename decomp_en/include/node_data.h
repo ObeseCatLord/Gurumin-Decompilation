@@ -46,6 +46,9 @@ enum NodeSavedState
     SAVED_RETURNING = 2   // lets the tracked rotation return to rest, then ends
 };
 
+// Nodes a chasing node's saved-state block can link to.
+const int SAVED_CHASE_LINK_MAX = 8;
+
 // A node's saved-state block (`Node::saved`): a saved matrix and the rotation limits used when the node tracks a target.
 struct NodeSaved
 {
@@ -56,8 +59,9 @@ struct NodeSaved
     float limitMin[3];             // 0x78: lowest rotation per axis (radians)
     char m_0084[0x88 - 0x84];      // 0x84: not used by EN code yet
     float limitMax[3];             // 0x88: highest rotation per axis
-    char m_0094[0xb8 - 0x94];      // 0x94: not used by EN code yet
-    int m_00b8;                    // 0xb8: not recovered (cleared by Reset)
+    char m_0094[0x98 - 0x94];      // 0x94: not used by EN code yet
+    struct Node *chaseLinks[SAVED_CHASE_LINK_MAX];   // 0x98: the nodes a chasing node follows (set by LinkToChasing)
+    int chaseLinkCount;            // 0xb8: entries of chaseLinks used (cleared by Reset)
     char m_00bc[NODE_SAVED_SIZE - 0xbc];  // 0xbc: not used by EN code yet
 
     void Reset();                  // EN 0x741950 (JP 0x10166870 ViewLimits::Reset): rotation limits back to +-45 degrees

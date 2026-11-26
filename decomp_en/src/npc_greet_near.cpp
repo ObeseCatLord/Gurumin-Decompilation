@@ -66,8 +66,8 @@ extern "C" int Npc_GreetWhenNear(int index)
                                    (NEAR_RADIUS_UNIT * NEAR_RADIUS_UNIT))))
     {
         Enemies_WakeNearby(index, NEAR_WAKE_RADIUS, 0);
-        g_charToldToReact[index] = 0;
         g_charState[index].state = NEAR_STATE_REACT;
+        g_charToldToReact[index] = 0;
         g_charState[index].values[NEAR_VALUE_WAIT] = 0;
         float cameraSquared = (g_characterModels[index].matrix.GetTranslation() - g_cameraTargetNow).LengthSquared3();
         if (cameraSquared < NEAR_SOUND_RANGE_SQUARED || index < NEAR_ALWAYS_SOUND_SLOT)

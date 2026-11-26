@@ -16,6 +16,8 @@ const unsigned char EFFECT_OPTION_FOLLOWS_OWNER = 2;    // follows its owner
 
 // Index of the setting that is 1 by default.
 const int EFFECT_SETTING_DEFAULT_ON = 2;
+// Index of the setting a running record uses as its "drawn this frame" mark (list 1 effects: 1 once drawn).
+const int EFFECT_SETTING_DRAWN = 6;
 // Number of byte-sized settings (an array, so locals of this type get a /GS cookie in JP code).
 const int EFFECT_SETTING_COUNT = 8;
 

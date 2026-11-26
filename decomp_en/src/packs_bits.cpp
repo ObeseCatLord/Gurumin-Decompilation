@@ -95,3 +95,19 @@ extern "C" int Packs_ReadStreamBits(int count)
     }
     return value;
 }
+
+// Writes the lowest `count` bits of `value` as compressor flags, highest of those bits first (bits at or above `count`
+// are skipped, a set bit becomes a one flag and a clear bit a zero flag). Called by the compressor at EN 0x7bd240.
+extern "C" void Packs_LzWriteLowBits(unsigned char value, int count)
+{
+    unsigned char mask = PACKS_LAST_BIT;
+    for (int bitIndex = 7; bitIndex >= 0; bitIndex--, mask >>= 1)
+    {
+        if (bitIndex >= count)
+            continue;
+        if (value & mask)
+            Packs_LzWriteOneFlag();
+        else
+            Packs_LzWriteZeroFlag();
+    }
+}

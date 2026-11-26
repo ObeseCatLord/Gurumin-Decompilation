@@ -144,7 +144,11 @@ struct EffectRecord
     int next;                                        // 0x04: next record of its list, -1 = last
     int id;                                          // 0x08: effect definition, EFFECT_NONE = free
     int parent;                                      // 0x0c: record this effect is attached to, -1 = none
-    char m_0010[0x192 - 0x10];                       // 0x10: not yet named (timing, positions, matrices)
+    char m_0010[0x2c - 0x10];                        // 0x10: not yet named (timing)
+    Vec4 partPositions[2];                           // 0x2c: positions of its two parts, indexed by `part`
+    char m_004c[0x18e - 0x4c];                       // 0x4c: not yet named (directions, matrices)
+    char part;                                       // 0x18e: 0 or 1, the part whose position decides visibility
+    char m_018f[0x192 - 0x18f];                      // 0x18f: not yet named
     short light;                                     // 0x192: entry of g_effectLights it uses, 0 = none
     EffectOptions options;                           // 0x194: the start options (options.owner = starting character)
     int *pause;                                      // 0x1d8: paused while it points to a non-zero value
@@ -199,7 +203,11 @@ struct EffectManager
     // matrix it is placed with, `options` the start options (0 = defaults) and `pause` a flag that pauses it while
     // non-zero. Returns the effect handle. EN 0x70a7f0 (JP 0x10172350).
     // Draws the running effects with `view` and the camera matrix `camera`. EN 0x725f40 (JP 0x10190e30).
-    void Draw(const Matrix4 &view, Matrix4 *camera, int flag);
+    int Draw(const Matrix4 &view, const Matrix4 *camera, unsigned char pass);
+    // Draws record `index` of the pass's list (every effect kind that is not a sprite or a light). EN 0x71e010 (JP 0x10189530).
+    int DrawRecord(int index, const Matrix4 &view, const Matrix4 *camera, int pass);
+    // Draws the ribbon of effect light `index`. EN 0x728860 (JP 0x101713f0).
+    int DrawLight(int index, const Matrix4 &view, const Matrix4 *camera);
     // Queues sprite `index` of table A (world position, projected with `view`) / table B (screen position) into the
     // effect batch. EN 0x725990 (JP 0x101890f0) / EN 0x725440 (JP 0x10189340).
     int DrawSpriteA(int index, const Matrix4 &view, const Matrix4 *camera);

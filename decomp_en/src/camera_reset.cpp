@@ -53,10 +53,10 @@ extern "C" int Camera_Reset(void)
     g_cameraState1664208 = 0;
     g_cameraScale9089e4 = 1.0f;
     g_cameraState1664a30 = 0;
-    g_worldFrameA = 0;
-    g_worldFrameB = 0;
-    g_worldFrameC = 0;
-    g_worldFrameD = 0;
+    g_worldFrame[0] = 0;
+    g_worldFrame[1] = 0;
+    g_worldFrame[2] = 0;
+    g_worldFrame[3] = 0;
     g_cameraEyePitch = 0;
     g_cameraPathFrame = 0;
     g_cameraState1664214 = 0;

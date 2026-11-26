@@ -56,4 +56,63 @@ extern "C" int __stdcall Joystick_EnumObjectCallback(const void *object, void *c
 // EN 0x7adf20 (joystick_setup.cpp). Called by the controller polling at EN 0x7ae5c0.
 extern "C" void Joystick_Configure(JoystickDevice *device, JoystickAxes *axes, void *window);
 
+// A GUID (16 bytes) as DirectInput names devices and products.
+struct DeviceGuid
+{
+    unsigned long data1;        // 0x00
+    unsigned short data2;       // 0x04
+    unsigned short data3;       // 0x06
+    unsigned char data4[8];     // 0x08
+};
+
+// DIDEVICEINSTANCE: what DirectInput reports for each device it enumerates (only the fields used are named).
+struct DeviceInstance
+{
+    unsigned long size;         // 0x00: size of this record
+    DeviceGuid instanceGuid;    // 0x04: identifies this device, used to create it
+    DeviceGuid productGuid;     // 0x14: identifies the product (tells XInput pads apart)
+};
+
+// IDirectInput8; only the slots used so far are named.
+struct DirectInputHost
+{
+    virtual long __stdcall QueryInterface() = 0;
+    virtual unsigned long __stdcall AddRef() = 0;
+    virtual unsigned long __stdcall Release() = 0;
+    // Slot 3: creates the device with the instance GUID `guid` and stores it in `*device`.
+    virtual long __stdcall CreateDevice(const DeviceGuid *guid, JoystickDevice **device, void *outer) = 0;
+};
+
+// Argument of Joystick_PickInstanceCallback.
+struct JoystickPickContext
+{
+    int *remaining;             // 0x00: pads still to skip before the wanted one (counts down)
+    DeviceGuid *chosen;         // 0x04: receives the instance GUID of the pad the enumeration stopped at
+};
+
+// The joystick device currently in use (0 = none). EN 0x022280e8.
+extern "C" JoystickDevice *g_activeJoystick;
+
+// Tells whether the product `productGuid` is an XInput pad (asked through WMI, EN 0x7aeb00; not recovered).
+extern "C" bool Joystick_IsXInputDevice(const DeviceGuid *productGuid);
+
+// Device enumeration callback that stops at the pad whose number is in `context->remaining`: XInput pads are skipped; for
+// every other pad the active joystick is released and its instance GUID stored in `context->chosen`, then the count is
+// used up. Returns 1 to go on and 0 to stop. EN 0x7ae040 (joystick_enum.cpp).
+extern "C" int __stdcall Joystick_PickInstanceCallback(const DeviceInstance *instance, JoystickPickContext *context);
+
+// Device enumeration callback that creates a device for every pad that is not an XInput one and stores it in the next free
+// slot of g_inputPad->devices; `index` counts the slots used. Returns 1 to go on and 0 when the slots are full.
+// EN 0x7adf90 (joystick_enum.cpp).
+extern "C" int __stdcall Joystick_CreateDeviceCallback(const DeviceInstance *instance, int *index);
+
+// Number of buttons of the game pad the key state is kept for.
+const int PAD_BUTTON_COUNT = 12;
+// Non-zero when game pad input is on (the config entry USEJP). EN 0x021f37c8.
+extern "C" int g_padEnabled;
+// Whether each pad button is held, polled every frame (1 = held). EN 0x02200fd8.
+extern "C" unsigned char g_padButtons[PAD_BUTTON_COUNT];
+// The held buttons as a bit mask, bit n for button n (0 when game pad input is off). EN 0x79fd90 (joystick_buttons.cpp).
+extern "C" unsigned int Pad_GetButtonMask(void);
+
 #endif

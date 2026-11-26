@@ -23,10 +23,10 @@ int WorldRenderer::AdvanceFrame()
         if (frame != lastFrame)
             RunScriptFrames(0);
         lastFrame = frame;
-        g_worldFrameA = frame;
-        g_worldFrameB = frame;
-        g_worldFrameC = frame;
-        g_worldFrameD = frame;
+        g_worldFrame[0] = frame;
+        g_worldFrame[1] = frame;
+        g_worldFrame[2] = frame;
+        g_worldFrame[3] = frame;
         frame++;
     }
     return 0;

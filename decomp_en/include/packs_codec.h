@@ -206,6 +206,7 @@ struct PacksBandHeader
     unsigned char scale;     // 0x00: 0 = the band is empty, else its starting activity is scale to the fourth power
     unsigned char gain;      // 0x01: how much a decoded coefficient raises the activity (out of 256)
     unsigned char keep;      // 0x02: how much of the previous activity is kept (out of 256)
+    unsigned char bias;      // 0x03: rescale bias of the band (the fourth byte of a PacksBandEntry), not touched by the band coder
 };
 
 // Decodes one band of width x height coefficients from `data` into `output` (rows `stride` apart). An empty band is
@@ -247,6 +248,17 @@ extern "C" void Packs_EncodeFlush(int bit, unsigned char *output);
 // plane encoders at EN 0x7bb280 and 0x7bb8d0.
 extern "C" int Packs_EncodeBand(const unsigned short *data, unsigned char *output, int count, int reserved,
                                 PacksBandHeader *band);
+
+// The three planes whose bands one block row holds.
+const int PACKS_PLANE_COUNT = 3;
+// Packed cells the plane encoder has used so far in each plane's cell buffer. EN 0x0222b1ac (plane 0), 0x0222b1b0, 0x0222b1b4.
+extern "C" int g_packsEncodedCells[PACKS_PLANE_COUNT];
+// Encodes the band of each of the three planes (`first`, `second`, `third`, each read from the plane's current cell count
+// on) with Packs_EncodeBand, into `output`, with the band headers `bands[0..2]`, and advances the three cell counts.
+// Returns 0. EN 0x7bb8d0 (packs_encode_planes.cpp).
+extern "C" int Packs_EncodePlaneBands(const unsigned short *first, const unsigned short *second,
+                                      const unsigned short *third, unsigned char *output, int count, int reserved,
+                                      PacksBandHeader *bands);
 
 // ---- Image container loader (src/packs_bmp.cpp) ----
 
@@ -349,6 +361,8 @@ extern "C" int Packs_ReadStreamBit(void);
 // Starts the next flag bit of the compressor's flag word like Packs_LzWriteZeroFlag, but sets it. EN 0x7bd0c0. Called by the
 // compressor at EN 0x7bd240 and EN 0x7bcff0.
 extern "C" void Packs_LzWriteOneFlag(void);
+// Writes the lowest `count` bits of `value` as one/zero flags, highest of them first. EN 0x7bcff0 (packs_bits.cpp).
+extern "C" void Packs_LzWriteLowBits(unsigned char value, int count);
 // Reads `count` bits of the packed stream with Packs_ReadStreamBit, first bit highest, and returns them as a number. EN
 // 0x7bd120. Called by Packs_DecodeBlock.
 extern "C" int Packs_ReadStreamBits(int count);

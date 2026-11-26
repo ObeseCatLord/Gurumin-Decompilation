@@ -32,6 +32,7 @@ struct KeyBank
     int Set(int frame, float x, float y, float z, float w);      // EN 0x779690 (JP 0x101ad820): returns the key's index
     int Sample(int frame, float *x, float *y, float *z, float *w, int flags);   // EN 0x7703f0 (JP 0x101af4c0): the value at `frame`
     int Insert(int frame, float x, float y, float z, float w);   // EN 0x76f900 (JP 0x101ad760): inserts a key, returns its index
+    int RemoveAt(int index);                                     // EN 0x772a40 (key_remove.cpp, EN-only): takes key `index` out and moves the later keys up; returns 0
 };
 
 #endif

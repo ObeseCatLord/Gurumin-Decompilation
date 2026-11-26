@@ -20,6 +20,9 @@ typedef int (*WorldCallback)(int code, int value);
 // Number of picture slots (WorldRenderer::picture*).
 #define PICTURE_COUNT 0x20
 
+// Keys below this number have their lowest line id cached (WorldRenderer::lowestIdCache).
+const int MESSAGE_ID_CACHE_SIZE = 1000;
+
 // What a picture shows (WorldRenderer::pictureKind).
 enum PictureKind
 {
@@ -57,7 +60,7 @@ struct WorldRenderer
     char pad_00977[0x1];
     int fadeOnTop;                                   // 0x978: 1 = the fade is drawn below the cinema bars
     int effectLevel;                                 // 0x97c: 0..3, selected by GGQ (which level key bank applies)
-    int m_00980[1000];
+    int lowestIdCache[MESSAGE_ID_CACHE_SIZE];       // 0x980: LowestMessageId of each key below the table size (-9999 = not worked out yet)
     int m_01920[1000];
     int m_028c0[1000];
     int m_03860;
@@ -238,7 +241,8 @@ struct WorldRenderer
     int SetKeyCommandAField(int key, int value);   // EN 0x71acd0 (EN-only, world_message_keys.cpp): the same for ScanLineCommandA
     int CountMessageKeys();                  // EN 0x731db0 (not ported yet): number of keys in the message lines, cached in the table (-9999 = not counted yet)
     int InsertMessageLine(int position);     // EN 0x73ef10 (not ported yet): inserts an empty line (id -1) before line `position` and counts it; returns 1
-    int LowestMessageId(int key);            // EN 0x72e990 (not ported yet): smallest id among the lines of key `key` (10000 when it has none), cached for keys below 1000
+    int RemoveMessageLine(int line);         // EN 0x71c9e0 (world_message_lines.cpp, EN-only): takes line `line` out of the table, moves the later lines up and counts it; returns 0
+    int LowestMessageId(int key);            // EN 0x72e990 (world_message_lines.cpp): smallest id among the lines of key `key` (10000 when it has none), cached for keys below 1000
     int DeleteMessageKey(int key);           // EN 0x71ca80 (not ported yet): removes the lines of key `key` and moves the later ones up
     int GetMessageNumber(int key);           // EN 0x72e830 (EN-only, world_message_edit.cpp): second field of the first line of key `key` as a number
     int AddMessageLine(int key);             // EN 0x73efb0 (EN-only, world_message_edit.cpp): adds an empty line at the end of key `key`'s lines; returns the number of lines the key had
@@ -257,10 +261,15 @@ struct WorldRenderer
 };
 
 // Frame number of the world, published for the renderers (EN 0x01664430 .. 0x0166443c; JP DAT_1101de08..14).
-extern "C" int g_worldFrameA;   // EN 0x01664430 (JP DAT_1101de08)
-extern "C" int g_worldFrameB;   // EN 0x01664434 (JP DAT_1101de0c)
-extern "C" int g_worldFrameC;   // EN 0x01664438 (JP DAT_1101de10)
-extern "C" int g_worldFrameD;   // EN 0x0166443c (JP DAT_1101de14)
+// Number of world frame slots (the worlds the renderers can show at once).
+const int WORLD_FRAME_SLOTS = 4;
+extern "C" int g_worldFrame[WORLD_FRAME_SLOTS];   // EN 0x01664430..0x0166443c (JP DAT_1101de08..14)
+// Two key banks per world slot (positions over the frames of a scripted move); sampled at the world frame. EN 0x01ee4e60 and 0x01da54a0.
+extern "C" KeyBank g_frameKeysA[WORLD_FRAME_SLOTS];
+extern "C" KeyBank g_frameKeysB[WORLD_FRAME_SLOTS];
+// Stores in `*first` and `*second` the values of the two key banks of world slot `index` at that slot's world frame.
+// Returns 0. EN 0x731b80 (world_frame_keys.cpp).
+int World_SampleFrameKeys(int index, Vec4 *first, Vec4 *second);
 
 extern "C" int g_scriptedCameraSlot;   // EN 0x01664670 (JP DAT_1101de34): scripted camera slot in use, reset when a scene starts
 extern "C" float g_lightScale;         // EN 0x00908b00 (JP DAT_10203420): strength of the scene light, 1.0 when a scene starts

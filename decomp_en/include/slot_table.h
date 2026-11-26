@@ -49,6 +49,7 @@ struct SlotTable
     int SetRange(int newFirst, int newLast);          // EN 0x77bf40 (JP 0x10146d90)
     int SetMaterial(int index, int value);              // EN 0x77cfa0 (JP 0x101476e0)
     int ReplaceMaterial(int key, int value);            // EN 0x77cf50 (JP 0x10147690)
+    int CopyFrom(const SlotTable *source);              // EN 0x772020 (slot_table_copy.cpp, EN-only): shares the tables of `source`; 0 when `source` is null, else 1
     int Reset();                                        // EN 0x7a4010 (JP 0x10145a10): no texture slot, no entries, every pointer cleared
     void Release();                                     // EN 0x7a3c80 (JP 0x10150a90): frees the texture slot and every table
     // EN 0x7a45b0 (JP 0x10150bb0): builds the Direct3D buffers and the per-pack tables from the node's packs.

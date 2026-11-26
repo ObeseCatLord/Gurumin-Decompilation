@@ -53,9 +53,15 @@ const int SCRIPT_VALUE_WRAP = 10000;
 extern "C" int ScriptValue_ToSigned(int stored);
 
 // The controller the input system reads (a record of the DirectInput device); only the index is named.
+struct DirectInputHost;     // IDirectInput8 (joystick_device.h)
+struct JoystickDevice;      // IDirectInputDevice8 of a joystick (joystick_device.h)
 struct InputPad
 {
-    char m_0000[0x14];      // 0x00: not recovered
+    DirectInputHost *directInput;   // 0x00: the DirectInput object the devices are created from
+    JoystickDevice **devices;       // 0x04: one device slot per game controller found (0 = could not be created)
+    char m_0008[4];                 // 0x08: not recovered
+    int deviceCount;                // 0x0c: number of game controllers found by the enumeration (not XInput ones)
+    char m_0010[4];                 // 0x10: not recovered
     int deviceIndex;        // 0x14: index of the device
 };
 // The current controller (0 = none). EN 0x02228138.

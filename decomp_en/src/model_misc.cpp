@@ -57,7 +57,7 @@ void NodeExtra::Init()
 // allocated (Node::AllocSaved).
 void NodeSaved::Reset()
 {
-    m_00b8 = 0;
+    chaseLinkCount = 0;
     limitMin[0] = -ROTATION_LIMIT;
     limitMin[1] = -ROTATION_LIMIT;
     limitMin[2] = -ROTATION_LIMIT;

@@ -40,6 +40,7 @@ struct MotionList
     int Init();                                                        // EN 0x778530 (EN-only, containers.cpp): an empty list with the signature, the default flags and one entry "NoName"; returns 1
     int SetEntry(int index, int id, int value, const char *name, int extra);   // EN 0x77a0b0 (EN-only, containers.cpp): overwrites entry `index` (up to entryCount); 0 when the index is out of range
     int InsertByName(int position, const char *name, int tag);         // EN 0x76fad0 (JP MotionList::InsertByName)
+    int InsertItem(int position, int item, int startTime);             // EN 0x76fa60 (motion_list_items.cpp, EN-only): sets m_0208 to `startTime`, inserts `item` before item `position` (-1 = append); 1 on success, 0 when `position` is too far or the timeline is full
     int FrameAt(int time, int *outItem, int *outEntry);                // EN 0x76fba0 (JP 0x101ad350): frame shown `time` frames after m_0208
 };
 

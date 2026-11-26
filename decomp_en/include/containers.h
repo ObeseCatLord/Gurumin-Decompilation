@@ -26,6 +26,8 @@ struct KeyTrack
     int RemoveAt(int index);       // EN 0x7729d0 (EN-only, containers.cpp): takes key `index` out and moves the later keys up; returns 0
     int NextFrame(int frame);      // EN 0x7772e0: frame of the first key after `frame` (the last key when none is later, 0 for an empty track)
     int PreviousFrame(int frame);  // EN 0x777670: frame of the last key before `frame` (the first key when none is earlier, 0 for an empty track)
+    int RemoveFrame(int frame);    // EN 0x772890 (key_remove.cpp, EN-only): removes the key at `frame` and moves the later keys up; 1 when found, else 0
+    int MaxFrame();                // EN 0x7755d0 (key_remove.cpp, EN-only): the highest key frame number (0 for an empty track)
 };
 
 // Size of one mesh vertex in bytes.

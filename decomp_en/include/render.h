@@ -32,6 +32,7 @@ extern "C" unsigned long g_textureStageStateCache[][TEXTURE_STAGE_STATE_COUNT]; 
 extern "C" unsigned long g_samplerStateCache[][TEXTURE_STAGE_STATE_COUNT];  // EN 0x021ed288 (JP DAT_10f141e0): last value set per sampler and state
 extern "C" TextureObject *g_stage0Texture;                       // EN 0x021e47ec (JP DAT_10f6550c): texture bound to stage 0
 extern "C" TextureObject *g_stage1Texture;                       // EN 0x021e47f0 (JP DAT_10f65510): texture bound to stage 1
+extern "C" int g_textures32Bit;                                  // EN 0x021e4814 (JP DAT_10f654a4): non-zero = 32-bit colour textures (else 16-bit)
 extern "C" char g_textureNamesAux[TEXTURE_SLOT_COUNT][TEXTURE_NAME_SIZE]; // EN 0x016152d0 (JP DAT_10f8dbb8): second name table, cleared with the first
 extern "C" IDirect3DTexture9 *g_pooledSurfaces[SURFACE_POOL_SIZE]; // EN 0x021ff508 (JP DAT_10f1bff0): pooled surfaces (0 = free)
 extern "C" int g_pooledSurfaceBytes[SURFACE_POOL_SIZE];          // EN 0x021fed08 (JP DAT_10f1de70): bytes of each pooled surface

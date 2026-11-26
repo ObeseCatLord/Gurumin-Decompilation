@@ -31,6 +31,8 @@ struct FontRenderer
     int digitAdvance;                                // 0x2398: pen advance in pixels of a digit in proportional text
 
     int TextWidth(const char *text, float scale);    // EN 0x7a10e0 (JP 0x1014fd30): width of `text` in pixels
+    // EN 0x7a1b50 (JP 0x101455d0, font_init.cpp): loads the bitmap fonts, creates the Windows font and the text textures; `unused` is not read. Returns 1.
+    int Init(int unused, const char *path);
     // EN 0x7a1170 (EN-only, font_metrics.cpp): measures `text` with the Windows font (width cut to FONT_MAX_MEASURED_WIDTH
     // before scaling); the scaled width goes to *width and the scaled height to *height. Returns 1.
     int MeasureWindowsText(const char *text, float scale, int *width, int *height);

@@ -63,7 +63,7 @@ int WorldRenderer::Bind(AnimModel *models, void *mapRoot, int *state, WorldCallb
     g_lightScale = 1.0f;
     for (int i = 0; i < WORLD_ID_TABLE_SIZE; i++)
     {
-        m_00980[i] = WORLD_ID_EMPTY;
+        lowestIdCache[i] = WORLD_ID_EMPTY;
         m_01920[i] = WORLD_ID_EMPTY;
         m_028c0[i] = WORLD_ID_EMPTY;
     }
@@ -183,7 +183,7 @@ int WorldRenderer::LoadCharacter(const char *path)
     g_lightScale = 1.0f;
     for (int i = 0; i < WORLD_ID_TABLE_SIZE; i++)
     {
-        m_00980[i] = WORLD_ID_EMPTY;
+        lowestIdCache[i] = WORLD_ID_EMPTY;
         m_01920[i] = WORLD_ID_EMPTY;
         m_028c0[i] = WORLD_ID_EMPTY;
     }

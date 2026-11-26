@@ -40,6 +40,8 @@ struct Vec4
     int InBoxMargin(const Box2 *box, float margin);  // EN 0x774b10 (JP 0x101ac740): inside the box grown by `margin`
     int InBoxAspect(const Box2 *box, float aspect);  // EN 0x774a70 (EN-only widescreen variant of InBox, not ported yet): InBox with the x range scaled by 1 / aspect around the box centre (aspect 1 = the box itself)
 
+    int InCubeAround(const Vec4 *centre, float halfSize);  // EN 0x773aa0 (vec4_box_aspect.cpp, EN-only): 1 when x, y and z are each within `halfSize` of `centre`
+
     Vec4 operator+(const Vec4 &other) const;         // EN 0x76f720 (JP 0x101ac9e0)
     Vec4 operator-(const Vec4 &other) const;         // EN 0x76f6d0 (JP 0x101aca40)
     Vec4 operator*(const Vec4 &other) const;         // EN 0x76f680: component-wise
@@ -157,5 +159,12 @@ Vec4 Slerp(const Vec4 &a, const Vec4 &b, float t);
 
 // Snaps an angle in radians to the nearest multiple of `step` degrees, returned in radians (EN 0x7476a0, JP 0x1016c340).
 float SnapAngle(float radians, int step);
+
+// Rotation matrix of the Euler angles (x, y, z in radians): RotationY * RotationX * RotationZ (EN 0x773b20, matrix_euler.cpp).
+Matrix4 EulerMatrix(const Vec4 *angles);
+
+// Stores in `result` the vector `source` turned `angle` radians about z (z and w copied) and returns `result`
+// (EN 0x778840, matrix_euler.cpp).
+Vec4 *Vec4_RotatedAboutZ(Vec4 *result, const Vec4 *source, float angle);
 
 #endif

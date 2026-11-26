@@ -34,9 +34,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 701 of 2,034 game functions (153,871 of 2,080,360 bytes, 7.40 %) |
-| Matched under the rules | 701 |
-| Queue | 108 walls, 66 with a matched JP twin (mostly 700+ bytes), 361 mapped to unmatched JP, 798 EN-only; open.tsv ~70 near-misses |
+| Matched | 750 of 2,034 game functions (162,770 of 2,080,360 bytes, 7.82 %) |
+| Matched under the rules | 750 |
+| Queue | 125 walls, 53 with a matched JP twin (mostly 1,200+ bytes), 343 mapped to unmatched JP, 763 EN-only; open.tsv ~90 near-misses |
 
 ## State
 - Batches 1-11 matched Node, Vec4/Matrix4/Box, containers, AnimModel, camera, IME, engine/render, texture manager,
@@ -52,6 +52,8 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 - Workers never `git stash`/reset/checkout/switch; never sed -i over shared files; backslash strings only via Edit/Write.
 - Push: plain push usually works now (CI no longer commits meters). Fallback: scratchpad `push_onto_remote.sh`
   (temporary-index rebuild on origin/master, then soft reset).
+- Check `git diff --stat` before each commit: a worker's sed -i turned obj_symbols.tsv into mixed CRLF/LF in batch 12
+  (normalised back to LF). Open puzzle: CreateShortcut calling convention (NOTES).
 - Never add address-taking tables or macros that only force COMDAT emission.
 - Blocked: launcher (164 EN-only functions) needs the VS2013 MFC headers (Express has no `VCtlmfc`; NOTES);
   `Game::~Game` 0x5a1150 needs Node dtor + EN Object base.

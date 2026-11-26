@@ -126,3 +126,51 @@ address	status	reason
 00747b50	open	EffectManager::RemoveOwnedBy: 2 bytes short; the original loads record.id into eax before comparing with -1 (a compare against memory in ours); local id, swapped tests, record pointer and continue forms tried
 00699dc0	open	Npc_StandOnGround: 8 bytes off; the original reserves the 0x10 stack bytes for the SetTranslation argument and loads ecx before the ground x/y stores; two-call and merged single-call forms tried
 005a23e7	open	starts mid-function (shared tail entered by jumps from the preceding function): not a function of its own, not ported
+006e20d0	library	CRT math.h/cmath wrapper (batch 11)
+006e20f0	library	CRT math.h/cmath wrapper (batch 11)
+006e2150	library	CRT math.h/cmath wrapper (batch 11)
+006e21c0	library	CRT math.h/cmath wrapper (batch 11)
+006e2210	library	CRT math.h/cmath wrapper (batch 11)
+006e58c0	library	CRT math.h/cmath wrapper (batch 11)
+006e58e0	library	CRT math.h/cmath wrapper (batch 11)
+006e5990	library	CRT math.h/cmath wrapper (batch 11)
+006e5a20	library	CRT math.h/cmath wrapper (batch 11)
+006e5a70	library	CRT math.h/cmath wrapper (batch 11)
+006e5a90	library	CRT math.h/cmath wrapper (batch 11)
+006e5a10	library	CRT math.h/cmath wrapper (batch 11)
+006e2090	library	CRT math.h/cmath wrapper (batch 11)
+007492b0	library	string.h C++ overload (strchr/strrchr)
+007492c0	library	string.h C++ overload (strchr/strrchr)
+007a9cf0	library	Steamworks SDK CCallback template slot (needs SDK headers)
+007a9d70	library	Steamworks SDK CCallback template slot (needs SDK headers)
+007a9d80	library	Steamworks SDK CCallback template slot (needs SDK headers)
+007aeed0	library	tail-jump thunk into the CRT (0x7eac81)
+007adf70	blocked	static DirectInput effect-enum callback; only the unmatched 0x7ae1e0 uses it
+005a0f90	blocked	ctor of an unmodelled type (Vec4/KeyBank/IndexList sub-ctors)
+005a1000	blocked	ctor of an unmodelled type
+005a1010	blocked	ctor of an unmodelled type
+005a1030	blocked	ctor of an unmodelled type
+005a1080	blocked	ctor of an unmodelled type
+005a10a0	blocked	ctor of an unmodelled type
+0076ef30	blocked	ctor of an unmodelled type
+0076ef40	blocked	ctor of an unmodelled type
+0070a200	blocked	ctor of the 0x38-byte slot record (layout unknown)
+0070a220	blocked	dtor (~Matrix4 at +0x34) of the 0x38-byte slot record
+0070a230	blocked	dtor (~Matrix4 at +0x34) of the 0x38-byte slot record
+0076f150	blocked	frees the buffer at this+4, owner unknown
+007a5c80	blocked	virtual slot 7 call on this+0, owner unknown
+007a5c90	blocked	virtual slot 7 call on this+0, owner unknown
+007a4ed0	blocked	owner holds a COM-style pointer at +0xc, unknown
+007aabb0	blocked	owner holds a COM-style pointer at +0xc, unknown
+00746570	blocked	passes +0x2c/+0x30 to stdcall 0x7a4d80, owner unknown
+007b8650	blocked	byte setter in an untyped Packs/sound-side class
+007b87a0	blocked	byte setter in an untyped Packs/sound-side class
+007aaaf0	blocked	calls unnamed function-pointer globals 0x9094e4/0x9094c8
+0077cc40	blocked	calls the unnamed table clear 0x77bb90
+006d2d60	blocked	cdecl wrapper of 0x5ba770, callee unnamed
+007b84d0	blocked	member of the unrecovered text-window class (stack 0x222b140)
+007b8660	blocked	member of the unrecovered text-window class
+007af9b0	blocked	member of the unrecovered text-window class
+00774c00	blocked	allocates 8-byte "id" records; no caller, element type unknown
+005a1040	blocked	ctor (64 KeyBank at stride 0xcb4 from +0x32440) of an unknown owner (not Game)
+007a5ca0	open	src/names_od.cpp Names_Set compiles to 65 bytes, EN is 146: check the map pairing, the EN function probably does more than the JP twin

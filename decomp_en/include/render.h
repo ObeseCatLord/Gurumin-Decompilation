@@ -55,7 +55,8 @@ extern "C" IUnknown *g_drawListBuffers[DRAW_LIST_COUNT][DRAW_LIST_BUFFER_COUNT];
 extern "C" IUnknown *g_renderTargetSurfaces[RENDER_TARGET_SURFACE_COUNT];        // EN 0x021e47a0 (JP DAT_10f1fd04): render-target surfaces
 extern "C" IDirect3DSurface9 *g_backBufferSurface;                // EN 0x021a3544 (JP DAT_10f141dc): the back buffer surface
 extern "C" D3DVIEWPORT9 g_viewport;                               // EN 0x021a3548 (JP DAT_10f1fd30): the current viewport
-extern "C" D3DVIEWPORT9 g_savedViewport;                          // EN 0x021a35a8 (JP DAT_10f0ece0): viewport restored by the state reset
+extern "C" D3DVIEWPORT9 g_offscreenViewport;                     // EN 0x021a3560 (JP DAT_10f1fd48): the viewport of the off-screen target (TextureObject::BeginRenderTo)
+extern "C" D3DVIEWPORT9 g_savedViewport;                         // EN 0x021a35a8 (JP DAT_10f0ece0): viewport restored by the state reset
 extern "C" int g_savedWidth;                                      // EN 0x021a35c0 (JP DAT_10f65470): saved width
 extern "C" int g_savedHeight;                                     // EN 0x021a35c4 (JP DAT_10f65474): saved height
 extern "C" int g_offscreenTargetActive;                           // EN 0x021a35c8 (JP DAT_10f65478): non-zero while an off-screen target is set up (the saved state is kept)

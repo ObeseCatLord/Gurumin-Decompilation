@@ -80,3 +80,94 @@ extern "C" int Switch_Release(int holder)
     }
     return 0;
 }
+
+// g_charKind of a character whose switch node is turned on while it holds something.
+const int SWITCH_KIND_HOLDER = 0x60;
+// CharRecord::switchesHeld bits: set for effect kinds 0 and 1, and for kind 2.
+const int SWITCH_HELD_BIT_PRIMARY = 1;
+const int SWITCH_HELD_BIT_SECONDARY = 2;
+// Effect kinds of a hold.
+const int SWITCH_EFFECT_KIND_0 = 0;
+const int SWITCH_EFFECT_KIND_1 = 1;
+const int SWITCH_EFFECT_KIND_2 = 2;
+// Slot number the search for a free slot reports as "none free" when the holder's own model is held (a leftover of a
+// smaller table: the original compares with 0x40 instead of SWITCH_HOLD_SLOTS there).
+const int SWITCH_OWN_MODEL_NO_SLOT = 0x40;
+
+// Switch_Hold: see the declaration in switches.h. Called when a character picks up a switch object and by the map
+// scripts.
+extern "C" int Switch_Hold(int holder, void *object, int kind)
+{
+    int slot;
+    if (object != 0)
+    {
+        for (slot = 0; slot < SWITCH_HOLD_SLOTS; slot++)
+        {
+            if (g_switchHeldObject[slot] == object)
+                return 0;
+        }
+        for (slot = 0; slot < SWITCH_HOLD_SLOTS; slot++)
+        {
+            if (g_switchHeldObject[slot] == 0)
+                break;
+        }
+        if (slot == SWITCH_HOLD_SLOTS)
+            return 0;
+        g_switchHeldObject[slot] = object;
+    }
+    else
+    {
+        object = g_characterModels[holder].root;
+        for (slot = 0; slot < SWITCH_HOLD_SLOTS; slot++)
+        {
+            if (g_switchHeldObject[slot] == object)
+                return 0;
+        }
+        for (slot = 0; slot < SWITCH_HOLD_SLOTS; slot++)
+        {
+            if (g_switchHeldObject[slot] == 0)
+                break;
+        }
+        if (slot == SWITCH_OWN_MODEL_NO_SLOT)
+            return 0;
+        g_switchHeldObject[slot] = object;
+    }
+    g_switchHolder[slot] = holder;
+    if (kind == SWITCH_EFFECT_KIND_0)
+    {
+        if (holder < SWITCH_HOLDER_OBJECT_BASE)
+        {
+            g_charRecords[holder].switchesHeld |= SWITCH_HELD_BIT_PRIMARY;
+            if (g_charKind[holder] == SWITCH_KIND_HOLDER)
+                g_game.RaiseLeverEvents(g_characterModels[holder].switchNode, 1);
+        }
+        else
+            g_objectSwitchState[holder % SWITCH_HOLD_SLOTS] += SWITCH_HELD_BONUS;
+    }
+    else if (kind == SWITCH_EFFECT_KIND_1)
+    {
+        if (holder < SWITCH_HOLDER_OBJECT_BASE)
+        {
+            g_charRecords[holder].switchesHeld |= SWITCH_HELD_BIT_PRIMARY;
+            if (g_charKind[holder] == SWITCH_KIND_HOLDER)
+                g_game.RaiseLeverEvents(g_characterModels[holder].switchNode, 1);
+        }
+        else
+            g_objectSwitchState[holder % SWITCH_HOLD_SLOTS] += SWITCH_HELD_BONUS;
+    }
+    else if (kind == SWITCH_EFFECT_KIND_2)
+    {
+        if (holder < SWITCH_HOLDER_OBJECT_BASE)
+        {
+            g_charRecords[holder].switchesHeld |= SWITCH_HELD_BIT_SECONDARY;
+            if (g_charKind[holder] == SWITCH_KIND_HOLDER)
+                g_game.RaiseLeverEvents(g_characterModels[holder].switchNode, 1);
+        }
+        else
+            g_objectSwitchState[holder % SWITCH_HOLD_SLOTS] += SWITCH_HELD_BONUS;
+    }
+    g_switchEffectKind[slot] = kind;
+    g_switchEffectStarted[slot] = 0;
+    g_switchSlotSetUp[slot] = 1;
+    return 1;
+}

@@ -1,5 +1,7 @@
 // Collecting the camera paths of a scene (EN build). Ported from decomp/src/camera_path_select.cpp.
 #include "camera.h"
+#include "screen_transition.h"
+#include "small_b11.h"
 #include "node.h"
 #include "node_data.h"
 #include <stdio.h>
@@ -69,5 +71,64 @@ int Camera_CollectPaths(Node *root, Node *node, int *count)
     }
     for (int i = 0; i < node->childCount; i++)
         Camera_CollectPaths(root, node->children[i], count);
+    return 0;
+}
+
+// Screen transition mode started when the camera switches from one path to another.
+const int CAMERA_PATH_SWITCH_TRANSITION = 0xf;
+// Id that stops the path camera.
+const int CAMERA_PATH_STOP = -1;
+
+// Camera_SelectPath: id CAMERA_PATH_STOP stops the path camera. Otherwise the path with that id becomes current (when
+// the camera already runs on it nothing changes; switching paths starts transition 0xf) and the camera starts at the
+// frame of the path whose target track is closest to the camera target (distance with z counted twice). Returns 0.
+// Called by the scene scripts. g_boundModels is the model the camera follows.
+int Camera_SelectPath(int id)
+{
+    if (id == CAMERA_PATH_STOP)
+    {
+        g_cameraState1664fd0 = 0;
+        return 0;
+    }
+    int previous = g_cameraState166469c;
+    for (int i = 0; i < g_cameraPathCount; i++)
+    {
+        if (g_pathIds[i] == id)
+        {
+            g_cameraState166469c = i;
+            break;
+        }
+    }
+    if (g_cameraState1664fd0 != 0)
+    {
+        if (g_cameraState166469c == previous)
+            return 0;
+        Screen_StartTransition(CAMERA_PATH_SWITCH_TRANSITION);
+    }
+    int path = g_cameraState166469c;
+    float nearest = 0.0f;
+    Vec4 point;
+    Vec4 target;
+    target.Copy(g_boundModels->matrix.GetTranslation());
+    float length = (float)g_pathTargetTracks[path].frames[g_pathTargetTracks[path].count - 1];
+    float bestFrame;
+    int bestPath;
+    int frame = 0;
+    for (float f = 0.0f; f < length; f = (float)++frame)
+    {
+        g_pathTargetTracks[path].Sample(frame, &point.x, &point.y, &point.z, &point.w, 0);
+        float distance = point.DistanceZWeighted(target);
+        if (nearest >= distance || frame == 0)
+        {
+            nearest = distance;
+            bestFrame = f;
+            bestPath = path;
+        }
+    }
+    g_cameraMoveStep = 1;
+    g_cameraState166469c = bestPath;
+    g_cameraPathFrame = bestFrame;
+    g_cameraState1664fd0 = 1;
+    g_cameraFlag1664468 = 1;
     return 0;
 }

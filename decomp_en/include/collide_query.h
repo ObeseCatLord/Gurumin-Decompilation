@@ -51,4 +51,17 @@ extern "C" char g_slotNoGround[CHAR_SLOT_COUNT];          // EN 0x00914560 (JP D
 // point or that there is no ground. Returns 1 when the slot has no ground below it. EN 0x6abce0 (JP 0x1001a450).
 extern "C" int Slot_HasNoGround(int slot, const Vec4 *point);
 
+// Ray flags of the heading probes below.
+const int PROBE_RAY_FLAGS = 4;
+
+// Casts a ray from character `index` (from its head node when `fromHead` is set and it has one, else from its
+// position), moved by `offset` when given, to the point `depth` units ahead of it (along -y turned by its heading)
+// against the world collision. With `testOnly` only whether something is hit is returned; otherwise the hit point goes
+// to `ground` (x = -200000 when there is none). Returns 1 on a hit. EN 0x5c1f10 (JP 0x100242c0).
+extern "C" int Char_ProbeAhead(int index, Vec4 *ground, float depth, int fromHead, int testOnly, const Vec4 *offset);
+// Char_ProbeAhead along `angle` instead of the heading, limited to the collision nodes called `name` (0 = all).
+// EN 0x5c1cc0 (JP 0x100244b0).
+extern "C" int Char_ProbeDirection(int index, float angle, Vec4 *ground, float depth, int fromHead, int testOnly,
+                                   const Vec4 *offset, const char *name);
+
 #endif

@@ -31,6 +31,16 @@ const int WATCH_VALUE_ACTIVE = 0;
 const int WATCH_VALUE_PHASE = 1;
 const int WATCH_VALUE_FRAMES = 2;
 
+// Npc_ApproachPlayer: CharState::values entries (the code: stop distance in tens of units plus 100 for "may be
+// released") and the stop distance computed from it; the state is 0 until the first frame ran.
+const int APPROACH_VALUE_CODE = 1;
+const int APPROACH_VALUE_STOP_DISTANCE = 2;
+// The stop distance is the code modulo 100 times this, in units; a code of 100 or more lets the release flag end the walk.
+const int APPROACH_STOP_UNIT = 10;
+const int APPROACH_CODE_RANGE = 100;
+// Weight of the height difference in the distance to the player.
+const float APPROACH_HEIGHT_WEIGHT = 2.0f;
+
 // Slot of the NPC the player is talking to. EN 0x013332c4 (JP DAT_10c6351c).
 extern "C" int g_talkingNpc;
 
@@ -40,5 +50,10 @@ extern "C" int Npc_TalkFacingSimple(int index);
 extern "C" int Npc_TalkFacing(int index);
 // Starts motion 7 and keeps the enemy turned towards the player until a random chance ends it. EN 0x5be510.
 extern "C" int Enemy_WatchPlayer(int index);
+
+// Walks NPC `index` up to the player: the first frame unlocks it, picks the stop distance and starts the walk motion;
+// later frames keep turning it towards the player until it is near enough (or released), then reset its state.
+// Returns 0. EN 0x6d6060 (JP 0x10045ed0).
+extern "C" int Npc_ApproachPlayer(int index);
 
 #endif

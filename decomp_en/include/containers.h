@@ -72,4 +72,8 @@ struct VertexPack
     int FreeVertices();              // EN 0x7784a0 (JP 0x101acfc0): frees the vertex buffer (the count is kept); returns 1
 };
 
+// Allocates an array of `count` empty packs (each Init-ed, radius 0) from the engine allocator and returns it (see
+// pack_arrays.cpp). EN 0x7556d0.
+extern "C" VertexPack * __stdcall VertexPacks_NewArray(int count);
+
 #endif

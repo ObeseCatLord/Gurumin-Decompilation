@@ -10,6 +10,10 @@
 const int EFFECT_OPTIONS_DEFAULT_COLOUR = 0xa2c2a;   // EffectOptions::colour
 const float EFFECT_OPTIONS_DEFAULT_SCALE = 1.0f;     // EffectOptions::scale
 
+// Bits of EffectOptions::flags (effect_update.cpp keeps its own local copies for the update loop).
+const unsigned char EFFECT_OPTION_FOLLOWS_MATRIX = 1;   // follows the matrix it was attached to
+const unsigned char EFFECT_OPTION_FOLLOWS_OWNER = 2;    // follows its owner
+
 // Index of the setting that is 1 by default.
 const int EFFECT_SETTING_DEFAULT_ON = 2;
 // Number of byte-sized settings (an array, so locals of this type get a /GS cookie in JP code).

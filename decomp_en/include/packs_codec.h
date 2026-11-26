@@ -3,6 +3,8 @@
 #ifndef GURUMIN_EN_PACKS_CODEC_H
 #define GURUMIN_EN_PACKS_CODEC_H
 
+#include "game_file.h"
+
 // Largest magnitude of a stored signed sample, the shift that places it in the top 12 bits of a 16-bit slot and the
 // sign bit of such a slot.
 const int PACKS_SAMPLE_MAX = 0x7ff;
@@ -17,6 +19,23 @@ extern "C" void Packs_StoreSignedSample(unsigned short *output, unsigned short b
 // Converts three sample planes to interleaved bytes (see packs_image.cpp). EN 0x7ba070.
 extern "C" void Packs_PlanesToComponents(short *planeA, short *planeB, short *planeC, int *width, int *height,
                                          unsigned char *output, int *outputLength);
+
+// ---- Image plane levels (src/packs_levels.cpp) ----
+
+// Rebuilds one resolution level of a decoded sample plane: `width` x `height` is the size of the level, `fullWidth` the
+// width of the full plane. Not ported yet. EN 0x7b9ab0 (1184 bytes, called by the image decoder at EN 0x7b8f30).
+extern "C" void Packs_ReconstructLevel(short *plane, short *scratch, int width, int height, int fullWidth);
+// Rebuilds the `levelCount` levels of a plane from the last (smallest) to the first, given the level sizes in `widths` and
+// `heights`. EN 0x7b9f60.
+extern "C" void Packs_ReconstructLevels(short *plane, short *scratch, int *widths, int *heights, int levelCount);
+// Rebuilds all levels of the three planes of an image. EN 0x7b9fb0.
+extern "C" void Packs_ReconstructPlanes(short *planeA, short *planeB, short *planeC, short *scratch, int *widths,
+                                        int *heights, int levelCount);
+// Splits one level of a sample plane into its coarser level and detail (the encoder's counterpart of
+// Packs_ReconstructLevel). Not ported yet. EN 0x7bc4d0 (2028 bytes, called by the image encoder at EN 0x7b8af0).
+extern "C" void Packs_DecomposeLevel(short *plane, short *scratch, int width, int height, int fullWidth);
+// Splits the `levelCount` levels of a plane from the first to the last. EN 0x7bc480.
+extern "C" void Packs_DecomposeLevels(short *plane, short *scratch, int *widths, int *heights, int levelCount);
 
 // ---- LZ decompressor (src/packs_lz.cpp) ----
 
@@ -80,6 +99,8 @@ extern "C" unsigned int Packs_Unpack(const PacksPackedHeader *packed, unsigned c
 const unsigned int PACKS_LZ_WINDOW_MASK = 0x7fff;
 const unsigned int PACKS_LZ_REACH = 0x1fff;
 const unsigned short PACKS_LZ_NO_ENTRY = 0xffff;
+// Longest run of equal bytes the compressor encodes in one token.
+const unsigned int PACKS_LZ_RUN_MAX = 0xfff;
 
 // Hash chains over the bytes being compressed.
 struct PacksLzState
@@ -89,13 +110,45 @@ struct PacksLzState
     unsigned short *links;            // 0x08: next position in the chain, indexed by position & PACKS_LZ_WINDOW_MASK
     unsigned short *chainTail;        // 0x0c: last position of each chain, indexed by hash
     unsigned short *chainHead;        // 0x10: first position of each chain, indexed by hash
+    int m_0014[2];                    // 0x14: not yet named
+    int length;                       // 0x1c: total number of bytes being compressed
 };
 
 extern "C" int g_packsLzPosition;           // EN 0x0222b1c0: position of the next byte to index
 extern "C" PacksLzState *g_packsLzState;    // EN 0x0222b1c4
 extern "C" int g_packsLzPending;            // EN 0x0222b1d0: bytes still to index
 
+// Longest run of equal bytes at PacksLzState::data, at most PACKS_LZ_RUN_MAX and at most the bytes left (see
+// packs_lz_run.cpp). Returns the run length. EN 0x7bccc0. Called by the compressor at EN 0x7bd240.
+extern "C" unsigned int Packs_LzCountRun(void);
+
 // Indexes g_packsLzPending bytes into the hash chains, dropping the entry that fell out of reach. EN 0x7bd790.
 extern "C" void Packs_LzIndexBytes();
+
+// ---- Image container loader (src/packs_bmp.cpp) ----
+
+// File mode, magic numbers (colour image only / colour image followed by an alpha image) and bytes per pixel of the
+// Packs image container.
+#define PACKS_OPEN_MODE "rb"
+const int PACKS_MAGIC_COLOUR = 0x378;
+const int PACKS_MAGIC_COLOUR_ALPHA = 0x379;
+const int PACKS_IMAGE_BYTES_PER_PIXEL = 3;
+
+// Decodes a JPEG stream from an open file into an RGB buffer and stores its size. EN 0x7be1c0.
+int Packs_DecodeJpeg(FILE *file, unsigned char *pixels, int flags, int *width, int *height, int reserved);
+// Reads one or two images of a Packs image file (see packs_bmp.cpp). EN 0x7bdd20.
+int Packs_LoadImageFile(const char *path, unsigned char *colourPixels, unsigned char *alphaPixels,
+                                   int decodeJpeg);
+
+// ---- Plane rescaling (src/packs_scale.cpp) ----
+
+// Largest magnitude of a rescaled sample, fraction bits of the ratio and the unit the denominator is counted in.
+const int PACKS_SCALE_LIMIT = 0x7fff;
+const int PACKS_SCALE_FRACTION_BITS = 8;
+const int PACKS_SCALE_DIVISOR_UNIT = 16;
+
+// Rescales three sample planes (see packs_scale.cpp). EN 0x7bab70.
+void Packs_ScalePlanes(short *planeFirst, short *planeSecond, short *planeThird, int columns, int rows, int stride,
+                       int denominator, int numerator, int biasFirst, int biasSecond, int biasThird);
 
 #endif

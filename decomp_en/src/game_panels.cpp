@@ -97,3 +97,89 @@ int Game::DrawLabelledNumber(int value, int x, int y, float z, float fade, float
     }
     return 0;
 }
+
+// Cursor distances above which the cursor moves at the next faster speed, and the speeds (pixels a frame).
+const float CURSOR_FAR = 256.0f;
+const float CURSOR_MIDDLE = 128.0f;
+const float CURSOR_NEAR = 20.0f;
+const float CURSOR_SPEED_FAR = 160.0f;
+const float CURSOR_SPEED_MIDDLE = 80.0f;
+const float CURSOR_SPEED_NEAR = 20.0f;
+
+// Game::MoveCursor: moves the menu cursor towards its target: 160 pixels a frame when more than 256 away, 80 when more
+// than 128, 20 when more than 20, and onto the target otherwise. Returns 1. Called by the menu and name-entry frames.
+int Game::MoveCursor()
+{
+    Vec4 step;
+    step.x = (float)(cursorTargetX - cursorX);
+    step.y = (float)(cursorTargetY - cursorY);
+    step.z = 0;
+    float length = step.Length();   // the distance to the target, then reused as the speed
+    if (length > CURSOR_FAR)
+    {
+        step.Copy(Vec3_Normalized(&step));
+        length = CURSOR_SPEED_FAR;
+        step.Copy(step * length);
+        cursorX += (int)step.x;
+        cursorY += (int)step.y;
+        return 1;
+    }
+    if (length > CURSOR_MIDDLE)
+    {
+        step.Copy(Vec3_Normalized(&step));
+        length = CURSOR_SPEED_MIDDLE;
+        step.Copy(step * length);
+        cursorX += (int)step.x;
+        cursorY += (int)step.y;
+        return 1;
+    }
+    if (length > CURSOR_NEAR)
+    {
+        step.Copy(Vec3_Normalized(&step));
+        length = CURSOR_SPEED_NEAR;
+        step.Copy(step * length);
+        cursorX += (int)step.x;
+        cursorY += (int)step.y;
+        return 1;
+    }
+    cursorX = cursorTargetX;
+    cursorY = cursorTargetY;
+    return 1;
+}
+
+// Speech balloon cells on texWaku01: width, the height of a cap or middle row, the extra bottom cap height (a pixel
+// short of two rows), and the texture rectangles of the lit top cap, the unlit top cap, a middle row and the bottom cap.
+const int BALLOON_WIDTH = 0xa0;
+const int BALLOON_CELL_HEIGHT = 0x20;
+const int BALLOON_BOTTOM_HEIGHT = 0x3f;
+const float BALLOON_U1 = 0.625f;
+const float BALLOON_LIT_V0 = 0.875f;
+const float BALLOON_UNLIT_V0 = 0.5f;
+const float BALLOON_UNLIT_V1 = 0.625f;
+const float BALLOON_MIDDLE_V0 = 0.625f;
+const float BALLOON_MIDDLE_V1 = 0.75f;
+const float BALLOON_BOTTOM_V0 = 0.75390625f;
+const float BALLOON_BOTTOM_V1 = 0.875f;
+
+// Game::DrawBalloon: draws a speech balloon from texWaku01 at (x, y): a top cap (lit or unlit), `rows` middle rows of 32
+// pixels and a bottom cap, all 160 pixels wide, faded by `fade`. The parameters `a` and `b` are not used. Returns 0.
+// Called by the item menu and the message windows.
+int Game::DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade)
+{
+    Render_Command(RENDER_TEXTURE_ADDRESS, 0, 0);
+    int right = x + BALLOON_WIDTH;
+    if (lit != 0)
+        g_textures[texWaku01].DrawTinted(x, y, right, y + BALLOON_CELL_HEIGHT, 0.0f, BALLOON_LIT_V0, BALLOON_U1, 1.0f, 0, fade, 0, 0,
+                                         ASPECT_STRETCH);
+    else
+        g_textures[texWaku01].DrawTinted(x, y, right, y + BALLOON_CELL_HEIGHT, 0.0f, BALLOON_UNLIT_V0, BALLOON_U1, BALLOON_UNLIT_V1, 0,
+                                         fade, 0, 0, ASPECT_STRETCH);
+    for (int i = 0; i < rows; i++)
+        g_textures[texWaku01].DrawTinted(x, y + BALLOON_CELL_HEIGHT + i * BALLOON_CELL_HEIGHT, right,
+                                         y + 2 * BALLOON_CELL_HEIGHT + i * BALLOON_CELL_HEIGHT, 0.0f, BALLOON_MIDDLE_V0, BALLOON_U1,
+                                         BALLOON_MIDDLE_V1, 0, fade, 0, 0, ASPECT_STRETCH);
+    y += rows * BALLOON_CELL_HEIGHT;
+    g_textures[texWaku01].DrawTinted(x, y + BALLOON_CELL_HEIGHT, right, y + BALLOON_BOTTOM_HEIGHT, 0.0f, BALLOON_BOTTOM_V0, BALLOON_U1,
+                                     BALLOON_BOTTOM_V1, 0, fade, 0, 0, ASPECT_STRETCH);
+    return 0;
+}

@@ -18,6 +18,8 @@ const int PICKUP_BANK_LIMIT = 300;
 const int PICKUP_BANK_LIMIT_EXTENDED = 400;
 // Frames the HUD counter stays up after a pickup.
 const int PICKUP_HUD_FRAMES = 8;
+// Frames a ring slot's effect runs before the slot is cleared.
+const int PICKUP_EFFECT_LIFETIME = 30;
 
 extern "C" int g_pickupRingIndex;                                // EN 0x009e2410 (JP DAT_10210fb8): next slot of the pickup effect ring
 extern "C" int g_pickupEffectKind[PICKUP_RING_SIZE];             // EN 0x009e2528 (JP DAT_10255040): effect kind of each ring slot
@@ -32,5 +34,9 @@ extern "C" void Pickup_Collect(int id, int quiet);
 // Starts the next slot of the pickup effect ring with effect kind `kind` and effect handle `handle` (frame count 0) and
 // advances the ring. Returns 0. EN 0x5a24d0.
 extern "C" int PickupRing_Push(int kind, int handle);
+
+// Ages every active ring slot by one frame and clears the ones past PICKUP_EFFECT_LIFETIME (see pickup_ring_age.cpp).
+// Returns 0. EN 0x5ac910. Called once per frame by the effect update at EN 0x60cb10.
+extern "C" int PickupRing_Age(void);
 
 #endif

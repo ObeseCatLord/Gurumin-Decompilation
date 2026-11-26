@@ -37,6 +37,11 @@ extern "C" int g_dialogGameSlots[];
 extern "C" int g_keyPromptSize;
 // Draws the key prompt balloon above every character that has one. Returns 0. EN 0x5cdcd0 (JP 0x1000d6b0).
 extern "C" int KeyPrompt_DrawAll(const Matrix4 *view);
+// g_overlayClosed value that makes the banner fade in (see Banner_UpdateFade).
+const int BANNER_START_FADE_IN = 1;
+// Sets the dialog message text to `text` (0 or an empty string clears it); a non-empty text also starts the banner fading
+// in from zero. Returns 0. EN 0x5b9650 (see dialog_message.cpp).
+extern "C" int DialogMessage_Set(const char *text);
 
 // Texture slots held by the overlay mode, and the bytes of its state block.
 const int OVERLAY_TEXTURE_COUNT = 0x22;

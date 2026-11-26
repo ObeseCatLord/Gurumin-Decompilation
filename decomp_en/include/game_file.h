@@ -26,6 +26,9 @@ struct GameFile
 // Copies the file name of `path` without directory and extension into `out`. EN 0x7a8930 (JP 0x10161120).
 extern "C" int Path_GetBaseName(char *out, const char *path);
 
+// A second, identical copy of Path_GetBaseName that the world renderer links. EN 0x72c290.
+extern "C" int Path_GetBaseNameWorldCopy(char *out, const char *path);
+
 // Error report of the loaders (empty in the release build): `title`, `detail` and a number. EN 0x77bf60 (JP 0x1013edb0).
 extern "C" int ErrorReport(const char *title, const char *detail, int value);
 

@@ -31,6 +31,8 @@ extern "C" int g_singleFrameBuffer;                             // EN 0x00909338
 
 extern "C" int FrameTimer_ResetNext2(void);                     // EN 0x7a40d0 (JP 0x1013faf0)
 extern "C" int FrameTimer_ResetNext(void);                      // EN 0x7a40f0 (JP 0x1013eee0)
+// Stores `folder` as the data folder and removes a trailing backslash (see data_folder.cpp). EN 0x7a4b20. Called by EN 0x609f70.
+extern "C" void DataFolder_Set(const char *folder);
 extern "C" char *MakeDataPath(const char *name);                // EN 0x7a31a0 (JP 0x1013f910)
 extern "C" const char *Path_Data(const char *name, int folder); // EN 0x7a31f0 (JP 0x1013f8a0)
 extern "C" int FrameBlend_Start(int active, int target, int frames);  // EN 0x77c840 (JP 0x1013fb10)

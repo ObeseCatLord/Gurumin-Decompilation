@@ -328,6 +328,9 @@ struct Node
     int CopyBindPoses();                   // EN 0x76e130 (JP 0x10191770)
     int CollectTrackingNodes(Node **list, int *count);    // EN 0x76ea90 (JP 0x10191920): nodes in state 0x4000 (up to 8)
     int LinkToChasing(Node *const *nodes, int count);     // EN 0x76d6e0 (JP 0x10191990)
+    int LinkTrackingNodes();                              // EN 0x76ea50 (EN-only, node_hierarchy.cpp): collects the nodes in state 0x4000 and links them to the chasing nodes
+    Node *AttachChild(Node *child);                       // EN 0x749750 (EN-only, node_hierarchy.cpp): appends an existing node to the child list and makes this its parent
+    Node *FindSkinned();                                  // EN 0x7532f0 (EN-only, node_hierarchy.cpp): this node or the first descendant (depth first) that has skinning data, 0 if none
     int StoreLinks(Node **list, int *count);              // EN 0x76eb70 (JP 0x10191870)
     int ScanChunks(GameFile *file, int arg);              // EN 0x7587c0 (JP 0x101a4a60): reads the INFO/MAN2 chunks of a model file
     int ParseChunks(GameFile *file, int a, int b, int keySum, unsigned int keyCheck);   // EN 0x755ef0 (JP 0x101a58a0): reads the model's chunks, checking them against the name key sum and xor

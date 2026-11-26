@@ -2,6 +2,10 @@
 #include "char_move.h"
 #include "anim_model.h"
 #include "char.h"
+#include "char_dispatch.h"
+#include "char_inline.h"
+#include "char_shots.h"
+#include <windows.h>
 #include "dialogs.h"
 #include "engine.h"
 #include "sound_effects.h"
@@ -1296,5 +1300,307 @@ extern "C" int Npc_RunToMarker(int index)
             Char_ResetState(index);
     }
     g_charToldToReact[index] = 0;
+    return 0;
+}
+
+// Npc_ChildFollow constants.
+// Motions: running, idle; blend frames; the height of the eye points above the feet.
+const int CHILD_MOTION_RUN = 1;
+const int CHILD_MOTION_IDLE = 2;
+const int CHILD_MOTION_TURN = 0;
+const float CHILD_PLAYER_EYE_HEIGHT = 50.0f;
+const float CHILD_SELF_EYE_HEIGHT = 75.0f;
+// Char_CanSee arguments: viewing range per talk line, angle (18 degrees either side), the range it always sees within.
+const int CHILD_RANGE_PER_LINE = 10;
+const float CHILD_SIGHT_ANGLE = 0.31415f;
+const float CHILD_SIGHT_NEAR_RANGE = 150.0f;
+// The prompt the child shows when it sees the player, how long, and its voice.
+const int CHILD_PROMPT_KEY = 15;
+const int CHILD_PROMPT_FRAMES = 60;
+const int CHILD_VOICE = 0x20c;
+// Radius within which it wakes the enemies of one behaviour (behaviour 15), and how many behaviours follow.
+const float CHILD_WAKE_RADIUS = 1500.0f;
+const int CHILD_WAKE_COUNT = 1;
+const int CHILD_WAKE_BEHAVIOUR = 15;
+// States.
+const int CHILD_STATE_START = 0;
+const int CHILD_STATE_WAITING = 1;
+const int CHILD_STATE_TURNING = 2;
+const int CHILD_STATE_RUNNING = 3;
+// Frames it turns to the player before it runs, and the angle (one degree in radians) below which it faces the player.
+const int CHILD_TURN_FRAMES = 0x1e;
+const float CHILD_FACING_ANGLE = 0.01745f;
+// Running: units a frame, the factor of the clearance probe, and the motion speed added while blocked.
+#define CHILD_RUN_STEP 16.0f   // a macro: Vec4::operator* takes its factor by reference, and the original passes a literal
+#define CHILD_PROBE_SCALE 6.0f   // a macro: Vec4::operator* takes its factor by reference, and the original passes a literal
+const float CHILD_BLOCKED_SPEED = 30.0f;
+// Within this distance the child checks, every ten frames, whether it can stand next to the player.
+const float CHILD_ARRIVE_RANGE = 450.0f;
+// How far from the player the line of sight ends, and the height it is tested at.
+#define CHILD_STOP_DISTANCE 50.0f   // a macro: Vec4::operator* takes its factor by reference, and the original passes a literal
+const float CHILD_SIGHT_LINE_HEIGHT = 50.0f;
+// The line of sight test is spread over this many frames (staggered by slot) and uses this collision mask.
+const int CHILD_CHECK_PERIOD = 10;
+const unsigned int CHILD_SIGHT_MASK = 4;
+
+// A child that idles (motion 2) until it sees the player (within its talk id's line * 10 units, 18 degrees either
+// side or 150 units, walls ignored) or is told to react: it shows prompt 15, plays voice 0x20c and wakes the enemies
+// of group 15 within 1500. It then turns to the player for 30 frames and runs to them (motion 1, 16 units a frame,
+// faster while blocked by the map). Once within 450 units it checks every ten frames whether the line from 50 units
+// behind it to 50 units short of the player is clear and it can stand; then its state is reset. Returns 0. Called by
+// the NPC update of the child kind.
+extern "C" int Npc_ChildFollow(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(g_characterModels[0].matrix.GetTranslation());
+    self.Copy(g_characterModels[index].matrix.GetTranslation());
+    (player - self).Length();      // computed and not used
+    float distance = (player - self).Length2D();
+    if (g_charState[index].state == CHILD_STATE_START)
+    {
+        g_characterModels[index].PlayMotion(CHILD_MOTION_IDLE, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        g_charState[index].state = CHILD_STATE_WAITING;
+        g_charToldToReact[index] = 0;
+        return 0;
+    }
+    if (g_charState[index].state == CHILD_STATE_WAITING)
+    {
+        g_characterModels[index].PlayMotion(CHILD_MOTION_IDLE, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        player.z += CHILD_PLAYER_EYE_HEIGHT;
+        self.z += CHILD_SELF_EYE_HEIGHT;
+        if ((g_charState[index].sawPlayer |= Char_CanSee(&self, &player, g_characterModels[index].heading,
+                                                       (float)(g_charState[index].values[CHARSTATE_NPC_TALK] * CHILD_RANGE_PER_LINE),
+                                                       CHILD_SIGHT_ANGLE, CHILD_SIGHT_NEAR_RANGE, 0)) != 0 ||
+            g_charToldToReact[index] != 0)
+        {
+            KeyPrompt_ShowInline(index, CHILD_PROMPT_KEY, CHILD_PROMPT_FRAMES);
+            Character_PlaySoundInline(index, CHILD_VOICE, 0, 0);
+            g_charState[index].state = CHILD_STATE_TURNING;
+            g_charState[index].values[CHARSTATE_NPC_WAIT] = 0;
+            Enemies_WakeNearby(index, CHILD_WAKE_RADIUS, CHILD_WAKE_COUNT, CHILD_WAKE_BEHAVIOUR);
+            g_charToldToReact[index] = 0;
+            return 0;
+        }
+    }
+    else if (g_charState[index].state == CHILD_STATE_TURNING)
+    {
+        float target = (float)atan2(player.x - self.x, player.y - self.y) + TURN_HALF;
+        g_charState[index].values[CHARSTATE_NPC_WAIT]++;
+        g_characterModels[index].targetHeading = target;
+        float turn = g_characterModels[index].heading - target;
+        while (turn > TURN_HALF)
+            turn -= TURN_FULL;
+        while (turn < -TURN_HALF)
+            turn += TURN_FULL;
+        if (turn < CHILD_FACING_ANGLE)
+            g_characterModels[index].PlayMotion(CHILD_MOTION_IDLE, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        else
+            g_characterModels[index].PlayMotion(CHILD_MOTION_TURN, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        if (g_charState[index].values[CHARSTATE_NPC_WAIT] == CHILD_TURN_FRAMES)
+        {
+            g_charState[index].values[CHARSTATE_NPC_WAIT] = 0;
+            g_charState[index].state = CHILD_STATE_RUNNING;
+            g_charToldToReact[index] = 0;
+            return 0;
+        }
+    }
+    else if (g_charState[index].state == CHILD_STATE_RUNNING)
+    {
+        g_characterModels[index].childRunning = 1;
+        g_characterModels[index].PlayMotion(CHILD_MOTION_RUN, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        Vec4 step;
+        step.Copy(player - self);
+        step.z = 0;
+        step.Normalized3();
+        step.Copy(step * CHILD_RUN_STEP);
+        g_characterModels[index].targetHeading = atan2f(step.x, step.y) + TURN_HALF;
+        Character_SetMove(index, step.x, step.y, 0);
+        step.Copy(step * CHILD_PROBE_SCALE);
+        if (g_characterModels[index].idleMotionEnabled != 0 && g_characterModels[index].IsClearOfMapLimited(&step) == 0)
+            g_characterModels[index].AddMotionSpeed(CHILD_BLOCKED_SPEED);
+        if (distance < CHILD_ARRIVE_RANGE)
+        {
+            Vec4 from;
+            Vec4 to;
+            Vec4 hit;
+            from.Copy(self - player);
+            from.z = 0;
+            from.Normalized3();
+            from.Copy(from * CHILD_STOP_DISTANCE);
+            to.Copy(player - from);
+            from.Copy(from + self);
+            g_collisionFilter = g_characterModels[index].collisionFilter;
+            to.z += CHILD_SIGHT_LINE_HEIGHT;
+            from.z += CHILD_SIGHT_LINE_HEIGHT;
+            if (g_frameCounter % CHILD_CHECK_PERIOD == index % CHILD_CHECK_PERIOD && g_mapRootNode != 0 &&
+                g_mapRootNode->Collide(0, CHILD_SIGHT_MASK, &from, &to, &hit) == 0 &&
+                g_characterModels[index].IsClearOfMapLimited(0) != 0 && g_characterModels[index].IsClearAny(0) != 0)
+                Char_ResetState(index);
+            g_collisionFilter = 0;
+        }
+    }
+    g_charToldToReact[index] = 0;
+    return 0;
+}
+
+// Npc_PopUp constants. Motions: the hover motion comes from the talk id's tens, the others are fixed.
+const int POPUP_RANGE_PER_UNIT = 100;
+const int POPUP_RISE_PER_HUNDRED = 50;
+const int POPUP_STATE_START = 0;
+const int POPUP_STATE_HOVERING = 1;
+const int POPUP_STATE_SINKING = 2;
+const int POPUP_STATE_JUMPING = 3;
+const int POPUP_STATE_LANDED = 4;
+const int POPUP_PROMPT_KEY = 15;
+const int POPUP_PROMPT_FRAMES = 60;
+const int POPUP_VOICE = 0x20c;
+const int POPUP_HOVER_CYCLE = 25;
+const float POPUP_HOVER_HEIGHT = 4.0f;
+const float POPUP_HOVER_RAMP = 8.0f;
+const float POPUP_SINK_SPAN = 50.0f;
+const float POPUP_SINK_SPEED = 20.0f;
+const float POPUP_SINK_MIN = 1.0f;
+const int POPUP_SINK_DELAY_FRAMES = 40;
+const int POPUP_SINK_STEP_MAX = 20;
+const int POPUP_EFFECT_AFTER = 43;
+const int POPUP_EFFECT_SKIP = 3;
+const int POPUP_EFFECT = 0x2d5;
+const float POPUP_JUMP_SPEED = 20.0f;
+const float POPUP_JUMP_BACK = -20.0f;
+const float POPUP_EYE_HEIGHT = 75.0f;
+const float POPUP_HEAD_HEIGHT = 50.0f;
+const int POPUP_CHECK_PERIOD = 10;
+const int POPUP_RAY_FLAGS = 4;
+const unsigned int POPUP_RAY_MASK = 0x4000000;
+
+// A character that bobs up and down where it was placed (motion = the talk id's tens, 4 units over a 25-frame cycle)
+// and pops up out of reach: once it has risen above its start height plus the talk id's hundreds * 50 it sinks back
+// (dropping at most 20 units a frame, with effect 0x2d5 every frame but each third after 43 frames) until it is back
+// at the start. When it is told to react, the player comes within the talk id's units * 100 or it already saw the
+// player, it shows prompt 15, jumps forward (20 units along its heading, voice 0x20c) and keeps moving until it
+// lands somewhere it can stand with the player in sight (state 4), where it stops and its state is reset once its
+// motion is done. Returns 0.
+int Npc_PopUp(int index)
+{
+    Vec4 player;
+    Vec4 self;
+    player.Copy(g_characterModels[0].matrix.GetTranslation());
+    self.Copy(g_characterModels[index].matrix.GetTranslation());
+    float distance = (player - self).Length();
+    if (g_charState[index].state < POPUP_STATE_JUMPING &&
+        (g_charToldToReact[index] != 0 ||
+         distance < (float)(g_charState[index].values[CHARSTATE_NPC_TALK] % 10 * POPUP_RANGE_PER_UNIT) ||
+         g_charState[index].sawPlayer != 0))
+    {
+        g_charToldToReact[index] = 0;
+        g_charState[index].state = POPUP_STATE_JUMPING;
+        g_charState[index].values[CHARSTATE_NPC_WAIT] = 0;
+        KeyPrompt_ShowInline(index, POPUP_PROMPT_KEY, POPUP_PROMPT_FRAMES);
+        g_characterModels[index].mode = 1;
+    }
+    if (g_charState[index].state == POPUP_STATE_START)
+    {
+        g_charState[index].state = POPUP_STATE_HOVERING;
+        g_charState[index].values[CHARSTATE_NPC_RANGE] = (int)self.z;
+        g_characterModels[index].mode = 0;
+        g_characterModels[index].childRunning = 1;
+    }
+    else if (g_charState[index].state == POPUP_STATE_HOVERING)
+    {
+        g_charState[index].values[CHARSTATE_NPC_WAIT]++;
+        g_characterModels[index].PlayMotion(g_charState[index].values[CHARSTATE_NPC_TALK] / 10 % 10, 0,
+                                            NPC_IDLE_BLEND_FRAMES, 1.0f);
+        int phase = g_charState[index].values[CHARSTATE_NPC_WAIT] % POPUP_HOVER_CYCLE;
+        g_charState[index].values[CHARSTATE_NPC_WAIT] = phase;
+        if (phase > 7 && phase < 18)
+            g_characterModels[index].SetPosition(self.x, self.y, self.z + POPUP_HOVER_HEIGHT);
+        else if (phase < 8)
+            g_characterModels[index].SetPosition(self.x, self.y, (float)phase / POPUP_HOVER_RAMP * POPUP_HOVER_HEIGHT + self.z);
+        else if (phase > 17)
+            g_characterModels[index].SetPosition(self.x, self.y,
+                                                 (float)(POPUP_HOVER_CYCLE - phase) / POPUP_HOVER_RAMP * POPUP_HOVER_HEIGHT + self.z);
+        if (self.z > (float)(g_charState[index].values[CHARSTATE_NPC_RANGE] +
+                             g_charState[index].values[CHARSTATE_NPC_TALK] / 100 * POPUP_RISE_PER_HUNDRED))
+        {
+            g_charState[index].state = POPUP_STATE_SINKING;
+            g_charState[index].values[CHARSTATE_NPC_WAIT] = 0;
+        }
+    }
+    else if (g_charState[index].state == POPUP_STATE_SINKING)
+    {
+        g_characterModels[index].PlayMotion(2, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        float start = (float)g_charState[index].values[CHARSTATE_NPC_RANGE];
+        g_charState[index].values[CHARSTATE_NPC_WAIT]++;
+        if (start + POPUP_SINK_SPAN > self.z)
+        {
+            float speed = (self.z - start) / POPUP_SINK_SPAN * POPUP_SINK_SPEED;
+            float drop = POPUP_SINK_MIN < speed ? speed : POPUP_SINK_MIN;
+            g_characterModels[index].SetPosition(self.x, self.y, self.z - drop);
+        }
+        else
+            g_characterModels[index].SetPosition(
+                self.x, self.y,
+                self.z - (float)max(min(g_charState[index].values[CHARSTATE_NPC_WAIT] - POPUP_SINK_DELAY_FRAMES,
+                                        POPUP_SINK_STEP_MAX), 0));
+        if (g_charState[index].values[CHARSTATE_NPC_WAIT] > POPUP_EFFECT_AFTER &&
+            g_charState[index].values[CHARSTATE_NPC_WAIT] % POPUP_EFFECT_SKIP != 0)
+        {
+            Vec4 offset;
+            Matrix4 matrix;
+            offset.Fill(0.0f);
+            matrix.SetIdentity();
+            matrix.SetTranslation(self);
+            Char_StartEffect(index, POPUP_EFFECT, offset, -1, -1, 0, 0, 0, &matrix, 0);
+        }
+        if (self.z < (float)g_charState[index].values[CHARSTATE_NPC_RANGE])
+        {
+            g_charState[index].state = POPUP_STATE_HOVERING;
+            g_charState[index].values[CHARSTATE_NPC_WAIT] = 0;
+        }
+    }
+    else if (g_charState[index].state == POPUP_STATE_JUMPING)
+    {
+        g_characterModels[index].PlayMotion(2, 0, NPC_IDLE_BLEND_FRAMES, 1.0f);
+        if (g_charState[index].values[CHARSTATE_NPC_WAIT] == 0)
+        {
+            g_shotSlots[index].position.Fill(0.0f);
+            g_shotSlots[index].position.y = POPUP_JUMP_BACK;
+            g_shotSlots[index].position.RotateZ(TURN_HALF - g_characterModels[index].heading);
+            g_characterModels[index].velocity.Copy(g_shotSlots[index].position);
+            g_characterModels[index].AddMotionSpeed(POPUP_JUMP_SPEED);
+            Character_PlaySound(index, POPUP_VOICE, 0, 0);
+            g_characterModels[index].childRunning = 1;
+            g_charState[index].values[CHARSTATE_NPC_WAIT]++;
+        }
+        else if (g_frameCounter % POPUP_CHECK_PERIOD == index % POPUP_CHECK_PERIOD)
+        {
+            Vec4 head;
+            Vec4 eye;
+            eye.Copy(player);
+            head.Copy(self);
+            eye.z += POPUP_EYE_HEIGHT;
+            head.z += POPUP_HEAD_HEIGHT;
+            if (g_characterModels[index].IsClearOfMapLimited(0) != 0)
+            {
+                Vec4 hit;
+                if (g_mapRootNode == 0 || g_mapRootNode->CastRay(0, POPUP_RAY_FLAGS, POPUP_RAY_MASK, &eye, &head, &hit, 0) == 0)
+                {
+                    g_characterModels[index].childRunning = 0;
+                    g_charState[index].state = POPUP_STATE_LANDED;
+                }
+            }
+        }
+        Character_SetMove(index, g_shotSlots[index].position.x, g_shotSlots[index].position.y,
+                          g_shotSlots[index].position.z);
+    }
+    else if (g_charState[index].state == POPUP_STATE_LANDED)
+    {
+        Character_SetMove(index, g_shotSlots[index].position.x, g_shotSlots[index].position.y,
+                          g_shotSlots[index].position.z);
+        g_characterModels[index].childRunning = 0;
+        if (g_characterModels[index].idleMotionEnabled != 0)
+            Char_ResetState(index);
+    }
     return 0;
 }

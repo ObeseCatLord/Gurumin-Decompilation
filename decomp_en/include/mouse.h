@@ -40,6 +40,12 @@ struct Mouse
     int SetCursorGamePos(int x, int y);              // EN 0x7aa8f0 (JP 0x10001090): moves the Windows cursor to a 640x480 game position
 };
 
+// 1 when `point` lies inside (borders included) the rectangle with top-left corner (left, top) and size width x height
+// (see mouse_hit.cpp). EN 0x7aa870. Called by the mouse state reader and the cursor hit tests.
+extern "C" int __stdcall Mouse_PointInRect(const MousePoint *point, int left, int top, int width, int height);
+// Second copy of Mouse_PointInRect that the text window code has for itself (nothing else calls it). EN 0x7b8160.
+extern "C" int __stdcall TextWindow_PointInRect(const MousePoint *point, int left, int top, int width, int height);
+
 // The game's mouse. EN 0x00a1d998 (JP DAT_1020d9e0).
 extern "C" Mouse g_mouse;
 

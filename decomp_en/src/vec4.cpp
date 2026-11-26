@@ -896,3 +896,13 @@ Matrix4 PerspectiveMatrix(float nearPlane, float farPlane, float fov, float aspe
     projection.m[14] = -(farPlane * nearPlane);
     return projection;
 }
+
+// Returns this vector with x/y/z divided by `divisor` (converted to float; w stays 0). EN-only; no direct caller.
+Vec4 Vec4::DividedByInt(const int &divisor)
+{
+    Vec4 result;
+    result.x = x / (float)divisor;
+    result.y = y / (float)divisor;
+    result.z = z / (float)divisor;
+    return result;
+}

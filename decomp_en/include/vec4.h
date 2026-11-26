@@ -35,6 +35,7 @@ struct Vec4
     void RotateZ(float angle);                       // EN 0x779400 (JP 0x101ac300)
     void RotateX(float angle);                       // EN 0x779200 (JP 0x101ac440): rotates the y/z part about the x axis
     void RotateY(float angle);                       // EN 0x779300 (JP 0x101ac3a0): rotates the x/z part about the y axis
+    void RotateAxis(const Vec4 &axis, float angle);  // EN 0x778ed0 (JP 0x101b1290): turns the vector about `axis` by `angle` radians
     int InBoxMargin(const Box2 *box, float margin);  // EN 0x774b10 (JP 0x101ac740): inside the box grown by `margin`
     int InBoxAspect(const Box2 *box, float aspect);  // EN 0x774a70 (EN-only widescreen variant of InBox, not ported yet): InBox with the x range scaled by 1 / aspect around the box centre (aspect 1 = the box itself)
 
@@ -44,6 +45,8 @@ struct Vec4
     Vec4 operator*(const float &scale) const;        // EN 0x76f630: x/y/z times `scale`, w = 0
     Vec4 Normalized3();                              // EN 0x777320 (JP 0x101af080): x/y/z scaled to length 1 in place and returned (w = 0); a zero vector stays and zero is returned
     Vec4 Divided(const float &divisor);              // EN 0x76f7c0 (JP 0x101acb60)
+    int Equals3(const Vec4 &other);                  // EN 0x76f1f0 (EN-only, vec4_equal.cpp): 1 when x, y and z are all equal to those of `other` (w ignored)
+    Vec4 DividedByInt(const int &divisor);           // EN 0x76f770 (EN-only, vec4.cpp): x/y/z divided by the integer converted to float, w = 0
 };
 
 // Dot product of the x/y/z parts of two vectors (EN 0x773750, JP 0x101ac200).
@@ -90,6 +93,8 @@ struct Matrix4
     Matrix4 operator*(const Matrix4 &other) const;  // EN 0x76f230 (JP 0x101b0670): this transformed by `other` (row vectors)
     void SetRotationZ(float angle);               // EN 0x77a1a0 (JP 0x101ae710): rotation about the z axis in the upper-left 3x3
     float Heading() const;                        // EN 0x774300 (JP 0x101b0a80): angle of the matrix's x axis in the x/y plane (atan2 of y over x)
+    void SetRotationIdentity();                   // EN 0x77a120 (EN-only, matrix4_rotation.cpp): the upper-left 3x3 becomes the identity (the other elements stay)
+    void SetRotationTransposed(const Matrix4 *source);   // EN 0x77a220 (EN-only, matrix4_rotation.cpp): the upper-left 3x3 becomes the transpose of that of `source`
 };
 
 // Rotation matrix looking from `eye` to `target` with `up` and roll `roll` (EN 0x77aea0, JP 0x101b1c20).

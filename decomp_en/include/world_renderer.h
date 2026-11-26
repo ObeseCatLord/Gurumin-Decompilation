@@ -191,11 +191,19 @@ struct WorldRenderer
     void TickFade();
     void TickCaption();                      // 0x101687c0 (model_misc.cpp)
     int SetModelState(int index, int mode);  // 0x10166f20 (world_model_state.cpp)
-    int GetMessageField(int line, int field, char *out);  // 0x101672c0 (text_fields.cpp)
+    int GetMessageField(int line, int field, char *out);  // 0x101672c0 (text_fields.cpp); EN 0x733400 (not ported yet): copies the comma-separated field `field` of line `line` to `out`
     int GetMessageId(int index);             // EN 0x7334a0: id of line `index` of the character's .itm file
     int SetMessageId(int index, int id);     // EN 0x746ba0: stores the id of line `index`
     int SetMessage(int index, int id, const char *text);   // EN 0x745510: stores the id and the text of line `index`
     int FindMessageLine(int key);            // EN 0x72c8b0: line number for `key` (not recovered yet)
+    int CountMessageKeys();                  // EN 0x731db0 (not ported yet): number of keys in the message lines, cached in the table (-9999 = not counted yet)
+    int InsertMessageLine(int position);     // EN 0x73ef10 (not ported yet): inserts an empty line (id -1) before line `position` and counts it; returns 1
+    int LowestMessageId(int key);            // EN 0x72e990 (not ported yet): smallest id among the lines of key `key` (10000 when it has none), cached for keys below 1000
+    int DeleteMessageKey(int key);           // EN 0x71ca80 (not ported yet): removes the lines of key `key` and moves the later ones up
+    int GetMessageNumber(int key);           // EN 0x72e830 (EN-only, world_message_edit.cpp): second field of the first line of key `key` as a number
+    int AddMessageLine(int key);             // EN 0x73efb0 (EN-only, world_message_edit.cpp): adds an empty line at the end of key `key`'s lines; returns the number of lines the key had
+    int SetKeyedMessage(int key, int offset, int id, const char *text);   // EN 0x745a50 (EN-only, world_message_edit.cpp): stores id and text of line `offset` of key `key`
+    int DeleteMessageKeysWithIds(int lowest, int highest);   // EN 0x71cc00 (EN-only, world_message_edit.cpp): deletes every key whose lowest id lies in lowest..highest
     int GetMessageIdOfKey(int key);          // EN 0x72ea20: id of the line FindMessageLine(key) finds
     int RunScriptFrames(int silent);        // EN 0x70c120 (JP 0x1017cc90) (world_script.cpp): runs the scene script up to the current frame and animates the world
     int AdvanceFrame();

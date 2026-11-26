@@ -198,6 +198,9 @@ extern "C" TextureManager g_textureManager;
 
 // Releases the Direct3D data of every texture whose alpha is generated (before a device reset). EN 0x740bb0 (JP 0x101734d0).
 extern "C" int Textures_ReleaseGenerated(void);
+// Re-uploads every texture whose alpha is generated from its kept source image (the counterpart of
+// Textures_ReleaseGenerated after the device is reset). Returns 1. EN 0x73fb80 (texture_rebuild.cpp).
+extern "C" int Textures_RebuildGenerated(void);
 // Recreates those textures after a device reset (not ported yet). EN 0x73fb80 (JP 0x10173510).
 extern "C" int Textures_RestoreGenerated(void);
 

@@ -25,4 +25,8 @@ struct IndexList
     int FreeSpheres();  // EN 0x778500: the same for a sphere list (identical code, separate function)
 };
 
+// Allocates an array of `count` empty lists (each Init-ed) from the engine allocator and returns it (see pack_arrays.cpp).
+// EN 0x755710.
+extern "C" IndexList * __stdcall IndexLists_NewArray(int count);
+
 #endif

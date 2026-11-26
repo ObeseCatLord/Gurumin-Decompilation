@@ -18,8 +18,10 @@ extern "C" IUnknown *g_slotSurfacesA[SURFACE_SLOT_COUNT]; // EN 0x021f66d8 (JP D
 extern "C" IUnknown *g_slotSurfacesB[SURFACE_SLOT_COUNT]; // EN 0x021f7d58 (JP DAT_10f0d5e0): second surface of each slot
 extern "C" int g_slotBytesC[SURFACE_SLOT_COUNT];          // EN 0x021f93d8 (JP DAT_10f60d38): bytes of the first surface, part of the VRAM total
 extern "C" int g_slotBytesD[SURFACE_SLOT_COUNT];          // EN 0x021faa58 (JP DAT_10f1a870): more bytes of the first surface, part of the VRAM total
+extern "C" int g_slotAge[SURFACE_SLOT_COUNT];              // EN 0x021fc0d8: frames since each slot was last used (counted up by TextureSlots_Age)
 extern "C" char g_slotMarked[SURFACE_SLOT_COUNT];         // EN 0x021fd760 (JP DAT_10f60690): per slot mark, cleared when a mesh buffer pair is created
 extern "C" int g_vramInUse;                                // EN 0x021fd758 (JP DAT_10f1a86c): VRAM tracked for the slots
+extern "C" int g_surfacePoolHead;                          // EN 0x021fdd00: reset to 0 with the surface pool (no other user found)
 extern "C" int g_pooledSurfaceUsed[SURFACE_POOL_SIZE];     // EN 0x021fdd08 (JP DAT_10f1fd90): 1 = pool entry in use
 
 // Reserves a free entry of the surface pool and returns its index. EN 0x7a1080 (JP 0x10148410).
@@ -45,5 +47,9 @@ extern "C" int Bounds_ResetFour(void *unused, Vec4 *bounds, int *counts);
 // rounded up to the next multiple of 256 bytes. Returns the slot, or -1 when no slot is free or a buffer cannot be
 // created. EN 0x77d4b0 (JP 0x10147880).
 extern "C" int MeshBuffers_Create(IDirect3DVertexBuffer9 **vertexBuffer, int vertexBytes, IDirect3DIndexBuffer9 **indexBuffer, int indexBytes);
+
+// Empties the surface pool: zeroes the byte total, the head value and the three per-entry tables (see
+// surface_pool_reset.cpp). Returns nothing. EN 0x7a1f10. Called by Render_CreateDevice (EN 0x7a13e0).
+extern "C" void SurfacePool_Reset(void);
 
 #endif

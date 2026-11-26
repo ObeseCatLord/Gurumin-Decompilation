@@ -178,6 +178,8 @@ struct ListBank
     char m_367b4[0x20];       // 0x367b4: element type of each keyword array (0 = int, otherwise float)
 
     int ClearGroup(int group);
+    int RegisterKeyword(int index, const char *name, int *array, char type);  // EN 0x6448f0 (EN-only, listbank_keywords.cpp): registers keyword `index` with its name, variable array and element type
+    int StoreOperand(int slot);                                // EN 0x6462c0 (EN-only, listbank_keywords.cpp): saves the last result as operand `slot` of the current nesting level
     int AppendEntry(const char *text, int group, int value, char flag);
     int FindKeyword(const char *name, int *index);
     int M_10004950(char *buffer, void *value, char type);

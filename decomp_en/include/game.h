@@ -134,7 +134,8 @@ struct Game : Object
     int windowId[MENU_SLOT_COUNT];          // 0x0a4: id of the menu window in each slot
     char m_00b0[0xe0 - 0xb0];               // 0x0b0: window geometry (not used by EN code yet)
     int lastEntry[MENU_SLOT_COUNT];         // 0x0e0: index of the last entry added to the window
-    char m_00ec[0x110 - 0xec];              // 0x0ec: not used by EN code yet
+    int windowRefresh[MENU_SLOT_COUNT];     // 0x0ec: set to 1 by RequestWindowRefresh for an open window slot (reader not recovered)
+    char m_00f8[0x110 - 0xf8];              // 0x0f8: not used by EN code yet
     int windowOpen[MENU_SLOT_COUNT];        // 0x110: 1 while the window slot is open
     int windowLastRow[MENU_SLOT_COUNT];     // 0x11c: per window slot: number of rows minus one (SetWindowRows)
     int windowFlags[MENU_SLOT_COUNT];       // 0x128: per window slot: layout flags (0x18 when opened, the yes/no dialogs set 0x20)
@@ -222,6 +223,7 @@ struct Game : Object
     int RaiseFireEvents(int argument, int on);      // EN 0x63c610
     int IsAnyWindowShown();                         // EN 0x5f4a90: 1 when a menu window is open or still fading out
     int SetWindowFlags(int id, int flags);          // EN 0x644c50: sets the layout flags of open window `id`
+    int RequestWindowRefresh(int id);               // EN 0x646190 (EN-only, game_menu_refresh.cpp): flags open window `id` for refresh
     int SetWindowRows(int id, int rows);            // EN 0x645a10: stores the row count of open window `id` (as rows - 1)
     int ClearEventQueues();                         // EN 0x63f660: empties the running and the queued event lists
     int ReadWordInLine();                           // EN 0x63f0d0
@@ -235,6 +237,8 @@ struct Game : Object
     int DrawPanel(int x, int y, int w, int h, float z, float alpha);       // EN 0x5e27f0 (JP DrawPanel)
     int DrawPanelAlt(int x, int y, int w, int h, float z, float alpha);    // EN 0x5e2730
     int DrawCursor(int x, int y, float fade, int frame);                   // EN 0x5cd420
+    int DrawBalloon(int x, int y, int lit, int rows, int a, int b, float fade);   // EN 0x5e2570 (JP 0x10008910): draws a speech balloon of `rows` middle rows
+    int MoveCursor();                                                      // EN 0x5a9e40 (JP 0x10009050): moves the menu cursor towards its target
     int DrawDebugText(const char *text, int x, int y);   // EN 0x5e05b0 (JP 0x100091d0): draws `text` with the 8x16 debug font of menu sheet 1
     int DrawLabelledNumber(int value, int x, int y, float z, float fade, float scale, float alpha);  // EN 0x5dec10
 };

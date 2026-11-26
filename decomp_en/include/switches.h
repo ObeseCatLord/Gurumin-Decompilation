@@ -38,10 +38,17 @@ extern "C" short g_objectSwitchState[SWITCH_HOLD_SLOTS];   // EN 0x00b919e0 (JP 
 
 extern "C" int g_switchEffectStarted[SWITCH_HOLD_SLOTS];   // EN 0x009188e0 (JP DAT_1042e0a8): 1 once the hold slot's effect was started
 extern "C" int g_switchEffectKind[SWITCH_HOLD_SLOTS];      // EN 0x0091ba70 (JP DAT_10219fc0): effect kind of each hold slot (0, 1 or 2)
+extern "C" int g_switchSlotSetUp[SWITCH_HOLD_SLOTS];       // EN 0x0091b870 (JP DAT_10219c40): 1 while the hold slot is set up (written by Switch_Hold)
 extern "C" unsigned int g_gameFrames;                      // EN 0x00a1ddfc (JP DAT_104bf890): frames since the game started
 
 // Starts the effects of the switch objects held near the camera. EN 0x5ac530 (JP Switch_UpdateEffects).
 extern "C" int Switch_UpdateEffects(void);
+
+// Lets `holder` (a character slot, or SWITCH_HOLDER_OBJECT_BASE + an object index) hold `object` (0 = the holder's own
+// model) with effect kind `kind` (0, 1 or 2). The object must not be held yet and a hold slot must be free. A character
+// gets hold bit 1 (kinds 0 and 1) or 2 (kind 2) and, for slot kind 0x60, its switch node turned on; an object gets its
+// held bonus. Returns 1, or 0 when the object is already held or no slot is free. EN 0x5a1fa0 (JP 0x10057c40).
+extern "C" int Switch_Hold(int holder, void *object, int kind);
 
 // Lets go of what character slot `holder` holds. EN 0x5c9fd0 (JP 0x10057b90).
 extern "C" int Switch_Release(int holder);

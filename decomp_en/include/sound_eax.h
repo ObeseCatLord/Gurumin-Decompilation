@@ -7,6 +7,9 @@
 #include <windows.h>
 #include <dsound.h>
 
+// KSPROPERTY_SUPPORT_GET and _SET together: the driver can read and write the property.
+const unsigned long EAX_SUPPORT_GET_AND_SET = 3;
+
 // Value a float getter returns when the driver has no such property (-1e30).
 const float EAX_FLOAT_UNAVAILABLE = -1.0e30f;
 
@@ -27,6 +30,7 @@ struct EaxBuffer
     IKsPropertySet *propertySet;   // 0x00: the buffer's property set (0 = EAX not available)
 
     float GetReverbMix();          // EN 0x7c1680: the reverb mix, EAX_FLOAT_UNAVAILABLE when the read fails
+    int SupportsProperty(unsigned long property);   // EN 0x7c16d0: 1 when the driver can both read and write buffer property `property`
 };
 
 // The EAX listener properties.
@@ -34,6 +38,7 @@ struct EaxListener
 {
     IKsPropertySet *propertySet;   // 0x00: the property set (0 = EAX not available)
 
+    int SupportsProperty(unsigned long property);    // EN 0x7c1930: 1 when the driver can both read and write listener property `property`
     float GetDamping();            // EN 0x7c1820: the damping, EAX_FLOAT_UNAVAILABLE when the read fails
     float GetDecayTime();          // EN 0x7c1860: the decay time, EAX_FLOAT_UNAVAILABLE when the read fails
     unsigned long GetEnvironment();// EN 0x7c18a0: the environment number, 0 when the read fails

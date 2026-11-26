@@ -1,7 +1,9 @@
 // EN texture slots, the 2D triangle batch and renderer shutdown (JP twins: texture_mgr.cpp, tri_batch.cpp).
 
 #include <d3d9.h>
+#include <string.h>
 
+#include "map_view.h"
 #include "render.h"
 #include "texture_mgr.h"
 
@@ -163,4 +165,53 @@ extern "C" int Textures_ReleaseGenerated(void)
             g_textures[i].Release();
     }
     return 1;
+}
+
+// Texture stages cleared by BeginRenderTo.
+const int RENDER_TARGET_STAGE_COUNT = 4;
+
+// TextureObject::BeginRenderTo: makes this texture's surface the render target (with the swap depth buffer) so it can be
+// drawn into: unbinds the texture stages and sets a viewport of offset..width by offset..height, clamped to the device
+// back buffer. Unless an off-screen target is already set up, the render target, depth buffer, viewport and size to
+// return to are saved. Returns 1 when target and viewport were set, 0 otherwise (also when render targets do not work).
+// Called by UpdateImage and the model shadow code.
+int TextureObject::BeginRenderTo(int width, int height, int offset)
+{
+    g_stageBindingsReset = 0;
+    g_d3dDevice->SetTexture(0, 0);
+    g_stage0Texture = TEXTURE_BINDING_UNKNOWN;
+    g_d3dDevice->SetTexture(1, 0);
+    g_stage1Texture = TEXTURE_BINDING_UNKNOWN;
+    g_d3dDevice->SetTexture(2, 0);
+    g_d3dDevice->SetTexture(3, 0);
+    if (g_renderTargetsWork == 0)
+        return 0;
+    HRESULT result = g_d3dDevice->SetRenderTarget(0, surface);
+    g_d3dDevice->SetDepthStencilSurface(g_swapDepthSurface);
+    if (result != 0)
+        return 0;
+    int targetWidth = g_deviceBackBufferWidth;
+    if (g_deviceBackBufferWidth > width)
+        targetWidth = width;
+    int targetHeight = g_deviceBackBufferHeight;
+    if (g_deviceBackBufferHeight > height)
+        targetHeight = height;
+    memset(&g_offscreenViewport, 0, sizeof(g_offscreenViewport));
+    g_offscreenViewport.Width = targetWidth - offset;
+    g_offscreenViewport.X = offset;
+    g_offscreenViewport.Y = offset;
+    g_offscreenViewport.Height = targetHeight - offset;
+    g_offscreenViewport.MinZ = 0;
+    g_offscreenViewport.MaxZ = 1.0f;
+    g_backBufferWidth = targetWidth;
+    g_backBufferHeight = targetHeight;
+    if (g_offscreenTargetActive == 0)
+    {
+        g_savedRenderTarget = surface;
+        g_savedViewport = g_viewport;
+        g_savedDepthSurface = g_swapDepthSurface;
+        g_savedWidth = targetWidth;
+        g_savedHeight = targetHeight;
+    }
+    return g_d3dDevice->SetViewport(&g_offscreenViewport) == 0;
 }

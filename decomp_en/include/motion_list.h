@@ -11,6 +11,12 @@ const int MOTION_NAME_SIZE = 0x20;
 // Items a MotionList holds (the timeline).
 const int MOTION_ITEM_COUNT = 0x7f;
 
+// Bit of MotionList::m_0004 that makes the list play its items in turn, and the entry extra bits that play an item
+// backwards and that hold its last frame once the list has run out.
+const int MOTION_LIST_PLAYS_ITEMS = 1;
+const int MOTION_EXTRA_BACKWARDS = 1;
+const int MOTION_EXTRA_HOLD_LAST = 2;
+
 struct MotionList
 {
     int m_0000;                                   // 0x000: not used by EN code yet
@@ -26,6 +32,7 @@ struct MotionList
     int AddEntry(int id, int value, const char *name, int extra);       // EN 0x76f9d0 (JP 0x101ad6a0): appends an entry; 0 when all are used
     int Clear();                                                       // EN 0x7722c0 (JP MotionList::Clear)
     int InsertByName(int position, const char *name, int tag);         // EN 0x76fad0 (JP MotionList::InsertByName)
+    int FrameAt(int time, int *outItem, int *outEntry);                // EN 0x76fba0 (JP 0x101ad350): frame shown `time` frames after m_0208
 };
 
 // The block behind one animation plug of a node (Node::plugs[k]).

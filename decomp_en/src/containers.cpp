@@ -327,3 +327,70 @@ void Matrix4::SetIdentity()
     m[12] = m[13] = m[14] = m[8] = m[9] = m[11] = m[4] = m[6] = m[7] = m[1] = m[2] = m[3] = 0.0f;
     m[0] = m[5] = m[10] = m[15] = 1.0f;
 }
+
+// MotionList::FrameAt: the frame shown `time` frames after m_0208 (never below 0). Without MOTION_LIST_PLAYS_ITEMS in
+// m_0004 that is just the elapsed time. Otherwise the list plays its items in turn: each item is a named entry whose
+// ids..values range is its first and end frame and whose extra bit MOTION_EXTRA_BACKWARDS plays it backwards. Stores
+// the item number in *outItem and the entry in *outEntry (when given). Past the end the last item repeats, or with
+// MOTION_EXTRA_HOLD_LAST holds its last frame (the backward case tests the extra of entry count - 1 instead of the
+// last item's entry). Called by the node animation code.
+int MotionList::FrameAt(int time, int *outItem, int *outEntry)
+{
+    time -= m_0208;
+    if (!(m_0004 & MOTION_LIST_PLAYS_ITEMS))
+        return time > 0 ? time : 0;
+    int start = 0;
+    int length;
+    for (int i = 0; i < count; i++)
+    {
+        length = values[items[i]] - ids[items[i]];
+        int end = length + start;
+        if (time < end)
+        {
+            if (!(extras[items[i]] & MOTION_EXTRA_BACKWARDS))
+            {
+                if (outItem != 0)
+                    *outItem = i;
+                if (outEntry != 0)
+                    *outEntry = items[i];
+                int frame = ids[items[i]] - start + time;
+                return frame > 0 ? frame : 0;
+            }
+            int back = start + start - time + length;
+            if (outItem != 0)
+                *outItem = i;
+            if (outEntry != 0)
+                *outEntry = items[i];
+            back += ids[items[i]] - start;
+            return back > 0 ? back : 0;
+        }
+        start = end;
+    }
+    if (length <= 0)
+        return 0;
+    if (!(extras[items[count - 1]] & MOTION_EXTRA_BACKWARDS))
+    {
+        if (outItem != 0)
+            *outItem = count - 1;
+        if (outEntry != 0)
+            *outEntry = items[count - 1];
+        if (extras[items[count - 1]] & MOTION_EXTRA_HOLD_LAST)
+        {
+            int frame = ids[items[count - 1]] + (length - 1) % length;
+            return frame > 0 ? frame : 0;
+        }
+        int frame = ids[items[count - 1]] + (time - start) % length;
+        return frame > 0 ? frame : 0;
+    }
+    if (outItem != 0)
+        *outItem = count - 1;
+    if (outEntry != 0)
+        *outEntry = items[count - 1];
+    if (extras[count - 1] & MOTION_EXTRA_HOLD_LAST)
+    {
+        int frame = ids[items[count - 1]];
+        return frame > 0 ? frame : 0;
+    }
+    int frame = ids[items[count - 1]] - (time - start) % length + length - 1;
+    return frame > 0 ? frame : 0;
+}

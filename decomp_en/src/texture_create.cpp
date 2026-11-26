@@ -123,3 +123,44 @@ int TextureObject::Create(int width, int height, const void *pixels, int alpha, 
     }
     return Upload(width, height, (unsigned char *)pixels, (const unsigned char *)alpha);
 }
+
+// Texture_CreateFromPixels: returns the slot of the texture named `name` (the existing one when that name is
+// loaded), creating it from width x height RGB `pixels` (all white when none are given) and the `alpha` mode or image.
+// Returns -1 for an empty name, when no slot is free or when the texture cannot be created. EN 0x71c5b0
+// (JP 0x10175c90). Called by the font, model and effect code that draws into textures.
+extern "C" int Texture_CreateFromPixels(const char *name, int width, int height, unsigned char *pixels, int alpha, int flags)
+{
+    if (name[0] == 0)
+        return -1;
+    int slot = Texture_FindByName(name);
+    if (slot != -1)
+        return slot;
+    for (slot = 0; slot < TEXTURE_SLOT_COUNT; slot++)
+    {
+        if (g_textureNames[slot][0] == 0)
+            break;
+    }
+    if (slot == TEXTURE_SLOT_COUNT)
+        return -1;
+    if (pixels == 0)
+    {
+        int size = width * height * RGB_BYTES_PER_PIXEL;
+        unsigned char *white = (unsigned char *)g_engineAlloc(size, "rgb");
+        memset(white, WHITE_BYTE, size);
+        if (g_textures[slot].Create(width, height, white, alpha, flags))
+        {
+            strcpy(g_textureNames[slot], name);
+            g_engineFree(white);
+            g_textureRefCount[slot] = 1;
+            return slot;
+        }
+        g_engineFree(white);
+    }
+    else if (g_textures[slot].Create(width, height, pixels, alpha, flags))
+    {
+        strcpy(g_textureNames[slot], name);
+        g_textureRefCount[slot] = 1;
+        return slot;
+    }
+    return -1;
+}

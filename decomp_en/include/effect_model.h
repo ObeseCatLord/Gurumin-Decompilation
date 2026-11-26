@@ -32,6 +32,7 @@ struct EffectModel
     int Free();     // EN 0x63f320 (JP 0x1000be10): releases the model, the slot is free again
     void AddKey(int frame, float x, float y, float z);        // inline: adds a position key
     void SetRotation(float x, float y, float z);              // inline: sets the rotation in degrees
+    int Rotate(float x, float y, float z);                    // EN 0x63f740 (EN-only, effect_model_rotate.cpp): the out-of-line twin of SetRotation that returns 0 (reached through a pointer, no direct caller)
     int DrawKeyed(Matrix4 &view, Matrix4 &camera);            // EN 0x5a8790 (JP 0x10037b40): plays one frame with the key frames applied
     int Setup(const char *path, int a, int start, int end);   // EN 0x602e10 (JP 0x1000b9f0): loads model `path` into the slot
 };

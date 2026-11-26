@@ -187,6 +187,18 @@ extern "C" float g_charCameraDistance[CHAR_SLOT_COUNT];
 // qsort comparator over slot numbers: orders them by g_charCameraDistance, nearest first (1 when `a` is at least as far as
 // `b`, else -1). EN 0x71bf70.
 extern "C" int CharSlot_CompareByDistance(const int *a, const int *b);
+// qsort comparator over slot numbers: orders them by depth, smallest sortBias + z position first (-1 when `a` has the
+// smaller depth, else 1). EN 0x5c94c0 (see object_lookup.cpp).
+extern "C" int CharSlot_CompareByDepth(const int *a, const int *b);
+// g_charKind letters of the object slots the scripts can look up by model id (the meaning of the letters is not recovered).
+const char OBJECT_KIND_LETTER_F = 'F';
+const char OBJECT_KIND_LETTER_M = 'M';
+const char OBJECT_KIND_LETTER_N = 'N';
+// Returned by Object_FindByModelId when no object has the id.
+const int OBJECT_NOT_FOUND = -1;
+// Slot of the first object (slots OBJECT_SLOT_FIRST up, kind letter F, M or N) whose model has id `objectId`, or
+// OBJECT_NOT_FOUND. Called by the script commands that name an object. EN 0x602dc0 (see object_lookup.cpp).
+extern "C" int Object_FindByModelId(int objectId);
 // Marks character `index` defeated and switches it to behaviour 1 unless it is busy; returns 1 when busy. EN 0x6de920.
 extern "C" int Char_MarkDefeatedAndSwitch(int index);
 extern "C" char g_charKind[CHAR_SLOT_COUNT];               // EN 0x00a35bc8 (JP DAT_1021f3c0): kind of each slot (3 = enemy)

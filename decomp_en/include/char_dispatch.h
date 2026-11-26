@@ -69,8 +69,8 @@ extern "C" int Enemy_PerchAndSwoop(int index);                 // EN 0x6965a0
 extern "C" int Enemy_ChaseLungeAndSpit(int index, int variant);    // EN 0x655020
 extern "C" int Enemy_AimedShots(int index);                    // EN 0x694f90
 extern "C" int Enemy_StarVolley(int index);                    // EN 0x695e20
-extern "C" int Enemy_SpinFire(int index);                      // EN 0x6991e0
-extern "C" int Enemy_CallBarrage(int index);                   // EN 0x6975e0
+int Enemy_SpinFire(int index);                                 // EN 0x6991e0 (C++ linkage: its temporaries are unwound)
+int Enemy_CallBarrage(int index);                              // EN 0x6975e0 (C++ linkage: its temporaries are unwound)
 extern "C" int Enemy_CallBursts(int index, int variant);       // EN 0x695710
 extern "C" int DigitCounter_Update(int index);                 // EN 0x63bc80
 

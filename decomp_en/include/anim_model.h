@@ -159,9 +159,12 @@ struct Playback
 
 struct AnimModel
 {
-    char m_0000[0x12];            // 0x000: not yet named
+    int objectId;                 // 0x000: id the scripts give to find this model among the objects (FindObjectByModelId)
+    char m_0004[0x12 - 4];        // 0x004: not yet named
     char m_0012;                  // 0x012: set to 2 every frame by the hovering characters
-    char m_0013[0x70 - 0x13];     // 0x013: not yet named
+    char m_0013[0x68 - 0x13];     // 0x013: not yet named
+    float sortBias;               // 0x068: added to the z position when objects are depth sorted (-1000 on objects set up by a map trigger in the JP build)
+    char m_006c[0x70 - 0x6c];     // 0x06c: not yet named
     union
     {
         int collisionFilter;      // 0x070: collision filter of the model's world tests (g_collisionFilter while they run)
@@ -321,6 +324,8 @@ struct AnimModel
     int GetPlaybackLayer();                                              // EN 0x72ce30 (JP 0x1017b1c0): the layer that plays now
     int UpdateCollision();                                               // EN 0x741b40 (JP 0x10162390): collides the model's position with the map
     int SetLayer(int layer, int a, int first, int last, int b, int c);   // EN 0x7438f0: Playback::SetLayer on the playback
+    int SetFollowUp(int layer, int index, int value);                    // EN 0x745590: Playback::SetFollowUp on the playback (creates it on first use)
+    int SetSlotOffset(int layer, int slot, int x, int y);                // EN 0x7464d0: Playback::SetSlotOffset on the playback (creates it on first use)
 };
 
 static_assert(sizeof(AnimModel) == ANIM_MODEL_SIZE, "AnimModel must be 0x249c bytes");

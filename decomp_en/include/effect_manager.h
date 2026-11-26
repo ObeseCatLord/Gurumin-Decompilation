@@ -154,7 +154,11 @@ struct EffectRecord
 struct EffectLight
 {
     int active;                                      // 0x00: non-zero while in use
-    char m_0004[0x4014 - 4];                         // 0x04: not yet named (trail points, widths and colours)
+    int definition;                                  // 0x04: effect definition the light belongs to (index in g_effectDefs)
+    int m_0008;                                      // 0x08: not yet named
+    int age;                                         // 0x0c: frames the light has faded for, 0 = not fading yet
+    float fade;                                      // 0x10: brightness factor, 1.0 when the fade starts, 0 at its end
+    char m_0014[0x4014 - 0x14];                      // 0x14: not yet named (trail points, widths and colours)
 };
 
 extern "C" EffectDef g_effectDefs[EFFECT_DEFINITION_COUNT];          // EN 0x01dd0354 (JP DAT_1101dfdc): effect definitions
@@ -218,6 +222,12 @@ struct EffectManager
             g_effectSpritesB[i].type = EFFECT_NONE;
         return 0;
     }
+    // Advances the record `index` of effect list `list` by one frame. EN 0x7163e0 (JP 0x10184440).
+    int Step(int index, int list);
+    // Runs one frame of every effect list, ages the sprites and fades the lights out. `onlyFollowing` restricts it to
+    // effects that follow a matrix, `runOwnerEffects` also runs effects that follow their owner and `runPaused` also
+    // runs effects whose pause flag is set. Returns 0. EN 0x719750 (JP 0x10188580). Called by the frame update.
+    int Update(int onlyFollowing, int runOwnerEffects, int runPaused);
     int Reset();   // EN 0x734ce0 (JP 0x10184170): removes every running effect
     int Start(int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame,
               const Matrix4 *matrix, const EffectOptions *options, int *pause);

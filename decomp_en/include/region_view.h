@@ -60,4 +60,7 @@ extern "C" MapRegion *g_mapRegions;
 // else 0 (also for hidden regions). EN 0x5f4f60 (JP Region_IsVisible).
 extern "C" int Region_IsVisible(int index);
 
+// Moves vertex `vertex` of region `region` by a sine wave per axis (see region_view.cpp). EN 0x5b3f50.
+int Region_WaveVertex(int region, int vertex);
+
 #endif

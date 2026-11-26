@@ -17,8 +17,16 @@ extern "C" int g_textInputLimit;
 extern "C" int g_menuChoice;
 // Mode of the menu choice (set to MENU_CHOICE_PICKED by MenuChoice_Set). EN 0x00a14f88.
 extern "C" int g_menuChoiceMode;
+// g_menuChoiceMode after MenuChoice_Request asked for a choice menu.
+const int MENU_CHOICE_REQUESTED = 1;
 // g_menuChoiceMode after a choice was made.
 const int MENU_CHOICE_PICKED = 2;
+// Third value of the pending choice request. EN 0x00a14f90.
+extern "C" int g_menuChoiceExtra;
+// Caption pointer the pending request was given (0 = none; the text itself is copied to g_menuChoiceCaption). EN 0x00a14f94.
+extern "C" const char *g_menuChoiceCaptionGiven;
+// Copy of the pending request's caption. EN 0x00a14f98.
+extern "C" char g_menuChoiceCaption[];
 
 // Clears the root node of every model file entry. EN 0x7347f0. Called when the model files are reset.
 extern "C" void ModelFileRoots_Clear(void);
@@ -34,6 +42,9 @@ extern "C" int MenuCursor_Report(int cursor, char *caption);
 extern "C" int TextInput_SetLimit(int limit);
 // Records a menu choice. Returns 0. EN 0x63e980.
 extern "C" int MenuChoice_Set(int value);
+// Records a request for a choice menu (value, caption text, third value) for the main loop to open. Returns 0. EN 0x63e9a0
+// (see menu_choice_request.cpp).
+extern "C" int MenuChoice_Request(int value, const char *caption, int extra);
 
 // Script values above this are negative numbers stored as value - SCRIPT_VALUE_WRAP.
 const int SCRIPT_VALUE_NEGATIVE_START = 5000;

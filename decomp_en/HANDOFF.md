@@ -34,9 +34,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 798 of 2,034 game functions (171,646 of 2,080,360 bytes, 8.25 %) |
-| Matched under the rules | 798 |
-| Queue | 146 walls, 40 with a matched JP twin (1,500+ bytes, low yield), 325 mapped to unmatched JP, 676 EN-only; open.tsv ~160 (incl. library/blocked rows, which leave the queue) near-misses |
+| Matched | 862 of 2,034 game functions (179,085 of 2,080,360 bytes, 8.61 %) |
+| Matched under the rules | 862 |
+| Queue | 162 walls, 40 with a matched JP twin (1,500+ bytes, low yield), 307 mapped to unmatched JP, 606 EN-only; open.tsv ~160 (incl. library/blocked rows, which leave the queue) near-misses |
 
 ## State
 - Batches 1-11 matched Node, Vec4/Matrix4/Box, containers, AnimModel, camera, IME, engine/render, texture manager,
@@ -55,6 +55,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 - Check `git diff --stat` before each commit: a worker's sed -i turned obj_symbols.tsv into mixed CRLF/LF in batch 12
   (normalised back to LF); batch 13 flipped five more. Before committing run
   `git ls-files --eol -- decomp_en` and restore any file whose w/ differs from i/. Open puzzle: CreateShortcut calling convention (NOTES).
+- Lever to test: `Game::TestScriptFlag` is inline in game.h, but the original calls it out of line (0x5ec240) from
+  DamageZone_Update 0x63ac70 and Route_FollowGates 0x5ee110; some callers may inline it. Also `small_b11.h` is a
+  catch-all header from batch 11: split its declarations into area headers when convenient.
 - Never add address-taking tables or macros that only force COMDAT emission.
 - Blocked: launcher (164 EN-only functions) needs the VS2013 MFC headers (Express has no `VCtlmfc`; NOTES);
   `Game::~Game` 0x5a1150 needs Node dtor + EN Object base.

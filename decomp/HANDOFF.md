@@ -266,6 +266,9 @@ function) and node_world.cpp (0) still break rule 2.
   w384i scratchpad, Vis_IsCharacterVisible via a boxes pointer local). Large walls (1600-4000) gave none: they are
   mostly register choice and slot order (NOTES "Stack-slot order of locals"). The remaining queue is walls only;
   exhaustive expression-order permutation is the lever still paying off on near misses.
+- Batch 385: no new matches (13 near misses with exhaustive permutation, 22 large walls). Input::ReadControls now
+  the original's size. What is left is mostly register choice, slot order and scheduling that source order does not
+  steer; a permuter-style search tool may be the next lever (ask before installing anything).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

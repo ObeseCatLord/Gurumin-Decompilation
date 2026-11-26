@@ -110,6 +110,7 @@ int Input::ReadControls(int control)
         memset(keys, 0, KEYBOARD_STATE_SIZE);
 
     int result = 0;
+    int axis;
     if (control == CONTROL_AXIS_X)
     {
         if (IsKeyboardButtonDown(BUTTON_X_LOW, keys) != 0)
@@ -123,6 +124,7 @@ int Input::ReadControls(int control)
                 return -AXIS_LIMIT - 1;
             return IsJoystickButtonDown(BUTTON_X_HIGH, &joy) != 0 ? AXIS_LIMIT : 0;
         }
+        axis = joy.x;
     }
     else if (control == CONTROL_AXIS_Y)
     {
@@ -137,7 +139,7 @@ int Input::ReadControls(int control)
                 return -AXIS_LIMIT - 1;
             return IsJoystickButtonDown(BUTTON_Y_HIGH, &joy) != 0 ? AXIS_LIMIT : 0;
         }
-        joy.x = joy.y;
+        axis = joy.y;
     }
     else
     {
@@ -177,10 +179,10 @@ int Input::ReadControls(int control)
         return result;
     }
 
-    int centred = joy.x / 256 - 0x80;
+    int centred = axis / 256 - 0x80;
     if (abs(centred) < DAT_10203408)
-        joy.x = AXIS_CENTRE;
-    result = (joy.x - AXIS_CENTRE) / (0x100 - DAT_10f65560);
+        axis = AXIS_CENTRE;
+    result = (axis - AXIS_CENTRE) / (0x100 - DAT_10f65560);
     if (result > -AXIS_LIMIT - 1)
     {
         if (result > AXIS_LIMIT)

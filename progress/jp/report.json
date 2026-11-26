@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 50.6804,
+  "fuzzy_match_percent": 50.6586,
   "total_code": "1720206",
   "matched_code": "357047",
   "matched_code_percent": 20.7561,
@@ -12059,7 +12059,7 @@
   {
    "name": "app/input_controls",
    "measures": {
-    "fuzzy_match_percent": 85.3155,
+    "fuzzy_match_percent": 62.3775,
     "total_code": "1633",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -12084,14 +12084,14 @@
     {
      "name": ".text",
      "size": "1633",
-     "fuzzy_match_percent": 85.3155
+     "fuzzy_match_percent": 62.3775
     }
    ],
    "functions": [
     {
      "name": "?ReadControls@Input@@QAEHH@Z",
      "size": "1633",
-     "fuzzy_match_percent": 85.3155,
+     "fuzzy_match_percent": 62.3775,
      "metadata": {
       "virtual_address": "269758848"
      }

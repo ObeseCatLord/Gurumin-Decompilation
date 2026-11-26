@@ -6,6 +6,9 @@ int g_oseBoard[OSE_BOARD_WORDS];   // the packed board (EN 0x01614d60)
 int g_oseComputerTurnPending;               // computer owes a move (EN 0x01614d70)
 int g_oseChosenColumn;                      // column chosen by the move search, -1 = none (EN 0x01614d74)
 int g_oseChosenRow;                         // row of the chosen move (EN 0x01615298)
+int g_oseMoveColumn[OSE_SEARCH_TABLE_SIZE];   // column of the move tried at each ply of the search (EN 0x01614d78)
+int g_oseMoveRow[OSE_SEARCH_TABLE_SIZE];      // row of the move tried at each ply of the search (EN 0x01615008)
+int g_oseBestCount;                           // most pieces of the counted colour reached so far (EN 0x0161529c)
 
 
 // Message box text when the computer finds no move ("masu") and when the move it found is illegal ("okashii").

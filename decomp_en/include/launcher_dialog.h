@@ -395,9 +395,21 @@ extern int g_oseChosenRow;                         // row of the chosen move (EN
 extern int g_oseDirectionColumn[OSE_DIRECTIONS];   // column step of each of the 8 directions (EN 0x00908990)
 extern int g_oseDirectionRow[OSE_DIRECTIONS];      // row step of each of the 8 directions (EN 0x009089b0)
 
-// Move search of the computer player (not yet reconstructed, EN 0x006ecb50): looks for the best move for `color`
-// (1 black, 2 white) on the unpacked board `cells`, recursing with `depth`; leaves its choice in g_oseChosenColumn/g_oseChosenRow.
-void Ose_SearchMove(unsigned char *cells, int depth, int color, int opponentColor);
+const int OSE_SEARCH_DEPTH = 7;             // plies the exhaustive move search looks ahead
+const int OSE_SEARCH_TABLE_SIZE = 164;      // entries the original reserves in the per-ply move tables
+extern int g_oseMoveColumn[OSE_SEARCH_TABLE_SIZE];   // column of the move tried at each ply of the search (EN 0x01614d78)
+extern int g_oseMoveRow[OSE_SEARCH_TABLE_SIZE];      // row of the move tried at each ply of the search (EN 0x01615008)
+extern int g_oseBestCount;                           // most pieces of the counted colour reached so far (EN 0x0161529c)
+
+// Move search of the computer player (EN 0x006ecb50): tries every empty cell for `color` (1 black, 2 white) on the
+// unpacked board `cells`, plays it and recurses one ply deeper for the other colour (a side without a move passes).
+// At the end of a line (board full or one colour gone, or OSE_SEARCH_DEPTH plies) it counts the pieces of
+// `countColor`; the first move of the line with the highest count is left in g_oseChosenColumn/g_oseChosenRow.
+// Always returns 0 (the result is unused). Called by COseDlg::OnTimer with depth 0.
+int Ose_SearchMove(unsigned char *cells, int depth, int color, int countColor);
+// The same search on a packed board (EN 0x006ecf40): unpacks it itself and packs every child board before recursing.
+// Never called in the exe (dead code next to Ose_SearchMove); only recursion.
+int Ose_SearchMovePacked(int *board, int depth, int color, int countColor);
 // Plays a move of `color` at (column, row) on the packed board: flips the opponent pieces it captures in the 8
 // directions and repacks the board. Returns 1 when the move was legal, 0 when it flips nothing or the cell is taken
 // (EN 0x006ec360). Called by COseDlg::OnTimer (computer) and COseDlg::OnLButtonDown (player).

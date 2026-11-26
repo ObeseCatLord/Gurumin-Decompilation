@@ -1377,6 +1377,8 @@ _Packs_DecodeBlock	007bd990
 ?OnTimer@COseDlg@@IAEXI@Z	006eca20
 ?OnRButtonDown@COseDlg@@IAEXIVCPoint@@@Z	006ec8f0
 ?Ose_PlayMove@@YAHPAHIIH@Z	006ec360
+?Ose_SearchMove@@YAHPAEHHH@Z	006ecb50
+?Ose_SearchMovePacked@@YAHPAHHHH@Z	006ecf40
 ?OnLButtonDown@COseDlg@@IAEXIVCPoint@@@Z	006ec5d0
 ?OnPaint@COseDlg@@IAEXXZ	006ec790
 ??1CNetDlg@@UAE@XZ	006e68b0

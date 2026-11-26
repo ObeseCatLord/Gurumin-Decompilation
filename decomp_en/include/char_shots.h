@@ -38,7 +38,8 @@ struct ShotSlot
 {
     Vec4 position;            // 0x00: start position of the shot
     Vec4 step;                // 0x10: per-frame step of the shot (cleared with the position when the character resets)
-    char m_0020[0x20];        // 0x20: not used by EN code yet
+    Vec4 history2;            // 0x20: the hopping enemy (kind 0x50) keeps the second-last standing position here, then the hop step
+    Vec4 history3;            // 0x30: ... and the oldest standing position, the one it hops back to
 };
 
 extern "C" ShotSlot g_shotSlots[CHAR_SLOT_COUNT];                 // EN 0x00da7b00 (JP DAT_10802bf8): record of each shot slot

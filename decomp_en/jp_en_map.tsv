@@ -41,7 +41,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 005a60f0	1697	APP.dll	1002a740	Char_SpiritUpdate	1833	unmatched	0.83	high	features	shared f9,i16,s2, 3 rare
 005a67a0	80	APP.dll	10015860	Vis_IsVisible	78	matched:visibility.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.97
 005a67f0	171	APP.dll	100157b0	Char_UpdateNearCells	167	unmatched	0.80	high	features	shared i4, 0 rare
-005a68a0	146	APP.dll	10015710		148	unmatched	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.99
+005a68a0	146	APP.dll	10015710		148	matched:visibility.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.99
 005a6940	1841	APP.dll	100b0f00	Companion2_Update	1558	matched:companion_update.cpp	0.85	high	features	shared i11, 2 rare
 005a7080	337	APP.dll	1001a840	Char_ClampStatus	330	matched:char_status.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.98
 005a71e0	1942	APP.dll	100b0880	Companion1_Update	1662	matched:companion_update.cpp	0.82	high	features	shared i13, 3 rare

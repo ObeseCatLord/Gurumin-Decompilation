@@ -14,9 +14,9 @@ extern "C" void Steam_GetCloudFileSize(const char *name)
 }
 
 // Asks the cloud whether a file exists; the game ignores the answer. Called by the save code.
-extern "C" void Steam_CloudFileExists(const char *name)
+extern "C" bool Steam_CloudFileExists(const char *name)
 {
-    SteamRemoteStorage()->FileExists(name);
+    return SteamRemoteStorage()->FileExists(name);
 }
 
 // Reads a cloud file into buffer; true when any bytes came back.
@@ -39,16 +39,16 @@ extern "C" CSteamID *Steam_GetUserId(CSteamID *id)
 }
 
 // Unlocks an achievement and sends the stats to Steam.
-extern "C" void Steam_UnlockAchievement(const char *name)
+extern "C" bool Steam_UnlockAchievement(const char *name)
 {
     SteamUserStats()->SetAchievement(name);
-    SteamUserStats()->StoreStats();
+    return SteamUserStats()->StoreStats();
 }
 
 // Reads the text typed into the Steam on-screen input.
-extern "C" void Steam_GetEnteredText(char *text, unsigned size)
+extern "C" bool Steam_GetEnteredText(char *text, unsigned size)
 {
-    SteamClient()->GetISteamUtils(GetHSteamPipe(), STEAM_UTILS_VERSION)->GetEnteredGamepadTextInput(text, size);
+    return SteamClient()->GetISteamUtils(GetHSteamPipe(), STEAM_UTILS_VERSION)->GetEnteredGamepadTextInput(text, size);
 }
 
 // Opens the Steam on-screen text input and remembers that it is open.

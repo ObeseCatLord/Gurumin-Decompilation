@@ -145,6 +145,10 @@ struct TextureObject
     // EN 0x78ce10: binds this texture to stages 0 to 3 and draws a quad covering the largest viewport size through
     // the pixel shader (all four coordinate sets map the texture's whole square, half a texel in from each edge). Returns 0.
     int DrawThroughShader();
+    // EN 0x790e70 (texture_shader3.cpp): binds this texture to stage 0, `second` to stage 1 and `third` to stage 2 and draws
+    // a quad over the back buffer size through the pixel shader of render target slot 2 (the first stage-1 binding is
+    // forgotten afterwards). Returns 0.
+    int DrawThroughShader3(TextureObject *second, TextureObject *third);
     int DrawFrameAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);  // EN 0x7955c0
     int DrawFrameAltStretched(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);  // EN 0x794c70 (JP 0x1014e5d0)
     int DrawFill(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);      // EN 0x798980 (JP 0x1014ce40)

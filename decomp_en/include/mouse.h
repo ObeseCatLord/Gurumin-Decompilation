@@ -21,16 +21,17 @@ struct Mouse
     char buttonExtra2;        // 0x04: second extra button
     char m_0005[3];           // 0x05: padding
     MousePoint position;      // 0x08: cursor position
-    int m_0010[2];            // 0x10: not recovered
+    MousePoint clickPosition; // 0x10: where the last click that started a double click was (game coordinates)
     int wheel;                // 0x18: wheel movement
     int moved;                // 0x1c: 1 once the cursor has moved since the last ClearChanged
     int window;               // 0x20: window handle the mouse is bound to
     MousePoint lastPosition;  // 0x24: position at the previous UpdateMoved
-    int m_002c[4];            // 0x2c: not recovered
+    int leftHeld, rightHeld, middleHeld, clickTime;   // 0x2c, 0x30, 0x34: 1 while that button has been seen down; 0x38: tick count of the last click
     MouseCursorCallback cursorCallback;   // 0x3c: cursor callback given to Init (0 = none)
     int callbackUser;         // 0x40: user value passed to the callback
     int m_0044;               // 0x44: cleared by Init
 
+    int Poll(MousePoint *outPosition, char *outLeft, char *outMiddle, char *outRight, int *outWheel, char *outDoubleClick);   // EN 0x7aa3a0 (JP Obj::Update, mouse_poll.cpp): reads the Windows mouse into the tracker and the out pointers
     int ClearChanged();       // EN 0x7aa8b0
     int Update();             // EN 0x7aa280 (JP 0x10001550): the method view of Sound_StopAll, which only calls the sound command with six zeros (the frame step loads ecx with g_mouse first)
     int UpdateMoved();        // EN 0x7aa250

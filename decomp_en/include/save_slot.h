@@ -29,4 +29,12 @@ extern "C" int SavePreview_Show(int slot);
 // is missing or does not descramble. C++ linkage (the GameFile local has an unwind table). EN 0x63e9f0 (JP 0x10010d10).
 int Save_ReadSlotInfo(const char *name, int *map, int *playTime, char *playerName, int *mode);
 
+// Loads the save file `path` (Steam cloud copy first, else the file on disk) into the game state and opens the game
+// with it; `name` is the slot name that descrambles it, the middle argument is not used. Returns 1, or 0 when missing
+// or invalid. C++ linkage (it has a GameFile local, so callers need an unwind state). EN 0x603630 (not ported yet).
+int Save_LoadSteam(const char *path, int unused, const char *name);
+// Loads save file `name` from the SaveData folder next to the program through Save_LoadSteam. `unused` is passed on
+// unchanged. C++ linkage (the GameFile local has an unwind table). Called by the load menu. EN 0x603940.
+int Save_LoadSlotSteam(const char *name, int unused);
+
 #endif

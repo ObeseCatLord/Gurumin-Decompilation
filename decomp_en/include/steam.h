@@ -121,7 +121,7 @@ extern "C" __declspec(dllimport) void __cdecl SteamAPI_RunCallbacks();   // disp
 // Wrappers the game calls (EN-only, no JP twin).
 // Cloud file size and existence queries; the game ignores the results. EN 0x005ec220 and 0x005e7b30.
 extern "C" void Steam_GetCloudFileSize(const char *name);
-extern "C" void Steam_CloudFileExists(const char *name);
+extern "C" bool Steam_CloudFileExists(const char *name);
 // Reads a cloud file; true when any bytes came back. EN 0x005e7b50.
 extern "C" bool Steam_CloudFileRead(const char *name, void *buffer, int size);
 // Writes a cloud file and returns the Steam result. EN 0x005e7b80.
@@ -129,9 +129,9 @@ extern "C" bool Steam_CloudFileWrite(const char *name, const void *data, int siz
 // Stores the logged-in user's account id into *id and returns id. EN 0x005ee4b0.
 extern "C" CSteamID *Steam_GetUserId(CSteamID *id);
 // Unlocks an achievement and sends the stats to Steam. EN 0x00642ca0.
-extern "C" void Steam_UnlockAchievement(const char *name);
+extern "C" bool Steam_UnlockAchievement(const char *name);
 // Reads the on-screen text input into a buffer. EN 0x005ec1e0.
-extern "C" void Steam_GetEnteredText(char *text, unsigned size);
+extern "C" bool Steam_GetEnteredText(char *text, unsigned size);
 // Opens the on-screen text input and remembers that it is open. EN 0x00646a90.
 extern "C" void Steam_ShowTextInput(const char *description, unsigned maxCharacters);
 // Steam callback payload GamepadTextInputDismissed_t (callback id 714, 8 bytes).

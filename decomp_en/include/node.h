@@ -466,6 +466,8 @@ struct Node
                    int texture, float scale, int size, float casterSize, AnimModel *model, float alpha);
     // EN 0x749b10 (JP 0x10199be0): marks the visibility cells of a map root node that are visible (not ported yet).
     int UpdateVisibleCells();
+    // EN 0x75ca20 (JP 0x101a8780, node_mesh_hits.cpp): 1 when the segment `from`-`to` hits one of this node's own opaque triangles (children are not visited).
+    int SegmentHitsMesh(Vec4 *from, Vec4 *to);
 
     // Whole-subtree setters and savers.
     void SaveFlags();                    // EN 0x7498c0 (JP 0x10191d50): flags into savedFlags

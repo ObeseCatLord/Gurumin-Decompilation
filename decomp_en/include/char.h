@@ -337,6 +337,9 @@ struct CharMarker
     float savedY;      // 0x04: y of that saved position
     float savedZ;      // 0x08: z of that saved position
     char m_000c[4];    // 0x0c: not used by EN code yet
+
+    // Stores `source` (x, y, z, w) in the record, through Vec4::Copy (the record has the layout of a Vec4).
+    void Copy(const Vec4 &source) { ((Vec4 *)this)->Copy(source); }
 };
 extern "C" char g_charInPlay[CHAR_SLOT_COUNT];                       // EN 0x0091d608 (JP DAT_1020d540): 1 = the character is in play
 extern "C" int g_waveEnemiesAlive;                                    // EN 0x01333350 (JP DAT_10c635a8): wave enemies still alive

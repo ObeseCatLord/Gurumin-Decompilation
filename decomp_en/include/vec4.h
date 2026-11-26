@@ -30,6 +30,8 @@ struct Vec4
     float DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest);  // EN 0x772ea0 (JP 0x101acdf0): distance to the segment a-b, closest point in `closest`
     float DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2);   // EN 0x7734d0 (JP 0x101acc60): squared x/y distance to the segment (x1, y1)-(x2, y2)
     float DistanceZWeighted(const Vec4 &other);      // EN 0x7736f0 (JP 0x101ac5f0)
+    float DistanceToLine(const Vec4 &a, const Vec4 &b);          // EN 0x773130 (JP DistanceToLine, not ported yet): distance from this point to the line through a and b
+    float DistanceSquaredToLine(const Vec4 &a, const Vec4 &b);   // EN 0x773320 (JP DistanceSquaredToLine, not ported yet): squared distance to the line through a and b
     float DistanceFlat(const Vec4 &other);           // EN 0x7736a0 (vec4_lengths.cpp): x/y distance to `other`, taken by reference
     int InRect(const Box2 *box);                     // EN 0x7749d0 (JP 0x101ac7c0): inside the box's x/y rectangle
     int InBox(const Box2 *box);                      // EN 0x774a10 (JP 0x101ac6e0)

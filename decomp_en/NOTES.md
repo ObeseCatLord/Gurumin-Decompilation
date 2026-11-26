@@ -148,3 +148,12 @@ EN 0x7a9db0 matches only as a free `__stdcall` function (`src/shortcut.cpp`); as
 `this` (frame 0x618 instead of 0x614). Its caller 0x7aa130 (`InstallerMenu::CreateDesktopShortcut`) loads ecx with
 `this` before the call and matches only when the callee is declared as a thiscall member (`include/installer_menu.h`).
 So the function has two declarations for now; find one form both functions accept before treating either as final.
+
+## Steam slot calls and unwind frames (batch 21)
+- Steam interface slot calls (`mov eax,[edx+N]; call eax` or `jmp eax`) match when the wrapper returns the call's
+  bool instead of discarding it (Steam_CloudFileExists, Steam_UnlockAchievement, Steam_GetEnteredText). This closes the
+  "Steam slot-call form" item from batches 8-10.
+- Functions with a Matrix4 or GameFile local get an unwind frame under /EHsc only with C++ linkage; `extern "C"` drops
+  it (Enemy_CastAndTeleport, Save_LoadSlotSteam, Camera_Refresh). Save_LoadSlotSteam constructs and destroys an unused
+  GameFile (calls 0x7a8900/0x7a8910 are in the binary), so the unused local is the original's, not a steering device.
+- `atan2f(dx, dy)` matches where `(float)atan2((double)dx, (double)dy)` does not.

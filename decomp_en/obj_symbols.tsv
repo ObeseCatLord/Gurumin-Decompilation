@@ -1479,3 +1479,16 @@ _Char_RunBehaviour	006d1b40
 ?Camera_Refresh@@YAHXZ	005a90c0
 ?Enemy_StalkAndLunge@@YAHH@Z	006a3ef0
 _CharKind4e_Update	0069c9f0
+# walls (batch 21)
+_AsciiInput_Begin	007ad4b0
+_AsciiInput_OnKey	007ad550
+?Save_LoadSlotSteam@@YAHPBDH@Z	00603940
+_RemoveScale	00773f20
+?Footstep_Play@@YAXHHPBUVec4@@@Z	0063f790
+?Wave_Update@@YAHXZ	006d6580
+?SegmentHitsMesh@Node@@QAEHPAUVec4@@0@Z	0075ca20
+?Poll@Mouse@@QAEHPAUMousePoint@@PAD11PAH1@Z	007aa3a0
+?DrawThroughShader3@TextureObject@@QAEHPAU1@0@Z	00790e70
+# section 2 (batch 21)
+_CharKind50_Update	0069e4a0
+?Enemy_CastAndTeleport@@YAHH@Z	00665b70

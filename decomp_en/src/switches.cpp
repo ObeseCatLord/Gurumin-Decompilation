@@ -1,4 +1,5 @@
 // Switch gimmicks (EN build). Ported from the matched JP source decomp/src/switches.cpp.
+#include "char_script.h"
 #include "game.h"
 #include "switches.h"
 
@@ -170,4 +171,21 @@ extern "C" int Switch_Hold(int holder, void *object, int kind)
     g_switchEffectStarted[slot] = 0;
     g_switchSlotSetUp[slot] = 1;
     return 1;
+}
+
+// Switch_ResetByNode: for every object slot whose switch node is `switchNode`, clears state values 0 and 1 and stores
+// `value` in state value SWITCH_VALUE_SETTING; then marks a voice event as asked for. Returns 0.
+extern "C" int Switch_ResetByNode(int switchNode, int value)
+{
+    for (int slot = OBJECT_SLOT_FIRST; slot < ENEMY_SLOT_END; slot++)
+    {
+        if (g_characterModels[slot].switchNode == switchNode)
+        {
+            g_charState[slot].values[SWITCH_VALUE_SETTING] = value;
+            g_charState[slot].values[0] = 0;
+            g_charState[slot].values[1] = 0;
+        }
+    }
+    g_scriptPlayback = 2;
+    return 0;
 }

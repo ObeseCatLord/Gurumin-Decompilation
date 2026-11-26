@@ -50,7 +50,7 @@ extern "C" int TextureNames_FindFree(void)
 }
 
 // Sets the second text input flag. Called when the name entry starts.
-extern "C" void TextInput_SetFlag(int value)
+extern "C" void TextInput_SetFlag(KeyDownCallback value)
 {
     g_textInputFlag = value;
 }

@@ -32,7 +32,8 @@ extern "C" int g_textInputState;        // EN 0x022280b0 (JP DAT_10f68110): clea
 extern "C" int g_textInputCursor;       // EN 0x022280a0 (JP DAT_10f66998): cleared when text input starts
 extern "C" char *g_textInputBuffer;     // EN 0x02226944 (JP DAT_10f68118): buffer that receives the typed text
 extern "C" int g_textInputActive;   // EN 0x02228074 (JP DAT_10f67000): 1 while text input (IME composition) is active
-extern "C" int g_textInputFlag;     // EN 0x021e4834: second text input flag, cleared when input ends
+typedef void (*KeyDownCallback)(WPARAM keyCode, LPARAM keyData);   // called by the window procedure on a key press
+extern "C" KeyDownCallback g_textInputFlag;     // EN 0x021e4834: key press callback of the name entry (0 = none), cleared when input ends
 
 // Text input callbacks installed in the game window.
 extern "C" void Ime_ReadCompositionString();   // EN 0x7ab050 (JP 0x1015f3e0): reads the composition string

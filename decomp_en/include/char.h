@@ -14,6 +14,26 @@ const int OBJECT_SLOT_FIRST = 0x5c;
 // g_charKind values of objects the actor scans look for.
 const int OBJECT_KIND_NEAR_POINT = 0x5c;
 const int OBJECT_KIND_BLOCKER = 0x14;
+// CharRecord::kind of the objects whose state words hold slot numbers (Objects_ClearReferencesInRange clears them).
+const int OBJECT_KIND_REFERENCE_HOLDER = 0x58;
+// How many of the first CharState::values such an object keeps slot numbers in.
+const int OBJECT_REFERENCE_VALUE_COUNT = 6;
+// Highest slot Object_SpawnModel hands out (it refuses when g_nextObjectSlot has reached it), and the g_charKind value the
+// spawned model gets.
+const int OBJECT_SPAWN_LIMIT = 0x7b;
+const char CHAR_KIND_SPAWNED_MODEL = 6;
+// Colour values the spawned model's node gets (SetColourA, SetColourB) and the mask that applies them to every mesh.
+const unsigned char SPAWNED_COLOUR_A = 0xff;
+const unsigned char SPAWNED_COLOUR_B = 0x4f;
+const unsigned int SPAWNED_COLOUR_MASK = 0xffffffff;
+extern "C" int g_nextObjectSlot;   // EN 0x00bc8878: the next slot Object_SpawnModel uses
+// Loads the model file `path` into the next free slot and places it at (x, y, z). Returns the slot, or 0 after showing
+// "Too many objects." when no slot is left. EN 0x5a2380 (see game_state.cpp). Called by the script command that places a model (EN 0x628750).
+extern "C" int Object_SpawnModel(const char *path, int x, int y, int z);
+// Clears every slot number between `first` and `last` (inclusive) that the objects of kind OBJECT_KIND_REFERENCE_HOLDER
+// keep in their state values. Returns 0. Called by the script command that removes characters (EN 0x6883a0). EN 0x647a80
+// (see object_lookup.cpp).
+extern "C" int Objects_ClearReferencesInRange(int first, int last);
 // Object_IsNearPoint: half size of the object's square and of the point's square.
 const float OBJECT_NEAR_HALF_SIZE = 125.0f;
 const float POINT_NEAR_HALF_SIZE = 25.0f;
@@ -32,6 +52,8 @@ const int CHARSTATE_NPC_TALK = 1;
 const int CHARSTATE_NPC_RANGE = 2;       // distance at which a waiting NPC reacts to the player
 // CharState::values index of the flag a route walker keeps: non-zero = walking the route backwards.
 const int CHARSTATE_ROUTE_REVERSED = 4;
+// Index in CharState::values of the frames a gate route walker still waits at a gate (type 3).
+const int CHARSTATE_GATE_WAIT = 0;
 // Characters in the party table (g_partyCharacters).
 const int PARTY_SIZE = 5;
 // Number of entries of the group table.
@@ -154,7 +176,12 @@ struct CharState
     {
         struct
         {
-            int state;                // 0x00: behaviour step (0 = not started yet)
+            union
+            {
+                int state;            // 0x00: behaviour step (0 = not started yet)
+                int gateReversed;     // 0x00: gate route walkers: non-zero = walking back along the route (Route_FollowGates)
+                int turn;             // 0x00: zone characters: which enemy of each step is checked this frame (DamageZone_Update)
+            };
             int values[13];           // 0x04: behaviour variables (the AI pickers use values[0] and values[1])
             int sawPlayer;            // 0x38: 1 once the character saw the player (or was told to react)
             int behaviour;            // 0x3c: behaviour number the character switches to (set with state 2)
@@ -253,6 +280,15 @@ extern "C" int Char_StartEffect(int index, int effect, Vec4 position, int parent
                                 int value, int frame, const Matrix4 *matrix, const EffectOptions *options);
 // Resets the behaviour state of character `index` (JP 0x10043cc0). EN 0x6d2070.
 extern "C" int Char_ResetState(int index);
+// Script code of each character: four two-digit fields AABBCCDD (BB, CC and DD are the mount, clothes and head models, AA
+// the weapon, see Char_ResetState). EN 0x0091e4c0 (JP DAT_102548c0).
+extern "C" int g_charSetupCode[CHAR_SLOT_COUNT];
+// Builds the worn models of character `index` from its script code and selects its kind unless `skipKindSelect`; see
+// the JP twin Char_PutOnEquipment. EN 0x6cd640 (C++ linkage, cdecl).
+int Char_PutOnEquipment(int index, int mount, int clothes, int head, int weapon, int skipKindSelect, int alternative);
+// Sets the kind of character `index` from its script code and resets its AI state when the kind changed (JP 0x1001b0a0).
+// EN 0x6d0870.
+extern "C" int Char_SelectKind(int index, int alternative, int quiet);
 // Stores `value`, sets the scene timer and plays the player's defeat motion. EN 0x5ec510.
 extern "C" int GameOver_StartQuiet(int value);
 // Returns the first enemy slot that has a model and is out of the world or finished, or -1. EN 0x5eb4b0.
@@ -277,8 +313,14 @@ const float CHAR_MARKER_HIDDEN = -200000.0f;        // marker y of a character t
 // The marker record of a placed character (0x10 bytes; only y is used so far).
 struct CharMarker
 {
-    float y;           // 0x00: height of the marker (CHAR_MARKER_HIDDEN = hidden)
-    char m_0004[0xc];  // 0x04: not used by EN code yet
+    union
+    {
+        float y;       // 0x00: height of the marker (CHAR_MARKER_HIDDEN = hidden)
+        float x;       // 0x00: x of the position a character away from the world was saved at (DamageZone_Update)
+    };
+    float savedY;      // 0x04: y of that saved position
+    float savedZ;      // 0x08: z of that saved position
+    char m_000c[4];    // 0x0c: not used by EN code yet
 };
 extern "C" char g_charInPlay[CHAR_SLOT_COUNT];                       // EN 0x0091d608 (JP DAT_1020d540): 1 = the character is in play
 extern "C" int g_waveEnemiesAlive;                                    // EN 0x01333350 (JP DAT_10c635a8): wave enemies still alive

@@ -38,6 +38,9 @@ struct FontRenderer
     int DrawStringToBuffer(unsigned short *buffer, int x, int y, const char *text, int colour, int fixedAdvance);
     // EN 0x7a3720: draws one Shift-JIS glyph into `buffer` at (x, y) and returns its advance in pixels.
     int DrawGlyph(unsigned short *buffer, int x, int y, unsigned short code, int colour, int colourAgain);
+    // EN 0x7a34f0: like DrawGlyph, but the 3-bit coverage of each pixel is blended with `colour` (ARGB4444) instead of
+    // becoming the alpha bits; the buffer is 640 pixels wide. Returns the advance in pixels.
+    int DrawGlyphBlended(unsigned short *buffer, int x, int y, unsigned short code, unsigned short colour, int unused);
     // EN 0x7a2c60 (JP 0x1014f590): lays out `text` and returns the pen position after its last character.
     int DrawString(int color, int x, int y, const char *text, unsigned short size, int fixedAdvance);
     // EN 0x78fd50 (JP 0x101501f0): draws `text` at (x, y) in `colour` (0xRRGGBB) at `depth`, faded by `alpha` and scaled.

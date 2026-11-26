@@ -32,7 +32,13 @@ struct RenderWindow
     void Create(HINSTANCE instance);                // EN 0x77d420 (JP 0x10148a40): registers the class and creates the window
 };
 
-extern "C" int g_fullScreen;   // EN 0x021e4c40 (JP DAT_10f65514): non-zero = full screen (borderless popup window)
+// The game's window: a RenderWindow whose WindowProc handles the game's messages (EN 0x7a22f0).
+struct GameWindow : RenderWindow
+{
+    LRESULT __stdcall WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+};
+
+extern "C" int g_fullScreen;  // EN 0x021e4c40 (JP DAT_10f65514): non-zero = full screen (borderless popup window)
 extern "C" RenderWindow g_gameWindow;   // EN 0x00909348 (JP DAT_10f65698): the game window
 
 extern "C" RenderWindow *g_renderWindow;   // EN 0x021a3498 (JP DAT_10f1a860): the window whose WindowProc receives the messages

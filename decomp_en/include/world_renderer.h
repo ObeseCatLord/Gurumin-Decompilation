@@ -196,6 +196,36 @@ struct WorldRenderer
     int SetMessageId(int index, int id);     // EN 0x746ba0: stores the id of line `index`
     int SetMessage(int index, int id, const char *text);   // EN 0x745510: stores the id and the text of line `index`
     int FindMessageLine(int key);            // EN 0x72c8b0: line number for `key` (not recovered yet)
+    int HighestMessageId(int key);           // EN 0x72e5d0 (not ported yet): largest id among the lines of key `key` (-10000 when it has none), cached for keys below 1000
+    int SetMessageField(int line, int field, const char *text);   // EN 0x746a50 (not ported yet): replaces the comma-separated field `field` of line `line` with `text`
+    int ShiftKeyIds(int key, int firstId, int shift);   // EN 0x746d80 (not ported yet): adds `shift` to the ids of key `key` that are at least `firstId`
+    int SetMessageNumber(int key, int number);   // EN 0x745aa0 (world_message_edit.cpp): writes `number` as the second field of the first line of key `key`
+    int ShiftIdsFrom(int firstId, int shift);    // EN 0x747cc0 (world_message_edit.cpp): ShiftKeyIds on every key whose highest id is at least `firstId`
+    // Script command scanners of the message editor (EN-only). ScanLineCommand<X> classifies the script command of line
+    // `line` (not recovered; -1 = not its kind). FindKeyCommand<X> returns the first line of key `key` that it accepts,
+    // -1 when none (world_message_scan.cpp).
+    int ScanLineCommandA(int line, int *position);   // EN 0x72ce80
+    int ScanLineCommandB(int line, int *position);   // EN 0x72d3b0
+    int ScanLineCommandC(int line, int *position);   // EN 0x72da60
+    int ScanLineCommandD(int line, int *position);   // EN 0x72dbd0
+    int ScanLineCommandE(int line, int *position);   // EN 0x72dcd0
+    int ScanLineCommandF(int line, int *position);   // EN 0x72de80
+    int ScanLineCommandG(int line, int *position);   // EN 0x72e030
+    int ScanLineCommandH(int line, int *position);   // EN 0x72e170
+    int ScanLineCommandI(int line, int *position);   // EN 0x72e270
+    int ScanLineCommandJ(int line, int *position);   // EN 0x732640
+    int ScanLineCommandK(int line, int *position);   // EN 0x7331b0
+    int FindKeyCommandA(int key);   // EN 0x72e3a0
+    int FindKeyCommandB(int key);   // EN 0x72e3f0
+    int FindKeyCommandC(int key);   // EN 0x72e440
+    int FindKeyCommandD(int key);   // EN 0x72e490
+    int FindKeyCommandE(int key);   // EN 0x72e4e0
+    int FindKeyCommandF(int key);   // EN 0x72e530
+    int FindKeyCommandG(int key);   // EN 0x72e580
+    int FindKeyCommandH(int key);   // EN 0x72e7e0
+    int FindKeyCommandI(int key);   // EN 0x72e870
+    int FindKeyCommandJ(int key);   // EN 0x72e8f0
+    int FindKeyCommandK(int key);   // EN 0x72e940
     int CountMessageKeys();                  // EN 0x731db0 (not ported yet): number of keys in the message lines, cached in the table (-9999 = not counted yet)
     int InsertMessageLine(int position);     // EN 0x73ef10 (not ported yet): inserts an empty line (id -1) before line `position` and counts it; returns 1
     int LowestMessageId(int key);            // EN 0x72e990 (not ported yet): smallest id among the lines of key `key` (10000 when it has none), cached for keys below 1000

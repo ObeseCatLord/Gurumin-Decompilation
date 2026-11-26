@@ -26,6 +26,13 @@ extern "C" short g_switchFlag[CHAR_SLOT_COUNT];       // EN 0x00920d20 (JP DAT_1
 extern "C" short g_switchDoorId[CHAR_SLOT_COUNT];     // EN 0x00920a18 (JP DAT_10219ec0): door id the switch's events use
 extern "C" int g_soundsMuted;                         // EN 0x0091f534 (JP DAT_104bfe6c): 1 while sounds are muted (cut-scenes)
 
+// CharState::values entry that holds a switch's setting.
+const int SWITCH_VALUE_SETTING = 5;
+// Resets the switch characters (object slots) that work node `switchNode`: their first two state values are cleared and
+// their fifth is set to `value`; afterwards a voice event is asked for (g_scriptPlayback = 2). Returns 0. EN 0x602d10
+// (see switches.cpp). Called by the script command that sets a switch (EN 0x5ecf70).
+extern "C" int Switch_ResetByNode(int switchNode, int value);
+
 // Number of switch hold slots, and the holders below this value are character slots (0x80 + n is object n).
 const int SWITCH_HOLD_SLOTS = 0x80;
 const int SWITCH_HOLDER_OBJECT_BASE = 0x80;

@@ -42,3 +42,44 @@ void Packs_ScalePlanes(short *planeFirst, short *planeSecond, short *planeThird,
         }
     }
 }
+
+// Rescales the detail bands of every level of three sample planes, from the smallest level (`levelCount`) up to level 1.
+// Level `n` has `widths[n]` x `heights[n]` samples in the top-left corner of the full plane (rows `widths[0]` samples
+// apart); its three detail bands (right, below and diagonal of the next smaller level) are rescaled by the factor of
+// level `n` for the first two and of level `n - 1` for the diagonal one. The factors start at PACKS_SCALE_ONE and halve
+// per level, but never drop below `minScale`. `bands` holds PACKS_BANDS_PER_LEVEL entries per level, the biases being
+// the top byte of each entry minus PACKS_BIAS_ORIGIN, times the factor. Called by the image decoder (EN 0x7b8f30).
+void Packs_ScaleLevels(short *planeFirst, short *planeSecond, short *planeThird, int *widths, int *heights, int minScale,
+                       int levelCount, const PacksBandEntry *bands)
+{
+    int scales[PACKS_LEVEL_COUNT];
+    scales[0] = PACKS_SCALE_ONE;
+    for (int level = 1; level < PACKS_LEVEL_COUNT; level++)
+    {
+        scales[level] = scales[level - 1] >> 1;
+        if (scales[level] < minScale)
+            scales[level] = minScale;
+    }
+    int fullWidth = widths[0];
+    for (int level = levelCount; level > 0; level--)
+    {
+        const PacksBandEntry *levelBands = bands + (levelCount - level) * PACKS_BANDS_PER_LEVEL;
+        int scale = scales[level];
+        Packs_ScalePlanes(planeFirst + widths[level], planeSecond + widths[level], planeThird + widths[level],
+                          widths[level - 1] - widths[level], heights[level], fullWidth, minScale, scale,
+                          (levelBands[0].bias - PACKS_BIAS_ORIGIN) * scale, (levelBands[1].bias - PACKS_BIAS_ORIGIN) * scale,
+                          (levelBands[2].bias - PACKS_BIAS_ORIGIN) * scale);
+        int rowOffset = fullWidth * heights[level];
+        Packs_ScalePlanes(planeFirst + rowOffset, planeSecond + rowOffset, planeThird + rowOffset, widths[level],
+                          heights[level - 1] - heights[level], fullWidth, minScale, scale,
+                          (levelBands[3].bias - PACKS_BIAS_ORIGIN) * scale, (levelBands[4].bias - PACKS_BIAS_ORIGIN) * scale,
+                          (levelBands[5].bias - PACKS_BIAS_ORIGIN) * scale);
+        int cornerOffset = (fullWidth * heights[level] + widths[level]);
+        int cornerScale = scales[level - 1];
+        Packs_ScalePlanes(planeFirst + cornerOffset, planeSecond + cornerOffset, planeThird + cornerOffset,
+                          widths[level - 1] - widths[level], heights[level - 1] - heights[level], fullWidth, minScale,
+                          cornerScale, (levelBands[6].bias - PACKS_BIAS_ORIGIN) * cornerScale,
+                          (levelBands[7].bias - PACKS_BIAS_ORIGIN) * cornerScale,
+                          (levelBands[8].bias - PACKS_BIAS_ORIGIN) * cornerScale);
+    }
+}

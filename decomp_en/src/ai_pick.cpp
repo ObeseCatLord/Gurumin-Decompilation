@@ -101,3 +101,51 @@ int UpdateMeshSlots()
     identity.SetIdentity();
     return 0;
 }
+
+// Enemy_PickAction_60_20_20: picker with three behaviours: behaviour 0 60 %, behaviour 1 20 %, behaviour 2 20 %.
+// Called by Enemy_UpdateAI_B.
+extern "C" int Enemy_PickAction_60_20_20(int index)
+{
+    int roll = Random() % 100;
+    if (roll < 60)
+    {
+        g_charState[index].state = 0;
+    }
+    else if (roll < 80)
+    {
+        g_charState[index].state = 1;
+    }
+    else if (roll < 100)
+    {
+        g_charState[index].state = 2;
+    }
+    else
+        return 0;
+    g_charState[index].values[0] = 0;
+    g_charState[index].values[1] = 0;
+    return 0;
+}
+
+// Enemy_PickAction_20_60_20: picker with three behaviours: behaviour 0 20 %, behaviour 1 60 %, behaviour 2 20 %.
+// Called by Enemy_UpdateAI_E.
+extern "C" int Enemy_PickAction_20_60_20(int index)
+{
+    int roll = Random() % 100;
+    if (roll < 20)
+    {
+        g_charState[index].state = 0;
+    }
+    else if (roll < 80)
+    {
+        g_charState[index].state = 1;
+    }
+    else if (roll < 100)
+    {
+        g_charState[index].state = 2;
+    }
+    else
+        return 0;
+    g_charState[index].values[0] = 0;
+    g_charState[index].values[1] = 0;
+    return 0;
+}

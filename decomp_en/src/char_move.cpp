@@ -1604,3 +1604,16 @@ int Npc_PopUp(int index)
     }
     return 0;
 }
+
+// Char_ScaleMoveAxes: scales the pending movement impulse (AnimModel::move) of character `index` by the model's
+// speedScale on each axis selected in `axes`. Returns 0. No direct caller (reached through a pointer).
+extern "C" int Char_ScaleMoveAxes(int index, unsigned int axes)
+{
+    if (axes & MOVE_AXIS_X)
+        g_characterModels[index].move.x = g_characterModels[index].speedScale * g_characterModels[index].move.x;
+    if (axes & MOVE_AXIS_Y)
+        g_characterModels[index].move.y = g_characterModels[index].speedScale * g_characterModels[index].move.y;
+    if (axes & MOVE_AXIS_Z)
+        g_characterModels[index].move.z = g_characterModels[index].speedScale * g_characterModels[index].move.z;
+    return 0;
+}

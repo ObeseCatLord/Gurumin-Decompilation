@@ -33,7 +33,7 @@ extern "C" unsigned long g_samplerStateCache[][TEXTURE_STAGE_STATE_COUNT];  // E
 extern "C" TextureObject *g_stage0Texture;                       // EN 0x021e47ec (JP DAT_10f6550c): texture bound to stage 0
 extern "C" TextureObject *g_stage1Texture;                       // EN 0x021e47f0 (JP DAT_10f65510): texture bound to stage 1
 extern "C" char g_textureNamesAux[TEXTURE_SLOT_COUNT][TEXTURE_NAME_SIZE]; // EN 0x016152d0 (JP DAT_10f8dbb8): second name table, cleared with the first
-extern "C" IUnknown *g_pooledSurfaces[SURFACE_POOL_SIZE];        // EN 0x021ff508 (JP DAT_10f1bff0): pooled surfaces (0 = free)
+extern "C" IDirect3DTexture9 *g_pooledSurfaces[SURFACE_POOL_SIZE]; // EN 0x021ff508 (JP DAT_10f1bff0): pooled surfaces (0 = free)
 extern "C" int g_pooledSurfaceBytes[SURFACE_POOL_SIZE];          // EN 0x021fed08 (JP DAT_10f1de70): bytes of each pooled surface
 extern "C" int g_pooledSurfaceReserved[SURFACE_POOL_SIZE];       // EN 0x021fe508 (JP DAT_10f0cd40): reservation flag of each entry
 extern "C" int g_pooledBytesTotal;                               // EN 0x021fd75c (JP DAT_10f0ff80): bytes held by all pooled surfaces
@@ -71,6 +71,15 @@ extern "C" int g_splitScreen;                                     // EN 0x021e36
 extern "C" int g_stageBindingsReset;                              // EN 0x021e3614 (JP DAT_10f6548c): set to 0 whenever the texture stages are unbound by a target reset
 // Unbinds the texture stages and restores the saved render target and viewport (render_restore.cpp). EN 0x7a4160 (JP 0x1014b390).
 extern "C" void Render_RestoreTarget(void);
+// Edge length in pixels of the square depth buffer of the swap targets. EN 0x00908b24.
+extern "C" int g_swapDepthSize;
+// Format and discard flag of that depth buffer: D3DFMT_D16 and "contents need not be kept".
+const D3DFORMAT SWAP_DEPTH_FORMAT = D3DFMT_D16;
+// Replaces the swap targets' depth buffer with a square one of `size` pixels. Returns 0. EN 0x7a4110
+// (render_swap_depth.cpp).
+extern "C" int Render_CreateSwapDepth(int size);
+// Presents the back buffer to `window` (ending the open scene first). Returns 1. EN 0x7a6050 (render_swap_depth.cpp).
+extern "C" int __stdcall Render_PresentToWindow(HWND window);
 extern "C" int g_swapTargetInUse;                                 // EN 0x021e8d4c (JP DAT_10f65490): swap target in use (0 or 1)
 extern "C" int g_swapTargetSaved;                                 // EN 0x021e8d50 (JP DAT_10f65494): swap target in use before a screen transition started
 extern "C" int g_transitionsEnabled;                              // EN 0x00908b34 (JP DAT_10203344): non-zero = screen transitions are allowed
@@ -163,6 +172,8 @@ extern "C" void Render_UnbindTexture1(void);     // EN 0x7a5920 (JP 0x10143b80)
 extern "C" int Render_ComposeFrame(void);        // EN 0x7a60b0 (JP 0x101493f0): finishes the 2D overlay
 extern "C" void Render_ResetTarget(void);        // EN 0x77dd40 (JP 0x101439e0)
 extern "C" void Render_ResetSwapTarget(void);    // EN 0x77dee0 (JP 0x1014b480)
+extern "C" int Render_DrawBackgroundSquare(void);   // EN 0x77c0a0 (JP 0x101441b0): draws the 257x257 black square that is the probe's background
+extern "C" int Render_DrawBlueSquare(void);         // EN 0x77c470 (JP 0x10144040): draws the 34x34 blue square in the corner of the target
 extern "C" int Render_CreateDevice(void);        // EN 0x7a13e0 (JP 0x10148b00): creates the Direct3D device
 extern "C" int SurfacePool_ReleaseAll(void);     // EN 0x7a3ed0 (JP 0x101483a0): releases every pooled surface and clears the pool tables
 extern "C" int FileBuffers_Free(void);           // EN 0x7a8a50 (JP 0x101b22b0): frees the two temporary file buffers (not ported)

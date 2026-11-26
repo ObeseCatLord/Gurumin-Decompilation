@@ -51,12 +51,27 @@ extern "C" int Inventory_Remove(const int *index, int *amount);
 // Opens the message window (normal and alternative style). EN 0x631380, 0x631400.
 extern "C" int Message_Show(const char *text, const char *subtext, int frames);
 extern "C" int Message_ShowAlt(const char *text, const char *subtext, int frames);
+// Advances the message window by a frame (opens, waits g_messageFrames, closes). Returns 1. EN 0x5b03b0 (message_window.cpp).
+extern "C" int MessageWindow_Tick(void);
 // Stops looping sound `index`. EN 0x63fe50.
 extern "C" void SoundLoop_Stop(int index);
 // Advances the fade by a frame. EN 0x5af380.
 extern "C" void ColourBlend_Step(void);
 // Starts a fade to (r, g, b, a) over `frames` frames. EN 0x645960.
 extern "C" void ColourFade_Start(int frames, float r, float g, float b, float a);
+// The same fade start as ColourFade_Start, expanded in place by the callers the compiler inlined it into.
+inline void ColourFade_StartInline(int frames, float r, float g, float b, float a)
+{
+    if (frames <= 1)
+    {
+        g_fadeColour.Set(r, g, b, a);
+        g_fadeFramesLeft = 0;
+        return;
+    }
+    g_fadeTarget.Set(r, g, b, a);
+    g_fadeStep.Copy((g_fadeTarget - g_fadeColour) * (1.0f / (float)frames));
+    g_fadeFramesLeft = frames;
+}
 
 // Non-zero = voices are off: sounds requested as optional are skipped. EN 0x00bc87a7 (JP DAT_104c0332).
 extern "C" char g_voicesOff;

@@ -118,6 +118,8 @@ struct TextureObject
     int BindStage1();                                       // EN 0x7a5840 (JP 0x1014b6e0): binds to stage 1 unless already bound
     int BeginRenderTo(int width, int height, int offset);   // EN 0x7a4bf0 (JP 0x10143870)
     int UpdateImage(int value);                             // EN 0x746550 (JP 0x10169f70): BeginRenderTo with the source size (out of line)
+    int CaptureRgbFirst(unsigned char *out);                // EN 0x7a0150 (JP CaptureRgbFirst): reads the render target back as 24-bit pixels, first read-back variant
+    int CaptureRgbRows(unsigned char *out);                 // EN 0x7a0060 (JP CaptureRgbRows): reads the render target back as 24-bit pixels, row by row
     int Release();                                          // EN 0x7a3e50 (JP 0x1014f520): frees the Direct3D texture and surface, forgets bindings
     void Unload();                                          // EN 0x740ea0 (JP 0x10169e40): frees the kept image and the texture
     int DrawTriangles(const void *vertices, int triangles); // EN 0x77ee90 (JP 0x1014bb70)

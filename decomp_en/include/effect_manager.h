@@ -235,4 +235,8 @@ struct EffectManager
 
 extern "C" EffectManager g_effectManager;   // EN 0x01487f98 (JP DAT_10daaa80)
 
+// Forgets the texture slot of every effect definition (-1 = not looked up) and frees every sprite of both tables.
+// Returns 0. EN 0x735100. Called when the effect textures are reloaded.
+extern "C" int Effects_ForgetTexturesAndSprites(void);
+
 #endif

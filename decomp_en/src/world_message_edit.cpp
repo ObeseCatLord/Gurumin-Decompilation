@@ -1,5 +1,6 @@
 // Editing the character's message lines (EN build, EN-only: no JP twin found).
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "world_renderer.h"
 
@@ -59,4 +60,34 @@ int WorldRenderer::DeleteMessageKeysWithIds(int lowest, int highest)
         DeleteMessageKey(key);
         keyCount--;
     }
+}
+
+// Field of a message line that holds a key's number (the same one GetMessageNumber reads).
+const int MESSAGE_NUMBER_FIELD_SET = 1;
+// Length of the text a number is formatted into.
+const int MESSAGE_NUMBER_TEXT_SIZE = 0x100;
+
+// WorldRenderer::SetMessageNumber: writes `number` as text into the number field of the first line of key `key`.
+// Returns `number`. No direct caller.
+int WorldRenderer::SetMessageNumber(int key, int number)
+{
+    int line = FindMessageLine(key);
+    char text[MESSAGE_NUMBER_TEXT_SIZE];
+    sprintf(text, "%d", number);
+    SetMessageField(line, MESSAGE_NUMBER_FIELD_SET, text);
+    return number;
+}
+
+// WorldRenderer::ShiftIdsFrom: for every key whose highest id is at least `firstId`, shifts that key's ids by `shift`
+// (ShiftKeyIds). Returns 0. No direct caller.
+int WorldRenderer::ShiftIdsFrom(int firstId, int shift)
+{
+    int keyCount = CountMessageKeys();
+    for (int key = 0; key < keyCount; key++)
+    {
+        int lowest = LowestMessageId(key);
+        if (HighestMessageId(key) >= firstId)
+            ShiftKeyIds(key, firstId, shift);
+    }
+    return 0;
 }

@@ -105,12 +105,13 @@ const unsigned int PACKS_LZ_RUN_MAX = 0xfff;
 // Hash chains over the bytes being compressed.
 struct PacksLzState
 {
-    int m_0000;                       // 0x00: not yet named
+    unsigned short *outputWord;       // 0x00: next 16-bit flag word of the compressed output
     unsigned char *data;              // 0x04: next byte to index (the hash is the 16-bit pair at this address)
     unsigned short *links;            // 0x08: next position in the chain, indexed by position & PACKS_LZ_WINDOW_MASK
     unsigned short *chainTail;        // 0x0c: last position of each chain, indexed by hash
     unsigned short *chainHead;        // 0x10: first position of each chain, indexed by hash
-    int m_0014[2];                    // 0x14: not yet named
+    int m_0014;                       // 0x14: not yet named
+    int outputBytes;                  // 0x18: bytes of compressed output written so far
     int length;                       // 0x1c: total number of bytes being compressed
 };
 
@@ -124,6 +125,63 @@ extern "C" unsigned int Packs_LzCountRun(void);
 
 // Indexes g_packsLzPending bytes into the hash chains, dropping the entry that fell out of reach. EN 0x7bd790.
 extern "C" void Packs_LzIndexBytes();
+
+// ---- Compressor driver (src/packs_compress.cpp) ----
+
+// Bytes of input compressed per block, the sum added to a length before the block count is taken, and the size of one
+// hash table piece the compressor clears before each block.
+const unsigned int PACKS_BLOCK_INPUT = 0x7ff0;
+const unsigned int PACKS_BLOCK_COUNT_BIAS = 0xffef;
+const int PACKS_LZ_CLEAR_PIECE = 0x8000;
+// Bytes in the header of the packed stream (the unpacked length and the block count).
+const int PACKS_COMPRESSED_HEADER_BYTES = 8;
+// Start value of PacksLzState::m_0014.
+const int PACKS_LZ_STATE_START = 8;
+// Progress ratio of the compressor: (blocks done * PACKS_PROGRESS_BLOCK + step * PACKS_PROGRESS_STEP) / (weight *
+// PACKS_PROGRESS_WEIGHT + blocks * PACKS_PROGRESS_PER_BLOCK).
+const unsigned int PACKS_PROGRESS_BLOCK = 0x319c;
+const unsigned int PACKS_PROGRESS_STEP = 0x64000;
+const unsigned int PACKS_PROGRESS_WEIGHT = 0x1000;
+const unsigned int PACKS_PROGRESS_PER_BLOCK = 0x7f;
+
+// Buffers of the compressor: the block being compressed (EN 0x025eb508), its compressed form with the 16-bit size first
+// (EN 0x025ab518), the hash chain links (EN 0x0262b4f8, 0x10000 bytes), and the chain tails and heads (EN 0x0266b4f8 and
+// 0x026eb4f8, 0x20000 bytes each).
+extern "C" unsigned char g_packsLzInput[];
+extern "C" unsigned char g_packsLzOutput[];
+extern "C" unsigned char g_packsLzLinks[];
+extern "C" unsigned char g_packsLzChainTail[];
+extern "C" unsigned char g_packsLzChainHead[];
+// Progress callback of the compressor (EN 0x0222b20c): called after each block; non-zero stops compressing.
+extern "C" PacksProgressCallback g_packsCompressProgress;
+
+// Compresses one block described by `state` (EN 0x7bd1e0). Returns 0.
+extern "C" int Packs_LzEncode(PacksLzState *state);
+// Compresses `length` bytes at `input` into `output` as blocks of PACKS_BLOCK_INPUT bytes (header: length and block
+// count, then per block the size, the compressed data and a flag for more blocks). Returns the bytes written. EN 0x7bcd10.
+extern "C" int Packs_Compress(const unsigned char *input, int *output, int length);
+
+// ---- Arithmetic decoder (src/packs_arith.cpp) ----
+
+// State of the arithmetic decoder: the range limits that trigger a shift (quarter, half, three quarters of the code
+// range), the top of the range, the code value read from the bit stream, the low and high end of the current interval
+// and the number of bits consumed.
+extern "C" unsigned int g_arithQuarter;          // EN 0x0222b154
+extern "C" unsigned int g_arithHalf;             // EN 0x0222b158
+extern "C" unsigned int g_arithThreeQuarters;    // EN 0x0222b15c
+extern "C" unsigned int g_arithTop;              // EN 0x0222b160
+extern "C" int g_arithBitsRead;                  // EN 0x0222b170
+extern "C" unsigned int g_arithValue;            // EN 0x0222b174
+extern "C" unsigned int g_arithLow;              // EN 0x0222b178
+extern "C" unsigned int g_arithHigh;             // EN 0x0222b17c
+
+// Rounding added before the interval is split and the shift that divides by the total frequency range.
+const unsigned int PACKS_ARITH_ROUND = 0x8000;
+const int PACKS_ARITH_SHIFT = 16;
+// Decodes one binary decision of probability `probability` (16 bits) from `data`: returns 0 as the low half of the
+// result when the decision was 0, otherwise the number of decisions taken. EN 0x7ba1f0 (called by the image decoder
+// at EN 0x7b9830).
+extern "C" unsigned int Packs_ArithDecode(const unsigned char *data, unsigned int probability);
 
 // ---- Image container loader (src/packs_bmp.cpp) ----
 
@@ -150,5 +208,78 @@ const int PACKS_SCALE_DIVISOR_UNIT = 16;
 // Rescales three sample planes (see packs_scale.cpp). EN 0x7bab70.
 void Packs_ScalePlanes(short *planeFirst, short *planeSecond, short *planeThird, int columns, int rows, int stride,
                        int denominator, int numerator, int biasFirst, int biasSecond, int biasThird);
+
+// One entry of the band table the image header carries (four bytes); only the last byte, the rescale bias offset by
+// PACKS_BIAS_ORIGIN, is read by Packs_ScaleLevels.
+struct PacksBandEntry
+{
+    unsigned char kind;       // 0x00: 0 = band empty, else the band stores data
+    unsigned char detail[2];  // 0x01: stored values of the band (not read by the rescaler)
+    unsigned char bias;       // 0x03: rescale bias of the band, stored with PACKS_BIAS_ORIGIN added
+};
+
+// Levels (and level scale factors) the codec supports, band table entries used per level, the factor of level 0, and the
+// value the stored bias is offset by.
+const int PACKS_LEVEL_COUNT = 9;
+const int PACKS_BANDS_PER_LEVEL = 9;
+const int PACKS_SCALE_ONE = 0x10000;
+const int PACKS_BIAS_ORIGIN = 0x80;
+
+// Rescales the detail bands of every level of three sample planes: level `level` is scaled by a factor that halves per
+// level but never drops below `minScale`, with the band biases of `bands` (nine entries per level). EN 0x7bad40, called by
+// the image decoder (EN 0x7b8f30).
+void Packs_ScaleLevels(short *planeFirst, short *planeSecond, short *planeThird, int *widths, int *heights, int minScale,
+                       int levelCount, const PacksBandEntry *bands);
+
+// ---- Forward sample transform (src/packs_planes.cpp) ----
+
+// Writes the three transformed samples of one pixel at `index` of the three planes. EN 0x7bab10.
+extern "C" void Packs_TransformPixel(short *planeA, short *planeB, short *planeC, int index, int first, int second,
+                                     int third);
+
+// ---- Bit coders (src/packs_bits.cpp) ----
+
+// Byte-wise bit reader: mask of the next bit, the byte being read and the position of that byte in the data.
+extern "C" unsigned char g_packsReadMask;       // EN 0x0222b168
+extern "C" unsigned char g_packsReadByte;       // EN 0x0222b169
+extern "C" int g_packsReadPosition;             // EN 0x0222b16c
+// Byte-wise bit writer: the byte being built, the mask of the next bit and the position of the next byte in the output.
+extern "C" unsigned char g_packsWriteByte;      // EN 0x0222b16a
+extern "C" unsigned char g_packsWriteMask;      // EN 0x0222b16b
+extern "C" int g_packsWritePosition;            // EN 0x0222b19c
+// Word-wise flag writer of the compressor: mask of the next flag bit and the flag word being built.
+struct PacksFlagWriter
+{
+    unsigned short mask;      // 0x00: next flag bit (0 once the 16 bits of the word are used)
+    unsigned short m_0002;    // 0x02: not yet named
+    unsigned short *word;     // 0x04: the flag word being built
+};
+extern "C" PacksFlagWriter g_packsFlagWriter;   // EN 0x0222b1e4
+// Word-wise bit reader of the block decoder: bytes of the packed data used, the 16 bits being read and how many are left.
+struct PacksWordReader
+{
+    int inputBytes;           // 0x00: bytes of the packed data used
+    unsigned short buffer;    // 0x04: the 16 bits being read (low bit first)
+    unsigned char count;      // 0x06: bits of `buffer` not read yet
+};
+extern "C" PacksWordReader g_packsWordReader;   // EN 0x0222b200
+
+// Mask of the first bit of a byte and of the last one.
+const unsigned char PACKS_FIRST_BIT = 0x01;
+const unsigned char PACKS_LAST_BIT = 0x80;
+// Bits in one packed word.
+const unsigned char PACKS_WORD_BITS = 16;
+// Bytes in one packed word.
+const int PACKS_WORD_BYTES = 2;
+
+// Returns the next bit of `data` (1 or 0) and moves on; at the end of a byte the next byte is loaded. EN 0x7ba1a0.
+extern "C" int Packs_ReadBit(const unsigned char *data);
+// Adds `bit` to the byte being built; a full byte is stored at the next position of `output`. EN 0x7bb4b0.
+extern "C" void Packs_WriteBit(int bit, unsigned char *output);
+// Starts the next flag bit of the compressor's flag word (a new word at the output when the last one is full) and
+// clears it. EN 0x7bd070. Called by the compressor at EN 0x7bd240.
+extern "C" void Packs_LzWriteZeroFlag(void);
+// Returns the next bit of the packed stream, refilling 16 bits at a time. EN 0x7bd190. Called by Packs_DecodeBlock.
+extern "C" int Packs_ReadStreamBit(void);
 
 #endif

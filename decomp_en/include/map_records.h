@@ -27,9 +27,28 @@ struct MapEntry
     RoutePoint route[MAP_RECORD_ROWS - 1];   // 0x10: the route points
 };
 
+// A damage zone read from a map record: an integer box and how it hurts the enemies inside it.
+struct DamageZone
+{
+    int left;                     // 0x00: x range
+    int right;                    // 0x04
+    int pad_0008[2];              // 0x08: not used
+    int front;                    // 0x10: y range
+    int back;                     // 0x14
+    int pad_0018[2];              // 0x18: not used
+    int top;                      // 0x20: z range
+    int bottom;                   // 0x24
+    int pad_0028[2];              // 0x28: not used
+    int damage;                   // 0x30: health an enemy in the box loses
+    int step;                     // 0x34: every step-th enemy is checked per frame
+    int onFlag;                   // 0x38: script flag that must be set (0 = always on)
+    int offFlag;                  // 0x3c: script flag that turns the zone off (0 = none)
+};
+
 // One record of the table (0x100 bytes).
 union MapRecord
 {
+    DamageZone zone;                         // the record as a damage zone
     RoutePoint points[MAP_RECORD_ROWS];      // a route or per-state values
     MapEntry entry;                          // the record as a map entry
 };

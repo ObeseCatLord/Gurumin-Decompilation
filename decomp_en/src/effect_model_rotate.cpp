@@ -9,3 +9,12 @@ int EffectModel::Rotate(float x, float y, float z)
     rotation.Set(x, y, z, 0);
     return 0;
 }
+
+// EffectModel::AddPositionKey: adds a position key at `frame` and marks the keys changed, exactly like the inline
+// AddKey, but as a separate function that returns 0. No direct caller (reached through a pointer).
+int EffectModel::AddPositionKey(int frame, float x, float y, float z)
+{
+    changed = 1;
+    keys.Insert(frame, x, y, z, 0);
+    return 0;
+}

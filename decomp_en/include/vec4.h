@@ -30,6 +30,7 @@ struct Vec4
     float DistanceToSegment(const Vec4 &a, const Vec4 &b, Vec4 &closest);  // EN 0x772ea0 (JP 0x101acdf0): distance to the segment a-b, closest point in `closest`
     float DistanceSquaredToSegment2D(float x1, float y1, float x2, float y2);   // EN 0x7734d0 (JP 0x101acc60): squared x/y distance to the segment (x1, y1)-(x2, y2)
     float DistanceZWeighted(const Vec4 &other);      // EN 0x7736f0 (JP 0x101ac5f0)
+    float DistanceFlat(const Vec4 &other);           // EN 0x7736a0 (vec4_lengths.cpp): x/y distance to `other`, taken by reference
     int InRect(const Box2 *box);                     // EN 0x7749d0 (JP 0x101ac7c0): inside the box's x/y rectangle
     int InBox(const Box2 *box);                      // EN 0x774a10 (JP 0x101ac6e0)
     void RotateZ(float angle);                       // EN 0x779400 (JP 0x101ac300)
@@ -54,6 +55,9 @@ extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b);
 
 // Squared length of the x/y/z part of `v` (EN 0x77a260, an out-of-line copy of the inline helper).
 float Vec3_LengthSquared(const Vec4 &v);
+
+// Length of the x/y/z part of `v` (EN 0x776890, vec4_lengths.cpp).
+extern "C" float Vec3_Length(const Vec4 *v);
 
 // Length of the x/y/z part of `v` after its z is multiplied by `zScale` (EN 0x5ec0d0).
 extern "C" float Vec3_LengthZScaled(const Vec4 *v, float zScale);
@@ -120,6 +124,10 @@ Matrix4 PerspectiveMatrix(float nearPlane, float farPlane, float fov, float aspe
 Vec4 Vec3_Normalized(Vec4 *v);
 // Translation matrix (EN 0x777220, JP 0x101b1360).
 Matrix4 TranslationMatrix(float x, float y, float z);
+
+// Matrix that turns the z axis into `direction` (a yaw about z, then a pitch about x; the w of `direction` is ignored)
+// (EN 0x77a760, JP 0x101b1f30).
+Matrix4 DirectionMatrix(Vec4 direction);
 
 // Rotation matrix of the quaternion `quaternion` (x, y, z = vector part, w = scalar part) (EN 0x777a20).
 Matrix4 RotationMatrix(const Vec4 &quaternion);

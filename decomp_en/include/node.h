@@ -40,7 +40,8 @@ enum NodeFlags
     NODE_FLAG_SKIP_SUBTREE = 0x8000,       // the subtree is not updated or drawn (also the "special pass" marker)
     NODE_FLAG_TEMPORARY_A = 0x40000,       // temporary saved state: undone and freed by ReleaseSavedStates
     NODE_FLAG_TEMPORARY_B = 0x80000,       // second temporary saved state
-    NODE_FLAG_ANIMATED = 0x100000,         // animated through its `extra` tracks (matrices sampled from them)
+    NODE_FLAG_COMMAND_TARGET = 0x1000000,  // receives the command text of ApplyCommandTextToFlagged
+    NODE_FLAG_ANIMATED = 0x100000,        // animated through its `extra` tracks (matrices sampled from them)
     NODE_FLAG_TARGET_TRACKING = 0x400000   // tracks a target (saved matrix restored by RestoreState400000)
 };
 
@@ -152,6 +153,9 @@ const int BLEND_ROTATION = 1;
 extern "C" char g_importantMotionChange;
 // out = a blended towards b by t (mode BLEND_ROTATION interpolates the rotation). EN 0x771830 (JP 0x101b1420).
 extern "C" Matrix4 *MatrixBlend(Matrix4 *out, Matrix4 a, Matrix4 b, int t, int mode);
+
+// Non-zero = the frame plugs of the nodes are not read (UpdateWorld keeps the frame it was given). EN 0x0217fae0 (JP DAT_11b044ec).
+extern "C" int g_framePlugsDisabled;
 
 // Motion frame of the current update pass, set by StartProximityPass. EN 0x217faf0 (JP DAT_11b044f8).
 extern "C" int g_updatePassFrame;
@@ -429,6 +433,9 @@ struct Node
     int SetOwnFlags(unsigned int bits);    // EN 0x76b710: sets `bits` in this node only (no recursion)
     int ClearOwnFlags(unsigned int bits);  // EN 0x750300: clears `bits` in this node only (no recursion)
     int SetRenderMode(int mode);           // EN 0x76d330 (JP 0x1019b050)
+    int ApplyCommandText(const char *commands);   // EN 0x76b780 (JP 0x101a3000): applies the command words in `commands` to this node
+    int ApplyCommandTextToFlagged(const char *commands);   // EN 0x76d2e0: ApplyCommandText on every node of the subtree with NODE_FLAG_COMMAND_TARGET
+    int ReplaceDrawMode(int from, int to);   // EN 0x74a310: sets drawMode to `to` on every node of the subtree whose drawMode is `from`
     int SetModel(AnimModel *owner);        // EN 0x76d420 (JP 0x1019b230)
     int UnrecoveredCall(int a, int b);     // EN 0x75f180: large routine (1420 bytes) not recovered yet; called by AnimModel::RunRootCall
     int ClearHasCollision();             // EN 0x76a5b0 (JP 0x101944d0)
@@ -440,6 +447,7 @@ struct Node
     int TagElements();                     // EN 0x76b200 (JP 0x10191e50)
     int UpdateWorldWithIk(float *parentWorld, Matrix4 *view, Matrix4 *billboard, int frame, int skinParent,
                           int forceChildren);                // EN 0x763e70 (JP 0x10194f40)
+    int UpdateWorld(const Matrix4 &parent, int frame);   // EN 0x768cd0 (JP 0x10194c60): world matrices of the tree for `frame`
     int StartProximityPass(float *position, Matrix4 *matrix, Matrix4 *reference, int frame, int b);  // EN 0x768c70
 };
 

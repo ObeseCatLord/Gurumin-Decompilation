@@ -24,3 +24,23 @@ extern "C" int CharSlot_CompareByDepth(const int *a, const int *b)
     float depthB = g_characterModels[*b].sortBias + g_characterModels[*b].matrix.m[MATRIX_TRANSLATION_Z];
     return depthA < depthB ? -1 : 1;
 }
+
+// Objects_ClearReferencesInRange: for every object slot of kind OBJECT_KIND_REFERENCE_HOLDER, clears the slot numbers
+// in its state values that lie between `first` and `last` (inclusive). Returns 0. Called when characters are removed
+// (EN 0x6883a0).
+extern "C" int Objects_ClearReferencesInRange(int first, int last)
+{
+    for (int slot = OBJECT_SLOT_FIRST; slot < ENEMY_SLOT_END; slot++)
+    {
+        if (g_charRecords[slot].kind == OBJECT_KIND_REFERENCE_HOLDER)
+        {
+            for (int i = 0; i < OBJECT_REFERENCE_VALUE_COUNT; i++)
+            {
+                int value = g_charState[slot].values[i];
+                if (value >= first && value <= last)
+                    g_charState[slot].values[i] = 0;
+            }
+        }
+    }
+    return 0;
+}

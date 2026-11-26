@@ -23,6 +23,7 @@ extern "C" char g_slotMarked[SURFACE_SLOT_COUNT];         // EN 0x021fd760 (JP D
 extern "C" int g_vramInUse;                                // EN 0x021fd758 (JP DAT_10f1a86c): VRAM tracked for the slots
 extern "C" int g_surfacePoolHead;                          // EN 0x021fdd00: reset to 0 with the surface pool (no other user found)
 extern "C" int g_pooledSurfaceUsed[SURFACE_POOL_SIZE];     // EN 0x021fdd08 (JP DAT_10f1fd90): 1 = pool entry in use
+extern "C" int g_pooledBytesBudget;                        // EN 0x00909344 (JP DAT_1020340c): bytes the pooled video-memory textures may hold
 
 // Reserves a free entry of the surface pool and returns its index. EN 0x7a1080 (JP 0x10148410).
 extern "C" int BufferPool_Alloc(void);

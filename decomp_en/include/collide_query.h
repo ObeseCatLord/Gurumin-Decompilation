@@ -64,4 +64,12 @@ extern "C" int Char_ProbeAhead(int index, Vec4 *ground, float depth, int fromHea
 extern "C" int Char_ProbeDirection(int index, float angle, Vec4 *ground, float depth, int fromHead, int testOnly,
                                    const Vec4 *offset, const char *name);
 
+// CastRay flags and mask of Map_TraceRay: the tagged collision meshes of the map that take part in collision.
+const int MAP_TRACE_RAY_FLAGS = 4;
+const unsigned int MAP_TRACE_RAY_MASK = 0x4000000;
+// Casts a ray between `second` and `first` against the map collision meshes with tag `tag`. Returns 1 on a hit; the hit point is
+// copied to `hitOut` unless `testOnly` is non-zero. Returns 0 when no map is loaded or nothing is hit. EN 0x5c1e80 (see
+// collide_query.cpp). Called by the character update (EN 0x66e780).
+extern "C" int Map_TraceRay(Vec4 *first, Vec4 *second, Vec4 *hitOut, int testOnly, const char *tag);
+
 #endif

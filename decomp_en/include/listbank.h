@@ -59,6 +59,9 @@ typedef void (*BuiltinHandler)(int id, ScriptArgument *args, ListBank *bank);
 #define SCRIPT_TYPE_FLOAT 1
 #define SCRIPT_TYPE_TEXT 2
 
+// Writes `value` as text into `buffer` according to its `type` (SCRIPT_TYPE_*). Returns 1. EN 0x646660 (see script_value_format.cpp).
+int __stdcall ScriptValue_Format(char *buffer, ScriptValue *value, char type);
+
 // Ids of the library builtins InitLibrary registers (all run by RunLibraryBuiltin, which switches on the id).
 enum LibraryBuiltinId
 {
@@ -184,6 +187,9 @@ struct ListBank
     int FindKeyword(const char *name, int *index);
     int M_10004950(char *buffer, void *value, char type);
     int HasParenthesis(const char *text);
+    int ParseInteger(const char *text, int *value);   // EN 0x5f49d0 (JP M_10004a30, listbank_numbers.cpp; the M_ name cannot be built: compare_obj reads it as a JP address)
+    int ParseFloat(const char *text, float *value);   // EN 0x5f48d0 (JP M_10004aa0, listbank_numbers.cpp)
+    int ShiftCharactersLeft(short *buffer, int start, int shift);   // EN 0x5ca080 (EN-only, listbank_numbers.cpp): moves the tail of a 0x80-character buffer towards its front
     int M_10004a30(const char *text, int *value);
     int M_10004aa0(const char *text, float *value);
     // Reports a parse error: sets the error flag (every reader then fails), prints the message, passes it and the

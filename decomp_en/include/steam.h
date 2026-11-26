@@ -116,6 +116,7 @@ extern "C" __declspec(dllimport) ISteamUserStats *__cdecl SteamUserStats();
 extern "C" __declspec(dllimport) ISteamUser *__cdecl SteamUser();
 extern "C" __declspec(dllimport) ISteamClient *__cdecl SteamClient();
 extern "C" __declspec(dllimport) HSteamPipe __cdecl GetHSteamPipe();
+extern "C" __declspec(dllimport) void __cdecl SteamAPI_RunCallbacks();   // dispatches the pending Steam callbacks
 
 // Wrappers the game calls (EN-only, no JP twin).
 // Cloud file size and existence queries; the game ignores the results. EN 0x005ec220 and 0x005e7b30.

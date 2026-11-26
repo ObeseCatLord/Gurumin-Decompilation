@@ -19,3 +19,27 @@ extern "C" int DialogMessage_Set(const char *text)
         g_dialogMessage[0] = 0;
     return 0;
 }
+
+// BannerText_Set: copies `text` into g_bannerText. Unless the banner is already fading in it restarts fading in from 0;
+// an empty text clears the banner text and a null `text` makes the banner fade out. Returns 0. Called by the script
+// commands that show or hide a banner.
+extern "C" int BannerText_Set(const char *text)
+{
+    if (g_overlayClosed != BANNER_START_FADE_IN)
+    {
+        g_overlayClosed = BANNER_START_FADE_IN;
+        g_bannerFade = 0;
+    }
+    if (text != 0)
+    {
+        if (text[0] == 0)
+        {
+            g_bannerText[0] = 0;
+            return 0;
+        }
+        strcpy(g_bannerText, text);
+        return 0;
+    }
+    g_overlayClosed = BANNER_START_FADE_OUT;
+    return 0;
+}

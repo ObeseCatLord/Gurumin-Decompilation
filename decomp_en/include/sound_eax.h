@@ -13,6 +13,18 @@ const unsigned long EAX_SUPPORT_GET_AND_SET = 3;
 // Value a float getter returns when the driver has no such property (-1e30).
 const float EAX_FLOAT_UNAVAILABLE = -1.0e30f;
 
+// Property number that reads or writes all four listener properties at once (EAXLISTENER_ALLPARAMETERS).
+const unsigned long EAX_LISTENER_ALL_PARAMETERS = 0;
+
+// The four listener properties in the order of EAX_LISTENER_ALL_PARAMETERS.
+struct EaxListenerParameters
+{
+    unsigned long environment;   // 0x00: environment number
+    float volume;                // 0x04: listener volume
+    float decayTime;             // 0x08: decay time of the room
+    float damping;               // 0x0c: damping of the room
+};
+
 // Property numbers of the EAX 1.0 listener set.
 const unsigned long EAX_LISTENER_ENVIRONMENT = 1;
 const unsigned long EAX_LISTENER_VOLUME = 2;
@@ -43,6 +55,7 @@ struct EaxListener
     float GetDecayTime();          // EN 0x7c1860: the decay time, EAX_FLOAT_UNAVAILABLE when the read fails
     unsigned long GetEnvironment();// EN 0x7c18a0: the environment number, 0 when the read fails
     float GetVolume();             // EN 0x7c18e0: the listener volume, EAX_FLOAT_UNAVAILABLE when the read fails
+    void SetAll(unsigned long environment, float volume, float decayTime, float damping);   // EN 0x7c19f0: writes all four properties
 };
 
 #endif

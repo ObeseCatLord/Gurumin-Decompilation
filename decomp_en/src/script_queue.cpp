@@ -30,3 +30,24 @@ extern "C" int Script_RunQueue(void)
     }
     return 0;
 }
+
+// Script_RunText: like one iteration of Script_RunQueue for a script text given directly: loads `text` into the script
+// parser and compiles and runs its main(). Does nothing when `text` is null or `suppress` is non-zero. Returns 0.
+extern "C" int Script_RunText(char *text, int suppress)
+{
+    if (text != 0 && suppress == 0)
+    {
+        g_scriptStateA = 0;
+        g_scriptParser.LoadText(text, strlen(text));
+        g_scriptStateA = 0;
+        g_queuedScriptRunning = 1;
+        g_scriptStateB = 0;
+        g_gameBuiltinsRegistered = 0;
+        g_scriptFlagByte = 0;
+        g_scriptParser.CompileStatement("main();");   // the entry point of the script text
+        g_scriptFlagByte = 0;
+        g_gameBuiltinsRegistered = 1;
+        g_queuedScriptRunning = 0;
+    }
+    return 0;
+}

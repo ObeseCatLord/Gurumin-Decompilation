@@ -3,7 +3,10 @@
 #include <string.h>
 
 #include "game_vars.h"
+#include "anim_model.h"
 #include "char.h"
+#include "engine.h"
+#include "node.h"
 #include "scene_start.h"
 
 // Inventory_Remove: takes *amount of item *index. When there are not enough, takes all and returns 0 with
@@ -125,4 +128,35 @@ extern "C" int Scene_ResetBattleState(void)
         ColourFade_Start(COMBO_FINISH_FADE_FRAMES, 1.0f, 1.0f, 1.0f, 1.0f);
     g_attackOverload = 0;
     return 0;
+}
+
+// Folder argument of Path_Data for the model files of the game's data folder.
+const int SPAWN_PATH_FOLDER = 0;
+// Frames the "too many objects" message stays up.
+const int SPAWN_FULL_MESSAGE_FRAMES = 0x50;
+// "Too many objects." with full-width spaces.
+#define SPAWN_FULL_MESSAGE "\x54\x6f\x6f\x81\x40\x6d\x61\x6e\x79\x81\x40\x6f\x62\x6a\x65\x63\x74\x73\x2e"
+
+// Object_SpawnModel (EN-only; it sits here because the compiler inlined Message_Show into it): loads model file `path` into slot g_nextObjectSlot, frees the unique mesh data of its node tree,
+// puts it at (x, y, z), marks the slot as kind CHAR_KIND_SPAWNED_MODEL, gives the nodes their colours (slot number,
+// SPAWNED_COLOUR_A, SPAWNED_COLOUR_B) and resets the scale to 1. Returns the slot. When the slots are used up it
+// shows the message "Too many objects." and returns 0.
+extern "C" int Object_SpawnModel(const char *path, int x, int y, int z)
+{
+    if (g_nextObjectSlot >= OBJECT_SPAWN_LIMIT)
+    {
+        Message_Show(SPAWN_FULL_MESSAGE, 0, SPAWN_FULL_MESSAGE_FRAMES);
+        return 0;
+    }
+    int slot = g_nextObjectSlot++;
+    g_characterModels[slot].LoadFile(Path_Data(path, SPAWN_PATH_FOLDER));
+    g_characterModels[slot].root->ReleaseUniqueMeshData();
+    g_characterModels[slot].Teleport((float)x, (float)y, (float)z);
+    g_charKind[slot] = CHAR_KIND_SPAWNED_MODEL;
+    g_characterModels[slot].m_0266 = 1;
+    g_characterModels[slot].root->SetColourC((char)slot, SPAWNED_COLOUR_MASK);
+    g_characterModels[slot].root->SetColourA(SPAWNED_COLOUR_A, SPAWNED_COLOUR_MASK);
+    g_characterModels[slot].root->SetColourB(SPAWNED_COLOUR_B, SPAWNED_COLOUR_MASK);
+    g_characterModels[slot].scale.Set(1.0f, 1.0f, 1.0f, 1.0f);
+    return slot;
 }

@@ -139,3 +139,27 @@ extern "C" int Slot_HasNoGround(int slot, const Vec4 *point)
     }
     return g_slotNoGround[slot] != 0;
 }
+
+// Map_TraceRay: casts the ray `second` to `first` through the map's collision meshes of tag `tag`. On a hit returns 1
+// and, unless `testOnly` is set, copies the hit point to `hitOut`; returns 0 for no hit or when no map is loaded.
+extern "C" int Map_TraceRay(Vec4 *first, Vec4 *second, Vec4 *hitOut, int testOnly, const char *tag)
+{
+    Vec4 hit;
+    if (testOnly != 0)
+    {
+        if (g_mapRootNode != 0)
+        {
+            if (g_mapRootNode->CastRay(tag, MAP_TRACE_RAY_FLAGS, MAP_TRACE_RAY_MASK, second, first, &hit, 0) != 0)
+                return 1;
+        }
+    }
+    else if (g_mapRootNode != 0)
+    {
+        if (g_mapRootNode->CastRay(tag, MAP_TRACE_RAY_FLAGS, MAP_TRACE_RAY_MASK, second, first, &hit, 0) != 0)
+        {
+            hitOut->Copy(hit);
+            return 1;
+        }
+    }
+    return 0;
+}

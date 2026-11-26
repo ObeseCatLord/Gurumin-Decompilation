@@ -81,6 +81,8 @@ const unsigned int MAP_COLLISION_ANY = 0xffffffff;
 extern "C" Node *g_modelFileRoots[MODEL_FILE_ENTRIES];
 // World matrix of each model file entry (the AnimModel::matrix of its model). EN 0x01663d70 (JP DAT_10ff19e8).
 extern "C" Matrix4 *g_modelFileMatrices[MODEL_FILE_ENTRIES];
+// Clears the collision flag (Node::hasCollision) of every loaded model file's root node. Returns 0. EN 0x734340.
+extern "C" int ModelFiles_ClearCollision(void);
 // Matrix reset to the identity every time a model is placed. EN 0x01ee48b0 (JP DAT_118e69a8).
 extern "C" Matrix4 g_placementMatrix;
 // Collision filter of the model-against-world test that runs now (a model's collisionFilter). EN 0x0217fb00 (JP DAT_11b002c0).
@@ -198,6 +200,7 @@ struct AnimModel
         int switchNode;           // 0x270: node id of the switch this character works (switch characters only)
         int bankIndex;            // 0x270: a model-bank record's own index in the bank (bank models only)
         int scriptFlag;           // 0x270: script flag set when an enemy is destroyed, 0 = none (Enemy_Destroy)
+        int zone;                 // 0x270: damage zone a zone character works: its index in g_mapRecords (DamageZone_Update)
     };
     union
     {
@@ -326,6 +329,7 @@ struct AnimModel
     int SetLayer(int layer, int a, int first, int last, int b, int c);   // EN 0x7438f0: Playback::SetLayer on the playback
     int SetFollowUp(int layer, int index, int value);                    // EN 0x745590: Playback::SetFollowUp on the playback (creates it on first use)
     int SetSlotOffset(int layer, int slot, int x, int y);                // EN 0x7464d0: Playback::SetSlotOffset on the playback (creates it on first use)
+    int LoadFile(const char *path);                                      // EN 0x735780 (JP 0x1017b9b0): loads the model file `path` into the model (not ported yet)
 };
 
 static_assert(sizeof(AnimModel) == ANIM_MODEL_SIZE, "AnimModel must be 0x249c bytes");

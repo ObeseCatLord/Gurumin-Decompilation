@@ -17,6 +17,10 @@ extern "C" int g_scriptStateB;
 // Script flag byte, cleared around a queued script (not recovered). EN 0x00bc8870 (JP DAT_104c0338).
 extern "C" char g_scriptFlagByte;
 
+// Loads script text `text` into the script parser and runs its main(), unless `text` is null or `suppress` is non-zero.
+// Returns 0. EN 0x644850 (EN-only, see script_queue.cpp; no direct caller).
+extern "C" int Script_RunText(char *text, int suppress);
+
 // Runs every queued script in order and empties the queue. EN 0x5b8cb0 (JP 0x100fc3e0).
 extern "C" int Script_RunQueue(void);
 

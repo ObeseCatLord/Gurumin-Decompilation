@@ -42,6 +42,11 @@ const int BANNER_START_FADE_IN = 1;
 // Sets the dialog message text to `text` (0 or an empty string clears it); a non-empty text also starts the banner fading
 // in from zero. Returns 0. EN 0x5b9650 (see dialog_message.cpp).
 extern "C" int DialogMessage_Set(const char *text);
+// g_overlayClosed value that makes the banner fade out.
+const int BANNER_START_FADE_OUT = 2;
+// Sets the banner text drawn at the upper left to `text` and starts the banner fading in; a null `text` makes the banner fade out and
+// an empty one clears the text. Returns 0. EN 0x5b96a0 (see dialog_message.cpp).
+extern "C" int BannerText_Set(const char *text);
 
 // Texture slots held by the overlay mode, and the bytes of its state block.
 const int OVERLAY_TEXTURE_COUNT = 0x22;

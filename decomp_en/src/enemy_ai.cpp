@@ -3,6 +3,7 @@
 // finished state a delay counter runs and a picker chooses the next behaviour.
 #include "char.h"
 #include "enemy_ai.h"
+#include "enemy_flee.h"
 #include "enemy_moves_long.h"
 #include "npc_facing.h"
 
@@ -94,6 +95,72 @@ extern "C" int Enemy_UpdateAI_D(int index)
         {
             g_charState[index].values[ENEMY_VALUE_PICK_DELAY] = 0;
             Enemy_PickAction_60_10_30(index);
+        }
+        return 0;
+    }
+    if (done != 0)
+    {
+        g_charState[index].values[ENEMY_VALUE_PICK_DELAY] = 0;
+        g_charState[index].state = ENEMY_STATE_FINISHED;
+    }
+    return 0;
+}
+
+// Enemy_UpdateAI_B: kind B (EN-only): turns to the player, backs away from it or chases it; picker 60/20/20. Returns 0. Called once per frame.
+extern "C" int Enemy_UpdateAI_B(int index)
+{
+    if (Enemy_IsBusy(index) != 0)
+        return 0;
+    int done;
+    switch (g_charState[index].state)
+    {
+    case ENEMY_BEHAVIOUR_FIRST:
+        done = Enemy_TurnToPlayer(index, ENEMY_TURN_END_CHANCE);
+        break;
+    case ENEMY_BEHAVIOUR_SECOND:
+        done = Enemy_BackAwayFromPlayer(index, ENEMY_BACK_AWAY_STOP_AFTER, 0);
+        break;
+    case ENEMY_BEHAVIOUR_THIRD:
+        done = Enemy_ChasePlayer(index, 0);
+        break;
+    default:
+        if (++g_charState[index].values[ENEMY_VALUE_PICK_DELAY] > ENEMY_PICK_DELAY_FRAMES)
+        {
+            g_charState[index].values[ENEMY_VALUE_PICK_DELAY] = 0;
+            Enemy_PickAction_60_20_20(index);
+        }
+        return 0;
+    }
+    if (done != 0)
+    {
+        g_charState[index].values[ENEMY_VALUE_PICK_DELAY] = 0;
+        g_charState[index].state = ENEMY_STATE_FINISHED;
+    }
+    return 0;
+}
+
+// Enemy_UpdateAI_E: kind E (EN-only): chases the player, turns to it or backs away from it; picker 20/60/20. Returns 0. Called once per frame.
+extern "C" int Enemy_UpdateAI_E(int index)
+{
+    if (Enemy_IsBusy(index) != 0)
+        return 0;
+    int done;
+    switch (g_charState[index].state)
+    {
+    case ENEMY_BEHAVIOUR_FIRST:
+        done = Enemy_ChasePlayer(index, 0);
+        break;
+    case ENEMY_BEHAVIOUR_SECOND:
+        done = Enemy_TurnToPlayer(index, ENEMY_TURN_END_CHANCE);
+        break;
+    case ENEMY_BEHAVIOUR_THIRD:
+        done = Enemy_BackAwayFromPlayer(index, 0, 1);
+        break;
+    default:
+        if (++g_charState[index].values[ENEMY_VALUE_PICK_DELAY] > ENEMY_PICK_DELAY_FRAMES)
+        {
+            g_charState[index].values[ENEMY_VALUE_PICK_DELAY] = 0;
+            Enemy_PickAction_20_60_20(index);
         }
         return 0;
     }

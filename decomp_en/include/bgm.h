@@ -45,6 +45,21 @@ extern "C" int (*g_soundArcPlayStreamCommand)(int stream, const char *path, int 
 extern "C" void (*g_soundArcStopStream)(int stream);                    // EN 0x009094b8 (JP FUN_10001ba0): stops a music stream
 extern "C" void (*g_soundArcFadeStream)(int stream, int milliseconds);  // EN 0x009094bc (JP FUN_10001bf0): fades a music stream out
 
+// Spectrum table of the music bars: bands per channel, bytes per frame, samples per frame and the right channel's offset.
+const int BGM_SPECTRUM_BANDS = 32;
+const int BGM_SPECTRUM_FRAME_SIZE = 0x50;
+const int BGM_SPECTRUM_SAMPLES_PER_FRAME = 0x5be;
+const int BGM_SPECTRUM_RIGHT_OFFSET = 0x28;
+extern "C" int g_bgmRequested;                     // EN 0x009e33f4 (JP DAT_104c012c): track the game asked for (-1 = none)
+extern "C" int g_bgmBarsShown;                     // EN 0x0222693c (JP DAT_1020aee4): non-zero = the music bars are drawn (the spectrum is loaded)
+extern "C" int g_bgmPositionFromSoundArc;          // EN 0x00a13960 (JP DAT_104c014c): non-zero = the music position is read from soundarc
+extern "C" short g_bgmStartOffset;                 // EN 0x009e3390 (JP DAT_104c00c0): position the track started from
+extern "C" int g_bgmPosition;                      // EN 0x009e1604 (JP DAT_10254088): playback position in 44.1 kHz samples
+extern "C" float g_bgmBars[2 * BGM_SPECTRUM_BANDS];   // EN 0x009e12a0 (JP DAT_104bff20): smoothed band levels, left channel then right
+extern "C" int (*g_soundArcGetPosition)(int stream);  // EN 0x009094dc (JP FUN_10001c80): playback position of a music stream
+// Updates the music: starts the requested track, computes g_bgmPosition and eases the bars. EN 0x5a8d70 (JP 0x1005c680).
+extern "C" int Bgm_Update(void);
+
 // Plays music file `name` on the other stream. EN 0x63e6d0 (JP 0x10010480).
 extern "C" void Bgm_StartStream(const char *name, int a, int b, int c, int d, int fade);
 // Checks a .de2 header against the key made from its file name; 1 when valid. EN 0x7aa9a0 (JP 0x10001cb0).

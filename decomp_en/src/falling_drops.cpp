@@ -68,3 +68,22 @@ extern "C" int Drops_Update(void)
     }
     return 0;
 }
+
+// Drop_Spawn: looks for an unused drop slot, starting after the slot used last and wrapping at DROP_COUNT, and starts
+// a falling drop at `position` there. Gives up after DROP_SPAWN_TRIES probes and returns 0; returns 1 when a drop was
+// started. Called by the effect code that makes drops (EN 0x60cb10).
+extern "C" int Drop_Spawn(const Vec4 &position)
+{
+    for (int tries = 0; tries < DROP_SPAWN_TRIES; tries++)
+    {
+        g_dropNext++;
+        g_dropNext = (g_dropNext < DROP_COUNT) ? g_dropNext : 0;
+        if (g_dropState[g_dropNext] == 0)
+        {
+            g_dropState[g_dropNext] = DROP_FALLING;
+            g_dropPositions[g_dropNext].Copy(position);
+            return 1;
+        }
+    }
+    return 0;
+}

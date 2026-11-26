@@ -14,6 +14,8 @@ const int ENEMY_VALUE_PICK_DELAY = 2;
 const int ENEMY_PICK_DELAY_FRAMES = 0;
 // Distance within which kind A wanders around its home.
 const float ENEMY_WANDER_RANGE = 300.0f;
+// Enemy_BackAwayFromPlayer argument kind B uses: frames after which it stops backing away.
+const int ENEMY_BACK_AWAY_STOP_AFTER = 4;
 // Argument of Enemy_TurnToPlayer used by the updaters: the chance per frame that the turn ends.
 const int ENEMY_TURN_END_CHANCE = 2;
 
@@ -28,10 +30,16 @@ extern "C" int Enemy_IdleMotion(int index);
 // Behaviour pickers (ai_pick.cpp).
 extern "C" int Enemy_PickAction_40_25_35(int index);   // EN 0x5b99a0
 extern "C" int Enemy_PickAction_60_10_30(int index);   // EN 0x5b9b10
+extern "C" int Enemy_PickAction_60_20_20(int index);   // EN 0x5b9a10 (ai_pick.cpp)
+extern "C" int Enemy_PickAction_20_60_20(int index);   // EN 0x5b9b80 (ai_pick.cpp)
 
 // Updaters of the enemy kinds A, C and D; each returns 0. EN 0x5ba630, 0x5baa30, 0x5baac0.
 extern "C" int Enemy_UpdateAI_A(int index);   // EN 0x5ba630 (JP 0x100e2080)
 extern "C" int Enemy_UpdateAI_C(int index);   // EN 0x5baa30 (JP 0x100e2440)
 extern "C" int Enemy_UpdateAI_D(int index);   // EN 0x5baac0 (JP 0x100e24d0)
+extern "C" int Enemy_UpdateAI_B(int index);   // EN 0x5ba6d0 (EN-only, enemy_ai.cpp): turns to the player, backs away, chases; picker 60/20/20
+extern "C" int Enemy_UpdateAI_E(int index);   // EN 0x5bab60 (EN-only, enemy_ai.cpp): chases, turns to the player, backs away; picker 20/60/20
+// Walks at the player; returns non-zero when done, and with `canGiveUp` set once in 400 frames. EN 0x5be740 (not ported yet).
+extern "C" int Enemy_ChasePlayer(int index, int canGiveUp);
 
 #endif

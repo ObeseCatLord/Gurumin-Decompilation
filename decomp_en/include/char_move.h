@@ -101,3 +101,10 @@ extern "C" int Npc_RunToMarker(int index);
 struct Vec4;
 // 1 when `eye` (looking along `heading`) sees `target` within `range` and `angleRange` (or `nearRange`), optionally with a wall test. EN 0x5b9500 (JP 0x10043e20).
 extern "C" int Char_CanSee(const Vec4 *target, const Vec4 *eye, float heading, float range, float angleRange, float nearRange, int checkWalls);
+// Bits of the axis mask of Char_ScaleMoveAxes.
+const unsigned int MOVE_AXIS_X = 1;
+const unsigned int MOVE_AXIS_Y = 2;
+const unsigned int MOVE_AXIS_Z = 4;
+// Multiplies the pending movement impulse of character `index` by the model's speed scale on the axes in `axes`
+// (MOVE_AXIS_* bits). Returns 0. EN 0x6458e0 (EN-only, see char_move.cpp; no direct caller).
+extern "C" int Char_ScaleMoveAxes(int index, unsigned int axes);

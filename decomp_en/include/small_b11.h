@@ -74,6 +74,21 @@ extern "C" void *g_scratchBlock;
 // Frees the scratch block. Returns 0. EN 0x7a99f0.
 extern "C" int ScratchBlock_Free(void);
 
+// The image reader of the Packs function table (EN 0x7be2b0): `command` 1 closes the reader's file; the other commands
+// open and decode an image into `buffer` (`rowBytes` is PACKS_READER_ROW_BYTES).
+typedef int (*PacksReaderFunction)(int command, void *buffer, int rowBytes, void *widthOut, void *heightOut, int flag);
+// EN 0x0222691c: entry of the Packs function table that points at the image reader.
+extern "C" PacksReaderFunction g_packsReader;
+// The image file the preview reader opened (0 = none). EN 0x02226934.
+extern "C" struct _iobuf *g_packsImageFile;
+// Row size in bytes the readers' scratch buffer is laid out for.
+const int PACKS_READER_ROW_BYTES = 0x780;
+// Reader command that closes the file.
+const int PACKS_READER_CLOSE = 1;
+// Frees the scratch block, tells the image reader to close and closes the image file. Returns 0. EN 0x7a9bb0
+// (packs_reader_close.cpp).
+extern "C" int Packs_CloseImageReader(void);
+
 // A pointer to a caller-owned memory block and its size in bytes (an output buffer the program fills).
 struct BufferView
 {

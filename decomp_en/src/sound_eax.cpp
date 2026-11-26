@@ -45,3 +45,14 @@ float EaxListener::GetVolume()
     propertySet->Get(g_eaxListenerPropertySet, EAX_LISTENER_VOLUME, 0, 0, &value, sizeof(value), &bytesReturned);
     return value;
 }
+
+// Writes the environment, volume, decay time and damping of the listener's room in one call. No direct caller.
+void EaxListener::SetAll(unsigned long environment, float volume, float decayTime, float damping)
+{
+    EaxListenerParameters parameters;
+    parameters.environment = environment;
+    parameters.volume = volume;
+    parameters.decayTime = decayTime;
+    parameters.damping = damping;
+    propertySet->Set(g_eaxListenerPropertySet, EAX_LISTENER_ALL_PARAMETERS, 0, 0, &parameters, sizeof(parameters));
+}

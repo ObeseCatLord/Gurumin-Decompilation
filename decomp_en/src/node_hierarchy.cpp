@@ -37,3 +37,25 @@ Node *Node::FindSkinned()
     }
     return 0;
 }
+
+// Runs ApplyCommandText(`commands`) on this node when it carries NODE_FLAG_COMMAND_TARGET, then on every descendant in
+// child order. Returns 0. No direct caller outside the recursion.
+int Node::ApplyCommandTextToFlagged(const char *commands)
+{
+    if ((flags & NODE_FLAG_COMMAND_TARGET) != 0)
+        ApplyCommandText(commands);
+    for (int i = 0; i < childCount; i++)
+        children[i]->ApplyCommandTextToFlagged(commands);
+    return 0;
+}
+
+// Gives every node of this subtree whose render mode is `from` the render mode `to` (this node included). Returns 0.
+// Called when a render mode is retired (EN 0x60cb10); calls itself on the children.
+int Node::ReplaceDrawMode(int from, int to)
+{
+    if (from == drawMode)
+        drawMode = to;
+    for (int i = 0; i < childCount; i++)
+        children[i]->ReplaceDrawMode(from, to);
+    return 0;
+}

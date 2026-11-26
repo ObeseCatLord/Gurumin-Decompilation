@@ -34,8 +34,8 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 897 of 2,034 game functions (185,824 of 2,080,360 bytes, 8.93 %) |
-| Matched under the rules | 897 |
+| Matched | 1,004 of 2,006 game functions (202,051 of 2,078,797 bytes, 9.72 %) |
+| Matched under the rules | 1,004 |
 | Queue | see QUEUE.md header (after batch 15); open.tsv ~160 (incl. library/blocked rows, which leave the queue) near-misses |
 
 ## State
@@ -60,8 +60,10 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   catch-all header from batch 11: split its declarations into area headers when convenient.
 - Type puns to clean up (batch 15): DShowStream::EndStreams casts to `IDirectDrawMediaStreamLike *` for vtable slot 8
   (declare slot 8 on the interface instead); Packs_DecodePlaneBands casts between two band views (make one type).
-- Paused after batch 15 at the orchestrator's request (external PR 3 brings the EN launcher, matched with VS2013
-  Community MFC, into decomp_en/). On resume: rebase onto origin/master, rebuild, check the launcher rows in QUEUE.
+- PR 3 (EN launcher, MFC) is merged: `E:\Microsoft Visual Studio 12.0` is now VS2013 Community Update 4 with
+  `VCtlmfc`; 28 MFC/ATL instantiations reclassified as library (2,006 game functions). The launcher range
+  0x6e5d60-0x6f15af is open again; open.tsv lists what PR 3 left. Before each push: `git fetch`, merge origin/master
+  if it moved (TSV/MD conflicts: keep both sides, then check obj_symbols for duplicate rows).
 - Never add address-taking tables or macros that only force COMDAT emission.
 - Blocked: launcher (164 EN-only functions) needs the VS2013 MFC headers (Express has no `VCtlmfc`; NOTES);
   `Game::~Game` 0x5a1150 needs Node dtor + EN Object base.

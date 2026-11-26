@@ -5,7 +5,7 @@ Re-run after each batch (finished items drop out). Per function: `python tools/p
 the JP twin's matched source, the EN callees with their JP names and the EN disassembly (`--brief` makes a
 subagent brief). Low-confidence map rows: check the twin before porting.
 
-## 1. Walls to retry (187)
+## 1. Walls to retry (199)
 
 - [ ] `005a1200` — CharRecord::operator= (implicit, 556 bytes): header ready (CharRecord fields 0x44..0xec made individual, ParamVector position); a throwaway copy function matched, but the standalone copy is only emitted in a TU with a real caller (Game_Reset 5a2dd0, Map_PlaceCharacters 637160, Game_LoadData 5f2cd0), so it has no honest source yet
 - [ ] `005a1fa0` — Switch_Hold (src/switches.cpp): function really ends at 0x5a214f (432 bytes, shared return-0 block after the last ret). With the held-object store inside each search branch ours tail-duplicates the code after the branches (434 bytes) where the original jumps to one shared tail; with the store after the branches the kind blocks and the lever check order differ. Tried 3 kind-block spellings and both store positions.
@@ -22,6 +22,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005b43f0` — AntiTamper_Check: not attempted (ran out of budget); no source written, no analysis recorded.
 - [ ] `005b4760` — Drops_Update: 565 vs 585 bytes; the original hoists the 0.02 drift constant into xmm1 for the whole loop (reloaded after the quad block clobbers it) and keeps screen.z in xmm5/xmm6 differently; ours loads constants per use; named constants, literals and a drop pointer local tried
 - [ ] `005ba770` — Enemy_DefaultStep (src/enemy_default_step.cpp): 665 vs 693 bytes; flow, constants (slots 14/20/11 fold from the index tests), calls and switch match the JP twin; the original builds two Vec4 positions (one per branch, both at ebp-0x18) and shares a single SetPosition tail by cross-jumping, plus keeps the 0.4/0.6 reference temporaries in the dead index parameter slot; one-position, two-position and early-return forms tried
+- [ ] `005be740` — Enemy_ChasePlayer (enemy_chase.cpp): all but two spots identical; the original loads -heading before storing step.y, computes the speed pointer with lea, and multiplies move.x then move.y sequentially off one speedScale register (ours interleaves); same wall as JP.
 - [ ] `005beb30` — Enemy_BackAwayFromPlayer: 1000 vs 994 bytes, only the move.x/move.y *= speedScale pair differs (original multiplies both then stores y then x); tried x-first, y-first, scale-on-left, float temporaries
 - [ ] `005bef20` — Enemy_KeepDistanceFromPlayer (src/enemy_flee.cpp): same move.x/move.y speedScale scale pair wall as Enemy_BackAwayFromPlayer (005beb30).
 - [ ] `005bf520` — Enemy_TurnToPlayer: 149 diffs; EN keeps a targetHeading store in each clamp branch with a shared tail, ours merges them
@@ -50,6 +51,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005ecf70` — Char_RunScriptStep (src/char_script.cpp): 944 bytes, identical except the SHOW step: the original pushes the constant 1 and then stores the started-voice character (g_scriptVoiceStarted) before pushing the event; ours stores first
 - [ ] `005ee110` — Route_FollowGates ported (592 vs 573 bytes): register allocation differs (original keeps point in edi, index in ebx) and Game::TestScriptFlag is inlined where the original calls 0x5ec240 (same blocker as 0063ac70)
 - [ ] `005f4060` — Ground_BuildHeights: logic equal to the JP twin; the outer/inner loop counters and the cell pointer get swapped registers (eax/ecx) and the original has loop-entry jumps with alignment padding, the copy loop is laid out differently (declaration order, header increments, for-init forms tried)
+- [ ] `005f4b40` — ListBank::FindVariable (listbank_find_variable.cpp): 183 bytes differ; first loop keeps count in esi and this in ebx (ours swapped), and the inline ReportError blocks of the array branch are laid out differently (dimension check jump polarity).
 - [ ] `00603940` — save-file wrapper: an unused GameFile local constructor/destructor is only reproduced by a dummy local; callee 0x603630 (Steam Save_Load) is not ported
 - [ ] `00607020` — ListBank::LoadText: only register numbering differs (ours c in dl and inQuotes in ecx, original c in cl and inQuotes in edx) and the second `cmp cl,0x22` is kept in the original; int/bool/declaration order tried (four spellings)
 - [ ] `00631480` — Map_FindRegionAt: only the xmm4/xmm5 choice for the margin constant vs point->x differs; tried comparison order, local order, for loop with continue, min/max macros
@@ -79,6 +81,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006aeda0` — Npc_PopUp (src/char_move.cpp): 1642 vs 1641 bytes, 12 non-reloc bytes: the told/state/wait stores of the react block are ordered told, state, wait in the original with the flag compare hoisted (all 6 orders tried give the same or worse), and the eye/head Vec4 slots swap (original eye at -0x54, head at -0x44; both declaration orders tried).
 - [ ] `006af410` — Npc_Held: not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
 - [ ] `006b10c0` — Enemy_Pendulum (src/enemy_pendulum.cpp): 11 bytes off; store placement in the arrival block (swing/fall/state/mode order) and mov [mem],imm versus mov [mem],eax. Tried the permutations of the four stores and ++values form.
+- [ ] `006b33f0` — Char_StartShagaLink (char_shaga_link.cpp): body and idiv/div CSE match the original; register allocation differs (original keeps index in edi and 50 in esi, state offset in [ebp-8] and count in [ebp-4]; ours swaps them), same wall as JP Enemy_SeekShaga.
 - [ ] `006b3b20` — Npc_WatchForPlayer: not attempted (time).
 - [ ] `006b4220` — Npc_FaceAndTalk: matches except edi/esi swapped (original keeps index in edi and index<<6 in esi; ours the reverse), length 1007 vs 998
 - [ ] `006b4610` — Npc_ChildFollow (src/char_move.cpp): 1533 vs 1515 bytes; the told-to-react store is an immediate 0 before xor eax,eax at the returns (ours mov [..],eax) and the state/wait stores before Enemies_WakeNearby are scheduled later; same wall as Npc_FaceAndTalk/Npc_RunToMarker.
@@ -94,6 +97,10 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006de0c0` — Enemy_DropInWhenNear: 1111 vs 1119 bytes, same register-pressure wall as Enemy_DropIn (original keeps 20 in esi and spills index*0x249c and the model pointer)
 - [ ] `006de520` — Enemy_DropIn: 1013 vs 1021 bytes; the original keeps 20 in esi and spills index*0x249c and the model pointer to the stack (register pressure in the drop-in state), ours keeps both in registers; tried a model pointer local
 - [ ] `006df520` — Carry_StackOnObject: 641 vs 662 bytes, 317 diffs; original keeps g_stackTargetSlot cached in ecx and position.z in xmm1 across the search loop (jumps into the loop middle), ours reloads the global every iteration; the first 40 instructions otherwise equal
+- [ ] `006ea830` — CCongigDlg::ShowPage: 9 diffs, only the load order of the final MoveWindow arguments (original loads top, bottom, left; ours bottom, top, left). The two RECT initialisations now match after declaring them at point of use; three spellings of the MoveWindow call (fields, &rect overload, locals x/y) compile to the same bytes.
+- [ ] `006eb860` — CKbDlg::IsStartRefused: all but the "unassigned list" flag matches (vectorised id array, loop, MessageBox call). The original keeps the bool result in a stack byte [ebp-1] for the normal exit and in bl for the declined path, and loads the stack frame 4 bytes larger; ours constant-folds the flag (xor al,al / mov al,1). Three spellings tried (result local set before the box and returned on both exits, constants on both exits, early return).
+- [ ] `006ec4e0` — COseDlg::OnReset: the board pack loop. The original unrolls the 16-cell inner loop by four with the shift held as esi = 4,12,20,28 (cmp esi,0x24) and keeps the running cell index in edi; ours does not unroll (word/cell and word/shift spellings tried, pointer and index forms). Probably a hand-unrolled body in the source; not written that way.
+- [ ] `006ed900` — CPadDlg::IsStartRefused: same residue as CKbDlg::IsStartRefused 0x006eb860 (flag kept in [ebp-1] and bl, frame 0x34 vs ours 0x30); identical source shape, same three spellings tried.
 - [ ] `0071add0` — Playback::Play: original keeps the repeated `layer != -1` tests separate and every early return gets its own epilogue; ours merges the tests (five spellings with unsigned compares)
 - [ ] `0071c410` — TextureObject::Create (src/texture_create.cpp): 400 vs 402 bytes, one instruction off; the original spills the buffer size to the alpha parameter slot [ebp+0x14] right before the allocation call (after the string push) in both speckle branches and the else loop bound is a copy (mov ebx,eax); ours spills earlier and reloads. Tried function-scope size, inline assignment, per-branch size.
 - [ ] `0071c5b0` — Texture_CreateFromPixels (src/texture_create.cpp): 175 diffs, structure matches; the original keeps the white buffer in edi and reloads the slot into ebx, ours spills the buffer to [ebp-4] and reloads the slot into edi (register allocation, same wall as Texture_CreateCopy). Tried inline size, function-scope buffer, reusing the pixels parameter.
@@ -103,9 +110,12 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00734b20` — ModelNames_ClearAll: loop pointer in edx with the zero kept in eax and both addresses loaded before rep stosd; index loop gives eax pointer and mov eax,0 after (three spellings: index, pointer, memset)
 - [ ] `00739250` — WorldRenderer::SetModelState: the original reloads this->models after every limit store (ours keeps it in ecx); NodeSaved::limitMin/Max are floats, tried literal and named limits
 - [ ] `0073ede0` — EffectDefs_Allocate: 49 diffs, same length; all stores match but the scheduler places the first list-head vector store and the last recent-effect vector store differently around the m_0164 store (EN: recents, m_0164, list heads); loops and explicit stores, store order of the byte and struct fields all tried
+- [ ] `0073eff0` — Playback::Advance (model_state.cpp): everything matches except that the original inlines Playback::Play (restart=1, blend 14) into the idle-motion path while ours calls it; the out-of-line Play is itself open.
+- [ ] `0073f770` — WorldRenderer::OffsetKeysFromA: original stores LowestMessageId's (unused) result into the dead stack slot of the firstId parameter, which also moves firstId to edi; a plain call (or an unused local) compiles to no store.
 - [ ] `00740c40` — AnimModel::Unload: only the placement of mov ecx,esi vs the m_2418 store after the Matrix4 temp destructor differs; tried int/void ResetState, float field, store order, named temp matrix
 - [ ] `007413f0` — AnimModel::ResetState: not attempted; needs about 80 named AnimModel fields, which would restructure the shared header
 - [ ] `00741c50` — Camera_Reset (src/camera_reset.cpp): 927 bytes, same stores and calls in the same order; only scheduling differs (the original hoists xorps xmm0 and the store of 1 to g_cameraCounter9089ec above the next Fill call setup; ours emits them later). All stores are to globals declared in camera.h and not yet understood
+- [ ] `00742020` — WorldRenderer::OffsetKeysFromB: same dead store of LowestMessageId's result into the firstId parameter slot as 0x73f770.
 - [ ] `00745680` — Camera_SelectPath (src/camera_path_select.cpp): 407 bytes, same size; the original pushes esi/edi before the id == -1 test and reads the current path after it, ours pushes them after the early return (or hoists the read when it is written first); same code otherwise. Tried reading the current path first, declaring the loop index first.
 - [ ] `00747b50` — EffectManager::RemoveOwnedBy: 2 bytes short; the original loads record.id into eax before comparing with -1 (a compare against memory in ours); local id, swapped tests, record pointer and continue forms tried
 - [ ] `00747cc0` — WorldRenderer::ShiftIdsFrom (src/world_message_edit.cpp): 81 vs 84 bytes; the original keeps this in ebx and firstId in edi and stores each LowestMessageId result into the parameter's stack home [ebp+8] (an unused local drops that store and swaps the registers); no spelling tried reproduces the dead store (unused local, reassigned parameter would change the compare)
@@ -126,6 +136,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00773f20` — (801 bytes, JP 101b17a0): not attempted (ran out of budget); no source written, no analysis recorded.
 - [ ] `00774300` — Matrix4::Heading (src/matrix_heading.cpp): the original does not inline Project; ours does.
 - [ ] `00774b90` — VertexPacks_AllocateArray: our build merges the duplicate radius store of the empty pack; bytes differ there.
+- [ ] `00774f00` — InverseMatrix (matrix_inverse.cpp): arithmetic matches in shape; the local result matrix is zeroed inline with the Matrix4() pattern and has no EH frame, but Matrix4() here is an out-of-line ctor with a dtor (call plus unwind frame); needs a Matrix4 with inline ctor and no dtor in this TU.
 - [ ] `00775320` — View_ContainsPoint: 6 bytes off, one subss placement in the behind-camera branch
 - [ ] `00777410` — Vec3_Normalized: 8 bytes off, xmm0/xmm2 numbering of x and y only
 - [ ] `00777770` — PerspectiveMatrix: first 200 bytes match; tail stores m[10] and m[14] in a different order (farPlane*nearPlane operand order)
@@ -156,6 +167,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007a5ca0` — src/names_od.cpp Names_Set compiles to 65 bytes, EN is 146: check the map pairing, the EN function probably does more than the JP twin
 - [ ] `007a8930` — Path_GetBaseName: original clears the first 8 bytes with two dword stores (memset gives movq)
 - [ ] `007a8ac0` — GameFile::Open returns int 0/1 in EN but game_file.h declares FILE * (model_prescan.cpp depends on it); fix the type and its caller together
+- [ ] `007a8d10` — GameFile::WritePicture: bytes equal except the order of the handle reload and the stack cleanup after the first fwrite (original: add esp, then mov eax,[esi]; ours hoists the reload and threads the skip jump to the return); the same shape matches in WriteCompressed.
 - [ ] `007a8d80` — GameFile::WriteCompressed: 44 bytes off, register scheduling after the compress call (count reused as the packed size).
 - [ ] `007a8ec0` — MmvPlayer::DrawToTexture: 85 bytes off; the original keeps `this` in ebx and re-reads `frame` for the call, ours holds frame in ebx; ternary/if forms for the palette and the clamp tried (four spellings)
 - [ ] `007a8f20` — MmvPlayer::DecodeFrameRle: the JP source is hand-written inline asm; the C version differs in scheduling.
@@ -238,7 +250,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007ab210` 7222 bytes <- APP.dll `1015d520` Text_ToFullWidth [decomp/src/text_fullwidth.cpp] (high 0.65)
 - [ ] `005d3360` 7715 bytes <- APP.dll `10038c10` Scene_DrawFrame [decomp/src/scene_draw.cpp] (high 0.85)
 
-## 3. JP twin not matched yet (291 functions, 1421468 bytes)
+## 3. JP twin not matched yet (280 functions, 1411832 bytes)
 
 - [ ] `006eab60` 10 bytes <- sound3d.dll `1004be9d`  (medium 0.35)
 - [ ] `007af3b0` 23 bytes <- sound3d.dll `100595ec`  (low 0.19)
@@ -251,7 +263,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e7060` 56 bytes <- sound3d.dll `1001e2fd` CreatePatternBrush (high 0.66)
 - [ ] `006ed9d0` 60 bytes <- sound3d.dll `100196f0` CheckImplicitLoad (medium 0.40)
 - [ ] `006e67d0` 71 bytes <- sound3d.dll `100550dd`  (medium 0.37)
-- [ ] `006ebc80` 80 bytes <- sound3d.dll `100587a7` DDX_CBIndex (medium 0.50)
 - [ ] `006ea720` 85 bytes <- sound3d.dll `10053d8f`  (low 0.33)
 - [ ] `007bd1e0` 89 bytes <- Packs.dll `10006e30`  (high 0.73)
 - [ ] `006eb540` 102 bytes <- sound3d.dll `10019267` _AtlGetStringResourceImage (high 0.85)
@@ -259,7 +270,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0077bcb0` 148 bytes <- sound3d.dll `10008610`  (high 0.73)
 - [ ] `006eaaa0` 159 bytes <- sound3d.dll `10020bf0` _memset (medium 0.52)
 - [ ] `007aefd0` 159 bytes <- sound3d.dll `100522e0` ATL::operator+ (medium 0.54)
-- [ ] `006ea450` 160 bytes <- sound3d.dll `10053e99`  (medium 0.45)
 - [ ] `006ed3b0` 183 bytes <- sound3d.dll `10053f0d` CDialog (low 0.24)
 - [ ] `006e8d10` 189 bytes <- Packs.dll `1002fab1` _wctomb (low 0.32)
 - [ ] `007aa020` 206 bytes <- sound3d.dll `100537f8`  (medium 0.43)
@@ -287,11 +297,9 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00771830` 814 bytes <- APP.dll `101b1420`  (high 0.88)
 - [ ] `007c51e0` 814 bytes <- sound3d.dll `1000a3a0`  (high 0.96)
 - [ ] `00646750` 819 bytes <- APP.dll `10037560` ListBank::AssignValue (high 0.83)
-- [ ] `007baf40` 831 bytes <- Packs.dll `100015c0`  (high 0.92)
 - [ ] `006d5a80` 837 bytes <- APP.dll `100b5550` Npc_GreetWhenNear (high 0.85)
 - [ ] `007bd990` 838 bytes <- Packs.dll `100063c0`  (medium 0.58)
 - [ ] `006b37c0` 863 bytes <- APP.dll `100b1800` Npc_GroupWatch (high 0.90)
-- [ ] `0064caf0` 865 bytes <- APP.dll `10019310` Camera_Shift (high 0.73)
 - [ ] `005ca520` 878 bytes <- APP.dll `1001bb20` Char_DrawLinks (medium 0.57)
 - [ ] `007bfe80` 884 bytes <- sound3d.dll `10004860`  (high 0.71)
 - [ ] `0060c750` 887 bytes <- APP.dll `10137b10` Game_FrameStep (high 0.85)
@@ -302,17 +310,12 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0077c0a0` 961 bytes <- APP.dll `101441b0`  (high 0.72)
 - [ ] `0077c470` 961 bytes <- APP.dll `10144040`  (high 0.72)
 - [ ] `00602730` 967 bytes <- APP.dll `10051190` MapCursor_Step (high 0.70)
-- [ ] `006b33f0` 969 bytes <- APP.dll `100d2110`  (high 0.95)
-- [ ] `00774f00` 981 bytes <- APP.dll `101b0d40`  (high 0.90)
-- [ ] `005be740` 995 bytes <- APP.dll `10027630` Enemy_ChasePlayer (high 0.97)
 - [ ] `005e75f0` 1014 bytes <- APP.dll `10055ee0` Player_KnockBack (high 0.96)
 - [ ] `0074fcf0` 1026 bytes <- APP.dll `1019e120` Node::BuildCollisionSpheres (high 0.74)
 - [ ] `0074f580` 1036 bytes <- APP.dll `101a82d0` Node::BuildMesh (high 0.63)
-- [ ] `005f4b40` 1039 bytes <- APP.dll `10037090` ListBank::FindVariable (high 0.67)
 - [ ] `0067fcc0` 1054 bytes <- APP.dll `100b9bb0` Enemy_PlayVoice (high 0.83)
 - [ ] `007b8af0` 1068 bytes <- Packs.dll `10004fb0` BMPPack (high 0.75)
 - [ ] `0070a7f0` 1078 bytes <- APP.dll `10172350` EffectManager::Start (high 0.80)
-- [ ] `0073eff0` 1092 bytes <- APP.dll `1016a480` Playback_Advance (high 0.91)
 - [ ] `0078d8a0` 1113 bytes <- APP.dll `10143e00` Render_FillRect (high 0.71)
 - [ ] `0063bc80` 1121 bytes <- APP.dll `1001d2d0` DigitCounter_Update (high 0.98)
 - [ ] `0063e9f0` 1123 bytes <- APP.dll `10010d10` Save_ReadSlotInfo (medium 0.58)
@@ -329,7 +332,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00654b60` 1212 bytes <- APP.dll `10034210` Move_SweepToWorld (high 0.61)
 - [ ] `005e29a0` 1228 bytes <- APP.dll `10038070` DrawItemPreview (high 0.64)
 - [ ] `007bd240` 1235 bytes <- Packs.dll `10006a40`  (medium 0.55)
-- [ ] `006eda40` 1240 bytes <- Packs.dll `1000f696`  (low 0.26)
 - [ ] `0079f8b0` 1248 bytes <- APP.dll `10147a20` GetMeshBuffers (high 0.70)
 - [ ] `00644300` 1276 bytes <- APP.dll `10036ca0` ListBank::RegisterBuiltin (high 0.76)
 - [ ] `007c20a0` 1290 bytes <- sound3d.dll `10006250`  (high 0.66)
@@ -344,7 +346,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0071ba10` 1363 bytes <- APP.dll `101643c0` AnimModel_LiftProbes (high 0.75)
 - [ ] `0077fbe0` 1364 bytes <- APP.dll `1014c080` TextureObject::DrawQuad (high 0.69)
 - [ ] `00642d80` 1384 bytes <- APP.dll `10050510` Char_SpawnEnemy (high 0.87)
-- [ ] `006f0cf0` 1384 bytes <- sound3d.dll `1004fa6c` ExecuteDlgInit (low 0.20)
 - [ ] `006b23d0` 1398 bytes <- APP.dll `10023900` Map_ResetOnEnter (high 0.90)
 - [ ] `006cc8d0` 1449 bytes <- APP.dll `100b4300` Npc_RaiseAlarm (high 0.70)
 - [ ] `0063d5d0` 1495 bytes <- APP.dll `1004ed60` TutorialBook_Open (high 0.88)
@@ -532,34 +533,16 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006883a0` 51470 bytes <- APP.dll `100d24a0` Bs006_Update (medium 0.60)
 - [ ] `0060cb10` 113582 bytes <- APP.dll `1011d810`  (high 0.72)
 
-## 4. EN-only (no JP twin found) (558 functions, 219353 bytes)
+## 4. EN-only (no JP twin found) (450 functions, 206429 bytes)
 
-- [ ] `006e6210` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006e6220` 6 bytes (launcher (EN-only config dialog))
 - [ ] `006e64f0` 6 bytes (launcher (EN-only config dialog))
 - [ ] `006e73d0` 6 bytes (launcher (EN-only config dialog))
 - [ ] `006e73e0` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006eb670` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006eb680` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006eba70` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006eba80` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006ec250` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006ec320` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006edf20` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006f0420` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006f0430` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006f06a0` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006f06b0` 6 bytes (launcher (EN-only config dialog))
-- [ ] `006f1260` 6 bytes (launcher (EN-only config dialog))
 - [ ] `006e7010` 9 bytes (launcher (EN-only config dialog))
 - [ ] `006e7220` 9 bytes (launcher (EN-only config dialog))
 - [ ] `006e73b0` 9 bytes (launcher (EN-only config dialog))
-- [ ] `006e93b0` 9 bytes (launcher (EN-only config dialog))
-- [ ] `006e93c0` 9 bytes (launcher (EN-only config dialog))
-- [ ] `006ea660` 9 bytes (launcher (EN-only config dialog))
 - [ ] `006e6760` 11 bytes (launcher (EN-only config dialog))
 - [ ] `006e6770` 11 bytes (launcher (EN-only config dialog))
-- [ ] `006f03b0` 11 bytes (launcher (EN-only config dialog))
 - [ ] `006e6080` 12 bytes (launcher (EN-only config dialog))
 - [ ] `006e6200` 12 bytes (launcher (EN-only config dialog))
 - [ ] `006e7170` 13 bytes (launcher (EN-only config dialog))
@@ -568,7 +551,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e6090` 18 bytes (launcher (EN-only config dialog))
 - [ ] `006e7320` 19 bytes (launcher (EN-only config dialog))
 - [ ] `006edf60` 19 bytes (launcher (EN-only config dialog))
-- [ ] `006ef790` 21 bytes (launcher (EN-only config dialog))
 - [ ] `006ea810` 22 bytes (launcher (EN-only config dialog))
 - [ ] `006ec340` 22 bytes (launcher (EN-only config dialog))
 - [ ] `005a8cd0` 24 bytes (unknown)
@@ -584,11 +566,8 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006ea9f0` 26 bytes (launcher (EN-only config dialog))
 - [ ] `006eb930` 26 bytes (launcher (EN-only config dialog))
 - [ ] `006e6f10` 27 bytes (launcher (EN-only config dialog))
-- [ ] `006e70b0` 27 bytes (launcher (EN-only config dialog))
-- [ ] `006ea4f0` 27 bytes (launcher (EN-only config dialog))
 - [ ] `006eaa10` 27 bytes (launcher (EN-only config dialog))
 - [ ] `006eab40` 27 bytes (launcher (EN-only config dialog))
-- [ ] `006efae0` 27 bytes (launcher (EN-only config dialog))
 - [ ] `006e6710` 29 bytes (launcher (EN-only config dialog))
 - [ ] `006e6730` 29 bytes (launcher (EN-only config dialog))
 - [ ] `006e8cc0` 29 bytes (launcher (EN-only config dialog))
@@ -599,14 +578,12 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e5c30` 30 bytes (unknown)
 - [ ] `006e5c80` 30 bytes (unknown)
 - [ ] `006e5d00` 30 bytes (unknown)
-- [ ] `006e9230` 30 bytes (launcher (EN-only config dialog))
 - [ ] `006ea990` 30 bytes (launcher (EN-only config dialog))
 - [ ] `00749270` 30 bytes (unknown)
 - [ ] `00749290` 30 bytes (unknown)
 - [ ] `007aab10` 30 bytes (unknown)
 - [ ] `007c1710` 31 bytes (unknown)
 - [ ] `007c1970` 31 bytes (unknown)
-- [ ] `006eb600` 32 bytes (launcher (EN-only config dialog))
 - [ ] `0071cbe0` 32 bytes (unknown)
 - [ ] `007c1730` 32 bytes (unknown)
 - [ ] `007c1990` 32 bytes (unknown)
@@ -622,14 +599,10 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e6490` 33 bytes (launcher (EN-only config dialog))
 - [ ] `006e6de0` 33 bytes (launcher (EN-only config dialog))
 - [ ] `006e6ee0` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006e91f0` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006ec2b0` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006ed8a0` 33 bytes (launcher (EN-only config dialog))
 - [ ] `006ed8d0` 33 bytes (launcher (EN-only config dialog))
 - [ ] `006f03f0` 33 bytes (launcher (EN-only config dialog))
 - [ ] `006f0590` 33 bytes (launcher (EN-only config dialog))
 - [ ] `006f0c90` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006f0cc0` 33 bytes (launcher (EN-only config dialog))
 - [ ] `00747c40` 33 bytes (unknown)
 - [ ] `007aabd0` 33 bytes (unknown)
 - [ ] `007aac00` 33 bytes (unknown)
@@ -641,7 +614,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007a4af0` 35 bytes (unknown)
 - [ ] `007a4b60` 35 bytes (unknown)
 - [ ] `00647a40` 36 bytes (unknown)
-- [ ] `006e9290` 36 bytes (launcher (EN-only config dialog))
 - [ ] `0076f0f0` 36 bytes (unknown)
 - [ ] `007ae010` 36 bytes (unknown)
 - [ ] `007ae300` 36 bytes (unknown)
@@ -651,11 +623,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e5b60` 37 bytes (unknown)
 - [ ] `006e5ca0` 37 bytes (unknown)
 - [ ] `006e5d20` 37 bytes (unknown)
-- [ ] `006e9260` 37 bytes (launcher (EN-only config dialog))
-- [ ] `006e92c0` 37 bytes (launcher (EN-only config dialog))
-- [ ] `006e92f0` 37 bytes (launcher (EN-only config dialog))
-- [ ] `006e9320` 37 bytes (launcher (EN-only config dialog))
-- [ ] `006e9350` 37 bytes (launcher (EN-only config dialog))
 - [ ] `00773bd0` 37 bytes (unknown)
 - [ ] `007a8ce0` 37 bytes (unknown)
 - [ ] `007ad310` 37 bytes (unknown)
@@ -671,9 +638,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e6e10` 39 bytes (launcher (EN-only config dialog))
 - [ ] `006e6e40` 39 bytes (launcher (EN-only config dialog))
 - [ ] `006e8ce0` 39 bytes (launcher (EN-only config dialog))
-- [ ] `006eb630` 39 bytes (launcher (EN-only config dialog))
-- [ ] `006eb770` 39 bytes (launcher (EN-only config dialog))
-- [ ] `006f03c0` 39 bytes (launcher (EN-only config dialog))
 - [ ] `00709d20` 39 bytes (unknown)
 - [ ] `00709d50` 39 bytes (unknown)
 - [ ] `007aac90` 39 bytes (unknown)
@@ -689,86 +653,33 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e2260` 46 bytes (unknown)
 - [ ] `006e5b10` 46 bytes (unknown)
 - [ ] `006e5be0` 46 bytes (unknown)
-- [ ] `006e90a0` 46 bytes (launcher (EN-only config dialog))
-- [ ] `006ea520` 49 bytes (launcher (EN-only config dialog))
-- [ ] `006ea620` 51 bytes (launcher (EN-only config dialog))
-- [ ] `006ec210` 51 bytes (launcher (EN-only config dialog))
-- [ ] `006ec2e0` 51 bytes (launcher (EN-only config dialog))
-- [ ] `006efbf0` 51 bytes (launcher (EN-only config dialog))
-- [ ] `006ec270` 52 bytes (launcher (EN-only config dialog))
 - [ ] `006ea780` 55 bytes (launcher (EN-only config dialog))
 - [ ] `006e72e0` 57 bytes (launcher (EN-only config dialog))
 - [ ] `006ea6e0` 57 bytes (launcher (EN-only config dialog))
 - [ ] `006eaa60` 57 bytes (launcher (EN-only config dialog))
-- [ ] `006ec590` 59 bytes (launcher (EN-only config dialog))
 - [ ] `006e6d30` 62 bytes (launcher (EN-only config dialog))
 - [ ] `006e6d70` 62 bytes (launcher (EN-only config dialog))
-- [ ] `006f0650` 70 bytes (launcher (EN-only config dialog))
-- [ ] `006e6780` 78 bytes (launcher (EN-only config dialog))
-- [ ] `006ebaa0` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebaf0` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebb40` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebb90` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebbe0` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebc30` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebcd0` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebd20` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebd70` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebdc0` 80 bytes (launcher (EN-only config dialog))
-- [ ] `006ebe10` 80 bytes (launcher (EN-only config dialog))
 - [ ] `006e5900` 81 bytes (unknown)
-- [ ] `006ea3d0` 85 bytes (launcher (EN-only config dialog))
 - [ ] `007ae040` 90 bytes (unknown)
 - [ ] `006e7100` 92 bytes (launcher (EN-only config dialog))
-- [ ] `006f1550` 94 bytes (launcher (EN-only config dialog))
-- [ ] `006e6e70` 97 bytes (launcher (EN-only config dialog))
-- [ ] `007427f0` 99 bytes (unknown)
 - [ ] `0079fd90` 103 bytes (unknown)
 - [ ] `006ea670` 107 bytes (launcher (EN-only config dialog))
-- [ ] `007a8d10` 110 bytes (unknown)
-- [ ] `007533b0` 111 bytes (unknown)
-- [ ] `0076b330` 111 bytes (unknown)
-- [ ] `0076b3a0` 111 bytes (unknown)
-- [ ] `0076b4c0` 111 bytes (unknown)
 - [ ] `0076fa60` 112 bytes (unknown)
-- [ ] `007a57c0` 113 bytes (unknown)
-- [ ] `006e5ed0` 114 bytes (launcher (EN-only config dialog))
-- [ ] `006f0510` 114 bytes (launcher (EN-only config dialog))
 - [ ] `0076b270` 114 bytes (unknown)
 - [ ] `007adf90` 115 bytes (unknown)
-- [ ] `0073f770` 116 bytes (unknown)
 - [ ] `00773aa0` 117 bytes (unknown)
 - [ ] `00778840` 117 bytes (unknown)
-- [ ] `007a8c30` 117 bytes (unknown)
-- [ ] `007c15d0` 117 bytes (unknown)
-- [ ] `007354e0` 118 bytes (unknown)
-- [ ] `007464d0` 118 bytes (unknown)
 - [ ] `007541d0` 118 bytes (unknown)
 - [ ] `00773b20` 118 bytes (unknown)
 - [ ] `007bb8d0` 118 bytes (unknown)
 - [ ] `007bcff0` 118 bytes (unknown)
-- [ ] `006e6610` 119 bytes (launcher (EN-only config dialog))
-- [ ] `0071ad50` 119 bytes (unknown)
-- [ ] `007aaee0` 119 bytes (unknown)
-- [ ] `006ec190` 120 bytes (launcher (EN-only config dialog))
 - [ ] `006e7230` 121 bytes (launcher (EN-only config dialog))
-- [ ] `007a81a0` 122 bytes (unknown)
-- [ ] `007a8bb0` 122 bytes (unknown)
-- [ ] `0070c030` 125 bytes (unknown)
-- [ ] `0071acd0` 125 bytes (unknown)
 - [ ] `00772020` 125 bytes (unknown)
 - [ ] `006e7180` 126 bytes (launcher (EN-only config dialog))
-- [ ] `00742020` 127 bytes (unknown)
-- [ ] `0073ef10` 128 bytes (unknown)
 - [ ] `00731b80` 129 bytes (unknown)
 - [ ] `0077bb00` 129 bytes (unknown)
-- [ ] `006e90d0` 130 bytes (launcher (EN-only config dialog))
-- [ ] `006e9160` 130 bytes (launcher (EN-only config dialog))
-- [ ] `00746230` 131 bytes (unknown)
 - [ ] `0076d6e0` 131 bytes (unknown)
 - [ ] `00748ca0` 132 bytes (unknown)
-- [ ] `006e5f70` 133 bytes (launcher (EN-only config dialog))
-- [ ] `006f05c0` 133 bytes (launcher (EN-only config dialog))
 - [ ] `007342b0` 133 bytes (unknown)
 - [ ] `007484e0` 133 bytes (unknown)
 - [ ] `0076a200` 133 bytes (unknown)
@@ -778,7 +689,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00772890` 138 bytes (unknown)
 - [ ] `00775670` 139 bytes (unknown)
 - [ ] `0076a8b0` 140 bytes (unknown)
-- [ ] `006ea560` 141 bytes (launcher (EN-only config dialog))
 - [ ] `006e8fa0` 142 bytes (launcher (EN-only config dialog))
 - [ ] `007a8e30` 142 bytes (unknown)
 - [ ] `007ab140` 142 bytes (unknown)
@@ -789,11 +699,9 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007730a0` 144 bytes (unknown)
 - [ ] `007af920` 144 bytes (unknown)
 - [ ] `00774a70` 148 bytes (unknown)
-- [ ] `006f0470` 149 bytes (launcher (EN-only config dialog))
 - [ ] `007755d0` 152 bytes (unknown)
 - [ ] `0076b670` 153 bytes (unknown)
 - [ ] `007b0440` 153 bytes (unknown)
-- [ ] `006ec0f0` 154 bytes (launcher (EN-only config dialog))
 - [ ] `0074f320` 154 bytes (unknown)
 - [ ] `007afe10` 155 bytes (unknown)
 - [ ] `00733400` 156 bytes (unknown)
@@ -801,7 +709,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007483d0` 156 bytes (unknown)
 - [ ] `007722d0` 156 bytes (unknown)
 - [ ] `007c1750` 156 bytes (unknown)
-- [ ] `006ec4e0` 158 bytes (launcher (EN-only config dialog))
 - [ ] `0070aec0` 165 bytes (unknown)
 - [ ] `0072ea40` 166 bytes (unknown)
 - [ ] `0073e270` 166 bytes (unknown)
@@ -816,10 +723,8 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007b0040` 175 bytes (unknown)
 - [ ] `0076a7b0` 177 bytes (unknown)
 - [ ] `007774e0` 179 bytes (unknown)
-- [ ] `006eb7a0` 181 bytes (launcher (EN-only config dialog))
 - [ ] `0071bfa0` 181 bytes (unknown)
 - [ ] `007aff80` 181 bytes (unknown)
-- [ ] `006eb6a0` 182 bytes (launcher (EN-only config dialog))
 - [ ] `00777960` 184 bytes (unknown)
 - [ ] `007ad250` 184 bytes (unknown)
 - [ ] `0072caa0` 186 bytes (unknown)
@@ -836,14 +741,11 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007b00f0` 194 bytes (unknown)
 - [ ] `0076fad0` 195 bytes (unknown)
 - [ ] `007a8220` 195 bytes (unknown)
-- [ ] `006e6340` 196 bytes (launcher (EN-only config dialog))
 - [ ] `007af670` 196 bytes (unknown)
 - [ ] `0072e270` 198 bytes (unknown)
 - [ ] `0076d470` 198 bytes (unknown)
 - [ ] `00709e60` 200 bytes (unknown)
-- [ ] `006ed900` 201 bytes (launcher (EN-only config dialog))
 - [ ] `0076b0b0` 201 bytes (unknown)
-- [ ] `006eb860` 202 bytes (launcher (EN-only config dialog))
 - [ ] `00771c30` 203 bytes (unknown)
 - [ ] `0070b8b0` 205 bytes (unknown)
 - [ ] `0077a580` 205 bytes (unknown)
@@ -916,7 +818,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006ec8f0` 282 bytes (launcher (EN-only config dialog))
 - [ ] `007b87c0` 282 bytes (unknown)
 - [ ] `007490c0` 285 bytes (unknown)
-- [ ] `006eb950` 286 bytes (launcher (EN-only config dialog))
 - [ ] `0072e6b0` 286 bytes (unknown)
 - [ ] `007b17d0` 288 bytes (unknown)
 - [ ] `007b81a0` 288 bytes (unknown)
@@ -927,7 +828,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007b9700` 294 bytes (unknown)
 - [ ] `00753ff0` 298 bytes (unknown)
 - [ ] `00774c40` 300 bytes (unknown)
-- [ ] `006e5d60` 302 bytes (launcher (EN-only config dialog))
 - [ ] `00773c00` 304 bytes (unknown)
 - [ ] `00773d30` 304 bytes (unknown)
 - [ ] `007450e0` 305 bytes (unknown)
@@ -939,7 +839,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006f0230` 314 bytes (launcher (EN-only config dialog))
 - [ ] `00773130` 314 bytes (unknown)
 - [ ] `007b8510` 314 bytes (unknown)
-- [ ] `006e60b0` 319 bytes (launcher (EN-only config dialog))
 - [ ] `00746680` 319 bytes (unknown)
 - [ ] `0074f1d0` 321 bytes (unknown)
 - [ ] `007addd0` 321 bytes (unknown)
@@ -953,7 +852,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0077a340` 337 bytes (unknown)
 - [ ] `00731c10` 341 bytes (unknown)
 - [ ] `007591a0` 341 bytes (unknown)
-- [ ] `006ea830` 343 bytes (launcher (EN-only config dialog))
 - [ ] `00742190` 344 bytes (unknown)
 - [ ] `007c5040` 346 bytes (unknown)
 - [ ] `007485c0` 348 bytes (unknown)
@@ -979,7 +877,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007432d0` 424 bytes (unknown)
 - [ ] `006ec5d0` 425 bytes (launcher (EN-only config dialog))
 - [ ] `0076ae00` 428 bytes (unknown)
-- [ ] `006e6900` 444 bytes (launcher (EN-only config dialog))
 - [ ] `007af740` 454 bytes (unknown)
 - [ ] `0073f580` 464 bytes (unknown)
 - [ ] `007bc1c0` 465 bytes (unknown)
@@ -1002,9 +899,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007331b0` 589 bytes (unknown)
 - [ ] `00753d90` 603 bytes (unknown)
 - [ ] `0076dec0` 615 bytes (unknown)
-- [ ] `006e6ac0` 618 bytes (launcher (EN-only config dialog))
 - [ ] `00746d80` 634 bytes (unknown)
-- [ ] `006ebe60` 647 bytes (launcher (EN-only config dialog))
 - [ ] `0077c8e0` 647 bytes (unknown)
 - [ ] `00731ec0` 649 bytes (unknown)
 - [ ] `00747010` 662 bytes (unknown)
@@ -1042,7 +937,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007472b0` 997 bytes (unknown)
 - [ ] `0075c160` 1012 bytes (unknown)
 - [ ] `00792750` 1016 bytes (unknown)
-- [ ] `006ed470` 1029 bytes (launcher (EN-only config dialog))
 - [ ] `0079a4a0` 1029 bytes (unknown)
 - [ ] `006ecf40` 1127 bytes (launcher (EN-only config dialog))
 - [ ] `00768f30` 1147 bytes (unknown)
@@ -1061,7 +955,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0075f180` 1420 bytes (unknown)
 - [ ] `007594b0` 1430 bytes (unknown)
 - [ ] `0079ac50` 1430 bytes (unknown)
-- [ ] `006f06f0` 1439 bytes (launcher (EN-only config dialog))
 - [ ] `00775fa0` 1542 bytes (unknown)
 - [ ] `007bb950` 1659 bytes (unknown)
 - [ ] `0079c270` 1666 bytes (unknown)

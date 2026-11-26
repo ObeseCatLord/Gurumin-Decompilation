@@ -41,8 +41,8 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 1,040 of 2,006 game functions (208,805 of 2,078,797 bytes, 10.04 %) |
-| Matched under the rules | 1,040 |
+| Matched | 1,114 of 2,006 game functions (254,536 of 2,078,797 bytes, 12.24 %) |
+| Matched under the rules | 1,114 |
 | Queue | see QUEUE.md header (after batch 15); open.tsv ~160 (incl. library/blocked rows, which leave the queue) near-misses |
 
 ## State
@@ -78,7 +78,9 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   scratchpad: list_sec2b, rest of list_sec3b, list_sec3c, list_sec4.
 
 ## Next steps
-0. Yield per batch: EN-only small functions ~90 %, section 3 ~45 %, section 2 (large) <20 %. Favour EN-only and
+0. Batches 19-21 (section 2, then walls, per the orchestrator): +15, +7, +7. Section 2 has 6 huge functions left
+   (4-8 KB, register-allocation walls); untouched walls are done except design-heavy ones (Menu_SaveLoad, Save_Load,
+   NameEntry_Update, Partner_SpecialSkill). Yield per batch: EN-only small functions ~90 %, section 3 ~45 %, section 2 (large) <20 %. Favour EN-only and
    section 3; record unknown-layout and library functions in open.tsv with status `blocked`/`library`.
 1. Section 2 rest (99, large): FontRandom_Load, File_Checksum, then by JP file.
 2. Section 3 small/medium functions (JP twin unmatched; port from Ghidra + EN bytes).

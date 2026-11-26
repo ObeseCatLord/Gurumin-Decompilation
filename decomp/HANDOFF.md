@@ -269,7 +269,7 @@ function) and node_world.cpp (0) still break rule 2.
 - Batch 385: no new matches (13 near misses with exhaustive permutation, 22 large walls). Input::ReadControls now
   the original's size. What is left is mostly register choice, slot order and scheduling that source order does not
   steer; a permuter-style search tool may be the next lever (ask before installing anything).
-- Batch 386: cpp_permuter installed with the user's OK (E:\Claude Typing of the Dead	ools\cpp_permuter, built with
+- Batch 386: cpp_permuter installed with the user's OK (E:\Claude Typing of the Dead\tools\cpp_permuter, built with
   clang; adapter tools\gurumin_permuter: compile.cmd + score.py, README there). First run matched 3 (889 -> 892):
   BoxSphere_Overlap, DrawDebugText, StatusPanel_UpdateText (each rewritten as plain source). Zero-register walls
   do not move with it. Next: run it on more near misses when the machine is quiet (Render_FillRect, Menu_DrawScene,

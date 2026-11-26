@@ -379,21 +379,29 @@ enum LauncherOseControlId {
 const int OSE_BOARD_SIZE = 8;               // cells per board side
 const int OSE_CELL_COUNT = 64;              // OSE_BOARD_SIZE * OSE_BOARD_SIZE
 const int OSE_BOARD_WORDS = 4;              // the packed board: 16 two-bit cells per 32-bit word
+const int OSE_GRID_LINES = 9;                // lines of the board grid in each direction (OSE_BOARD_SIZE + 1)
+const int OSE_DIRECTIONS = 8;               // neighbours of a cell (the 8 compass directions)
 const int OSE_CELL_PIXELS = 16;             // width and height of a board cell on screen
+const COLORREF OSE_COLOR_BLACK = 0x000000;   // colour of the grid lines and black pieces
+const COLORREF OSE_COLOR_WHITE = 0xfafafa;   // colour of white pieces
 const unsigned char OSE_CELL_EMPTY = 0;     // cell state: no piece
 const unsigned char OSE_CELL_BLACK = 1;     // cell state: black piece
 const unsigned char OSE_CELL_WHITE = 2;     // cell state: white piece
 
 extern int g_oseBoard[OSE_BOARD_WORDS];   // the board, 2 bits per cell, row major (EN 0x01614d60)
 extern int g_oseComputerTurnPending;               // non-zero while the computer owes a move (EN 0x01614d70)
-extern int g_oseChosenCell;                        // cell index the move search chose, -1 = no move (EN 0x01614d74)
-extern int g_oseChosenValue;                       // the search's value for the chosen move (EN 0x01615298)
+extern int g_oseChosenColumn;                      // column the move search chose, -1 = no move (EN 0x01614d74)
+extern int g_oseChosenRow;                         // row of the chosen move (EN 0x01615298)
+extern int g_oseDirectionColumn[OSE_DIRECTIONS];   // column step of each of the 8 directions (EN 0x00908990)
+extern int g_oseDirectionRow[OSE_DIRECTIONS];      // row step of each of the 8 directions (EN 0x009089b0)
 
 // Move search of the computer player (not yet reconstructed, EN 0x006ecb50): looks for the best move for `color`
-// (1 black, 2 white) on the unpacked board `cells`, recursing with `depth`; leaves its choice in g_oseChosenCell.
+// (1 black, 2 white) on the unpacked board `cells`, recursing with `depth`; leaves its choice in g_oseChosenColumn/g_oseChosenRow.
 void Ose_SearchMove(unsigned char *cells, int depth, int color, int opponentColor);
-// Plays the chosen move on the packed board (not yet reconstructed, EN 0x006ec360). Returns 0 when the move is illegal.
-int Ose_PlayMove(int *board, int cell, int value, int color);
+// Plays a move of `color` at (column, row) on the packed board: flips the opponent pieces it captures in the 8
+// directions and repacks the board. Returns 1 when the move was legal, 0 when it flips nothing or the cell is taken
+// (EN 0x006ec360). Called by COseDlg::OnTimer (computer) and COseDlg::OnLButtonDown (player).
+int Ose_PlayMove(int *board, unsigned int column, unsigned int row, int color);
 
 // Othello page (dialog template IDD_OSE_DIALOG): the player plays one colour against the computer. The timer
 // (every 10 ms) lets the computer move once the player has moved or passed.
@@ -412,7 +420,9 @@ protected:
     afx_msg void OnReset();                             // EN 0x006ec4e0
     afx_msg void OnPass();                              // EN 0x006ec580
     afx_msg void OnTimer(UINT_PTR nIDEvent);            // EN 0x006eca20 (10 ms game timer: the computer's move)
-    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);   // EN 0x006ec8f0 (setup phase: puts a white piece)
+    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);   // EN 0x006ec5d0 (setup: black piece, else the player's move)
+    afx_msg void OnPaint();                                  // EN 0x006ec790 (draws the board)
+    afx_msg void OnRButtonDown(UINT nFlags, CPoint point);   // EN 0x006ec8f0 (setup phase: puts a white piece)
     DECLARE_MESSAGE_MAP()
 };
 

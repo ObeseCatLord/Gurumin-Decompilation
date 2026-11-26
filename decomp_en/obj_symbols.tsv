@@ -1375,7 +1375,10 @@ _Jpeg_WriteRgb	007be690
 _Packs_DecodeBlock	007bd990
 # launcher (batch 18)
 ?OnTimer@COseDlg@@IAEXI@Z	006eca20
-?OnLButtonDown@COseDlg@@IAEXIVCPoint@@@Z	006ec8f0
+?OnRButtonDown@COseDlg@@IAEXIVCPoint@@@Z	006ec8f0
+?Ose_PlayMove@@YAHPAHIIH@Z	006ec360
+?OnLButtonDown@COseDlg@@IAEXIVCPoint@@@Z	006ec5d0
+?OnPaint@COseDlg@@IAEXXZ	006ec790
 ??1CNetDlg@@UAE@XZ	006e68b0
 ??_GCAboutDlg@@UAEPAXI@Z	006e6de0
 ??_GCButton@@UAEPAXI@Z	006e6000

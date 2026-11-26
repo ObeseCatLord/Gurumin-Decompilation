@@ -66,7 +66,14 @@ struct SlotTable
     // `paramsA` and `paramsB` are the node's two draw parameter vectors.
     int DrawLit(const Matrix4 *world, const Matrix4 *view, int mode, const void *lights, const Vec4 *paramsA, const Vec4 *paramsB);
     int BuildBuffers(VertexPack *packs, IndexList *indexLists, int packCount, Material *materials, int flags);
+    // EN 0x78c0f0 (JP 0x10146db0): debug view of a mesh's bounding box: draws the box `box` (smallest corner, then
+    // largest corner) as a solid with `world`, then three coordinate axes with arrow heads at the world position through
+    // `view`. Does nothing without a texture slot or when the scene cannot be drawn. Returns 1 when it drew, else 0.
+    int DrawDebugBox(Matrix4 *world, const Matrix4 *view, const Vec4 *box);
 };
+
+// Non-zero while the scene can be drawn into (the debug drawing is skipped otherwise). EN 0x021a34cc (JP DAT_10f65584).
+extern "C" int g_sceneCanDraw;
 
 // Value of the `key` argument of ReplaceMaterial that matches every entry.
 const int MATERIAL_ANY = -1;

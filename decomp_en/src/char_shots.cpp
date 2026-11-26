@@ -33,7 +33,7 @@ extern "C" int Char_FireShot(int owner, const Vec4 *position, int spread)
 // angle of the slot, from 50 units above that point to 300 units below it, against the world collision, filtered by
 // the collision filter of the slot's model. The ray is not offset by the position of the slot. Returns 1 on a hit, 0
 // when there is none or the slot skips the probe.
-extern "C" int Char_ProbeGround(int slot, int unused, float distance)
+extern "C" int Char_ProbeGround(int slot, const Vec4 *unused, float distance)
 {
     if (g_charState[slot].values[CHARSTATE_SKIP_GROUND_PROBE] == 0)
     {

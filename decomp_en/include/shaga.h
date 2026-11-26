@@ -30,8 +30,8 @@ struct Matrix4;
 int Shaga_BreakOff(int index, const char *model, int radius, const Vec4 *position, const Matrix4 *matrix, int scaled,
                    float force, int tired);
 
-// Creates a shaga piece (model `model`, radius `radius`) at `position`; returns the slot or -1. EN 0x64b210 (JP 0x100425f0).
-extern "C" int Shaga_Create(const Vec4 *position, const char *model, int radius, float d, float e);
+// Creates a shaga piece (model `model`, radius `radius`) at `position` launched along `heading` (below -100 = at random) with `force`; returns the slot or -1. EN 0x64b210 (JP 0x100425f0).
+int Shaga_Create(const Vec4 *position, const char *model, int radius, float heading, float force);
 // Creates a piece and sets it to stop. EN 0x64b640 (JP 0x10062750).
 extern "C" int Shaga_Spawn(const Vec4 *position, const char *model, int radius, float d, float e);
 

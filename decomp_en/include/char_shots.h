@@ -47,6 +47,6 @@ extern "C" float g_shotParams[CHAR_SLOT_COUNT][SHOT_PARAM_COUNT];   // EN 0x00bc
 // Starts a shot of character `owner` from `position` in the first free helper slot. Returns 0. EN 0x6cb910.
 extern "C" int Char_FireShot(int owner, const Vec4 *position, int spread);
 // Ground probe for slot `slot` at `distance` along its angle. Returns 1 on a hit. EN 0x6a4d20.
-extern "C" int Char_ProbeGround(int slot, int unused, float distance);
+extern "C" int Char_ProbeGround(int slot, const Vec4 *unused, float distance);
 
 #endif

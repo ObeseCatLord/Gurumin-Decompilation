@@ -1458,3 +1458,24 @@ _SaveSummary_Draw	005dc610
 ?Npc_HurlAtPlayer@@YAHH@Z	006d2280
 ?DrawCaption@WorldRenderer@@QAEXXZ	0072b530
 ?Npc_HoverCarrier@@YAHH@Z	006d3a00
+# section 2 (batch 20)
+?Npc_RideBehindMarker@@YAHH@Z	006d14f0
+?Enemy_PulseAndCharge@@YAHH@Z	00664f80
+?Char_UpdateAttachSlots@@YAHH@Z	0063b0a0
+?Enemy_StalkAndBreathe@@YAHH@Z	006a4e20
+# walls (batch 20)
+?Npc_GroupWatch@@YAHH@Z	006b3b20
+?Debris_Draw@@YAHXZ	005ce240
+?Characters_Draw@@YAHPAUMatrix4@@ABU1@PAUVec4@@@Z	005d5190
+?Npc_Held@@YAHH@Z	006af410
+?Shaga_Create@@YAHPBUVec4@@PBDHMM@Z	0064b210
+# AnimModel (batch 20)
+?ResetState@AnimModel@@QAEHXZ	007413f0
+?CloneModel@AnimModel@@QAEHPAU1@H@Z	0071aff0
+?LoadFile@AnimModel@@QAEHPBD@Z	00735780
+?Draw@AnimModel@@QAEHPAUMatrix4@@PBXH@Z	0071d240
+_Char_RunBehaviour	006d1b40
+?DrawDebugBox@SlotTable@@QAEHPAUMatrix4@@PBU2@PBUVec4@@@Z	0078c0f0
+?Camera_Refresh@@YAHXZ	005a90c0
+?Enemy_StalkAndLunge@@YAHH@Z	006a3ef0
+_CharKind4e_Update	0069c9f0

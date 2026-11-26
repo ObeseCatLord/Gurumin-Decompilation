@@ -70,6 +70,13 @@ int Npc_TurnWhenSeen(int index);
 // An NPC that waits underground and rises when the player comes near. EN 0x6b0d60 (JP 0x100b3430).
 int Npc_RiseWhenSeen(int index);
 
+// A guard that belongs to a group: counts its group mates, now and then turns to look at one, and alarms on seeing the
+// player. EN 0x6b3b20.
+int Npc_GroupWatch(int index);
+
+// A character held in place by a spell: sparkles until the scripts release it, then it is freed with a flash. EN 0x6af410 (JP 0x100469d0).
+int Npc_Held(int index);
+
 // A door that swings about its hinge. EN 0x6ae950 (JP 0x10048b70).
 int Char_SwingDoor(int index);
 

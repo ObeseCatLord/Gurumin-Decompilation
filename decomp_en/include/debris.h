@@ -4,6 +4,7 @@
 #define GURUMIN_EN_DEBRIS_H
 
 #include "vec4.h"
+#include "node.h"
 
 // Debris slots: 0..DEBRIS_SIMPLE_SLOTS - 1 hold simple pieces, the rest thrown pieces.
 const int DEBRIS_SLOTS = 0x100;
@@ -26,6 +27,12 @@ extern "C" Vec4 g_debrisScale[DEBRIS_SLOTS];          // EN 0x00dac980 (JP DAT_1
 
 extern "C" int g_debrisColour[DEBRIS_SLOTS];          // EN 0x0091ce00 (JP DAT_10446eb0): colour of a thrown piece
 extern "C" int g_characterColour[];                   // EN 0x009e2f40 (JP DAT_10467288): colour of each character slot's model
+
+extern "C" Node g_debrisModels[];                     // EN 0x00dae1c0 (JP DAT_104d2a08): the model of each piece type (the table is shared with the map objects and preloaded models)
+extern "C" int g_debrisDrawColour;                    // EN 0x021a34ac (JP DAT_10f655b4): colour index the pieces draw with (0 = none); set around the draw of a thrown piece
+
+// Draws every used debris piece. Returns 0. EN 0x5ce240 (JP 0x1000e340).
+int Debris_Draw(void);
 
 // Starts a thrown piece of type `type` or `type + 1` at (x, y, z) in the first free thrown slot, along `direction`,
 // with the colour and model scale of character `owner`. Returns 1, or 0 when the slots are all taken. EN 0x5a2190.

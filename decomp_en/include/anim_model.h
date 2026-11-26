@@ -67,6 +67,57 @@ const unsigned char SHADOW_OPACITY_PLACED = 15;
 // Highest hold weight.
 const float HOLD_WEIGHT_MAX = 0.9f;
 
+// Values loading, cloning and resetting a model give its fields.
+const int M_025C_RANGE = 500;                    // AnimModel::m_025c is a random number below this
+const int FRESH_M_2380 = 40;                     // AnimModel::m_2380 of a model that was just loaded
+const float MODEL_REACH_SCALE = 0.578f;          // scale of a node's bounding radius to the reach of the model (colliderReach and the wobble vectors)
+const float WOBBLE_DIRECTION_SCALE = 0.5f;       // wobble direction vectors: share of the reach
+const float WOBBLE_OFFSET_SCALE = 0.3f;          // random wobble offsets: share of the reach
+const float WOBBLE_WEIGHT_SCALE = 0.15f;         // weight carried by the wobble axis vectors: share of the reach
+const float WOBBLE_LIFT = 50.0f;                 // height added to every wobble direction
+const int WOBBLE_OFFSET_ENTRIES = 10;            // entries of AnimModel::m_00b4 a model file load fills in
+const int OFFSET_RANDOM_RANGE = 100;             // random wobble offsets are drawn from 0..99 ...
+const int OFFSET_RANDOM_HALF = 50;               // ... minus this
+// Node::flags of the node a model file's tree is loaded as (the animated root) and of its collision node.
+const unsigned int MODEL_FLAG_LOADED_ROOT = 0x80;
+const unsigned int MODEL_FLAG_COLLIDER = 0x100;
+// Colour value and node mask CloneModel and LoadFile give Node::SetColourA (every node, full colour).
+const unsigned char NODE_COLOUR_OPAQUE = 0xff;
+const unsigned int NODE_ALL_FLAGS = 0xffffffff;
+// Node::SetRenderModeExcept arguments of a model file load while g_refreshRenderMode is set: back to the default render
+// mode, except the nodes in the default mode or in mode 0x1f.
+const int RENDER_MODE_DEFAULT = 0;
+const int MODEL_LOAD_RENDER_MODE_EXCEPT = 0x1f;
+
+// AnimModel::Draw: `flags` values (any other value is a pointer to the matrix of a mirror the model is reflected in).
+const int DRAW_NORMAL = 0;                 // the plain draw
+const int DRAW_OVERHEAD = 1;               // flipped about z below the floor (the overhead pass)
+// shadowOpacity of a fully opaque model: Draw divides the opacity by it.
+const float SHADOW_OPACITY_FULL = 15.0f;
+// Root drawMode that turns the rainbow wobble on, and the entries of the triangle ramp it steps through.
+const int WOBBLE_DRAW_MODE = 0x24;
+const int WOBBLE_RAMP_LENGTH = 30;
+const float WOBBLE_RAMP_PEAK = 9.0f;       // highest ramp value: dividing by it scales the ramp to 0..1
+const int WOBBLE_COLOUR_COUNT = 10;        // colours of AnimModel::m_00b4 copied to g_wobbleColours
+// Phase shift of the three channels of the first wobbling colour and of each following one.
+const unsigned int WOBBLE_PHASE_X = 0;
+const unsigned int WOBBLE_PHASE_Y = 10;
+const unsigned int WOBBLE_PHASE_Z = 20;
+const unsigned int WOBBLE_NEXT_COLOUR = 6;
+// Matrix4::m index of the z scale (_33) that flips a model about z, and the factors that shift the flipped model:
+// the overhead pass doubles the shadow matrix's z, a mirror's frame moves it by -2 times.
+const int MATRIX_SCALE_Z = 10;
+const float OVERHEAD_FLIP_SCALE = 2.0f;
+const float MIRROR_SHADOW_SCALE = -2.0f;
+const float MIRROR_OFFSET_SCALE = -2.0f;   // how far the mirrored model moves from the foot of its perpendicular
+
+// Non-zero = models whose root has drawMode WOBBLE_DRAW_MODE are drawn with the rainbow wobble. EN 0x021a34a8 (JP DAT_10f6558c).
+extern "C" int g_wobbleOn;
+// The model's m_024c (all ones while the wobble runs), handed to the renderer. EN 0x021ffe58 (JP DAT_10f65888).
+extern "C" Vec4 g_wobbleAmbient;
+// Copy of the model's m_00b4 colours; the wobble overwrites x/y/z of the odd ones. EN 0x021ffd98 (JP DAT_10f655c8).
+extern "C" Vec4 g_wobbleColours[WOBBLE_COLOUR_COUNT];
+
 // Entries of the model file table (one root node per loaded model file).
 const int MODEL_FILE_ENTRIES = 0x100;
 // Models and pushes one collision test can report.
@@ -173,39 +224,53 @@ struct AnimModel
 {
     int objectId;                 // 0x000: id the scripts give to find this model among the objects (FindObjectByModelId)
     char m_0004[0x12 - 4];        // 0x004: not yet named
-    char m_0012;                  // 0x012: set to 2 every frame by the hovering characters
-    char m_0013[0x68 - 0x13];     // 0x013: not yet named
+    char m_0012;                // 0x012: set to 2 every frame by the hovering characters
+    char m_0013;                  // 0x013: cleared when the model is loaded or cloned
+    char m_0014[0x68 - 0x14];     // 0x014: not yet named
     float sortBias;               // 0x068: added to the z position when objects are depth sorted (-1000 on objects set up by a map trigger in the JP build)
-    char m_006c[0x70 - 0x6c];     // 0x06c: not yet named
+    char m_006c;                  // 0x06c: cleared on reset
+    char m_006d[0x70 - 0x6d];     // 0x06d: not yet named
     union
     {
         int collisionFilter;      // 0x070: collision filter of the model's world tests (g_collisionFilter while they run)
         char *nearCells;          // 0x070: characters: row of g_charNearCells (map cells near the character), 0 = no visibility data
     };
-    char m_0074;                  // 0x074: not yet named
+    char m_0074;                  // 0x074: cleared when the model is loaded or reset
     char carriedFlag;             // 0x075: cleared on the carried model and on the player when a knock-back drops the carried object
     char uiAnimStarted;           // 0x076: set to 1 by UiAnim_Play (read on the first model only)
-    char m_0077[0x84 - 0x77];     // 0x077: not yet named
+    unsigned char m_0077;         // 0x077: cleared on reset (JP: the model variant the player costume loads)
+    int m_0078;                   // 0x078: cleared on reset (JP: frames the left foot has been planted)
+    int m_007c;                   // 0x07c: cleared on reset (JP: frames the right foot has been planted)
+    int m_0080;                   // 0x080: cleared on reset and on load
     unsigned char speedDivisor;   // 0x084: slows every motion of this model down (0 = no division)
-    char m_0085[0x8d - 0x85];       // 0x85: not yet named
+    char m_0085[0x88 - 0x85];       // 0x85: not yet named
+    int m_0088;                   // 0x088: cleared when a model file is loaded or cloned (JP: spin angle of the drawn model)
+    unsigned char m_008c;         // 0x08c: cleared on reset and on load
     char childRunning;              // 0x8d: set while a child runs to the player (Npc_ChildFollow, Enemy_DropIn)
-    char m_008e[0xb0 - 0x8e];       // 0x8e: not yet named
+    char m_008e[0x90 - 0x8e];       // 0x8e: not yet named
+    Vec4 m_0090;                  // 0x090: cleared (Fill) when a model file is loaded or cloned
+    char m_00a0[0xb0 - 0xa0];       // 0xa0: not yet named
     float placeHeight;       // 0xb0: height the model was placed at (SetPosition, Teleport)
-    char m_00b4[0x1d4 - 0xb4];       // 0xb4: not yet named
+    Vec4 m_00b4[12];         // 0x0b4: Draw's wobble colour offsets: loading a model fills the even entries 0..8 with random directions scaled by the model size and the odd ones with unit axes carrying a weight in w (entries 10 and 11 stay unused)
+    Vec4 m_0174[6];          // 0x174: Draw's wobble directions: five pointing around the model, scaled by the model size (the sixth is unused by Draw)
     int m_01d4;              // 0x1d4: cleared when the model is placed
     char m_01d8[0x21c - 0x1d8];       // 0x1d8: not yet named
     Vec4 scale;                   // 0x21c: model scale (x, y, z)
-    char m_022c[0x23c - 0x22c];       // 0x22c: not yet named
+    Vec4 m_022c;                  // 0x22c: colour offset handed to Node::QueueDraw (cleared on reset, load and clone)
     int m_023c;              // 0x23c: cleared when the model is placed
-    char m_0240[0x248 - 0x240];       // 0x240: not yet named
+    char m_0240;                  // 0x240: cleared on reset, load and clone
+    char m_0241[0x244 - 0x241];   // 0x241: not yet named
+    Node *spineNode;              // 0x244: the "Bip01 Spine" bone (the loaded root when the model has none)
     float holdWeight;             // 0x248: blend weight while holding (at most HOLD_WEIGHT_MAX)
-    char m_024c[0x260 - 0x24c];   // 0x24c: not yet named
+    Vec4 m_024c;                  // 0x24c: ambient colour Draw hands to the renderer (cleared to 1 on reset)
+    int m_025c;                   // 0x25c: random phase 0..M_025C_RANGE-1 picked when a model file is loaded (Draw's wobble)
     float uniformScale;           // 0x260: scale of the whole model (1 for bank models)
     char m_0264;                  // 0x264: not yet named
     char important;               // 0x265: set when a character is assigned to a slot (CharacterBank::Assign)
     char m_0266;                  // 0x266: not yet named
     char idling;                  // 0x267: 1 while an NPC idles; set every frame by the kind updates
-    char m_0268[0x270 - 0x268];   // 0x268: not yet named
+    Vec4 *pullTarget;             // 0x268: position the model is drawn towards while pullFrames last (0 = none)
+    int pullFrames;               // 0x26c: frames left of the pull towards pullTarget
     union
     {
         int switchNode;           // 0x270: node id of the switch this character works (switch characters only)
@@ -227,12 +292,16 @@ struct AnimModel
     int walkingRoute;             // 0x294: 1 while the character walks a route (cleared when the player gets a helmet)
     Playback *playback;           // 0x298: the motion playback state (allocated on first use)
     float speedScale;             // 0x29c: motion speed scale
-    char m_02a0[3];               // 0x2a0: not yet named
+    char m_02a0;                  // 0x2a0: cleared on reset, load and clone
+    char m_02a1;                  // 0x2a1: cleared on reset, load and clone
+    char m_02a2;                  // 0x2a2: cleared on reset, load and clone
     unsigned char loadCount;      // 0x2a3: number of model files loaded into this model so far (stops counting at 3)
     char holdState;               // 0x2a4: HoldState
-    char m_02a5[0x2ac - 0x2a5];   // 0x2a5: not yet named
+    char m_02a5[0x2a8 - 0x2a5];   // 0x2a5: not yet named
+    int m_02a8;                   // 0x2a8: cleared on reset (JP: angle the held model is turned about the hold point)
     MotionChannels motion;        // 0x2ac: the motion channel (track A)
-    char m_0d44[8];               // 0xd44: not yet named
+    int m_0d44;                   // 0xd44: cleared on reset
+    int m_0d48;                   // 0xd48: cleared on reset
     float alpha;                  // 0xd4c: model alpha (1 = fully visible; set when an enemy is respawned)
     MotionChannels trackB;        // 0xd50: track B
     char m_17e8;                  // 0x17e8: not yet named
@@ -259,7 +328,8 @@ struct AnimModel
     char m_230c[0x2318 - 0x230c]; // 0x230c: not yet named
     float colliderReach;          // 0x2318: reach of the model's probes against the collider
     Node *dropCollider;           // 0x231c: collision node the model drops onto (set by SetDropCollider)
-    char m_2320[0x2328 - 0x2320]; // 0x2320: not yet named
+    int m_2320;                   // 0x2320: cleared when a model file is loaded or cloned (JP: the node whose world matrix and frame this model copies)
+    Node *bipNode;                // 0x2324: the "Bip01" bone (0 = no node tree)
     Matrix4 matrix;               // 0x2328: world matrix; the translation row (m[12..14]) is the position
     int motionFrame;              // 0x2368: frame of the motion file shown now
     float verticalSpeed;          // 0x236c: vertical speed (positive = rising)
@@ -270,7 +340,7 @@ struct AnimModel
     unsigned char shadowOpacity; // 0x237a: shadow opacity (SHADOW_OPACITY_PLACED when placed, 0 = no shadow)
     char m_237b;                  // 0x237b: not yet named
     float m_237c;            // 0x237c: 1 when the model is placed
-    char m_2380[0x2384 - 0x2380];       // 0x2380: not yet named
+    int m_2380;                   // 0x2380: set to FRESH_M_2380 on reset, load and clone (purpose not yet known)
     int collisionResult;          // 0x2384: collision result, cleared before each update (UpdateCollision)
     int speedChangeFrames;        // 0x2388: frames since the speed change (1 once one is pending)
     int idleMotionEnabled;        // 0x238c: non-zero = the model plays its idle motion now and then (Char_RandomIdle)
@@ -285,12 +355,17 @@ struct AnimModel
     Vec4 m_23f8;             // 0x23f8: cleared when the model is placed
     Vec4 m_2408;             // 0x2408: cleared when the model is placed
     int m_2418;                         // 0x2418: cleared when the model is unloaded
-    char m_241c[0x2434 - 0x241c];       // 0x241c: not yet named
+    char m_241c[0x2420 - 0x241c];       // 0x241c: not yet named
+    Vec4 m_2420;                  // 0x2420: cleared on reset
+    int m_2430;                   // 0x2430: cleared on reset
     Matrix4 shadowMatrix;    // 0x2434: matrix the shadow is drawn with (Teleport moves it with the model)
-    char m_2474[0x247c - 0x2474];       // 0x2474: not yet named
+    char m_2474;                  // 0x2474: cleared on reset, load and clone
+    char m_2475[0x2478 - 0x2475]; // 0x2475: not yet named
+    int updateCount;              // 0x2478: cleared on reset (JP: frames the model has been updated)
     float heading;                // 0x247c: angle the character faces now
     float targetHeading;         // 0x2480: angle the character turns towards
-    char m_2484[0x2494 - 0x2484]; // 0x2484: not yet named
+    int m_2484;                   // 0x2484: cleared on reset
+    char m_2488[0x2494 - 0x2488]; // 0x2488: not yet named
     float eventCameraHeight;      // 0x2494: height the event camera adds to its eye and target (cleared by LoadModel)
     int mode;                     // 0x2498: behaviour mode (1 = the walking mode that slows movement impulses)
 
@@ -303,6 +378,7 @@ struct AnimModel
     int AddTrackCKey(int frame, float x, float y, float z);              // EN 0x70ad20 (JP 0x10161af0)
     int AddTrackCKeyFlagged(int frame, float x, float y, float z, char flag);   // EN 0x70ad90 (JP 0x10161a90)
     int StepMotion();                                                    // EN 0x70bea0 (JP 0x10161c00): advances the motion channel one frame
+    int Draw(Matrix4 *viewProjection, const void *lights, int flag);   // EN 0x71d240 (JP 0x10163150): queues the model for drawing under `viewProjection` with the light set `lights`
     int AddMotionKey(int frame, float value);                            // EN 0x70af70 (JP 0x10161b90)
     int SetPendingPush(float x, float y, float z, char flag);            // EN 0x73f940 (JP 0x101628b0)
     int StepPath();                                                      // EN 0x70bf40 (JP 0x10161c80): moves the model along track C one frame
@@ -343,7 +419,8 @@ struct AnimModel
     int SetLayer(int layer, int a, int first, int last, int b, int c);   // EN 0x7438f0: Playback::SetLayer on the playback
     int SetFollowUp(int layer, int index, int value);                    // EN 0x745590: Playback::SetFollowUp on the playback (creates it on first use)
     int SetSlotOffset(int layer, int slot, int x, int y);                // EN 0x7464d0: Playback::SetSlotOffset on the playback (creates it on first use)
-    int LoadFile(const char *path);                                      // EN 0x735780 (JP 0x1017b9b0): loads the model file `path` into the model (not ported yet)
+    int LoadFile(const char *path);                                      // EN 0x735780 (JP 0x1017b9b0, anim_clone.cpp): loads the model file `path` into the model
+    int CloneModel(AnimModel *source, int unused);                       // EN 0x71aff0 (JP 0x1017b210, anim_clone.cpp): gives the model a copy of `source`'s node tree, 0 when `source` has none
 };
 
 static_assert(sizeof(AnimModel) == ANIM_MODEL_SIZE, "AnimModel must be 0x249c bytes");

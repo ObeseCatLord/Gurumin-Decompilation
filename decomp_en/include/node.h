@@ -346,6 +346,8 @@ struct Node
     int QueueDraw(DrawList *list, Matrix4 *view, const void *lights, int pass, Vec4 *fade, int flag);
     // Same function (EN 0x750a50) called with the world matrix of the node tree in the first argument.
     int QueueDraw(Matrix4 *world, Matrix4 *view, const void *lights, int pass, Vec4 *fade, int flag);
+    // Same function (EN 0x750a50) called with a colour offset added to the fade colour (AnimModel::Draw passes m_022c; JP addColour).
+    int QueueDraw(Matrix4 *world, Matrix4 *view, const void *lights, int pass, Vec4 *fade, Vec4 *addColour);
     int BindLinks(Node *root, Node **list, int *count);   // EN 0x76d770 (JP 0x1019eeb0): links nodes and bones under `root`
     Node *AddChild(const char *childName, int position);  // EN 0x74ebb0 (JP 0x101abc30): creates a child at `position` (appended when negative or past the end)
     int SetupSkins(Node *root);            // EN 0x76dbe0 (JP 0x101ab9d0): stores bind poses and inverse bone matrices for the skinned nodes of this subtree

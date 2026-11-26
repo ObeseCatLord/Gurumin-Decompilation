@@ -18,8 +18,8 @@ reading it, then `AGENTS.md`.
 | Measure | Value |
 |---|---|
 | Fully linked | 0.00% of code (151 of 264 units complete) |
-| Matched | 20.76% of code, 889 of 1212 functions |
-| Matched under the rules | 20.72% of code, 888 of the 889 matched functions |
+| Matched | 20.97% of code, 892 of 1212 functions |
+| Matched under the rules | 20.93% of code, 891 of the 892 matched functions |
 | Fuzzy match | 50.68% |
 
 "Matched under the rules": a matched function counts only when its file declares no struct/class/union and no
@@ -269,6 +269,11 @@ function) and node_world.cpp (0) still break rule 2.
 - Batch 385: no new matches (13 near misses with exhaustive permutation, 22 large walls). Input::ReadControls now
   the original's size. What is left is mostly register choice, slot order and scheduling that source order does not
   steer; a permuter-style search tool may be the next lever (ask before installing anything).
+- Batch 386: cpp_permuter installed with the user's OK (E:\Claude Typing of the Dead	ools\cpp_permuter, built with
+  clang; adapter tools\gurumin_permuter: compile.cmd + score.py, README there). First run matched 3 (889 -> 892):
+  BoxSphere_Overlap, DrawDebugText, StatusPanel_UpdateText (each rewritten as plain source). Zero-register walls
+  do not move with it. Next: run it on more near misses when the machine is quiet (Render_FillRect, Menu_DrawScene,
+  AntiTamper_Check), then over the walls of section 1 sorted by size.
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

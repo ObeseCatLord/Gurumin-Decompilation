@@ -145,8 +145,7 @@ int Node::BoxSphereOverlap(const Vec4 *first, const Vec4 *firstOffset, const Vec
     int pushX = 0;
     int pushY = 0;
     int pushZ = 0;
-    float sphereRadius = sphere->w * 0.578f;
-    float radiusSquared = sphereRadius * sphereRadius;
+    float radiusSquared = (sphere->w * 0.578f) * (sphere->w * 0.578f);
 
     // Across x: point = sphere (z, y).
     point.x = sphereOffset->z + sphere->z;

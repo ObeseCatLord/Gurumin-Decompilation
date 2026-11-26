@@ -135,7 +135,6 @@ int Game::DrawNumberAlt(int value, int x, int y, float z, float fade, float scal
 }
 
 // Draws ASCII `text` with the 8x16 debug font in texMenu1 (32 glyphs per row starting at the space).
-// Not byte-identical yet (see open.tsv).
 int Game::DrawDebugText(const char *text, int x, int y)
 {
     int length = strlen(text);
@@ -144,11 +143,10 @@ int Game::DrawDebugText(const char *text, int x, int y)
         int glyph = text[i] - 0x20;
         if (glyph > 0)
         {
-            int row = (glyph >> 5) * 16;
             int column = (glyph & 0x1f) * 8;
+            int row = (glyph >> 5) * 16;
             float v = row * (1.0f / 256);
-            float u = column * (1.0f / 256);
-            DAT_118d0ba8[texMenu1].DrawCell(x, y, x + 8, y + 0x10, u, v, u + 0.03125f, v + 0.0625f, 0, 1.0f, 0);
+            DAT_118d0ba8[texMenu1].DrawCell(x, y, x + 8, y + 0x10, column * (1.0f / 256), v, column * (1.0f / 256) + 0.03125f, v + 0.0625f, 0, 1.0f, 0);
         }
         x += 8;
     }

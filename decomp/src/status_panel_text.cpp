@@ -140,8 +140,8 @@ extern "C" int FUN_1001e4b0(int recordFlag, int notCleared)
                 int colonWidth = DAT_1020e538.TextWidth("\x81" "F", TEXT_SCALE);
                 sprintf(timeLine, "%ss%03d%ss%03d\x81" "F", timeLine, VALUE_RIGHT_X - width, numberText, (centre - (colonWidth >> 1)) + 1);
                 sprintf(numberText, "\x81^");
-                int timeSlashWidth = DAT_1020e538.TextWidth(numberText, TEXT_SCALE);
-                sprintf(timeLine, "%ss%03d%02d", timeLine, timeSlashWidth + SLASH_RIGHT_X, seconds);
+                int textWidth = DAT_1020e538.TextWidth(numberText, TEXT_SCALE);
+                sprintf(timeLine, "%ss%03d%02d", timeLine, textWidth + SLASH_RIGHT_X, seconds);
                 switch (gradeDigits)
                 {
                 case 1:
@@ -168,10 +168,10 @@ extern "C" int FUN_1001e4b0(int recordFlag, int notCleared)
                 default:
                     strcpy(numberText, "\x82" "b");
                 }
-                int gradeHalf = timeSlashWidth >> 1;
+                int gradeHalf = textWidth >> 1;
                 width = DAT_1020e538.TextWidth(numberText, TEXT_SCALE);
-                int gradeShift = (int)(float)width;
-                sprintf(gradeLine, "%ss%03d%s", gradeLine, gradeHalf - (gradeShift >> 1) + COLUMN_CENTRE_X, numberText);
+                textWidth = (int)(float)width;
+                sprintf(gradeLine, "%ss%03d%s", gradeLine, gradeHalf - (textWidth >> 1) + COLUMN_CENTRE_X, numberText);
                 DAT_1020dc80 = (char)gradeDigits;
             }
             CopyText(DAT_1020da50[0], enemiesLine);

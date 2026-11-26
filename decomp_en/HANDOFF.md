@@ -65,8 +65,7 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   0x6e5d60-0x6f15af is open again; open.tsv lists what PR 3 left. Before each push: `git fetch`, merge origin/master
   if it moved (TSV/MD conflicts: keep both sides, then check obj_symbols for duplicate rows).
 - Never add address-taking tables or macros that only force COMDAT emission.
-- Blocked: launcher (164 EN-only functions) needs the VS2013 MFC headers (Express has no `VCtlmfc`; NOTES);
-  `Game::~Game` 0x5a1150 needs Node dtor + EN Object base.
+- Blocked: `Game::~Game` 0x5a1150 needs Node dtor + EN Object base.
 - Batch 11b (701) committed all three batch-11 workers. EN-only: CRT math wrappers, string.h overloads and Steam SDK
   CCallback slots are library code (skip); many small ctors/dtors wait for their class layouts. Lists still open in the
   scratchpad: list_sec2b, rest of list_sec3b, list_sec3c, list_sec4.

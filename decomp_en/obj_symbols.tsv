@@ -1623,3 +1623,4 @@ _Char_DispatchByKind	00699810
 _DataFolder_SetFolderName	007a4b60
 ?QueryDeltaStartAndCursor@ImeContext@@QAEXXZ	007aac90
 _Event_PlayCueSound	00647a40
+?Launcher_LoadConfig@@YAXH@Z	006e81d0

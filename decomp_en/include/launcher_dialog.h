@@ -119,7 +119,7 @@ public:
     int m_resolution;                // 0x0a0 IDC_RESOLUTION selected row (-1 none)
     int m_uncompressedTextures;      // 0x0a4 IDC_UNCOMPRESSED_TEXTURES check state
     int m_audioEnable;               // 0x0a8 IDC_AUDIO_ENABLE radio group index (-1 none)
-    int m_00ac;                      // 0x0ac not touched by the constructor or DoDataExchange
+    int m_antiAlias;                 // 0x0ac ini key ANTI, loaded by Launcher_LoadConfig; not touched by the constructor or DoDataExchange
     int m_textureFiltering;          // 0x0b0 IDC_TEXTURE_FILTERING selected row
     int m_multiSampling;             // 0x0b4 IDC_MULTI_SAMPLING selected row
     int m_depthOfField;              // 0x0b8 IDC_DEPTH_OF_FIELD check state
@@ -708,9 +708,11 @@ protected:
     DECLARE_MESSAGE_MAP()
 };
 
-// Loads the launcher settings from bin\gurumin.def into the global configuration. `section` 0 loads everything,
-// 1 only the pad assignments, 2 only the keyboard assignments (EN 0x006e81d0, not yet reconstructed).
-void Launcher_LoadConfig(int section);
+// Loads the launcher settings from bin\gurumin.def into the page objects' members (the lobby address, the graphics
+// and audio switches, the keyboard and pad assignments) and refreshes the pages. `part` 0 loads everything, 1 only the
+// pad assignments, 2 only the keyboard assignments. Called by the Reset To Default button (0), the pad page (1) and
+// the keyboard page (2). EN 0x006e81d0.
+void Launcher_LoadConfig(int part);
 
 // Pad button capture state of the gamepad page (the 50 ms timer in CPadDlg::OnTimer reads it).
 extern int g_padWaitingAction;      // 1-based action slot waiting for a button press, 0 = none (EN 0x016152a0)

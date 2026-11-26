@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 50.0638,
+  "fuzzy_match_percent": 50.071,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -10673,7 +10673,7 @@
   {
    "name": "app/game_load_data",
    "measures": {
-    "fuzzy_match_percent": 51.8615,
+    "fuzzy_match_percent": 54.3978,
     "total_code": "4887",
     "matched_code": "537",
     "matched_code_percent": 10.9883,
@@ -10698,7 +10698,7 @@
     {
      "name": ".text",
      "size": "4887",
-     "fuzzy_match_percent": 51.8615
+     "fuzzy_match_percent": 54.3978
     }
    ],
    "functions": [
@@ -10711,9 +10711,9 @@
      }
     },
     {
-     "name": "_FUN_100cb0c0",
+     "name": "?Game_LoadData@@YAHXZ",
      "size": "4350",
-     "fuzzy_match_percent": 45.9188,
+     "fuzzy_match_percent": 48.7682,
      "metadata": {
       "virtual_address": "269267136"
      }

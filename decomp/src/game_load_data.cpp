@@ -104,7 +104,7 @@ static const char MESSAGE_EFFECT_VERSION[] = "\x83G\x83t\x83""F\x83N\x83g\x83t\x
 // object, weapon, tutorial and effect models, starts the game (Game_Reset) and reports its progress through
 // FUN_1000fb80. Returns 1 when everything loaded; 0 when the window was closed or a render step failed (the message is
 // then shown until a key is pressed). Not byte-identical yet: see open.tsv.
-extern "C" int FUN_100cb0c0(void)
+int Game_LoadData(void)
 {
     if (DAT_102026d4 != 0)
     {

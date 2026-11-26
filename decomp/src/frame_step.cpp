@@ -47,9 +47,9 @@
 #define STAMP_COPY_PIXEL(offset)     do     {         if (lastByte[(offset) * 3 - 2] != 0 || lastByte[(offset) * 3 - 1] != 0 || lastByte[(offset) * 3] != 0)         {             pixels[(top * width + x + left + (offset)) * 3] = lastByte[(offset) * 3 - 2];             pixels[(top * width + x + left + (offset)) * 3 + 1] = lastByte[(offset) * 3 - 1];             pixels[(top * width + x + left + (offset)) * 3 + 2] = lastByte[(offset) * 3];         }     } while (0)
 
 extern "C" int FUN_1000e750(void);
-extern "C" int Game_LoadData(void);
 int TitleScreen_Update();                    // 0x10114950 (title_screen.cpp)
 #include "game_frame.h"
+#include "game_load_data.h"
 #include "name_entry.h"
 #include "field_update.h"
 extern "C" int FUN_1013f070(int command, int value, int extra);

@@ -44,6 +44,8 @@ extern "C" MapCharacterStats DAT_10927744[];
 extern "C" int DAT_109276e0;                              // number of records in DAT_10918e60
 extern "C" int DAT_102108e8[CHAR_SLOT_COUNT];             // per-slot value copied from the map character table
 
+int Game_LoadData(void);                                  // 0x100cb0c0 (game_load_data.cpp); 0 while the data is still loading
+
 extern "C" int DAT_102026d4;                              // non-zero = the render targets still have to be created
 extern "C" int DAT_102027fc;                              // texture slot of colorms.bmp
 extern "C" char DAT_1030baf8[8][0x20];                    // eight 32-byte records (first byte cleared at load)

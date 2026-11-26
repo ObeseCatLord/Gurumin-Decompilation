@@ -104,11 +104,38 @@ offsets); record such headers here. None so far: `Node` is declared again in EN 
   immediate.
 
 ## Launcher, Steam, sound engine (batches 8-10)
-- **The launcher needs MFC headers that are not installed:** `E:\Microsoft Visual Studio 12.0` is the Express
-  (WDExpress) edition without `VC\atlmfc`. The launcher's Falcom dialog classes (0x6e5d60-0x6f15af, OnInitDialog
-  0x6ebe60) need the VS2013 Feature Pack MFC headers (copy `VC\atlmfc` from VS2013 Professional/Community). Most
-  small launcher functions are MFC header inlines (message-map accessors, CWnd SendMessage wrappers, CString
-  refcounts) and count as library code.
+- **Launcher (MFC), 2026-11-25:** VS2013 Community Update 4 ships the MFC headers (`VC\atlmfc\include`, put on
+  INCLUDE by `vcvars32.bat`), so the Falcom dialog classes of 0x6e5d60-0x6f15af are written against the real
+  `afxwin.h`/`afxcmn.h`. They live in `include/launcher_dialog.h`, the only header that includes MFC (so no shared game
+  header sees it), and one source file per dialog class (`src/launcher_*.cpp`, as in the original: a dialog's
+  destructor is an out-of-line call from the page that opens it, which only happens across translation units).
+  - **Defines:** none beyond the build's `/MT /D WIN32 /D NDEBUG /D _WINDOWS`. The exe is static MFC, ANSI (no
+    `_UNICODE`, no `_MBCS`: `SendMessageA`, `char` strings); `_AFXDLL` must stay undefined. No `build.bat` change.
+  - **CDialog layout:** the exe's MFC is 12.0.21005 (the MBCS libraries): `sizeof(CDialog)` is 0x94 and every Falcom
+    dialog's first member is at 0x94. Update 4's `afxwin.h` adds `BOOL m_bClosedByEndDialog` (CDialog is 0x98). The
+    header does `#define m_bClosedByEndDialog :0` around the includes (an unnamed zero-width bit-field) and
+    `static_assert`s `sizeof(CDialog) == 0x94`. Control wrappers (CButton, CComboBox, CEdit, CSliderCtrl, CTabCtrl,
+    CProgressCtrl) are 0x74 bytes and match as they are.
+  - **Habits found:** (1) ClassWizard style: `IMPLEMENT_DYNAMIC` only on the classes with a `GetRuntimeClass` in the
+    vtable (CAdvancedOptionDlg, CInstDlg, CKbDlg, CTitDlg, CCongigDlg, CTabCtrl2; not CVideoDlg, CNetDlg, COseDlg,
+    CPadDlg). (2) An *explicit* empty `~Dlg() {}` stores the class's vtable pointer first (CAdvancedOptionDlg,
+    CInstDlg, CKbDlg, CTitDlg match that way); an implicit destructor does not (CNetDlg, COseDlg, CVideoDlg, CPadDlg,
+    CCongigDlg). (3) A destructor defined in the same file as its caller is inlined: `CVideoDlg::OnAdvancedOption`
+    only matches with `CAdvancedOptionDlg` in another file. (4) Exchanged ints are zeroed in the constructor's
+    member-initialiser list (interleaved with the control constructors in declaration order) or in the body (`-1`
+    for "none"); an exchanged `CString` is `m_x = ""` in the body for CNetDlg but `m_x("")` in the list for CPadDlg.
+    (5) The `int ids[12] = {...}` locals of the key-assignment checks compile to the original's SSE2 constant
+    sequences unchanged. (6) `ON_WM_CTLCOLOR` handlers are `CDialog::OnCtlColor` + `SetBkMode(TRANSPARENT)`;
+    `OnPaint` that only builds a `CPaintDC` matches as written. (7) Locals are declared at point of use
+    (`CRect`/`RECT` initialisers vectorise where they stand). (8) `CREATESTRUCT::lpszClass` (not `lpszName`) is what
+    `CCongigDlg::OnCreate` sets to "Falcom".
+  - **MFC/ATL header instantiations:** the object files carry the CString/ATL/CWnd inline instantiations that cl
+    emits from the headers; 28 of them are byte-identical to launcher-range functions (rows in `obj_symbols.tsv`
+    under "MFC/ATL header instantiations"). They are library code, not Falcom source.
+  - Not reconstructed yet: the launcher entry point 0x6e7470 and the ini loader 0x6e81d0 (large, global-heavy),
+    `CCongigDlg::OnInitDialog` 0x6e9410, the Othello game logic (0x6ec360, 0x6ecb50, 0x6ecf40 and the mouse/paint
+    handlers; the board pack loops need a hand-unrolled spelling, open.tsv), `CVideoDlg`'s preset handler 0x6f1340, the
+    pad page's ~40 "Set" button handlers (0x6edf80-0x6ef760, missing from classify.tsv).
 - Steam: no Steamworks SDK headers; `include/steam.h` declares only the interface slots used. Some slot calls compile
   as `call [edx+N]` where the original has `mov eax,[edx+N]; call eax` (open.tsv).
 - Sound engine (JP sound3d unmatched) ported from Ghidra + EN bytes; MmioFile methods are header inlines whose

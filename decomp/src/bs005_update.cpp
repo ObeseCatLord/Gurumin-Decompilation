@@ -205,8 +205,6 @@ int Bs005_Update(int index)
     if (DAT_104c0135 != 0)
         return 0;
     AnimModel &model = DAT_10db6ee8[index];
-    Bs005State &st = DAT_1020b430[index].bs005;
-    CharSlot &slot = DAT_10daaae8[index];
     Vec4 playerPos;
     Vec4 ownPos;
     Vec4 toPlayer;
@@ -242,7 +240,7 @@ int Bs005_Update(int index)
     DAT_1020344c = 1.5f;
     if (DAT_10210d30[index] != 0)
     {
-        if (st.endingSetUp == 0)
+        if (DAT_1020b430[index].bs005.endingSetUp == 0)
         {
             for (int word = 0; word < 0x10; word++)
             {
@@ -252,7 +250,7 @@ int Bs005_Update(int index)
                 if (word < 6)
                     DAT_10868838[index][word].SetIdentity();
             }
-            st.endingSetUp = 1;
+            DAT_1020b430[index].bs005.endingSetUp = 1;
             DAT_10802bf8[index].position.Fill(0.0f);
             DAT_10802bf8[index].step.Fill(0.0f);
             if (DAT_10255f08 != 0)
@@ -270,12 +268,12 @@ int Bs005_Update(int index)
         AnimModel &endingB = DAT_10db6ee8[BS005_ENDING_MODEL_B];
         int room = DAT_10c63ffc;
         DAT_104c0354 = 2;
-        slot.m_0141 = 1;
-        slot.stats[STAT_EFFECT_PARAM] = 0;
-        slot.stats[STAT_BUSY] = 1;
+        DAT_10daaae8[index].m_0141 = 1;
+        DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] = 0;
+        DAT_10daaae8[index].stats[STAT_BUSY] = 1;
         int roomFlags = DAT_10874848.TestScriptFlag(room * 2 + BS005_ROOM_FLAG_BASE);
         DAT_10874848.SetScriptFlag(room * 2 + BS005_ROOM_FLAG_BASE, roomFlags | (1 << (index - BS005_PEOPLE_FIRST)));
-        int t = st.endingTimer;
+        int t = DAT_1020b430[index].bs005.endingTimer;
         if (t < 30)
         {
             if (t % 10 == 0 || FUN_1013f880() % 100 == 0)
@@ -289,15 +287,15 @@ int Bs005_Update(int index)
             FUN_1013fb10(3, 200, 30);
             FUN_100b9bb0(index, 0x46, 1, 0);
         }
-        if (st.endingTimer == 0xb4)
+        if (DAT_1020b430[index].bs005.endingTimer == 0xb4)
         {
             FUN_1000db30(0, 0, 0);
             FUN_1000db30(0, 100, 20);
         }
-        else if (st.endingTimer == 0xc3)
+        else if (DAT_1020b430[index].bs005.endingTimer == 0xc3)
         {
             FUN_1013fb10(3, 0, 10);
-            DAT_10874848.MarkKilled(slot.routeRecord);
+            DAT_10874848.MarkKilled(DAT_10daaae8[index].routeRecord);
             model.SetPosition(BS005_FAR_X, 0.0f, 0.0f);
             endingA.SetPosition(BS005_FAR_X, 0.0f, 0.0f);
             endingB.SetPosition(BS005_FAR_X, 0.0f, 0.0f);
@@ -305,19 +303,19 @@ int Bs005_Update(int index)
             DAT_104c0354 = 0;
             DAT_11018734 = 1;
         }
-        if (st.endingMotionStarted == 0)
+        if (DAT_1020b430[index].bs005.endingMotionStarted == 0)
         {
             FUN_10011c60();
             model.PlayMotion(0x24, 1, 5, 1.0f);
             FUN_10065b10(index, 0x2fd, 1, 0);
-            st.cameraHidden = 0x24;
+            DAT_1020b430[index].bs005.cameraHidden = 0x24;
             if (DAT_104bfe78 == 0)
-                st.endingMotionStarted = 1;
+                DAT_1020b430[index].bs005.endingMotionStarted = 1;
             endingA.heading = model.targetHeading;
             endingB.targetHeading = model.targetHeading;
             endingA.targetHeading = model.heading;
             endingB.heading = model.heading;
-            st.endingTimer = BS005_ENDING_START;
+            DAT_1020b430[index].bs005.endingTimer = BS005_ENDING_START;
             endingA.m_0000.Copy(model.matrix.GetTranslation());
             endingB.m_0000.Copy(model.matrix.GetTranslation());
             model.root->M_101946b0(0, 0xffffffff);
@@ -329,7 +327,7 @@ int Bs005_Update(int index)
             endingA.alpha = 0.0f;
             endingB.alpha = 0.0f;
         }
-        int clock = st.endingTimer;
+        int clock = DAT_1020b430[index].bs005.endingTimer;
         if (clock > 0)
         {
             if (clock < 90)
@@ -365,7 +363,7 @@ int Bs005_Update(int index)
                 model.alpha = 0.0f;
             }
         }
-        clock = st.endingTimer;
+        clock = DAT_1020b430[index].bs005.endingTimer;
         if (clock > 0)
         {
             if (clock < 0x3c)
@@ -386,7 +384,7 @@ int Bs005_Update(int index)
             else
                 endingA.scale.Fill(0.0f);
         }
-        clock = st.endingTimer;
+        clock = DAT_1020b430[index].bs005.endingTimer;
         if (clock > 0x29)
         {
             if (clock < 0x72)
@@ -420,7 +418,7 @@ int Bs005_Update(int index)
         endingA.m_0294 = 1;
         endingB.m_0294 = 1;
         endingA.motionFrame = model.motionFrame;
-        st.endingTimer++;
+        DAT_1020b430[index].bs005.endingTimer++;
         endingB.motionFrame = model.motionFrame;
         endingA.SetPosition(DAT_10db9240, DAT_10db9244, DAT_10db9248);
         endingB.SetPosition(DAT_10db9240, DAT_10db9244, DAT_10db9248);
@@ -433,9 +431,9 @@ int Bs005_Update(int index)
         DAT_10edbd48.Copy(model.matrix.GetTranslation());
         DAT_10edbd48.z += 600.0f;
         DAT_10866d98.Copy(DAT_10edbd48 + look * 1.6f);
-        if (st.endingTimer < 0xa1)
+        if (DAT_1020b430[index].bs005.endingTimer < 0xa1)
         {
-            float k = (float)(0xa0 - st.endingTimer);
+            float k = (float)(0xa0 - DAT_1020b430[index].bs005.endingTimer);
             k = (k + 1.0f) * k * 0.5f;
             k = k * k;
             float blend = 1.0f - k / 3.292411e+08f;
@@ -469,8 +467,8 @@ int Bs005_Update(int index)
         return 1;
     }
     DAT_1021f9c0[index] = 0;
-    if (slot.held == 0)
-        st.calmFrames++;
+    if (DAT_10daaae8[index].held == 0)
+        DAT_1020b430[index].bs005.calmFrames++;
     unsigned char level = DAT_102550e0[index];
     if (level == 0)
     {
@@ -481,14 +479,14 @@ int Bs005_Update(int index)
     {
         if ((difficulty == 2 && DAT_10c66cc0 == 2 && level > 2) || level > 0x14)
         {
-            if (st.motionFrame < 0)
-                model.PlayMotion(st.motionLayer, 1, 3, 1.0f);
+            if (DAT_1020b430[index].bs005.motionFrame < 0)
+                model.PlayMotion(DAT_1020b430[index].bs005.motionLayer, 1, 3, 1.0f);
             else
             {
-                model.PlayMotion(st.motionLayer, 1, 0, 1.0f);
-                model.motion->m_0004 = (float)st.motionFrame;
-                model.motion->frame = st.motionFrame;
-                model.motionFrame = st.motionFrame;
+                model.PlayMotion(DAT_1020b430[index].bs005.motionLayer, 1, 0, 1.0f);
+                model.motion->m_0004 = (float)DAT_1020b430[index].bs005.motionFrame;
+                model.motion->frame = DAT_1020b430[index].bs005.motionFrame;
+                model.motionFrame = DAT_1020b430[index].bs005.motionFrame;
                 model.motion->Advance();
             }
             model.m_0294 = 1;
@@ -496,7 +494,7 @@ int Bs005_Update(int index)
                 DAT_102550e0[index] = 4;
             else
                 DAT_102550e0[index] = difficulty == 1 ? 7 : 1;
-            if (st.attacking != 0)
+            if (DAT_1020b430[index].bs005.attacking != 0)
                 DAT_102550e0[index] = 1;
         }
         if (DAT_102550e0[index] == 1)
@@ -534,9 +532,9 @@ int Bs005_Update(int index)
     }
     if (DAT_102550e0[index] != 0)
         goto finish;
-    if (st.state == BS005_STATE_SET_UP)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_SET_UP)
     {
-        st.state = BS005_STATE_WAKE_PIECES;
+        DAT_1020b430[index].bs005.state = BS005_STATE_WAKE_PIECES;
         model.PlayMotion(BS005_MOTION_IDLE, 1, 0, 1.0f);
         DAT_1021bdf8[index][0] = model.root->Find("Dummy01", 0);
         DAT_1021bdf8[index][1] = model.root->Find("Dummy02", 0);
@@ -554,88 +552,88 @@ int Bs005_Update(int index)
         DAT_10836c70.ResetFrameTimer();
         goto finish;
     }
-    if (st.state == BS005_STATE_WAKE_PIECES)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_WAKE_PIECES)
     {
         for (int piece = 0; piece < BS005_PIECE_COUNT; piece++)
             DodgeGame_UpdateGolemPiece(BS005_FIRST_PIECE + piece);
-        st.state = BS005_STATE_REST;
-        st.frames = 0;
+        DAT_1020b430[index].bs005.state = BS005_STATE_REST;
+        DAT_1020b430[index].bs005.frames = 0;
         if (DAT_10255f08 != 0)
         {
             Node *camera = DAT_10255f08->Find("CAboss", 0);
             if (camera != 0)
             {
                 camera->ClearFlags(BS005_HIT_CAMERA_FLAG);
-                st.cameraHidden = 0;
+                DAT_1020b430[index].bs005.cameraHidden = 0;
             }
             camera = DAT_10255f08->Find("CAboss2", 0);
             if (camera != 0)
                 camera->SetFlags(BS005_HIT_CAMERA_FLAG);
         }
-        st.lastHealth = slot.stats[STAT_HEALTH];
-        st.healthMark = slot.stats[STAT_HEALTH];
+        DAT_1020b430[index].bs005.lastHealth = DAT_10daaae8[index].stats[STAT_HEALTH];
+        DAT_1020b430[index].bs005.healthMark = DAT_10daaae8[index].stats[STAT_HEALTH];
         if (difficulty == 1)
-            slot.stats[4] -= 8;
+            DAT_10daaae8[index].stats[4] -= 8;
         goto finish;
     }
-    if (st.state == BS005_STATE_REST)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_REST)
     {
-        st.frames++;
+        DAT_1020b430[index].bs005.frames++;
         motion = BS005_MOTION_IDLE;
-        if (!((difficulty != 0 || st.frames < 0x5b || FUN_1013f880() % 100 > 9) &&
-              (difficulty != 1 || st.frames < 0x97 || FUN_1013f880() % 100 > 9) &&
-              (difficulty != 2 || st.frames < 0x2e || FUN_1013f880() % 100 > 9) &&
-              slot.stats[STAT_HEALTH] == st.lastHealth))
+        if (!((difficulty != 0 || DAT_1020b430[index].bs005.frames < 0x5b || FUN_1013f880() % 100 > 9) &&
+              (difficulty != 1 || DAT_1020b430[index].bs005.frames < 0x97 || FUN_1013f880() % 100 > 9) &&
+              (difficulty != 2 || DAT_1020b430[index].bs005.frames < 0x2e || FUN_1013f880() % 100 > 9) &&
+              DAT_10daaae8[index].stats[STAT_HEALTH] == DAT_1020b430[index].bs005.lastHealth))
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_SLAM)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_SLAM)
     {
-        st.frames++;
+        DAT_1020b430[index].bs005.frames++;
         motion = 9;
-        if (st.frames == 1 && st.motionLayer == 2 && DAT_10c66cc0 != 0)
+        if (DAT_1020b430[index].bs005.frames == 1 && DAT_1020b430[index].bs005.motionLayer == 2 && DAT_10c66cc0 != 0)
         {
             restart = 1;
             SayLine(index, 0x45, BS005_VOICE_COOLDOWN_SHORT);
         }
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         frame = model.motionFrame;
         if (frame >= 0x88 && frame <= 0x92)
         {
-            power = slot.stats[STAT_EFFECT_PARAM] - 3;
+            power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] - 3;
             rightHit = 1;
         }
         else if (frame > 0x98 && frame < 0xa5)
         {
-            power = slot.stats[STAT_EFFECT_PARAM] - 3;
+            power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] - 3;
             leftHit = 1;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_BACKHAND)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_BACKHAND)
     {
-        st.frames++;
-        if (st.frames == 1)
+        DAT_1020b430[index].bs005.frames++;
+        if (DAT_1020b430[index].bs005.frames == 1)
         {
-            st.variant = FUN_1013f880() % 2;
+            DAT_1020b430[index].bs005.variant = FUN_1013f880() % 2;
             restart = 1;
             if (DAT_10c66cc0 != 0)
                 SayLine(index, 0x43, BS005_VOICE_COOLDOWN_SHORT);
         }
         frame = model.motionFrame;
-        if (st.variant == 0)
+        if (DAT_1020b430[index].bs005.variant == 0)
         {
             motion = 0xc;
             if (frame > 0xec && frame < 0x109)
             {
-                power = slot.stats[STAT_EFFECT_PARAM] - 2;
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] - 2;
                 leftHit = 1;
             }
         }
@@ -644,34 +642,34 @@ int Bs005_Update(int index)
             motion = 0xb;
             if (frame > 0xb6 && frame < 0xce)
             {
-                power = slot.stats[STAT_EFFECT_PARAM] - 2;
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] - 2;
                 rightHit = 1;
             }
         }
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_SWEEP)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_SWEEP)
     {
-        st.frames++;
-        if (st.frames == 1)
+        DAT_1020b430[index].bs005.frames++;
+        if (DAT_1020b430[index].bs005.frames == 1)
         {
-            st.variant = FUN_1013f880() % 2;
+            DAT_1020b430[index].bs005.variant = FUN_1013f880() % 2;
             restart = 1;
             FUN_100b9bb0(index, 0x42, 0, 0);
         }
         frame = model.motionFrame;
-        if (st.variant == 0)
+        if (DAT_1020b430[index].bs005.variant == 0)
         {
             motion = 0xe;
             if ((frame >= 0x18b && frame <= 0x198) || (frame >= 0x19c && frame < 0x1b3))
             {
                 leftHit = 1;
-                power = slot.stats[STAT_EFFECT_PARAM];
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
             }
         }
         else
@@ -680,22 +678,22 @@ int Bs005_Update(int index)
             if ((frame >= 0x12d && frame <= 0x13f) || (frame >= 0x142 && frame <= 0x15d))
             {
                 rightHit = 1;
-                power = slot.stats[STAT_EFFECT_PARAM];
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
             }
         }
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_STOMP || st.state == BS005_STATE_CLOSE_STOMP)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_STOMP || DAT_1020b430[index].bs005.state == BS005_STATE_CLOSE_STOMP)
     {
-        bool closeStomp = st.state == BS005_STATE_CLOSE_STOMP;
-        st.frames++;
+        bool closeStomp = DAT_1020b430[index].bs005.state == BS005_STATE_CLOSE_STOMP;
+        DAT_1020b430[index].bs005.frames++;
         motion = closeStomp ? 0x21 : 0xf;
-        if (st.frames == 1 && st.motionLayer == 2 && (closeStomp || DAT_10c66cc0 != 0))
+        if (DAT_1020b430[index].bs005.frames == 1 && DAT_1020b430[index].bs005.motionLayer == 2 && (closeStomp || DAT_10c66cc0 != 0))
         {
             restart = 1;
             if (closeStomp)
@@ -703,7 +701,7 @@ int Bs005_Update(int index)
             else
                 SayLine(index, 0x41, BS005_VOICE_COOLDOWN_LONG);
         }
-        if (st.frames == 0x1e)
+        if (DAT_1020b430[index].bs005.frames == 0x1e)
             FUN_100b9bb0(index, 0x43, 0, 0);
         frame = model.motionFrame;
         bool burstA = closeStomp ? (frame == 0x570 || frame == 0x598 || frame == 0x5c0)
@@ -730,14 +728,14 @@ int Bs005_Update(int index)
             if ((frame > 0x57c && frame < 0x585) || (frame > 0x5a3 && frame < 0x5ad) ||
                 (frame > 0x5cb && frame < 0x5d5))
             {
-                power = slot.stats[STAT_EFFECT_PARAM];
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
                 rightHit = 1;
             }
             if ((frame > 0x569 && frame < 0x571) || (frame > 0x58f && frame < 0x599) ||
                 (frame >= 0x5b7 && frame < 0x5c1))
             {
                 leftHit = 1;
-                power = slot.stats[STAT_EFFECT_PARAM];
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
             }
         }
         else
@@ -745,32 +743,32 @@ int Bs005_Update(int index)
             if ((frame > 0x20b && frame < 0x219) || (frame > 0x23a && frame < 0x247) ||
                 (frame > 0x266 && frame < 0x273))
             {
-                power = slot.stats[STAT_EFFECT_PARAM];
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
                 rightHit = 1;
             }
             if ((frame >= 0x1f5 && frame <= 0x202) || (frame >= 0x224 && frame <= 0x22f) ||
                 (frame >= 0x251 && frame <= 0x25b))
             {
                 leftHit = 1;
-                power = slot.stats[STAT_EFFECT_PARAM];
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
             }
         }
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_ROCK_THROW)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_ROCK_THROW)
     {
-        st.attacking = 1;
-        st.frames++;
+        DAT_1020b430[index].bs005.attacking = 1;
+        DAT_1020b430[index].bs005.frames++;
         motion = 0x10;
-        if (st.frames == 1)
+        if (DAT_1020b430[index].bs005.frames == 1)
         {
             restart = 1;
-            st.variant = FUN_1013f880() % BS005_ROCK_COUNT;
+            DAT_1020b430[index].bs005.variant = FUN_1013f880() % BS005_ROCK_COUNT;
             FUN_100b9bb0(index, 0x44, 0, 0);
         }
         frame = model.motionFrame;
@@ -778,11 +776,11 @@ int Bs005_Update(int index)
         {
             rightHit = 1;
             leftHit = 1;
-            power = slot.stats[STAT_EFFECT_PARAM] + 2;
+            power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] + 2;
         }
         if (frame >= 0x2c2 && frame < 0x2d0)
         {
-            int rock = ((st.variant - 0x2c2 + frame) * 3) % BS005_ROCK_COUNT + BS005_FIRST_ROCK;
+            int rock = ((DAT_1020b430[index].bs005.variant - 0x2c2 + frame) * 3) % BS005_ROCK_COUNT + BS005_FIRST_ROCK;
             int target = DAT_1020b430[rock].words[BS005_PIECE_TARGET_WORD];
             if (DAT_1021f3c0[target] > 0)
             {
@@ -795,7 +793,7 @@ int Bs005_Update(int index)
                 DAT_1020b430[rock].words[1] = 0;
             }
         }
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
             if (DAT_10255f08 != 0)
             {
@@ -803,45 +801,45 @@ int Bs005_Update(int index)
                 if (camera != 0)
                 {
                     camera->ClearFlags(BS005_HIT_CAMERA_FLAG);
-                    st.cameraHidden = 0;
+                    DAT_1020b430[index].bs005.cameraHidden = 0;
                 }
             }
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_ROAR_WAVES)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_ROAR_WAVES)
     {
-        st.frames++;
-        st.attacking = 1;
+        DAT_1020b430[index].bs005.frames++;
+        DAT_1020b430[index].bs005.attacking = 1;
         int limit = difficulty == 0 ? 0x78 : (difficulty == 1 ? 0xb4 : 0x3c);
-        if (st.frames < limit)
+        if (DAT_1020b430[index].bs005.frames < limit)
         {
             motion = 0x11;
-            if (st.frames == 1 && st.motionLayer == 2 && DAT_10c66cc0 != 0)
+            if (DAT_1020b430[index].bs005.frames == 1 && DAT_1020b430[index].bs005.motionLayer == 2 && DAT_10c66cc0 != 0)
             {
                 restart = 1;
                 SayLine(index, 0x40, BS005_VOICE_COOLDOWN_LONG);
             }
         }
-        else if (st.frames < BS005_FRAMES_PART_TWO)
+        else if (DAT_1020b430[index].bs005.frames < BS005_FRAMES_PART_TWO)
         {
             motion = 0x19;
             restart = 1;
-            st.frames = BS005_FRAMES_PART_TWO;
+            DAT_1020b430[index].bs005.frames = BS005_FRAMES_PART_TWO;
         }
         else
         {
             int hardness = DAT_10874848.TestScriptFlag(BS005_SCRIPT_FLAG_DIFFICULTY);
-            if ((hardness == 0 && st.frames < 0x44c) || (hardness == 1 && st.frames < 0x415) ||
-                (hardness == 2 && st.frames < 0x47e))
+            if ((hardness == 0 && DAT_1020b430[index].bs005.frames < 0x44c) || (hardness == 1 && DAT_1020b430[index].bs005.frames < 0x415) ||
+                (hardness == 2 && DAT_1020b430[index].bs005.frames < 0x47e))
             {
-                if (st.motionLayer == 0x19)
+                if (DAT_1020b430[index].bs005.motionLayer == 0x19)
                     motion = 0x19;
                 model.targetHeading = Atan2(ownPos.x - playerPos.x, ownPos.y - playerPos.y) + BS005_PI;
                 turnScale = DAT_10874848.TestScriptFlag(BS005_SCRIPT_FLAG_DIFFICULTY) == 2 ? 0.4f : 0.5f;
-                if (st.frames % 0x1e == 0)
+                if (DAT_1020b430[index].bs005.frames % 0x1e == 0)
                 {
                     Matrix4 pose = RotationX(-BS005_QUARTER_TURN) * RotationZ(model.heading);
                     Vec4 spot = model.matrix.GetTranslation();
@@ -853,24 +851,24 @@ int Bs005_Update(int index)
             else
             {
                 motion = 0x1c;
-                if (st.frames < BS005_FRAMES_PART_THREE)
+                if (DAT_1020b430[index].bs005.frames < BS005_FRAMES_PART_THREE)
                 {
                     restart = 1;
-                    st.frames = BS005_FRAMES_PART_THREE;
+                    DAT_1020b430[index].bs005.frames = BS005_FRAMES_PART_THREE;
                 }
             }
         }
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_SHATTER)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_SHATTER)
     {
-        st.attacking = 1;
-        if (st.cameraHidden == 0)
+        DAT_1020b430[index].bs005.attacking = 1;
+        if (DAT_1020b430[index].bs005.cameraHidden == 0)
         {
             away.Copy((ownPos - playerPos).Normalized3() * 1000.0f);
             away.z = 300.0f;
@@ -878,45 +876,45 @@ int Bs005_Update(int index)
                 DAT_10255f08->Collide(0, 0xffffffff, &look, &toPlayer, &reach) == 0)
             {
                 DAT_10255f08->Find("CAboss", 0)->SetFlags(BS005_HIT_CAMERA_FLAG);
-                st.cameraHidden = 1;
+                DAT_1020b430[index].bs005.cameraHidden = 1;
             }
         }
-        st.frames++;
-        if (st.frames == 1)
+        DAT_1020b430[index].bs005.frames++;
+        if (DAT_1020b430[index].bs005.frames == 1)
         {
-            st.savedStat4 = slot.stats[4];
+            DAT_1020b430[index].bs005.savedStat4 = DAT_10daaae8[index].stats[4];
             motion = 0x12;
             restart = 1;
-            slot.stats[4] = (DAT_10874848.TestScriptFlag(BS005_SCRIPT_FLAG_DIFFICULTY) != 1 ? 7 : 0) + 3;
+            DAT_10daaae8[index].stats[4] = (DAT_10874848.TestScriptFlag(BS005_SCRIPT_FLAG_DIFFICULTY) != 1 ? 7 : 0) + 3;
             FUN_10065b10(index, 0x18b, 1, 0);
             FUN_100b9bb0(index, 0x43, 0, 0);
         }
-        else if (st.frames < 100)
+        else if (DAT_1020b430[index].bs005.frames < 100)
         {
             motion = 0x12;
-            if (st.motionLayer == 0x13)
+            if (DAT_1020b430[index].bs005.motionLayer == 0x13)
             {
                 motion = 0x13;
-                st.frames = 100;
+                DAT_1020b430[index].bs005.frames = 100;
             }
         }
         else
         {
             motion = 0x13;
             int hardness = DAT_10874848.TestScriptFlag(BS005_SCRIPT_FLAG_DIFFICULTY);
-            if (st.frames < BS005_FRAMES_PART_TWO)
+            if (DAT_1020b430[index].bs005.frames < BS005_FRAMES_PART_TWO)
             {
                 if (model.motionFrame == 0x387)
-                    st.variant++;
-                if ((st.variant > 0 && hardness == 2) || (st.variant > 1 && hardness == 1) ||
-                    (st.variant > 2 && hardness == 0))
+                    DAT_1020b430[index].bs005.variant++;
+                if ((DAT_1020b430[index].bs005.variant > 0 && hardness == 2) || (DAT_1020b430[index].bs005.variant > 1 && hardness == 1) ||
+                    (DAT_1020b430[index].bs005.variant > 2 && hardness == 0))
                 {
-                    st.frames = BS005_FRAMES_PART_TWO;
-                    st.variant = 0;
+                    DAT_1020b430[index].bs005.frames = BS005_FRAMES_PART_TWO;
+                    DAT_1020b430[index].bs005.variant = 0;
                 }
-                if (st.frames < 0x75)
+                if (DAT_1020b430[index].bs005.frames < 0x75)
                 {
-                    int piece = (st.frames * 3 - 0x12f) % 0x10 + BS005_FIRST_PIECE;
+                    int piece = (DAT_1020b430[index].bs005.frames * 3 - 0x12f) % 0x10 + BS005_FIRST_PIECE;
                     if (DAT_1021f3c0[DAT_1020b430[piece].words[BS005_PIECE_TARGET_WORD]] < 0)
                     {
                         DAT_1020b430[piece].state = 2;
@@ -928,21 +926,21 @@ int Bs005_Update(int index)
             {
                 if (model.motionFrame == 0x387)
                 {
-                    st.variant++;
-                    if (st.variant > 2)
+                    DAT_1020b430[index].bs005.variant++;
+                    if (DAT_1020b430[index].bs005.variant > 2)
                     {
-                        slot.stats[4] = st.savedStat4;
-                        st.state = BS005_STATE_PICK;
-                        if (st.cameraHidden == 0 && DAT_10255f08 != 0 && DAT_10255f08->Find("CAboss", 0) != 0)
+                        DAT_10daaae8[index].stats[4] = DAT_1020b430[index].bs005.savedStat4;
+                        DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
+                        if (DAT_1020b430[index].bs005.cameraHidden == 0 && DAT_10255f08 != 0 && DAT_10255f08->Find("CAboss", 0) != 0)
                         {
                             DAT_10255f08->Find("CAboss", 0)->SetFlags(BS005_HIT_CAMERA_FLAG);
-                            st.cameraHidden = 1;
+                            DAT_1020b430[index].bs005.cameraHidden = 1;
                         }
                     }
                 }
-                if (st.frames < 0x40a)
+                if (DAT_1020b430[index].bs005.frames < 0x40a)
                 {
-                    int piece = (st.frames * 3 - 0xbbb) % 0x10 + BS005_FIRST_PIECE;
+                    int piece = (DAT_1020b430[index].bs005.frames * 3 - 0xbbb) % 0x10 + BS005_FIRST_PIECE;
                     if (DAT_1021f3c0[DAT_1020b430[piece].words[BS005_PIECE_TARGET_WORD]] < 0)
                     {
                         DAT_1020b430[piece].state = 3;
@@ -951,7 +949,7 @@ int Bs005_Update(int index)
                 }
             }
         }
-        if (st.frames >= 0x65 && st.frames <= 0x405 && st.frames % period == 0 && FUN_1013f880() % 3 == 0)
+        if (DAT_1020b430[index].bs005.frames >= 0x65 && DAT_1020b430[index].bs005.frames <= 0x405 && DAT_1020b430[index].bs005.frames % period == 0 && FUN_1013f880() % 3 == 0)
         {
             Matrix4 pose = RotationZ(FUN_10001f80(ownPos.x, ownPos.y));
             pose.SetTranslation(ownPos);
@@ -959,16 +957,16 @@ int Bs005_Update(int index)
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_BEAM)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_BEAM)
     {
-        st.frames++;
+        DAT_1020b430[index].bs005.frames++;
         motion = 0x14;
-        if (st.frames == 1 && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames == 1 && DAT_1020b430[index].bs005.motionLayer == 2)
         {
             restart = 1;
             FUN_100b9bb0(index, 0x41, 0, 0);
         }
-        if (st.frames == 0x1e)
+        if (DAT_1020b430[index].bs005.frames == 0x1e)
             FUN_100b9bb0(index, 0x43, 0, 1);
         if (model.motionFrame == 0x3bd)
         {
@@ -991,48 +989,48 @@ int Bs005_Update(int index)
         {
             rightHit = 1;
             leftHit = 1;
-            power = slot.stats[STAT_EFFECT_PARAM] + 2;
+            power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] + 2;
         }
         int hardness = DAT_10874848.TestScriptFlag(BS005_SCRIPT_FLAG_DIFFICULTY);
-        if ((hardness == 0 && st.frames > 0xa5) || (hardness == 1 && st.frames > 0x78) ||
-            (hardness == 2 && st.frames > 0x5a))
+        if ((hardness == 0 && DAT_1020b430[index].bs005.frames > 0xa5) || (hardness == 1 && DAT_1020b430[index].bs005.frames > 0x78) ||
+            (hardness == 2 && DAT_1020b430[index].bs005.frames > 0x5a))
             motion = 0x23;
-        if (st.frames < 0x1e)
+        if (DAT_1020b430[index].bs005.frames < 0x1e)
             model.targetHeading = Atan2(ownPos.x - playerPos.x, ownPos.y - playerPos.y) + BS005_PI;
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_LIFT)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_LIFT)
     {
-        st.attacking = 1;
-        st.frames++;
-        if (st.frames == 0x1e)
+        DAT_1020b430[index].bs005.attacking = 1;
+        DAT_1020b430[index].bs005.frames++;
+        if (DAT_1020b430[index].bs005.frames == 0x1e)
             FUN_100b9bb0(index, 0x43, 0, 0);
-        if (st.frames == 1)
+        if (DAT_1020b430[index].bs005.frames == 1)
         {
             motion = 0x15;
             restart = 1;
             FUN_100b9bb0(index, 0x40, 0, 0);
             goto finish;
         }
-        if (st.frames < 100)
+        if (DAT_1020b430[index].bs005.frames < 100)
         {
             motion = 0x15;
             if (model.motionFrame == 0x421)
-                st.frames = 100;
+                DAT_1020b430[index].bs005.frames = 100;
             goto finish;
         }
-        if (st.frames < BS005_FRAMES_PART_TWO)
+        if (DAT_1020b430[index].bs005.frames < BS005_FRAMES_PART_TWO)
         {
             motion = 0x15;
-            float lift = 95.0f - (float)(st.frames - 100);
+            float lift = 95.0f - (float)(DAT_1020b430[index].bs005.frames - 100);
             if (lift > 0.0f)
                 DAT_10db9248 += lift;
-            if (st.frames % (period / 2) == 0)
+            if (DAT_1020b430[index].bs005.frames % (period / 2) == 0)
             {
                 Matrix4 pose;
                 pose.SetIdentity();
@@ -1042,14 +1040,14 @@ int Bs005_Update(int index)
             if (model.motionFrame == 0x455)
             {
                 motion = 0x16;
-                st.frames = BS005_FRAMES_PART_TWO;
+                DAT_1020b430[index].bs005.frames = BS005_FRAMES_PART_TWO;
             }
             model.targetHeading = Atan2(ownPos.x - playerPos.x, ownPos.y - playerPos.y) + BS005_PI;
             goto finish;
         }
-        if (st.frames >= BS005_FRAMES_PART_FOUR)
+        if (DAT_1020b430[index].bs005.frames >= BS005_FRAMES_PART_FOUR)
         {
-            if (st.frames < 4000)
+            if (DAT_1020b430[index].bs005.frames < 4000)
             {
                 motion = 0x17;
                 if (model.motionFrame == 0x458)
@@ -1064,8 +1062,8 @@ int Bs005_Update(int index)
                 }
                 if (model.motionFrame == 0x472)
                 {
-                    st.state = BS005_STATE_PICK;
-                    st.attacking = 0;
+                    DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
+                    DAT_1020b430[index].bs005.attacking = 0;
                 }
             }
             goto finish;
@@ -1075,11 +1073,11 @@ int Bs005_Update(int index)
             model.targetHeading = Atan2(ownPos.x - playerPos.x, ownPos.y - playerPos.y) + BS005_PI;
         else
         {
-            st.frames = BS005_FRAMES_PART_FOUR;
+            DAT_1020b430[index].bs005.frames = BS005_FRAMES_PART_FOUR;
             motion = 0x17;
             model.targetHeading = model.heading;
         }
-        if (st.frames % (period / 2) == 0)
+        if (DAT_1020b430[index].bs005.frames % (period / 2) == 0)
         {
             Matrix4 pose;
             pose.SetIdentity();
@@ -1088,18 +1086,18 @@ int Bs005_Update(int index)
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_TURN)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_TURN)
     {
-        int maxHealth = slot.stats[STAT_MAX_HEALTH];
-        if (st.frames < 100)
+        int maxHealth = DAT_10daaae8[index].stats[STAT_MAX_HEALTH];
+        if (DAT_1020b430[index].bs005.frames < 100)
         {
             motion = 4;
-            if (st.motionLayer == 5)
-                st.frames = 100;
-            if (maxHealth / 4 < st.healthMark - slot.stats[STAT_HEALTH])
-                st.frames = BS005_FRAMES_PART_TWO;
+            if (DAT_1020b430[index].bs005.motionLayer == 5)
+                DAT_1020b430[index].bs005.frames = 100;
+            if (maxHealth / 4 < DAT_1020b430[index].bs005.healthMark - DAT_10daaae8[index].stats[STAT_HEALTH])
+                DAT_1020b430[index].bs005.frames = BS005_FRAMES_PART_TWO;
         }
-        else if (st.frames < BS005_FRAMES_PART_TWO)
+        else if (DAT_1020b430[index].bs005.frames < BS005_FRAMES_PART_TWO)
         {
             float wanted = Atan2(ownPos.x - playerPos.x, ownPos.y - playerPos.y) + BS005_PI;
             float error = WrapAngle(wanted - model.heading);
@@ -1109,30 +1107,30 @@ int Bs005_Update(int index)
                 motion = 7;
             model.targetHeading = wanted;
             if (fabs(error) < 0.17453f)
-                st.frames = BS005_FRAMES_PART_TWO;
-            if (maxHealth / 4 < st.healthMark - slot.stats[STAT_HEALTH])
-                st.frames = BS005_FRAMES_PART_TWO;
+                DAT_1020b430[index].bs005.frames = BS005_FRAMES_PART_TWO;
+            if (maxHealth / 4 < DAT_1020b430[index].bs005.healthMark - DAT_10daaae8[index].stats[STAT_HEALTH])
+                DAT_1020b430[index].bs005.frames = BS005_FRAMES_PART_TWO;
         }
         else
         {
             motion = 8;
-            if (st.motionLayer == 2)
-                st.state = BS005_STATE_PICK;
+            if (DAT_1020b430[index].bs005.motionLayer == 2)
+                DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
         }
         goto finish;
     }
-    if (st.state == BS005_STATE_CLOSE_ATTACK_A)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_CLOSE_ATTACK_A)
     {
-        st.frames++;
+        DAT_1020b430[index].bs005.frames++;
         motion = 0x1d;
-        if (st.frames == 1 && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames == 1 && DAT_1020b430[index].bs005.motionLayer == 2)
         {
             restart = 1;
             FUN_100b9bb0(index, 0x45, 0, 1);
         }
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         frame = model.motionFrame;
@@ -1142,26 +1140,26 @@ int Bs005_Update(int index)
             leftHit = 1;
         else
             goto finish;
-        power = slot.stats[STAT_EFFECT_PARAM] - 3;
+        power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] - 3;
         goto finish;
     }
-    if (st.state == BS005_STATE_CLOSE_ATTACK_B)
+    if (DAT_1020b430[index].bs005.state == BS005_STATE_CLOSE_ATTACK_B)
     {
-        st.frames++;
-        if (st.frames == 1)
+        DAT_1020b430[index].bs005.frames++;
+        if (DAT_1020b430[index].bs005.frames == 1)
         {
-            st.variant = FUN_1013f880() % 2;
+            DAT_1020b430[index].bs005.variant = FUN_1013f880() % 2;
             restart = 1;
             FUN_100b9bb0(index, 0x43, 0, 1);
         }
         frame = model.motionFrame;
-        if (st.variant == 0)
+        if (DAT_1020b430[index].bs005.variant == 0)
         {
             motion = 0x20;
             if (frame > 0x519 && frame < 0x52d)
             {
                 leftHit = 1;
-                power = slot.stats[STAT_EFFECT_PARAM] - 2;
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] - 2;
             }
         }
         else
@@ -1170,34 +1168,34 @@ int Bs005_Update(int index)
             if (frame > 0x4df && frame < 0x4f5)
             {
                 rightHit = 1;
-                power = slot.stats[STAT_EFFECT_PARAM] - 2;
+                power = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] - 2;
             }
         }
-        if (st.frames > 0x1e && st.motionLayer == 2)
+        if (DAT_1020b430[index].bs005.frames > 0x1e && DAT_1020b430[index].bs005.motionLayer == 2)
         {
-            st.state = BS005_STATE_PICK;
+            DAT_1020b430[index].bs005.state = BS005_STATE_PICK;
             motion = BS005_MOTION_NONE;
         }
         goto finish;
     }
-    if (st.state != BS005_STATE_PICK)
+    if (DAT_1020b430[index].bs005.state != BS005_STATE_PICK)
         goto finish;
-    st.frames = 0;
-    st.variant = 0;
-    st.attacking = 0;
+    DAT_1020b430[index].bs005.frames = 0;
+    DAT_1020b430[index].bs005.variant = 0;
+    DAT_1020b430[index].bs005.attacking = 0;
     {
         int hardness = DAT_10874848.TestScriptFlag(BS005_SCRIPT_FLAG_DIFFICULTY);
-        int maxHealth = slot.stats[STAT_MAX_HEALTH];
-        int lost = st.healthMark - slot.stats[STAT_HEALTH];
+        int maxHealth = DAT_10daaae8[index].stats[STAT_MAX_HEALTH];
+        int lost = DAT_1020b430[index].bs005.healthMark - DAT_10daaae8[index].stats[STAT_HEALTH];
         unsigned pick;
-        if (slot.held == 0)
+        if (DAT_10daaae8[index].held == 0)
         {
             pick = FUN_1013f880() % 10;
-            bool angry = pick == 4 || st.calmFrames > FUN_1013f880() % 10000 || (lost > maxHealth / 4 && hardness != 1) ||
+            bool angry = pick == 4 || DAT_1020b430[index].bs005.calmFrames > FUN_1013f880() % 10000 || (lost > maxHealth / 4 && hardness != 1) ||
                          (lost > maxHealth / 2 && hardness == 1);
             if (angry)
             {
-                if (st.calmFrames < FUN_1013f880() % 10000 &&
+                if (DAT_1020b430[index].bs005.calmFrames < FUN_1013f880() % 10000 &&
                     ((lost < maxHealth / 4 && hardness != 1) || (lost < maxHealth / 2 && hardness == 1)))
                     pick = FUN_1013f880() % 10;
                 else
@@ -1208,29 +1206,29 @@ int Bs005_Update(int index)
             case 0:
             case 5:
                 turnLimit = 1.4f;
-                st.state = BS005_STATE_BEAM;
+                DAT_1020b430[index].bs005.state = BS005_STATE_BEAM;
                 break;
             case 1:
             case 7:
                 turnLimit = 0.8f;
-                st.state = BS005_STATE_SLAM;
+                DAT_1020b430[index].bs005.state = BS005_STATE_SLAM;
                 break;
             case 2:
             case 6:
             case 8:
                 turnLimit = 2.4f;
-                st.state = BS005_STATE_SWEEP;
+                DAT_1020b430[index].bs005.state = BS005_STATE_SWEEP;
                 break;
             case 3:
                 turnLimit = 1.5f;
-                st.state = BS005_STATE_ROAR_WAVES;
+                DAT_1020b430[index].bs005.state = BS005_STATE_ROAR_WAVES;
                 break;
             case 9:
-                st.state = BS005_STATE_LIFT;
+                DAT_1020b430[index].bs005.state = BS005_STATE_LIFT;
                 turnLimit = BS005_PI;
                 break;
             default:
-                st.state = BS005_STATE_SHATTER;
+                DAT_1020b430[index].bs005.state = BS005_STATE_SHATTER;
                 turnLimit = BS005_PI;
                 break;
             }
@@ -1256,29 +1254,29 @@ int Bs005_Update(int index)
             {
             case 0:
                 turnLimit = 0.17453f;
-                st.state = BS005_STATE_REST;
+                DAT_1020b430[index].bs005.state = BS005_STATE_REST;
                 break;
             case 1:
             case 7:
                 turnLimit = 0.8f;
-                st.state = BS005_STATE_SLAM;
+                DAT_1020b430[index].bs005.state = BS005_STATE_SLAM;
                 break;
             case 2:
             case 6:
             case 8:
                 turnLimit = 1.5f;
-                st.state = BS005_STATE_BACKHAND;
+                DAT_1020b430[index].bs005.state = BS005_STATE_BACKHAND;
                 break;
             case 3:
-                st.state = BS005_STATE_STOMP;
+                DAT_1020b430[index].bs005.state = BS005_STATE_STOMP;
                 turnLimit = BS005_PI;
                 break;
             case 5:
                 turnLimit = 1.4f;
-                st.state = BS005_STATE_BEAM;
+                DAT_1020b430[index].bs005.state = BS005_STATE_BEAM;
                 break;
             default:
-                st.state = BS005_STATE_ROCK_THROW;
+                DAT_1020b430[index].bs005.state = BS005_STATE_ROCK_THROW;
                 turnLimit = BS005_PI;
                 break;
             }
@@ -1286,28 +1284,28 @@ int Bs005_Update(int index)
         toPlayer = ownPos - playerPos;
         if (toPlayer.Length2D() < 700.0f)
         {
-            switch (st.state)
+            switch (DAT_1020b430[index].bs005.state)
             {
             case BS005_STATE_SLAM:
-                st.state = BS005_STATE_CLOSE_ATTACK_A;
+                DAT_1020b430[index].bs005.state = BS005_STATE_CLOSE_ATTACK_A;
                 break;
             case BS005_STATE_BACKHAND:
             case BS005_STATE_SWEEP:
                 turnLimit = 1.4f;
-                st.state = BS005_STATE_CLOSE_ATTACK_B;
+                DAT_1020b430[index].bs005.state = BS005_STATE_CLOSE_ATTACK_B;
                 break;
             case BS005_STATE_STOMP:
             case BS005_STATE_ROCK_THROW:
-                if (st.state == BS005_STATE_ROCK_THROW && FUN_1013f880() % 2 == 0)
+                if (DAT_1020b430[index].bs005.state == BS005_STATE_ROCK_THROW && FUN_1013f880() % 2 == 0)
                     break;
                 turnLimit = 1.6f;
-                st.state = BS005_STATE_CLOSE_STOMP;
+                DAT_1020b430[index].bs005.state = BS005_STATE_CLOSE_STOMP;
                 break;
             }
         }
         float error = WrapAngle(Atan2(ownPos.x - playerPos.x, ownPos.y - playerPos.y) + BS005_PI - model.targetHeading);
         if (turnLimit < (float)fabs(error))
-            st.state = BS005_STATE_TURN;
+            DAT_1020b430[index].bs005.state = BS005_STATE_TURN;
     }
 finish:
     if (refreshMotion != 0)
@@ -1315,33 +1313,33 @@ finish:
         Playback *playing = model.motion;
         if (playing->blending == 0)
         {
-            st.motionFrame = (int)playing->m_0004;
-            st.motionLayer = playing->layer;
+            DAT_1020b430[index].bs005.motionFrame = (int)playing->m_0004;
+            DAT_1020b430[index].bs005.motionLayer = playing->layer;
         }
         else
         {
-            st.motionFrame = -1;
-            st.motionLayer = playing->nextLayer;
+            DAT_1020b430[index].bs005.motionFrame = -1;
+            DAT_1020b430[index].bs005.motionLayer = playing->nextLayer;
         }
     }
     if (motion >= 0)
         model.PlayMotion(motion, restart, 5, 1.0f);
-    st.hitLevel = DAT_102550e0[index];
+    DAT_1020b430[index].bs005.hitLevel = DAT_102550e0[index];
     int pieceNo = 2;
     for (int piece = BS005_FIRST_PIECE + 2; piece < BS005_FIRST_PIECE + BS005_PIECE_COUNT; piece++, pieceNo++)
     {
         if (DAT_1021f3c0[DAT_1020b430[piece].words[BS005_PIECE_TARGET_WORD]] > 0)
         {
-            slot.held = 1;
-            st.healthMark = slot.stats[STAT_HEALTH];
-            st.calmFrames = 0;
+            DAT_10daaae8[index].held = 1;
+            DAT_1020b430[index].bs005.healthMark = DAT_10daaae8[index].stats[STAT_HEALTH];
+            DAT_1020b430[index].bs005.calmFrames = 0;
             break;
         }
     }
     if (pieceNo == 0x10)
     {
-        char wasHeld = slot.held;
-        slot.held = 0;
+        char wasHeld = DAT_10daaae8[index].held;
+        DAT_10daaae8[index].held = 0;
         if (wasHeld != 0)
             DAT_10daaa80.RemoveOwnedBy(index + BS005_EFFECT_OWNER_BASE);
     }
@@ -1352,7 +1350,7 @@ finish:
     if ((float)fabs(turn) > turnCap)
         turn = turn <= 0.0f ? -turnCap : turnCap;
     turn = turn * turnScale;
-    st.lastHealth = slot.stats[STAT_HEALTH];
+    DAT_1020b430[index].bs005.lastHealth = DAT_10daaae8[index].stats[STAT_HEALTH];
     model.targetHeading = model.heading - turn;
     for (int fist = 0; fist < 2; fist++)
     {
@@ -1374,7 +1372,7 @@ finish:
         bool broken = DAT_1021f3c0[DAT_1020b430[pieceSlot].words[BS005_PIECE_TARGET_WORD]] > 0;
         EffectOptions options;
         options.m_0000 = 0;
-        options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+        options.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
         options.m_0008 = 1.0f;
         options.followOwner = 1;
         FUN_1001d8b0(index, broken ? 0x7a6 : 0x7a8, at, -1, -1, 0, 0, 0, &pose, broken ? 0 : &options);
@@ -1404,7 +1402,7 @@ finish:
         Vec4 at;
         int pieceSlot = fist == 0 ? BS005_FIST_A_PIECE : BS005_FIST_B_PIECE;
         options.m_0000 = 0;
-        options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
+        options.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
         options.m_0008 = effectScale;
         pose.SetIdentity();
         pose.m[12] = DAT_1021bdf8[index][fist]->matrix.m[12];

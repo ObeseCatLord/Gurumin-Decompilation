@@ -459,8 +459,6 @@ int Bs002_Update(int index)
 {
     AnimModel &model = DAT_10db6ee8[index];
     int prev = index - 1;
-    Bs002State &st = DAT_1020b430[index].bs002;
-    Bs002Extra &ex = DAT_1020b3f0[index];
     CharSlot &slot = DAT_10daaae8[index];
     Vec4 ownPos;
     Vec4 playerPos;
@@ -483,11 +481,11 @@ int Bs002_Update(int index)
     DAT_104c0110 = index;
     model.uniformScale = 0.05f;
     slot.stats[14] = 1;
-    if (ex.tinted != 0 && st.state != BS002_STATE_ROAR_WAVES && st.state != BS002_STATE_CLAW_B &&
-        st.state != BS002_STATE_CLAW_C)
+    if (DAT_1020b3f0[index].tinted != 0 && DAT_1020b430[index].bs002.state != BS002_STATE_ROAR_WAVES && DAT_1020b430[index].bs002.state != BS002_STATE_CLAW_B &&
+        DAT_1020b430[index].bs002.state != BS002_STATE_CLAW_C)
     {
         FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
-        ex.tinted = 0;
+        DAT_1020b3f0[index].tinted = 0;
     }
     DAT_10db6ee8[prev].locked = 1;
     model.locked = 1;
@@ -500,14 +498,14 @@ int Bs002_Update(int index)
         AnimModel &endingC = DAT_10db6ee8[BS002_ENDING_MODEL_C];
         int room = DAT_10c63ffc;
         slot.stats[13] = 1;
-        if (ex.endingSetUp == 0)
+        if (DAT_1020b3f0[index].endingSetUp == 0)
         {
             FUN_10011c60();
             int roomFlags = DAT_10874848.TestScriptFlag(room * 2 + BS002_ROOM_FLAG_BASE);
             DAT_10874848.SetScriptFlag(room * 2 + BS002_ROOM_FLAG_BASE, roomFlags | (1 << (index - BS002_PEOPLE_FIRST)));
             int nearMiddle = 0;
             slot.m_0141 = 1;
-            if (ex.phase < 3 && model.matrix.GetTranslation().Length2D() < 550.0f)
+            if (DAT_1020b3f0[index].phase < 3 && model.matrix.GetTranslation().Length2D() < 550.0f)
                 nearMiddle = 1;
             for (int word = 0; word < 0x10; word++)
             {
@@ -515,8 +513,8 @@ int Bs002_Update(int index)
                 DAT_1020b430[index].words[word] = 0;
             }
             DAT_10db6ee8[prev].SetPosition(BS002_FAR_X, 0.0f, 0.0f);
-            ex.phase = nearMiddle;
-            ex.endingSetUp = 1;
+            DAT_1020b3f0[index].phase = nearMiddle;
+            DAT_1020b3f0[index].endingSetUp = 1;
             return 1;
         }
         int roomFlags = DAT_10874848.TestScriptFlag(room * 2 + BS002_ROOM_FLAG_BASE);
@@ -526,7 +524,7 @@ int Bs002_Update(int index)
         slot.m_0141 = 1;
         slot.stats[STAT_EFFECT_PARAM] = 0;
         DAT_10874848.SetScriptFlag(room * 2 + BS002_ROOM_FLAG_BASE, roomFlags | (1 << (index - BS002_PEOPLE_FIRST)));
-        int &timer = st.mode;
+        int &timer = DAT_1020b430[index].bs002.mode;
         if (timer < 0x1e)
         {
             if (timer % 10 == 0 || FUN_1013f880() % 100 == 0)
@@ -557,27 +555,27 @@ int Bs002_Update(int index)
             DAT_104c0354 = 0;
             DAT_11018734 = 1;
         }
-        if (st.hits == 0)
+        if (DAT_1020b430[index].bs002.hits == 0)
         {
             FUN_10011c60();
-            if (ex.phase == 0)
+            if (DAT_1020b3f0[index].phase == 0)
                 model.PlayMotion(0x34, 1, 5, 1.0f);
             else
             {
                 model.PlayMotion(0x36, 1, 5, 1.0f);
                 model.mode = 1;
             }
-            st.angle = 0xd;
+            DAT_1020b430[index].bs002.angle = 0xd;
             if (slot.m_00a8 != 0)
                 DAT_10db6ee8[slot.m_00a4].PlayMotion(0xd, 1, 5, 1.0f);
             FUN_10065b10(index, 0x2fd, 1, 0);
             if (DAT_104bfe78 == 0)
-                st.hits = 1;
+                DAT_1020b430[index].bs002.hits = 1;
             endingA.targetHeading = model.targetHeading;
             endingB.targetHeading = model.targetHeading;
             endingA.heading = model.heading;
             endingB.heading = model.heading;
-            st.mode = BS002_ENDING_START;
+            DAT_1020b430[index].bs002.mode = BS002_ENDING_START;
             DAT_10da9150.Copy(DAT_118e69e8);
             DAT_10868818.Copy(DAT_118e6cb8);
             model.root->M_101946b0(0, 0xffffffff);
@@ -727,7 +725,7 @@ int Bs002_Update(int index)
     }
 
     // The fight. `prev` is the second half of its body; both halves are held in place by the engine's reaction code.
-    int lastHealthWas = ex.lastHealth;
+    int lastHealthWas = DAT_1020b3f0[index].lastHealth;
     DAT_1021f9c0[index] = 0;
     DAT_1021f9c0[prev] = 0;
     DAT_10255a88[index] = 0;
@@ -735,14 +733,14 @@ int Bs002_Update(int index)
     DAT_10210d30[index] = 0;
     DAT_10210d30[prev] = 0;
     if (lastHealthWas == 0)
-        ex.lastHealth = slot.stats[STAT_HEALTH];
-    int lungeWas = st.lunging;
+        DAT_1020b3f0[index].lastHealth = slot.stats[STAT_HEALTH];
+    int lungeWas = DAT_1020b430[index].bs002.lunging;
     DAT_10daaae8[prev].m_0141 = 1;
     slot.m_0141 = 0;
     DAT_10db6ee8[prev].m_17e8 = 1;
     if (lungeWas != 0)
     {
-        st.lunging = 0;
+        DAT_1020b430[index].bs002.lunging = 0;
         armed = 1;
     }
     DAT_11b04510 = 1;
@@ -764,11 +762,11 @@ int Bs002_Update(int index)
         FUN_1001c090(index, 1);
     }
     int hitLevel = DAT_102550e0[index];
-    ex.variant = 0;
+    DAT_1020b3f0[index].variant = 0;
 
     if (hitLevel == 0)
     {
-        if (st.state == BS002_STATE_SET_UP)
+        if (DAT_1020b430[index].bs002.state == BS002_STATE_SET_UP)
         {
             DAT_10db6ee8[BS002_ENDING_MODEL_A].LoadFile(FUN_1013f8a0("bs_002en.it3", 0));
             DAT_10db6ee8[BS002_ENDING_MODEL_B].LoadFile(FUN_1013f8a0("bs_002pa.it3", 0));
@@ -783,12 +781,12 @@ int Bs002_Update(int index)
             if (DAT_10874848.TestScriptFlag(BS002_DIFFICULTY_FLAG) == 1)
                 slot.stats[STAT_VALUE_4] -= 5;
             slot.stats[13] = 1;
-            st.state = BS002_STATE_RING_WALK;
-            st.frames = 0;
-            st.height = -50;
-            st.targetHeight = -50;
-            st.direction = -1;
-            st.angle = 0xc46;
+            DAT_1020b430[index].bs002.state = BS002_STATE_RING_WALK;
+            DAT_1020b430[index].bs002.frames = 0;
+            DAT_1020b430[index].bs002.height = -50;
+            DAT_1020b430[index].bs002.targetHeight = -50;
+            DAT_1020b430[index].bs002.direction = -1;
+            DAT_1020b430[index].bs002.angle = 0xc46;
             model.PlayMotion(0xb, 1, 0, 1.0f);
             motion = 10;
             DAT_10255160[index][1] = 1000.0f;
@@ -812,118 +810,118 @@ int Bs002_Update(int index)
             DAT_1021bdd4[index][BS002_NODE_PELVIS] = model.root->Find("Bip01 Pelvis", 0);
             DAT_1021bdd4[index][BS002_NODE_TAIL_B] = model.root->Find("Bone_tail2", 0);
             DAT_1021bdd4[index][BS002_NODE_DUMMY] = model.root->Find("Dummy05", 0);
-            st.height = -250;
-            st.targetHeight = -250;
+            DAT_1020b430[index].bs002.height = -250;
+            DAT_1020b430[index].bs002.targetHeight = -250;
             for (int piece = index + 1; piece < index + 1 + BS002_PIECE_COUNT; piece++)
                 DAT_10daaae8[piece].kind = BS002_PIECE_KIND;
             DAT_10db6ee8[prev].SetPosition(BS002_FAR_X, 0.0f, 0.0f);
         }
-        else if (st.state == BS002_STATE_CIRCLE_LEFT || st.state == BS002_STATE_CIRCLE_RIGHT)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_CIRCLE_LEFT || DAT_1020b430[index].bs002.state == BS002_STATE_CIRCLE_RIGHT)
         {
             // Circles to the left (1) or right (2) while the ring grows, then goes back to the ring walk.
-            bool left = st.state == BS002_STATE_CIRCLE_LEFT;
+            bool left = DAT_1020b430[index].bs002.state == BS002_STATE_CIRCLE_LEFT;
             slot.stats[13] = 1;
-            int frames = st.frames;
-            st.targetHeight = -250;
-            st.angle = left ? st.angle + frames - 3 : st.angle + (3 - frames);
-            float angle = (float)st.angle / 1000.0f;
+            int frames = DAT_1020b430[index].bs002.frames;
+            DAT_1020b430[index].bs002.targetHeight = -250;
+            DAT_1020b430[index].bs002.angle = left ? DAT_1020b430[index].bs002.angle + frames - 3 : DAT_1020b430[index].bs002.angle + (3 - frames);
+            float angle = (float)DAT_1020b430[index].bs002.angle / 1000.0f;
             if (frames == 0)
-                st.radiusBoost = 0;
-            st.radiusBoost += ((0x25 - frames) * 8) / 0x25;
-            RingGoal(goal, angle, (float)st.radiusBoost + 1000.0f, st.height);
+                DAT_1020b430[index].bs002.radiusBoost = 0;
+            DAT_1020b430[index].bs002.radiusBoost += ((0x25 - frames) * 8) / 0x25;
+            RingGoal(goal, angle, (float)DAT_1020b430[index].bs002.radiusBoost + 1000.0f, DAT_1020b430[index].bs002.height);
             move.Copy(goal - ownPos);
             moveMode = BS002_MOVE_TOWARDS;
             model.targetHeading = Atan2(move.x, move.y) + BS002_PI;
-            st.frames++;
-            if (st.frames > 0x25)
+            DAT_1020b430[index].bs002.frames++;
+            if (DAT_1020b430[index].bs002.frames > 0x25)
             {
-                st.state = BS002_STATE_RING_WALK;
-                st.frames = 0;
-                st.direction = left ? 1 : -1;
+                DAT_1020b430[index].bs002.state = BS002_STATE_RING_WALK;
+                DAT_1020b430[index].bs002.frames = 0;
+                DAT_1020b430[index].bs002.direction = left ? 1 : -1;
             }
             motion = left ? 4 : 5;
         }
-        else if (st.state == BS002_STATE_RING_LUNGE)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_RING_LUNGE)
         {
             // Pulls in to the ring's inner circle for a few frames, then runs round it before the ring walk.
             slot.stats[13] = 1;
-            int frames = st.frames;
-            st.targetHeight = -300;
+            int frames = DAT_1020b430[index].bs002.frames;
+            DAT_1020b430[index].bs002.targetHeight = -300;
             if (frames == 0)
-                ex.variant = FUN_1013f880() % 6 - 1;
-            st.frames++;
-            if (st.frames < 6)
+                DAT_1020b3f0[index].variant = FUN_1013f880() % 6 - 1;
+            DAT_1020b430[index].bs002.frames++;
+            if (DAT_1020b430[index].bs002.frames < 6)
             {
-                goal.Set(ownPos.x, ownPos.y, (float)st.height, 0.0f);
-                st.mode = 1;
+                goal.Set(ownPos.x, ownPos.y, (float)DAT_1020b430[index].bs002.height, 0.0f);
+                DAT_1020b430[index].bs002.mode = 1;
             }
             else
             {
-                RingGoal(goal, (float)(st.angle + st.direction * 0x14) / 1000.0f, 1000.0f, st.height);
+                RingGoal(goal, (float)(DAT_1020b430[index].bs002.angle + DAT_1020b430[index].bs002.direction * 0x14) / 1000.0f, 1000.0f, DAT_1020b430[index].bs002.height);
                 move.Copy(goal - ownPos);
                 model.targetHeading = Atan2(move.x, move.y) + BS002_PI;
-                if (st.frames < 0x15)
-                    goal.Set(ownPos.x, ownPos.y, (float)st.height, 0.0f);
+                if (DAT_1020b430[index].bs002.frames < 0x15)
+                    goal.Set(ownPos.x, ownPos.y, (float)DAT_1020b430[index].bs002.height, 0.0f);
                 else
                 {
-                    st.angle += st.direction * -8;
-                    RingGoal(goal, (float)st.angle / 1000.0f, 1000.0f, st.height);
+                    DAT_1020b430[index].bs002.angle += DAT_1020b430[index].bs002.direction * -8;
+                    RingGoal(goal, (float)DAT_1020b430[index].bs002.angle / 1000.0f, 1000.0f, DAT_1020b430[index].bs002.height);
                 }
             }
             moveMode = BS002_MOVE_TOWARDS;
-            if (st.frames < 0x2d)
+            if (DAT_1020b430[index].bs002.frames < 0x2d)
                 motion = 0xd;
             else
             {
                 motion = 2;
-                st.frames = 0;
-                st.state = BS002_STATE_RING_WALK;
+                DAT_1020b430[index].bs002.frames = 0;
+                DAT_1020b430[index].bs002.state = BS002_STATE_RING_WALK;
             }
         }
-        else if (st.state == BS002_STATE_RING_WALK)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_RING_WALK)
         {
             // Walks round the ring with the player in the middle, picking a balloon-side radius, and ends the walk
             // with a pick (or a lunge) now and then.
             slot.stats[13] = 0;
-            ex.attacking = 1;
+            DAT_1020b3f0[index].attacking = 1;
             motion = 0;
-            st.targetHeight = -250;
-            st.angle = st.direction * 0x1e - (int)(Atan2(-ownPos.y, -ownPos.x) * 1000.0f);
+            DAT_1020b430[index].bs002.targetHeight = -250;
+            DAT_1020b430[index].bs002.angle = DAT_1020b430[index].bs002.direction * 0x1e - (int)(Atan2(-ownPos.y, -ownPos.x) * 1000.0f);
             float &radius = DAT_10255160[index][1];
-            float ringAngle = (float)st.angle / 1000.0f;
-            RingGoal(goal, ringAngle, radius, st.height);
+            float ringAngle = (float)DAT_1020b430[index].bs002.angle / 1000.0f;
+            RingGoal(goal, ringAngle, radius, DAT_1020b430[index].bs002.height);
             move.Copy(goal - ownPos);
             moveMode = BS002_MOVE_BLEND;
             model.targetHeading = Atan2(move.x, move.y) + BS002_PI;
-            st.frames++;
+            DAT_1020b430[index].bs002.frames++;
             bool decided = false;
-            if (st.frames >= 0x3d)
+            if (DAT_1020b430[index].bs002.frames >= 0x3d)
             {
-                int fury = ex.furyLevel;
+                int fury = DAT_1020b3f0[index].furyLevel;
                 int roll = FUN_1013f880();
-                if (st.frames - fury * fury - 0x3c > roll % 5000 && armed == 0)
+                if (DAT_1020b430[index].bs002.frames - fury * fury - 0x3c > roll % 5000 && armed == 0)
                 {
-                    st.state = BS002_STATE_PICK;
-                    ex.furyLevel = fury + 1;
+                    DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
+                    DAT_1020b3f0[index].furyLevel = fury + 1;
                     decided = true;
                 }
             }
             if (!decided)
             {
-                int frames = st.frames;
+                int frames = DAT_1020b430[index].bs002.frames;
                 if (frames >= 0x29 && (frames * frames) / 0x32 > FUN_1013f880() % 5000)
                 {
                     armed = 1;
-                    ex.furyLevel = 0;
-                    st.lunging = 1;
+                    DAT_1020b3f0[index].furyLevel = 0;
+                    DAT_1020b430[index].bs002.lunging = 1;
                 }
                 else if (frames < 0x28)
                 {
                     armed = 0;
-                    st.lunging = 0;
+                    DAT_1020b430[index].bs002.lunging = 0;
                 }
                 else if (armed != 0)
-                    st.lunging = 1;
+                    DAT_1020b430[index].bs002.lunging = 1;
             }
             {
                 // Keeps the ring on the balloon side: the balloon that is next along the walk sets the radius.
@@ -935,7 +933,7 @@ int Bs002_Update(int index)
                     {
                         Vec4 spot = DAT_10db6ee8[target].matrix.GetTranslation();
                         float gap = Atan2(spot.y, spot.x) - ringAngle;
-                        if (st.direction < 1)
+                        if (DAT_1020b430[index].bs002.direction < 1)
                         {
                             while (gap < -BS002_TWO_PI)
                                 gap += BS002_TWO_PI;
@@ -966,78 +964,78 @@ int Bs002_Update(int index)
                     radius = 1200.0f;
                 else if (radius < 900.0f)
                     radius = 900.0f;
-                st.angle = WrapRingAngle(st.angle);
+                DAT_1020b430[index].bs002.angle = WrapRingAngle(DAT_1020b430[index].bs002.angle);
                 for (int step = 0; step < BS002_RING_STEPS; step++)
                 {
-                    if (RingAngleGap(st.angle, sRingAngles[step]) < 0x14 && armed != 0)
+                    if (RingAngleGap(DAT_1020b430[index].bs002.angle, sRingAngles[step]) < 0x14 && armed != 0)
                     {
-                        st.angle = sRingAngles[step];
-                        st.state = BS002_STATE_PICK;
+                        DAT_1020b430[index].bs002.angle = sRingAngles[step];
+                        DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
                         break;
                     }
                 }
             }
         }
-        else if (st.state == BS002_STATE_RING_SHOTS)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_RING_SHOTS)
         {
             // Stands still and spits a fan of shots (5, or 7 on the hardest setting) once after a wind-up.
-            int frames = ++st.frames;
+            int frames = ++DAT_1020b430[index].bs002.frames;
             slot.stats[13] = 1;
             motion = 10;
             goal.Copy(ownPos);
-            goal.z = (float)st.height;
+            goal.z = (float)DAT_1020b430[index].bs002.height;
             moveMode = BS002_MOVE_TOWARDS;
             if (frames > 0x23)
                 motion = 0xb;
-            st.targetHeight = frames > 0xf ? 0 : -400;
+            DAT_1020b430[index].bs002.targetHeight = frames > 0xf ? 0 : -400;
             if (frames > 0x1e)
             {
                 slot.stats[13] = 0;
                 model.targetHeading = Atan2(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS002_PI;
             }
-            ex.attacking = 0;
-            frames = st.frames;
+            DAT_1020b3f0[index].attacking = 0;
+            frames = DAT_1020b430[index].bs002.frames;
             if (frames == 0x5a)
-                st.motion = 10;
+                DAT_1020b430[index].bs002.motion = 10;
             else if (frames >= 0x3c && frames < 0x5a)
             {
                 motion = 0xc;
-                ex.attacking = 1;
+                DAT_1020b3f0[index].attacking = 1;
                 if (frames == 0x3c)
                 {
                     restart = 1;
-                    FireShotFan(index, model, slot, ex);
+                    FireShotFan(index, model, slot, DAT_1020b3f0[index]);
                 }
             }
-            frames = st.frames;
+            frames = DAT_1020b430[index].bs002.frames;
             if (frames < 0xf0 && frames > 0x5a && frames % 0xf == 0 && slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 4)
                 checkTargets = 1;
             if (frames == 400)
-                ChooseFollowUp(st, slot, distance2D, ownPos, playerPos);
+                ChooseFollowUp(DAT_1020b430[index].bs002, slot, distance2D, ownPos, playerPos);
         }
-        else if (st.state == BS002_STATE_STOMP)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_STOMP)
         {
             // Plants its feet and stamps; the stamp sends a ring of dust from the spine and a pulse from the head.
             motion = 0xb;
             slot.stats[13] = 1;
             goal.Copy(ownPos);
-            goal.z = (float)st.height;
+            goal.z = (float)DAT_1020b430[index].bs002.height;
             moveMode = BS002_MOVE_TOWARDS;
-            st.targetHeight = 0;
-            if (st.frames < 0x28 && st.frames % 4 == 0)
+            DAT_1020b430[index].bs002.targetHeight = 0;
+            if (DAT_1020b430[index].bs002.frames < 0x28 && DAT_1020b430[index].bs002.frames % 4 == 0)
             {
                 where.Fill(0.0f);
                 StartEffect(index, 0x703, where, &Bs002Bone(BS002_BONE_SPINE)->worldMatrix, 0, 0, 0, 0);
             }
-            if (st.frames == 0)
+            if (DAT_1020b430[index].bs002.frames == 0)
             {
                 FUN_10065b10(index, 0x2e7, 1, 0);
                 FUN_100b9bb0(index, FUN_1013f880() % 2 == 0 ? 0x24 : 0x20, 0, 1);
             }
-            if (st.frames > 0x28)
+            if (DAT_1020b430[index].bs002.frames > 0x28)
             {
                 motion = 0x18;
-                if (st.frames == 0x29)
+                if (DAT_1020b430[index].bs002.frames == 0x29)
                 {
                     restart = 1;
                     EffectOptions options;
@@ -1054,18 +1052,18 @@ int Bs002_Update(int index)
                 }
             }
             int frame = model.motionFrame;
-            st.frames++;
+            DAT_1020b430[index].bs002.frames++;
             if (frame == 0x81)
             {
-                st.state = BS002_STATE_CLIMB;
-                st.frames = 0;
+                DAT_1020b430[index].bs002.state = BS002_STATE_CLIMB;
+                DAT_1020b430[index].bs002.frames = 0;
             }
         }
-        else if (st.state == BS002_STATE_ROAR_WAVES)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_ROAR_WAVES)
         {
             // Roars with the screen tinted; at frame 0x79 of the motion it sends a fan of waves (3, or 5 on the
             // hardest setting) in front of it.
-            ex.tinted = 1;
+            DAT_1020b3f0[index].tinted = 1;
             FUN_1000ec70(0xf, 0.5f, 0.5f, 0.8f, 1.0f);
             slot.stats[13] = 1;
             motion = 0xb;
@@ -1103,9 +1101,9 @@ int Bs002_Update(int index)
                     StartEffect(index, 0x69f, where, 0, 0, 0, &pose, &options);
                 }
             }
-            if (st.frames == 0xf)
+            if (DAT_1020b430[index].bs002.frames == 0xf)
                 FUN_100b9bb0(index, 0x27, 0, 0);
-            int frames = st.frames;
+            int frames = DAT_1020b430[index].bs002.frames;
             if (frames < 0x2d)
             {
                 Matrix4 pose;
@@ -1123,49 +1121,49 @@ int Bs002_Update(int index)
             else if (frames == 0x3fc)
             {
                 FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
-                st.state = BS002_STATE_PICK;
-                ex.tinted = 0;
+                DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
+                DAT_1020b3f0[index].tinted = 0;
             }
             int frame = model.motionFrame;
-            st.frames++;
+            DAT_1020b430[index].bs002.frames++;
             if (frame == 0x81)
-                st.frames = 1000;
+                DAT_1020b430[index].bs002.frames = 1000;
         }
-        else if (st.state == BS002_STATE_CLIMB)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_CLIMB)
         {
             // Rises out of the ring (frames 0..0x3c), shoots up out of sight, then drops back on the ring walk's
             // side of the player and lands with a blast.
             slot.stats[13] = 1;
             motion = 0x26;
-            if (st.frames == 0)
+            if (DAT_1020b430[index].bs002.frames == 0)
             {
-                if (ex.lungeReady == 0)
+                if (DAT_1020b3f0[index].lungeReady == 0)
                 {
-                    float gap = Atan2(playerPos.y, playerPos.x) - (float)st.angle / 1000.0f;
+                    float gap = Atan2(playerPos.y, playerPos.x) - (float)DAT_1020b430[index].bs002.angle / 1000.0f;
                     while (gap < -BS002_PI)
                         gap += BS002_TWO_PI;
                     while (gap > BS002_PI)
                         gap -= BS002_TWO_PI;
-                    st.direction = gap >= 0.0f ? 1 : -1;
+                    DAT_1020b430[index].bs002.direction = gap >= 0.0f ? 1 : -1;
                     DAT_10255160[index][0] = DAT_104bfe24 - 100.0f;
                 }
-                ex.variant = FUN_1013f880() % 5;
+                DAT_1020b3f0[index].variant = FUN_1013f880() % 5;
             }
-            if (st.frames < 0x3c)
+            if (DAT_1020b430[index].bs002.frames < 0x3c)
             {
-                st.targetHeight = 0x708;
-                st.mode = 0;
+                DAT_1020b430[index].bs002.targetHeight = 0x708;
+                DAT_1020b430[index].bs002.mode = 0;
             }
-            else if (st.frames == 0x3c)
+            else if (DAT_1020b430[index].bs002.frames == 0x3c)
             {
-                st.targetHeight = -2000;
-                st.mode = 1;
+                DAT_1020b430[index].bs002.targetHeight = -2000;
+                DAT_1020b430[index].bs002.mode = 1;
                 FUN_10065b10(index, 0x2e9, 1, 0);
             }
             else
             {
-                st.targetHeight = -600;
-                if ((float)st.height <= DAT_104bfe24 + 100.0f)
+                DAT_1020b430[index].bs002.targetHeight = -600;
+                if ((float)DAT_1020b430[index].bs002.height <= DAT_104bfe24 + 100.0f)
                     motion = 0x20;
                 else
                 {
@@ -1184,68 +1182,68 @@ int Bs002_Update(int index)
                     StartEffect(index, 0x45d, where, &Bs002Bone(BS002_BONE_HEAD)->worldMatrix, 0, 0, 0, &options);
                     StartEffect(index, 0x45d, where, &Bs002Bone(BS002_BONE_LEFT_ARM)->worldMatrix, 0, 0, 0, &options);
                     StartEffect(index, 0x45d, where, &Bs002Bone(BS002_BONE_RIGHT_ARM)->worldMatrix, 0, 0, 0, &options);
-                    if (st.frames < 500 && Bs002Bone(BS002_BONE_HEAD)->worldMatrix._43 < DAT_104bfe24 + 100.0f)
+                    if (DAT_1020b430[index].bs002.frames < 500 && Bs002Bone(BS002_BONE_HEAD)->worldMatrix._43 < DAT_104bfe24 + 100.0f)
                     {
-                        st.frames = 500;
+                        DAT_1020b430[index].bs002.frames = 500;
                         FUN_100543a0(ownPos);
                     }
                 }
             }
-            st.angle += st.direction * (st.frames / 0xf);
-            RingGoal(goal, (float)st.angle / 1000.0f, 1000.0f, st.height);
+            DAT_1020b430[index].bs002.angle += DAT_1020b430[index].bs002.direction * (DAT_1020b430[index].bs002.frames / 0xf);
+            RingGoal(goal, (float)DAT_1020b430[index].bs002.angle / 1000.0f, 1000.0f, DAT_1020b430[index].bs002.height);
             goal.w = 1.0f;
             move.Copy(goal - ownPos);
             moveMode = BS002_MOVE_TOWARDS;
             model.targetHeading = Atan2(move.x, move.y) + BS002_PI;
             int frame = model.motionFrame;
-            st.frames++;
+            DAT_1020b430[index].bs002.frames++;
             if (frame == 499)
             {
-                if (ex.lungeReady == 0 || FUN_1013f880() % 0x32 > 0x1d)
+                if (DAT_1020b3f0[index].lungeReady == 0 || FUN_1013f880() % 0x32 > 0x1d)
                 {
-                    st.state = BS002_STATE_RING_WALK;
-                    st.frames = 0;
+                    DAT_1020b430[index].bs002.state = BS002_STATE_RING_WALK;
+                    DAT_1020b430[index].bs002.frames = 0;
                 }
                 else
                 {
-                    st.state = BS002_STATE_PICK;
-                    st.lunging = 1;
+                    DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
+                    DAT_1020b430[index].bs002.lunging = 1;
                 }
             }
         }
-        else if (st.state == BS002_STATE_GLARE)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_GLARE)
         {
             // Rears up and glares (frames 0x3c..0x95: pillars of light round it), then fires one shot at the player
             // every half second until it picks again.
-            int frames = ++st.frames;
+            int frames = ++DAT_1020b430[index].bs002.frames;
             slot.stats[13] = 1;
             motion = 10;
             goal.Copy(ownPos);
-            goal.z = (float)st.height;
+            goal.z = (float)DAT_1020b430[index].bs002.height;
             moveMode = BS002_MOVE_TOWARDS;
             if (frames > 0x23)
                 motion = 0xb;
-            st.targetHeight = frames < 0x10 ? -400 : -50;
+            DAT_1020b430[index].bs002.targetHeight = frames < 0x10 ? -400 : -50;
             if (frames > 0x1e && (frames < 0x3c || frames > 0x96))
             {
                 slot.stats[13] = 0;
                 model.targetHeading = Atan2(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS002_PI;
             }
-            frames = st.frames;
-            ex.attacking = 0;
+            frames = DAT_1020b430[index].bs002.frames;
+            DAT_1020b3f0[index].attacking = 0;
             if (frames >= 0x3c && frames < 0x96)
             {
                 slot.stats[13] = 0;
                 motion = 0x29;
-                ex.attacking = 1;
+                DAT_1020b3f0[index].attacking = 1;
                 if (frames == 0x3c)
                 {
                     restart = 1;
-                    ex.variant = FUN_1013f880() % 4 + 1;
+                    DAT_1020b3f0[index].variant = FUN_1013f880() % 4 + 1;
                     FUN_10065b10(index, 0x28e, 1, 0);
                     FUN_100b9bb0(index, 0x21, 0, 1);
                 }
-                if (st.frames % 0x16 == 0)
+                if (DAT_1020b430[index].bs002.frames % 0x16 == 0)
                 {
                     Matrix4 pose;
                     EffectOptions options;
@@ -1263,7 +1261,7 @@ int Bs002_Update(int index)
                 if (frames < 0x14a)
                 {
                     motion = 0x2f;
-                    ex.attacking = 1;
+                    DAT_1020b3f0[index].attacking = 1;
                 }
             }
             else if (frames >= 0x96)
@@ -1271,8 +1269,8 @@ int Bs002_Update(int index)
                 if (frames == 0x96)
                     FUN_100b9bb0(index, 0x22, 0, 1);
                 motion = 0xc;
-                ex.attacking = 1;
-                if (st.frames % 0x1e == 0)
+                DAT_1020b3f0[index].attacking = 1;
+                if (DAT_1020b430[index].bs002.frames % 0x1e == 0)
                 {
                     Matrix4 pose;
                     EffectOptions options;
@@ -1294,81 +1292,81 @@ int Bs002_Update(int index)
                 }
             }
             int half = slot.stats[STAT_MAX_HEALTH] / 2;
-            if ((slot.stats[STAT_HEALTH] > half && st.frames >= 0x28a) || st.frames == 800)
-                ChooseFollowUp(st, slot, distance2D, ownPos, playerPos);
+            if ((slot.stats[STAT_HEALTH] > half && DAT_1020b430[index].bs002.frames >= 0x28a) || DAT_1020b430[index].bs002.frames == 800)
+                ChooseFollowUp(DAT_1020b430[index].bs002, slot, distance2D, ownPos, playerPos);
         }
-        else if (st.state == BS002_STATE_WHIRL)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_WHIRL)
         {
             // Spins round the ring at a growing speed with the ring radius shrinking, rains rocks on the floor and
             // lands back at the ring walk (frames 1000.. = spinning in, 2000.. = on the way out, 3000.. = dropping).
-            int direction = st.direction;
-            int frames = st.frames;
+            int direction = DAT_1020b430[index].bs002.direction;
+            int frames = DAT_1020b430[index].bs002.frames;
             slot.stats[13] = 1;
-            ex.attacking = 1;
+            DAT_1020b3f0[index].attacking = 1;
             motion = (direction > 0 ? 2 : 0) + 0x30;
             float &ringRadius = DAT_10255160[index][1];
             if (frames < BS002_FRAMES_PART_TWO)
             {
-                st.targetHeight = 300;
-                st.mode = 2;
+                DAT_1020b430[index].bs002.targetHeight = 300;
+                DAT_1020b430[index].bs002.mode = 2;
                 if (frames < 0x1e)
-                    st.angle += ((0x1e - frames) * direction) / 2;
-                RingGoal(goal, (float)st.angle / 1000.0f, 900.0f, st.height);
+                    DAT_1020b430[index].bs002.angle += ((0x1e - frames) * direction) / 2;
+                RingGoal(goal, (float)DAT_1020b430[index].bs002.angle / 1000.0f, 900.0f, DAT_1020b430[index].bs002.height);
                 goal.w = 1.0f;
                 move.Copy(goal - ownPos);
                 moveMode = BS002_MOVE_TOWARDS;
-                if (st.frames < 0x19)
+                if (DAT_1020b430[index].bs002.frames < 0x19)
                     model.targetHeading = Atan2(move.x, move.y) + BS002_PI;
                 if (DAT_104bfe24 < goal.z)
                 {
-                    st.frames = BS002_FRAMES_PART_TWO;
+                    DAT_1020b430[index].bs002.frames = BS002_FRAMES_PART_TWO;
                     FUN_100543a0(goal);
                     ringRadius = 900.0f;
                 }
-                if (goal.z <= DAT_104bfe24 && st.frames != 0xf)
-                    st.frames++;
+                if (goal.z <= DAT_104bfe24 && DAT_1020b430[index].bs002.frames != 0xf)
+                    DAT_1020b430[index].bs002.frames++;
                 else
                 {
                     FUN_100b9bb0(index, 0x23, 0, 0);
-                    st.frames++;
+                    DAT_1020b430[index].bs002.frames++;
                 }
             }
             else if (frames < BS002_FRAMES_PART_THREE)
             {
-                st.targetHeight = 300;
-                st.mode = 2;
+                DAT_1020b430[index].bs002.targetHeight = 300;
+                DAT_1020b430[index].bs002.mode = 2;
                 if (ringRadius < 800.0f)
                 {
-                    st.targetHeight = 0;
-                    st.mode = 0;
+                    DAT_1020b430[index].bs002.targetHeight = 0;
+                    DAT_1020b430[index].bs002.mode = 0;
                 }
                 ringRadius -= (float)(frames - BS002_FRAMES_PART_TWO) * 1.5f;
-                RingGoal(goal, (float)st.angle / 1000.0f, ringRadius, st.height);
+                RingGoal(goal, (float)DAT_1020b430[index].bs002.angle / 1000.0f, ringRadius, DAT_1020b430[index].bs002.height);
                 goal.w = 1.0f;
                 move.Copy(goal - ownPos);
                 moveMode = BS002_MOVE_TOWARDS;
                 FUN_100543a0(goal);
                 if (ringRadius >= 550.0f)
-                    st.frames++;
+                    DAT_1020b430[index].bs002.frames++;
                 else
                 {
-                    st.frames = BS002_FRAMES_PART_THREE;
-                    st.frames++;
+                    DAT_1020b430[index].bs002.frames = BS002_FRAMES_PART_THREE;
+                    DAT_1020b430[index].bs002.frames++;
                 }
             }
             else if (frames < BS002_FRAMES_PART_FOUR)
             {
-                st.targetHeight = 0;
+                DAT_1020b430[index].bs002.targetHeight = 0;
                 ringRadius -= 20.0f;
-                RingGoal(goal, (float)st.angle / 1000.0f, ringRadius, st.height);
+                RingGoal(goal, (float)DAT_1020b430[index].bs002.angle / 1000.0f, ringRadius, DAT_1020b430[index].bs002.height);
                 goal.w = 1.0f;
                 move.Copy(goal - ownPos);
                 moveMode = BS002_MOVE_TOWARDS;
                 if (ringRadius < -500.0f)
-                    st.frames = BS002_FRAMES_PART_FOUR;
-                if (st.frames % 2 == 0)
+                    DAT_1020b430[index].bs002.frames = BS002_FRAMES_PART_FOUR;
+                if (DAT_1020b430[index].bs002.frames % 2 == 0)
                     StartFloorSplash(index, model, ownPos);
-                if (st.frames % 6 == 0)
+                if (DAT_1020b430[index].bs002.frames % 6 == 0)
                     FUN_10065b10(index, 0x28f, 1, 0);
                 EffectOptions options;
                 options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
@@ -1386,132 +1384,132 @@ int Bs002_Update(int index)
                             &options);
                 StartEffect(index, 0x456, where, &DAT_1021bdd4[index][BS002_NODE_TAIL_B]->worldMatrix, 0, 0, 0,
                             &options);
-                st.frames++;
+                DAT_1020b430[index].bs002.frames++;
             }
             else
             {
                 if (frames < 4000)
                 {
-                    st.targetHeight = 200;
+                    DAT_1020b430[index].bs002.targetHeight = 200;
                     if (frames > 0xbc0)
-                        st.targetHeight = -600;
+                        DAT_1020b430[index].bs002.targetHeight = -600;
                     float fall = 20.0f - (float)(frames - BS002_FRAMES_PART_FOUR) * 0.66667f;
                     if (fall < 0.0f)
                         fall = 0.0f;
                     ringRadius -= fall;
-                    RingGoal(goal, (float)st.angle / 1000.0f, ringRadius, st.height);
+                    RingGoal(goal, (float)DAT_1020b430[index].bs002.angle / 1000.0f, ringRadius, DAT_1020b430[index].bs002.height);
                     goal.w = 1.0f;
                     move.Copy(goal - ownPos);
                     moveMode = BS002_MOVE_TOWARDS;
-                    if ((float)st.height < DAT_104bfe24)
+                    if ((float)DAT_1020b430[index].bs002.height < DAT_104bfe24)
                         FUN_100543a0(goal);
-                    if ((float)st.height < DAT_104bfe24 - 100.0f)
+                    if ((float)DAT_1020b430[index].bs002.height < DAT_104bfe24 - 100.0f)
                     {
-                        int angle = st.angle;
-                        st.direction = -st.direction;
-                        st.state = BS002_STATE_RING_WALK;
-                        st.frames = -1;
+                        int angle = DAT_1020b430[index].bs002.angle;
+                        DAT_1020b430[index].bs002.direction = -DAT_1020b430[index].bs002.direction;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_RING_WALK;
+                        DAT_1020b430[index].bs002.frames = -1;
                         ringRadius = 1000.0f;
-                        st.angle = angle + 0xc46;
+                        DAT_1020b430[index].bs002.angle = angle + 0xc46;
                     }
                 }
-                st.frames++;
+                DAT_1020b430[index].bs002.frames++;
             }
         }
-        else if (st.state == BS002_STATE_CLAW_RUN)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_CLAW_RUN)
         {
             // Runs round the ring clawing at the player (one swing every few frames, rolled for the end).
             slot.stats[13] = 1;
             DAT_1021f6c0[index] = 1;
             motion = 0x21;
-            st.angle += st.direction * 0xf;
-            st.targetHeight = (int)(DAT_104bfe24 * 0.0f);
-            RingGoal(goal, (float)st.angle / 1000.0f, DAT_10255160[index][1], st.height);
+            DAT_1020b430[index].bs002.angle += DAT_1020b430[index].bs002.direction * 0xf;
+            DAT_1020b430[index].bs002.targetHeight = (int)(DAT_104bfe24 * 0.0f);
+            RingGoal(goal, (float)DAT_1020b430[index].bs002.angle / 1000.0f, DAT_10255160[index][1], DAT_1020b430[index].bs002.height);
             move.Copy(goal - ownPos);
             moveMode = BS002_MOVE_TOWARDS;
-            model.targetHeading = Atan2(move.x, move.y) + BS002_PI - (float)st.direction * 0.6f;
-            st.frames++;
-            st.angle = WrapRingAngle(st.angle);
+            model.targetHeading = Atan2(move.x, move.y) + BS002_PI - (float)DAT_1020b430[index].bs002.direction * 0.6f;
+            DAT_1020b430[index].bs002.frames++;
+            DAT_1020b430[index].bs002.angle = WrapRingAngle(DAT_1020b430[index].bs002.angle);
             bool atStop = false;
             for (int step = 0; step < BS002_RING_STEPS; step++)
             {
-                if (RingAngleGap(st.angle, sRingAngles[step]) < 0x14)
+                if (RingAngleGap(DAT_1020b430[index].bs002.angle, sRingAngles[step]) < 0x14)
                     atStop = true;
             }
-            if (st.frames == 1)
+            if (DAT_1020b430[index].bs002.frames == 1)
                 FUN_100b9bb0(index, 0x23, 0, 1);
-            int frames = st.frames;
+            int frames = DAT_1020b430[index].bs002.frames;
             if (frames >= 0x97 && (frames - 0x96) > FUN_1013f880() % 5000)
-                st.state = BS002_STATE_PICK;
+                DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
             else if (frames > 299 && atStop)
             {
-                st.state = BS002_STATE_PICK;
-                st.lunging = 1;
+                DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
+                DAT_1020b430[index].bs002.lunging = 1;
             }
-            if ((float)st.height > DAT_104bfe24 - 150.0f && st.frames > 10)
-                ClawTrail(index, model, slot, st, ownPos, playerPos);
+            if ((float)DAT_1020b430[index].bs002.height > DAT_104bfe24 - 150.0f && DAT_1020b430[index].bs002.frames > 10)
+                ClawTrail(index, model, slot, DAT_1020b430[index].bs002, ownPos, playerPos);
         }
-        else if (st.state == BS002_STATE_SWIPE)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_SWIPE)
         {
-            int frames = ++st.frames;
+            int frames = ++DAT_1020b430[index].bs002.frames;
             slot.stats[13] = 1;
             motion = 10;
             goal.Copy(ownPos);
-            goal.z = (float)st.height;
+            goal.z = (float)DAT_1020b430[index].bs002.height;
             moveMode = BS002_MOVE_TOWARDS;
             if (frames > 0x14)
             {
-                st.state = BS002_STATE_CLIMB;
-                st.frames = 0;
-                ex.lungeReady = 1;
+                DAT_1020b430[index].bs002.state = BS002_STATE_CLIMB;
+                DAT_1020b430[index].bs002.frames = 0;
+                DAT_1020b3f0[index].lungeReady = 1;
                 FUN_100543a0(ownPos);
             }
-            if (st.frames == 0xf)
+            if (DAT_1020b430[index].bs002.frames == 0xf)
                 FUN_100b9bb0(index, 0x25, 0, 1);
-            st.targetHeight = st.frames > 0xf ? 0 : -400;
+            DAT_1020b430[index].bs002.targetHeight = DAT_1020b430[index].bs002.frames > 0xf ? 0 : -400;
         }
-        else if (st.state == BS002_STATE_STAGGER)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_STAGGER)
         {
             // Staggers back and slumps (a long motion; the height follows a fixed table of frames), then comes
             // back on the ring. Dust and splashes at the burst frames.
             int splash = 0;
             float eased;
-            ++st.frames;
+            ++DAT_1020b430[index].bs002.frames;
             slot.stats[13] = 1;
-            ex.lastHealth = slot.stats[STAT_HEALTH];
+            DAT_1020b3f0[index].lastHealth = slot.stats[STAT_HEALTH];
             armed = 0;
-            st.mode = 3;
-            st.targetHeight = -45;
-            ex.attacking = 1;
-            goal.Set(ownPos.x, ownPos.y, (float)st.height, 1.0f);
+            DAT_1020b430[index].bs002.mode = 3;
+            DAT_1020b430[index].bs002.targetHeight = -45;
+            DAT_1020b3f0[index].attacking = 1;
+            goal.Set(ownPos.x, ownPos.y, (float)DAT_1020b430[index].bs002.height, 1.0f);
             moveMode = BS002_MOVE_TOWARDS;
-            int frames = st.frames;
+            int frames = DAT_1020b430[index].bs002.frames;
             if (frames < 100 && frames > 0x13)
             {
                 float steps = (float)(100 - frames);
-                goal.Set(ownPos.x - ownPos.x / steps, ownPos.y - ownPos.y / steps, (float)st.height, 0.0f);
+                goal.Set(ownPos.x - ownPos.x / steps, ownPos.y - ownPos.y / steps, (float)DAT_1020b430[index].bs002.height, 0.0f);
                 DAT_10802bf8[index].position.w = (float)atan2(-ownPos.x, -ownPos.y) + BS002_PI;
             }
-            if (st.frames == 1)
+            if (DAT_1020b430[index].bs002.frames == 1)
             {
                 motion = 0x12;
-                ex.roarStep = 0;
+                DAT_1020b3f0[index].roarStep = 0;
                 restart = 1;
             }
-            frames = st.frames;
+            frames = DAT_1020b430[index].bs002.frames;
             if (frames < 0x14)
             {
-                st.targetHeight = -400;
-                st.mode = 0;
+                DAT_1020b430[index].bs002.targetHeight = -400;
+                DAT_1020b430[index].bs002.mode = 0;
             }
             else if (frames > 0x14 && frames < 0x43)
             {
-                FUN_10034810((float)st.height, 1100.0f, &eased, (float)(0x49 - frames), 1);
+                FUN_10034810((float)DAT_1020b430[index].bs002.height, 1100.0f, &eased, (float)(0x49 - frames), 1);
                 float mark = DAT_104bfe24 - 100.0f;
-                if (mark < eased && (float)st.height < mark)
+                if (mark < eased && (float)DAT_1020b430[index].bs002.height < mark)
                     FUN_100543a0(ownPos);
-                st.height = (int)eased;
-                st.targetHeight = st.height;
+                DAT_1020b430[index].bs002.height = (int)eased;
+                DAT_1020b430[index].bs002.targetHeight = DAT_1020b430[index].bs002.height;
             }
             else if (frames == 0x50)
             {
@@ -1548,25 +1546,25 @@ int Bs002_Update(int index)
                         {
                             if (frames > 0x88 && frames < 0x94)
                             {
-                                ex.roarStep = 10;
-                                FUN_10034810((float)st.height, -200.0f, &eased, (float)(0x94 - frames), 1);
-                                st.height = (int)eased;
-                                st.targetHeight = st.height;
+                                DAT_1020b3f0[index].roarStep = 10;
+                                FUN_10034810((float)DAT_1020b430[index].bs002.height, -200.0f, &eased, (float)(0x94 - frames), 1);
+                                DAT_1020b430[index].bs002.height = (int)eased;
+                                DAT_1020b430[index].bs002.targetHeight = DAT_1020b430[index].bs002.height;
                                 splash = 2;
                             }
                             else if (frames == 0x94)
                             {
-                                ex.phase = 3;
-                                st.height = -200;
-                                st.targetHeight = -200;
+                                DAT_1020b3f0[index].phase = 3;
+                                DAT_1020b430[index].bs002.height = -200;
+                                DAT_1020b430[index].bs002.targetHeight = -200;
                                 StartDebrisPuffs(index, model, 2);
                                 splash = 2;
                             }
                             else if (frames >= 0x95 && frames <= 0x111)
                             {
-                                st.mode = 0;
-                                st.height = -200 - (frames - 0x94);
-                                st.targetHeight = st.height;
+                                DAT_1020b430[index].bs002.mode = 0;
+                                DAT_1020b430[index].bs002.height = -200 - (frames - 0x94);
+                                DAT_1020b430[index].bs002.targetHeight = DAT_1020b430[index].bs002.height;
                                 if (frames > 0xb8)
                                 {
                                     motion = 0;
@@ -1576,8 +1574,8 @@ int Bs002_Update(int index)
                             else if (frames == 0x112)
                             {
                                 FUN_100b9bb0(index, 0x2f, 1, 0);
-                                st.state = BS002_STATE_PICK;
-                                st.mode = 0;
+                                DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
+                                DAT_1020b430[index].bs002.mode = 0;
                                 if (DAT_10255f08 != 0)
                                 {
                                     Node *marker = DAT_10255f08->Find("dai", 0);
@@ -1588,39 +1586,39 @@ int Bs002_Update(int index)
                                 temp.Fill(0.0f);
                                 temp.y = -1.0f;
                                 temp.RotateZ(model.heading);
-                                st.angle = (int)(Atan2(temp.y, temp.x) * 1000.0f);
+                                DAT_1020b430[index].bs002.angle = (int)(Atan2(temp.y, temp.x) * 1000.0f);
                             }
                         }
                         else
                         {
-                            FUN_10034810((float)st.height, 150.0f, &eased, (float)(0x89 - frames), 1);
-                            st.height = (int)eased;
-                            st.targetHeight = st.height;
+                            FUN_10034810((float)DAT_1020b430[index].bs002.height, 150.0f, &eased, (float)(0x89 - frames), 1);
+                            DAT_1020b430[index].bs002.height = (int)eased;
+                            DAT_1020b430[index].bs002.targetHeight = DAT_1020b430[index].bs002.height;
                             splash = 2;
                         }
                     }
                     else
                     {
-                        FUN_10034810((float)st.height, -145.0f, &eased, (float)(0x85 - frames), 1);
-                        st.height = (int)eased;
-                        st.targetHeight = st.height;
+                        FUN_10034810((float)DAT_1020b430[index].bs002.height, -145.0f, &eased, (float)(0x85 - frames), 1);
+                        DAT_1020b430[index].bs002.height = (int)eased;
+                        DAT_1020b430[index].bs002.targetHeight = DAT_1020b430[index].bs002.height;
                     }
                 }
                 else
                 {
-                    FUN_10034810((float)st.height, 300.0f, &eased, (float)(0x7d - frames), 1);
-                    st.height = (int)eased;
-                    st.targetHeight = st.height;
+                    FUN_10034810((float)DAT_1020b430[index].bs002.height, 300.0f, &eased, (float)(0x7d - frames), 1);
+                    DAT_1020b430[index].bs002.height = (int)eased;
+                    DAT_1020b430[index].bs002.targetHeight = DAT_1020b430[index].bs002.height;
                 }
             }
             else
             {
                 StartArmGlow(index, model, DAT_1042d918[BS002_BONE_LEFT_ARM], DAT_1042d918[BS002_BONE_RIGHT_ARM]);
-                FUN_10034810((float)st.height, -50.0f, &eased, (float)(0x72 - st.frames), 1);
-                st.height = (int)eased;
-                st.targetHeight = st.height;
+                FUN_10034810((float)DAT_1020b430[index].bs002.height, -50.0f, &eased, (float)(0x72 - DAT_1020b430[index].bs002.frames), 1);
+                DAT_1020b430[index].bs002.height = (int)eased;
+                DAT_1020b430[index].bs002.targetHeight = DAT_1020b430[index].bs002.height;
             }
-            frames = st.frames;
+            frames = DAT_1020b430[index].bs002.frames;
             if (frames < 0x3c)
                 DAT_1101dddc = 150.0f - (float)(frames * 5);
             else if (frames < 0xf5)
@@ -1630,25 +1628,25 @@ int Bs002_Update(int index)
             if (splash != 0)
                 StartStaggerSplashes(index, model);
         }
-        else if (st.state == BS002_STATE_CLAW_B)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_CLAW_B)
         {
-            int frames = ++st.frames;
+            int frames = ++DAT_1020b430[index].bs002.frames;
             slot.stats[13] = 0;
-            ex.attacking = 1;
+            DAT_1020b3f0[index].attacking = 1;
             motion = 10;
             goal.Copy(ownPos);
-            goal.z = (float)st.height;
+            goal.z = (float)DAT_1020b430[index].bs002.height;
             moveMode = BS002_MOVE_TOWARDS;
             if (frames > 0x23)
                 motion = 0xb;
-            st.targetHeight = frames < 0x10 ? -400 : 0;
+            DAT_1020b430[index].bs002.targetHeight = frames < 0x10 ? -400 : 0;
             if (frames > 0x1e)
             {
                 slot.stats[13] = 0;
                 model.targetHeading = Atan2(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS002_PI;
             }
-            frames = st.frames;
-            ex.attacking = 0;
+            frames = DAT_1020b430[index].bs002.frames;
+            DAT_1020b3f0[index].attacking = 0;
             if (frames == 0x3c)
                 StartPillar(index, model);
             if (frames > 0x3c && frames < 0x5a && frames % 4 == 0)
@@ -1656,22 +1654,22 @@ int Bs002_Update(int index)
                 where.Fill(0.0f);
                 StartEffect(index, 0x703, where, &Bs002Bone(BS002_BONE_SPINE)->worldMatrix, 0, 0, 0, 0);
             }
-            frames = st.frames;
+            frames = DAT_1020b430[index].bs002.frames;
             if (frames >= 0x3d && frames <= 0x149)
             {
-                ex.tinted = 1;
+                DAT_1020b3f0[index].tinted = 1;
                 FUN_1000ec70(0xf, 0.45f, 0.45f, 0.45f, 1.0f);
             }
             else if (frames == 0x14a)
             {
-                ex.tinted = 0;
+                DAT_1020b3f0[index].tinted = 0;
                 FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
             }
-            frames = st.frames;
+            frames = DAT_1020b430[index].bs002.frames;
             if (frames >= 0x5a && frames <= 0x12a)
             {
                 motion = 0xc;
-                ex.attacking = 1;
+                DAT_1020b3f0[index].attacking = 1;
                 if (frames % 0x3c == 0)
                 {
                     Matrix4 pose;
@@ -1679,7 +1677,7 @@ int Bs002_Update(int index)
                     pose.SetIdentity();
                     pose.SetTranslation(ownPos);
                     pose._43 = DAT_104bfe24;
-                    st.motion = 0xb;
+                    DAT_1020b430[index].bs002.motion = 0xb;
                     restart = 1;
                     options.m_0004 = slot.stats[STAT_EFFECT_PARAM];
                     StartEffect(index, 0x70c, where, 0, 0, 5, &pose, &options);
@@ -1687,8 +1685,8 @@ int Bs002_Update(int index)
                 }
             }
             else if (frames == 299)
-                st.motion = 10;
-            frames = st.frames;
+                DAT_1020b430[index].bs002.motion = 10;
+            frames = DAT_1020b430[index].bs002.frames;
             if (frames < 0x3c)
                 DAT_1101dddc = 150.0f - (float)(frames * 3);
             else if (frames >= 0x12d && frames <= 0x167)
@@ -1697,27 +1695,27 @@ int Bs002_Update(int index)
                 DAT_1101dddc = -30.0f;
             if (frames == 0x28a)
             {
-                st.state = distance2D >= 400.0f || playerPos.z <= DAT_104bfe24 ? BS002_STATE_PICK : BS002_STATE_STOMP;
-                st.frames = 0;
+                DAT_1020b430[index].bs002.state = distance2D >= 400.0f || playerPos.z <= DAT_104bfe24 ? BS002_STATE_PICK : BS002_STATE_STOMP;
+                DAT_1020b430[index].bs002.frames = 0;
             }
         }
-        else if (st.state == BS002_STATE_CLAW_C)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_CLAW_C)
         {
             slot.stats[13] = 0;
             motion = 10;
-            int frames = ++st.frames;
+            int frames = ++DAT_1020b430[index].bs002.frames;
             goal.Copy(ownPos);
-            goal.z = (float)st.height;
+            goal.z = (float)DAT_1020b430[index].bs002.height;
             moveMode = BS002_MOVE_TOWARDS;
             if (frames > 0x23)
                 motion = 0xb;
-            st.targetHeight = frames < 0x10 ? -400 : 0;
+            DAT_1020b430[index].bs002.targetHeight = frames < 0x10 ? -400 : 0;
             if (frames % 0xf == 0 && frames > 0x2d && frames < 0x10e)
                 checkTargets = 1;
-            ex.attacking = 0;
+            DAT_1020b3f0[index].attacking = 0;
             if (frames >= 0x1f && frames <= 0x10d)
             {
-                ex.tinted = 1;
+                DAT_1020b3f0[index].tinted = 1;
                 FUN_1000ec70(0xf, 0.5f, 0.5f, 0.8f, 1.0f);
                 where.Copy(model.matrix.GetTranslation());
                 where.x += (float)(FUN_1013f880() % 200 - 100);
@@ -1727,9 +1725,9 @@ int Bs002_Update(int index)
                 pose.SetIdentity();
                 pose.SetTranslation(where);
                 StartEffect(index, 0x6d6, where, 0, 0, 0, &pose, 0);
-                ex.attacking = 1;
+                DAT_1020b3f0[index].attacking = 1;
                 motion = 0x29;
-                if (st.frames == 0x1f)
+                if (DAT_1020b430[index].bs002.frames == 0x1f)
                 {
                     restart = 1;
                     FUN_10065b10(index, 0x292, 1, 0);
@@ -1738,10 +1736,10 @@ int Bs002_Update(int index)
             }
             else if (frames == 0x10e)
             {
-                ex.tinted = 0;
+                DAT_1020b3f0[index].tinted = 0;
                 FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
             }
-            frames = st.frames;
+            frames = DAT_1020b430[index].bs002.frames;
             if (frames < 0x3c)
                 DAT_1101dddc = 150.0f - (float)(frames * 3);
             else if (frames >= 0x10f && frames <= 0x15d)
@@ -1749,69 +1747,69 @@ int Bs002_Update(int index)
             else if (frames < 0x10f)
                 DAT_1101dddc = -30.0f;
             if (frames == 0x2a8)
-                st.state = BS002_STATE_PICK;
+                DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
             model.targetHeading = Atan2(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + BS002_PI;
         }
-        else if (st.state == BS002_STATE_PICK)
+        else if (DAT_1020b430[index].bs002.state == BS002_STATE_PICK)
         {
-            st.frames = 0;
-            ex.damageTaken = 0;
+            DAT_1020b430[index].bs002.frames = 0;
+            DAT_1020b3f0[index].damageTaken = 0;
             if (armed == 0)
             {
-                if (st.lastState == BS002_STATE_RING_WALK)
+                if (DAT_1020b430[index].bs002.lastState == BS002_STATE_RING_WALK)
                 {
-                    if (st.direction > 0)
+                    if (DAT_1020b430[index].bs002.direction > 0)
                     {
-                        st.state = BS002_STATE_CIRCLE_RIGHT;
-                        st.direction = -1;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CIRCLE_RIGHT;
+                        DAT_1020b430[index].bs002.direction = -1;
                     }
-                    else if (st.direction < 0)
+                    else if (DAT_1020b430[index].bs002.direction < 0)
                     {
-                        st.state = BS002_STATE_CIRCLE_LEFT;
-                        st.direction = 1;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CIRCLE_LEFT;
+                        DAT_1020b430[index].bs002.direction = 1;
                     }
                 }
-                else if (st.lastState == BS002_STATE_STAGGER || st.lastState == BS002_STATE_CLAW_RUN)
-                    st.state = BS002_STATE_RING_WALK;
+                else if (DAT_1020b430[index].bs002.lastState == BS002_STATE_STAGGER || DAT_1020b430[index].bs002.lastState == BS002_STATE_CLAW_RUN)
+                    DAT_1020b430[index].bs002.state = BS002_STATE_RING_WALK;
                 else
-                    st.state = BS002_STATE_RING_LUNGE;
+                    DAT_1020b430[index].bs002.state = BS002_STATE_RING_LUNGE;
             }
             else if (DAT_10874848.TestScriptFlag(BS002_DIFFICULTY_FLAG) == 1 ||
                      slot.stats[STAT_MAX_HEALTH] / 2 <= slot.stats[STAT_HEALTH])
             {
-                if (st.lastState == BS002_STATE_RING_WALK)
+                if (DAT_1020b430[index].bs002.lastState == BS002_STATE_RING_WALK)
                 {
                     int roll = FUN_1013f880() % 3;
                     if (roll == 0)
-                        st.state = BS002_STATE_RING_SHOTS;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_RING_SHOTS;
                     else if (roll == 1)
-                        st.state = BS002_STATE_GLARE;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_GLARE;
                     else if (roll == 2)
-                        st.state = BS002_STATE_WHIRL;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_WHIRL;
                 }
             }
             else
             {
-                switch (st.lastState)
+                switch (DAT_1020b430[index].bs002.lastState)
                 {
                 case BS002_STATE_RING_WALK:
                 case BS002_STATE_CLIMB:
                     switch (FUN_1013f880() % 5)
                     {
                     case 0:
-                        st.state = BS002_STATE_GLARE;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_GLARE;
                         break;
                     case 1:
-                        st.state = BS002_STATE_CLAW_RUN;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLAW_RUN;
                         break;
                     case 2:
-                        st.state = BS002_STATE_SWIPE;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_SWIPE;
                         break;
                     case 3:
-                        st.state = BS002_STATE_CLAW_B;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLAW_B;
                         break;
                     case 4:
-                        st.state = BS002_STATE_CLAW_C;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLAW_C;
                         break;
                     }
                     break;
@@ -1819,13 +1817,13 @@ int Bs002_Update(int index)
                     switch (FUN_1013f880() % 3)
                     {
                     case 0:
-                        st.state = BS002_STATE_GLARE;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_GLARE;
                         break;
                     case 1:
-                        st.state = BS002_STATE_CLAW_B;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLAW_B;
                         break;
                     case 2:
-                        st.state = BS002_STATE_CLAW_C;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLAW_C;
                         break;
                     }
                     break;
@@ -1833,78 +1831,78 @@ int Bs002_Update(int index)
                     switch (FUN_1013f880() % 5)
                     {
                     case 0:
-                        st.state = BS002_STATE_GLARE;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_GLARE;
                         break;
                     case 1:
-                        st.state = BS002_STATE_CLAW_RUN;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLAW_RUN;
                         break;
                     case 2:
-                        st.state = BS002_STATE_CLIMB;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLIMB;
                         break;
                     case 3:
-                        st.state = BS002_STATE_CLAW_B;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLAW_B;
                         break;
                     case 4:
-                        st.state = BS002_STATE_CLAW_C;
+                        DAT_1020b430[index].bs002.state = BS002_STATE_CLAW_C;
                         break;
                     }
                     break;
                 }
             }
-            if (ex.phase == 1)
+            if (DAT_1020b3f0[index].phase == 1)
             {
-                st.state = BS002_STATE_STAGGER;
-                ex.phase = 2;
+                DAT_1020b430[index].bs002.state = BS002_STATE_STAGGER;
+                DAT_1020b3f0[index].phase = 2;
             }
-            ex.lungeReady = 0;
+            DAT_1020b3f0[index].lungeReady = 0;
         }
     }
     else
     {
         // The reaction to a hit: the first time it falls below half health it roars (reaction 1), and after enough
         // damage since the last stagger it staggers (reaction 2); every hit gets a voice line.
-        st.motion = -1;
+        DAT_1020b430[index].bs002.motion = -1;
         reaction = 0;
-        if (DAT_10c635f8 != 1 && ex.phase == 0 && slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 2)
+        if (DAT_10c635f8 != 1 && DAT_1020b3f0[index].phase == 0 && slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 2)
         {
             reaction = 1;
-            ex.phase = 1;
-            if (st.state > 0 && (st.state < 8 || st.state == 9))
-                st.state = BS002_STATE_PICK;
-            ex.lastHealth = slot.stats[STAT_HEALTH];
+            DAT_1020b3f0[index].phase = 1;
+            if (DAT_1020b430[index].bs002.state > 0 && (DAT_1020b430[index].bs002.state < 8 || DAT_1020b430[index].bs002.state == 9))
+                DAT_1020b430[index].bs002.state = BS002_STATE_PICK;
+            DAT_1020b3f0[index].lastHealth = slot.stats[STAT_HEALTH];
         }
-        else if (ex.lastHealth != slot.stats[STAT_HEALTH])
+        else if (DAT_1020b3f0[index].lastHealth != slot.stats[STAT_HEALTH])
         {
-            if (ex.phase == 1 || st.state == BS002_STATE_STAGGER)
-                ex.damageTaken = 0;
+            if (DAT_1020b3f0[index].phase == 1 || DAT_1020b430[index].bs002.state == BS002_STATE_STAGGER)
+                DAT_1020b3f0[index].damageTaken = 0;
             else
             {
-                ex.damageTaken += ex.lastHealth - slot.stats[STAT_HEALTH];
+                DAT_1020b3f0[index].damageTaken += DAT_1020b3f0[index].lastHealth - slot.stats[STAT_HEALTH];
                 bool normalPlay = DAT_10c635f8 != 1;
-                if ((normalPlay && slot.stats[STAT_MAX_HEALTH] / 9 < ex.damageTaken) ||
-                    slot.stats[STAT_MAX_HEALTH] * 3 / 10 < ex.damageTaken)
+                if ((normalPlay && slot.stats[STAT_MAX_HEALTH] / 9 < DAT_1020b3f0[index].damageTaken) ||
+                    slot.stats[STAT_MAX_HEALTH] * 3 / 10 < DAT_1020b3f0[index].damageTaken)
                 {
                     reaction = 2;
-                    st.state = BS002_STATE_CLIMB;
-                    st.frames = 0;
-                    ex.damageTaken = 0;
+                    DAT_1020b430[index].bs002.state = BS002_STATE_CLIMB;
+                    DAT_1020b430[index].bs002.frames = 0;
+                    DAT_1020b3f0[index].damageTaken = 0;
                 }
             }
-            ex.lastHealth = slot.stats[STAT_HEALTH];
+            DAT_1020b3f0[index].lastHealth = slot.stats[STAT_HEALTH];
         }
         if (hitLevel > 6)
             DAT_102550e0[index] = 6;
-        if (slot.stats[13] != 0 || ex.attacking != 0)
+        if (slot.stats[13] != 0 || DAT_1020b3f0[index].attacking != 0)
         {
-            int savedFrame = st.motionFrame;
+            int savedFrame = DAT_1020b430[index].bs002.motionFrame;
             DAT_102550e0[index] = 0;
             if (savedFrame < 0)
-                model.PlayMotion(st.motionLayer, 1, 3, 1.0f);
+                model.PlayMotion(DAT_1020b430[index].bs002.motionLayer, 1, 3, 1.0f);
             else
             {
-                model.PlayMotion(st.motionLayer, 1, 0, 1.0f);
-                model.motion->frame = st.motionFrame;
-                model.motion->m_0004 = (float)st.motionFrame;
+                model.PlayMotion(DAT_1020b430[index].bs002.motionLayer, 1, 0, 1.0f);
+                model.motion->frame = DAT_1020b430[index].bs002.motionFrame;
+                model.motion->m_0004 = (float)DAT_1020b430[index].bs002.motionFrame;
                 model.motion->Advance();
             }
         }
@@ -1925,12 +1923,12 @@ int Bs002_Update(int index)
     }
 
     // The end of every frame: remember the state, vary the mood now and then, keep the lunge on the ring's steps.
-    if (st.state != BS002_STATE_PICK)
+    if (DAT_1020b430[index].bs002.state != BS002_STATE_PICK)
     {
-        st.lastState = st.state;
+        DAT_1020b430[index].bs002.lastState = DAT_1020b430[index].bs002.state;
         int roll = FUN_1013f880();
-        if (st.frames % 10 == 5 && ((ex.phase > 1 && roll % 500 < 10) || roll % 500 < 5))
-            ex.variant = FUN_1013f880() % 3 + 5;
+        if (DAT_1020b430[index].bs002.frames % 10 == 5 && ((DAT_1020b3f0[index].phase > 1 && roll % 500 < 10) || roll % 500 < 5))
+            DAT_1020b3f0[index].variant = FUN_1013f880() % 3 + 5;
     }
     if (model.motionFrame > 0x82 && model.motionFrame < 0xab)
     {
@@ -1963,7 +1961,7 @@ int Bs002_Update(int index)
             goal.x = pull.x + goal.x;
             goal.y = pull.y + goal.y;
         }
-        int gap = stepAngle - st.angle;
+        int gap = stepAngle - DAT_1020b430[index].bs002.angle;
         if ((gap < 0 ? -gap : gap) > 1)
         {
             if (gap > 0xc46)
@@ -1971,33 +1969,33 @@ int Bs002_Update(int index)
             if (gap < -0xc46)
                 gap += 0x1828 + ((unsigned)(-gap - 0xc47) / 0x1828) * 0x1828;
             if (gap > 0)
-                st.angle += 10;
+                DAT_1020b430[index].bs002.angle += 10;
             if (gap < 0)
-                st.angle -= 10;
+                DAT_1020b430[index].bs002.angle -= 10;
         }
     }
 
     // The height follows its target, faster the further away it is.
-    int height = st.height;
-    int targetHeight = st.targetHeight;
+    int height = DAT_1020b430[index].bs002.height;
+    int targetHeight = DAT_1020b430[index].bs002.targetHeight;
     int heightGap = height - targetHeight;
-    if ((heightGap < 0 ? -heightGap : heightGap) > 0x13 && st.mode != 3)
+    if ((heightGap < 0 ? -heightGap : heightGap) > 0x13 && DAT_1020b430[index].bs002.mode != 3)
     {
         if (height < targetHeight)
         {
-            st.riseSpeed = (int)(float)(targetHeight - height);
-            if (st.riseSpeed < 100)
-                st.riseSpeed = 100;
-            st.height = st.riseSpeed / 100 + height;
+            DAT_1020b430[index].bs002.riseSpeed = (int)(float)(targetHeight - height);
+            if (DAT_1020b430[index].bs002.riseSpeed < 100)
+                DAT_1020b430[index].bs002.riseSpeed = 100;
+            DAT_1020b430[index].bs002.height = DAT_1020b430[index].bs002.riseSpeed / 100 + height;
         }
         else if (targetHeight < height)
         {
-            if (st.riseSpeed < 100)
-                st.riseSpeed = 100;
-            st.height = height - st.riseSpeed / 100;
+            if (DAT_1020b430[index].bs002.riseSpeed < 100)
+                DAT_1020b430[index].bs002.riseSpeed = 100;
+            DAT_1020b430[index].bs002.height = height - DAT_1020b430[index].bs002.riseSpeed / 100;
         }
     }
-    st.mode = 0;
+    DAT_1020b430[index].bs002.mode = 0;
 
     // Dust where its bones brush the floor: up to four puffs a frame, going through the eight bones in turn.
     if ((DAT_104bf890 & 1) == 0)
@@ -2006,7 +2004,7 @@ int Bs002_Update(int index)
         EffectOptions options;
         Vec4 where2;
         int spawned = 0;
-        int first = ex.shotRing;
+        int first = DAT_1020b3f0[index].shotRing;
         int next = first;
         bool secondPass = true;
         pose.SetIdentity();
@@ -2044,13 +2042,13 @@ int Bs002_Update(int index)
                 next++;
             }
         }
-        ex.shotRing = next;
+        DAT_1020b3f0[index].shotRing = next;
         if (next > 8)
-            ex.shotRing = next - 8;
+            DAT_1020b3f0[index].shotRing = next - 8;
     }
 
     // Crossing the floor line (its head going up or down through 8 above the floor) splashes and blasts the balloons.
-    if (st.state != BS002_STATE_CLAW_RUN)
+    if (DAT_1020b430[index].bs002.state != BS002_STATE_CLAW_RUN)
     {
         float line = DAT_104bfe24 + 8.0f;
         float headBefore = DAT_10255160[index][0];
@@ -2129,7 +2127,7 @@ int Bs002_Update(int index)
             }
         }
         bool special = DAT_10db9380 == 2;
-        if (nearest >= 0 && !special && nearest != st.markedTarget)
+        if (nearest >= 0 && !special && nearest != DAT_1020b430[index].bs002.markedTarget)
         {
             Matrix4 pose;
             EffectOptions options;
@@ -2143,11 +2141,11 @@ int Bs002_Update(int index)
             pose.SetTranslation(spot);
             pose._43 += 15.0f;
             StartEffect(index, 0x702, none, 0, 0, 0, &pose, &options);
-            st.markedTarget = nearest;
+            DAT_1020b430[index].bs002.markedTarget = nearest;
             Vec4 soundAt = pose.GetTranslation();
             FUN_10054550(0x291, 0x23, &soundAt);
         }
-        else if (special && st.markedTarget != -1)
+        else if (special && DAT_1020b430[index].bs002.markedTarget != -1)
         {
             Matrix4 pose;
             EffectOptions options;
@@ -2159,30 +2157,30 @@ int Bs002_Update(int index)
             pose.SetTranslation(playerPos);
             pose._43 = -22.0f;
             DAT_10daaa80.Start(0x702, none, -1, -1, 0, 0, 0, &pose, &options, &DAT_10219770[index]);
-            st.markedTarget = -1;
+            DAT_1020b430[index].bs002.markedTarget = -1;
             Vec4 soundAt = pose.GetTranslation();
             FUN_10054550(0x291, 0x23, &soundAt);
         }
         else
-            st.markedTarget = 0;
+            DAT_1020b430[index].bs002.markedTarget = 0;
     }
 
     // The motion the state asked for (restarted when it changed or the state asked for a restart), and the frame it is at,
     // kept for the reaction branch of the next frame.
-    if (motion > -1 && (st.motion != motion || restart != 0))
+    if (motion > -1 && (DAT_1020b430[index].bs002.motion != motion || restart != 0))
     {
         model.PlayMotion(motion, restart, blendFrames, 1.0f);
-        st.motion = motion;
+        DAT_1020b430[index].bs002.motion = motion;
     }
     if (model.motion->blending == 0)
     {
-        st.motionLayer = model.motion->layer;
-        st.motionFrame = model.motion->frame;
+        DAT_1020b430[index].bs002.motionLayer = model.motion->layer;
+        DAT_1020b430[index].bs002.motionFrame = model.motion->frame;
     }
     else
     {
-        st.motionLayer = model.motion->nextLayer;
-        st.motionFrame = -1;
+        DAT_1020b430[index].bs002.motionLayer = model.motion->nextLayer;
+        DAT_1020b430[index].bs002.motionFrame = -1;
     }
 
     // Heading: turns towards the target heading by a third of the shortest way round (3.5 -> the original's divisor).

@@ -1,6 +1,6 @@
 {
  "measures": {
-  "fuzzy_match_percent": 50.071,
+  "fuzzy_match_percent": 50.5269,
   "total_code": "1720206",
   "matched_code": "345498",
   "matched_code_percent": 20.0847,
@@ -2725,7 +2725,7 @@
   {
    "name": "app/bs001_update",
    "measures": {
-    "fuzzy_match_percent": 29.2824,
+    "fuzzy_match_percent": 29.1584,
     "total_code": "23098",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -2750,14 +2750,14 @@
     {
      "name": ".text",
      "size": "23098",
-     "fuzzy_match_percent": 29.2824
+     "fuzzy_match_percent": 29.1584
     }
    ],
    "functions": [
     {
      "name": "?Bs001_Update@@YAHH@Z",
      "size": "23098",
-     "fuzzy_match_percent": 29.2824,
+     "fuzzy_match_percent": 29.1584,
      "metadata": {
       "virtual_address": "269534800"
      }
@@ -2771,7 +2771,7 @@
   {
    "name": "app/bs002_update",
    "measures": {
-    "fuzzy_match_percent": 21.1058,
+    "fuzzy_match_percent": 26.8706,
     "total_code": "32656",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -2796,14 +2796,14 @@
     {
      "name": ".text",
      "size": "32656",
-     "fuzzy_match_percent": 21.1058
+     "fuzzy_match_percent": 26.8706
     }
    ],
    "functions": [
     {
      "name": "?Bs002_Update@@YAHH@Z",
      "size": "32656",
-     "fuzzy_match_percent": 21.1058,
+     "fuzzy_match_percent": 26.8706,
      "metadata": {
       "virtual_address": "269502016"
      }
@@ -2909,7 +2909,7 @@
   {
    "name": "app/bs004_update",
    "measures": {
-    "fuzzy_match_percent": 22.1093,
+    "fuzzy_match_percent": 24.128,
     "total_code": "29926",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -2934,14 +2934,14 @@
     {
      "name": ".text",
      "size": "29926",
-     "fuzzy_match_percent": 22.1093
+     "fuzzy_match_percent": 24.128
     }
    ],
    "functions": [
     {
      "name": "?Bs004_Update@@YAHH@Z",
      "size": "29926",
-     "fuzzy_match_percent": 22.1093,
+     "fuzzy_match_percent": 24.128,
      "metadata": {
       "virtual_address": "269236672"
      }
@@ -2955,7 +2955,7 @@
   {
    "name": "app/bs005_update",
    "measures": {
-    "fuzzy_match_percent": 22.5934,
+    "fuzzy_match_percent": 27.1933,
     "total_code": "23305",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -2980,14 +2980,14 @@
     {
      "name": ".text",
      "size": "23305",
-     "fuzzy_match_percent": 22.5934
+     "fuzzy_match_percent": 27.1933
     }
    ],
    "functions": [
     {
      "name": "?Bs005_Update@@YAHH@Z",
      "size": "23305",
-     "fuzzy_match_percent": 22.5934,
+     "fuzzy_match_percent": 27.1933,
      "metadata": {
       "virtual_address": "269271712"
      }
@@ -3001,7 +3001,7 @@
   {
    "name": "app/bs006_update",
    "measures": {
-    "fuzzy_match_percent": 22.821,
+    "fuzzy_match_percent": 24.3322,
     "total_code": "54584",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -3026,14 +3026,14 @@
     {
      "name": ".text",
      "size": "54584",
-     "fuzzy_match_percent": 22.821
+     "fuzzy_match_percent": 24.3322
     }
    ],
    "functions": [
     {
      "name": "?Bs006_Update@@YAHH@Z",
      "size": "54584",
-     "fuzzy_match_percent": 22.821,
+     "fuzzy_match_percent": 24.3322,
      "metadata": {
       "virtual_address": "269296800"
      }
@@ -16477,7 +16477,7 @@
   {
    "name": "app/neo_galaxy_update",
    "measures": {
-    "fuzzy_match_percent": 25.4655,
+    "fuzzy_match_percent": 28.3694,
     "total_code": "25057",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -16502,14 +16502,14 @@
     {
      "name": ".text",
      "size": "25057",
-     "fuzzy_match_percent": 25.4655
+     "fuzzy_match_percent": 28.3694
     }
    ],
    "functions": [
     {
      "name": "?NeoGalaxy_Update@@YAHH@Z",
      "size": "25057",
-     "fuzzy_match_percent": 25.4655,
+     "fuzzy_match_percent": 28.3694,
      "metadata": {
       "virtual_address": "269382272"
      }
@@ -19747,7 +19747,7 @@
   {
    "name": "app/prince_update",
    "measures": {
-    "fuzzy_match_percent": 24.9023,
+    "fuzzy_match_percent": 33.6466,
     "total_code": "31560",
     "matched_code": "0",
     "matched_code_percent": 0.0,
@@ -19772,14 +19772,14 @@
     {
      "name": ".text",
      "size": "31560",
-     "fuzzy_match_percent": 24.9023
+     "fuzzy_match_percent": 33.6466
     }
    ],
    "functions": [
     {
      "name": "?Prince_Update@@YAHH@Z",
      "size": "31560",
-     "fuzzy_match_percent": 24.9023,
+     "fuzzy_match_percent": 33.6466,
      "metadata": {
       "virtual_address": "269409952"
      }

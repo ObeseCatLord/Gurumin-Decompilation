@@ -1285,6 +1285,8 @@ static __forceinline void BurstIntoPieces(const Vec4 &at, const Vec4 *direction,
 #define VIEW_NEAR_SQUARED 62500.0f
 #define SCENERY_FIRST_MODEL 0x5c
 #define SCENERY_NEAR_SQUARED 4000000.0f
+// The original keeps room for 64 sorted distances (the frame holds them right below the 125-entry model order).
+#define DISTANCE_SORT_CAPACITY 0x40
 
 // 0x1011d810 (the in-game frame). Mode 1 of the frame step. The first call resets the mode's globals (DAT_104bf8bc
 // was 0 until then). Each call computes how many engine ticks have passed since the last one (at most
@@ -8112,7 +8114,7 @@ else
             // the characters in view, sorted by their distance to the camera
             if (DAT_10255f08 != 0)
                 DAT_10255f08->UpdateVisibleCells();
-            float distances[CHAR_SLOT_COUNT];
+            float distances[DISTANCE_SORT_CAPACITY];
             int visible = 0;
             for (i = 0; i < CHAR_SLOT_COUNT; i++)
             {

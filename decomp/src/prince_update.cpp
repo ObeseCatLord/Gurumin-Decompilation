@@ -461,14 +461,13 @@ static int RunEnding(int index, PrinceFrame &f)
         DAT_10edbd48.Copy(DAT_10868818 + (DAT_10edbd48 - DAT_10868818) * blend);
     }
     float distance = (DAT_10edbd48 - DAT_10866d98).Length();
-    float &closest = DAT_10255160[index][0];
-    if (distance <= closest)
-        closest = distance;
+    if (distance <= DAT_10255160[index][0])
+        DAT_10255160[index][0] = distance;
     else
     {
-        closest = (distance - closest) * 0.3f + closest;
+        DAT_10255160[index][0] = (distance - DAT_10255160[index][0]) * 0.3f + DAT_10255160[index][0];
         Vec4 away = DAT_10edbd48 - DAT_10866d98;
-        away.Copy(away.Normalized3() * closest);
+        away.Copy(away.Normalized3() * DAT_10255160[index][0]);
         DAT_10866d98.Copy(DAT_10edbd48 - away);
     }
     DAT_1020344c = 1.0f;
@@ -589,24 +588,23 @@ static void StateStrafe(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    LastPosition &last = DAT_10802bf8[f.index];
     if (st.frames == 0)
     {
         Vec4 away = f.ownPos - f.playerPos;
         away.z = 0.0f;
         Vec4 direction = away.Normalized3();
         direction.RotateZ(((float)(FUN_1013f880() % 2000) - 1000.0f) / 3600.0f * PRINCE_PI);
-        last.step.Copy(direction * (float)(FUN_1013f880() % 1000 + 0x2ee));
-        last.step.z = PRINCE_FLOOR_HEIGHT - f.ownPos.z;
-        direction = last.step.Normalized3();
-        last.step.Copy(direction * 80.0f);
+        DAT_10802bf8[f.index].step.Copy(direction * (float)(FUN_1013f880() % 1000 + 0x2ee));
+        DAT_10802bf8[f.index].step.z = PRINCE_FLOOR_HEIGHT - f.ownPos.z;
+        direction = DAT_10802bf8[f.index].step.Normalized3();
+        DAT_10802bf8[f.index].step.Copy(direction * 80.0f);
         model.targetHeading = FacePlayer(f);
         FUN_10065b10(f.index, 0x140, 1, 0);
         st.frames++;
         return;
     }
     f.moveMode = PRINCE_MOVE_PLACE;
-    f.move.Copy(last.step);
+    f.move.Copy(DAT_10802bf8[f.index].step);
     f.move.Copy(f.move * 0.875f);
     float delta = WrapAngle(model.targetHeading - FUN_10001f80(f.move.x, f.move.y) + PRINCE_PI);
     if (delta >= -0.785375f && delta < 0.785375f)
@@ -642,9 +640,8 @@ static int FollowElevation(PrinceFrame &f, float &elevation)
     elevation -= 0.25f;
     if (elevation <= 0.0f)
         elevation = 0.0f;
-    float &tilt = DAT_10255160[f.index][0];
-    int reached = ApproachValue(tilt, elevation, 0.06f);
-    LeanBody(f.index, tilt);
+    int reached = ApproachValue(DAT_10255160[f.index][0], elevation, 0.06f);
+    LeanBody(f.index, DAT_10255160[f.index][0]);
     return reached;
 }
 
@@ -654,7 +651,6 @@ static void StatePunchLean(PrinceFrame &f)
     AnimModel &model = *f.model;
     float elevation = 0.0f;
     int reached = 0;
-    float &tilt = DAT_10255160[f.index][0];
     st.engaged = 1;
     model.targetHeading = FacePlayer(f);
     if (st.frames < PRINCE_FRAMES_PART_THREE)
@@ -696,10 +692,10 @@ static void StatePunchLean(PrinceFrame &f)
             f.move.Fill(0.0f);
             DAT_10802bf8[f.index].step.Fill(0.0f);
             DAT_10802bf8[f.index].step.y = -120.0f;
-            DAT_10802bf8[f.index].step.RotateX(tilt);
+            DAT_10802bf8[f.index].step.RotateX(DAT_10255160[f.index][0]);
             DAT_10802bf8[f.index].step.RotateZ(PRINCE_PI - model.targetHeading);
             f.moveMode = PRINCE_MOVE_PLACE;
-            StartPunchEffects(f, tilt);
+            StartPunchEffects(f, DAT_10255160[f.index][0]);
             FUN_10065b10(f.index, 0x145, 1, 0);
             SayRandomLine(f.index);
         }
@@ -717,21 +713,21 @@ static void StatePunchLean(PrinceFrame &f)
     else if (st.frames < PRINCE_FRAMES_PART_FOUR)
     {
         DampStep(f, 0.8f);
-        if (tilt <= 0.0f)
+        if (DAT_10255160[f.index][0] <= 0.0f)
         {
-            tilt = 0.0f;
+            DAT_10255160[f.index][0] = 0.0f;
             st.frames = PRINCE_FRAMES_PART_FOUR;
         }
         else
         {
-            tilt -= 0.07f;
-            if (tilt < 0.0f)
+            DAT_10255160[f.index][0] -= 0.07f;
+            if (DAT_10255160[f.index][0] < 0.0f)
             {
-                tilt = 0.0f;
+                DAT_10255160[f.index][0] = 0.0f;
                 st.frames = PRINCE_FRAMES_PART_FOUR;
             }
         }
-        LeanBody(f.index, tilt);
+        LeanBody(f.index, DAT_10255160[f.index][0]);
         st.frames++;
         return;
     }
@@ -751,7 +747,6 @@ static void StatePunch(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    float &tilt = DAT_10255160[f.index][0];
     st.engaged = 1;
     model.targetHeading = FacePlayer(f);
     model.mode = 1;
@@ -777,7 +772,7 @@ static void StatePunch(PrinceFrame &f)
             DAT_10802bf8[f.index].step.y = -80.0f;
             DAT_10802bf8[f.index].step.RotateZ(PRINCE_PI - model.targetHeading);
             f.moveMode = PRINCE_MOVE_PLACE;
-            tilt = 0.0f;
+            DAT_10255160[f.index][0] = 0.0f;
             StartPunchEffects(f, 0.0f);
             FUN_10065b10(f.index, 0x145, 1, 0);
             SayRandomLine(f.index);
@@ -837,7 +832,6 @@ static void StateGatlingAim(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    float &tilt = DAT_10255160[f.index][0];
     st.engaged = 1;
     st.wobble = 3;
     if (st.frames == 0)
@@ -850,8 +844,8 @@ static void StateGatlingAim(PrinceFrame &f)
             gatling->RestartColourPlugs("r_start", 0);
         }
     }
-    ApproachValue(tilt, 0.675f, 0.06f);
-    LeanBody(f.index, tilt);
+    ApproachValue(DAT_10255160[f.index][0], 0.675f, 0.06f);
+    LeanBody(f.index, DAT_10255160[f.index][0]);
     if (st.frames < PRINCE_FRAMES_PART_TWO)
     {
         model.targetHeading = FacePlayer(f);
@@ -897,7 +891,7 @@ static void StateGatlingAim(PrinceFrame &f)
     f.motion = 0xf;
     if (st.frames % 4 == 0)
     {
-        FireGatling(f, tilt, ((float)(FUN_1013f880() % 0x1e - 0xf) * PRINCE_PI) / 180.0f);
+        FireGatling(f, DAT_10255160[f.index][0], ((float)(FUN_1013f880() % 0x1e - 0xf) * PRINCE_PI) / 180.0f);
     }
     st.counter++;
 }
@@ -906,14 +900,13 @@ static void StateGatlingSpray(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    LastPosition &last = DAT_10802bf8[f.index];
     st.engaged = 1;
     f.motion = 0xf;
     if (st.frames == 0)
     {
-        last.step.Fill(0.0f);
-        last.step.y = (float)(FUN_1013f880() % 10) * -0.6f;
-        last.step.RotateZ((((float)(FUN_1013f880() % 0x10e - 0x87) * PRINCE_PI) / 180.0f - model.targetHeading) +
+        DAT_10802bf8[f.index].step.Fill(0.0f);
+        DAT_10802bf8[f.index].step.y = (float)(FUN_1013f880() % 10) * -0.6f;
+        DAT_10802bf8[f.index].step.RotateZ((((float)(FUN_1013f880() % 0x10e - 0x87) * PRINCE_PI) / 180.0f - model.targetHeading) +
                           PRINCE_PI);
         Node *gatling = model.root->Find("@gatring_null", 0);
         DAT_1021bdf8[f.index][PRINCE_NODE_GATLING] = gatling;
@@ -934,15 +927,15 @@ static void StateGatlingSpray(PrinceFrame &f)
                 st.frames = 10000;
             else
             {
-                last.step.Fill(0.0f);
-                last.step.y = -(float)(FUN_1013f880() % 10);
-                last.step.RotateZ((((float)(FUN_1013f880() % 0x10e - 0x87) * PRINCE_PI) / 180.0f -
+                DAT_10802bf8[f.index].step.Fill(0.0f);
+                DAT_10802bf8[f.index].step.y = -(float)(FUN_1013f880() % 10);
+                DAT_10802bf8[f.index].step.RotateZ((((float)(FUN_1013f880() % 0x10e - 0x87) * PRINCE_PI) / 180.0f -
                                    model.targetHeading) + PRINCE_PI);
             }
         }
         f.moveMode = PRINCE_MOVE_WALK;
         st.wobble = 1;
-        f.move.Copy(last.step);
+        f.move.Copy(DAT_10802bf8[f.index].step);
         SteerHeight(f, 25.0f, 65.0f, 20.0f);
         if ((model.motionFrame & 3) == 0)
         {
@@ -1032,7 +1025,6 @@ static void StateSwingFollow(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    float &tilt = DAT_10255160[f.index][0];
     float elevation = 0.0f;
     st.engaged = 1;
     st.wobble = 2;
@@ -1044,7 +1036,7 @@ static void StateSwingFollow(PrinceFrame &f)
         if (elevation >= 1.5708f)
             elevation = 1.5708f;
     }
-    ApproachValue(tilt, elevation, 0.06f);
+    ApproachValue(DAT_10255160[f.index][0], elevation, 0.06f);
     if (st.frames == 0)
     {
         st.counter = 0x3c;
@@ -1061,7 +1053,7 @@ static void StateSwingFollow(PrinceFrame &f)
             st.frames = PRINCE_FRAMES_PART_TWO;
         f.move.z = (float)st.counter;
         f.moveMode = PRINCE_MOVE_PLACE;
-        LeanBody(f.index, tilt);
+        LeanBody(f.index, DAT_10255160[f.index][0]);
         model.targetHeading = FacePlayer(f);
         st.frames++;
         return;
@@ -1085,7 +1077,7 @@ static void StateSwingFollow(PrinceFrame &f)
         if (model.motionFrame == 0x245 || model.motionFrame == 0x252)
         {
             float jitter = ((float)(FUN_1013f880() % 0x14 - 10) * PRINCE_PI) / 180.0f;
-            StartLeftHandSwing(f, 0x36b6, 1.1f, tilt, jitter);
+            StartLeftHandSwing(f, 0x36b6, 1.1f, DAT_10255160[f.index][0], jitter);
             FUN_10065b10(f.index, 0x142, 1, 0);
             if (FUN_1013f880() % 3 == 0)
                 FUN_100b9bb0(f.index, FUN_1013f880() % 3 + 0x47, 0, 1);
@@ -1095,7 +1087,7 @@ static void StateSwingFollow(PrinceFrame &f)
     {
         if (st.frames >= PRINCE_FRAMES_PART_FOUR)
         {
-            tilt = 0.0f;
+            DAT_10255160[f.index][0] = 0.0f;
             st.state = PRINCE_STATE_PICK;
             st.frames++;
             return;
@@ -1106,7 +1098,7 @@ static void StateSwingFollow(PrinceFrame &f)
         if (model.m_238c != 0 || f.ownPos.z < 0.0f)
             st.frames = PRINCE_FRAMES_PART_FOUR;
     }
-    LeanBody(f.index, tilt);
+    LeanBody(f.index, DAT_10255160[f.index][0]);
     st.frames++;
 }
 
@@ -1159,7 +1151,6 @@ static void StateHitRecover(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    LastPosition &last = DAT_10802bf8[f.index];
     int frames = st.frames;
     st.engaged = 1;
     if (frames == 0)
@@ -1196,9 +1187,9 @@ static void StateHitRecover(PrinceFrame &f)
             Vec4 toPlayer = f.playerPos - f.ownPos;
             toPlayer.z = 0.0f;
             Vec4 direction = toPlayer.Normalized3();
-            last.step.Copy(direction * (f.distance2D - 100.0f) * 0.1f);
-            last.step.z = 9.0f;
-            f.move.Copy(last.step);
+            DAT_10802bf8[f.index].step.Copy(direction * (f.distance2D - 100.0f) * 0.1f);
+            DAT_10802bf8[f.index].step.z = 9.0f;
+            f.move.Copy(DAT_10802bf8[f.index].step);
         }
     }
     else if (frames < PRINCE_FRAMES_PART_FOUR)
@@ -1221,11 +1212,11 @@ static void StateHitRecover(PrinceFrame &f)
         if (st.frames < 0x7db)
         {
             f.moveMode = PRINCE_MOVE_PLACE;
-            last.step.Copy(f.move);
+            DAT_10802bf8[f.index].step.Copy(f.move);
         }
         else
         {
-            f.move.Copy(last.step * 0.5f);
+            f.move.Copy(DAT_10802bf8[f.index].step * 0.5f);
             st.wobble = 0;
         }
         if (st.frames == 0x7db)
@@ -1258,7 +1249,6 @@ static void StateCharge(PrinceFrame &f, int variant)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    LastPosition &last = DAT_10802bf8[f.index];
     int isB = variant != 0;
     static const int motionsA[4] = {0x22, 0x27, 0x28, 0x29};
     static const int motionsB[4] = {0x1d, 0x1e, 0x1f, 0x22};
@@ -1270,9 +1260,9 @@ static void StateCharge(PrinceFrame &f, int variant)
             st.attackMotion = (isB ? motionsB : motionsA)[FUN_1013f880() & 3];
             f.motion = st.attackMotion;
             f.motionLoop = 1;
-            last.step.Fill(0.0f);
-            last.step.y = -30.0f;
-            last.step.RotateZ(-model.targetHeading);
+            DAT_10802bf8[f.index].step.Fill(0.0f);
+            DAT_10802bf8[f.index].step.y = -30.0f;
+            DAT_10802bf8[f.index].step.RotateZ(-model.targetHeading);
             FUN_10065b10(f.index, isB ? 0x14d : 0x148, 1, 0);
             SayRandomLine(f.index);
         }
@@ -1287,8 +1277,8 @@ static void StateCharge(PrinceFrame &f, int variant)
     else
     {
         f.motion = st.attackMotion;
-        f.move.x = last.step.x;
-        f.move.y = last.step.y;
+        f.move.x = DAT_10802bf8[f.index].step.x;
+        f.move.y = DAT_10802bf8[f.index].step.y;
         f.moveMode = PRINCE_MOVE_WALK;
         f.move.Copy(f.move * (isB ? 0.92f : 0.9f));
         if (isB)
@@ -1335,13 +1325,12 @@ static void StateLeap(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    LastPosition &last = DAT_10802bf8[f.index];
     if (st.frames == 0)
     {
         if (f.distance3D >= 500.0f)
         {
             Vec4 toPlayer = f.playerPos - f.ownPos;
-            last.step.Copy(toPlayer.Normalized3() * 40.0f);
+            DAT_10802bf8[f.index].step.Copy(toPlayer.Normalized3() * 40.0f);
             st.counter = (int)(toPlayer.Length() / 40.0f);
             st.wobble = 1;
             model.mode = 0;
@@ -1354,7 +1343,7 @@ static void StateLeap(PrinceFrame &f)
         {
             st.frames = PRINCE_FRAMES_PART_TWO;
             st.wobble = 1;
-            last.step.Fill(0.0f);
+            DAT_10802bf8[f.index].step.Fill(0.0f);
             model.mode = 0;
             f.motion = 0xb;
             f.motionLoop = 1;
@@ -1370,14 +1359,14 @@ static void StateLeap(PrinceFrame &f)
         {
             st.counter--;
             f.moveMode = PRINCE_MOVE_PLACE;
-            f.move.Copy(last.step);
+            f.move.Copy(DAT_10802bf8[f.index].step);
         }
         if (f.layer == 1 || st.counter < 0)
         {
             f.motion = 0xb;
             st.frames = PRINCE_FRAMES_PART_TWO;
             model.targetHeading = FacePlayer(f);
-            last.step.Fill(0.0f);
+            DAT_10802bf8[f.index].step.Fill(0.0f);
         }
         StartLinkedSparks(f, 0x7c5, 0x7c7);
         if (st.frames % 10 == 1)
@@ -1486,7 +1475,6 @@ static void StateBombard(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    float &tilt = DAT_10255160[f.index][0];
     if (st.hurt != 0)
         st.frames = 4000;
     if (st.frames == 0)
@@ -1521,14 +1509,14 @@ static void StateBombard(PrinceFrame &f)
         model.targetHeading = FacePlayer(f);
         if (model.motionFrame == 0x1b8)
         {
-            tilt = (float)(FUN_1013f880() % 300 - 0x96) / 5000.0f - 0.87606f;
+            DAT_10255160[f.index][0] = (float)(FUN_1013f880() % 300 - 0x96) / 5000.0f - 0.87606f;
             Vec4 offset;
             offset.Fill(0.0f);
             offset.y = -60.0f;
             offset.z = 20.0f;
-            StartHandEffect(f, 0x7ca, offset, tilt, 1.3f);
-            StartHandEffect(f, 0x3713, offset, tilt, 1.3f);
-            tilt = 0.0f;
+            StartHandEffect(f, 0x7ca, offset, DAT_10255160[f.index][0], 1.3f);
+            StartHandEffect(f, 0x3713, offset, DAT_10255160[f.index][0], 1.3f);
+            DAT_10255160[f.index][0] = 0.0f;
             FUN_10065b10(f.index, 0x145, 1, 0);
         }
         else if (model.motionFrame == 0x1bc)
@@ -1705,7 +1693,6 @@ static void StateLockOn(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    LastPosition &last = DAT_10802bf8[f.index];
     int index = f.index;
     if (st.frames == 0)
     {
@@ -1727,7 +1714,7 @@ static void StateLockOn(PrinceFrame &f)
         }
         else if (model.motionFrame == 0x203)
         {
-            last.step.Fill(0.0f);
+            DAT_10802bf8[f.index].step.Fill(0.0f);
             st.frames = PRINCE_FRAMES_PART_TWO;
             FUN_100b9bb0(index, (FUN_1013f880() & 1) + 0x47, 0, 0);
         }
@@ -1738,7 +1725,7 @@ static void StateLockOn(PrinceFrame &f)
                 FUN_1001a760(index, 1, "O_108.it3");
                 DAT_1021bdf8[index][PRINCE_NODE_LOCK] = model.root->Find("@lk_null", 0);
             }
-            last.step.Fill(0.0f);
+            DAT_10802bf8[f.index].step.Fill(0.0f);
             st.frames = PRINCE_FRAMES_PART_TWO;
             st.frames++;
             return;
@@ -1755,13 +1742,13 @@ static void StateLockOn(PrinceFrame &f)
         }
         f.moveMode = PRINCE_MOVE_WALK;
         if (f.ownPos.x > f.playerPos.x)
-            last.step.x -= 2.0f;
+            DAT_10802bf8[f.index].step.x -= 2.0f;
         else if (f.ownPos.x < f.playerPos.x)
-            last.step.x += 2.0f;
+            DAT_10802bf8[f.index].step.x += 2.0f;
         if (f.ownPos.y > f.playerPos.y)
-            last.step.y -= 2.0f;
+            DAT_10802bf8[f.index].step.y -= 2.0f;
         else if (f.ownPos.y < f.playerPos.y)
-            last.step.y += 2.0f;
+            DAT_10802bf8[f.index].step.y += 2.0f;
         if (f.playerPos.z + 25.0f > f.ownPos.z)
         {
             f.move.z = 15.0f;
@@ -1772,10 +1759,10 @@ static void StateLockOn(PrinceFrame &f)
             f.move.z = -15.0f;
             st.heightPhase = 0x401;
         }
-        if (last.step.Length2D() > 30.0f)
-            last.step.Copy(last.step.Normalized3() * 30.0f);
-        f.move.x = last.step.x;
-        f.move.y = last.step.y;
+        if (DAT_10802bf8[f.index].step.Length2D() > 30.0f)
+            DAT_10802bf8[f.index].step.Copy(DAT_10802bf8[f.index].step.Normalized3() * 30.0f);
+        f.move.x = DAT_10802bf8[f.index].step.x;
+        f.move.y = DAT_10802bf8[f.index].step.y;
         Node *hand = PrinceNode(index, PRINCE_NODE_HAND_L);
         Node *lock = PrinceNode(index, PRINCE_NODE_LOCK);
         if (hand != 0 && lock != 0)
@@ -2034,28 +2021,27 @@ static void ApplyMovement(PrinceFrame &f)
 {
     Kind43State &st = *f.st;
     AnimModel &model = *f.model;
-    LastPosition &last = DAT_10802bf8[f.index];
     if (f.moveMode == PRINCE_MOVE_WALK)
     {
         if (st.wobble != 0)
             f.move.z += (float)(st.heightPhase % 1000 - 0x19) / 12.5f;
-        f.move.Copy(last.position * 0.9f + f.move * 0.1f);
+        f.move.Copy(DAT_10802bf8[f.index].position * 0.9f + f.move * 0.1f);
         FUN_100241e0(f.index, f.move.x, f.move.y, f.move.z);
-        last.position.Copy(f.move);
+        DAT_10802bf8[f.index].position.Copy(f.move);
     }
     else if (f.moveMode == PRINCE_MOVE_PLACE)
     {
-        f.move.Copy(last.position * 0.65f + f.move * 0.35f);
-        last.position.Copy(f.move);
+        f.move.Copy(DAT_10802bf8[f.index].position * 0.65f + f.move * 0.35f);
+        DAT_10802bf8[f.index].position.Copy(f.move);
         f.move.Copy(f.move + f.ownPos);
         model.SetPosition(f.move.x, f.move.y, f.move.z);
     }
     else if (st.wobble != 0)
     {
         float bob = (float)(st.heightPhase % 1000 - 0x19) / 12.5f;
-        last.position.Copy(last.position * 0.9f);
-        last.position.z = bob * 0.1f + last.position.z;
-        FUN_100241e0(f.index, last.position.x, last.position.y, last.position.z);
+        DAT_10802bf8[f.index].position.Copy(DAT_10802bf8[f.index].position * 0.9f);
+        DAT_10802bf8[f.index].position.z = bob * 0.1f + DAT_10802bf8[f.index].position.z;
+        FUN_100241e0(f.index, DAT_10802bf8[f.index].position.x, DAT_10802bf8[f.index].position.y, DAT_10802bf8[f.index].position.z);
     }
 }
 
@@ -2072,10 +2058,7 @@ int Prince_Update(int index)
         FUN_100e21a0(index);
         return 0;
     }
-    CharSlot &slot = DAT_10daaae8[index];
-    AnimModel &model = DAT_10db6ee8[index];
-    Kind43State &st = DAT_1020b430[index].kind43;
-    slot.m_0098 |= PRINCE_SLOT_FLAG_SKIP;
+    DAT_10daaae8[index].m_0098 |= PRINCE_SLOT_FLAG_SKIP;
     if (DAT_104bfdf0 != 0)
         return 0;
     if (DAT_104bfe1c != 0)
@@ -2084,26 +2067,26 @@ int Prince_Update(int index)
         return 0;
     PrinceFrame f;
     f.index = index;
-    f.model = &model;
-    f.slot = &slot;
-    f.st = &st;
+    f.model = &DAT_10db6ee8[index];
+    f.slot = &DAT_10daaae8[index];
+    f.st = &DAT_1020b430[index].kind43;
     f.moveMode = PRINCE_MOVE_NONE;
     f.motion = PRINCE_MOTION_NONE;
     f.motionLoop = 0;
     f.motionBlend = PRINCE_MOTION_BLEND;
-    f.layer = model.motion->layer;
-    f.nextLayer = model.motion->nextLayer;
-    if (st.syncedFlag == 0 || DAT_10315350[index] < st.syncedFlag)
-        st.syncedFlag = DAT_10315350[index];
-    else if (st.syncedFlag < DAT_10315350[index])
-        DAT_10315350[index] = (unsigned char)st.syncedFlag;
+    f.layer = DAT_10db6ee8[index].motion->layer;
+    f.nextLayer = DAT_10db6ee8[index].motion->nextLayer;
+    if (DAT_1020b430[index].kind43.syncedFlag == 0 || DAT_10315350[index] < DAT_1020b430[index].kind43.syncedFlag)
+        DAT_1020b430[index].kind43.syncedFlag = DAT_10315350[index];
+    else if (DAT_1020b430[index].kind43.syncedFlag < DAT_10315350[index])
+        DAT_10315350[index] = (unsigned char)DAT_1020b430[index].kind43.syncedFlag;
     DAT_104c0110 = index;
     DAT_1021f6c0[index] = 0;
     f.playerPos.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
-    f.ownPos.Copy(model.matrix.GetTranslation());
+    f.ownPos.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     if (DAT_104c0380 % 0x1e == index % 0x1e)
     {
-        model.m_0012 = 2;
+        DAT_10db6ee8[index].m_0012 = 2;
         if (DAT_102022b8 != 0)
             FUN_1001c090(index, 0);
     }
@@ -2114,28 +2097,28 @@ int Prince_Update(int index)
 
     if (DAT_10210d30[index] != 0)
     {
-        slot.stats[STAT_BUSY] = 1;
-        if (st.healing == 0)
+        DAT_10daaae8[index].stats[STAT_BUSY] = 1;
+        if (DAT_1020b430[index].kind43.healing == 0)
             return RunEnding(index, f);
     }
-    if (slot.stats[STAT_BUSY] != 0)
-        slot.stats[STAT_BUSY] = 0;
+    if (DAT_10daaae8[index].stats[STAT_BUSY] != 0)
+        DAT_10daaae8[index].stats[STAT_BUSY] = 0;
     int level = DAT_102550e0[index];
     DAT_10210d30[index] = 0;
     DAT_1021f9c0[index] = 0;
-    slot.m_0141 = 0;
+    DAT_10daaae8[index].m_0141 = 0;
     if (level != 0)
     {
-        st.hurt = 1;
+        DAT_1020b430[index].kind43.hurt = 1;
         if (level > 7)
             DAT_102550e0[index] = 7;
         int bothHard = DAT_10c635f8 == 2 && DAT_10c66cc0 == 2;
         int skipAdjust = 0;
-        if (model.holding == 0 || ((!bothHard || DAT_102550e0[index] < 3) && DAT_102550e0[index] < 8))
+        if (DAT_10db6ee8[index].holding == 0 || ((!bothHard || DAT_102550e0[index] < 3) && DAT_102550e0[index] < 8))
         {
             if (((bothHard && DAT_102550e0[index] > 2) || DAT_102550e0[index] > 5) &&
-                (st.state == PRINCE_STATE_CHARGE_A || st.state == PRINCE_STATE_CHARGE_B ||
-                 st.state == PRINCE_STATE_SWAP_WEAPON))
+                (DAT_1020b430[index].kind43.state == PRINCE_STATE_CHARGE_A || DAT_1020b430[index].kind43.state == PRINCE_STATE_CHARGE_B ||
+                 DAT_1020b430[index].kind43.state == PRINCE_STATE_SWAP_WEAPON))
             {
                 if (DifficultyIsHard() && FUN_1013f880() % 100 > 4)
                     skipAdjust = 1;
@@ -2144,8 +2127,8 @@ int Prince_Update(int index)
                     DAT_102550e0[index] = 5;
                     if (bothHard)
                         DAT_102550e0[index] = 2;
-                    st.state = PRINCE_STATE_STRAFE;
-                    st.frames = 0;
+                    DAT_1020b430[index].kind43.state = PRINCE_STATE_STRAFE;
+                    DAT_1020b430[index].kind43.frames = 0;
                 }
             }
         }
@@ -2155,11 +2138,11 @@ int Prince_Update(int index)
             if (bothHard)
                 DAT_102550e0[index] = 2;
         }
-        if (model.holding == 0 && st.state != PRINCE_STATE_LOCK_ON &&
+        if (DAT_10db6ee8[index].holding == 0 && DAT_1020b430[index].kind43.state != PRINCE_STATE_LOCK_ON &&
             (!DifficultyIsHard() || FUN_1013f880() % 100 < 5))
         {
-            st.state = PRINCE_STATE_STRAFE;
-            st.frames = 0;
+            DAT_1020b430[index].kind43.state = PRINCE_STATE_STRAFE;
+            DAT_1020b430[index].kind43.frames = 0;
         }
         if (DAT_102550e0[index] != 0)
         {
@@ -2183,51 +2166,51 @@ int Prince_Update(int index)
             }
         }
     }
-    int wobble = st.wobble;
-    st.age++;
-    slot.m_0141 = 0;
+    int wobble = DAT_1020b430[index].kind43.wobble;
+    DAT_1020b430[index].kind43.age++;
+    DAT_10daaae8[index].m_0141 = 0;
     DAT_10255a88[index] = 0;
     DAT_10210d30[index] = 0;
     if (wobble == 0)
-        model.mode = 1;
-    if (model.mode == 0)
+        DAT_10db6ee8[index].mode = 1;
+    if (DAT_10db6ee8[index].mode == 0)
     {
-        model.m_238c = 0;
-        st.lastHeight = PRINCE_UNSET_HEIGHT;
+        DAT_10db6ee8[index].m_238c = 0;
+        DAT_1020b430[index].kind43.lastHeight = PRINCE_UNSET_HEIGHT;
     }
     else
     {
         int height = (int)f.ownPos.z;
-        if (height == st.lastHeight)
-            model.m_238c = 1;
-        st.lastHeight = height;
+        if (height == DAT_1020b430[index].kind43.lastHeight)
+            DAT_10db6ee8[index].m_238c = 1;
+        DAT_1020b430[index].kind43.lastHeight = height;
     }
-    int phase = st.heightPhase;
-    model.mode = 0;
+    int phase = DAT_1020b430[index].kind43.heightPhase;
+    DAT_10db6ee8[index].mode = 0;
     DAT_1101dddc = 100.0f;
     DAT_1020344c = 1.0f;
     if (phase / 1000 == 0)
     {
-        st.heightPhase = phase + 1;
+        DAT_1020b430[index].kind43.heightPhase = phase + 1;
         if ((phase + 1) % 1000 == 0x32)
-            st.heightPhase = phase + 0x3e9;
+            DAT_1020b430[index].kind43.heightPhase = phase + 0x3e9;
     }
     else
     {
-        st.heightPhase = phase - 1;
+        DAT_1020b430[index].kind43.heightPhase = phase - 1;
         if ((phase - 1) % 1000 == 0)
-            st.heightPhase = phase - 0x3e9;
+            DAT_1020b430[index].kind43.heightPhase = phase - 0x3e9;
     }
-    if (st.state != PRINCE_STATE_TELEPORT && CountEdgesOutsideArena(f.ownPos) != 0)
+    if (DAT_1020b430[index].kind43.state != PRINCE_STATE_TELEPORT && CountEdgesOutsideArena(f.ownPos) != 0)
     {
-        st.state = PRINCE_STATE_TELEPORT;
-        st.frames = 0;
-        slot.m_0141 = 1;
-        model.holding = 1;
+        DAT_1020b430[index].kind43.state = PRINCE_STATE_TELEPORT;
+        DAT_1020b430[index].kind43.frames = 0;
+        DAT_10daaae8[index].m_0141 = 1;
+        DAT_10db6ee8[index].holding = 1;
         FUN_10065b10(index, 0x13e, 1, 0);
     }
 
-    switch (st.state)
+    switch (DAT_1020b430[index].kind43.state)
     {
     case PRINCE_STATE_SET_UP:
         StateSetUp(f);
@@ -2284,23 +2267,23 @@ int Prince_Update(int index)
         StatePick(f);
         break;
     default:
-        st.state = PRINCE_STATE_PICK;
+        DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
         break;
     }
 
-    if (st.healing != 0)
+    if (DAT_1020b430[index].kind43.healing != 0)
     {
-        slot.stats[STAT_HEALTH] += 0x1e;
-        if (slot.stats[STAT_MAX_HEALTH] <= slot.stats[STAT_HEALTH])
+        DAT_10daaae8[index].stats[STAT_HEALTH] += 0x1e;
+        if (DAT_10daaae8[index].stats[STAT_MAX_HEALTH] <= DAT_10daaae8[index].stats[STAT_HEALTH])
         {
-            slot.stats[STAT_HEALTH] = slot.stats[STAT_MAX_HEALTH];
-            st.healing = 0;
+            DAT_10daaae8[index].stats[STAT_HEALTH] = DAT_10daaae8[index].stats[STAT_MAX_HEALTH];
+            DAT_1020b430[index].kind43.healing = 0;
         }
     }
     if (f.ownPos.z < 0.0f)
     {
-        st.wobble = 0;
-        model.matrix.translation.z = 0.0f;
+        DAT_1020b430[index].kind43.wobble = 0;
+        DAT_10db6ee8[index].matrix.translation.z = 0.0f;
     }
     ApplyMovement(f);
     if (f.motion >= 0)
@@ -2308,16 +2291,16 @@ int Prince_Update(int index)
         int motion = f.motion;
         if (f.motion == 2 || f.motion == 4 || f.layer == 2 || f.layer == 4 || f.nextLayer == 2 || f.nextLayer == 4)
         {
-            if (st.weapon == 1)
+            if (DAT_1020b430[index].kind43.weapon == 1)
                 motion = 0x11;
-            else if (st.weapon == 2)
+            else if (DAT_1020b430[index].kind43.weapon == 2)
                 motion = 0xc;
         }
-        model.PlayMotion(motion, f.motionLoop, f.motionBlend, 1.0f);
-        if (model.motion->blending != 0 && model.motion->m_0004 > 0.0f)
+        DAT_10db6ee8[index].PlayMotion(motion, f.motionLoop, f.motionBlend, 1.0f);
+        if (DAT_10db6ee8[index].motion->blending != 0 && DAT_10db6ee8[index].motion->m_0004 > 0.0f)
             Sleep(0);
     }
-    st.hurt = 0;
+    DAT_1020b430[index].kind43.hurt = 0;
     if (PrinceNode(index, PRINCE_NODE_ROOT_NULL) != 0)
         DAT_10868838[index][0] = PrinceNode(index, PRINCE_NODE_ROOT_NULL)->worldMatrix;
     return 0;

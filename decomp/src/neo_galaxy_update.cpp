@@ -76,21 +76,21 @@
 #define GALAXY_SUMMON_HEALTH_STAT 4
 
 // The slot's own variables (words of CharState).
-#define STATE st.state
-#define STEP st.words[1]                       // frames in the state
-#define WORD_FLASH st.words[2]                 // hit flash (0x168 while a long state holds the pose)
-#define WORD_FLASH_LEVEL st.words[3]
-#define WORD_LAST_STATE st.words[4]            // the state before the pause state 100
-#define WORD_COUNT st.words[5]                 // small counter of the state (and the attack choice)
-#define WORD_FRAMES st.words[6]                // frames since the slot started
-#define WORD_DEFEATED st.words[7]              // 1 once the fight is over (body 0x3a, 0x3c, 0x3e in words 7 of each)
-#define WORD_GONE st.words[8]                  // 1 while the body waits outside the scene
-#define WORD_ATTACKS st.words[9]               // attacks done
-#define WORD_ANGRY st.words[0xb]               // 1 in the second phase
-#define WORD_STARTED st.words[0xc]             // 1 once the slot has started
-#define WORD_IDLE_FRAMES st.words[0xd]
-#define WORD_WEAK st.words[0xe]
-#define WORD_ENDED st.words[0xf]               // 1 after the long finish (state 0x20 from step 500)
+#define STATE DAT_1020b430[index].state
+#define STEP DAT_1020b430[index].words[1]                       // frames in the state
+#define WORD_FLASH DAT_1020b430[index].words[2]                 // hit flash (0x168 while a long state holds the pose)
+#define WORD_FLASH_LEVEL DAT_1020b430[index].words[3]
+#define WORD_LAST_STATE DAT_1020b430[index].words[4]            // the state before the pause state 100
+#define WORD_COUNT DAT_1020b430[index].words[5]                 // small counter of the state (and the attack choice)
+#define WORD_FRAMES DAT_1020b430[index].words[6]                // frames since the slot started
+#define WORD_DEFEATED DAT_1020b430[index].words[7]              // 1 once the fight is over (body 0x3a, 0x3c, 0x3e in words 7 of each)
+#define WORD_GONE DAT_1020b430[index].words[8]                  // 1 while the body waits outside the scene
+#define WORD_ATTACKS DAT_1020b430[index].words[9]               // attacks done
+#define WORD_ANGRY DAT_1020b430[index].words[0xb]               // 1 in the second phase
+#define WORD_STARTED DAT_1020b430[index].words[0xc]             // 1 once the slot has started
+#define WORD_IDLE_FRAMES DAT_1020b430[index].words[0xd]
+#define WORD_WEAK DAT_1020b430[index].words[0xe]
+#define WORD_ENDED DAT_1020b430[index].words[0xf]               // 1 after the long finish (state 0x20 from step 500)
 #define BODY_WORD(slot, n) DAT_1020b430[slot].words[n]
 
 #define GALAXY_LINE_ANGRY "\202\340\202\244\223{\202\301\202\275\202\274\201I"
@@ -135,10 +135,9 @@ static void SetBodyAlpha(int index, float alpha)
 // Plays the "hit" sound and slows the player while the player is restricted, in the first frames of a fade.
 static void SlowRestrictedBodies(int index, int firstStepLimit)
 {
-    AnimModel &self = DAT_10db6ee8[index];
-    if (DAT_1020b430[index].words[1] < firstStepLimit && self.m_238c != 0)
+    if (DAT_1020b430[index].words[1] < firstStepLimit && DAT_10db6ee8[index].m_238c != 0)
     {
-        self.AddMotionSpeed(GALAXY_MOTION_SPEED);
+        DAT_10db6ee8[index].AddMotionSpeed(GALAXY_MOTION_SPEED);
         FUN_10065b10(index, GALAXY_SOUND_FLASH, 1, 0);
     }
 }
@@ -146,7 +145,6 @@ static void SlowRestrictedBodies(int index, int firstStepLimit)
 // The other two bodies' restricted checks of the same fade.
 static void SlowOtherBodies(int index, int firstStepLimit)
 {
-    CharState &st = DAT_1020b430[index];
     if (STEP < firstStepLimit && DAT_10db6ee8[index + 2].m_238c != 0)
     {
         DAT_10db6ee8[index].AddMotionSpeed(GALAXY_MOTION_SPEED);
@@ -306,9 +304,8 @@ static void MoveBodiesToRing(int index, const Vec4 *ring)
 {
     for (int body = 0; body < 3; body++)
     {
-        AnimModel &model = DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE];
-        if (model.matrix.translation.x > GALAXY_OFF_SCENE)
-            model.SetPosition(ring[body].x, ring[body].y, ring[body].z);
+        if (DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].matrix.translation.x > GALAXY_OFF_SCENE)
+            DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].SetPosition(ring[body].x, ring[body].y, ring[body].z);
     }
 }
 
@@ -364,9 +361,6 @@ int NeoGalaxy_Update(int index)
         return 0;
     }
 
-    CharState &st = DAT_1020b430[index];
-    AnimModel &self = DAT_10db6ee8[index];
-    CharSlot &slot = DAT_10daaae8[index];
     Node *&headBone = DAT_1021bdf8[index][0];
     Node *&spineBone = DAT_1021bdf8[index][1];
     Node *&rootNode = DAT_1021bdf8[index][2];
@@ -383,11 +377,11 @@ int NeoGalaxy_Update(int index)
             DAT_1101dddc = (300.0f - DAT_10db6ee8[0].matrix.translation.z) * 0.5f;
     }
     else
-        slot.stats[STAT_BUSY] = 1;
+        DAT_10daaae8[index].stats[STAT_BUSY] = 1;
     DAT_1021f6c0[index] = 0;
 
     playerPos = DAT_10db6ee8[0].matrix.GetTranslation();
-    ownPos = self.matrix.GetTranslation();
+    ownPos = DAT_10db6ee8[index].matrix.GetTranslation();
     toPlayer = playerPos - ownPos;
 
     if (WORD_ENDED != 0 && DAT_10db6ee8[0].m_238c != 0)
@@ -396,10 +390,10 @@ int NeoGalaxy_Update(int index)
         WORD_ENDED = 0;
     }
 
-    // The scene is over: fade the bodies out (slot 0x3a also runs the intro/outro of the galaxy backdrop).
+    // The scene is over: fade the bodies out (DAT_10daaae8[index] 0x3a also runs the intro/outro of the galaxy backdrop).
     if (DAT_10210d30[index] != 0)
     {
-        slot.stats[STAT_BUSY] = 1;
+        DAT_10daaae8[index].stats[STAT_BUSY] = 1;
         if (WORD_STARTED == 0)
         {
             FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -443,12 +437,12 @@ int NeoGalaxy_Update(int index)
         int fade = DAT_1020c2f0[0].galaxyFade + 1;
         DAT_104c00c8 = 1;
         DAT_1021f9fa = 0;
-        slot.stats[STAT_BUSY] = 1;
-        slot.m_0141 = 1;
+        DAT_10daaae8[index].stats[STAT_BUSY] = 1;
+        DAT_10daaae8[index].m_0141 = 1;
         if (fade < 0xf)
         {
             DAT_1020c2f0[0].galaxyFade = fade;
-            self.PlayMotion(GALAXY_MOTION_IDLE, 0, 5, 1.0f);
+            DAT_10db6ee8[index].PlayMotion(GALAXY_MOTION_IDLE, 0, 5, 1.0f);
         }
         else
         {
@@ -456,7 +450,7 @@ int NeoGalaxy_Update(int index)
             {
                 DAT_10e3c78c = 0.0f;
                 DAT_1020c2f0[0].galaxyFade = fade;
-                self.SetPosition(0.0f, 0.0f, 200.0f);
+                DAT_10db6ee8[index].SetPosition(0.0f, 0.0f, 200.0f);
                 DAT_10e3dec0 = (float)FUN_10001f80(toPlayer.x, toPlayer.y) + GALAXY_PI;
                 return 0;
             }
@@ -465,8 +459,8 @@ int NeoGalaxy_Update(int index)
                 DAT_1020c2f0[0].galaxyFade = fade;
                 DAT_1021f9fa = 0;
                 DAT_104c00c8 = 1;
-                slot.stats[STAT_BUSY] = 1;
-                slot.m_0141 = 1;
+                DAT_10daaae8[index].stats[STAT_BUSY] = 1;
+                DAT_10daaae8[index].m_0141 = 1;
                 DAT_10e3c78c = (float)(fade - 0xe) / 15.0f;
                 return 0;
             }
@@ -482,8 +476,8 @@ int NeoGalaxy_Update(int index)
                 DAT_1020c2f0[0].galaxyFade = fade;
                 DAT_1021f9fa = 0;
                 DAT_104c00c8 = 1;
-                slot.stats[STAT_BUSY] = 1;
-                slot.m_0141 = 1;
+                DAT_10daaae8[index].stats[STAT_BUSY] = 1;
+                DAT_10daaae8[index].m_0141 = 1;
                 return 0;
             }
             if (fade == 0x5a)
@@ -499,13 +493,13 @@ int NeoGalaxy_Update(int index)
                     DAT_1020c2f0[0].galaxyFade = fade;
                     DAT_1021f9fa = 0;
                     DAT_104c00c8 = 1;
-                    slot.stats[STAT_BUSY] = 1;
-                    slot.m_0141 = 1;
+                    DAT_10daaae8[index].stats[STAT_BUSY] = 1;
+                    DAT_10daaae8[index].m_0141 = 1;
                     return 0;
                 }
                 // The fight is recorded as won and the credits flag is set (bit 0, or bit 1 when the pictures are skipped).
                 DAT_1020c2f0[0].galaxyFade = fade;
-                self.SetPosition(GALAXY_GONE_X, 0.0f, 0.0f);
+                DAT_10db6ee8[index].SetPosition(GALAXY_GONE_X, 0.0f, 0.0f);
                 DAT_10874848.MarkKilled(DAT_10daaae8[GALAXY_FIRST_SLOT].routeRecord);
                 int flagIndex = DAT_10c63ffc * 2 + GALAXY_SCORE_FLAG_BASE;
                 unsigned int flags = DAT_10874848.TestScriptFlag(flagIndex);
@@ -515,7 +509,7 @@ int NeoGalaxy_Update(int index)
                 return 0;
             }
             DAT_1020c2f0[0].galaxyFade = fade;
-            self.PlayMotion(GALAXY_MOTION_WALK, 0, 5, 1.0f);
+            DAT_10db6ee8[index].PlayMotion(GALAXY_MOTION_WALK, 0, 5, 1.0f);
             DAT_10e3dec0 = (float)FUN_10001f80(toPlayer.x, toPlayer.y);
             step.x = 0.0f;
             step.y = -18.0f;
@@ -542,7 +536,7 @@ int NeoGalaxy_Update(int index)
     WORD_FRAMES++;
     WORD_IDLE_FRAMES++;
 
-    // The hit flash: it counts down while the slot is not stunned and rises while a stun lasts.
+    // The hit flash: it counts down while the DAT_10daaae8[index] is not stunned and rises while a stun lasts.
     if (DAT_102550e0[index] == 0)
     {
         if (WORD_FLASH > 0)
@@ -602,16 +596,16 @@ int NeoGalaxy_Update(int index)
         motion = GALAXY_MOTION_IDLE;
         STEP++;
         if (STEP == 1)
-            FacePlayer(self, toPlayer);
+            FacePlayer(DAT_10db6ee8[index], toPlayer);
         if (STEP == 0x1e)
         {
-            FireEffect(index, 0x519, ownPos, self.heading, 0.0f, slot.stats[3], 1.0f, 0, 0, 0);
+            FireEffect(index, 0x519, ownPos, DAT_10db6ee8[index].heading, 0.0f, DAT_10daaae8[index].stats[3], 1.0f, 0, 0, 0);
             goto finish;
         }
         if (STEP > 0x1f && STEP < 0x2f)
         {
-            self.targetHeading = self.heading + 0.41887894f;
-            self.heading = self.heading + 0.41887894f;
+            DAT_10db6ee8[index].targetHeading = DAT_10db6ee8[index].heading + 0.41887894f;
+            DAT_10db6ee8[index].heading = DAT_10db6ee8[index].heading + 0.41887894f;
         }
         else if (STEP == 0x5a)
             STATE = GALAXY_STATE_CHOOSE;
@@ -624,16 +618,16 @@ int NeoGalaxy_Update(int index)
         STEP++;
         if (STEP == 1)
         {
-            FacePlayer(self, toPlayer);
+            FacePlayer(DAT_10db6ee8[index], toPlayer);
             goto finish;
         }
         if (STEP == 0x1e)
         {
             Matrix4 tilt = RotationX(1.5708f);
-            Node *root = self.root;
+            Node *root = DAT_10db6ee8[index].root;
             root->matrix = tilt;
-            FireEffect(index, 0x3e9, self.matrix.GetTranslation(), 0.0f, 0.0f, 0, 1.0f, 0, 0, 0);
-            FireEffect(index, 0x3ec, self.matrix.GetTranslation(), 0.0f, 0.0f, slot.stats[3], 1.0f, 0, 0, 0x14);
+            FireEffect(index, 0x3e9, DAT_10db6ee8[index].matrix.GetTranslation(), 0.0f, 0.0f, 0, 1.0f, 0, 0, 0);
+            FireEffect(index, 0x3ec, DAT_10db6ee8[index].matrix.GetTranslation(), 0.0f, 0.0f, DAT_10daaae8[index].stats[3], 1.0f, 0, 0, 0x14);
             FUN_10065b10(index, 0x2f8, 1, 0);
             FUN_10054550(0x2f8, 0, &ownPos);
             goto finish;
@@ -642,14 +636,14 @@ int NeoGalaxy_Update(int index)
         {
             for (int burst = 0; burst < 6; burst++)
             {
-                Vec4 spot = self.matrix.GetTranslation();
+                Vec4 spot = DAT_10db6ee8[index].matrix.GetTranslation();
                 if (burst != 0)
                 {
                     spot.x = spot.x + ((float)(FUN_1013f880() % 1000) - 800.0f);
                     spot.y = spot.y + ((float)(FUN_1013f880() % 1000) - 800.0f);
                 }
                 spot.z = 0.0f;
-                FireEffect(index, 0x160, spot, 0.0f, 0.0f, slot.stats[3], 0.75f, 5, 0, 0);
+                FireEffect(index, 0x160, spot, 0.0f, 0.0f, DAT_10daaae8[index].stats[3], 0.75f, 5, 0, 0);
             }
             goto finish;
         }
@@ -662,17 +656,17 @@ int NeoGalaxy_Update(int index)
     if (STATE == 3)
     {
         STEP++;
-        FacePlayer(self, toPlayer);
+        FacePlayer(DAT_10db6ee8[index], toPlayer);
         if (STEP == 0x1e)
         {
-            float ringAngle = self.heading + 2.35619f;
+            float ringAngle = DAT_10db6ee8[index].heading + 2.35619f;
             for (int ball = 4; ball != 0; ball--)
             {
                 Matrix4 placement = RotationZ(ringAngle);
-                placement.SetTranslation(self.matrix.GetTranslation());
+                placement.SetTranslation(DAT_10db6ee8[index].matrix.GetTranslation());
                 EffectOptions options;
                 options.m_0000 = 0;
-                options.m_0004 = slot.stats[3];
+                options.m_0004 = DAT_10daaae8[index].stats[3];
                 options.m_0008 = 0.8f;
                 options.owner = GALAXY_FIRST_SLOT;
                 StartAt(index, 0x51e, &placement, &options, DAT_10db6ee8[0].headNode, 0);
@@ -682,7 +676,7 @@ int NeoGalaxy_Update(int index)
                 {
                     ringAngle = ringAngle + 0.5236f;
                     Matrix4 second = RotationZ(ringAngle - 0.5236f - 0.5236f);
-                    second.SetTranslation(self.matrix.GetTranslation());
+                    second.SetTranslation(DAT_10db6ee8[index].matrix.GetTranslation());
                     StartAt(index, 0x51e, &second, &options, DAT_10db6ee8[0].headNode, 0);
                     ringAngle = ringAngle + 0.5236f;
                 }
@@ -700,7 +694,7 @@ int NeoGalaxy_Update(int index)
         if (STEP < 0x1e)
         {
             motion = GALAXY_MOTION_WALK;
-            FacePlayer(self, toPlayer);
+            FacePlayer(DAT_10db6ee8[index], toPlayer);
             goto finish;
         }
         if (STEP > 0x95)
@@ -712,13 +706,13 @@ int NeoGalaxy_Update(int index)
         motion = GALAXY_MOTION_WALK;
         moveMode = 1;
         step.y = -24.0f;
-        step.RotateZ(self.heading);
+        step.RotateZ(DAT_10db6ee8[index].heading);
         if (STEP % 0x14 == 0)
         {
             int effect = (FUN_1013f880() & 1) == 0 ? 0x525 : 0x523;
-            FireEffect(index, effect, ownPos, self.heading, 0.0f, 0, 1.1f, 0, DAT_10db6ee8[0].headNode, 0);
+            FireEffect(index, effect, ownPos, DAT_10db6ee8[index].heading, 0.0f, 0, 1.1f, 0, DAT_10db6ee8[0].headNode, 0);
         }
-        if (self.IsClearOfMapLimited(0) == 0)
+        if (DAT_10db6ee8[index].IsClearOfMapLimited(0) == 0)
             STEP = 0x95;
         goto finish;
     }
@@ -733,10 +727,10 @@ int NeoGalaxy_Update(int index)
                 STATE = GALAXY_STATE_CHOOSE;
             goto finish;
         }
-        FacePlayer(self, toPlayer);
-        Vec4 where = self.matrix.GetTranslation();
+        FacePlayer(DAT_10db6ee8[index], toPlayer);
+        Vec4 where = DAT_10db6ee8[index].matrix.GetTranslation();
         where.z += 50.0f;
-        FireEffect(index, 0x451, where, self.targetHeading, 0.0f, 0, 0.7f, 0, 0, 0);
+        FireEffect(index, 0x451, where, DAT_10db6ee8[index].targetHeading, 0.0f, 0, 0.7f, 0, 0, 0);
         FUN_10065b10(index, 0x18d, 1, 0);
         goto finish;
     }
@@ -747,12 +741,12 @@ int NeoGalaxy_Update(int index)
         motion = GALAXY_MOTION_WALK;
         moveMode = 1;
         step.y = -16.0f;
-        step.RotateZ(self.heading);
+        step.RotateZ(DAT_10db6ee8[index].heading);
         STEP++;
         if (STEP == 1)
         {
-            FacePlayer(self, toPlayer);
-            FireEffect(index, 0x655, ownPos, self.targetHeading, 0.0f, 0, 1.0f, 0, spineBone, 0);
+            FacePlayer(DAT_10db6ee8[index], toPlayer);
+            FireEffect(index, 0x655, ownPos, DAT_10db6ee8[index].targetHeading, 0.0f, 0, 1.0f, 0, spineBone, 0);
         }
         if (STEP < 0x28)
         {
@@ -776,12 +770,12 @@ int NeoGalaxy_Update(int index)
         }
         if (STEP < 0x46)
         {
-            if (STEP < 0x2d && self.m_238c != 0)
+            if (STEP < 0x2d && DAT_10db6ee8[index].m_238c != 0)
             {
-                self.AddMotionSpeed(GALAXY_MOTION_SPEED);
+                DAT_10db6ee8[index].AddMotionSpeed(GALAXY_MOTION_SPEED);
                 FUN_10065b10(index, GALAXY_SOUND_FLASH, 1, 0);
             }
-            self.alpha = (float)abs(STEP - 0x37) / GALAXY_FADE_FRAMES;
+            DAT_10db6ee8[index].alpha = (float)abs(STEP - 0x37) / GALAXY_FADE_FRAMES;
             if (STEP == 0x37)
             {
                 // Reappear at a random spot near the player.
@@ -796,15 +790,15 @@ int NeoGalaxy_Update(int index)
                     spot.RotateZ((float)(FUN_1013f880() % 0x168));
                     target = playerPos - spot;
                 }
-                self.matrix.translation.x = spot.x + toPlayer.x;
-                self.matrix.translation.y = spot.y + toPlayer.y;
-                self.targetHeading = (float)FUN_10001f80(-spot.x, -spot.y) + GALAXY_PI;
-                self.heading = self.targetHeading;
+                DAT_10db6ee8[index].matrix.translation.x = spot.x + toPlayer.x;
+                DAT_10db6ee8[index].matrix.translation.y = spot.y + toPlayer.y;
+                DAT_10db6ee8[index].targetHeading = (float)FUN_10001f80(-spot.x, -spot.y) + GALAXY_PI;
+                DAT_10db6ee8[index].heading = DAT_10db6ee8[index].targetHeading;
             }
         }
         else if (STEP == 0x46)
         {
-            self.alpha = 1.0f;
+            DAT_10db6ee8[index].alpha = 1.0f;
             STEP = 0;
         }
         goto finish;
@@ -817,7 +811,7 @@ int NeoGalaxy_Update(int index)
         WORD_FLASH = GALAXY_FLASH_FRAMES;
         if (STEP == 1)
         {
-            FacePlayer(self, toPlayer);
+            FacePlayer(DAT_10db6ee8[index], toPlayer);
             FUN_10056260(index, GALAXY_LINE_TAKE_THIS, GALAXY_LINE_Z_SLASH, "", "");
             motion = GALAXY_MOTION_WALK;
             goto finish;
@@ -834,19 +828,19 @@ int NeoGalaxy_Update(int index)
             {
                 if (STEP == 0x24)
                 {
-                    self.heading = self.targetHeading + 2.3004313f;
-                    self.targetHeading = self.heading;
+                    DAT_10db6ee8[index].heading = DAT_10db6ee8[index].targetHeading + 2.3004313f;
+                    DAT_10db6ee8[index].targetHeading = DAT_10db6ee8[index].heading;
                 }
                 else if (STEP == 0x2d)
                 {
-                    self.heading = self.targetHeading - 2.3004313f;
-                    self.targetHeading = self.heading;
+                    DAT_10db6ee8[index].heading = DAT_10db6ee8[index].targetHeading - 2.3004313f;
+                    DAT_10db6ee8[index].targetHeading = DAT_10db6ee8[index].heading;
                 }
-                FireEffect(index, 0x750, ownPos, self.targetHeading, 5.0f, slot.stats[3], 2.0f, 5, 0, 0);
+                FireEffect(index, 0x750, ownPos, DAT_10db6ee8[index].targetHeading, 5.0f, DAT_10daaae8[index].stats[3], 2.0f, 5, 0, 0);
             }
             step.y = -200.0f;
             moveMode = 2;
-            step.RotateZ(self.heading);
+            step.RotateZ(DAT_10db6ee8[index].heading);
             goto finish;
         }
         if (STEP == 0x4b)
@@ -862,8 +856,8 @@ int NeoGalaxy_Update(int index)
     if (STATE == GALAXY_ATTACK_FINAL_SPARK)
     {
         STEP++;
-        if (slot.stats[STAT_HEALTH] > 0)
-            self.mode = 0;
+        if (DAT_10daaae8[index].stats[STAT_HEALTH] > 0)
+            DAT_10db6ee8[index].mode = 0;
         WORD_FLASH = GALAXY_FLASH_FRAMES;
         if (STEP == 1)
         {
@@ -873,7 +867,7 @@ int NeoGalaxy_Update(int index)
         }
         if (STEP < 0xf)
         {
-            FacePlayer(self, toPlayer);
+            FacePlayer(DAT_10db6ee8[index], toPlayer);
             motion = GALAXY_MOTION_IDLE;
             FlashGrey();
             goto finish;
@@ -882,20 +876,20 @@ int NeoGalaxy_Update(int index)
         {
             DAT_10255160[index][1] = 60.0f;
             motion = GALAXY_MOTION_IDLE;
-            Vec4 where = self.matrix.GetTranslation();
+            Vec4 where = DAT_10db6ee8[index].matrix.GetTranslation();
             where.z = 0.0f;
-            FireEffect(index, 0x754, ownPos, 0.0f, 0.0f, slot.stats[3], 1.8f, 0, 0, 2);
+            FireEffect(index, 0x754, ownPos, 0.0f, 0.0f, DAT_10daaae8[index].stats[3], 1.8f, 0, 0, 2);
             goto finish;
         }
         if (STEP < 0x2d)
         {
-            FacePlayer(self, toPlayer);
+            FacePlayer(DAT_10db6ee8[index], toPlayer);
             step.z = DAT_10255160[index][1];
             moveMode = 2;
             DAT_10255160[index][1] = DAT_10255160[index][1] - 4.0f;
             motion = GALAXY_MOTION_IDLE;
             if (STEP >= 0x1a && STEP <= 0x1e)
-                self.root->matrix = RotationX((float)(STEP - 0x19) * -0.62832f);
+                DAT_10db6ee8[index].root->matrix = RotationX((float)(STEP - 0x19) * -0.62832f);
             goto finish;
         }
         if (STEP > 0x3f)
@@ -908,9 +902,9 @@ int NeoGalaxy_Update(int index)
                 {
                     FlashGrey();
                     FUN_10056260(index, GALAXY_LINE_FLAME_ATTACK, "", "", "");
-                    FacePlayer(self, toPlayer);
+                    FacePlayer(DAT_10db6ee8[index], toPlayer);
                     moveMode = 2;
-                    step.z = -self.matrix.translation.z;
+                    step.z = -DAT_10db6ee8[index].matrix.translation.z;
                 }
                 goto finish;
             }
@@ -918,7 +912,7 @@ int NeoGalaxy_Update(int index)
             {
                 if (STEP == 0x41)
                 {
-                    FireEffect(index, 0x756, ownPos, 0.0f, 0.0f, slot.stats[3], 1.9f, 5, spineBone, 0);
+                    FireEffect(index, 0x756, ownPos, 0.0f, 0.0f, DAT_10daaae8[index].stats[3], 1.9f, 5, spineBone, 0);
                     FUN_10065b10(index, 0x22d, 0, 0);
                 }
                 goto finish;
@@ -932,7 +926,7 @@ int NeoGalaxy_Update(int index)
                     else
                     {
                         FlashGrey();
-                        FacePlayer(self, toPlayer);
+                        FacePlayer(DAT_10db6ee8[index], toPlayer);
                         FUN_10056260(index, GALAXY_LINE_COLD_UPPER, "", "", "");
                     }
                     goto finish;
@@ -944,23 +938,23 @@ int NeoGalaxy_Update(int index)
                         // Three whirls of slashes, one frame after the other.
                         Vec4 offset;
                         offset.y = -200.0f;
-                        offset.RotateZ(self.heading);
+                        offset.RotateZ(DAT_10db6ee8[index].heading);
                         Vec4 spot = ownPos + offset;
-                        FireEffect(index, 0x71b, spot, 0.0f, 0.0f, slot.stats[3], 2.2f, 0, 0, 0);
+                        FireEffect(index, 0x71b, spot, 0.0f, 0.0f, DAT_10daaae8[index].stats[3], 2.2f, 0, 0, 0);
                         spot = DAT_10db6ee8[0].matrix.GetTranslation() + offset;
-                        FireEffect(index, 0x71b, spot, 0.0f, 0.0f, slot.stats[3], 2.2f, 0, 0, 7);
+                        FireEffect(index, 0x71b, spot, 0.0f, 0.0f, DAT_10daaae8[index].stats[3], 2.2f, 0, 0, 7);
                         FUN_1003ad20(0x71b, &spot, 1.0f);
                         spot = DAT_10db6ee8[0].matrix.GetTranslation() + offset;
-                        FireEffect(index, 0x71b, spot, 0.0f, 0.0f, slot.stats[3], 2.2f, 0, 0, 0xe);
+                        FireEffect(index, 0x71b, spot, 0.0f, 0.0f, DAT_10daaae8[index].stats[3], 2.2f, 0, 0, 0xe);
                         FUN_1003ad20(0x71b, &spot, 1.0f);
                     }
                     goto finish;
                 }
                 FlashWhite(0xf);
                 STATE = GALAXY_STATE_CHOOSE;
-                self.mode = 1;
-                self.m_238c = 1;
-                step.z = -self.matrix.translation.z;
+                DAT_10db6ee8[index].mode = 1;
+                DAT_10db6ee8[index].m_238c = 1;
+                step.z = -DAT_10db6ee8[index].matrix.translation.z;
                 moveMode = 2;
                 motion = GALAXY_MOTION_IDLE;
                 if (DAT_104bfb08[index] == 3)
@@ -972,12 +966,12 @@ int NeoGalaxy_Update(int index)
             step.y = -50.0f;
             if (STEP < 0x50)
             {
-                self.root->matrix = RotationX((float)(STEP - 0x4a) * -0.31416f);
+                DAT_10db6ee8[index].root->matrix = RotationX((float)(STEP - 0x4a) * -0.31416f);
                 step.z = 20.0f;
             }
             if (STEP >= 100)
             {
-                self.root->matrix = RotationX((float)(0x68 - STEP) * -0.31416f);
+                DAT_10db6ee8[index].root->matrix = RotationX((float)(0x68 - STEP) * -0.31416f);
                 step.z = -20.0f;
             }
             if (STEP < 0x52)
@@ -987,7 +981,7 @@ int NeoGalaxy_Update(int index)
             if (STEP % 3 == 0)
                 FireEffect(index, 0x600, ownPos, 0.0f, 0.0f, 0, 1.0f, 0, 0, 0);
             moveMode = 2;
-            step.RotateZ(self.heading);
+            step.RotateZ(DAT_10db6ee8[index].heading);
             goto finish;
         }
         // Steps 0x2d..0x3f: the landing, the ground shakes and the body slides back.
@@ -1003,15 +997,15 @@ int NeoGalaxy_Update(int index)
         if (STEP > 0x2e)
         {
             step.y = -10.0f;
-            step.RotateZ(self.heading);
+            step.RotateZ(DAT_10db6ee8[index].heading);
         }
         DAT_10255160[index][1] = DAT_10255160[index][1] - 4.0f;
         if (STEP <= 0x32)
-            self.root->matrix = RotationX((float)(0x32 - STEP) * -0.62832f);
+            DAT_10db6ee8[index].root->matrix = RotationX((float)(0x32 - STEP) * -0.62832f);
         goto finish;
     }
 
-    // State 0x14: summons a helper enemy (kind 0x32 in the first free slot) with a quarter of this one's health.
+    // State 0x14: summons a helper enemy (kind 0x32 in the first free DAT_10daaae8[index]) with a quarter of this one's health.
     if (STATE == GALAXY_STATE_SPAWN_HELPER)
     {
         STEP++;
@@ -1020,29 +1014,28 @@ int NeoGalaxy_Update(int index)
             int helper = FUN_10050510(ownPos.x, ownPos.y, ownPos.z, GALAXY_KIND, 0);
             if (helper > 0)
             {
-                CharSlot &helperSlot = DAT_10daaae8[helper];
                 if (WORD_ANGRY == 0)
-                    helperSlot.stats[STAT_HEALTH] = helperSlot.stats[STAT_MAX_HEALTH] / 4;
+                    DAT_10daaae8[helper].stats[STAT_HEALTH] = DAT_10daaae8[helper].stats[STAT_MAX_HEALTH] / 4;
                 else
-                    helperSlot.stats[STAT_HEALTH] = helperSlot.stats[STAT_MAX_HEALTH];
-                helperSlot.stats[GALAXY_SUMMON_HEALTH_STAT] = -0x14;
-                helperSlot.stats[STAT_EFFECT_PARAM] = (int)((float)slot.stats[STAT_EFFECT_PARAM] * GALAXY_STAT_SCALE + 0.5f);
+                    DAT_10daaae8[helper].stats[STAT_HEALTH] = DAT_10daaae8[helper].stats[STAT_MAX_HEALTH];
+                DAT_10daaae8[helper].stats[GALAXY_SUMMON_HEALTH_STAT] = -0x14;
+                DAT_10daaae8[helper].stats[STAT_EFFECT_PARAM] = (int)((float)DAT_10daaae8[index].stats[STAT_EFFECT_PARAM] * GALAXY_STAT_SCALE + 0.5f);
                 WORD_COUNT = FUN_1013f880() & 1;
                 STEP = 0;
                 STATE = GALAXY_STATE_HELPER_WAIT;
                 DAT_1021f940[index] = 0x1e;
-                self.locked = 1;
-                slot.m_0141 = 1;
+                DAT_10db6ee8[index].locked = 1;
+                DAT_10daaae8[index].m_0141 = 1;
                 FUN_1001dc20(helper);
                 Char_UpdateByKind(helper);
                 DAT_1021f940[helper] = 0x1d;
                 DAT_1020d540[helper] = 1;
                 DAT_1020b430[helper].words[5] = WORD_COUNT == 0;
                 DAT_10db6ee8[helper].locked = 1;
-                DAT_10db6ee8[helper].heading = self.heading;
-                DAT_10db6ee8[helper].targetHeading = self.targetHeading;
-                helperSlot.m_0141 = 1;
-                helperSlot.coins = 0;
+                DAT_10db6ee8[helper].heading = DAT_10db6ee8[index].heading;
+                DAT_10db6ee8[helper].targetHeading = DAT_10db6ee8[index].targetHeading;
+                DAT_10daaae8[helper].m_0141 = 1;
+                DAT_10daaae8[helper].coins = 0;
                 DAT_1021b4c8[helper] = (char)(helper % 5);
                 DAT_102199b8[helper] = 2;
                 DAT_10db6ee8[helper].alpha = 1.0f;
@@ -1065,9 +1058,9 @@ int NeoGalaxy_Update(int index)
         {
             moveMode = 1;
             step.y = -30.0f / (float)(before - 0x3b);
-            step.RotateZ(self.heading);
-            slot.m_0141 = 0;
-            self.locked = 0;
+            step.RotateZ(DAT_10db6ee8[index].heading);
+            DAT_10daaae8[index].m_0141 = 0;
+            DAT_10db6ee8[index].locked = 0;
             goto finish;
         }
         if (STEP == 0x5a)
@@ -1081,21 +1074,21 @@ int NeoGalaxy_Update(int index)
         STEP++;
         if (WORD_IDLE_FRAMES > 0xa8c)
             WORD_IDLE_FRAMES = 0;
-        if (STEP < 5 && self.m_238c != 0)
+        if (STEP < 5 && DAT_10db6ee8[index].m_238c != 0)
         {
-            self.AddMotionSpeed(GALAXY_MOTION_SPEED);
+            DAT_10db6ee8[index].AddMotionSpeed(GALAXY_MOTION_SPEED);
             FUN_10065b10(index, GALAXY_SOUND_FLASH, 1, 0);
         }
         if (STEP < 0xf)
-            self.alpha = (float)abs(STEP - 0xf) / GALAXY_FADE_FRAMES;
+            DAT_10db6ee8[index].alpha = (float)abs(STEP - 0xf) / GALAXY_FADE_FRAMES;
         else if (DAT_1020c2b0 == 0x1f)
         {
-            self.alpha = 0.0f;
+            DAT_10db6ee8[index].alpha = 0.0f;
             WORD_GONE = 1;
-            slot.stats[STAT_BUSY] = 1;
-            self.SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
-            if (slot.stats[STAT_HEALTH] > 0)
-                self.mode = 0;
+            DAT_10daaae8[index].stats[STAT_BUSY] = 1;
+            DAT_10db6ee8[index].SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
+            if (DAT_10daaae8[index].stats[STAT_HEALTH] > 0)
+                DAT_10db6ee8[index].mode = 0;
         }
         if (WORD_DEFEATED == 0 && STEP > 0xf)
         {
@@ -1112,7 +1105,7 @@ int NeoGalaxy_Update(int index)
         STEP++;
         if (STEP == 1)
         {
-            if ((WORD_ANGRY == 0 && slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 2) ||
+            if ((WORD_ANGRY == 0 && DAT_10daaae8[index].stats[STAT_HEALTH] < DAT_10daaae8[index].stats[STAT_MAX_HEALTH] / 2) ||
                 (DAT_10db6ee8[index + 2].matrix.translation.x >= GALAXY_OFF_SCENE && DAT_10210d30[index + 2] == 0 &&
                  DAT_10db6ee8[index + 4].matrix.translation.x >= GALAXY_OFF_SCENE && DAT_10210d30[index + 4] == 0))
             {
@@ -1131,10 +1124,10 @@ int NeoGalaxy_Update(int index)
         {
             if (STEP > 0xf)
             {
-                int health = slot.stats[STAT_HEALTH];
+                int health = DAT_10daaae8[index].stats[STAT_HEALTH];
                 if (health > 0)
-                    self.mode = 0;
-                if (WORD_ANGRY == 0 && health < slot.stats[STAT_MAX_HEALTH] / 2)
+                    DAT_10db6ee8[index].mode = 0;
+                if (WORD_ANGRY == 0 && health < DAT_10daaae8[index].stats[STAT_MAX_HEALTH] / 2)
                 {
                     bool secondOut = BODY_WORD(index + 2, 8) != 0 || DAT_10210d30[index + 2] == 2 || DAT_10210d30[index + 2] > 4 ||
                                      DAT_10db6ee8[index + 2].matrix.translation.x < GALAXY_OFF_SCENE;
@@ -1163,22 +1156,22 @@ int NeoGalaxy_Update(int index)
                         STATE = GALAXY_STATE_CHOOSE;
                 }
             }
-            if (STEP < 5 && self.m_238c != 0)
+            if (STEP < 5 && DAT_10db6ee8[index].m_238c != 0)
             {
-                self.AddMotionSpeed(GALAXY_MOTION_SPEED);
+                DAT_10db6ee8[index].AddMotionSpeed(GALAXY_MOTION_SPEED);
                 FUN_10065b10(index, GALAXY_SOUND_FLASH, 1, 0);
             }
             if (STEP < 0xf)
             {
-                self.alpha = (float)abs(STEP - 0xf) / GALAXY_FADE_FRAMES;
+                DAT_10db6ee8[index].alpha = (float)abs(STEP - 0xf) / GALAXY_FADE_FRAMES;
                 goto finish;
             }
             if (STATE == GALAXY_STATE_FINISH)
             {
-                slot.stats[STAT_BUSY] = 1;
-                self.alpha = 0.0f;
+                DAT_10daaae8[index].stats[STAT_BUSY] = 1;
+                DAT_10db6ee8[index].alpha = 0.0f;
                 WORD_GONE = 1;
-                self.SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
+                DAT_10db6ee8[index].SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
                 goto finish;
             }
         }
@@ -1189,7 +1182,7 @@ int NeoGalaxy_Update(int index)
     if (STATE == GALAXY_STATE_RETURN)
     {
         motion = GALAXY_MOTION_IDLE;
-        slot.stats[STAT_BUSY] = 0;
+        DAT_10daaae8[index].stats[STAT_BUSY] = 0;
         STEP++;
         if (STEP == 1)
         {
@@ -1197,16 +1190,16 @@ int NeoGalaxy_Update(int index)
             spot.y = (float)(FUN_1013f880() % 0x640);
             spot.RotateZ((float)FUN_1013f880());
             spot.z = GALAXY_RING_HEIGHT;
-            if (self.matrix.translation.x > GALAXY_OFF_SCENE)
-                self.SetPosition(spot.x, spot.y, spot.z);
-            self.mode = 1;
+            if (DAT_10db6ee8[index].matrix.translation.x > GALAXY_OFF_SCENE)
+                DAT_10db6ee8[index].SetPosition(spot.x, spot.y, spot.z);
+            DAT_10db6ee8[index].mode = 1;
         }
         if (STEP < 0xf)
-            self.alpha = (float)STEP / GALAXY_FADE_FRAMES;
+            DAT_10db6ee8[index].alpha = (float)STEP / GALAXY_FADE_FRAMES;
         else
         {
             STATE = GALAXY_STATE_CHOOSE;
-            self.alpha = 1.0f;
+            DAT_10db6ee8[index].alpha = 1.0f;
             RemoveHelpers(GALAXY_GHOST_KIND, 0);
         }
         goto finish;
@@ -1279,11 +1272,10 @@ int NeoGalaxy_Update(int index)
             PlaceRing(ring, angle);
             for (int body = 0; body < 3; body++)
             {
-                AnimModel &model = DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE];
-                model.matrix.translation.x = ring[body].x;
-                model.matrix.translation.y = ring[body].y;
-                model.PlayMotion(GALAXY_MOTION_WALK, 0, 5, 1.0f);
-                model.targetHeading = (float)FUN_10001f80(ring[body].x, ring[body].y) + GALAXY_PI;
+                DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].matrix.translation.x = ring[body].x;
+                DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].matrix.translation.y = ring[body].y;
+                DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].PlayMotion(GALAXY_MOTION_WALK, 0, 5, 1.0f);
+                DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].targetHeading = (float)FUN_10001f80(ring[body].x, ring[body].y) + GALAXY_PI;
             }
         }
         if (STEP < 0xff || STEP > 0x10d)
@@ -1375,19 +1367,19 @@ int NeoGalaxy_Update(int index)
         rootNode->matrix = rootNode->matrix * spin;
         if (STEP == 1)
         {
-            self.mode = 1;
-            self.SetPosition(toPlayer.x, toPlayer.y, 0.0f);
-            self.targetHeading = (float)FUN_10001f80(toPlayer.x, toPlayer.y) + GALAXY_PI;
-            self.heading = self.targetHeading;
-            slot.stats[STAT_BUSY] = 1;
+            DAT_10db6ee8[index].mode = 1;
+            DAT_10db6ee8[index].SetPosition(toPlayer.x, toPlayer.y, 0.0f);
+            DAT_10db6ee8[index].targetHeading = (float)FUN_10001f80(toPlayer.x, toPlayer.y) + GALAXY_PI;
+            DAT_10db6ee8[index].heading = DAT_10db6ee8[index].targetHeading;
+            DAT_10daaae8[index].stats[STAT_BUSY] = 1;
             FUN_1000ec70(0xf, 1.0f, 1.0f, 1.0f, 1.0f);
         }
         int frame = STEP;
         if (frame < 0xf)
-            self.alpha = (float)frame / GALAXY_FADE_FRAMES;
+            DAT_10db6ee8[index].alpha = (float)frame / GALAXY_FADE_FRAMES;
         else if (frame == 0xf)
         {
-            self.alpha = 1.0f;
+            DAT_10db6ee8[index].alpha = 1.0f;
             motion = GALAXY_MOTION_IDLE;
             FUN_10056260(index, GALAXY_LINE_NAME, "", "", "");
         }
@@ -1395,17 +1387,17 @@ int NeoGalaxy_Update(int index)
         {
             if (frame < 100)
             {
-                if (frame < 0x5a && self.m_238c != 0)
+                if (frame < 0x5a && DAT_10db6ee8[index].m_238c != 0)
                 {
-                    self.AddMotionSpeed(GALAXY_MOTION_SPEED);
+                    DAT_10db6ee8[index].AddMotionSpeed(GALAXY_MOTION_SPEED);
                     FUN_10065b10(index, GALAXY_SOUND_FLASH, 1, 0);
                 }
-                self.alpha = (float)(100 - STEP) / GALAXY_FADE_FRAMES;
+                DAT_10db6ee8[index].alpha = (float)(100 - STEP) / GALAXY_FADE_FRAMES;
             }
             else if (frame == 100)
             {
-                self.SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
-                self.mode = 0;
+                DAT_10db6ee8[index].SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
+                DAT_10db6ee8[index].mode = 0;
             }
             else if (frame > 0x1c1)
             {
@@ -1413,13 +1405,13 @@ int NeoGalaxy_Update(int index)
                 {
                     if (frame == 0x1c2)
                     {
-                        self.SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
-                        self.mode = 1;
+                        DAT_10db6ee8[index].SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
+                        DAT_10db6ee8[index].mode = 1;
                     }
-                    self.alpha = (float)(STEP - 0x1c2) / GALAXY_FADE_FRAMES;
+                    DAT_10db6ee8[index].alpha = (float)(STEP - 0x1c2) / GALAXY_FADE_FRAMES;
                 }
                 else if (frame == 0x1d1)
-                    self.alpha = 1.0f;
+                    DAT_10db6ee8[index].alpha = 1.0f;
             }
         }
         frame = STEP;
@@ -1519,18 +1511,18 @@ int NeoGalaxy_Update(int index)
         {
             if (frame < 0x27b)
             {
-                if (frame < 0x271 && self.m_238c != 0)
+                if (frame < 0x271 && DAT_10db6ee8[index].m_238c != 0)
                 {
-                    self.AddMotionSpeed(GALAXY_MOTION_SPEED);
+                    DAT_10db6ee8[index].AddMotionSpeed(GALAXY_MOTION_SPEED);
                     FUN_10065b10(index, GALAXY_SOUND_FLASH, 1, 0);
                 }
-                self.alpha = (float)(0x27b - STEP) / GALAXY_FADE_FRAMES;
+                DAT_10db6ee8[index].alpha = (float)(0x27b - STEP) / GALAXY_FADE_FRAMES;
             }
             else if (frame == 0x27b)
             {
-                self.SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
-                self.mode = 0;
-                slot.stats[STAT_BUSY] = 0;
+                DAT_10db6ee8[index].SetPosition(GALAXY_PARKED_X, 0.0f, 0.0f);
+                DAT_10db6ee8[index].mode = 0;
+                DAT_10daaae8[index].stats[STAT_BUSY] = 0;
                 WORD_DEFEATED = 0;
                 WORD_GONE = 0;
                 BODY_WORD(index + 2, 7) = 0;
@@ -1548,17 +1540,17 @@ int NeoGalaxy_Update(int index)
     if (STATE == GALAXY_STATE_REST)
     {
         STEP++;
-        if (STEP < 5 && self.m_238c != 0)
+        if (STEP < 5 && DAT_10db6ee8[index].m_238c != 0)
         {
-            self.AddMotionSpeed(GALAXY_MOTION_SPEED);
+            DAT_10db6ee8[index].AddMotionSpeed(GALAXY_MOTION_SPEED);
             FUN_10065b10(index, GALAXY_SOUND_FLASH, 1, 0);
         }
         int frame = STEP;
         if (frame < 0x1e)
-            self.alpha = (float)abs(frame - 0xf) / GALAXY_FADE_FRAMES;
+            DAT_10db6ee8[index].alpha = (float)abs(frame - 0xf) / GALAXY_FADE_FRAMES;
         else if (frame == 0x1f)
         {
-            self.alpha = 1.0f;
+            DAT_10db6ee8[index].alpha = 1.0f;
             STATE = GALAXY_STATE_CHOOSE;
         }
         if (frame == 0xf)
@@ -1566,8 +1558,8 @@ int NeoGalaxy_Update(int index)
             Vec4 spot;
             spot.y = (float)(FUN_1013f880() % 0x640);
             spot.RotateZ((float)(FUN_1013f880() % 0x168));
-            self.matrix.translation.x = spot.x;
-            self.matrix.translation.y = spot.y;
+            DAT_10db6ee8[index].matrix.translation.x = spot.x;
+            DAT_10db6ee8[index].matrix.translation.y = spot.y;
         }
         goto finish;
     }
@@ -1587,7 +1579,7 @@ int NeoGalaxy_Update(int index)
                 STATE = GALAXY_STATE_RING_A + (FUN_1013f880() & 1);
             else
                 STATE = GALAXY_STATE_RING_A + FUN_1013f880() % 3;
-            if (WORD_ANGRY == 0 && slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 2)
+            if (WORD_ANGRY == 0 && DAT_10daaae8[index].stats[STAT_HEALTH] < DAT_10daaae8[index].stats[STAT_MAX_HEALTH] / 2)
             {
                 STATE = GALAXY_STATE_ENDING;
                 WORD_ANGRY = 1;
@@ -1609,7 +1601,7 @@ int NeoGalaxy_Update(int index)
             WORD_ATTACKS++;
             if (index == GALAXY_FIRST_SLOT)
             {
-                bool weak = DAT_1020c2dc == 0 && slot.stats[STAT_HEALTH] < slot.stats[STAT_MAX_HEALTH] / 2;
+                bool weak = DAT_1020c2dc == 0 && DAT_10daaae8[index].stats[STAT_HEALTH] < DAT_10daaae8[index].stats[STAT_MAX_HEALTH] / 2;
                 if (FUN_1013f880() % 0x32 < DAT_1020c2d4 * 3 || weak || DAT_1020c2e4 > 0xa8c)
                 {
                     DAT_1020c2d4 = 0;
@@ -1707,7 +1699,6 @@ int NeoGalaxy_Update(int index)
             PlaceRing(ring, -angle);
             for (int body = 0; body < 3; body++)
             {
-                AnimModel &model = DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE];
                 Vec4 hit;
                 if (FUN_100246b0(&ring[body], &center, &hit, 0, 0) != 0)
                 {
@@ -1717,47 +1708,46 @@ int NeoGalaxy_Update(int index)
                     ring[body].y = -reach;
                     ring[body].RotateZ(around);
                 }
-                Vec4 offset = ring[body] - model.matrix.GetTranslation();
+                Vec4 offset = ring[body] - DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].matrix.GetTranslation();
                 offset.z = 0.0f;
                 float length = offset.Length2D();
                 if (length <= 2.0f)
-                    model.PlayMotion(GALAXY_MOTION_IDLE, 0, 5, 1.0f);
+                    DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].PlayMotion(GALAXY_MOTION_IDLE, 0, 5, 1.0f);
                 else
                 {
                     offset = offset.Normalized3() * 12.0f;
                     FUN_100241e0(index + body * GALAXY_BODY_STRIDE, offset.x, offset.y, offset.z);
-                    model.PlayMotion(GALAXY_MOTION_WALK, 0, 5, 1.0f);
+                    DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].PlayMotion(GALAXY_MOTION_WALK, 0, 5, 1.0f);
                 }
-                model.targetHeading = (float)FUN_10001f80(ring[body].x, ring[body].y) + GALAXY_PI;
+                DAT_10db6ee8[index + body * GALAXY_BODY_STRIDE].targetHeading = (float)FUN_10001f80(ring[body].x, ring[body].y) + GALAXY_PI;
             }
             if (STEP % 0xf == 0)
             {
                 int shooter = ((STEP / 0xf) % 3) * 2 + GALAXY_FIRST_SLOT;
-                AnimModel &shooterModel = DAT_10db6ee8[shooter];
-                if (shooterModel.matrix.translation.x > GALAXY_OFF_SCENE)
+                if (DAT_10db6ee8[shooter].matrix.translation.x > GALAXY_OFF_SCENE)
                 {
-                    Vec4 muzzle = shooterModel.matrix.GetTranslation();
+                    Vec4 muzzle = DAT_10db6ee8[shooter].matrix.GetTranslation();
                     Vec4 origin;
                     EffectOptions options;
                     options.m_0000 = 0;
-                    options.m_0004 = slot.stats[3];
+                    options.m_0004 = DAT_10daaae8[index].stats[3];
                     options.m_0008 = 0.9f;
                     options.owner = GALAXY_FIRST_SLOT;
                     options.m_000e = 5;
-                    FUN_1001d8b0(index, 0x74f, origin, -1, -1, &shooterModel.root->worldMatrix, 0, 0, 0, 0);
+                    FUN_1001d8b0(index, 0x74f, origin, -1, -1, &DAT_10db6ee8[shooter].root->worldMatrix, 0, 0, 0, 0);
                     switch (FUN_1013f880() % (hard * 2 + 6))
                     {
                     case 0:
                     case 3:
-                        FireEffect(index, 0x41a, muzzle, shooterModel.targetHeading, 0.0f, 0, 1.0f, 0, 0, 0);
-                        FireEffect(index, 0x422, muzzle, shooterModel.targetHeading, 0.0f, 0, 1.0f, 0, 0, 0);
+                        FireEffect(index, 0x41a, muzzle, DAT_10db6ee8[shooter].targetHeading, 0.0f, 0, 1.0f, 0, 0, 0);
+                        FireEffect(index, 0x422, muzzle, DAT_10db6ee8[shooter].targetHeading, 0.0f, 0, 1.0f, 0, 0, 0);
                         break;
                     case 1:
                     case 4:
                         FireEffect(index, 0x25, muzzle, 0.0f, 50.0f, 0, 1.0f, 0, 0, 0);
                         FireEffect(index, 0x52, muzzle, 0.0f, 50.0f, 0, 1.0f, 0, 0, 0);
                         for (int orb = 0; orb < 5; orb++)
-                            FireEffect(index, 0x423, muzzle, (float)orb * 1.256637f + shooterModel.targetHeading, 50.0f, 0, 1.0f, 0, 0, 0);
+                            FireEffect(index, 0x423, muzzle, (float)orb * 1.256637f + DAT_10db6ee8[shooter].targetHeading, 50.0f, 0, 1.0f, 0, 0, 0);
                         FUN_10065b10(shooter, 0x397, 1, 0);
                         break;
                     case 2:
@@ -1816,15 +1806,15 @@ finish:
         DAT_1020b430[index].words[4] = STATE;
     if (motion != -1)
     {
-        Playback *playback = self.motion;
+        Playback *playback = DAT_10db6ee8[index].motion;
         if ((playback->layer < 0x5a || playback->blending != 0) && (playback->nextLayer < 0x5a || DAT_104686b0[index] == 0))
-            self.PlayMotion(motion, 0, 5, 1.0f);
+            DAT_10db6ee8[index].PlayMotion(motion, 0, 5, 1.0f);
     }
     if (moveMode == 1)
         FUN_100241e0(index, step.x, step.y, step.z);
     else if (moveMode != 0)
-        self.SetPosition(ownPos.x + step.x, ownPos.y + step.y, ownPos.z + step.z);
-    if (self.matrix.translation.z < 0.0f)
-        self.matrix.translation.z = 0.0f;
+        DAT_10db6ee8[index].SetPosition(ownPos.x + step.x, ownPos.y + step.y, ownPos.z + step.z);
+    if (DAT_10db6ee8[index].matrix.translation.z < 0.0f)
+        DAT_10db6ee8[index].matrix.translation.z = 0.0f;
     return 0;
 }

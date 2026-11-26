@@ -1,0 +1,59 @@
+# Builds and tests the native port scaffold (port/) on Linux x64 and Linux arm64.
+# gurumin_core compiles matched decomp files unchanged; the tests run them natively on both architectures.
+# No game files are needed: gurumin_port --probe only self-tests the compiled code when no --game folder is given.
+name: port
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: x64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    name: linux-${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build g++ libsdl2-dev
+
+      - name: Configure
+        run: cmake -S port -B build/port -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      - name: Build
+        run: cmake --build build/port
+
+      - name: Test
+        run: ctest --test-dir build/port --output-on-failure
+
+      - name: Run the shell headless
+        run: |
+          uname -m
+          build/port/gurumin_port --help
+          build/port/gurumin_port --probe
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v5
+        with:
+          name: gurumin-port-linux-${{ matrix.arch }}
+          path: |
+            build/port/gurumin_port
+            build/port/gurumin_core_tests
+            build/port/gurumin_formats_tests
+            build/port/libgurumin_core.a
+          if-no-files-found: error

@@ -1291,7 +1291,7 @@ static __forceinline void BurstIntoPieces(const Vec4 &at, const Vec4 *direction,
 // MAX_CATCH_UP_TICKS, otherwise one); every tick polls the input (and records or replays it), runs the main menu and
 // the queued events and then the whole game logic for the player and the characters. After the last tick the model
 // bank and the lens flare are prepared and the scene is drawn. Returns 0 when the frame was cut short, 1 otherwise.
-extern "C" int FUN_1011d810(void)
+int FUN_1011d810(void)
 {
     int ticks;
     int tick;
@@ -1315,9 +1315,8 @@ extern "C" int FUN_1011d810(void)
     char gameOverPadA;
     char gameOverPadB;
     int gameOverPos[2];
-    int stepForced;
+    char stepForced;
     int engineTick;
-    int windowBusy;
     int modelCount;
     int modelPos;
     int modelIdx;
@@ -1402,12 +1401,12 @@ extern "C" int FUN_1011d810(void)
         DAT_104bfe50 = 0;
         for (i = 1; i < CHAR_SLOT_COUNT; i++)
             DAT_10daaae8[i].stats[STAT_HEALTH] = DAT_10daaae8[i].stats[STAT_MAX_HEALTH];
-        if (DAT_104b7210 > -1)
+        if (DAT_104b7210 >= 0)
             FUN_10174c70(DAT_104b7210, 0);
         DAT_104b7210 = -1;
         for (i = 0; i < HUD_TEXTURE_SLOT_COUNT; i++)
         {
-            if (DAT_10202808[i] > -1)
+            if (DAT_10202808[i] >= 0)
                 FUN_10174c70(DAT_10202808[i], 0);
             DAT_10202808[i] = -1;
         }
@@ -1430,15 +1429,13 @@ extern "C" int FUN_1011d810(void)
         DAT_104c02f0 = 0;
     else
     {
-        float modelDistance = DAT_10db6ee8[NEAR_MODEL].matrix.GetTranslation().Distance(DAT_10db6ee8[0].matrix.GetTranslation());
         DAT_104c02f0 = 1;
-        if (modelDistance >= NEAR_MODEL_DISTANCE)
+        if (!(DAT_10db6ee8[NEAR_MODEL].matrix.GetTranslation().Distance(DAT_10db6ee8[0].matrix.GetTranslation()) < NEAR_MODEL_DISTANCE))
             DAT_104c02f0 = 0;
     }
-    windowBusy = DAT_104b7200.IsAnyWindowBusy();
     engineTick = DAT_10f65504;
     stepForced = DAT_104c0134;
-    if (windowBusy != 0 || (DAT_104c0135 = 0, DAT_104c03dc != 0))
+    if (DAT_104b7200.IsAnyWindowBusy() != 0 || (DAT_104c0135 = 0, DAT_104c03dc != 0))
         DAT_104c0135 = 1;
     DAT_10db6ee8[DAT_104bf8b4].m_02a0 = 0;
     if (DAT_104bf8b8 == engineTick && stepForced == 0)
@@ -1448,9 +1445,10 @@ extern "C" int FUN_1011d810(void)
     ticks = engineTick - DAT_104bf8b8;
     DAT_104bf8b8 = engineTick;
     if (DAT_1065cb90 != 0)
-        DAT_104c0184 = DAT_104c0184 + 0xf - ticks * 5;
-    if (ticks > MAX_CATCH_UP_TICKS || DAT_104bf8a0 != 0 || DAT_104bf880 != 0 || ticks == 0 || stepForced != 0
-        || DAT_1065cb90 != 0)
+        DAT_104c0184 = DAT_104c0184 + 0xf + ticks * -5;
+    if (ticks > MAX_CATCH_UP_TICKS || DAT_104bf8a0 != 0 || DAT_104bf880 != 0)
+        ticks = 1;
+    if (ticks == 0 || stepForced != 0 || DAT_1065cb90 != 0)
         ticks = 1;
     DAT_104c020c = 1;
     for (tick = 0; tick < ticks; tick++)
@@ -1508,9 +1506,13 @@ extern "C" int FUN_1011d810(void)
         DAT_10210f30 = DAT_10f08008.ReadControls(0);
         DAT_1020d9e0.M_10001550();
         DAT_104bf890 = DAT_104bf890 + 1;
-        if (DAT_10202358 < BGM_TRACK_LIMIT && DAT_108db358[DAT_10202358].m_002c != 0)
-            DAT_1032d6a0 = ((DAT_10254088 - DAT_108db358[DAT_10202358].start) * BGM_BEAT_STEPS)
-                           / (BGM_BEAT_SAMPLES / DAT_108db358[DAT_10202358].m_002c);
+        if (DAT_10202358 < BGM_TRACK_LIMIT)
+        {
+            int trackTempo = DAT_108db358[DAT_10202358].m_002c;
+            if (trackTempo != 0)
+                DAT_1032d6a0 = ((DAT_10254088 - DAT_108db358[DAT_10202358].start) * BGM_BEAT_STEPS)
+                               / (BGM_BEAT_SAMPLES / trackTempo);
+        }
         DAT_1065cb28.SetButtons(DAT_10210f30);
         DAT_1065cb28.M_1015caa0(DAT_10f08008.ReadControls(1), 0);
         DAT_1065cb28.M_1015caa0(DAT_10f08008.ReadControls(2), 1);

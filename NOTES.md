@@ -585,3 +585,9 @@ original had there is not found yet.
   EffectManager::DrawRecord builds; Init/Reset clear only the first 0x80 (rep stosd 0x80280 dwords), so they spell the size
   as sizeof(EffectLight) * EFFECT_LIGHT_COUNT. The old globals DAT_11aea3f8/DAT_11aeabfc are light 0x80 fields
   (pointCount, points[RIBBON_JITTER_BASE + i]). Resizing a shared array changes every sizeof() of it in matched code.
+
+## Linkage and EH frames (0x1011d810, batch 373)
+An `extern "C"` function built here under /GX got no EH frame (no `push -1 / handler / fs:[0]` prologue and no
+`mov [esp+N], state` writes around temporaries with destructors). When the original has that prologue, give the
+function C++ linkage and map its mangled name in obj_symbols.tsv (in-game frame: `?FUN_1011d810@@YAHXZ`). Check the
+other huge drafts (Bs00x_Update, DrawLit, RunScriptFrames) for the same gap.

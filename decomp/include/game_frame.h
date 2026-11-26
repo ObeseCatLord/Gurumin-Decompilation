@@ -9,7 +9,7 @@
 // engine tick that has elapsed since the last frame (the first frame also resets the mode's globals), then prepares
 // and draws the scene. Returns 0 when the pass was cut short (the main menu opened or a queued event is due while
 // the debug flag is set) and 1 when the frame was completed.
-extern "C" int FUN_1011d810(void);
+int FUN_1011d810(void);
 
 // 0x10057ee0 (drill_level.cpp): keeps the drill gauge in range and moves the drill level to match it. Returns 0.
 int UpdateDrillLevel(void);

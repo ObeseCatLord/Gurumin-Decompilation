@@ -61,7 +61,7 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 - Type puns to clean up (batch 15): DShowStream::EndStreams casts to `IDirectDrawMediaStreamLike *` for vtable slot 8
   (declare slot 8 on the interface instead); Packs_DecodePlaneBands casts between two band views (make one type).
 - PR 3 (EN launcher, MFC) is merged: `E:\Microsoft Visual Studio 12.0` is now VS2013 Community Update 4 with
-  `VCtlmfc`; 28 MFC/ATL instantiations reclassified as library (2,006 game functions). The launcher range
+  `VC\atlmfc`; 28 MFC/ATL instantiations reclassified as library (2,006 game functions). The launcher range
   0x6e5d60-0x6f15af is open again; open.tsv lists what PR 3 left. Before each push: `git fetch`, merge origin/master
   if it moved (TSV/MD conflicts: keep both sides, then check obj_symbols for duplicate rows).
 - Never add address-taking tables or macros that only force COMDAT emission.

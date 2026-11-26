@@ -26,4 +26,17 @@ extern "C" int Launcher_SaveSettings();
 // a WM_QUIT, which it also logs to a file. Called by the launcher while it waits. EN 0x006e8fa0.
 extern "C" int Launcher_PumpMessages(void);
 
+// Clears the read-only attribute of the file `path` when it exists (the status is read and written back). EN 0x006ea720.
+extern "C" void Launcher_ClearReadOnly(const char *path);
+
+// Folder the game was installed in, ending with a backslash (256 characters). EN 0x01614c60.
+extern "C" char g_launcherInstallDir[256];
+// Folder the game saves into (256 characters). EN 0x01614b60.
+extern "C" char g_launcherSaveDir[256];
+// Path of the configuration file in use (256 characters). EN 0x01614a60.
+extern "C" char g_launcherConfigPath[256];
+
+// Works out the save folder and the configuration file path (see launcher_folders.cpp). EN 0x006e8dd0.
+void Launcher_PrepareSaveFolders(void);
+
 #endif

@@ -249,3 +249,19 @@ extern "C" void Packs_LzEncodeTokens(void)
     Packs_LzWriteLowBits(PACKS_LZ_END_PREFIX, PACKS_LZ_END_PREFIX_BITS);
     PutByte(0);
 }
+
+// Packs_LzEncode: compresses one block. Makes `state` the current compressor state, resets the match search (position,
+// pending count, best match), reserves the first flag word in the output and runs the token loop. Returns 0. Called by
+// Packs_Compress for every block.
+extern "C" int Packs_LzEncode(PacksLzState *state)
+{
+    g_packsLzState = state;
+    g_packsLzBlockStart = state->data;
+    g_packsLzSpareWord = g_packsLzPending = g_packsLzNextByte = 0;
+    g_packsLzPosition = g_packsLzSpare = 0;
+    g_packsLzMatchPosition = PACKS_LZ_NO_ENTRY;
+    state->outputWord++;
+    g_packsLzState->outputBytes += PACKS_WORD_BYTES;
+    Packs_LzEncodeTokens();
+    return 0;
+}

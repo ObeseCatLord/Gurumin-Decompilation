@@ -62,6 +62,9 @@ const int ARCHIVE_NAME_BUFFER = 16;
 extern "C" int ItmDescramble(unsigned char *data, int size, char *name, int expectedSum, unsigned int expectedCheck);
 // Copies the file name of a path without directory and extension. EN 0x7bf670.
 extern "C" void SoundFile_BaseName(ArchiveName *name, const char *path);
+// Checks a compressed sound file's key: the first eight characters of `name` (upper-cased in place) build a block whose
+// byte sums and xor must equal `sum` and `check`. Returns 1 when they do. EN 0x7bfd30 (sound_key.cpp).
+extern "C" int SoundFile_KeyMatches(char *name, int sum, unsigned int check);
 
 // A sound file opened through the multimedia I/O functions.
 struct MmioFile

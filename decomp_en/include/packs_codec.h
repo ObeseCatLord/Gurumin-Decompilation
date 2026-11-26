@@ -125,6 +125,8 @@ extern "C" PacksLzState *g_packsLzState;    // EN 0x0222b1c4
 extern "C" int g_packsLzPending;            // EN 0x0222b1d0: bytes still to index
 extern "C" unsigned int g_packsLzMatchPosition;   // EN 0x0222b1d4: offset of the best match found (PACKS_LZ_NO_ENTRY = none)
 extern "C" unsigned int g_packsLzNextByte;        // EN 0x0222b1d8: the byte at the current position
+extern "C" int g_packsLzSpare;                    // EN 0x0222b1c8: cleared by Packs_LzEncode, never read
+extern "C" unsigned short g_packsLzSpareWord;     // EN 0x0222b1cc: cleared by Packs_LzEncode, never read
 
 // Longest run of equal bytes at PacksLzState::data, at most PACKS_LZ_RUN_MAX and at most the bytes left (see
 // packs_lz_run.cpp). Returns the run length. EN 0x7bccc0. Called by the compressor at EN 0x7bd240.

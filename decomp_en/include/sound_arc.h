@@ -8,8 +8,11 @@ const int SOUND_ARC_QUEUE_SIZE = 0x100;
 // Commands.
 const int SOUND_ARC_COMMAND_PLAY_STREAM = 0x65;     // play a file on a music stream
 const int SOUND_ARC_COMMAND_PLAY_STREAM_FADE = 100; // play a file on a music stream (fading variants)
+const int SOUND_ARC_COMMAND_PLAY_STREAM_FADE_MS = 0x66;  // play a file on a music stream, fading in for a given time
 const int SOUND_ARC_COMMAND_PLAY_3D = 0x96;         // play a 3D sound effect
 const int SOUND_ARC_COMMAND_PLAY_FILE = 200;        // play a sound file, optionally positioned
+// Milliseconds after which a queued command that carries a time stamp is dropped unplayed.
+const unsigned long SOUND_ARC_COMMAND_LIFETIME_MS = 1000;
 // Music streams that exist.
 const unsigned SOUND_ARC_LAST_STREAM = 1;
 const int SOUND_ARC_STREAM_PARAMS = 5;              // playback parameters of a music stream command

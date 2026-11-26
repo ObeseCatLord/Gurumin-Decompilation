@@ -964,3 +964,47 @@ Vec4 TransformPoint4(const Vec4 &point, const Matrix4 &matrix)
     result.w = matrix.m[3] * point.x + matrix.m[7] * point.y + matrix.m[11] * point.z + matrix.m[15];
     return result;
 }
+
+// Vec4_NormalizedLerp: interpolates between `*a` (t = 0) and `*b` (t = 1) in all four components and scales the result to
+// length 1; a result whose length is not above zero is returned unscaled. An out-of-line copy of the helper that Slerp
+// inlines. No direct caller recovered.
+Vec4 Vec4_NormalizedLerp(const Vec4 *a, const Vec4 *b, float t)
+{
+    float mixedX = (b->x - a->x) * t + a->x;
+    float mixedY = (b->y - a->y) * t + a->y;
+    float mixedZ = (b->z - a->z) * t + a->z;
+    float mixedW = (b->w - a->w) * t + a->w;
+    Vec4 result(mixedX, mixedY, mixedZ, mixedW);
+    float length = (float)sqrt(mixedY * mixedY + mixedX * mixedX + mixedZ * mixedZ + mixedW * mixedW);
+    if (length > 0.0f)
+    {
+        result.x = mixedX / length;
+        result.y = mixedY / length;
+        result.z = mixedZ / length;
+        result.w = mixedW / length;
+    }
+    return result;
+}
+
+// Vec4_AxisAngleQuaternion: the unit quaternion of a turn of `angle` radians about `*axis`. The axis is scaled by
+// sin(angle / 2) in place and becomes the vector part; w = cos(angle / 2); all four are divided by the length. No direct
+// caller recovered.
+Vec4 Vec4_AxisAngleQuaternion(Vec4 *axis, float angle)
+{
+    angle *= HALF;
+    float sine = (float)sin(angle);
+    float vx = axis->x * sine;
+    axis->x = vx;
+    float vy = axis->y * sine;
+    axis->y = vy;
+    float vz = axis->z * sine;
+    axis->z = vz;
+    float cosine = (float)cos(angle);
+    float length = (float)sqrt(vy * vy + vx * vx + vz * vz + cosine * cosine);
+    Vec4 result;
+    result.w = cosine / length;
+    result.x = vx / length;
+    result.y = vy / length;
+    result.z = vz / length;
+    return result;
+}

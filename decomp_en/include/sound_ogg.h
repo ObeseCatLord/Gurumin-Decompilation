@@ -4,9 +4,26 @@
 #ifndef GURUMIN_EN_SOUND_OGG_H
 #define GURUMIN_EN_SOUND_OGG_H
 
+#include "sound_file.h"
+
 // Opaque libogg / libvorbis state blocks (sizes from the OggReader layout).
 // The WAVE header of the decoded sound (RIFF, fmt and data chunk headers).
-struct OggWaveHeader { char bytes[0x2c]; };
+struct OggWaveHeader
+{
+    unsigned riffId;            // 0x00: "RIFF"
+    unsigned riffSize;          // 0x04: size of the decoded data
+    unsigned waveId;            // 0x08: "WAVE"
+    unsigned fmtId;             // 0x0c: "fmt "
+    unsigned fmtSize;           // 0x10: size of the format chunk
+    unsigned short formatTag;   // 0x14: format tag
+    unsigned short channels;    // 0x16: channels
+    unsigned sampleRate;        // 0x18: samples per second
+    unsigned bytesPerSecond;    // 0x1c
+    unsigned short blockAlign;  // 0x20
+    unsigned short bitsPerSample;   // 0x22
+    unsigned dataId;            // 0x24: "data" (not filled in by the reader)
+    unsigned dataSize;          // 0x28: size of the sound data
+};
 struct OggSyncState { char bytes[0x1c]; };      // ogg_sync_state
 struct OggPage { char bytes[0x14]; };           // ogg_page
 struct OggStreamState { char bytes[0x168]; };   // ogg_stream_state
@@ -70,14 +87,31 @@ const int OGG_FEED_BYTES = 0x1000;
 // 16-bit values in the reader's output block (all channels).
 const int OGG_PCM_OUT_SHORTS = 0x1000;
 
+// Bytes of the path copy kept in the reader, and of the decoded chunk buffer allocated for it.
+const int OGG_PATH_BYTES = 0x400;
+const int OGG_PCM_BUFFER_BYTES = 0x3a980;
+// Fields of the WAVE header the reader writes: "RIFF", "WAVE" and "fmt " as little-endian words, the size of the
+// format chunk, the two format words (tag 0 and 2 channels, block align 4 and 16 bits), the CD sample rate and its
+// byte rate (44100 * 4).
+const unsigned OGG_RIFF_ID = 0x46464952;
+const unsigned OGG_WAVE_ID = 0x45564157;
+const unsigned OGG_FMT_ID = 0x20746d66;
+const unsigned OGG_FMT_SIZE = 0x10;
+const unsigned short OGG_FORMAT_TAG = 0;
+const unsigned short OGG_CHANNELS = 2;
+const unsigned OGG_SAMPLE_RATE = 44100;
+const unsigned OGG_BYTES_PER_SECOND = 0x2b110;
+const unsigned short OGG_BLOCK_ALIGN = 4;
+const unsigned short OGG_BITS_PER_SAMPLE = 16;
+// Extra seconds added to the length estimated from the bitrate, and the factor between the data size and the size
+// the header declares.
+const int OGG_LENGTH_SLACK_SECONDS = 3;
+
 // Reads and decodes an Ogg Vorbis file held in memory (0x2748 bytes).
 struct OggReader
 {
-    char m_0000[4];                 // 0x0000: not used by ported code yet
-    void *m_0004;                   // 0x0004: cleared by the constructor
-    char m_0008[4];                 // 0x0008: not used by ported code yet
-    void *m_000c;                   // 0x000c: cleared by the constructor
-    char m_0010[4];                 // 0x0010: not used by ported code yet
+    int totalBytes;                 // 0x0000: size of the decoded sound with its WAVE header
+    MmioFile file;                  // 0x0004: the Ogg file while it is read (closed afterwards)
     void *pcmBuffer;                // 0x0014: decoded sound data
     OggWaveHeader waveHeader;       // 0x0018: the 44-byte WAVE header handed out before the sound data
     char m_0044[0x48 - 0x44];       // 0x0044: not used by ported code yet
@@ -93,7 +127,8 @@ struct OggReader
     int chunkFrames;                // 0x2310: most sample frames converted at a time
     char m_2314;                    // 0x2314: not used by ported code yet
     char initialised;               // 0x2315: non-zero once the Vorbis states were set up
-    char m_2316[0x2724 - 0x2316];   // 0x2316: not used by ported code yet
+    char m_2316[0x2324 - 0x2316];   // 0x2316: not used by ported code yet
+    char path[OGG_PATH_BYTES];      // 0x2324: copy of the path the reader was opened with
     float gain;                     // 0x2724: output gain
     int totalLength;                // 0x2728: length of the sound
     int savedLength;                // 0x272c: copy of totalLength taken when the stream position is known
@@ -106,6 +141,10 @@ struct OggReader
 
     // Constructor: clears the buffers and the initialised flag. EN 0x7be8b0.
     OggReader();
+    // Opens the Ogg file `path` (a plain file or a section of an archive), loads it into memory, reads its headers
+    // and fills in the WAVE header from the file size and bitrate. Returns 1, or 0 when the file cannot be opened.
+    // EN 0x7c0200.
+    int Open(const char *path);
     // Frees the buffers and the Vorbis states. EN 0x7bea30.
     int Free();
     // Clears the stream and sync states when initialised. EN 0x7c1190.

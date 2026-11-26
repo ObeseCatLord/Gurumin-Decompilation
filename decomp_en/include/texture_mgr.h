@@ -194,6 +194,11 @@ struct TriangleBatch
     int SetBlend(int mode, int unused);                                  // EN 0x70bff0 (JP 0x10173450)
     int AddVertices(TextureObject *texture, void *source, int count);    // EN 0x70bdf0 (JP 0x10188eb0)
     int DrawWith(TextureObject *texture);                                // EN 0x71dec0 (JP 0x10172a40)
+    // EN 0x71d070 (EN-only, texture_slot_quads.cpp): AppendQuad of the pixel rectangle (srcLeft, srcTop)-(srcRight, srcBottom)
+    // of texture slot `slot` (texture coordinates are the pixels over the texture size) into the screen rectangle
+    // (left, top)-(right, bottom), drawn white; a negative slot appends nothing (returns 0, else 1).
+    int AppendSlotQuad(int slot, int left, int top, int right, int bottom, float srcLeft, float srcTop, float srcRight,
+                       float srcBottom, float z, float alpha, float rotation);
 };
 
 // The renderer object that owns the textures; `this` is mostly unused.
@@ -267,6 +272,8 @@ extern "C" int Textures_SaveAllItp(const char *folder);
 // Writes a text list of the texture slots (names, source size, pool index) to a fixed file. Returns 0. EN 0x72c0d0 (texture_dump.cpp, EN-only).
 extern "C" int Textures_DumpList(void);
 
+// Marks every named (loaded) texture slot as kept across a map change. Returns 0. EN 0x747c40 (texture_keep.cpp, EN-only).
+extern "C" int Textures_KeepAllLoaded(void);
 // After a map change: unloads every texture that was not marked as kept and has no generated alpha (EN 0x747c70).
 extern "C" int Texture_ReloadMissing(void);
 // Releases one reference to texture slot `slot`; unloads it when the count reaches zero or `force` is set. Returns the
@@ -321,5 +328,11 @@ inline int TriangleBatch::AddQuad(TextureObject *newTexture, float left, float t
 
 extern "C" int Texture_BindStage1(int index);   // EN 0x7469d0 (JP 0x101610b0): binds slot `index` to stage 1 (negative = unbind)
 extern "C" int Texture_BindStage0(int index);   // EN 0x746a10 (JP 0x10161070): binds slot `index` to stage 0 (negative = unbind)
+
+// Draws the pixel rectangle (srcLeft, srcTop)-(srcRight, srcBottom) of texture slot `slot` at (left, top) at its own
+// size (no stretching), at depth `z`, faded by `alpha` and turned by `angle`; a negative slot draws nothing (returns 0,
+// else 1). EN 0x71df00 (EN-only, texture_slot_quads.cpp).
+extern "C" int Texture_DrawPixelRect(int slot, int left, int top, float srcLeft, float srcTop, float srcRight,
+                                     float srcBottom, float z, float alpha, float angle);
 
 #endif

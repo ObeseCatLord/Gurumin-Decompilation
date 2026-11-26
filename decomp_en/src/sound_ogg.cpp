@@ -8,8 +8,8 @@
 // set up for an Ogg source.
 OggReader::OggReader()
 {
-    m_0004 = 0;
-    m_000c = 0;
+    file.handle = 0;
+    file.isPlain = 0;
     pcmBuffer = 0;
     fileData = 0;
     initialised = 0;
@@ -334,4 +334,44 @@ int OggReader::ReadPcm(char *buffer, int bytes)
         savedLength = totalLength;
         remaining += step;
     }
+}
+
+// Opens an Ogg file for playback: resets the reader, copies the path, reads the whole file into memory and closes it,
+// then parses the headers and fills in the WAVE header (length estimated from the file size and the nominal bitrate,
+// plus a few seconds of slack). Returns 1, or 0 when the file cannot be opened. Called by SoundSource::OpenSource for
+// Ogg files.
+int OggReader::Open(const char *openPath)
+{
+    gain = 1.0f;
+    Free();
+    if (pcmBuffer == 0)
+        pcmBuffer = malloc(OGG_PCM_BUFFER_BYTES);
+    strcpy(path, openPath);
+    if (file.Open(openPath, "rb") == 0)
+        return 0;
+    file.Seek(0, SEEK_END);
+    fileSize = file.Tell();
+    file.Seek(0, SEEK_SET);
+    if (fileData == 0)
+        fileData = (char *)malloc(fileSize);
+    file.Read(fileData, 1, fileSize);
+    file.Close();
+    OpenStream();
+    waveHeader.riffId = OGG_RIFF_ID;
+    int seconds = fileSize * 8 / info.bitrateNominal + OGG_LENGTH_SLACK_SECONDS;
+    waveHeader.riffSize = seconds * OGG_BYTES_PER_SECOND;
+    totalBytes = waveHeader.riffSize + OGG_WAVE_HEADER_BYTES;
+    waveHeader.waveId = OGG_WAVE_ID;
+    waveHeader.fmtId = OGG_FMT_ID;
+    waveHeader.dataSize = waveHeader.riffSize / 2;
+    waveHeader.sampleRate = OGG_SAMPLE_RATE;
+    waveHeader.bytesPerSecond = OGG_BYTES_PER_SECOND;
+    waveHeader.blockAlign = OGG_BLOCK_ALIGN;
+    waveHeader.bitsPerSample = OGG_BITS_PER_SAMPLE;
+    waveHeader.formatTag = OGG_FORMAT_TAG;
+    waveHeader.channels = OGG_CHANNELS;
+    waveHeader.fmtSize = OGG_FMT_SIZE;
+    totalLength = 0;
+    savedLength = 0;
+    return 1;
 }

@@ -37,6 +37,15 @@ extern "C" const GUID g_eaxListenerPropertySet;   // EN 0x00861ebc: DSPROPSETID 
 extern "C" const GUID g_eaxBufferPropertySet;     // EN 0x00861eec: DSPROPSETID of the EAX 1.0 buffer properties
 extern "C" const GUID g_ksPropertySetInterfaceId;   // EN 0x00861f8c: IID_IKsPropertySet
 
+// The one buffer property of EAX_BUFFER_ALL_PARAMETERS.
+struct EaxBufferParameters
+{
+    float reverbMix;   // 0x00: reverb mix of the buffer
+};
+
+// Property number that reads or writes all buffer properties at once (EAXBUFFER_ALLPARAMETERS).
+const unsigned long EAX_BUFFER_ALL_PARAMETERS = 0;
+
 // The EAX properties of one sound source (a DirectSound buffer).
 struct EaxBuffer
 {
@@ -45,6 +54,9 @@ struct EaxBuffer
     EaxBuffer *Attach(IUnknown *buffer);   // EN 0x7c15d0 (EN-only, sound_eax_attach.cpp): asks `buffer` for its property set and keeps it only when both buffer properties are readable and writable; returns this
     float GetReverbMix();          // EN 0x7c1680: the reverb mix, EAX_FLOAT_UNAVAILABLE when the read fails
     int SupportsProperty(unsigned long property);   // EN 0x7c16d0: 1 when the driver can both read and write buffer property `property`
+    HRESULT SetParameters(EaxBufferParameters *parameters);   // EN 0x7c1710 (sound_eax_set.cpp, EN-only): writes all buffer properties at once
+    HRESULT GetParameters(EaxBufferParameters *parameters);   // EN 0x7c1650 (sound_eax_get_all.cpp, EN-only): reads all buffer properties at once
+    HRESULT SetReverbMix(float mix);                          // EN 0x7c1730 (sound_eax_set.cpp, EN-only): writes the reverb mix
 };
 
 // The EAX listener properties.
@@ -59,6 +71,12 @@ struct EaxListener
     unsigned long GetEnvironment();// EN 0x7c18a0: the environment number, 0 when the read fails
     float GetVolume();             // EN 0x7c18e0: the listener volume, EAX_FLOAT_UNAVAILABLE when the read fails
     void SetAll(unsigned long environment, float volume, float decayTime, float damping);   // EN 0x7c19f0: writes all four properties
+    HRESULT SetParameters(EaxListenerParameters *parameters);   // EN 0x7c1970 (sound_eax_set.cpp, EN-only): writes all four properties from a structure
+    HRESULT GetParameters(EaxListenerParameters *parameters);   // EN 0x7c17f0 (sound_eax_get_all.cpp, EN-only): reads all four properties into a structure
+    HRESULT SetDamping(float damping);                          // EN 0x7c1990 (sound_eax_set.cpp, EN-only): writes the damping
+    HRESULT SetDecayTime(float decayTime);                      // EN 0x7c19b0 (sound_eax_set.cpp, EN-only): writes the decay time
+    HRESULT SetEnvironment(unsigned long environment);          // EN 0x7c19d0 (sound_eax_set.cpp, EN-only): writes the environment number
+    HRESULT SetVolume(float volume);                            // EN 0x7c1a40 (sound_eax_set.cpp, EN-only): writes the listener volume
 };
 
 #endif

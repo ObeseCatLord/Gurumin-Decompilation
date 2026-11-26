@@ -32,3 +32,26 @@ extern "C" int Itm_Descramble(unsigned char *data, int size, char *name, int sum
         return 1;
     return 0;
 }
+
+// Scrambles a .itm file in place (the inverse of Itm_Descramble, same key): every plain byte is added to the byte sum and
+// xored into the check, then replaced by the inverted xor with its key byte. The sum and check of the plain data go to
+// *sum and *check; returns 1. Called by the item data writer.
+extern "C" int Itm_Scramble(unsigned char *data, int size, char *name, int *sum, unsigned int *check)
+{
+    int total = 0;
+    unsigned int mix = ITM_CHECK_SEED;
+    char table[70] = "!~_Q#xDRgd-d&yfg&'(8)(5(594er2f4asf5f6e5f4s5fvwyjk%fgqTUCFD4568r";
+    char key[16] = "GURUguruMinmIN_";
+    _strupr(name);
+    strncpy(table + ITM_NAME_OFFSET, name, ITM_NAME_LENGTH);
+    for (int i = 0; i < size; i++)
+    {
+        unsigned char plain = data[i];
+        mix ^= plain;
+        total += plain;
+        data[i] = ~((key[i % ITM_KEY_PERIOD] + (i & 7)) * table[i & ITM_TABLE_MASK] ^ plain);
+    }
+    *sum = total;
+    *check = mix;
+    return 1;
+}

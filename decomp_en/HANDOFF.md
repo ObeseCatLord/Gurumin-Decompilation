@@ -41,8 +41,8 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
 ## Progress (2026-11-25, `progress/en/report.json`)
 | Measure | Value |
 |---|---|
-| Matched | 1,114 of 2,006 game functions (254,536 of 2,078,797 bytes, 12.24 %) |
-| Matched under the rules | 1,114 |
+| Matched | 1,202 of 2,006 game functions (276,754 of 2,078,797 bytes, 13.31 %) |
+| Matched under the rules | 1,202 |
 | Queue | see QUEUE.md header (after batch 15); open.tsv ~160 (incl. library/blocked rows, which leave the queue) near-misses |
 
 ## State
@@ -78,6 +78,13 @@ session in the same checkout: never edit, stage or commit `decomp/`, `tools/`, `
   scratchpad: list_sec2b, rest of list_sec3b, list_sec3c, list_sec4.
 
 ## Next steps
+
+**Paused 2026-11-26 after batch 23 (user: focus tokens on JP matching).** On resume, first set up an EN copy of
+the permuter adapter (`E:\Claude Typing of the Dead\tools\gurumin_permuter` -> a sibling `gurumin_permuter_en`: VS2013
+flags via `decomp_en/env.bat` + `tools/run_cl.py`, scoring with `decomp_en/tools/compare_obj.py` and `enimg.Image`;
+leave the JP adapter unchanged) and try it on near misses (Shaga_Update 00649da0, 33 bytes off; ListBank::RegisterBuiltin
+00644300, 3 bytes). Results must be rewritten as honest source, no PERM_ leftovers.
+
 0. Batches 19-21 (section 2, then walls, per the orchestrator): +15, +7, +7. Section 2 has 6 huge functions left
    (4-8 KB, register-allocation walls); untouched walls are done except design-heavy ones (Menu_SaveLoad, Save_Load,
    NameEntry_Update, Partner_SpecialSkill). Yield per batch: EN-only small functions ~90 %, section 3 ~45 %, section 2 (large) <20 %. Favour EN-only and

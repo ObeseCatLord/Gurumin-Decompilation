@@ -106,6 +106,33 @@ extern "C" int __stdcall Joystick_PickInstanceCallback(const DeviceInstance *ins
 // EN 0x7adf90 (joystick_enum.cpp).
 extern "C" int __stdcall Joystick_CreateDeviceCallback(const DeviceInstance *instance, int *index);
 
+// DIDEVICEOBJECTINSTANCE: what DirectInput reports for each object (axis or button) of a joystick (only the fields used are named).
+struct DeviceObjectInstance
+{
+    unsigned long size;         // 0x00: size of this record
+    DeviceGuid typeGuid;        // 0x04: kind of object
+    unsigned long offset;       // 0x14: offset of the object in the data format
+    unsigned long type;         // 0x18: object type and instance number
+    unsigned long flags;        // 0x1c: DIDOI_* flags
+};
+
+// DIDOI_FFACTUATOR: the object can be driven by a force feedback effect.
+const unsigned long OBJECT_FLAG_FORCE_ACTUATOR = 1;
+// Force feedback axes the game drives at most.
+const unsigned int FORCE_ACTUATOR_LIMIT = 2;
+
+// Value a DirectInput enumeration callback returns to go on / to stop.
+const int ENUM_CONTINUE = 1;
+const int ENUM_STOP = 0;
+
+// Device enumeration callback that counts the pads that are not XInput ones in `*count`. Returns 1. EN 0x7ae010
+// (joystick_enum_counts.cpp).
+extern "C" int __stdcall Joystick_CountNonXInputCallback(const DeviceInstance *instance, int *count);
+
+// Object enumeration callback that counts force feedback actuators in `*count`, up to FORCE_ACTUATOR_LIMIT. Returns 1.
+// EN 0x7ae300 (joystick_enum_counts.cpp).
+extern "C" int __stdcall Joystick_CountActuatorCallback(const DeviceObjectInstance *object, unsigned int *count);
+
 // Number of buttons of the game pad the key state is kept for.
 const int PAD_BUTTON_COUNT = 12;
 // Non-zero when game pad input is on (the config entry USEJP). EN 0x021f37c8.

@@ -27,6 +27,9 @@ struct KeyTrack
     int NextFrame(int frame);      // EN 0x7772e0: frame of the first key after `frame` (the last key when none is later, 0 for an empty track)
     int PreviousFrame(int frame);  // EN 0x777670: frame of the last key before `frame` (the first key when none is earlier, 0 for an empty track)
     int RemoveFrame(int frame);    // EN 0x772890 (key_remove.cpp, EN-only): removes the key at `frame` and moves the later keys up; 1 when found, else 0
+    // EN 0x776ce0 (key_move.cpp, EN-only): moves the key at frame `frame` to `newFrame` with the values x, y, z, w (KEY_UNCHANGED = keep the key's own); flags are not kept. 1 when there was such a key, else 0.
+    int MoveFrame(int frame, int newFrame, float x, float y, float z, float w);
+    int MoveKeyTo(int index, int frame, float x, float y, float z, float w);  // EN 0x777010 (key_move.cpp, EN-only): key `index` gets frame `frame` (kept between its neighbours) and the values; keeps its flags; returns 1
     float Spline(float t, float a, float b, float c, float d);  // EN 0x771c30 (key_track_spline.cpp): cubic Hermite interpolation between b (t = 0) and c (t = 1); `this` is not read
     int MaxFrame();                // EN 0x7755d0 (key_remove.cpp, EN-only): the highest key frame number (0 for an empty track)
 };
@@ -77,6 +80,7 @@ struct VertexPack
     void Init();                     // EN 0x7787e0 (JP 0x101acfa0): empties a pack allocated raw
     int CopyFrom(const VertexPack *source);  // EN 0x771eb0 (JP 0x101ad040): copies the bounds and the vertices; returns 0 for an empty source
     int FreeVertices();              // EN 0x7784a0 (JP 0x101acfc0): frees the vertex buffer (the count is kept); returns 1
+    void EmptyVertices();            // EN 0x76f0f0 (vertex_pack_empty.cpp, EN-only): frees the vertex buffer and clears both the buffer and the vertex count
 };
 
 // Allocates an array of `count` empty packs (each Init-ed, radius 0) from the engine allocator and returns it (see

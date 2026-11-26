@@ -14,8 +14,10 @@ struct ImeContext
     HIMC context;             // 0x04: the input context (Imm32 handle)
     int m_0008;               // 0x08: not yet named
     CANDIDATELIST *buffer;    // 0x0c: candidate list loaded by LoadCandidates (0 = none)
+    int m_0010;               // 0x10: zeroed by the constructor, not used by other ported code yet
 
-    ~ImeContext();                                                      // EN 0x7aab30: releases the context like Release
+    ImeContext();                                                       // EN 0x7aab10 (EN-only, ime_context_ctor.cpp): no window, no context, no candidate list
+    ~ImeContext();                                                     // EN 0x7aab30: releases the context like Release
     int Release();                                                      // EN 0x7aaf70 (JP 0x1015d0a0)
     int Attach(HWND target);                                            // EN 0x7aaff0 (JP 0x1015d0e0)
     int SetOpen(BOOL open);                                             // EN 0x7aafb0 (JP 0x1015d120)
@@ -23,8 +25,11 @@ struct ImeContext
     int SetConversion(const DWORD *conversion, const DWORD *sentence);  // EN 0x7aafd0 (JP 0x1015d160)
     int GetResultString(char *out);                                     // EN 0x7aacc0 (JP ImeContext::GetResultString): copies the finished text into `out`
     int GetCompositionString(char *out);                                // EN 0x7aaee0 (EN-only, ime_composition.cpp): copies the text still being composed into `out`
-    int GetModeText(char *out);                                         // EN 0x7aad70 (JP 0x1015d180): writes the input mode label into `out`
-    DWORD LoadCandidates();                                             // EN 0x7aac30 (JP 0x1015d430)
+    void QueryDeltaStartAndCursor();                                    // EN 0x7aac90 (ime_context_queries.cpp, EN-only): asks Imm32 for the composition change start and the cursor position and drops both answers
+    int GetModeText(char *out);                                        // EN 0x7aad70 (JP 0x1015d180): writes the input mode label into `out`
+    DWORD GetReadingClauseEnd();                                        // EN 0x7aabd0 (EN-only, ime_clauses.cpp): end of the first reading clause of the composition, 0 when the IME gives none
+    DWORD GetClauseEnd();                                               // EN 0x7aac00 (EN-only, ime_clauses.cpp): end of the first clause of the composition, 0 when the IME gives none
+    DWORD LoadCandidates();                                          // EN 0x7aac30 (JP 0x1015d430)
 };
 
 extern "C" ImeContext g_imeContext;     // EN 0x022280b8 (JP DAT_10f68124): the game's IME context
@@ -44,5 +49,9 @@ extern "C" void Ime_ReadAttributes();          // EN 0x7ab110 (JP 0x1015f4b0): r
 
 // Starts text input into `buffer` (name entry). EN 0x7ad410 (JP 0x1015fda0). TextInput_End finishes it.
 extern "C" int TextInput_Begin(char *buffer);
+// Ends text input (src/ime.cpp). EN 0x7ab1e0.
+extern "C" int TextInput_End(void);
+// 1 while text input is active (src/ime.cpp). EN 0x7ad4a0.
+extern "C" int Ime_IsOpen(void);
 
 #endif

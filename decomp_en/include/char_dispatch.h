@@ -76,6 +76,11 @@ extern "C" int DigitCounter_Update(int index);                 // EN 0x63bc80
 
 // Runs the kind-specific update of boss kinds 100, 101, 105 and 107. Returns 0. EN 0x699840.
 extern "C" int Char_DispatchBossKind(int index);
+// Runs the behaviour update of character `index` (EN 0x6a0950, JP Char_UpdateByKind, not reconstructed). Returns 0.
+extern "C" int Char_UpdateByKind(int index);
+// Runs the update of character `index`: kinds below the first boss kind take Char_UpdateByKind, boss kinds Char_DispatchBossKind.
+// EN 0x699810 (char_update_dispatch.cpp). Called by the character update loop (EN 0x60cb10).
+extern "C" int Char_DispatchByKind(int index);
 // Runs the update of kinds 0x47..0x51. EN 0x6998e0.
 extern "C" int Char_DispatchSpecialKind(int index);
 // Runs the behaviour updater chosen by the behaviour number of the character. Returns 0. EN 0x6a3d30.

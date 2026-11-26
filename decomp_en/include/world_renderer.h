@@ -206,6 +206,16 @@ struct WorldRenderer
     int SetMessageId(int index, int id);     // EN 0x746ba0: stores the id of line `index`
     int SetMessage(int index, int id, const char *text);   // EN 0x745510: stores the id and the text of line `index`
     int FindMessageLine(int key);            // EN 0x72c8b0: line number for `key` (not recovered yet)
+    // Finders and writers of the message editor (EN-only; world_message_find.cpp, world_message_highest.cpp, world_message_store.cpp).
+    int FindKeyLineOffset(int key, const char *first, const char *second, const char *third);   // EN 0x72c360: position within key `key` of the first line whose first three fields equal the strings (ignoring case; null = any), -1 when none
+    int FindKeyLine(int key, const char *first, const char *second, const char *third);         // EN 0x72c450: the same, as a line number of the table
+    int KeyMoveCommandKind(int key);         // EN 0x735390: 1 when a line of key `key` starts with "RCM"/"RCA"/"RM2"/"RA2", 2 for "RGM"/"RGA"/"RMT"/"RAT", else 0
+    int AppendKeyLinesFrom(WorldRenderer *source, int key);   // EN 0x70ac30: appends the lines of key `key` of `source` to this table and forgets every cached id and the key count; returns 0
+    int SaveMessages(const char *path);      // EN 0x7420b0: writes every line as "##nnnn,text" to the file `path`; returns 0
+    // Callees of HighestMessageId (provisional names: only what they return is known).
+    int KeyIdOffset(int key, int variant);            // EN 0x732440 (not ported yet): id offset of key `key`: the id of its first line when it has no move commands
+    int KeyCommandCount(int key, int kind);           // EN 0x731ec0 (not ported yet): how many move commands of kind `kind` (0..15) key `key` has
+    int KeyCommandId(int key, int kind, int index);   // EN 0x732150 (not ported yet): id offset of the `index`-th move command of kind `kind` of key `key`
     int HighestMessageId(int key);           // EN 0x72e5d0 (not ported yet): largest id among the lines of key `key` (-10000 when it has none), cached for keys below 1000
     int SetMessageField(int line, int field, const char *text);   // EN 0x746a50 (not ported yet): replaces the comma-separated field `field` of line `line` with `text`
     int ShiftKeyIds(int key, int firstId, int shift);   // EN 0x746d80 (not ported yet): adds `shift` to the ids of key `key` that are at least `firstId`

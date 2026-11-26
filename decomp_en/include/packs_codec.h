@@ -105,7 +105,11 @@ const unsigned int PACKS_LZ_RUN_MAX = 0xfff;
 // Hash chains over the bytes being compressed.
 struct PacksLzState
 {
-    unsigned short *outputWord;       // 0x00: next 16-bit flag word of the compressed output
+    union
+    {
+        unsigned short *outputWord;   // 0x00: next 16-bit flag word of the compressed output
+        unsigned char *outputByte;    // 0x00: the same position seen as the next byte (literals and lengths are bytes)
+    };
     unsigned char *data;              // 0x04: next byte to index (the hash is the 16-bit pair at this address)
     unsigned short *links;            // 0x08: next position in the chain, indexed by position & PACKS_LZ_WINDOW_MASK
     unsigned short *chainTail;        // 0x0c: last position of each chain, indexed by hash
@@ -113,15 +117,22 @@ struct PacksLzState
     int m_0014;                       // 0x14: not yet named
     int outputBytes;                  // 0x18: bytes of compressed output written so far
     int length;                       // 0x1c: total number of bytes being compressed
+    void (*progress)(PacksLzState *state);   // 0x20: called after each token (0 = none; Packs_Compress sets it to 0)
 };
 
 extern "C" int g_packsLzPosition;           // EN 0x0222b1c0: position of the next byte to index
 extern "C" PacksLzState *g_packsLzState;    // EN 0x0222b1c4
 extern "C" int g_packsLzPending;            // EN 0x0222b1d0: bytes still to index
+extern "C" unsigned int g_packsLzMatchPosition;   // EN 0x0222b1d4: offset of the best match found (PACKS_LZ_NO_ENTRY = none)
+extern "C" unsigned int g_packsLzNextByte;        // EN 0x0222b1d8: the byte at the current position
 
 // Longest run of equal bytes at PacksLzState::data, at most PACKS_LZ_RUN_MAX and at most the bytes left (see
 // packs_lz_run.cpp). Returns the run length. EN 0x7bccc0. Called by the compressor at EN 0x7bd240.
 extern "C" unsigned int Packs_LzCountRun(void);
+
+// Compresses the whole input of g_packsLzState token by token (flags, literals, runs, matches, end marker). EN 0x7bd240
+// (packs_lz_run.cpp). Called by Packs_LzEncode.
+extern "C" void Packs_LzEncodeTokens(void);
 
 // Indexes g_packsLzPending bytes into the hash chains, dropping the entry that fell out of reach. EN 0x7bd790.
 extern "C" void Packs_LzIndexBytes();

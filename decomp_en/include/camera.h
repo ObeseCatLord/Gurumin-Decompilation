@@ -57,6 +57,7 @@ extern "C" int g_trackedCount;                                // EN 0x0091e76c (
 
 // Adds character `index` position to the list of positions the camera keeps in view. Returns 1. EN 0x645730.
 extern "C" int Camera_AddTrackedPosition(int index);
+extern "C" int Camera_SetPushOffset(float x, float y);   // EN 0x70b8b0 (camera_push_offset.cpp): the player's ground push turned into the camera frame (g_cameraPushOffset)
 
 
 // Shot cameras (camera_follow.cpp): the goals and the smoothed vectors of the script-driven shots.

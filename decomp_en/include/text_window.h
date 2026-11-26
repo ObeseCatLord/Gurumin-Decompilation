@@ -19,6 +19,19 @@ const int TEXT_CHOICE_TEXT_SIZE = 0x80;
 // TextWindow::itemKind values of the items AddPanel and AddLabel make (the other kinds are passed to AddItem).
 const int TEXT_ITEM_KIND_PANEL = -2;
 const int TEXT_ITEM_KIND_LABEL = -20;
+// TextWindow::itemKind values of the other item makers (text_window_kinds.cpp).
+const int TEXT_ITEM_KIND_PLAIN = -1;
+const int TEXT_ITEM_KIND_BUTTON = -4;
+const int TEXT_ITEM_KIND_TEXT = -5;
+const int TEXT_ITEM_KIND_LIST_B = -8;
+const int TEXT_ITEM_KIND_LIST_A = -9;
+// Choices a list item has room for, and bytes of that room (TextWindowChoice is 0x84 bytes).
+const int TEXT_LIST_CHOICE_CAPACITY = 256;
+// Scale a text item's text is measured at when its width is left to the text.
+const float TEXT_ITEM_MEASURE_SCALE = 0.8f;
+// Height of a button or measured text item, and the margin a button adds to its text width.
+const int TEXT_ITEM_LINE_HEIGHT = 16;
+const int TEXT_BUTTON_MARGIN = 16;
 // Scale the label text is measured at.
 const float TEXT_LABEL_SCALE = 1.0f;
 
@@ -61,7 +74,7 @@ struct TextWindow
     int itemHeight[TEXT_WINDOW_MAX_ITEMS];              // 0x874: item height
     int itemKind[TEXT_WINDOW_MAX_ITEMS];                // 0x974: item kind (TEXT_ITEM_KIND_*)
     char itemLabel[TEXT_WINDOW_MAX_ITEMS][TEXT_ITEM_LABEL_SIZE];   // 0xa74: the item's label text
-    int m_1074[TEXT_WINDOW_MAX_ITEMS];                  // 0x1074: not recovered
+    const char *itemText[TEXT_WINDOW_MAX_ITEMS];        // 0x1074: text of a TEXT_ITEM_KIND_TEXT item (was m_1074, retyped from int)
     int itemParam[TEXT_WINDOW_MAX_ITEMS];               // 0x1174: extra value of a panel item
     TextWindowChoice *choices[TEXT_WINDOW_MAX_ITEMS];   // 0x1274: the item's choices (room for the item's list)
     char m_1374[0x1390 - 0x1374];          // 0x1374: not recovered
@@ -78,6 +91,13 @@ struct TextWindow
     int AddLabel(const char *text, int x, int y);
     // EN 0x7b0040 (EN-only): appends a choice (`text`, `value`) to item `item`; the first choice becomes the item's label and result. Returns the index of the new choice.
     int AddChoice(int item, const char *text, int value);
+    // text_window_kinds.cpp (EN-only): the other item makers. Their names are provisional: only the kind number and
+    // the layout they give the item are known. Each returns 0 unless said otherwise.
+    int AddPlainItem(int *result, int x, int y, const char *text);   // EN 0x7b00f0: kind TEXT_ITEM_KIND_PLAIN sized from `text` at scale 1.0, label = text
+    int AddButton(int *result, int *pickedInto, int x, int y, const char *text);   // EN 0x7afbb0: kind TEXT_ITEM_KIND_BUTTON, width = text width + 16, height 16, label = text
+    int AddTextItem(int *result, int x, int y, int itemW, int itemH, const char *text);   // EN 0x7af9e0: kind TEXT_ITEM_KIND_TEXT keeping the pointer `text`; a width of 0 measures the text instead (height 16)
+    int AddChoiceListA(int *result, int *pickedInto, int x, int y, int itemW, int itemH);   // EN 0x7afc90: empty list of kind TEXT_ITEM_KIND_LIST_A with room for 256 choices; returns its item index
+    int AddChoiceListB(int *result, int *pickedInto, int x, int y, int itemW, int itemH);   // EN 0x7afeb0: the same with kind TEXT_ITEM_KIND_LIST_B
 };
 
 // 1 when the mouse of any of the first `count` windows of `windows` is inside that window (margin added to its size).

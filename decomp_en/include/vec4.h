@@ -108,7 +108,7 @@ struct Matrix4
 };
 
 // Rotation matrix looking from `eye` to `target` with `up` and roll `roll` (EN 0x77aea0, JP 0x101b1c20).
-Matrix4 LookAt(Vec4 eye, Vec4 target, Vec4 *up, float roll);
+extern "C" Matrix4 LookAt(Vec4 eye, Vec4 target, Vec4 *up, float roll);
 // `a` transformed by `b` (EN 0x7768e0, JP 0x101b10f0).
 Matrix4 Multiply(const Matrix4 &a, const Matrix4 &b);
 // Inverse of `matrix` (EN 0x774f00, JP 0x101b0d40).
@@ -172,5 +172,14 @@ Matrix4 EulerMatrix(const Vec4 *angles);
 // Stores in `result` the vector `source` turned `angle` radians about z (z and w copied) and returns `result`
 // (EN 0x778840, matrix_euler.cpp).
 Vec4 *Vec4_RotatedAboutZ(Vec4 *result, const Vec4 *source, float angle);
+
+// The quaternion product a * b (EN 0x777880, vec4.cpp).
+Vec4 QuatMultiply(const Vec4 &a, const Vec4 &b);
+
+// (x, y, z, 1) * `matrix`, w included and without a divide (EN 0x77a580, vec4.cpp).
+Vec4 TransformPoint4(const Vec4 &point, const Matrix4 &matrix);
+
+// Signed difference a - b of two angles in radians, the short way round (EN 0x778de0, angle_difference.cpp).
+extern "C" float AngleDifference(float a, float b);
 
 #endif

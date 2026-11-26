@@ -112,6 +112,8 @@ struct Material
     char edge[4];                                                   // 0x17c: edge flags, signed bytes
 
     void SetBlank(float r, float g, float b, char edgeFlag);        // EN 0x779880 (JP: loop body of AllocMaterials)
+    void SetBlankFirstEdge(float r, float g, float b, char edgeFlag);  // EN 0x779a20 (material_blank.cpp): SetBlank that leaves edge[1..3] alone
+    void SetBlankNoEdges(float r, float g, float b);                // EN 0x7797b0 (material_blank.cpp): SetBlank with all four edge flags cleared
 };
 
 // Number of nodes CreateChildCopies makes.
@@ -368,6 +370,7 @@ struct Node
     // EN 0x74f9a0 (EN-only, not reconstructed yet): replaces the node's mesh with one built from `vertexCount` vertices and `indexCount` indices (no mesh when the vertex count is 0).
     int BuildMeshFromVertices(const Vertex *vertices, const int *indices, int vertexCount, int indexCount);
     int BuildQuadMesh(const Vertex *first, const Vertex *second, const Vertex *third, const Vertex *fourth);   // EN 0x74f320 (EN-only, node_quad_mesh.cpp): builds a four-vertex mesh from the four vertices
+    int ProjectPlanarUVs(int material);     // EN 0x74ece0 (JP 0x1019bdd0, node_planar_uv.cpp): planar texture coordinates for the packs that use `material`; returns 1
     int ResetVertexColours(float uvScale);  // EN 0x74f3c0 (JP 0x1019c3a0): every vertex white with its emissive colour cleared; a non-zero `uvScale` also lifts it and takes texture coordinates from x and y; returns 0
     int WeldVertices();                    // EN 0x75b920 (JP 0x1019e610): merges equal vertices in every pack
     int SortPacks();                       // EN 0x75bef0 (JP 0x1019c690): opaque packs first, then those with vertex alpha
@@ -400,6 +403,7 @@ struct Node
     // EN 0x76dec0 (not ported yet): on a bone node: stores its inverse bone matrix as entry *boneIndex of `skinned`'s inverse bones.
     int StoreInverseBone(Node *skinned, int *boneIndex);
     int TagRegionsInTree(const Box2 *boxes, const VisCell *cells);   // EN 0x76a200 (node_tree_passes.cpp, EN-only): TagRegion on every command-target node of the subtree (0, 0 = the visibility data of this map root)
+    int CopyTreeAnimation(Node *source, int slot);  // EN 0x74e0a0 (node_animation_tree.cpp): CopyAnimation on this node and every child whose name (bone, bip, camera, charbase, scene root) also exists in `source`; returns 1
     int CopyAnimation(Node *source, int slot);  // EN 0x74e180 (JP 0x1019b890): gives this node the animation (plugs, tracks, matrices) of `source`
     int ComputeBounds();                   // EN 0x75bb30 (JP 0x1019d8e0): recomputes the node's bounding sphere and box
     // EN 0x74f580 (JP 0x101a82d0, node_mesh_build.cpp): replaces the node's mesh with one built from a triangle list: `count` indices
@@ -426,6 +430,8 @@ struct Node
     int SetColourA(unsigned char value, unsigned int mask);  // EN 0x76b030 (JP 0x101946b0)
     int SetColourB(unsigned char value, unsigned int mask);  // EN 0x76afb0 (JP 0x10194730)
     int SetColourC(char value, unsigned int mask);           // EN 0x76b180 (JP 0x10194630)
+    int SetFlatColour(float r, float g, float b, float a);   // EN 0x76d470 (node_vertex_paint.cpp, EN-only): first texture of every material set to "white", every vertex of every pack gets (r, g, b, a); returns 1
+    int SetVertexColours(const short *vertexNumbers, float r, float g, float b);   // EN 0x76b0b0 (node_vertex_paint.cpp, EN-only): rgb of the listed vertices of the first pack (0 = all of them); returns 1
     int EnterTargetState(void *target);    // EN 0x76b410 (JP 0x101948f0)
     int EnterCollisionSphereState();       // EN 0x76b330 (EN-only): saves the matrix and sets NODE_FLAG_COLLISION_SPHERE (leaves the other saved states first)
     int EnterTwoBoneState();               // EN 0x76b3a0 (EN-only): the same for NODE_FLAG_TWO_BONE_LIMB

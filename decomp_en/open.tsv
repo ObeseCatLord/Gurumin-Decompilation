@@ -361,3 +361,35 @@ address	status	reason
 006355e0	open	Menu_SaveLoad: not ported. The EN function needs about 50 globals that have no EN name yet (menu flags 0x01331ff8..0x0133448c, 0x00a1da28..0x00a1dd34, 0x00a36380.., 0x00b91b68.., etc.), a map of JP DAT to EN address by instruction alignment, the EN English strings, and the callees 0x603940, 0x5d3360 and 0x5db5a0 are undeclared; mapping done for the Game window API (SetWindowScroll=SetWindowFlags, SetWindowLastItem=SetWindowRows, ConfirmWindow=RequestWindowRefresh) but no source written
 0069e4a0	open	CharKind50_Update (src/enemy_hop_strafe.cpp, JP Enemy_HopAndStrafe): 4805 vs 4768 bytes; same statements and call order, but register allocation differs (original: index in esi, model offset edi, slot<<6 in ebx; ours keeps index in edi, spills the slot offset and never uses ebx), plus the original shares one landing-probe tail between the two hops and reuses the parameter slot as a float temp; local references (CharState&, ShotSlot&, AnimModel&) and a matrix local do not move it
 00665b70	open	Enemy_CastAndTeleport (src/enemy_cast_teleport.cpp): same size (4211), 8 bytes differ: in the fade-in step the original stores alpha = 1.0f first and then state, wait, mode; the compiler schedules the CharState stores (state, wait) before the alpha store whatever the source order (all 24 orders tried)
+007743b0	open	DecomposeMatrix (src/matrix_unscale.cpp): same shape as RemoveScale (same blocker): 1252 vs 1328 bytes, frame 0x1ec vs 0x1bc; the original shares one hoisted zero register and spills the m*0 products at other points because Project and the Vec4 length are inlined from a header, here the local ProjectedAxisLength helper schedules differently
+00649da0	open	Shaga_Update (src/shaga_update.cpp): 5262 vs 5229 bytes, frame, call order, branches and constants all agree; only the address of g_shagaRadius[slot] differs: ours hoists lea [slot*4+base] into a stack slot (used by the const float& operator* calls and reads) where the original recomputes it at each use (`lea eax,[edi*4+0x91f370]`); tried a local float *radius at three scopes and plain indexing, none stops the CSE (also the Sub/Add order of `reach - sqrtf(depth) + 1.0f` follows from it)
+00644300	open	ListBank::RegisterBuiltin (src/listbank_register_builtin.cpp): 1279 vs 1276 bytes, every instruction agrees except the two pointer temporaries the duplicate-name loop spills: the original keeps them in the dead parameter home slots [ebp+8] and [ebp+0x10] (frame 0x200), ours puts them in new locals [ebp-8] and [ebp-4] (frame 0x208); cursor declaration order, a separate loop index and the one-char `firstChar` local that matches the register use did not change it
+0077aea0	open	LookAt (src/matrix_look_at.cpp, extern "C" so no unwind frame; header vec4.h changed to extern "C"): 1257 vs 1191 bytes; prologue, y/z swap with saved originals, identity early return, call set and statement order agree; the original keeps the normalised forward/right/up components in memory slots across the zero-length branch (stores after the join, no store in the zero arm) and schedules the three cross products with different register reuse; local normalise helper vs params-in-place, declaration order of the four saved floats (24 orders x 6 forward orders) do not change it
+007bd240	open	Packs_LzEncodeTokens (src/packs_lz_run.cpp, JP twin Packs.dll 10006a40): 1268 vs 1235 bytes; control flow, flag/byte output order, switch (jump table lengths 2..5 with the out-of-line Packs_LzWriteZeroFlag call in case 5), run and match branches all follow the bytes; registers differ: the original keeps the state pointer in esi and the constants 0xffff (ebx) and 1 (edi) in registers across the loop, spills the best length to [ebp-8] and the candidate to [ebp-4], and its match-compare loop hoists position/state->length/state->data (our spelling of that loop and a call of Packs_LzMatchLength, which the original does not inline, give different register use); added PacksLzState::progress (0x20) and the outputByte union alias
+005bac00	open	Enemy_IsBusy not attempted in EN: needs about 20 undeclared globals (queue slots 0x1336a7c..a9c, 0x148a318/470/488, 0x9160e0 table stride 0x40) plus Partner_Follow at 0x5bc4a0; port from decomp/src/enemy_busy.cpp once the globals are declared
+00637f40	open	Player_SelectActionMotion not attempted: large global-driven function, globals undeclared in EN
+005b3ac0	open	Regions_Update not attempted: collide-region globals undeclared in EN
+00603180	open	Costume_LoadPlayerModel not attempted: about 28 undeclared globals
+00654b60	open	Move_SweepToWorld not attempted: large, many globals and Node::Query
+005e29a0	open	DrawItemPreview not attempted: undeclared globals
+005eca30	open	Char_StepRouteTarget not attempted: undeclared globals
+007ba440	open	Packs double-precision regression code; unlikely to match
+0079f8b0	open	GetMeshBuffers: raw D3D COM vtable calls, no typed interface declared
+007ae5c0	open	Input::Update: XInput/DirectInput COM and GetProcAddress, not attempted
+00771c30	open	KeyTrack::Spline: original keeps t2*3 and c-b shared with all xmm regs busy, ours spills (same wall as 00771b60)
+0070b8b0	open	Camera_SetPushOffset: 13 byte diffs, float scheduling of atan2/cos/sin operands
+0077a580	open	TransformPoint4: original reuses eax for the matrix pointer after loading point y,x,z; ours holds both pointers (register allocation)
+007bc3a0	open	Packs_ComponentsToPlanes: 206 vs 211 bytes; original has extra spills (0x18 frame) and an edi=2*width row step
+0072c290	open	Path_GetBaseNameWorldCopy: original clears 8 bytes with two dword stores, ours gives movq (same wall as 007a8930)
+0072c360	open	FindKeyLineOffset: 8 diffs, scheduling at the start
+0072c450	open	FindKeyLine: 91 diffs; original keeps third in esi and end in the key slot
+0072e270	open	WorldRenderer::ScanLineCommandI: ROP/AOP test layout, original uses lea esi,[eax+1] and a different jle layout
+0076d470	open	Node::SetFlatColour: 2 diffs, addressing operand order [esi+ecx] vs [ecx+esi]
+0076b0b0	open	Node::SetVertexColours: 180 diffs; original reloads packs[0] and vertices on each store, ours hoists
+0076fad0	open	MotionList::InsertByName: 11 diffs; original stores m_0208 before loading the count
+007a8220	open	Render_PresentCenteredComposed: original reloads back-buffer globals after each rect store (same wall as 007a7ed0)
+007a0060	open	TextureObject::ReadBackRgbPreview: 8 diffs, xor edx,edx scheduled earlier in the original
+00709e60	blocked	constructor of an unknown class (8 Vec4 then 12 KeyTrack, size 0x170); owner class unknown, KeyTrack constructor declaration would change other matches
+007af670	open	table save (fopen wb/fwrite; count at +0x78, 5 blocks stride 0x23280, 0x1c blocks stride 36000 at +0xafd00): owner class not identified, not attempted
+007a44c0	open	compares 4-float rows against a global table (0x21ffee8) and copies them, then device vtable slot 0x178: no typed device interface, not attempted
+0071a6a0	open	large stack init (0x165c frame, alloca probe, Vec4 arrays) calling 0x71ba10 with 13 args: types unknown, not attempted

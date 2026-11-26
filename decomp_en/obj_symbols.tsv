@@ -1492,3 +1492,45 @@ _RemoveScale	00773f20
 # section 2 (batch 21)
 _CharKind50_Update	0069e4a0
 ?Enemy_CastAndTeleport@@YAHH@Z	00665b70
+# section 2 (batch 22)
+_Text_ToFullWidth	007ab210
+?Shaga_Update@@YAHXZ	00649da0
+# section 3 (batch 22)
+_DecomposeMatrix	007743b0
+_LookAt	0077aea0
+?ProjectPlanarUVs@Node@@QAEHH@Z	0074ece0
+?RegisterBuiltin@ListBank@@QAEHPBDFP6AXHPATScriptArgument@@PAU1@@Z@Z	00644300
+_Packs_LzEncodeTokens	007bd240
+_Helmet_FaceSettings	00646df0
+# EN-only high (batch 22)
+?SetBlankFirstEdge@Material@@QAEXMMMD@Z	00779a20
+?SetBlankNoEdges@Material@@QAEXMMM@Z	007797b0
+?Set@Vertex@@QAEXMMMMM@Z	00779c00
+?Set@Vertex@@QAEXMMMMMMMM@Z	00779ce0
+?Set@Vertex@@QAEXMMMMMMMMMM@Z	00779dd0
+?Spline@KeyTrack@@QAEMMMMMM@Z	00771c30
+_Camera_SetPushOffset	0070b8b0
+?QuatMultiply@@YA?AUVec4@@ABU1@0@Z	00777880
+?TransformPoint4@@YA?AUVec4@@ABU1@ABUMatrix4@@@Z	0077a580
+_AngleDifference	00778de0
+_Packs_ComponentsToPlanes	007bc3a0
+?AddPlainItem@TextWindow@@QAEHPAHHHPBD@Z	007b00f0
+?AddButton@TextWindow@@QAEHPAH0HHPBD@Z	007afbb0
+?AddTextItem@TextWindow@@QAEHPAHHHHHPBD@Z	007af9e0
+?AddChoiceListA@TextWindow@@QAEHPAH0HHHH@Z	007afc90
+?AddChoiceListB@TextWindow@@QAEHPAH0HHHH@Z	007afeb0
+_Path_GetBaseNameWorldCopy	0072c290
+?FindKeyLineOffset@WorldRenderer@@QAEHHPBD00@Z	0072c360
+?FindKeyLine@WorldRenderer@@QAEHHPBD00@Z	0072c450
+?KeyMoveCommandKind@WorldRenderer@@QAEHH@Z	00735390
+?HighestMessageId@WorldRenderer@@QAEHH@Z	0072e5d0
+?AppendKeyLinesFrom@WorldRenderer@@QAEHPAU1@H@Z	0070ac30
+?SaveMessages@WorldRenderer@@QAEHPBD@Z	007420b0
+?ScanLineCommandI@WorldRenderer@@QAEHHPAH@Z	0072e270
+?SetFlatColour@Node@@QAEHMMMM@Z	0076d470
+?InsertByName@MotionList@@QAEHHPBDH@Z	0076fad0
+?CopyTreeAnimation@Node@@QAEHPAU1@H@Z	0074e0a0
+_Render_PresentCenteredComposed@4	007a8220
+_Packs_OpenImageReader	007a9a70
+?ReadBackRgbPreview@TextureObject@@QAEHPAE@Z	007a0060
+?SetVertexColours@Node@@QAEHPBFMMM@Z	0076b0b0

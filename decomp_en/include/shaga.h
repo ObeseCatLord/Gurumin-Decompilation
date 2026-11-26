@@ -39,4 +39,8 @@ extern "C" int Shaga_Spawn(const Vec4 *position, const char *model, int radius, 
 // something, moved along the hit normal, a few times at most. Returns 0. EN 0x64bb90 (JP 0x1001af10).
 int Shaga_PushOut(int index);
 
+// Updates every shaga piece once per frame (tumbling, resting, flying to the player, being collected). Returns 0.
+// EN 0x649da0 (JP 0x10042a30).
+int Shaga_Update(void);
+
 #endif

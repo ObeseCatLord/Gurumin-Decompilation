@@ -65,7 +65,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 005ac910	59	-					0.00	none	en-only	unknown
 005ac950	1726	APP.dll	100564d0	Debris_Update	1611	unmatched	0.86	high	features	shared f5,i11, 3 rare
 005ad010	7096	APP.dll	1002d4e0	Char_LaserZone	5810	unmatched	0.83	high	features	shared f2,i26,s3, 11 rare
-005aec10	1767	APP.dll	1001e4b0	StatusPanel_UpdateText	2161	unmatched	0.53	medium	features	shared i9,s5, 5 rare
+005aec10	1767	APP.dll	1001e4b0	StatusPanel_UpdateText	2161	matched:status_panel_text.cpp	0.53	medium	features	shared i9,s5, 5 rare
 005af380	79	APP.dll	1000ed20	ColourBlend_Step	77	matched:app_0009.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.97
 005af3d0	4030	APP.dll	1000a0b0	Game::UpdateWindows	3983	unmatched	0.87	high	features	shared f2,i36, 7 rare
 005b03b0	131	-					0.00	none	en-only	unknown
@@ -208,7 +208,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 005df1c0	4693	APP.dll	10056b30	ShopMenu_Draw	4169	unmatched	0.71	high	features	shared c1,f9,i39, 3 rare
 005e0430	295	-					0.00	none	en-only	unknown
 005e0560	77	APP.dll	1000c340	Overlay_DrawFullScreen	69	matched:app_0007.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.90
-005e05b0	248	APP.dll	100091d0	Game::DrawDebugText	239	unmatched	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.96
+005e05b0	248	APP.dll	100091d0	Game::DrawDebugText	239	matched:game_panels.cpp	0.74	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.96
 005e06b0	4255	APP.dll	100311b0	MapMinigame_DrawHudMinuteTimer	4234	unmatched	0.84	high	features	shared c1,f15,i32,s1, 4 rare
 005e1750	3006	APP.dll	1007d0a0	TextWindows_Draw	2569	unmatched	0.89	high	features	shared f7,i21,s1, 3 rare
 005e2320	582	APP.dll	100236c0	Overlay_DrawModel	563	matched:overlay_draw.cpp	0.65	high	features	shared f2,i5, 1 rare
@@ -1214,7 +1214,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 007541d0	118	-					0.00	none	en-only	unknown
 00754250	554	APP.dll	10191fd0	Node::BoxesOverlap	549	matched:box_overlap.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.99
 00754480	948	APP.dll	10192200	Node::BoxCylinderOverlap	796	matched:box_overlap.cpp	0.52	medium	features	shared f2,i1, 0 rare
-00754840	1491	APP.dll	10192520	Node::BoxSphereOverlap	1233	unmatched	0.58	medium	features	shared f2,i1, 0 rare
+00754840	1491	APP.dll	10192520	Node::BoxSphereOverlap	1233	matched:box_overlap.cpp	0.58	medium	features	shared f2,i1, 0 rare
 00754e20	650	APP.dll	10192a00	Node::CylindersOverlap	649	matched:box_overlap.cpp	0.66	high	features	shared f2, 0 rare
 007550b0	1224	APP.dll	10192c90	Node::CylinderSphereOverlap	975	unmatched	0.66	high	features	shared f3, 0 rare
 00755580	202	APP.dll	10193060	Node::SpheresOverlap	221	matched:node_spheres.cpp	0.80	high	callgraph	neighbours 4 of 5 mapped agree, size ratio 0.91

@@ -29,6 +29,15 @@ const int PACKS_PICTURE_QUALITY = 0x100;   // fourth argument of the picture enc
 extern "C" int g_packsImageWidth;
 extern "C" int g_packsImageHeight;
 
+// Set to 0 by the image preview reader whenever it reopens; no reader of it found. EN 0x0222692c.
+extern "C" int g_packsImageState;
+
+// Size of the scratch block the preview reader allocates (a 640x480 picture at 3 bytes per pixel, rounded up).
+const int PACKS_SCRATCH_BLOCK_BYTES = 0xe1000;
+// Frees the old scratch block, allocates a new one, closes the image file and runs the reader with `command`.
+// Returns 1 on success, 0 when there is no block or the reader fails. EN 0x7a9a70 (packs_reader_open.cpp).
+extern "C" int Packs_OpenImageReader(int command);
+
 // Runs the image reader of the table with `command` on the scratch block (rows PACKS_READER_ROW_BYTES wide), letting it
 // update g_packsImageWidth and g_packsImageHeight. Returns 1 when the reader succeeded, 0 when there is no scratch block
 // or the reader failed (see packs_reader_run.cpp). EN 0x7a9a10.

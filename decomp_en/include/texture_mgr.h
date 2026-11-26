@@ -109,6 +109,8 @@ struct TextureObject
     int Create(int width, int height, const void *pixels, int alpha, int flags);
     // EN 0x79ffa0 (EN-only, texture_read_back.cpp): reads the 256 x 256 render target back into `rgb` as 24-bit pixels; returns 1, or 0 when the copy fails.
     int ReadBackRgb(unsigned char *rgb);
+    // EN 0x7a0060 (EN-only, texture_read_back_preview.cpp): ReadBackRgb for the first 0x400 pixels only, with an X1R5G5B5 fallback surface; returns 1, or 0 when no surface can be made or the copy fails.
+    int ReadBackRgbPreview(unsigned char *rgb);
     // EN 0x77d950 (JP 0x1014f1f0): (re)creates this texture at width x height and forgets it as a bound texture. `alpha` is 0
     // (system memory R5G6B5 texture filled from the 24-bit `pixels`), UPLOAD_TARGET_565 or UPLOAD_TARGET_8888 (an empty
     // render target) or a second 24-bit image whose first byte per pixel is the alpha of an A4R4G4B4 texture. Returns 0

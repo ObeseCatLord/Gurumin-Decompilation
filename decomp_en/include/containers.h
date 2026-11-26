@@ -27,6 +27,7 @@ struct KeyTrack
     int NextFrame(int frame);      // EN 0x7772e0: frame of the first key after `frame` (the last key when none is later, 0 for an empty track)
     int PreviousFrame(int frame);  // EN 0x777670: frame of the last key before `frame` (the first key when none is earlier, 0 for an empty track)
     int RemoveFrame(int frame);    // EN 0x772890 (key_remove.cpp, EN-only): removes the key at `frame` and moves the later keys up; 1 when found, else 0
+    float Spline(float t, float a, float b, float c, float d);  // EN 0x771c30 (key_track_spline.cpp): cubic Hermite interpolation between b (t = 0) and c (t = 1); `this` is not read
     int MaxFrame();                // EN 0x7755d0 (key_remove.cpp, EN-only): the highest key frame number (0 for an empty track)
 };
 
@@ -49,6 +50,9 @@ struct Vertex
 
     void SetPosition(float x, float y, float z);   // EN 0x779b20 (JP 0x101acbb0): sets the position, everything else to defaults
     void Set(float x, float y, float z, float nx, float ny, float nz, float u, float v, float r, float g, float b, float a);  // EN 0x779ec0: position, normal, uv and colour in one call
+    void Set(float x, float y, float z, float u, float v);   // EN 0x779c00 (vertex_set.cpp): position and uv; normal +z, white
+    void Set(float x, float y, float z, float nx, float ny, float nz, float u, float v);   // EN 0x779ce0 (vertex_set.cpp): position, normal and uv; white
+    void Set(float x, float y, float z, float nx, float ny, float nz, float r, float g, float b, float a);   // EN 0x779dd0 (vertex_set.cpp): position, normal and colour; uv zero
 };
 
 static_assert(sizeof(Vertex) == VERTEX_SIZE, "Vertex must be 0x70 bytes");

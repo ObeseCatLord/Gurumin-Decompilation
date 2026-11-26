@@ -232,7 +232,7 @@ struct ListBank
     int CompileCall(const char *text, int flags);              // 0x10089a10 (Script_CompileCall)
     int FirstIndexValue(const char *name, int *value);
     int DeclareVariable(const char *name, int group, char type);
-    int RegisterBuiltin(const char *signature, short id, BuiltinHandler handler);  // 0x10036ca0
+    int RegisterBuiltin(const char *signature, short id, BuiltinHandler handler);  // EN 0x644300 (JP 0x10036ca0)
     int InitLibrary();
     int ApplyOperator(const char *op);                         // 0x10004b10 (script_operators.cpp)
 };

@@ -940,3 +940,27 @@ void Vec4::Normalize4()
         w = w / length;
     }
 }
+
+// Hamilton product a * b of two quaternions (x, y, z = vector part, w = scalar part). Called from the player model
+// update (0x6a0950).
+Vec4 QuatMultiply(const Vec4 &a, const Vec4 &b)
+{
+    Vec4 result;
+    result.x = (b.z * a.y - b.y * a.z) + b.x * a.w + a.x * b.w;
+    result.y = (b.x * a.z - a.x * b.z) + a.w * b.y + b.w * a.y;
+    result.z = (a.x * b.y - b.x * a.y) + a.w * b.z + b.w * a.z;
+    result.w = ((b.w * a.w - a.x * b.x) - b.y * a.y) - a.z * b.z;
+    return result;
+}
+
+// The point (x, y, z, 1) multiplied by `matrix` (row vectors, translation in m[12..14]); all four result components are
+// kept, with no divide by w (Project, 0x77a4a0, divides). No direct caller.
+Vec4 TransformPoint4(const Vec4 &point, const Matrix4 &matrix)
+{
+    Vec4 result;
+    result.x = matrix.m[4] * point.y + point.x * matrix.m[0] + matrix.m[8] * point.z + matrix.m[12];
+    result.y = matrix.m[1] * point.x + matrix.m[5] * point.y + matrix.m[9] * point.z + matrix.m[13];
+    result.z = matrix.m[2] * point.x + matrix.m[6] * point.y + matrix.m[10] * point.z + matrix.m[14];
+    result.w = matrix.m[3] * point.x + matrix.m[7] * point.y + matrix.m[11] * point.z + matrix.m[15];
+    return result;
+}

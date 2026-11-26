@@ -46,3 +46,19 @@ int MotionList::RemoveEntry(int index)
     entryCount--;
     return 1;
 }
+
+// MotionList::InsertByName: looks up the entry called `name` and inserts its index into the timeline before item
+// `position` (MOTION_APPEND = at the end), recording `startTime` (the work of InsertItem, which EN inlines here).
+// Returns 0 when there is no entry of that name or the insert fails, otherwise 1. Called by the node animation code.
+int MotionList::InsertByName(int position, const char *name, int startTime)
+{
+    int entry;
+    for (entry = 0; entry < entryCount; entry++)
+    {
+        if (strcmp(name, names[entry]) == 0)
+            break;
+    }
+    if (entry == entryCount)
+        return 0;
+    return InsertItem(position, entry, startTime);
+}

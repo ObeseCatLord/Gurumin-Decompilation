@@ -30,3 +30,38 @@ extern "C" Matrix4 RemoveScale(const Matrix4 &source)
     result = InverseMatrix(ScaleMatrix(scaleX, scaleY, scaleZ)) * result;
     return result;
 }
+
+// Splits `source` into its translation, the scale along each axis (x/y/z of `scale`), and the rotation quaternion of
+// what is left once the scale is taken out (normalised over all four components; unit length unless it is zero).
+// Same steps as RemoveScale, with the quaternion taken at the end. Called by the node transform code.
+extern "C" int DecomposeMatrix(const Matrix4 *source, Vec4 *scale, Vec4 *rotation, Vec4 *translation)
+{
+    translation->x = source->m[MATRIX_TRANSLATION_X];
+    translation->y = source->m[MATRIX_TRANSLATION_Y];
+    translation->z = source->m[MATRIX_TRANSLATION_Z];
+    translation->w = 0;
+
+    Matrix4 unscaled = *source;
+    unscaled.m[MATRIX_TRANSLATION_X] = 0;
+    unscaled.m[MATRIX_TRANSLATION_Y] = 0;
+    unscaled.m[MATRIX_TRANSLATION_Z] = 0;
+    scale->x = ProjectedAxisLength(unscaled, 1, 0, 0);
+    scale->y = ProjectedAxisLength(unscaled, 0, 1, 0);
+    scale->z = ProjectedAxisLength(unscaled, 0, 0, 1);
+    unscaled = InverseMatrix(ScaleMatrix(scale->x, scale->y, scale->z)) * unscaled;
+
+    Vec4 quaternion = QuatFromMatrix(unscaled);
+    float length = (float)sqrt(quaternion.x * quaternion.x + quaternion.y * quaternion.y + quaternion.z * quaternion.z + quaternion.w * quaternion.w);
+    rotation->x = quaternion.x;
+    rotation->y = quaternion.y;
+    rotation->z = quaternion.z;
+    rotation->w = quaternion.w;
+    if (0.0f < length)
+    {
+        rotation->x = quaternion.x / length;
+        rotation->y = quaternion.y / length;
+        rotation->z = quaternion.z / length;
+        rotation->w = quaternion.w / length;
+    }
+    return 0;
+}

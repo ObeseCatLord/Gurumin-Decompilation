@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "char.h"
 #include "effect_manager.h"
+#include "engine.h"
 #include "visibility.h"
 
 // Camera_Ease: the follow shot. On the first call sets both goals from the current camera (the target goal from the
@@ -206,5 +207,156 @@ extern "C" int Camera_Between(void)
     g_cameraEye.Copy(g_cameraPositionNow);
     g_cameraPreviousPosition.Copy(g_cameraPositionNow);
     g_cameraPreviousTarget.Copy(g_cameraTargetNow);
+    return 0;
+}
+
+// Settings of the pull-to-item-stand shot, kept in elements of the first saved node matrix (the shot shares it with the
+// item stand sparkle).
+#define PULL_ORBIT_DISTANCE g_characterNodeMatrices[0][0].m[0]    // distance of the position goal from the target goal
+#define PULL_ORBIT_HEIGHT g_characterNodeMatrices[0][0].m[1]      // height of the position goal when the shot started
+#define PULL_ORBIT_UNUSED_STEP g_characterNodeMatrices[0][0].m[2] // set to the turn per frame, never read
+#define PULL_ORBIT_SCALE_RATE g_characterNodeMatrices[0][0].m[4]  // change of PULL_ORBIT_SCALE each frame
+#define PULL_ORBIT_TURN g_characterNodeMatrices[0][0].m[6]        // radians the position goal turns each frame
+#define PULL_ORBIT_SCALE g_characterNodeMatrices[0][0].m[8]       // factor on the orbit distance
+#define PULL_START_DISTANCE 800.0f     // distance of the position goal from the target goal at the start
+#define PULL_TURN_PER_FRAME 0.008f     // radians the position goal turns each frame
+#define PULL_WALL_CLEARANCE 25.0f      // distance kept in front of a wall
+#define PULL_WALL_NEAR 50.0f           // walls closer than this get a shrunk distance instead
+#define PULL_WALL_NEAR_SHRINK 0.75f    // factor on the distance to a near wall
+#define PULL_MAX_STEP 15.0f            // furthest the player is moved towards the stand in a frame
+#define PULL_TARGET_LIFT 70.0f         // height of the target goal above the player
+#define PULL_EASE_GOAL 0.15f           // share of the way to its goal the camera moves each frame
+#define PULL_EASE_PREVIOUS 0.85f       // share of the way to the previous value
+const int PULL_STATE_ENDING = 1;              // g_cameraShiftFrames value that ends the shot
+const int PULL_STATE_ENDED = 2;               // g_cameraShiftFrames value after the shot ended
+const unsigned int PULL_MASK_CAMERA = 4;      // map shape mask of the camera walls ("CA" shapes)
+const int PULL_VARIANT_CHOICES = 2;           // each digit of the variant is one of two values
+
+// Camera_PullToItemStand: the camera position goal stays on the line from the target goal through the current camera,
+// turned 0.008 rad a frame and set to PULL_ORBIT_DISTANCE * PULL_ORBIT_SCALE from the target goal (the settings are set
+// up on the first call, which also rolls the variant for the player's slot). The goal is then moved in front of walls:
+// a segment from 25 units beyond the goal back to the target is cast against the map's "CA" shapes (mask 4) and then
+// its "CS" shapes, and a hit puts the goal 25 units short of it (or at 3/4 of the distance when that is less than 50).
+// g_cameraShiftFrames = 1 ends the shot (follow mode, state 2). While the map has a "@kagudai" node the player is moved
+// towards it (at most 15 units a frame, when the map allows) and the target goal is 70 units above the player. The
+// target and position then move 15 % towards their goals plus 85 % towards their previous values (only while the shot
+// runs), and the copies are refreshed. Returns 0. Called every frame while the camera runs this shot.
+extern "C" int Camera_PullToItemStand(void)
+{
+    if (g_cameraShiftFrames == 0)
+    {
+        if (g_cameraShotStarted == 0)
+        {
+            Camera_SetMode2();
+            g_cameraPositionGoal.Copy(g_cameraPositionNow);
+            g_cameraTargetGoal.Copy(g_cameraTargetNow);
+            float scale = 1.0f;
+            g_cameraPositionGoal.Copy((g_cameraPositionGoal - g_cameraTargetGoal) * scale + g_cameraTargetGoal);
+            g_cameraShotStarted = 1;
+            g_charState[0].values[CHARSTATE_CAMERA_FRAMES] = 0;
+            ZeroMatrix();
+            g_charState[0].values[CHARSTATE_CAMERA_FRAMES] =
+                ((Random() % PULL_VARIANT_CHOICES + 1) * 16) | (Random() % PULL_VARIANT_CHOICES * 4 + 4) |
+                (Random() % PULL_VARIANT_CHOICES + 1);
+            (g_cameraPositionGoal - g_cameraTargetGoal).Length2D();
+            PULL_ORBIT_HEIGHT = g_cameraPositionGoal.z;
+            PULL_ORBIT_UNUSED_STEP = PULL_TURN_PER_FRAME;
+            PULL_ORBIT_SCALE_RATE = 0.0f;
+            PULL_ORBIT_TURN = PULL_TURN_PER_FRAME;
+            PULL_ORBIT_SCALE = 1.0f;
+            PULL_ORBIT_DISTANCE = PULL_START_DISTANCE;
+        }
+        PULL_ORBIT_SCALE = PULL_ORBIT_SCALE + PULL_ORBIT_SCALE_RATE;
+        Vec4 orbitOffset;
+        orbitOffset.Copy(g_cameraPositionGoal - g_cameraTargetGoal);
+        orbitOffset.RotateZ(-PULL_ORBIT_TURN);
+        orbitOffset.Normalized3();
+        orbitOffset.Copy(orbitOffset * PULL_ORBIT_DISTANCE * PULL_ORBIT_SCALE);
+        g_cameraPositionGoal.Copy(g_cameraTargetGoal + orbitOffset);
+        {
+            Vec4 farPoint;
+            Vec4 target;
+            Vec4 hit;
+            target.Copy(g_cameraTargetGoal);
+            farPoint.Copy(g_cameraPositionGoal - g_cameraTargetGoal);
+            {
+                float distance = farPoint.Length();
+                float reach = distance + PULL_WALL_CLEARANCE;
+                farPoint.Normalized3();
+                farPoint.Copy(farPoint * reach + g_cameraTargetGoal);
+            }
+            if (g_mapRootNode != 0)
+            {
+                if (g_mapRootNode->CastSegment("CA", PULL_MASK_CAMERA, &farPoint, &target, &hit, 0))
+                {
+                    float clearance = (hit - target).Length();
+                    if (clearance > PULL_WALL_NEAR)
+                        clearance -= PULL_WALL_CLEARANCE;
+                    else
+                        clearance *= PULL_WALL_NEAR_SHRINK;
+                    hit.Copy(farPoint - target);
+                    hit.Normalized3();
+                    g_cameraPositionGoal.Copy(target + hit * clearance);
+                    farPoint.Copy(target + hit * (clearance + PULL_WALL_CLEARANCE));
+                }
+                if (g_mapRootNode != 0)
+                {
+                    if (g_mapRootNode->CastSegment("CS", 0, &farPoint, &target, &hit, 0))
+                    {
+                        float clearance = (hit - target).Length();
+                        if (clearance > PULL_WALL_NEAR)
+                            clearance -= PULL_WALL_CLEARANCE;
+                        else
+                            clearance *= PULL_WALL_NEAR_SHRINK;
+                        hit.Copy(farPoint - target);
+                        hit.Normalized3();
+                        farPoint.Copy(target + hit * clearance);
+                        g_cameraPositionGoal.Copy(farPoint);
+                    }
+                }
+            }
+        }
+        g_cameraTargetNow.Copy(g_cameraTargetNow + (g_cameraTargetGoal - g_cameraTargetNow) * PULL_EASE_GOAL +
+                               (g_cameraPreviousTarget - g_cameraTargetNow) * PULL_EASE_PREVIOUS);
+        g_cameraPositionNow.Copy(g_cameraPositionNow + (g_cameraPositionGoal - g_cameraPositionNow) * PULL_EASE_GOAL +
+                                 (g_cameraPreviousPosition - g_cameraPositionNow) * PULL_EASE_PREVIOUS);
+        g_cameraTargetCopy.Copy(g_cameraTargetNow);
+        g_cameraPositionCopy.Copy(g_cameraPositionNow);
+        g_cameraTarget.Copy(g_cameraTargetNow);
+        g_cameraEye.Copy(g_cameraPositionNow);
+        g_cameraPreviousPosition.Copy(g_cameraPositionNow);
+        g_cameraPreviousTarget.Copy(g_cameraTargetNow);
+    }
+    else if (g_cameraShiftFrames == PULL_STATE_ENDING)
+    {
+        Camera_SetModeFollow();
+        g_cameraShiftFrames = PULL_STATE_ENDED;
+    }
+    if (g_mapRootNode != 0)
+    {
+        Node *stand = g_mapRootNode->Find("@kagudai", 0);
+        if (stand != 0)
+        {
+            Vec4 playerPosition;
+            Vec4 toStand;
+            playerPosition.Copy(g_characterModels[0].matrix.GetTranslation());
+            toStand.Copy(stand->worldMatrix.GetTranslation());
+            toStand.Copy(toStand - playerPosition);
+            toStand.z = 0;
+            if (toStand.Length2D() > PULL_MAX_STEP)
+            {
+                toStand.Normalized3();
+                float step = PULL_MAX_STEP;
+                toStand.Copy(toStand * step);
+            }
+            if (g_characterModels[0].IsClearOfMapLimited(&toStand))
+            {
+                g_characterModels[0].matrix.m[MATRIX_TRANSLATION_X] += toStand.x;
+                g_characterModels[0].matrix.m[MATRIX_TRANSLATION_Y] += toStand.y;
+            }
+            g_cameraTargetGoal.Copy(g_characterModels[0].matrix.GetTranslation());
+            g_cameraTargetGoal.z += PULL_TARGET_LIFT;
+        }
+    }
     return 0;
 }

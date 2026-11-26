@@ -339,6 +339,9 @@ struct Node
     // coordinates at the hit point interpolated from uvA..uvC. Returns 1 on a hit, else 0. Does not use `this`.
     int IntersectTriangle(const Vec4 *origin, const Vec4 *direction, Vec4 *a, Vec4 *b, const Vec4 *c, float *hitT, float *texU, float *texV,
                           const Vec4 *uvA, const Vec4 *uvB, const Vec4 *uvC);
+    // EN 0x75f710 (EN-only, node_pick.cpp): the node of this tree whose box a screen point lies over (0 = none); the hit point goes to *hitX/Y/Z. Callee cleans up its ten arguments.
+    Node *PickBox(float *hitX, float *hitY, float *hitZ, float screenX, float screenY, const Matrix4 *projection, const Matrix4 *camera,
+                  int unusedA, int unusedB, int firstCall);
     // EN 0x750a50 (JP 0x10199e20): queues this node tree for drawing into `list` with `view`, the lights `lights`, pass mask `pass` (-1 = all), fade colour `fade` and `flag`.
     int QueueDraw(DrawList *list, Matrix4 *view, const void *lights, int pass, Vec4 *fade, int flag);
     // Same function (EN 0x750a50) called with the world matrix of the node tree in the first argument.

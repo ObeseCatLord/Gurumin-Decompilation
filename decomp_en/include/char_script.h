@@ -27,4 +27,9 @@ extern "C" int Voice_StartEvent(int event, int value);
 extern "C" int Char_RunScriptStep(int index, int *doneStep, int step, int *nextStep, Vec4 *position, int *kind, int *value,
                                   int *extra);
 
+extern "C" int g_scriptCharacterRegistered;   // EN 0x00915cb4 (JP DAT_104c036c): 1 once a scripted character was added to the camera list
+
+// Runs the script of character `index` for one frame (see char_script.cpp). EN 0x6e5750 (JP 0x1002a340).
+extern "C" int Char_RunScript(int index);
+
 #endif

@@ -160,7 +160,11 @@ struct CharRecord
     ParamVector position;                    // 0x130: position
     char switchesHeld;                       // 0x140: number of switches the character is holding
     char defeated;                           // 0x141: 1 once the character is marked defeated
-    char m_0142;                             // 0x142: not used by EN code yet
+    union
+    {
+        char m_0142;                         // 0x142: not used by EN code yet (older name of `held`)
+        char held;                           // 0x142: 1 = a companion is held in place (Companion*_Update); cleared when it goes down
+    };
     char colourByte;                         // 0x143: colour value Char_UnpackParameter saves before it switches the kind
     char heldFlag;                           // 0x144: kept in the CharState while the character is held
     char name[CHAR_NAME_SIZE];               // 0x145: display name (message boxes show it as the speaker)

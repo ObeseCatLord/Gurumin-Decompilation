@@ -71,7 +71,7 @@ extern "C" int Enemy_AimedShots(int index);                    // EN 0x694f90
 extern "C" int Enemy_StarVolley(int index);                    // EN 0x695e20
 int Enemy_SpinFire(int index);                                 // EN 0x6991e0 (C++ linkage: its temporaries are unwound)
 int Enemy_CallBarrage(int index);                              // EN 0x6975e0 (C++ linkage: its temporaries are unwound)
-extern "C" int Enemy_CallBursts(int index, int variant);       // EN 0x695710
+int Enemy_CallBursts(int index, int variant);                  // EN 0x695710 (C++ linkage: its temporaries are unwound)
 extern "C" int DigitCounter_Update(int index);                 // EN 0x63bc80
 
 // Runs the kind-specific update of boss kinds 100, 101, 105 and 107. Returns 0. EN 0x699840.

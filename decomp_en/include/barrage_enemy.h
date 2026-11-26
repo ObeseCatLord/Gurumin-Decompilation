@@ -76,4 +76,30 @@ const char SPIN_FIRE_NODE_NAME[] = "@firenull";
 const int SPIN_RUN_MOTION = 1;
 
 
+// Enemy_CallBursts (behaviours 16 and 17): the call waits for its motion to set AnimModel::idleMotionEnabled, then fires bursts.
+// AnimModel::AddMotionSpeed when the call starts.
+const float BURST_MOTION_SPEED = 15.0f;
+// CharState::values[0] jumps here once the bursts are fired, and the enemy walks again after BURST_END.
+const int BURST_FIRED = 1000;
+const int BURST_END = 1060;
+// One burst effect; it follows the player's spine node (else the head, else the player).
+const int BURST_EFFECT = 0x3705;
+// EffectOptions::scale of a burst.
+const float BURST_SCALE = 1.3f;
+// Each burst starts 0 to BURST_FRAME_SPREAD - 1 frames late.
+const int BURST_FRAME_SPREAD = 30;
+const char BURST_NODE_NAME[] = "Bip01 Spine";
+// Offsets (x right of the enemy's facing, z above it) of the bursts: two high ones, and with variant 1 four lower ones.
+const float BURST_HIGH_X = 25.0f;  // the high bursts sit at -BURST_HIGH_X and +BURST_HIGH_X
+const float BURST_HIGH_Z = 120.0f;
+const float BURST_LOW_LEFT_X = -52.0f;
+const float BURST_LOW_RIGHT_X = 52.0f;
+const float BURST_LOW_Z = 45.0f;
+const float BURST_MID_LEFT_X = -50.0f;
+const float BURST_MID_RIGHT_X = 52.0f;
+const float BURST_MID_Z = 87.0f;
+// Motion played when the call starts and layer blend while it fires.
+const int BURST_MOTION_CALL = 2;
+const int BURST_MOTION_BLEND = 5;
+
 #endif

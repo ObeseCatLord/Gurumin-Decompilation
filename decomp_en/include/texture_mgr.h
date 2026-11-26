@@ -149,6 +149,9 @@ struct TextureObject
     int DrawFrameAltStretched(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);  // EN 0x794c70 (JP 0x1014e5d0)
     int DrawFill(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);      // EN 0x798980 (JP 0x1014ce40)
     int DrawFillAlt(int left, int top, int right, int bottom, float z, float alpha, int textured, int border);   // EN 0x799230
+    // EN 0x795e20 (JP 0x1014ec30): the DrawFrameAlt outline drawn in the colour `rgb` (0xRRGGBB) instead of white.
+    int DrawFrameAltTinted(int left, int top, int right, int bottom, float z, float alpha, int textured, int border,
+                           unsigned int rgb);
     int Write16(int x, int y, int rowPixels, int rows, int pitch, const void *bits);  // EN 0x77d2e0 (JP 0x1014f060)
     int WriteRgb32(int left, int top, int right, int bottom, int pitch, const unsigned char *bits);  // EN 0x77d030 (JP 0x1014ef20)
     int WritePaletted(int left, int top, int right, int bottom, int pitch, const unsigned char *bits,

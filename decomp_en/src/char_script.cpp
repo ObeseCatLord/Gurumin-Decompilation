@@ -1,6 +1,7 @@
 // Scripted character steps (EN build). Ported from the matched JP source decomp/src/char_script.cpp.
 #include "anim_model.h"
 #include "char.h"
+#include "camera.h"
 #include "char_script.h"
 #include "map_records.h"
 
@@ -163,4 +164,60 @@ extern "C" int Char_RunScriptStep(int index, int *doneStep, int step, int *nextS
     *value = opacity;
     *kind = stepKind;
     return visible;
+}
+
+// Indices in CharState::values of the script variables of a scripted character (the frame counter is SCRIPT_WAIT_VALUE).
+const int SCRIPT_STEP_VALUE = 1;       // step the script is at
+const int SCRIPT_REGISTERED_VALUE = 2; // 1 once the character's position was added to the camera list
+const int SCRIPT_OPACITY_VALUE = 4;    // opacity in tenths
+const int SCRIPT_RESULT_VALUE = 6;     // result of the last step (SCRIPT_STEP_KIND_RUNNING = 5)
+// Step result that makes the script run the next step in the same frame.
+const int SCRIPT_RESULT_CONTINUE = 5;
+// Value of SCRIPT_RESULT_VALUE after the script ended.
+const int SCRIPT_RESULT_ENDED = 1;
+// Where a finished character is parked (far outside the world).
+const float SCRIPT_PARKED_POSITION = -5000.0f;
+
+// Char_RunScript: runs the script of character `index` for this frame: steps follow each other at once while a step
+// returns 5. When the script ends (a result other than 2 and no frames kept after the script) the character is reset
+// and moved out of the world. On the first call its position is added to the camera list. The opacity follows the
+// script value (tenths). Returns 0. Called every frame for the scripted scene characters.
+extern "C" int Char_RunScript(int index)
+{
+    Vec4 position;
+    Vec4 unused;
+    int doneStep;
+    int extra;
+    int nextStep;
+    int result;
+    position.Copy(g_characterModels[index].matrix.GetTranslation());
+    g_characterModels[index].mode = 0;
+    int value = g_charState[index].values[SCRIPT_OPACITY_VALUE];
+    do
+    {
+        Char_RunScriptStep(index, &doneStep, g_charState[index].values[SCRIPT_STEP_VALUE], &nextStep, &position, &result,
+                           &value, &extra);
+        g_charState[index].values[SCRIPT_OPACITY_VALUE] = value;
+        g_charState[index].values[SCRIPT_RESULT_VALUE] = result;
+        g_charState[index].values[SCRIPT_STEP_VALUE] = nextStep;
+    } while (result == SCRIPT_RESULT_CONTINUE);
+    if (g_charState[index].values[SCRIPT_KEEP_VALUE] == 0 && result != SCRIPT_STEP_KEEP)
+    {
+        g_charState[index].values[SCRIPT_RESULT_VALUE] = SCRIPT_RESULT_ENDED;
+        g_charState[index].values[SCRIPT_WAIT_VALUE] = 0;
+        g_charState[index].values[SCRIPT_STEP_VALUE] = 0;
+        g_charState[index].values[SCRIPT_OPACITY_VALUE] = 0;
+        g_characterModels[index].alpha = 0;
+        g_characterModels[index].SetPosition(SCRIPT_PARKED_POSITION, SCRIPT_PARKED_POSITION, SCRIPT_PARKED_POSITION);
+    }
+    if (g_charState[index].values[SCRIPT_REGISTERED_VALUE] == 0)
+    {
+        g_charState[index].values[SCRIPT_REGISTERED_VALUE] = 1;
+        g_scriptCharacterRegistered = 1;
+        g_trackedPositions[g_trackedCount] = &g_characterModels[index].matrix.m[MATRIX_TRANSLATION_X];
+        g_trackedFlags[g_trackedCount] = 0;
+        g_trackedCount++;
+    }
+    g_characterModels[index].alpha = (float)value / SCRIPT_ALPHA_TENTHS;
+    return 0;
 }

@@ -9,6 +9,7 @@ struct TextureObject;
 
 // MmvPlayer::state value of a movie that is loaded but not playing, and of one that played its last frame.
 const int MMV_STOPPED = 0;
+const int MMV_PLAYING = 1;      // MmvPlayer::state of a movie that is playing
 const int MMV_FINISHED = 2;
 // Movie type that is cut short, and how many frames it plays.
 const int MMV_TYPE_SHORT = 6;

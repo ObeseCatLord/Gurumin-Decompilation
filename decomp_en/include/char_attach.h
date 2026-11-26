@@ -50,7 +50,7 @@ const int ITEM_HELMET_COSTUME_3 = 0x3d;
 const int HELMET_NODE_POSITION = 2;
 
 extern "C" int g_helmetFaceSettings;     // EN 0x00b493f8 (JP DAT_104c02c8): face settings of the player's helmet
-extern "C" char g_helmetKind;            // EN 0x00bc8872 (JP DAT_104c033a): which helmet model variant the player wears (0 = none, 6 = costume 6)
+extern "C" unsigned char g_helmetKind;         // EN 0x00bc8872 (JP DAT_104c033a): which helmet model variant the player wears (0 = none, 6 = costume 6)
 extern "C" char g_helmetOn;              // EN 0x00b91eab (JP DAT_104c0319): set to 1 when a helmet node was created
 
 // Face settings of helmet item `item`. EN 0x646df0 (JP 0x10014d30).

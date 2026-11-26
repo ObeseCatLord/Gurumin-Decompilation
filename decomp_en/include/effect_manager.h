@@ -252,6 +252,9 @@ struct EffectManager
     // effects that follow a matrix, `runOwnerEffects` also runs effects that follow their owner and `runPaused` also
     // runs effects whose pause flag is set. Returns 0. EN 0x719750 (JP 0x10188580). Called by the frame update.
     int Update(int onlyFollowing, int runOwnerEffects, int runPaused);
+    // Reads the effect definition file `path` into the free definition slots and loads their textures and models. Returns 1,
+    // or 0 when the file cannot be read. EN 0x7361c0 (JP 0x1016e450).
+    int LoadDefinitions(const char *path);
     int Reset();   // EN 0x734ce0 (JP 0x10184170): removes every running effect
     int Start(int effect, Vec4 position, int parent, int unused, const Matrix4 *owner, int value, int frame,
               const Matrix4 *matrix, const EffectOptions *options, int *pause);

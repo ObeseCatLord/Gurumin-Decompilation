@@ -123,6 +123,12 @@ extern "C" Vec4 g_cameraShiftTarget;             // EN 0x00daa720 (JP DAT_10c67f
 // Camera_Shift: the shot that shifts the camera by offsets. Returns 0. EN 0x64caf0 (JP 0x10019310).
 extern "C" int Camera_Shift(void);
 
+// Camera_PullToItemStand: the camera shot that pulls back from the item stand while the player walks to it. Returns 0.
+// EN 0x64c090 (JP 0x10018870, camera_follow.cpp). Switches back to the follow mode (Camera_SetModeFollow, EN 0x7485b0)
+// when g_cameraShiftFrames is 1.
+extern "C" int Camera_PullToItemStand(void);
+extern "C" int Camera_SetModeFollow(void);
+
 // Camera state cleared with the player (Player_ResetMotion) and the camera (Camera_Reset).
 const int CAMERA_GROUND_UNKNOWN = -100;          // g_cameraGroundHeight value before a ground height was measured
 extern "C" int g_cameraGroundHeight;             // EN 0x00908a20 (JP DAT_10203444): ground height cache, CAMERA_GROUND_UNKNOWN = unknown

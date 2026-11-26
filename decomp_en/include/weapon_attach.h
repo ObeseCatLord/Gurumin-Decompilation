@@ -30,4 +30,8 @@ extern "C" int g_refreshRenderMode;
 // shaga slot `slot`. Returns 0. EN 0x6aa070 (JP 0x1001a990).
 extern "C" int Char_AttachWeapon(int index, int weapon, int right, int left, int slot);
 
+// Makes character `index` drop what it wears in its hands (`scatter` throws the pieces about, `bothHands` drops both
+// hands' models). C++ linkage, cdecl. EN 0x6cf480 (JP 0x100615f0).
+int Char_DropEquipment(int index, int scatter, int bothHands);
+
 #endif

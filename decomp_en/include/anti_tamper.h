@@ -31,4 +31,13 @@ extern "C" int AntiTamper_StoreValues(void);
 // Refreshes the guard copies of the item stock and the extra values. Returns 0. EN 0x5f4700.
 extern "C" int AntiTamper_StoreArrays(void);
 
+// Entries of the noise table AntiTamper_Check writes random values into when a guard copy does not match.
+const int TAMPER_NOISE_COUNT = 16;
+extern "C" int g_tamperNoise[TAMPER_NOISE_COUNT];   // EN 0x00a363a8 (JP DAT_104c0270): anti-tamper noise table
+extern "C" int g_debuggerDetected;                  // EN 0x0217fb04 (JP DAT_11b044f0): non-zero = a debugger was found (the check then adds noise)
+extern "C" short g_tamperCheckDepth;                // EN 0x00bc8890 (JP DAT_104c034c): raised while AntiTamper_Check runs, lowered when it ends
+// Compares every guard copy with its value, adds noise to g_tamperNoise for each mismatch and checks the array copies
+// every 30 frames. Returns 0. EN 0x5b43f0 (JP 0x1000e870).
+extern "C" int AntiTamper_Check(void);
+
 #endif

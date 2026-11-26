@@ -622,3 +622,38 @@ int ListBank::ReadArgument(char **text, char *word)
     *text = p;
     return 1;
 }
+
+// Index values FirstIndexValue keeps (only the first one is used).
+const int INDEX_VALUE_COUNT = 8;
+// Characters of a name or of an index expression.
+const int INDEX_TEXT_SIZE = 256;
+
+// ListBank::FirstIndexValue: for an array reference such as "name[expr]..." (a '[' after the first character) evaluates every
+// bracketed index expression in turn and stores the value of the first one in `value` (0 when there is no '['). Returns
+// 0. Called when an array element is read or assigned.
+int ListBank::FirstIndexValue(const char *name, int *value)
+{
+    int values[INDEX_VALUE_COUNT];
+    char part[INDEX_TEXT_SIZE];
+    char copy[INDEX_TEXT_SIZE];
+    *value = 0;
+    int bracket = 0;
+    for (int i = (int)strlen(name) - 1; i > 0; i--)
+    {
+        if (name[i] == '[')
+            bracket = 1;
+    }
+    if (bracket != 0)
+    {
+        int n = 0;
+        strcpy(copy, name);
+        while (GetIndexPart(copy, part, n) != 0)
+        {
+            Evaluate(part, 0);
+            values[n] = *result;
+            n++;
+        }
+        *value = values[0];
+    }
+    return 0;
+}

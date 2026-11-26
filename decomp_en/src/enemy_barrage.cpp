@@ -211,3 +211,112 @@ int Enemy_SpinFire(int index)
     }
     return 0;
 }
+
+// Walks with the common enemy behaviour and, with the same 2.5 % chance per frame as Enemy_CallBarrage, stops to call
+// bursts: it faces the player, speeds its motion up and waits until its motion sets AnimModel::idleMotionEnabled; then
+// effect 0x3705 bursts on the player's spine (else head, else position) at points around the enemy's facing: two 120
+// units up, and with variant 1 four more at 45 and 87 units. It walks again 60 frames later. Returns 0. Called by the
+// enemy updater (behaviours 16 and 17, variant 0 and 1).
+int Enemy_CallBursts(int index, int variant)
+{
+    if (g_charState[index].state == BARRAGE_RUNNING)
+    {
+        Vec4 player;
+        Vec4 self;
+        player.Copy(g_characterModels[0].matrix.GetTranslation());
+        self.Copy(g_characterModels[index].matrix.GetTranslation());
+        if (++g_charState[index].values[0] == 1)
+        {
+            // the call starts: face the player
+            g_characterModels[index].AddMotionSpeed(BURST_MOTION_SPEED);
+            g_characterModels[index].idleMotionEnabled = 0;
+            float dy = player.y - self.y;
+            float dx = player.x - self.x;
+            g_characterModels[index].targetHeading = (float)atan2((double)dx, (double)dy) + TURN_HALF;
+        }
+        if (g_charState[index].values[0] < BURST_FIRED)
+        {
+            if (g_characterModels[index].idleMotionEnabled == 1)
+            {
+                // the motion reached its call frame: fire the bursts
+                g_charState[index].values[0] = BURST_FIRED;
+                EffectOptions options;
+                Matrix4 burst;
+                Vec4 offset;
+                const Matrix4 *target;
+                if (g_characterModels[0].root->Find(BURST_NODE_NAME, 0) != 0)
+                    target = &g_characterModels[0].root->Find(BURST_NODE_NAME, 0)->worldMatrix;
+                else if (g_characterModels[0].headNode != 0)
+                    target = &g_characterModels[0].headNode->worldMatrix;
+                else
+                    target = &g_characterModels[0].matrix;
+                options.colour = g_charRecords[index].stats[STAT_EFFECT_COLOUR];
+                options.scale = BURST_SCALE;
+                burst.SetIdentity();
+                burst = RotationZ(g_characterModels[index].heading);
+                if (variant != 0)
+                {
+                    offset.x = BURST_LOW_LEFT_X;
+                    offset.z = BURST_LOW_Z;
+                    offset.RotateZ(-g_characterModels[index].heading);
+                    burst.SetTranslation(offset + self);
+                    offset.Fill(0.0f);
+                    Char_StartEffectInline(index, BURST_EFFECT, offset, -1, -1, target, 0, Random() % BURST_FRAME_SPREAD,
+                                           &burst, &options);
+                    offset.x = BURST_LOW_RIGHT_X;
+                    offset.z = BURST_LOW_Z;
+                    offset.RotateZ(-g_characterModels[index].heading);
+                    burst.SetTranslation(offset + self);
+                    offset.Fill(0.0f);
+                    Char_StartEffectInline(index, BURST_EFFECT, offset, -1, -1, target, 0, Random() % BURST_FRAME_SPREAD,
+                                           &burst, &options);
+                    offset.x = BURST_MID_LEFT_X;
+                    offset.z = BURST_MID_Z;
+                    offset.RotateZ(-g_characterModels[index].heading);
+                    burst.SetTranslation(offset + self);
+                    offset.Fill(0.0f);
+                    Char_StartEffectInline(index, BURST_EFFECT, offset, -1, -1, target, 0, Random() % BURST_FRAME_SPREAD,
+                                           &burst, &options);
+                    offset.x = BURST_MID_RIGHT_X;
+                    offset.z = BURST_MID_Z;
+                    offset.RotateZ(-g_characterModels[index].heading);
+                    burst.SetTranslation(offset + self);
+                    offset.Fill(0.0f);
+                    Char_StartEffectInline(index, BURST_EFFECT, offset, -1, -1, target, 0, Random() % BURST_FRAME_SPREAD,
+                                           &burst, &options);
+                }
+                offset.x = -BURST_HIGH_X;
+                offset.z = BURST_HIGH_Z;
+                offset.RotateZ(-g_characterModels[index].heading);
+                burst.SetTranslation(offset + self);
+                offset.Fill(0.0f);
+                Char_StartEffectInline(index, BURST_EFFECT, offset, -1, -1, target, 0, Random() % BURST_FRAME_SPREAD,
+                                       &burst, &options);
+                offset.x = BURST_HIGH_X;
+                offset.z = BURST_HIGH_Z;
+                offset.RotateZ(-g_characterModels[index].heading);
+                burst.SetTranslation(offset + self);
+                offset.Fill(0.0f);
+                Char_StartEffectInline(index, BURST_EFFECT, offset, -1, -1, target, 0, Random() % BURST_FRAME_SPREAD,
+                                       &burst, &options);
+            }
+            g_characterModels[index].PlayMotion(BURST_MOTION_CALL, 0, BURST_MOTION_BLEND, 1.0f);
+        }
+        else if (g_charState[index].values[0] > BURST_END)
+        {
+            g_charState[index].state = 0;
+            g_charState[index].values[0] = 0;
+        }
+    }
+    else
+    {
+        Enemy_ChaseLungeAndSpit(index, 0);
+        if (g_characterModels[index].playback->layer != BARRAGE_BLOCKING_LAYER &&
+            g_characterModels[index].playback->blending == 0 && Random() % BARRAGE_CHANCE_RANGE < BARRAGE_CHANCE)
+        {
+            g_charState[index].state = BARRAGE_RUNNING;
+            g_charState[index].values[0] = 0;
+        }
+    }
+    return 0;
+}

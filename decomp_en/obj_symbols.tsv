@@ -1424,3 +1424,37 @@ _Packs_EncodeImage	007b8af0
 _DigitCounter_Update	0063bc80
 ?Save_ReadSlotInfo@@YAHPBDPAH1PAD1@Z	0063e9f0
 ?BindLinks@Node@@QAEHPAU1@PAPAU1@PAH@Z	0076d770
+# section 2 B (batch 19)
+?Mirror@Vec4@@QAEXABU1@@Z	00777fc0
+# walls (batch 19)
+_Camera_ChaseTarget	005a56f0
+_Block_Update	005a5e10
+?Lava_Update@@YAHXZ	005a8320
+?UpdateDrillLevel@@YAHXZ	005a9fe0
+_AntiTamper_Check	005b43f0
+_Player_TakeDamage	005c9c50
+_Sound_PlayVoice	006e05d0
+_Sound_PlayDelayed	005ca1d0
+# section 2 A (batch 19)
+_Char_RunScript	006e5750
+_Camera_PullToItemStand	0064c090
+?TutorialBook_Update@@YAHXZ	005b8590
+_Sound_UpdateDopplerLoops	006dedc0
+?Enemy_CallBursts@@YAHHH@Z	00695710
+_Enemy_FetchDroppedWeapon	006a98c0
+?Companion2_Update@@YAHH@Z	005a6940
+?Companion1_Update@@YAHH@Z	005a71e0
+?PickBox@Node@@QAEPAU1@PAM00MMPBUMatrix4@@1HHH@Z	0075f710
+_Enemy_Defeat	006cce80
+_Render_Command	007a4f60
+_Item_DrawCaption	005cdf70
+?LoadDefinitions@EffectManager@@QAEHPBD@Z	007361c0
+?DrawFrameAltTinted@TextureObject@@QAEHHHHHMMHHI@Z	00795e20
+?FirstIndexValue@ListBank@@QAEHPBDPAH@Z	005ec290
+_Map_SetEntryFlags	006420b0
+_SaveSummary_Draw	005dc610
+?DrawFrameAltStretched@TextureObject@@QAEHHHHHMMHH@Z	00794c70
+?Char_SwingPlatform@@YAHH@Z	00666bf0
+?Npc_HurlAtPlayer@@YAHH@Z	006d2280
+?DrawCaption@WorldRenderer@@QAEXXZ	0072b530
+?Npc_HoverCarrier@@YAHH@Z	006d3a00

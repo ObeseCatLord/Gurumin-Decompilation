@@ -15,6 +15,7 @@ struct IndexList;
 struct Channel;
 struct SlotTable;
 struct VertexPack;
+struct Vertex;
 struct Material;
 struct TextureRef;
 struct VisData;
@@ -80,6 +81,8 @@ enum NodeElement
 // Material sizes: texture file names and material names share one size.
 const int MATERIAL_NAME_SIZE = 0x40;
 const int MATERIAL_TEXTURE_COUNT = 4;
+// Value that ends the vertex index list ListVerticesOfMaterialColour writes.
+const short MATERIAL_VERTEX_LIST_END = -1;
 // Material::alpha of a blank material (no vertex alpha).
 const float MATERIAL_BLANK_ALPHA = 0.0f;
 // Material::m_0174 of a blank material.
@@ -288,6 +291,9 @@ struct Node
     Node *FindPrefixRecursiveStripped(const char *prefix, int *skip);  // EN 0x753660 (JP 0x10191b60)
 
     Node *FindByFlags(unsigned int mask, int nth, int *counter);   // EN 0x753420 (JP 0x10191cc0)
+    Node *FindByFlagsBelow(unsigned int mask);                     // EN 0x7534b0 (EN-only, node_hierarchy.cpp): the first node below this one (child by child, each searched with FindByFlags) whose flags contain `mask`, 0 when none
+    // EN 0x753770 (EN-only, node_materials.cpp): writes the indices of the first pack's vertices whose colour equals the colour of material `materialIndex` to `indices`, ended by MATERIAL_VERTEX_LIST_END; 0 when the material does not exist
+    int ListVerticesOfMaterialColour(int materialIndex, short *indices);
     int Rename(const char *newName, const char *oldName);          // EN 0x769fa0 (JP 0x1019ed40)
     int SetUniqueName(const char *name);                           // EN 0x76b570 (JP 0x101a52d0)
     void MakeNameUnique();                                         // EN 0x76d540 (JP 0x101a2290)
@@ -345,6 +351,7 @@ struct Node
     int LinkToChasing(Node *const *nodes, int count);     // EN 0x76d6e0 (JP 0x10191990)
     int LinkTrackingNodes();                              // EN 0x76ea50 (EN-only, node_hierarchy.cpp): collects the nodes in state 0x4000 and links them to the chasing nodes
     Node *AttachChild(Node *child);                       // EN 0x749750 (EN-only, node_hierarchy.cpp): appends an existing node to the child list and makes this its parent
+    int SetParentRecursive(Node *newParent);              // EN 0x76b670 (EN-only, node_hierarchy.cpp): sets the parent (name and pointer), refreshes the child name table and repeats for every child
     Node *FindSkinned();                                  // EN 0x7532f0 (EN-only, node_hierarchy.cpp): this node or the first descendant (depth first) that has skinning data, 0 if none
     int StoreLinks(Node **list, int *count);              // EN 0x76eb70 (JP 0x10191870)
     int ScanChunks(GameFile *file, int arg);              // EN 0x7587c0 (JP 0x101a4a60): reads the INFO/MAN2 chunks of a model file
@@ -353,6 +360,9 @@ struct Node
     int SpheresOverlap(const Vec4 *boundsA, const Vec4 *offsetA, const Vec4 *boundsB, const Vec4 *offsetB, Vec4 *aToB, Vec4 *bToA);
     // EN 0x75a770 (JP 0x1019f210): looks for nodes below this one whose bounding sphere overlaps the sphere of `radius` around `center`; hits are appended to `found` (when given). Returns 1 on a hit.
     int FindTouchingSphere(int unused, const Vec4 *center, float radius, Node **found, int *foundCount);
+    // EN 0x74f9a0 (EN-only, not reconstructed yet): replaces the node's mesh with one built from `vertexCount` vertices and `indexCount` indices (no mesh when the vertex count is 0).
+    int BuildMeshFromVertices(const Vertex *vertices, const int *indices, int vertexCount, int indexCount);
+    int BuildQuadMesh(const Vertex *first, const Vertex *second, const Vertex *third, const Vertex *fourth);   // EN 0x74f320 (EN-only, node_quad_mesh.cpp): builds a four-vertex mesh from the four vertices
     int ResetVertexColours(float uvScale);  // EN 0x74f3c0 (JP 0x1019c3a0): every vertex white with its emissive colour cleared; a non-zero `uvScale` also lifts it and takes texture coordinates from x and y; returns 0
     int WeldVertices();                    // EN 0x75b920 (JP 0x1019e610): merges equal vertices in every pack
     int SortPacks();                       // EN 0x75bef0 (JP 0x1019c690): opaque packs first, then those with vertex alpha
@@ -387,6 +397,11 @@ struct Node
     int TagRegionsInTree(const Box2 *boxes, const VisCell *cells);   // EN 0x76a200 (node_tree_passes.cpp, EN-only): TagRegion on every command-target node of the subtree (0, 0 = the visibility data of this map root)
     int CopyAnimation(Node *source, int slot);  // EN 0x74e180 (JP 0x1019b890): gives this node the animation (plugs, tracks, matrices) of `source`
     int ComputeBounds();                   // EN 0x75bb30 (JP 0x1019d8e0): recomputes the node's bounding sphere and box
+    // EN 0x74f580 (JP 0x101a82d0, node_mesh_build.cpp): replaces the node's mesh with one built from a triangle list: `count` indices
+    // into `vertices` (three per triangle, each vertex carries its material number); one vertex pack per material. 0 for an empty list, else 1.
+    int BuildMesh(Vertex *vertices, int *indices, int count);
+    int ApplyMaterialColours();            // EN 0x75ac10 (JP 0x1019c560): applies the material colours to the vertices (not yet ported)
+    int SplitIntoCells();                  // EN 0x75ad30 (JP 0x1019c8d0): splits the packs into cells (not yet ported)
     int SetMaterialValue(const char *material, int value);  // EN 0x74a400 (JP 0x1019e8c0)
     int SetMaterials(const Material *source, int count);    // EN 0x74f170 (EN-only, node_materials.cpp): replaces the material table with a copy of `count` materials from `source`; returns 1
     int MarkMaterialEdges();                                // EN 0x76ad50 (EN-only, node_materials.cpp): sets MATERIAL_EDGE_MARKED on the first edge flag of every material of this subtree; returns 0

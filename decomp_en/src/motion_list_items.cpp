@@ -1,4 +1,5 @@
 // Inserting into the timeline of a MotionList (EN build, EN-only: no JP twin found).
+#include <string.h>
 #include "motion_list.h"
 
 // Position that appends an item at the end of the timeline.
@@ -24,5 +25,24 @@ int MotionList::InsertItem(int position, int item, int startTime)
         items[i + 1] = items[i];
     items[position] = item;
     count++;
+    return 1;
+}
+
+// MotionList::RemoveEntry: takes entry `index` out of the entry table (id, value, extra and name) by moving the later
+// entries down one place and counts it. Returns 0 when `index` is not an entry, otherwise 1. No direct caller.
+int MotionList::RemoveEntry(int index)
+{
+    if (entryCount <= index)
+        return 0;
+    if (index < 0)
+        return 0;
+    for (int i = index; i < entryCount - 1; i++)
+    {
+        ids[i] = ids[i + 1];
+        values[i] = values[i + 1];
+        extras[i] = extras[i + 1];
+        strcpy(names[i], names[i + 1]);
+    }
+    entryCount--;
     return 1;
 }

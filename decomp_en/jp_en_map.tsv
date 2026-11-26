@@ -97,11 +97,11 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 005b9b10	106	APP.dll	10026c80	Enemy_PickAction_60_10_30	126	matched:ai_pick.cpp	0.72	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.84
 005b9b80	106	-					0.00	none	en-only	unknown
 005b9bf0	2597	APP.dll	10116550	NameEntry_Update	15107	matched:name_entry.cpp	0.88	high	callgraph	neighbours 22 of 23 mapped agree, size ratio 0.17; also inlines APP.dll:1015f4e0
-005ba630	151	APP.dll	100e2080	Enemy_UpdateAI_A	144	unmatched	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.95
+005ba630	151	APP.dll	100e2080	Enemy_UpdateAI_A	144	matched:enemy_ai.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.95
 005ba6d0	149	-					0.00	none	en-only	unknown
 005ba770	693	APP.dll	100e21a0	Enemy_DefaultStep	671	unmatched	0.84	high	features	shared i7, 1 rare
-005baa30	143	APP.dll	100e2440	Enemy_UpdateAI_C	139	unmatched	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.97
-005baac0	145	APP.dll	100e24d0	Enemy_UpdateAI_D	141	unmatched	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.97
+005baa30	143	APP.dll	100e2440	Enemy_UpdateAI_C	139	matched:enemy_ai.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.97
+005baac0	145	APP.dll	100e24d0	Enemy_UpdateAI_D	141	matched:enemy_ai.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.97
 005bab60	149	-					0.00	none	en-only	unknown
 005bac00	1144	APP.dll	100e1c40	Enemy_IsBusy	1082	unmatched	0.92	high	features	shared f5,i7, 0 rare
 005bb080	5147	APP.dll	10078060	Partner_SpecialSkill	5123	matched:partner_skill.cpp	0.85	high	features	shared f17,i34,s7, 14 rare
@@ -290,13 +290,13 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 005f7cd0	21147	APP.dll	1009e380	Script_SceneCommand	21807	unmatched	0.76	high	features	shared f25,i103,s10, 40 rare
 005fd1b0	7848	APP.dll	100fedd0	Script_SystemCommand	6739	unmatched	0.89	high	features	shared c2,f4,i88,s40, 98 rare
 005ff130	13273	APP.dll	101011b0	Script_ValueCommand	13173	unmatched	0.92	high	features	shared c1,f11,i183,s15, 136 rare
-00602660	198	APP.dll	10035a30	ListBank::SkipBlock	224	unmatched	0.81	high	features	shared i6,s1, 4 rare
+00602660	198	APP.dll	10035a30	ListBank::SkipBlock	224	matched:listbank.cpp	0.81	high	features	shared i6,s1, 4 rare
 00602730	967	APP.dll	10051190	MapCursor_Step	988	unmatched	0.70	high	features	shared f2,i4, 0 rare
 00602b00	241	APP.dll	10011b70	Char_PushAwayFrom	236	matched:char_turn.cpp	0.90	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.98
 00602c00	270	-					0.00	none	en-only	unknown
 00602d10	171	-					0.00	none	en-only	unknown
 00602dc0	66	-					0.00	none	en-only	unknown
-00602e10	348	APP.dll	1000b9f0		252	unmatched	0.87	high	features	shared i3,s1, 1 rare
+00602e10	348	APP.dll	1000b9f0		252	matched:effect_model.cpp	0.87	high	features	shared i3,s1, 1 rare
 00602f70	516	APP.dll	1000fb80	Loading_Tick	453	matched:loading_tick.cpp	1.00	high	features	shared c1,f3,i10, 5 rare
 00603180	1200	APP.dll	1003b6e0	Costume_LoadPlayerModel	1208	unmatched	0.86	high	features	shared i5,s9, 9 rare
 00603630	769	-					0.00	none	en-only	steam
@@ -328,7 +328,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 00631890	14173	APP.dll	1011a060	Field_Update	14244	unmatched	0.81	high	features	shared c4,f24,i52,s50, 63 rare
 00635010	984	APP.dll	10020090	Collide_RayThroughRegions	1224	matched:collide_regions.cpp	0.66	high	features	shared f2,i9, 0 rare
 006353f0	143	APP.dll	1001fff0	Model_CollideRegions	159	matched:collide_regions.cpp	0.65	high	features	shared i4, 0 rare
-00635480	310	APP.dll	100bd960	Map_UpdateSpecial	345	unmatched	0.67	high	features	shared f1,i2, 1 rare
+00635480	310	APP.dll	100bd960	Map_UpdateSpecial	345	matched:map_special.cpp	0.67	high	features	shared f1,i2, 1 rare
 006355e0	4075	APP.dll	10064630	Menu_SaveLoad	3598	matched:menu_save_load.cpp	0.75	high	features	shared c1,i13,s7, 6 rare
 006365f0	2904	APP.dll	100524d0	Map17_UpdateMoleGame	2888	unmatched	0.86	high	features	shared f8,i31,s2, 12 rare
 00637160	3544	APP.dll	1005def0	Map_PlaceCharacters	3516	unmatched	0.96	high	features	shared f4,i42,s7, 16 rare
@@ -342,11 +342,11 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 0063b0a0	3002	APP.dll	1001c670	Char_UpdateAttachSlots	3125	matched:attach_slots.cpp	0.72	high	features	shared f11,i13, 2 rare
 0063bc80	1121	APP.dll	1001d2d0	DigitCounter_Update	1154	unmatched	0.98	high	features	shared i4,s20, 20 rare
 0063c170	332	APP.dll	10054770	Game::MarkKilled	506	unmatched	0.55	medium	features	shared i3,s1, 3 rare
-0063c2c0	287	APP.dll	10055110	Game::RaiseDoorEvents	476	unmatched	0.47	medium	features	shared i1,s4, 4 rare
+0063c2c0	287	APP.dll	10055110	Game::RaiseDoorEvents	476	matched:app_0003.cpp	0.47	medium	features	shared i1,s4, 4 rare
 0063c3e0	118	-					0.00	none	en-only	unknown
 0063c460	133	APP.dll	10054970	Game::RaiseKskonEvents	239	matched:app_0003.cpp	0.70	high	callgraph	neighbours 3 of 4 mapped agree, size ratio 0.56
-0063c4f0	287	APP.dll	10054f30	Game::RaiseLeverEvents	476	unmatched	0.48	medium	features	shared i1,s4, 4 rare
-0063c610	287	APP.dll	10054d50	Game::RaiseFireEvents	476	unmatched	0.48	medium	features	shared i1,s4, 4 rare
+0063c4f0	287	APP.dll	10054f30	Game::RaiseLeverEvents	476	matched:app_0003.cpp	0.48	medium	features	shared i1,s4, 4 rare
+0063c610	287	APP.dll	10054d50	Game::RaiseFireEvents	476	matched:app_0003.cpp	0.48	medium	features	shared i1,s4, 4 rare
 0063c730	140	-					0.00	none	en-only	unknown
 0063c7c0	140	APP.dll	10054b70	Game::RaiseTalkEvents	239	matched:app_0003.cpp	0.54	medium	callgraph	neighbours 2 of 3 mapped agree, size ratio 0.59
 0063c850	3329	APP.dll	10004b10	ListBank::ApplyOperator	3854	unmatched	0.84	high	features	shared c1,f1,i20, 17 rare
@@ -411,7 +411,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 00645960	176	APP.dll	1000ec70	ColourFade_Start	169	matched:app_0009.cpp	0.79	high	callgraph	neighbours 13 of 17 mapped agree, size ratio 0.96
 00645a10	58	-					0.00	none	en-only	unknown
 00645a50	114	APP.dll	100046d0	ListBank::AddEntry	130	matched:listbank.cpp	0.46	medium	features	shared i3, 0 rare
-00645ad0	210	APP.dll	10004760	ListBank::DeclareVariable	236	unmatched	0.69	high	features	shared i3,s1, 1 rare
+00645ad0	210	APP.dll	10004760	ListBank::DeclareVariable	236	matched:listbank.cpp	0.69	high	features	shared i3,s1, 1 rare
 00645bb0	1241	APP.dll	100ed510	ListBank_DeclareFromText	1160	matched:listbank.cpp	0.79	high	features	shared c1,i11,s1, 3 rare
 006460b0	224	-					0.00	none	en-only	unknown
 00646190	67	-					0.00	none	en-only	unknown
@@ -519,7 +519,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 006abce0	316	APP.dll	1001a450	Slot_HasNoGround	315	matched:collide_query.cpp	0.75	high	features	shared f2,i3, 0 rare
 006abe20	46	APP.dll	10047400	Char_UpdateGroup	62	matched:app_0011.cpp	0.70	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.74
 006abe50	647	APP.dll	100b9930	Enemy_DragToPit	637	unmatched	0.85	high	features	shared f1,i6, 1 rare
-006ac0e0	308	APP.dll	1001b670	Enemies_WakeNearby	307	unmatched	0.90	high	callgraph	neighbours 18 of 18 mapped agree, size ratio 1.00
+006ac0e0	308	APP.dll	1001b670	Enemies_WakeNearby	307	matched:char_proximity.cpp	0.90	high	callgraph	neighbours 18 of 18 mapped agree, size ratio 1.00
 006ac220	62	APP.dll	1001b840	Char_RandomIdle	59	matched:app_0011.cpp	0.56	medium	features	shared i3, 0 rare
 006ac260	1648	APP.dll	10051e20	Flames_Update	1618	unmatched	0.86	high	features	shared f2,i22,s2, 3 rare
 006ac8d0	743	APP.dll	10026730	Watcher_Update	950	matched:hover_watcher.cpp	0.65	high	features	shared f6,i5, 0 rare
@@ -615,7 +615,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 006e24d0	3577	APP.dll	10079470	Char_HikariButtonRide	3839	unmatched	0.83	high	features	shared f12,i8,s7, 9 rare
 006e32d0	7209	APP.dll	1002ae70	Char_HikariWarp	7666	unmatched	0.74	high	features	shared f15,i37,s4, 10 rare
 006e4f10	2098	APP.dll	1002cc70	Char_HikariRide	2150	unmatched	0.79	high	features	shared f10,i4,s3, 3 rare
-006e5750	355	APP.dll	1002a340	Char_RunScript	325	unmatched	0.91	high	features	shared f1,i2, 1 rare
+006e5750	355	APP.dll	1002a340	Char_RunScript	325	matched:char_script.cpp	0.91	high	features	shared f1,i2, 1 rare
 006e58c0	30	-					0.00	none	en-only	unknown
 006e58e0	30	-					0.00	none	en-only	unknown
 006e5900	81	-					0.00	none	en-only	unknown
@@ -804,7 +804,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 006f0cf0	1384	sound3d.dll	1004fa6c	ExecuteDlgInit	225	unmatched	0.20	low	features	shared i2, 1 rare
 006f1260	6	-					0.00	none	en-only	launcher (EN-only config dialog)
 006f1550	94	-					0.00	none	en-only	launcher (EN-only config dialog)
-00709ca0	120	APP.dll	101668b0	ModelState::ModelState	82	matched:model_state.cpp	0.55	medium	features	shared i2, 1 rare
+00709ca0	120	APP.dll	101668b0	ModelState::ModelState	82	unmatched	0.55	medium	features	shared i2, 1 rare
 00709d20	39	-					0.00	none	en-only	unknown
 00709d50	39	-					0.00	none	en-only	unknown
 00709d80	211	APP.dll	101728c0	ModelInstance::ModelInstance	205	matched:anim_channels.cpp	0.59	medium	callgraph	neighbours 1 of 1 mapped agree, size ratio 0.97
@@ -815,7 +815,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 0070a220	8	-					0.00	none	en-only	unknown
 0070a230	8	-					0.00	none	en-only	unknown
 0070a240	97	-					0.00	none	en-only	unknown
-0070a2b0	397	APP.dll	10164af0	ModelBank::AddLitModel	284	unmatched	0.85	high	features	shared i29, 9 rare
+0070a2b0	397	APP.dll	10164af0	ModelBank::AddLitModel	284	matched:model_bank.cpp	0.85	high	features	shared i29, 9 rare
 0070a440	502	APP.dll	1017c570	ModelBank::Add	123	matched:model_bank.cpp	0.71	high	features	shared i10, 6 rare
 0070a640	189	-					0.00	none	en-only	unknown
 0070a700	239	-					0.00	none	en-only	unknown
@@ -845,7 +845,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 0070bf40	171	APP.dll	10175e80	AnimModel::StepPath	160	matched:path_anim.cpp	0.94	high	features	shared i6, 0 rare
 0070bff0	51	APP.dll	10173450	TriangleBatch::SetTexture	48	matched:texture_mgr.cpp	0.90	high	callgraph	neighbours 4 of 4 mapped agree, size ratio 0.94
 0070c030	125	-					0.00	none	en-only	unknown
-0070c0b0	106	APP.dll	10167390	WorldRenderer::StartFade	104	unmatched	0.99	high	features	shared i5, 3 rare
+0070c0b0	106	APP.dll	10167390	WorldRenderer::StartFade	104	matched:world_ctor.cpp	0.99	high	features	shared i5, 3 rare
 0070c120	28249	APP.dll	1017cc90	WorldRenderer::RunScriptFrames	29886	unmatched	0.85	high	features	shared c3,f6,i256,s2, 157 rare; also inlines APP.dll:101687c0 APP.dll:10167400
 00712f90	13348	APP.dll	1016c3e0	Camera_Update	13569	unmatched	0.69	high	features	shared f27,i68,s2, 5 rare
 007163e0	13151	APP.dll	10184440	EffectManager::Step	12476	unmatched	0.58	medium	features	shared f11,i25, 1 rare
@@ -971,7 +971,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 007347f0	17	-					0.00	none	en-only	unknown
 00734840	713	APP.dll	1017c9c0	WorldRenderer::Bind	581	matched:world_ctor.cpp	0.75	high	features	shared f1,i37,s1, 18 rare
 00734b20	37	APP.dll	10169720		40	unmatched	0.40	medium	features	shared i1, 1 rare
-00734b50	309	APP.dll	101649c0		213	unmatched	1.00	high	features	shared i30, 25 rare
+00734b50	309	APP.dll	101649c0		213	matched:model_bank.cpp	1.00	high	features	shared i30, 25 rare
 00734cc0	23	-					0.00	none	en-only	unknown
 00734ce0	318	APP.dll	10184170	EffectManager::Reset	276	matched:char_effects.cpp	0.52	medium	features	shared i5, 0 rare
 00734e60	613	APP.dll	101842a0	EffectManager::Init	375	matched:char_effects.cpp	0.58	medium	features	shared i6, 0 rare
@@ -1027,7 +1027,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 00740ea0	311	APP.dll	10169e40	MeshInstance::FreeImage	297	matched:mesh_cache.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.95
 00740fe0	328	-					0.00	none	en-only	unknown
 00741130	364	-					0.00	none	en-only	unknown
-007412b0	178	APP.dll	10169f90	Playback::Init	136	matched:model_state.cpp	0.73	high	features	shared i5, 0 rare
+007412b0	178	APP.dll	10169f90	Playback::Init	136	unmatched	0.73	high	features	shared i5, 0 rare
 00741370	121	APP.dll	10166810	NodeSkin::Clear	83	matched:scene_misc.cpp	0.75	high	features	shared i6, 0 rare
 007413f0	1342	APP.dll	10161f80	AnimModel::ResetState	1027	matched:anim_reset.cpp	0.86	high	features	shared i80, 3 rare
 00741930	17	-					0.00	none	en-only	unknown
@@ -1385,7 +1385,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 00773320	278	-					0.00	none	en-only	unknown
 00773440	66	APP.dll	101ac650	Vec4::DistanceSquared	69	matched:vec_math.cpp	0.90	high	callgraph	neighbours 12 of 12 mapped agree, size ratio 0.96
 00773490	50	APP.dll	101ac6a0	Vec4::LengthSquared3	55	matched:vec_math.cpp	0.90	high	callgraph	neighbours 39 of 39 mapped agree, size ratio 0.91
-007734d0	316	APP.dll	101acc60	Vec4::DistanceSquaredToSegment2D	301	unmatched	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.95
+007734d0	316	APP.dll	101acc60	Vec4::DistanceSquaredToSegment2D	301	matched:vec4.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.95
 00773610	68	APP.dll	101ac540	Vec4::Distance2D	65	matched:vec_math.cpp	0.90	high	callgraph	neighbours 5 of 5 mapped agree, size ratio 0.96
 00773660	56	APP.dll	101ac500	Vec4::Length2D	57	matched:vec_math.cpp	0.90	high	callgraph	neighbours 104 of 104 mapped agree, size ratio 0.98
 007736a0	78	-					0.00	none	en-only	unknown
@@ -1449,7 +1449,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 00777a20	488	APP.dll	101b08c0		442	unmatched	0.82	high	callgraph	neighbours 5 of 6 mapped agree, size ratio 0.91
 00777c10	270	-					0.00	none	en-only	unknown
 00777d20	660	APP.dll	101aeae0	Slerp	425	matched:vec_math.cpp	0.68	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.64
-00777fc0	1158	APP.dll	101aed50	Vec4::Mirror	385	unmatched	0.54	medium	callgraph	neighbours 3 of 6 mapped agree, size ratio 0.33
+00777fc0	1158	APP.dll	101aed50	Vec4::Mirror	385	matched:vec4.cpp	0.54	medium	callgraph	neighbours 3 of 6 mapped agree, size ratio 0.33
 00778450	71	-					0.00	none	en-only	unknown
 007784a0	34	-					0.00	none	en-only	unknown
 007784d0	40	-					0.00	none	en-only	unknown
@@ -1727,7 +1727,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 007aa130	282	SoundArc.dll	00402640		114	unmatched	0.44	medium	features	shared i2, 1 rare
 007aa250	33	APP.dll	10001450	Mouse_UpdateMoved	67	matched:app_0001.cpp	0.82	high	callgraph	neighbours 5 of 6 mapped agree, size ratio 0.49
 007aa280	23	APP.dll	10001550	Sound_StopAll	23	matched:app_0002.cpp	0.90	high	callgraph	neighbours 8 of 8 mapped agree, size ratio 1.00
-007aa2a0	140	APP.dll	100014b0	Mouse_ReportCursor	159	unmatched	0.69	high	features	shared c3,i1, 0 rare
+007aa2a0	140	APP.dll	100014b0	Mouse_ReportCursor	159	matched:app_0001.cpp	0.69	high	features	shared c3,i1, 0 rare
 007aa330	101	APP.dll	10001110	Mouse_GetState	91	matched:app_0001.cpp	0.90	high	callgraph	neighbours 9 of 9 mapped agree, size ratio 0.90
 007aa3a0	1132	APP.dll	10001170	Obj::Update	712	matched:app_0001.cpp	0.86	high	features	shared c5,i4, 3 rare
 007aa810	65	APP.dll	10001010	Mouse::Init	63	matched:app_0001.cpp	0.89	high	callgraph	neighbours 3 of 3 mapped agree, size ratio 0.97
@@ -1758,7 +1758,7 @@ en_address	en_size	jp_module	jp_address	jp_name	jp_size	jp_status	confidence	lev
 007ace50	245	-					0.00	none	en-only	unknown
 007acf50	289	-					0.00	none	en-only	unknown
 007ad080	281	-					0.00	none	en-only	unknown
-007ad1a0	172	APP.dll	1015fb20	ImeCandidates_Draw	187	unmatched	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.92
+007ad1a0	172	APP.dll	1015fb20	ImeCandidates_Draw	187	matched:menu_list.cpp	0.73	high	callgraph	neighbours 2 of 2 mapped agree, size ratio 0.92
 007ad250	184	-					0.00	none	en-only	unknown
 007ad310	37	-					0.00	none	en-only	unknown
 007ad340	105	-					0.00	none	en-only	unknown

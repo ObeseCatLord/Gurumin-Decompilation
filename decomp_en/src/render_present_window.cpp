@@ -37,3 +37,30 @@ extern "C" int Render_UnbindAllTextures(void)
     g_d3dDevice->SetTexture(3, 0);
     return 0;
 }
+
+// Render_PresentCentered: ends the open Direct3D scene, then presents the device back buffer into `window` with the
+// destination rectangle centred in the client area. A client area wider or taller than the back buffer is cropped to
+// the back buffer size from the origin instead. Returns 1. No direct caller.
+extern "C" int __stdcall Render_PresentCentered(HWND window)
+{
+    RECT client;
+    RECT destination;
+    Render_CloseScene();
+    GetClientRect(window, &client);
+    destination.top = (g_deviceBackBufferHeight - client.bottom + client.top) / 2;
+    destination.bottom = (destination.top - client.top) + client.bottom;
+    destination.left = (g_deviceBackBufferWidth - client.right + client.left) / 2;
+    destination.right = (destination.left - client.left) + client.right;
+    if (g_deviceBackBufferWidth < client.right)
+    {
+        destination.right = g_deviceBackBufferWidth;
+        destination.left = 0;
+    }
+    if (g_deviceBackBufferHeight < client.bottom)
+    {
+        destination.bottom = g_deviceBackBufferHeight;
+        destination.top = 0;
+    }
+    g_d3dDevice->Present(&destination, &client, window, 0);
+    return 1;
+}

@@ -55,3 +55,52 @@ extern "C" int Jpeg_SaveBgr(const char *path, const unsigned char *pixels, int w
     fclose(file);
     return 1;
 }
+
+// Jpeg_WriteRgb: see the declaration in jpeg_lib.h. Compresses each RGB row as it is (the sibling of Jpeg_SaveBgr for an
+// already open file and pixels that need no channel swap).
+extern "C" int Jpeg_WriteRgb(FILE *file, const unsigned char *pixels, int width, int height, int quality, int progressive)
+{
+    jpeg_error_mgr errorManager;
+    jpeg_compress_struct cinfo;
+    if (file == 0)
+        return 0;
+    if (pixels == 0)
+        return 0;
+    cinfo.err = jpeg_std_error(&errorManager);
+    jpeg_CreateCompress(&cinfo, JPEG_LIB_VERSION, sizeof(cinfo));
+    jpeg_stdio_dest(&cinfo, file);
+    cinfo.image_width = width;
+    cinfo.image_height = height;
+    cinfo.input_components = JPEG_SAVE_BYTES_PER_PIXEL;
+    cinfo.in_color_space = JCS_RGB;
+    jpeg_set_defaults(&cinfo);
+    jpeg_set_quality(&cinfo, quality, 1);
+    if (progressive != 0)
+        jpeg_simple_progression(&cinfo);
+    jpeg_start_compress(&cinfo, 1);
+    JSAMPROW row = (JSAMPROW)malloc(width * JPEG_SAVE_BYTES_PER_PIXEL);
+    int pitch = (width * JPEG_SAVE_BYTES_PER_PIXEL + JPEG_SAVE_ROW_ALIGNMENT - 1) / JPEG_SAVE_ROW_ALIGNMENT * JPEG_SAVE_ROW_ALIGNMENT;
+    while (cinfo.next_scanline < cinfo.image_height)
+    {
+        const unsigned char *in = pixels;
+        JSAMPROW out = row;
+        if (width > 0)
+        {
+            int remaining = width;
+            do
+            {
+                *out++ = *in++;
+                *out++ = *in++;
+                *out++ = *in++;
+                remaining--;
+            } while (remaining != 0);
+        }
+        pixels += pitch;
+        JSAMPROW scanline = row;
+        jpeg_write_scanlines(&cinfo, &scanline, 1);
+    }
+    jpeg_finish_compress(&cinfo);
+    jpeg_destroy_compress(&cinfo);
+    free(row);
+    return 1;
+}

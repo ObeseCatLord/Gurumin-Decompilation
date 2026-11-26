@@ -1,6 +1,7 @@
 // EN-only launcher: the gamepad assignment page (CPadDlg). Falcom MFC dialog code (ClassWizard style) from the Steam
 // build; see NOTES.md "Launcher (MFC)".
 #include "launcher_dialog.h"
+#include "small_b11.h"   // Input_GetPadIndex
 
 // Builds the page. The wizard-style constructor zeroes the exchanged check, slider and text values in the member
 // initialiser list (in declaration order, between the control objects); the button lists start on -1 (none).
@@ -123,6 +124,7 @@ BEGIN_MESSAGE_MAP(CPadDlg, CDialog)
     ON_WM_CTLCOLOR()
     ON_WM_PAINT()
     ON_WM_DESTROY()
+    ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 // Draws the page's controls with a transparent background.
@@ -181,4 +183,106 @@ BOOL CPadDlg::PreTranslateMessage(MSG *pMsg)
         }
     }
     return CDialog::PreTranslateMessage(pMsg);
+}
+
+int g_padWaitingAction;      // 1-based action slot waiting for a button press (EN 0x016152a0)
+HWND g_padOwnerWindow;       // top-level window handed to the pad scan (EN 0x016152a4)
+int g_padCaptureStep;        // countdown that steps by 2 on every timer tick (EN 0x016152b4)
+unsigned char g_padFlash;    // repaint ticks still owed after a capture (EN 0x016152b8)
+
+const int PAD_SLOT_COUNT = 15;           // action slots on the page (twelve visible lists and three hidden ones)
+const int PAD_CAPTURE_STEP_START = 16;   // value the capture countdown restarts at
+const int PAD_CAPTURE_STEP = 2;          // amount the capture countdown drops per timer tick
+const unsigned char PAD_FLASH_TICKS = 2; // repaint ticks owed after a capture
+
+// Selects, in each of the fifteen lists, the row that shows the stored button number, then runs UpdateData.
+// Stored numbers 1-2 sit two rows lower, 3-4 two rows higher, 5-8 sixteen rows lower and 21-24 sixteen rows higher
+// (the list orders the stick directions differently from the scan codes).
+void CPadDlg::ShowAssignments(BOOL saveAndValidate)
+{
+    int listIds[PAD_SLOT_COUNT] = {
+        0x3ef, 0x3f0, 0x3f1, 0x3f2, 0x3f3, 0x3f4, 0x3f5, 0x3f6, 0x3f7, 0x3f8, 0x3fa, 0x3fc, 0x413, 0x416, 0x419
+    };
+    int stored[PAD_SLOT_COUNT] = {
+        m_00d0, m_00ec, m_00f0, m_00f4, m_00f8, m_00fc, m_0100, m_0104,
+        m_0108, m_00e8, m_00e4, m_00e0, m_00dc, m_00d8, m_00d4
+    };
+
+    for (int i = 0; i < PAD_SLOT_COUNT; i++) {
+        int row = stored[i];
+        if (row != 0) {
+            if (row <= 2) {
+                row += 2;
+            } else if (row <= 4) {
+                row -= 2;
+            } else if (row <= 8) {
+                row += 0x10;
+            } else if (row > 0x14) {
+                if (row <= 0x18) {
+                    row -= 0x10;
+                }
+            }
+        }
+        ((CComboBox *)GetDlgItem(listIds[i]))->SetCurSel(row);
+    }
+    UpdateData(saveAndValidate);
+}
+
+// Stores `button` for action slot `action` (1-based). If another slot already holds the same button, that slot is
+// cleared and the lists are refreshed; otherwise they are refreshed only when `refresh` is set.
+void CPadDlg::AssignPadButton(int action, int button, bool refresh)
+{
+    int *slots[PAD_SLOT_COUNT] = {
+        &m_00d0, &m_00ec, &m_00f0, &m_00f4, &m_00f8, &m_00fc, &m_0100, &m_0104,
+        &m_0108, &m_00e8, &m_00e4, &m_00e0, &m_00dc, &m_00d8, &m_00d4
+    };
+    int chosen = action - 1;
+
+    *slots[chosen] = button;
+    for (unsigned int i = 0; i < PAD_SLOT_COUNT; i++) {
+        if (i != chosen && *slots[i] == button) {
+            *slots[i] = 0;
+            ShowAssignments(TRUE);
+            return;
+        }
+    }
+    if (refresh) {
+        ShowAssignments(TRUE);
+    }
+}
+
+// 50 ms timer: while an action waits for a button, scans the pad and assigns the pressed button; keeps the page
+// repainting for a couple of ticks after a capture and steps the capture countdown.
+void CPadDlg::OnTimer(UINT_PTR nIDEvent)
+{
+    if (m_hWnd) {
+        if (g_padWaitingAction != 0) {
+            int button = Pad_FindPressedButton(g_padOwnerWindow, m_check425 != 0);
+            if (button != 0) {
+                AssignPadButton(g_padWaitingAction, button, true);
+                ResetSetButtons();
+                g_padWaitingAction = 0;
+                m_0110 = Input_GetPadIndex();
+            }
+        }
+        if (g_padWaitingAction != 0) {
+            {
+                CPaintDC dc(this);
+            }
+            g_padFlash = PAD_FLASH_TICKS;
+        } else if (g_padFlash != 0) {
+            {
+                CPaintDC dc(this);
+            }
+            if (g_padFlash != 0) {
+                g_padFlash--;
+            }
+        }
+        int step = g_padCaptureStep;
+        if (step <= 0) {
+            step = PAD_CAPTURE_STEP_START;
+        }
+        g_padCaptureStep = step - PAD_CAPTURE_STEP;
+        CDialog::OnTimer(nIDEvent);
+    }
 }

@@ -192,6 +192,7 @@ struct CharState
                 int state;            // 0x00: behaviour step (0 = not started yet)
                 int gateReversed;     // 0x00: gate route walkers: non-zero = walking back along the route (Route_FollowGates)
                 int turn;             // 0x00: zone characters: which enemy of each step is checked this frame (DamageZone_Update)
+                int counterValue;     // 0x00: digit counters: the number shown (DigitCounter_Update)
             };
             int values[13];           // 0x04: behaviour variables (the AI pickers use values[0] and values[1])
             int sawPlayer;            // 0x38: 1 once the character saw the player (or was told to react)

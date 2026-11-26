@@ -91,3 +91,58 @@ int WorldRenderer::ShiftIdsFrom(int firstId, int shift)
     }
     return 0;
 }
+
+// Field of a message line that holds its tag, and the tag GetKeyZimNumber looks for.
+const int MESSAGE_TAG_FIELD = 0;
+const char MESSAGE_ZIM_TAG[] = "ZIM";
+// Characters of the field text GetKeyZimNumber reads.
+const int ZIM_FIELD_SIZE = 0x80;
+// Result of GetKeyZimNumber for a key without a usable ZIM line.
+const int ZIM_NUMBER_NONE = -1;
+
+// WorldRenderer::GetKeyZimNumber: goes through the lines of key `key` and returns the number in the second field of
+// the first line whose first field is "ZIM" and whose number is not -1; -1 when there is none. No direct caller.
+long WorldRenderer::GetKeyZimNumber(int key)
+{
+    char field[ZIM_FIELD_SIZE];
+    int start = FindMessageLine(key);
+    int end = FindMessageLine(key + 1);
+    if (end == MESSAGE_LINE_NOT_FOUND)
+        end = messageCount;
+    for (int line = start; line < end; line++)
+    {
+        GetMessageField(line, MESSAGE_TAG_FIELD, field);
+        if (strcmp(field, MESSAGE_ZIM_TAG) == 0)
+        {
+            GetMessageField(line, MESSAGE_NUMBER_FIELD, field);
+            long number = atol(field);
+            if (number != ZIM_NUMBER_NONE)
+                return number;
+        }
+    }
+    return ZIM_NUMBER_NONE;
+}
+
+// WorldRenderer::ShiftKeyIdsClamped: forgets the cached ids of key `key`, then adds `shift` to the id of every line of
+// the key. A negative shift is shortened first so that no id goes below 0. Returns 0. No direct caller.
+int WorldRenderer::ShiftKeyIdsClamped(int key, int shift)
+{
+    if (key < MESSAGE_ID_CACHE_SIZE)
+    {
+        lowestIdCache[key] = MESSAGE_ID_CACHE_EMPTY;
+        lineTagIdCache[key] = MESSAGE_ID_CACHE_EMPTY;
+        highestIdCache[key] = MESSAGE_ID_CACHE_EMPTY;
+    }
+    int first = FindMessageLine(key);
+    int end = FindMessageLine(key + 1);
+    if (end == MESSAGE_LINE_NOT_FOUND)
+        end = messageCount;
+    for (int line = first; line < end; line++)
+    {
+        if (messageIds[line] + shift < 0)
+            shift = -messageIds[line];
+    }
+    for (int line = first; line < end; line++)
+        messageIds[line] += (short)shift;
+    return 0;
+}

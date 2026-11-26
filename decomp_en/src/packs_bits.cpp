@@ -1,5 +1,5 @@
 // Bit coders of the Packs codec (EN build, EN-only: no JP twin found).
-#include "packs_codec.h"
+#include "packs_stream_bit.h"
 
 // Returns the next bit of `data`. The reader keeps the byte being read, a mask that walks from bit 0 to bit 7 and the
 // position of that byte; after bit 7 the next byte of `data` is loaded. Called by the decoders of the image codec.
@@ -50,21 +50,10 @@ extern "C" void Packs_LzWriteZeroFlag(void)
     *g_packsFlagWriter.word &= ~g_packsFlagWriter.mask;
 }
 
-// Returns the next bit of the packed stream. The stream is read 16 bits at a time (low bit first): when none are left,
-// the next word is taken from the stream's input. Called by Packs_DecodeBlock.
-extern "C" int Packs_ReadStreamBit(void)
+// Returns the next bit of the packed stream (the out-of-line copy of Packs_NextStreamBit). Called by Packs_DecodeBlock.
+extern "C" unsigned short Packs_ReadStreamBit(void)
 {
-    if (g_packsWordReader.count == 0)
-    {
-        g_packsWordReader.buffer = *(unsigned short *)g_packsStream->input;
-        g_packsWordReader.count = PACKS_WORD_BITS;
-        g_packsStream->input += PACKS_WORD_BYTES;
-        g_packsWordReader.inputBytes += PACKS_WORD_BYTES;
-    }
-    int bit = g_packsWordReader.buffer & 1;
-    g_packsWordReader.count--;
-    g_packsWordReader.buffer >>= 1;
-    return bit;
+    return Packs_NextStreamBit();
 }
 
 // Moves the compressor to the next flag bit and sets it. When all 16 bits of the flag word are used, a new flag word is
@@ -85,7 +74,7 @@ extern "C" void Packs_LzWriteOneFlag(void)
 
 // Reads `count` bits of the packed stream, the first one ending up highest, and returns them as a number. Called by
 // Packs_DecodeBlock.
-extern "C" int Packs_ReadStreamBits(int count)
+extern "C" unsigned short Packs_ReadStreamBits(int count)
 {
     int value = 0;
     while (count != 0)

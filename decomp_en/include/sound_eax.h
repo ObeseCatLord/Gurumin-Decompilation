@@ -52,6 +52,7 @@ struct EaxListener
 {
     IKsPropertySet *propertySet;   // 0x00: the property set (0 = EAX not available)
 
+    EaxListener *Attach(IUnknown *source);   // EN 0x7c1750 (EN-only, sound_eax_attach.cpp): asks `source` for its property set and keeps it only when all five listener properties are readable and writable; returns this
     int SupportsProperty(unsigned long property);    // EN 0x7c1930: 1 when the driver can both read and write listener property `property`
     float GetDamping();            // EN 0x7c1820: the damping, EAX_FLOAT_UNAVAILABLE when the read fails
     float GetDecayTime();          // EN 0x7c1860: the decay time, EAX_FLOAT_UNAVAILABLE when the read fails

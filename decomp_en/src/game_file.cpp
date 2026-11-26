@@ -78,6 +78,15 @@ int GameFile::Size()
     return ftell(handle);
 }
 
+// Writes `count` records of `size` bytes from `buffer` (fwrite). Does nothing and returns 0 when no file is open.
+// Called by the picture savers.
+size_t GameFile::Write(const void *buffer, size_t size, size_t count)
+{
+    if (handle != 0)
+        return fwrite(buffer, size, count, handle);
+    return 0;
+}
+
 // Copies the file name of `path` without directory and extension into `out` (the part after the last backslash and
 // before the last dot; the whole name when there is no dot). Returns 0. Called by the loaders to name their files.
 extern "C" int Path_GetBaseName(char *out, const char *path)

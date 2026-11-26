@@ -64,8 +64,8 @@ int WorldRenderer::Bind(AnimModel *models, void *mapRoot, int *state, WorldCallb
     for (int i = 0; i < WORLD_ID_TABLE_SIZE; i++)
     {
         lowestIdCache[i] = WORLD_ID_EMPTY;
-        m_01920[i] = WORLD_ID_EMPTY;
-        m_028c0[i] = WORLD_ID_EMPTY;
+        lineTagIdCache[i] = WORLD_ID_EMPTY;
+        highestIdCache[i] = WORLD_ID_EMPTY;
     }
     m_03860 = WORLD_ID_EMPTY;
     moviePicture = 0;
@@ -184,8 +184,8 @@ int WorldRenderer::LoadCharacter(const char *path)
     for (int i = 0; i < WORLD_ID_TABLE_SIZE; i++)
     {
         lowestIdCache[i] = WORLD_ID_EMPTY;
-        m_01920[i] = WORLD_ID_EMPTY;
-        m_028c0[i] = WORLD_ID_EMPTY;
+        lineTagIdCache[i] = WORLD_ID_EMPTY;
+        highestIdCache[i] = WORLD_ID_EMPTY;
     }
     m_03860 = WORLD_ID_EMPTY;
     moviePicture = 0;

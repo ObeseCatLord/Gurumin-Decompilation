@@ -1,4 +1,5 @@
 // Node material table and the subtree passes over it (EN build, EN-only: no JP twin found).
+#include "containers.h"
 #include "node.h"
 #include "engine_memory.h"
 
@@ -37,4 +38,28 @@ int Node::MergeMaterialPacksInSubtree(Node *source, const char *materialPrefix, 
     for (int i = 0; i < childCount; i++)
         children[i]->MergeMaterialPacksInSubtree(source, materialPrefix, otherPrefix);
     return 0;
+}
+
+// Node::ListVerticesOfMaterialColour: writes the indices of the vertices of the first pack whose colour equals the
+// diffuse colour of material `materialIndex` to `indices`, ended by MATERIAL_VERTEX_LIST_END. Returns 0 when there is
+// no such material, otherwise 1. No direct caller.
+int Node::ListVerticesOfMaterialColour(int materialIndex, short *indices)
+{
+    if (materialCount <= materialIndex)
+        return 0;
+    int found = 0;
+    float red = materials[materialIndex].colour[0];
+    float green = materials[materialIndex].colour[1];
+    float blue = materials[materialIndex].colour[2];
+    for (int i = 0; i < packs->vertexCount; i++)
+    {
+        if (packs->vertices[i].colour[0] == red && packs->vertices[i].colour[1] == green &&
+            packs->vertices[i].colour[2] == blue)
+        {
+            indices[found] = (short)i;
+            found++;
+        }
+    }
+    indices[found] = MATERIAL_VERTEX_LIST_END;
+    return 1;
 }

@@ -107,6 +107,8 @@ struct TextureObject
     // Creates the texture from width x height pixels (RGB, or `alpha` as the alpha image or mode). Returns non-zero when it
     // was created. EN 0x71c410.
     int Create(int width, int height, const void *pixels, int alpha, int flags);
+    // EN 0x79ffa0 (EN-only, texture_read_back.cpp): reads the 256 x 256 render target back into `rgb` as 24-bit pixels; returns 1, or 0 when the copy fails.
+    int ReadBackRgb(unsigned char *rgb);
     // EN 0x77d950 (JP 0x1014f1f0): (re)creates this texture at width x height and forgets it as a bound texture. `alpha` is 0
     // (system memory R5G6B5 texture filled from the 24-bit `pixels`), UPLOAD_TARGET_565 or UPLOAD_TARGET_8888 (an empty
     // render target) or a second 24-bit image whose first byte per pixel is the alpha of an A4R4G4B4 texture. Returns 0
@@ -126,6 +128,9 @@ struct TextureObject
     int DrawTriangles(const void *vertices, int triangles); // EN 0x77ee90 (JP 0x1014bb70)
     int DrawStrip(ScreenVertex *vertices, int count);        // EN 0x77e360 (JP 0x1014ba20)
     int DrawScreenCopy(int left, int top, int right, int bottom, float z, float alpha);  // EN 0x78a950 (JP 0x1014b750)
+    // EN 0x78d8a0 (JP twin Render_FillRect 0x10143e00): draws the rectangle (left, top)-(right, bottom) of the 640x480 screen in `colour` (0xRRGGBB) at opacity
+    // `alpha` (0..1) and depth `z` with stage 0 unbound; the texture coordinates reach as far as the device back buffer covers this texture. Returns 1.
+    int FillRect(int left, int top, int right, int bottom, float z, float alpha, unsigned int colour);
     int DrawColoured(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
                      float alpha, float angle, float red, float green, float blue);  // EN 0x78ed90 (JP 0x1014c960)
     int DrawCell(int left, int top, int right, int bottom, float u0, float v0, float u1, float v1, float z,
@@ -194,6 +199,9 @@ struct TextureManager
     int PumpAndRecover();          // EN 0x7a2050 (JP 0x1015c850): message pump that waits while the game is inactive or the device is lost
     int Present(const struct tagRECT *source);   // EN 0x7a7fa0 (JP 0x1013edc0): ends the scene and presents a rectangle of the back buffer
     int ResetFrameTimer();         // EN 0x7a40f0 (JP 0x1013eee0): sets the next-frame deadline to now plus one frame (FrameTimer_ResetNext)
+    int PaceFrame();               // EN 0x7a8460 (JP 0x1014ade0): the method view of Frame_Pace (the frame step loads ecx with the renderer first)
+    int PresentFrame();            // EN 0x7a8080 (JP 0x1015c960): the method view of Render_Present
+    int PresentSimple();           // EN 0x7a80f0 (JP 0x1015c9b0): the method view of Render_PresentSimple
 };
 
 // The renderer object (`this` of the TextureManager methods). EN 0x00da747c (JP DAT_10836c70).
@@ -214,6 +222,10 @@ extern "C" int Texture_CreateFromPixels(const char *name, int width, int height,
 // Like Texture_CreateFromPixels with the size, pixels and alpha taken from `source` (all white when it kept no pixels).
 // Returns the slot, or -1. EN 0x71c740 (JP 0x10175a90).
 extern "C" int Texture_CreateCopy(const char *name, const TextureObject *source, int flags);
+
+// Turns the 24-bit image `pixels` (width x height) upside down. Returns 1. EN 0x7483d0 (bitmap_flip.cpp, EN-only);
+// called by Texture_LoadBmp.
+extern "C" int Bitmap_FlipRows24(unsigned char *pixels, int width, int height);
 
 // Loads a .bmp texture (with an optional alpha image) and returns its slot. EN 0x737ac0 (JP 0x10173550).
 extern "C" int Texture_LoadBmp(const char *path, const char *alphaPath, int reload);
@@ -243,6 +255,8 @@ extern "C" TextureObject g_textures[TEXTURE_SLOT_COUNT];            // EN 0x01d8
 
 // Writes every named texture slot to "<folder>\<name>.itp". Returns 1. EN 0x7427f0 (texture_save_itp.cpp).
 extern "C" int Textures_SaveAllItp(const char *folder);
+// Writes a text list of the texture slots (names, source size, pool index) to a fixed file. Returns 0. EN 0x72c0d0 (texture_dump.cpp, EN-only).
+extern "C" int Textures_DumpList(void);
 
 // After a map change: unloads every texture that was not marked as kept and has no generated alpha (EN 0x747c70).
 extern "C" int Texture_ReloadMissing(void);

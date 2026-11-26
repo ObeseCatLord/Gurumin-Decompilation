@@ -55,7 +55,8 @@ struct NodeSaved
     char m_0000[0x20];             // 0x00: not used by EN code yet
     int state;                     // 0x20: saved state (0 = nothing saved)
     Matrix4 matrix;                // 0x24: the saved matrix restored by the node
-    char m_0064[0x78 - 0x64];      // 0x64: not used by EN code yet
+    struct Node *linkedRoot;       // 0x64: the root of the chain this limb belongs to (set by BindLinks for chasing nodes)
+    char m_0068[0x78 - 0x68];      // 0x68: not used by EN code yet
     float limitMin[3];             // 0x78: lowest rotation per axis (radians)
     char m_0084[0x88 - 0x84];      // 0x84: not used by EN code yet
     float limitMax[3];             // 0x88: highest rotation per axis

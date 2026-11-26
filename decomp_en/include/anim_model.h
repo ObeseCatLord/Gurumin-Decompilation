@@ -182,7 +182,8 @@ struct AnimModel
         int collisionFilter;      // 0x070: collision filter of the model's world tests (g_collisionFilter while they run)
         char *nearCells;          // 0x070: characters: row of g_charNearCells (map cells near the character), 0 = no visibility data
     };
-    char m_0074[0x76 - 0x74];     // 0x074: not yet named
+    char m_0074;                  // 0x074: not yet named
+    char carriedFlag;             // 0x075: cleared on the carried model and on the player when a knock-back drops the carried object
     char uiAnimStarted;           // 0x076: set to 1 by UiAnim_Play (read on the first model only)
     char m_0077[0x84 - 0x77];     // 0x077: not yet named
     unsigned char speedDivisor;   // 0x084: slows every motion of this model down (0 = no division)

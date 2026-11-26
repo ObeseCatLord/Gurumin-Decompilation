@@ -144,9 +144,23 @@ struct EffectRecord
     int next;                                        // 0x04: next record of its list, -1 = last
     int id;                                          // 0x08: effect definition, EFFECT_NONE = free
     int parent;                                      // 0x0c: record this effect is attached to, -1 = none
-    char m_0010[0x2c - 0x10];                        // 0x10: not yet named (timing)
+    int m_0010;                                      // 0x10: -1 when the effect starts
+    int frame;                                       // 0x14: frame the effect is at (the definition's start frame plus the caller's frame at the start)
+    int m_0018;                                      // 0x18: cleared when the effect starts
+    int m_001c;                                      // 0x1c: cleared when the effect starts
+    int serial;                                      // 0x20: start number of the effect (g_effectSerial when it started)
+    char m_0024[0x2c - 0x24];                        // 0x24: not yet named (timing)
     Vec4 partPositions[2];                           // 0x2c: positions of its two parts, indexed by `part`
-    char m_004c[0x18e - 0x4c];                       // 0x4c: not yet named (directions, matrices)
+    char m_004c[0x94 - 0x4c];                        // 0x4c: not yet named (directions)
+    Vec4 velocity;                                   // 0x94: movement per frame (cleared when the effect starts)
+    char m_00a4[0xb4 - 0xa4];                        // 0xa4: not yet named
+    Vec4 position;                                   // 0xb4: world position
+    char m_00c4[0x104 - 0xc4];                       // 0xc4: not yet named
+    Matrix4 matrix;                                  // 0x104: the matrix the effect was placed with (identity when none was given)
+    char m_0144[0x184 - 0x144];                      // 0x144: not yet named
+    const Matrix4 *matrixOwner;                      // 0x184: the matrix the effect follows (0 = none)
+    int value;                                       // 0x188: value the caller started the effect with
+    short m_018c;                                    // 0x18c: cleared when the effect starts
     char part;                                       // 0x18e: 0 or 1, the part whose position decides visibility
     char m_018f[0x192 - 0x18f];                      // 0x18f: not yet named
     short light;                                     // 0x192: entry of g_effectLights it uses, 0 = none
@@ -183,7 +197,9 @@ typedef char check_effect_light[sizeof(EffectLight) == 0x4014 ? 1 : -1];
 // Script ids of the most recently started effects (32 entries) and the next entry to overwrite.
 const int EFFECT_RECENT_COUNT = 32;
 extern "C" int g_recentEffectIds[EFFECT_RECENT_COUNT];   // EN 0x01674670 (JP DAT_110186a8): set to -1 by Init
-extern "C" char g_recentEffectNext;                      // EN 0x01664469 (JP DAT_1101de64): next entry of that cache
+extern "C" unsigned char g_recentEffectNext;                      // EN 0x01664469 (JP DAT_1101de64): next entry of that cache
+extern "C" int g_recentEffectDefinitions[EFFECT_RECENT_COUNT];   // EN 0x016746f0 (JP DAT_10fa73f8): the definition found for each id of g_recentEffectIds
+extern "C" int g_effectSerial;                           // EN 0x0166f414 (JP DAT_1101de60): number of effects started so far
 // Takes the first free effect definition, names it "not set" and resets the lookup caches; returns its index or -1.
 // EN 0x73ede0 (JP 0x1016f900). Called by EffectManager::Init.
 extern "C" int EffectDefs_Allocate(void);

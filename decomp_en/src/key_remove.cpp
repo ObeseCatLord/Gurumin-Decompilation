@@ -21,6 +21,32 @@ int KeyBank::RemoveAt(int index)
     return 0;
 }
 
+// KeyBank::RemoveFrame: removes the key that sits at frame `frame`, moving the later keys up one place. Returns 1 when
+// there was such a key, else 0. Called by the key-moving code at EN 0x776dd0.
+int KeyBank::RemoveFrame(int frame)
+{
+    for (int i = 0; i < count; i++)
+    {
+        if (frames[i] == frame)
+        {
+            count--;
+            for (int next = i; next < count; next++)
+            {
+                frames[next] = frames[next + 1];
+                Vec4 *key = &values[next];
+                const Vec4 *following = &values[next + 1];
+                key->x = following->x;
+                key->y = following->y;
+                key->z = following->z;
+                key->w = following->w;
+                flags[next] = flags[next + 1];
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // Removes the key that sits at frame `frame`, moving the later keys up one place. Returns 1 when there was such a key,
 // else 0. Called by the key-moving code at EN 0x776ce0.
 int KeyTrack::RemoveFrame(int frame)

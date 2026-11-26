@@ -36,7 +36,8 @@ struct MotionList
     int values[MOTION_ENTRY_COUNT];               // 0xb10: entry values
     int extras[MOTION_ENTRY_COUNT];               // 0xc10: entry extra values
     int AddEntry(int id, int value, const char *name, int extra);       // EN 0x76f9d0 (JP 0x101ad6a0): appends an entry; 0 when all are used
-    int Clear();                                                       // EN 0x7722c0 (JP MotionList::Clear)
+    int RemoveEntry(int index);                                        // EN 0x7722d0 (EN-only, motion_list_items.cpp): takes entry `index` out and moves the later entries down; 0 when `index` is not an entry
+    int Clear();                                                      // EN 0x7722c0 (JP MotionList::Clear)
     int Init();                                                        // EN 0x778530 (EN-only, containers.cpp): an empty list with the signature, the default flags and one entry "NoName"; returns 1
     int SetEntry(int index, int id, int value, const char *name, int extra);   // EN 0x77a0b0 (EN-only, containers.cpp): overwrites entry `index` (up to entryCount); 0 when the index is out of range
     int InsertByName(int position, const char *name, int tag);         // EN 0x76fad0 (JP MotionList::InsertByName)

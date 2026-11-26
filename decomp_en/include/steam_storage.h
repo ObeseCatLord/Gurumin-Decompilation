@@ -22,6 +22,9 @@ public:
     virtual void Slot9() = 0;
     // True when cloud file `name` exists; vtable slot 10 (offset 0x28).
     virtual bool FileExists(const char *name) = 0;
+    virtual void Slot11() = 0;
+    // Size in bytes of cloud file `name`; vtable slot 12 (offset 0x30).
+    virtual int GetFileSize(const char *name) = 0;
 };
 
 // Returns the Steam client's remote storage object (steam_api.dll export, imported by name; EN import 0x847d38).

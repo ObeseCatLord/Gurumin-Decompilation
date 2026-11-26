@@ -32,6 +32,7 @@ struct Mouse
     int m_0044;               // 0x44: cleared by Init
 
     int ClearChanged();       // EN 0x7aa8b0
+    int Update();             // EN 0x7aa280 (JP 0x10001550): the method view of Sound_StopAll, which only calls the sound command with six zeros (the frame step loads ecx with g_mouse first)
     int UpdateMoved();        // EN 0x7aa250
     int GetState(MousePoint *outPosition, char *outLeft, char *outRight, char *outMiddle, int *outWheel,
                  char *outExtra1, char *outExtra2);  // EN 0x7aa330

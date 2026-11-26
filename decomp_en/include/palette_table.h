@@ -33,8 +33,10 @@ extern "C" int g_paletteSquares[PALETTE_SIZE];
 extern "C" int g_paletteLastMatch;
 
 // Index of the bucket whose colour is nearest to the four channel values (the fourth counts three times); the squared
-// distance goes to `*distance` when given. EN 0x748bd0 (not ported yet).
+// distance goes to `*distance` when given. EN 0x748bd0 (palette_nearest.cpp).
 extern "C" int Palette_FindNearest(int channel0, int channel1, int channel2, int channel3, int *distance);
+// The same search over the first three channels only; `unused` is not read. EN 0x748b20 (palette_nearest.cpp, EN-only).
+extern "C" int Palette_FindNearest3(int channel0, int channel1, int channel2, int unused, int *distance);
 // Fills the PALETTE_SIZE buckets from `palette` with their fourth channel 0, zeroes their counters and fills the square
 // table. EN 0x748ca0 (palette_buckets.cpp).
 extern "C" void Palette_LoadOpaque(const PaletteColour *palette);

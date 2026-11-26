@@ -5,7 +5,7 @@ Re-run after each batch (finished items drop out). Per function: `python tools/p
 the JP twin's matched source, the EN callees with their JP names and the EN disassembly (`--brief` makes a
 subagent brief). Low-confidence map rows: check the twin before porting.
 
-## 1. Walls to retry (214)
+## 1. Walls to retry (238)
 
 - [ ] `005a1200` — CharRecord::operator= (implicit, 556 bytes): header ready (CharRecord fields 0x44..0xec made individual, ParamVector position); a throwaway copy function matched, but the standalone copy is only emitted in a TU with a real caller (Game_Reset 5a2dd0, Map_PlaceCharacters 637160, Game_LoadData 5f2cd0), so it has no honest source yet
 - [ ] `005a1fa0` — Switch_Hold (src/switches.cpp): function really ends at 0x5a214f (432 bytes, shared return-0 block after the last ret). With the held-object store inside each search branch ours tail-duplicates the code after the branches (434 bytes) where the original jumps to one shared tail; with the store after the branches the kind blocks and the lever check order differ. Tried 3 kind-block spellings and both store positions.
@@ -32,6 +32,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005c1840` — Npc_Greet (src/npc_greet.cpp): 736 vs 734 bytes; same calls and constants, only the balloon choice differs (original keeps the roll in eax and lays the special-character chain out in source order with the costume cases after it; ours moves the costume blocks; a switch(index) gives 734 bytes but another layout)
 - [ ] `005c20e0` — Char_ProbeSideStep: 4 bytes, same distance register difference
 - [ ] `005c24a0` — Char_ProbeSideLedge: 4 bytes, local distance reloaded into xmm1 (original xmm0)
+- [ ] `005c2c40` — TutorialBook_Close (src/tutorial_book.cpp): the original expands the .iti/.bmp loader inline at the plain-page sites (book 0 or flag -1) with two strlen loops sharing one tail and calls Texture_Load for flagged pages; the inline helper is not inlined by plain inline here and with __forceinline the sites merge into one strlen loop (801 vs 934 bytes); structure otherwise equals the JP twin (batch 18)
 - [ ] `005c3100` — EffectHook_PickTarget: 4 bytes off; xmm0/xmm1 swap in the distance < RANGE compare (original loads the constant into xmm1 and reloads the distance into xmm0); tried reversed compare, !(>=), keys[] compare, function-scope local.
 - [ ] `005c9c50` — Player_TakeDamage: not attempted (ran out of budget). Analysed: JP twin 0x1005dbf0 flow; EN routes the hurt voice through the out-of-line voices-off wrapper 0x6e05d0 (not Character_PlaySoundInline), rumble via Rumble_StartIfEnabled 0x7a8830, EventSlots_Add 0x5c9ba0, AntiTamper_Store 0x5f4650, gameover movie 0x7a31f0/0x7a8f90/0x7a8ec0, hit effect 0x70a7f0.
 - [ ] `005ca1d0` — Sound_PlayDelayed: not attempted (ran out of budget); no source written, no analysis recorded.
@@ -52,6 +53,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005ee110` — Route_FollowGates ported (592 vs 573 bytes): register allocation differs (original keeps point in edi, index in ebx) and Game::TestScriptFlag is inlined where the original calls 0x5ec240 (same blocker as 0063ac70)
 - [ ] `005f4060` — Ground_BuildHeights: logic equal to the JP twin; the outer/inner loop counters and the cell pointer get swapped registers (eax/ecx) and the original has loop-entry jumps with alignment padding, the copy loop is laid out differently (declaration order, header increments, for-init forms tried)
 - [ ] `005f4b40` — ListBank::FindVariable (listbank_find_variable.cpp): 183 bytes differ; first loop keeps count in esi and this in ebx (ours swapped), and the inline ReportError blocks of the array branch are laid out differently (dimension check jump polarity).
+- [ ] `00602730` — MapCursor_Step (src/map_cursor.cpp): 1018 bytes against 967; the original keeps the rider result and the held flag in stack slots with the index in ebx and the slot offset in a register, ours keeps them in registers (landed in ebx, index in edi) so every later compare/branch differs; tried pointer vs direct hold access and reference vs direct slot access (batch 18)
 - [ ] `00603940` — save-file wrapper: an unused GameFile local constructor/destructor is only reproduced by a dummy local; callee 0x603630 (Steam Save_Load) is not ported
 - [ ] `00607020` — ListBank::LoadText: only register numbering differs (ours c in dl and inQuotes in ecx, original c in cl and inQuotes in edx) and the second `cmp cl,0x22` is kept in the original; int/bool/declaration order tried (four spellings)
 - [ ] `00631480` — Map_FindRegionAt: only the xmm4/xmm5 choice for the margin constant vs point->x differs; tried comparison order, local order, for loop with continue, min/max macros
@@ -60,7 +62,9 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00639500` — ListBank::SkipStatement: register allocation (original keeps text in ebx, parens in memory); declaration orders tried; 541 diffs
 - [ ] `0063ac70` — DamageZone_Update: ours inlines Game::TestScriptFlag (defined inline in game.h) where the original calls the out-of-line copy 0x5ec240 with ecx=g_game; pragma auto_inline(off) did not stop it; 460 bytes off
 - [ ] `0063aeb0` — Char_UpdateShoves: original keeps the 10000 divisor in edi with a spill slot of its own at [ebp-4] (frame 0x2c, loop counter in ebx); ours reuses the argument slot (frame 0x28); tried plain literals, named local before and after the shove pointer
+- [ ] `0063bc80` — DigitCounter_Update: the original splits the shown count with idiv by a register-held 10 (count % 10 and count / 10 fused, then a second idiv) where our build uses the magic-number multiply (754 byte diffs, all after the first split of the count); the next count and count / 100 match. Chain, fused and literal spellings tried.
 - [ ] `0063c170` — Game::MarkKilled (src/game_killed.cpp): frame and induction-pointer structure differ in the trigger loop.
+- [ ] `0063e9f0` — Save_ReadSlotInfo: source ported and structurally equal (1127 vs 1123 bytes, cloud/old-format/descramble paths line up) but the frame is 8 bytes smaller (0x4d0 vs 0x4d8): the original keeps the buffer, map and chapter in separate stack slots with the buffer reloaded from [ebp-0x1c] and the body base held in ebx (fields addressed from body+0x30000), ours packs map and buffer into one slot and addresses fields from esi; the Popon flag also compiles to cmove in the original and sete in ours.
 - [ ] `0063f790` — step effect + sound (852 bytes, EH frame): analysed (effect ids 0x2da/0x2dc/0x2e0, sound ids, RotationZ heading matrix) but not ported; ran out of budget.
 - [ ] `0063fc10` — Sound_PlayEffect: EN hoists cvtps2pd of the volume to the top; 507 vs 519 bytes
 - [ ] `00640040` — Save_Load: not attempted; EN is a save writer (SystemSav_WriteRecord, 0x4c38c block, checksum), not the JP loader, needs a new design
@@ -74,6 +78,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0064b210` — Shaga_Create: not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
 - [ ] `0064bb90` — Shaga_PushOut: only the esi/edi roles differ (original keeps index in esi, steps in edi); tried steps declaration spot, do-while vs for vs ++steps
 - [ ] `0064bd10` — Camera_ItemStand: 889 bytes, same length; store scheduling in the sparkle-matrix block (shot-point ints interleaved with matrix stores, z re-read); ~6 spellings
+- [ ] `0067fcc0` — Enemy_PlayVoice: the original keeps the reset block and the cooldown check as separate code (push edi after the reset, check re-reads kind: cmp ecx,ecx) and falls to the voice at one place; ours threads each reset branch straight into its check (1275 vs 1054 bytes); the switch tables and the Character_PlaySound inline match
 - [ ] `006975e0` — Enemy_CallBarrage (src/enemy_barrage.cpp): 6 bytes off; store/pop scheduling around the inline Char_StartEffect/Character_PlaySound copies (char_inline.h). Tried real versus inline helper at each site, direct g_characterModels[index].matrix.
 - [ ] `006991e0` — Enemy_SpinFire (src/enemy_barrage.cpp): 12 bytes off; same store/pop scheduling as Enemy_CallBarrage, inline helpers expanded at sites 1 and 3 only. Tried frame local versus direct values[0] reads (direct fixes the %10 strength reduction).
 - [ ] `00699dc0` — Npc_StandOnGround: 8 bytes off; the original reserves the 0x10 stack bytes for the SetTranslation argument and loads ecx before the ground x/y stores; two-call and merged single-call forms tried
@@ -100,12 +105,13 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006de0c0` — Enemy_DropInWhenNear: 1111 vs 1119 bytes, same register-pressure wall as Enemy_DropIn (original keeps 20 in esi and spills index*0x249c and the model pointer)
 - [ ] `006de520` — Enemy_DropIn: 1013 vs 1021 bytes; the original keeps 20 in esi and spills index*0x249c and the model pointer to the stack (register pressure in the drop-in state), ours keeps both in registers; tried a model pointer local
 - [ ] `006df520` — Carry_StackOnObject: 641 vs 662 bytes, 317 diffs; original keeps g_stackTargetSlot cached in ecx and position.z in xmm1 across the search loop (jumps into the loop middle), ours reloads the global every iteration; the first 40 instructions otherwise equal
-- [ ] `006e64f0` — GetMessageMap of the launcher application class (CWinApp-derived, owner of InitInstance 0x6e7470): the class is not reconstructed yet (batch 17)
 - [ ] `006e7010` — 6-byte-body thunk (push ebp; mov ebp,esp; pop ebp; jmp CDialog::Create(LPCTSTR,CWnd*) 0x40129c) in the vtable at 0x84f170 next to 0x6e9410: virtual override of an unreconstructed launcher dialog class; class not identified (batch 17)
 - [ ] `006ea830` — CCongigDlg::ShowPage: 9 diffs, only the load order of the final MoveWindow arguments (original loads top, bottom, left; ours bottom, top, left). The two RECT initialisations now match after declaring them at point of use; three spellings of the MoveWindow call (fields, &rect overload, locals x/y) compile to the same bytes.
 - [ ] `006eb860` — CKbDlg::IsStartRefused: all but the "unassigned list" flag matches (vectorised id array, loop, MessageBox call). The original keeps the bool result in a stack byte [ebp-1] for the normal exit and in bl for the declined path, and loads the stack frame 4 bytes larger; ours constant-folds the flag (xor al,al / mov al,1). Three spellings tried (result local set before the box and returned on both exits, constants on both exits, early return).
-- [ ] `006ec4e0` — COseDlg::OnReset: the board pack loop. The original unrolls the 16-cell inner loop by four with the shift held as esi = 4,12,20,28 (cmp esi,0x24) and keeps the running cell index in edi; ours does not unroll (word/cell and word/shift spellings tried, pointer and index forms). Probably a hand-unrolled body in the source; not written that way.
 - [ ] `006ed900` — CPadDlg::IsStartRefused: same residue as CKbDlg::IsStartRefused 0x006eb860 (flag kept in [ebp-1] and bl, frame 0x34 vs ours 0x30); identical source shape, same three spellings tried.
+- [ ] `006efb10` — CPadDlg::OnTimer (src/launcher_pad.cpp): 2 bytes off, the final countdown step is sub eax,2 in the original and add eax,-2 in ours (local, direct, ternary and += spellings tried).
+- [ ] `006f0140` — CPadDlg::AssignPadButton (src/launcher_pad.cpp): ours inlines CPadDlg::ShowAssignments (505 vs 140 bytes); the original keeps it out of line (it has about 40 more callers in the unreconstructed "Set" button handlers 0x6edf80-0x6ef760, which are not written yet). Reordering the definitions does not change that.
+- [ ] `006f0230` — CPadDlg::ShowAssignments (src/launcher_pad.cpp): 60 diffs, all in the row conversion: the original compares 0x14 then 0x18 separately and uses add esi,-2 / add esi,-0x10, ours folds the last test into lea/cmp 3/ja and uses sub. Nested ifs, += -2 and -= 2 spellings tried.
 - [ ] `0071add0` — Playback::Play: original keeps the repeated `layer != -1` tests separate and every early return gets its own epilogue; ours merges the tests (five spellings with unsigned compares)
 - [ ] `0071c410` — TextureObject::Create (src/texture_create.cpp): 400 vs 402 bytes, one instruction off; the original spills the buffer size to the alpha parameter slot [ebp+0x14] right before the allocation call (after the string push) in both speckle branches and the else loop bound is a copy (mov ebx,eax); ours spills earlier and reloads. Tried function-scope size, inline assignment, per-branch size.
 - [ ] `0071c5b0` — Texture_CreateFromPixels (src/texture_create.cpp): 175 diffs, structure matches; the original keeps the white buffer in edi and reloads the slot into ebx, ours spills the buffer to [ebp-4] and reloads the slot into edi (register allocation, same wall as Texture_CreateCopy). Tried inline size, function-scope buffer, reusing the pixels parameter.
@@ -113,9 +119,12 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0071cf80` — SortByDepth: 25 bytes off; the original reuses the dead count parameter slot for one spill, ours takes a fresh local (bool/early return variants worse)
 - [ ] `00725f40` — EffectManager::Draw: 932 bytes against 925; this is spilled at entry (frame 0x34 against 0x30) and the loop bookkeeping of the sprite loops and the record-list checks differs (batch 17)
 - [ ] `00729610` — ModelBank::DrawLensFlares: ~281 diffs; constant hoisting of 240.0/320.0 around the DrawScreenCopy calls
+- [ ] `0072caa0` — rotates a 2D vector by an angle taken from the difference of two global float pairs (0x1ee4900/04, 0x217b5b0/b4) through the x87/SSE trig wrappers 0x7e3c6a/0x7e5370/0x7e68b0; the globals and the trig call forms (cvtps2pd round trips) are not recovered
 - [ ] `0072e990` — WorldRenderer::LowestMessageId: register assignment of the scan loop differs (batch 17)
+- [ ] `00733400` — WorldRenderer::GetMessageField (world_message_fields.cpp): same size (159), register allocation differs: the original keeps the field counter in edi and the inlined strlen pointer in esi (ours swaps them); declaration order and a local line pointer tried (batch 18)
 - [ ] `00734b20` — ModelNames_ClearAll: loop pointer in edx with the zero kept in eax and both addresses loaded before rep stosd; index loop gives eax pointer and mov eax,0 after (three spellings: index, pointer, memset)
 - [ ] `00739250` — WorldRenderer::SetModelState: the original reloads this->models after every limit store (ours keeps it in ecx); NodeSaved::limitMin/Max are floats, tried literal and named limits
+- [ ] `0073e270` — WorldRenderer::ShiftKeyIdsClamped (world_message_edit.cpp): bytes off (180 vs 166): the original re-reads the id from memory after the compare (no CSE) and keeps the key's first line in the parameter slot [ebp+8], addressing the id table as (first + 0x27d38) * 2; five spellings tried (batch 18)
 - [ ] `0073ede0` — EffectDefs_Allocate: 49 diffs, same length; all stores match but the scheduler places the first list-head vector store and the last recent-effect vector store differently around the m_0164 store (EN: recents, m_0164, list heads); loops and explicit stores, store order of the byte and struct fields all tried
 - [ ] `0073eff0` — Playback::Advance (model_state.cpp): everything matches except that the original inlines Playback::Play (restart=1, blend 14) into the idle-motion path while ours calls it; the out-of-line Play is itself open.
 - [ ] `0073f770` — WorldRenderer::OffsetKeysFromA: original stores LowestMessageId's (unused) result into the dead stack slot of the firstId parameter, which also moves firstId to edi; a plain call (or an unused local) compiles to no store.
@@ -125,14 +134,17 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00745680` — Camera_SelectPath (src/camera_path_select.cpp): 407 bytes, same size; the original pushes esi/edi before the id == -1 test and reads the current path after it, ours pushes them after the early return (or hoists the read when it is written first); same code otherwise. Tried reading the current path first, declaring the loop index first.
 - [ ] `00747b50` — EffectManager::RemoveOwnedBy: 2 bytes short; the original loads record.id into eax before comparing with -1 (a compare against memory in ours); local id, swapped tests, record pointer and continue forms tried
 - [ ] `00747cc0` — WorldRenderer::ShiftIdsFrom (src/world_message_edit.cpp): 81 vs 84 bytes; the original keeps this in ebx and firstId in edi and stores each LowestMessageId result into the parameter's stack home [ebp+8] (an unused local drops that store and swaps the registers); no spelling tried reproduces the dead store (unused local, reassigned parameter would change the compare)
+- [ ] `007483d0` — Bitmap_FlipRows24 (bitmap_flip.cpp): bytes off (176 vs 156): the original keeps the inner loop index-based (eax += 3, rows as base+2/base+1 pointers) where cl rewrites it as a counted pointer loop; five spellings tried (batch 18)
 - [ ] `00748740` — Camera_LiftOverGround (src/camera_lift.cpp): 790 bytes, every instruction identical except where the 120.0f clamp constant is loaded into xmm6 (ours right after the CastRay call inside the loop, the original just before its use after the loop); tried separate constants for the hit lift and the clamp and a ternary in the loop
 - [ ] `00748ca0` — Palette_LoadOpaque: 7 diffs, original computes i*i before the zero stores with a pointer loop (batch 17)
 - [ ] `007491e0` — Palette_Accumulate: 97 diffs, original keeps pixel pointer and count in stack slots (register/loop shape) (batch 17)
 - [ ] `0074a050` — Node::MoveToParent: 6 bytes off; operand order of the inline strcpy at the two insertion sites and the edi load order
 - [ ] `0074e640` — Node::Clone: only the inline strcpy loops differ, [ecx+edx-1] in the original vs [edx+ecx-1] (base/index operand order of the shared this-source offset; the plug copy loop shows the same swap), plus the epilogue order of mov eax,1
+- [ ] `0074f580` — BuildMesh triangle copy loop: the original keeps the fill count in ebx and spills pack*0x74 to [ebp-8]; ours swaps those roles (146 byte diffs); swapping the declaration order of fill/pack moves the whole stack frame instead
 - [ ] `0074fcf0` — Node::BuildCollisionSpheres: min/max sphere maths and loop bookkeeping differ (batch 17)
 - [ ] `00750450` — Node::RemoveChild: 1 diff, the inlined strcpy loop addresses [ecx + ebx - 1] in the original, [ebx + ecx - 1] in ours
 - [ ] `00752190` — Node::DrawShadow: 1453 vs 1456, casterSize register choice (movaps xmm0,xmm1 copy)
+- [ ] `007534b0` — Node::FindByFlagsBelow (node_hierarchy.cpp): bytes off (182 vs 172): the original shares one `if (found != 0) return found` tail for both exits and keeps the child pointer and loop count in different registers; three spellings tried (batch 18)
 - [ ] `007541d0` — CommandText_ReadWord: loop/branch layout differs; node command text layout not recovered (batch 17)
 - [ ] `00754e20` — Node::CylindersOverlap: 8 diffs, dx/dy temporaries live in swapped xmm2/xmm3 registers
 - [ ] `007550b0` — Node::CylinderSphereOverlap: 6 bytes off, three adds of point.y load sphere->y first where the original loads the offset first (z already flips the right way); source operand order and statement order make no difference
@@ -140,6 +152,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0075ca20` — Node::SegmentHitsMesh: not attempted (time).
 - [ ] `00768cd0` — Node::UpdateWorld ported from JP (557 vs 594 bytes): frame variable lives in the stack slot, not ebx, and the EH state of the AnimatedMatrix temporary is 1, the original has 5 (four more temporaries with unwind ids); several spellings of the frame local tried
 - [ ] `0076a290` — Node::Init (src/node_init.cpp): same 790 bytes, same store set; only the schedule differs (original stores brightness/colourA right after the first Fill call and pushes the second Fill argument after the fogFar store; ours hoists the push and lea). Tried moving brightness/colourA, tint.Fill order, a shared const float local
+- [ ] `0076d770` — Node::BindLinks: everything matches (1122 vs 1123 bytes, 230 byte diffs from relocations and one layout difference) except the block order of the flag tests at the end: the original lays the 0x400000 branch inline and puts the 0x1000 / 0x4000 branches after the return (they jump back to the child loop); ours puts the nested else-branches in front of the loop. Flat else-if chain, nested form and an inlined AllocSaved helper tried.
 - [ ] `0076f810` — KeyTrack::Insert: shift loop matches with a local values pointer, but the original keeps the frame argument in ebx and count in edx (lea ebx,[edx-1]); tried member-wise, Vec4 copy, local count, while loop
 - [ ] `0076fba0` — MotionList::FrameAt: JP source ported unchanged, 456 vs 473 bytes; EN rotates the search loop so its exit falls into the past-the-end code and keeps start in the time param home with the tail duplicated per branch, ours merges the tails (length=0 init changes the frame to an ebp local)
 - [ ] `007703f0` — KeyBank::Sample (int frame): not attempted past reading; four Spline calls are inlined with the t factor shared and spilled, float schedule too fragile (JP Spline itself is unmatched)
@@ -147,12 +160,15 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00771b60` — KeyInterpolator::Spline: 199 vs 203 bytes; the original keeps t2*3 and c-b shared and all eight xmm registers busy, ours spills t2 to a new local; single expression, shared locals and Ghidra order tried
 - [ ] `00773b20` — EulerMatrix: original has no ~Matrix4 calls (temporaries folded differently); ours emits them (batch 17)
 - [ ] `00773f20` — (801 bytes, JP 101b17a0): not attempted (ran out of budget); no source written, no analysis recorded.
+- [ ] `00774250` — unknown inlined helper: heading of the matrix's y axis (atan2 of m[4]/w, m[5]/w with w = m[7] + m[15]); the transform is open-coded with x*0 terms and no translation, sibling of Matrix4::Heading (EN 0x774300); no Matrix4 member or free function reproduces it (batch 18)
 - [ ] `00774300` — Matrix4::Heading (src/matrix_heading.cpp): the original does not inline Project; ours does.
 - [ ] `00774a70` — Vec4::InBoxAspect: register allocation of the float compare chain differs after ~5 spellings (batch 17)
 - [ ] `00774b90` — VertexPacks_AllocateArray: our build merges the duplicate radius store of the empty pack; bytes differ there.
 - [ ] `00774f00` — InverseMatrix (matrix_inverse.cpp): arithmetic matches in shape; the local result matrix is zeroed inline with the Matrix4() pattern and has no EH frame, but Matrix4() here is an out-of-line ctor with a dtor (call plus unwind frame); needs a Matrix4 with inline ctor and no dtor in this TU.
 - [ ] `00775320` — View_ContainsPoint: 6 bytes off, one subss placement in the behind-camera branch
 - [ ] `00777410` — Vec3_Normalized: 8 bytes off, xmm0/xmm2 numbering of x and y only
+- [ ] `007774e0` — OrthographicMatrix: original inlines Matrix4() but keeps only the 8 stores SetIdentity does not overlap (stores to 0,10,12,14,15 elided across the SetIdentity call) and orders the divisions differently; ours zeroes all 13 elements and schedules the near/far arithmetic differently (152 byte diffs)
+- [ ] `007776b0` — perspective-style matrix (tan call plus memset-of-0x40 inline, EN-only variant of PerspectiveMatrix 0x777540 area); sibling PerspectiveMatrix in vec4.cpp is itself not matched
 - [ ] `00777770` — PerspectiveMatrix: first 200 bytes match; tail stores m[10] and m[14] in a different order (farPlane*nearPlane operand order)
 - [ ] `00777a20` — RotationMatrix (src/rotation_matrix.cpp): needs the Matrix4() constructor inline (header definition instead of vec4.cpp, a restructure of the shared header) and the original keeps every constructor zero store (no dead-store elimination: the result pointer and the quaternion reference may alias; an out-pointer spelling keeps them, a by-value return drops them) so the by-value declaration in vec4.h cannot produce these bytes. Tried 4 expression spellings, placement-new and out-pointer variants.
 - [ ] `00778840` — Vec4_RotatedAboutZ: instruction schedule of the sin/cos pair differs (batch 17)
@@ -166,11 +182,13 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0078ae20` — EN rewrite of JP DrawTinted (extra mode argument, widescreen globals); port from the EN bytes, not JP
 - [ ] `0078bc00` — EN rewrite of JP SwapTarget_DrawPreview (back-buffer RECT, device vtable +0x88); port from the EN bytes
 - [ ] `0078ce10` — TextureObject::DrawThroughShader: 1187 vs 1279; original recomputes u - 1/512 for every store
+- [ ] `0078d8a0` — TextureObject::FillRect: only SSE register numbering differs (129 byte diffs, size 1113 matches): the original holds the two screen scale factors in xmm5/xmm6 and the texture coordinate ratios in xmm3/xmm4; ours swaps them
 - [ ] `007906d0` — FontRenderer_DrawTextClipped: not attempted; EN adds a Windows-font GDI path (flag 0x21e4814) that has no JP twin code
 - [ ] `00790e70` — TextureObject 3-texture screen quad (mislabelled DrawBlurred): not attempted; binds this and two argument textures to stages 0-2, 4 vertices of 0x38 bytes, cached sampler states, pixel shader at 0x21e47a8
 - [ ] `00791e30` — TextureObject::DrawFrameAlt: not attempted (time)
 - [ ] `00792370` — Render_DrawGradientQuad (stdcall, 8 args): 110 bytes off, only the scheduling of the x/y scale multiplies and stores; six orderings of the y/x statements and local-vs-chain spellings tried
 - [ ] `007955c0` — DrawFrame: EN differs from JP (stage alpha before colour, second pass, stage-1 tail); JP draft 2550 vs 2138 bytes
+- [ ] `0079ffa0` — TextureObject::ReadBackRgb (src/texture_read_back.cpp): 188 bytes against 187, all instructions equal but the loop swaps eax and ecx (original keeps the output pointer in eax and the channel temporaries in ecx; ours the reverse)
 - [ ] `007a11e0` — TexturePool_Get (src/texture_pool.cpp): 473 vs 475 bytes; logic matches the JP source, but the original keeps the byte count in edi, the attempt counter in ebx and spills only the format ([ebp-4]) while ours hoists &g_pooledSurfaces[poolIndex] into ebx and spills the byte count too (register allocation). Tried per-use array expressions, early-return local, declaration orders.
 - [ ] `007a22f0` — GameWindow::WindowProc (src/game_window.cpp): 591 vs 475 bytes; same cases and bodies, but the original switch splits at 0x10e (4 cases below, no jump table for 0x207-0x281, shared DefWindowProc tail) where ours splits at 0x10f and emits a jump table for 0x207/0x208/0x20a/0x281. An extra non-elided case flips the root to 0x10e but changes registers; tried explicit returns, case order, extra cases.
 - [ ] `007a2790` — FontRenderer::DrawStringToBuffer: 1559 vs 1224; original tail-merges the digit/punctuation branches, y kept in edx
@@ -180,6 +198,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007a4160` — Render_RestoreTarget (src/render_restore.cpp): the original keeps a dead memset of the viewport; ours drops it.
 - [ ] `007a4ef0` — Render_SetSamplerState: 104 vs 111; original has two cache stores and two rets, GetSamplerState writes into the parameter slot
 - [ ] `007a5ca0` — src/names_od.cpp Names_Set compiles to 65 bytes, EN is 146: check the map pairing, the EN function probably does more than the JP twin
+- [ ] `007a7ed0` — Render_PresentCentered (src/render_present_window.cpp): 187 bytes against 160-ish, same arithmetic but ours keeps the back buffer height/width in registers (edi/ebx) where the original reloads both globals after each rect store and uses different temporaries; the cause of the reloads (what the compiler thinks the stores alias) is not found
 - [ ] `007a8930` — Path_GetBaseName: original clears the first 8 bytes with two dword stores (memset gives movq)
 - [ ] `007a8ac0` — GameFile::Open returns int 0/1 in EN but game_file.h declares FILE * (model_prescan.cpp depends on it); fix the type and its caller together
 - [ ] `007a8d10` — GameFile::WritePicture: bytes equal except the order of the handle reload and the stack cleanup after the first fwrite (original: add esp, then mov eax,[esi]; ours hoists the reload and threads the skip jump to the return); the same shape matches in WriteCompressed.
@@ -192,17 +211,22 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007ad3b0` — ImeCandidates_WidestWidth: 54 bytes off; VS2013 rotates the loop (test before the loop) in every spelling, the original tests at the top; five spellings tried (for, while, for(;;)+break, min four ways)
 - [ ] `007ad4b0` — ascii text input begin: not ported, needs ascii_input.h and the unported callback 0x7ad550 it installs.
 - [ ] `007ad550` — ascii text input callback: not ported.
+- [ ] `007b0040` — TextWindow::AddChoice (text_window_items.cpp): bytes off (165 vs 175): the original keeps `this` in a spilled local and reads choices[item] before choiceCount[item]; register allocation of item/value differs (batch 18)
+- [ ] `007b8af0` — Packs_EncodeImage: the original computes the eight level sizes fully unrolled with spilled temporaries (frame 0x18c, level scale doubled in place); our loop compiles to a 0x188 frame and different spills (1073 vs 1068 bytes, 794 byte diffs); the rest of the body (planes, decompose loops, calls) lines up
 - [ ] `007b95a0` — Packs_PackPlanes: 342 vs 339 bytes; register allocation differs (original keeps output in edi and the written count in edx, ours reloads output each pass); spellings tried: row index, row pointers, carry locals vs in-place shifts, unsigned short fields, loop counter forms
 - [ ] `007b9830` — Packs_DecodeBand (src/packs_band.cpp): 629 vs 624 bytes, loops and arithmetic identical; the prologue schedules the weight products and the loop-invariant activity term in a different order and register set (original keeps the band pointer in ecx and the scale in eax through the weight imuls); bit-reader inline, local scale/gain, invariant term and statement orders tried
 - [ ] `007ba070` — Packs_PlanesToComponents: 8 bytes smaller than the original (301 vs 308-314); the original keeps one pointer into the middle plane and loop-invariant offsets to the other two with the clamps as cmov; about ten spellings tried (index forms, row pointers, short/int locals, helper clamp)
 - [ ] `007ba1f0` — Packs_ArithDecode ported from Ghidra (395 vs 587 bytes): the original keeps low/high/value in registers across three inlined shift loops and writes the globals through; ours reloads the globals (const data pointer may alias them), several spellings of the state locals not matched
 - [ ] `007bab70` — Packs_ScalePlanes: 443 vs 451 bytes; loop structure and arithmetic right, but the original keeps wholeFactor/fraction/half in param homes and hoists plane-minus-plane byte offsets per column (pointer-difference induction), ours differs in register allocation; tried index, pointer, do-while loops and declaration orders
 - [ ] `007bad40` — Packs_ScaleLevels (src/packs_scale.cpp): same size (505), 87 bytes differ; the original loads widths[0] through the widths parameter with levelCount in esi and keeps heights/widths bases as locals ([ebp-0x10], [ebp-0x14]) and reads fullWidth before the heights in rowOffset (imul eax, ecx with eax = fullWidth) while ours keeps the widths pointer in esi. Tried index and pointer-induction loops, row offset spellings, inline offsets.
+- [ ] `007bb580` — Packs_EncodeFlush (packs_encode_flush.cpp): same size (174), 25 bytes differ: the original schedules the byte/position/mask stores of the bit-writer tail differently (stores after the pending-count load) and keeps `1 - bit` in edi; five spellings of the inline bit writer tried (batch 18)
 - [ ] `007bb630` — Packs_EncodeBand (src/packs_encode_band.cpp): 656 vs 670 bytes, body identical in structure (the run/value loop is instruction-for-instruction close); the head schedules the weight products differently and the original keeps the zero-run counter in the dead parameter slot [ebp+0x18] and the packed-word index in [ebp-4] while ours uses other slots; same class as Packs_DecodeBand 007b9830
 - [ ] `007bcd10` — Packs_Compress ported from Ghidra (595 vs 598 bytes, structure the same): original stores the block count and returns the constant 8 before the loop, keeps the output pointer/total in different registers, and loads the progress callback before clearing state.outputWord; int*/byte-pointer, branch order and callback-local spellings tried
 - [ ] `007bd120` — Packs_ReadStreamBits: original inlines the bit read with its own local and different register use; five spellings of value=value*2+bit tried, 47-51 bytes off.
 - [ ] `007bd730` — Packs_LzMatchLength: original forms earlier = input+candidate+2 and loads state->length/data before the loop; our loop keeps the pointer base differently.
+- [ ] `007bd990` — Packs_DecodeBlock: 268 diffs, all in the run-fill branch: the original defers the stack cleanup of Packs_ReadStreamBits(4) past the join and reads inputBytes inside each branch, ours cleans up inside the first branch and reads inputBytes after; rest (inlined bit reader, calls, length decode, copy loop) matches (batch 18)
 - [ ] `007bdd20` — Packs_LoadImageFile: structure and EH match up to the Size call; register allocation (alpha flag in edi, result in esi) and the tail layout (Close/return 1 duplicated per branch) differ, 447-451 vs 445 bytes
+- [ ] `007bdee0` — Packs_SaveImageFile: 197 diffs only in scheduling: the original subtracts (end - start of the JPEG stream) before loading ecx for the Seek call, ours after (after 5 spellings of the length expression); everything else matches (batch 18)
 - [ ] `007be4f0` — Jpeg_SaveBgr (src/jpeg_save.cpp, not ___crtGetLocaleInfoA: it is a libjpeg screenshot writer, no callers): 426 vs 398 bytes; the compiler merges the in/out pointers of the BGR-to-RGB row loop into one induction variable (extra frame slot, other register assignment) where the original keeps both pointers. Tried for/do-while spellings and countdown counters.
 - [ ] `007bed30` — OggReader::Decode: same code except the original hoists the gain into xmm2 and stores it back to the member in every channel pass (a store of the value just read); no honest spelling found
 - [ ] `007bf170` — MmioFile::Open: 183 bytes off; stack slot order of the path buffers and the tail layout differ
@@ -222,8 +246,10 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007c5a60` — SoundArc_PlayFile: EN keeps the queue index in a byte and recomputes slot*0x1c0 for the tick store; every spelling keeps one pointer
 - [ ] `007c5f80` — SoundEngine_SetOptions: store of the tens digit scheduled after the second division
 
-## 2. JP twin matched: port the JP source (40 functions, 128439 bytes)
+## 2. JP twin matched: port the JP source (42 functions, 129952 bytes)
 
+- [ ] `006e5750` 355 bytes <- APP.dll `1002a340` Char_RunScript [decomp/src/char_script.cpp] (high 0.91)
+- [ ] `00777fc0` 1158 bytes <- APP.dll `101aed50` Vec4::Mirror [decomp/src/vec4.cpp] (medium 0.54)
 - [ ] `0064c090` 1779 bytes <- APP.dll `10018870` Camera_PullToItemStand [decomp/src/camera_item_stand_pull.cpp] (high 0.90)
 - [ ] `00695710` 1781 bytes <- APP.dll `100a8370` Enemy_CallBursts [decomp/src/enemy_barrage.cpp] (high 0.86)
 - [ ] `005b8590` 1817 bytes <- APP.dll `10065450` TutorialBook_Update [decomp/src/tutorial_update.cpp] (high 0.64)
@@ -265,34 +291,27 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007ab210` 7222 bytes <- APP.dll `1015d520` Text_ToFullWidth [decomp/src/text_fullwidth.cpp] (high 0.65)
 - [ ] `005d3360` 7715 bytes <- APP.dll `10038c10` Scene_DrawFrame [decomp/src/scene_draw.cpp] (high 0.85)
 
-## 3. JP twin not matched yet (261 functions, 1401975 bytes)
+## 3. JP twin not matched yet (239 functions, 1384977 bytes)
 
 - [ ] `007af3b0` 23 bytes <- sound3d.dll `100595ec`  (low 0.19)
 - [ ] `007af230` 32 bytes <- sound3d.dll `1005d5ff` FID_conflict:GetProfileIntW (low 0.22)
 - [ ] `007af250` 37 bytes <- sound3d.dll `1005d668`  (low 0.14)
-- [ ] `006e7020` 56 bytes <- sound3d.dll `1001df20` CreateCompatibleDC (high 0.63)
-- [ ] `006e7060` 56 bytes <- sound3d.dll `1001e2fd` CreatePatternBrush (high 0.65)
-- [ ] `006e67d0` 71 bytes <- sound3d.dll `100550dd`  (medium 0.37)
 - [ ] `006ea720` 85 bytes <- sound3d.dll `10053d8f`  (low 0.33)
 - [ ] `007bd1e0` 89 bytes <- Packs.dll `10006e30`  (high 0.73)
 - [ ] `0077bb90` 113 bytes <- sound3d.dll `10008790`  (high 0.60)
 - [ ] `0077bcb0` 148 bytes <- sound3d.dll `10008610`  (high 0.73)
 - [ ] `007aefd0` 159 bytes <- sound3d.dll `100522e0` ATL::operator+ (medium 0.54)
 - [ ] `007aa020` 206 bytes <- sound3d.dll `100537f8`  (medium 0.43)
-- [ ] `006efb10` 218 bytes <- sound3d.dll `1004ebdc`  (medium 0.49)
 - [ ] `0072c190` 243 bytes <- sound3d.dll `10002d60`  (high 0.69)
 - [ ] `007c3d30` 252 bytes <- sound3d.dll `10006700`  (high 0.85)
 - [ ] `007ae0a0` 316 bytes <- sound3d.dll `1005fdf1` QueryInterface (medium 0.37)
 - [ ] `007bfd30` 335 bytes <- sound3d.dll `10002e70`  (medium 0.52)
 - [ ] `006ec790` 341 bytes <- sound3d.dll `10054ce1`  (medium 0.49)
-- [ ] `006e5750` 355 bytes <- APP.dll `1002a340` Char_RunScript (high 0.91)
 - [ ] `006effd0` 359 bytes <- Packs.dll `10028559`  (low 0.19)
-- [ ] `007be690` 373 bytes <- SoundArc.dll `0040f79d` ___crtGetLocaleInfoA (medium 0.42)
 - [ ] `0079fe00` 402 bytes <- sound3d.dll `10018aac`  (medium 0.39)
 - [ ] `007c0200` 406 bytes <- sound3d.dll `10003cb0`  (high 0.89)
 - [ ] `007c03a0` 429 bytes <- sound3d.dll `10004590`  (high 0.83)
 - [ ] `006e8dd0` 450 bytes <- sound3d.dll `1005255b`  (low 0.19)
-- [ ] `007bdee0` 477 bytes <- SoundArc.dll `0040f0fe`  (medium 0.53)
 - [ ] `007c0660` 481 bytes <- sound3d.dll `10004390`  (high 0.85)
 - [ ] `006e2290` 566 bytes <- APP.dll `1002a110` Char_WalkRoute (medium 0.58)
 - [ ] `007a3260` 589 bytes <- sound3d.dll `1004dbb1`  (low 0.24)
@@ -301,25 +320,10 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007aeb00` 794 bytes <- sound3d.dll `1001da8a` Format (medium 0.38)
 - [ ] `006ef7b0` 804 bytes <- sound3d.dll `10049698` GetPathName (medium 0.49)
 - [ ] `007c51e0` 814 bytes <- sound3d.dll `1000a3a0`  (high 0.96)
-- [ ] `007bd990` 838 bytes <- Packs.dll `100063c0`  (medium 0.58)
-- [ ] `005ca520` 878 bytes <- APP.dll `1001bb20` Char_DrawLinks (medium 0.57)
 - [ ] `007bfe80` 884 bytes <- sound3d.dll `10004860`  (high 0.71)
-- [ ] `0060c750` 887 bytes <- APP.dll `10137b10` Game_FrameStep (high 0.85)
-- [ ] `005c2c40` 934 bytes <- APP.dll `1004f250` TutorialBook_Close (high 0.84)
-- [ ] `00602730` 967 bytes <- APP.dll `10051190` MapCursor_Step (high 0.70)
-- [ ] `005e75f0` 1014 bytes <- APP.dll `10055ee0` Player_KnockBack (high 0.96)
-- [ ] `0074f580` 1036 bytes <- APP.dll `101a82d0` Node::BuildMesh (high 0.63)
-- [ ] `0067fcc0` 1054 bytes <- APP.dll `100b9bb0` Enemy_PlayVoice (high 0.83)
-- [ ] `007b8af0` 1068 bytes <- Packs.dll `10004fb0` BMPPack (high 0.75)
-- [ ] `0070a7f0` 1078 bytes <- APP.dll `10172350` EffectManager::Start (high 0.80)
-- [ ] `0078d8a0` 1113 bytes <- APP.dll `10143e00` Render_FillRect (high 0.71)
-- [ ] `0063bc80` 1121 bytes <- APP.dll `1001d2d0` DigitCounter_Update (high 0.98)
-- [ ] `0063e9f0` 1123 bytes <- APP.dll `10010d10` Save_ReadSlotInfo (medium 0.58)
-- [ ] `0076d770` 1123 bytes <- APP.dll `1019eeb0` Node::SetupSkinning (high 0.84)
 - [ ] `00637f40` 1137 bytes <- APP.dll `10011520` Player_SelectActionMotion (high 0.65)
 - [ ] `005bac00` 1144 bytes <- APP.dll `100e1c40` Enemy_IsBusy (high 0.92)
 - [ ] `0074ece0` 1154 bytes <- APP.dll `1019bdd0` Node::ProjectPlanarUVs (high 0.73)
-- [ ] `00777fc0` 1158 bytes <- APP.dll `101aed50` Vec4::Mirror (medium 0.54)
 - [ ] `005b3ac0` 1159 bytes <- APP.dll `1004d4b0` Regions_Update (high 0.75)
 - [ ] `007ba440` 1182 bytes <- Packs.dll `10001000`  (high 0.64)
 - [ ] `0077aea0` 1191 bytes <- APP.dll `101b1c20` LookAt (high 0.90)
@@ -529,7 +533,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006883a0` 51470 bytes <- APP.dll `100d24a0` Bs006_Update (medium 0.60)
 - [ ] `0060cb10` 113582 bytes <- APP.dll `1011d810`  (high 0.72)
 
-## 4. EN-only (no JP twin found) (371 functions, 200609 bytes)
+## 4. EN-only (no JP twin found) (310 functions, 192414 bytes)
 
 - [ ] `005a8cd0` 24 bytes (unknown)
 - [ ] `006e5af0` 30 bytes (unknown)
@@ -554,15 +558,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e20a0` 33 bytes (unknown)
 - [ ] `006e2230` 33 bytes (unknown)
 - [ ] `006e5bb0` 33 bytes (unknown)
-- [ ] `006e6000` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006e6030` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006e6490` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006e6de0` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006e6ee0` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006ed8d0` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006f03f0` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006f0590` 33 bytes (launcher (EN-only config dialog))
-- [ ] `006f0c90` 33 bytes (launcher (EN-only config dialog))
 - [ ] `00747c40` 33 bytes (unknown)
 - [ ] `007aabd0` 33 bytes (unknown)
 - [ ] `007aac00` 33 bytes (unknown)
@@ -584,7 +579,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e5ca0` 37 bytes (unknown)
 - [ ] `006e5d20` 37 bytes (unknown)
 - [ ] `00773bd0` 37 bytes (unknown)
-- [ ] `007a8ce0` 37 bytes (unknown)
 - [ ] `007ad310` 37 bytes (unknown)
 - [ ] `005cb860` 38 bytes (unknown)
 - [ ] `006e5960` 38 bytes (unknown)
@@ -594,64 +588,17 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007c1650` 38 bytes (unknown)
 - [ ] `007c17f0` 38 bytes (unknown)
 - [ ] `00699810` 39 bytes (unknown)
-- [ ] `006e6e10` 39 bytes (launcher (EN-only config dialog))
-- [ ] `006e6e40` 39 bytes (launcher (EN-only config dialog))
 - [ ] `00709d20` 39 bytes (unknown)
 - [ ] `00709d50` 39 bytes (unknown)
 - [ ] `007aac90` 39 bytes (unknown)
 - [ ] `006e59e0` 40 bytes (unknown)
 - [ ] `006e5cd0` 40 bytes (unknown)
-- [ ] `006ea7e0` 40 bytes (launcher (EN-only config dialog))
-- [ ] `006eaa30` 40 bytes (launcher (EN-only config dialog))
-- [ ] `006e81a0` 41 bytes (launcher (EN-only config dialog))
 - [ ] `006e05d0` 43 bytes (unknown)
-- [ ] `006e68b0` 45 bytes (launcher (EN-only config dialog))
 - [ ] `006e2170` 46 bytes (unknown)
 - [ ] `006e2260` 46 bytes (unknown)
 - [ ] `006e5b10` 46 bytes (unknown)
 - [ ] `006e5be0` 46 bytes (unknown)
-- [ ] `006e72e0` 57 bytes (launcher (EN-only config dialog))
-- [ ] `006ea6e0` 57 bytes (launcher (EN-only config dialog))
-- [ ] `006e6d30` 62 bytes (launcher (EN-only config dialog))
-- [ ] `006e6d70` 62 bytes (launcher (EN-only config dialog))
 - [ ] `006e5900` 81 bytes (unknown)
-- [ ] `006e7230` 121 bytes (launcher (EN-only config dialog))
-- [ ] `006e8fa0` 142 bytes (launcher (EN-only config dialog))
-- [ ] `0076b670` 153 bytes (unknown)
-- [ ] `007b0440` 153 bytes (unknown)
-- [ ] `0074f320` 154 bytes (unknown)
-- [ ] `007afe10` 155 bytes (unknown)
-- [ ] `00733400` 156 bytes (unknown)
-- [ ] `007355d0` 156 bytes (unknown)
-- [ ] `007483d0` 156 bytes (unknown)
-- [ ] `007722d0` 156 bytes (unknown)
-- [ ] `007c1750` 156 bytes (unknown)
-- [ ] `0070aec0` 165 bytes (unknown)
-- [ ] `0072ea40` 166 bytes (unknown)
-- [ ] `0073e270` 166 bytes (unknown)
-- [ ] `007afd60` 167 bytes (unknown)
-- [ ] `00753770` 168 bytes (unknown)
-- [ ] `0076eb70` 171 bytes (unknown)
-- [ ] `007534b0` 174 bytes (unknown)
-- [ ] `007bb580` 174 bytes (unknown)
-- [ ] `00748b20` 175 bytes (unknown)
-- [ ] `00772920` 175 bytes (unknown)
-- [ ] `00774250` 175 bytes (unknown)
-- [ ] `007b0040` 175 bytes (unknown)
-- [ ] `0076a7b0` 177 bytes (unknown)
-- [ ] `007774e0` 179 bytes (unknown)
-- [ ] `0071bfa0` 181 bytes (unknown)
-- [ ] `007aff80` 181 bytes (unknown)
-- [ ] `00777960` 184 bytes (unknown)
-- [ ] `007ad250` 184 bytes (unknown)
-- [ ] `0072caa0` 186 bytes (unknown)
-- [ ] `0070a640` 189 bytes (unknown)
-- [ ] `0079ffa0` 189 bytes (unknown)
-- [ ] `0072c0d0` 190 bytes (unknown)
-- [ ] `007776b0` 190 bytes (unknown)
-- [ ] `007a7ed0` 190 bytes (unknown)
-- [ ] `00779960` 191 bytes (unknown)
-- [ ] `00748bd0` 193 bytes (unknown)
 - [ ] `00779a20` 193 bytes (unknown)
 - [ ] `0072c290` 194 bytes (unknown)
 - [ ] `007797b0` 194 bytes (unknown)
@@ -679,7 +626,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00777880` 218 bytes (unknown)
 - [ ] `007420b0` 222 bytes (unknown)
 - [ ] `00778de0` 222 bytes (unknown)
-- [ ] `006f0140` 226 bytes (launcher (EN-only config dialog))
 - [ ] `0072c450` 226 bytes (unknown)
 - [ ] `00779ce0` 226 bytes (unknown)
 - [ ] `007a0060` 226 bytes (unknown)
@@ -699,7 +645,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0072c7b0` 242 bytes (unknown)
 - [ ] `00776dd0` 243 bytes (unknown)
 - [ ] `007be0c0` 243 bytes (unknown)
-- [ ] `006eca20` 244 bytes (launcher (EN-only config dialog))
 - [ ] `007ace50` 245 bytes (unknown)
 - [ ] `00777120` 249 bytes (unknown)
 - [ ] `0076ec20` 250 bytes (unknown)
@@ -732,7 +677,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0071dda0` 280 bytes (unknown)
 - [ ] `007a98d0` 280 bytes (unknown)
 - [ ] `007ad080` 281 bytes (unknown)
-- [ ] `006ec8f0` 282 bytes (launcher (EN-only config dialog))
 - [ ] `007b87c0` 282 bytes (unknown)
 - [ ] `007490c0` 285 bytes (unknown)
 - [ ] `0072e6b0` 286 bytes (unknown)
@@ -753,7 +697,6 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0072e030` 310 bytes (unknown)
 - [ ] `007499d0` 310 bytes (unknown)
 - [ ] `007b7c50` 311 bytes (unknown)
-- [ ] `006f0230` 314 bytes (launcher (EN-only config dialog))
 - [ ] `00773130` 314 bytes (unknown)
 - [ ] `007b8510` 314 bytes (unknown)
 - [ ] `00746680` 319 bytes (unknown)

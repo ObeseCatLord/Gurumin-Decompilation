@@ -376,8 +376,16 @@ const unsigned char OSE_CELL_EMPTY = 0;     // cell state: no piece
 const unsigned char OSE_CELL_BLACK = 1;     // cell state: black piece
 const unsigned char OSE_CELL_WHITE = 2;     // cell state: white piece
 
-extern unsigned int g_oseBoard[OSE_BOARD_WORDS];   // the board, 2 bits per cell, row major (EN 0x01614d60)
+extern int g_oseBoard[OSE_BOARD_WORDS];   // the board, 2 bits per cell, row major (EN 0x01614d60)
 extern int g_oseComputerTurnPending;               // non-zero while the computer owes a move (EN 0x01614d70)
+extern int g_oseChosenCell;                        // cell index the move search chose, -1 = no move (EN 0x01614d74)
+extern int g_oseChosenValue;                       // the search's value for the chosen move (EN 0x01615298)
+
+// Move search of the computer player (not yet reconstructed, EN 0x006ecb50): looks for the best move for `color`
+// (1 black, 2 white) on the unpacked board `cells`, recursing with `depth`; leaves its choice in g_oseChosenCell.
+void Ose_SearchMove(unsigned char *cells, int depth, int color, int opponentColor);
+// Plays the chosen move on the packed board (not yet reconstructed, EN 0x006ec360). Returns 0 when the move is illegal.
+int Ose_PlayMove(int *board, int cell, int value, int color);
 
 // Othello page (dialog template IDD_OSE_DIALOG): the player plays one colour against the computer. The timer
 // (every 10 ms) lets the computer move once the player has moved or passed.
@@ -395,8 +403,21 @@ protected:
     virtual BOOL OnInitDialog();                        // EN 0x006ec590
     afx_msg void OnReset();                             // EN 0x006ec4e0
     afx_msg void OnPass();                              // EN 0x006ec580
+    afx_msg void OnTimer(UINT_PTR nIDEvent);            // EN 0x006eca20 (10 ms game timer: the computer's move)
+    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);   // EN 0x006ec8f0 (setup phase: puts a white piece)
     DECLARE_MESSAGE_MAP()
 };
+
+// Application object of the launcher: a CWinApp whose only own code is InitInstance, which builds the page dialogs and
+// the main dialog (CCongigDlg), runs it and starts the game. The standard Help command is routed to CWinApp::OnHelp.
+class CLauncherApp : public CWinApp {
+public:
+    CLauncherApp();                      // EN 0x006e6460
+    virtual BOOL InitInstance();         // EN 0x006e7470 (not yet reconstructed)
+                                         // (implicit destructor EN 0x006e6480, scalar deleting form 0x006e6490)
+    DECLARE_MESSAGE_MAP()                // GetMessageMap EN 0x006e64f0
+};
+extern CLauncherApp theApp;              // the one application object (EN 0x016125d0)
 
 // ---- Main launcher dialog (RT_DIALOG 102) and its tab control -------------------------------------------------------
 const int IDD_LAUNCHER_DIALOG = 0x66;   // "Gurumin Ver.1.4 (STEAM)" main dialog template (CCongigDlg)
@@ -638,7 +659,17 @@ public:
     // default input setup offered by the warning box. EN 0x006ed900.
     bool IsStartRefused(CWnd *owner);
 
+    // Stores pad button `button` for action slot `action` (1-based) and clears the same button from any other slot;
+    // refreshes the lists when it cleared one or when `refresh` is set. EN 0x006f0140.
+    void AssignPadButton(int action, int button, bool refresh);
+    // Shows the stored button assignments in the fifteen lists (converting each stored button number to its list
+    // row), then runs UpdateData(saveAndValidate). EN 0x006f0230.
+    void ShowAssignments(BOOL saveAndValidate);
+    // Resets the state of the "Set" buttons after a button was captured (not yet reconstructed). EN 0x006effd0.
+    void ResetSetButtons();
+
 protected:
+    afx_msg void OnTimer(UINT_PTR nIDEvent);   // EN 0x006efb10 (50 ms pad polling timer: captures the pressed button)
     virtual void DoDataExchange(CDataExchange *pDX);   // EN 0x006eda40
     afx_msg HBRUSH OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor);   // EN 0x006e92c0
     afx_msg void OnPaint();                                               // EN 0x006efae0 (paints nothing)
@@ -650,6 +681,15 @@ protected:
 // Loads the launcher settings from bin\gurumin.def into the global configuration. `section` 0 loads everything,
 // 1 only the pad assignments, 2 only the keyboard assignments (EN 0x006e81d0, not yet reconstructed).
 void Launcher_LoadConfig(int section);
+
+// Pad button capture state of the gamepad page (the 50 ms timer in CPadDlg::OnTimer reads it).
+extern int g_padWaitingAction;      // 1-based action slot waiting for a button press, 0 = none (EN 0x016152a0)
+extern HWND g_padOwnerWindow;       // top-level window handed to the pad scan (EN 0x016152a4)
+extern int g_padCaptureStep;        // countdown that steps by 2 on every timer tick, restarts at 16 (EN 0x016152b4)
+extern unsigned char g_padFlash;    // repaint ticks still owed after a capture (EN 0x016152b8)
+// Scans the game controllers for a pressed button or stick direction and returns its code, 0 when none (large routine
+// in the game's input code, not yet reconstructed, EN 0x007ad690).
+extern "C" int Pad_FindPressedButton(HWND window, bool option);
 
 // The page dialogs the main dialog shows in its tab control; they are global objects of the launcher.
 extern CNetDlg g_netPage;       // network page (EN 0x01612750)

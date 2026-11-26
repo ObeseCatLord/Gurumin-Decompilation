@@ -22,4 +22,8 @@ extern "C" int Launcher_ListRowToSetting(int row);
 // EN 0x006efc30.
 extern "C" int Launcher_SaveSettings();
 
+// Dispatches up to 30 pending window messages. Returns 1 when the queue is drained (or the limit is hit) and 0 after
+// a WM_QUIT, which it also logs to a file. Called by the launcher while it waits. EN 0x006e8fa0.
+extern "C" int Launcher_PumpMessages(void);
+
 #endif

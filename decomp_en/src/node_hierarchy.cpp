@@ -115,3 +115,52 @@ Node *Node::FindParentOf(const Node *child)
     }
     return 0;
 }
+
+// Makes `newParent` this node's parent (0 = root) and records its name, then refreshes the child name table of this node
+// from its children and calls itself on each child with this node as their new parent. Returns 1. No direct caller
+// outside the recursion.
+int Node::SetParentRecursive(Node *newParent)
+{
+    if (newParent != 0)
+    {
+        parent = newParent;
+        strcpy(parentName, newParent->name);
+    }
+    else
+    {
+        parent = 0;
+        parentName[0] = 0;
+    }
+    for (int i = 0; i < childCount; i++)
+    {
+        strcpy(childNames[i], children[i]->name);
+        children[i]->SetParentRecursive(this);
+    }
+    return 1;
+}
+
+// Node::FindByFlagsBelow: the first node below this one (looking at each child, then at the nodes under it in turn)
+// whose flags contain every bit of `mask`; 0 when there is none. No direct caller.
+Node *Node::FindByFlagsBelow(unsigned int mask)
+{
+    for (int i = 0; i < childCount; i++)
+    {
+        Node *child = children[i];
+        if (child != 0)
+        {
+            int matchCount = 0;
+            if ((child->flags & mask) == mask)
+                return child;
+            for (int j = 0; j < child->childCount; j++)
+            {
+                if (child->children[j] != 0)
+                {
+                    Node *found = child->children[j]->FindByFlags(mask, 0, &matchCount);
+                    if (found != 0)
+                        return found;
+                }
+            }
+        }
+    }
+    return 0;
+}

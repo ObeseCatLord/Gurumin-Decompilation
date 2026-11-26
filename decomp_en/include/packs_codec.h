@@ -357,7 +357,7 @@ extern "C" void Packs_WriteBit(int bit, unsigned char *output);
 // clears it. EN 0x7bd070. Called by the compressor at EN 0x7bd240.
 extern "C" void Packs_LzWriteZeroFlag(void);
 // Returns the next bit of the packed stream, refilling 16 bits at a time. EN 0x7bd190. Called by Packs_DecodeBlock.
-extern "C" int Packs_ReadStreamBit(void);
+extern "C" unsigned short Packs_ReadStreamBit(void);
 // Starts the next flag bit of the compressor's flag word like Packs_LzWriteZeroFlag, but sets it. EN 0x7bd0c0. Called by the
 // compressor at EN 0x7bd240 and EN 0x7bcff0.
 extern "C" void Packs_LzWriteOneFlag(void);
@@ -365,7 +365,7 @@ extern "C" void Packs_LzWriteOneFlag(void);
 extern "C" void Packs_LzWriteLowBits(unsigned char value, int count);
 // Reads `count` bits of the packed stream with Packs_ReadStreamBit, first bit highest, and returns them as a number. EN
 // 0x7bd120. Called by Packs_DecodeBlock.
-extern "C" int Packs_ReadStreamBits(int count);
+extern "C" unsigned short Packs_ReadStreamBits(int count);
 
 // Start of the bytes the compressor is matching in (candidate positions are offsets into it). EN 0x0222b1bc.
 extern "C" unsigned char *g_packsLzBlockStart;

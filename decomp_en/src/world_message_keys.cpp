@@ -108,3 +108,22 @@ int WorldRenderer::InsertMessageLine(int position)
     messageCount++;
     return 1;
 }
+
+// WorldRenderer::EffectLevelKeyKind: looks through the lines of key `key` (as KeyHasRpkLine does) and returns
+// EFFECT_LEVEL_KEY_K when a line begins with "RFK" or "AFK", EFFECT_LEVEL_KEY_Q for "RFQ" or "AFQ" (the first line
+// that is either decides), and 0 when there is none. No direct caller.
+int WorldRenderer::EffectLevelKeyKind(int key)
+{
+    int start = FindMessageLine(key);
+    int end = FindMessageLine(key + 1);
+    if (end == KEY_NOT_FOUND)
+        end = messageCount;
+    for (int line = start; line < end; line++)
+    {
+        if (memcmp(messages[line], "RFK", MESSAGE_TAG_LENGTH) == 0 || memcmp(messages[line], "AFK", MESSAGE_TAG_LENGTH) == 0)
+            return EFFECT_LEVEL_KEY_K;
+        if (memcmp(messages[line], "RFQ", MESSAGE_TAG_LENGTH) == 0 || memcmp(messages[line], "AFQ", MESSAGE_TAG_LENGTH) == 0)
+            return EFFECT_LEVEL_KEY_Q;
+    }
+    return 0;
+}

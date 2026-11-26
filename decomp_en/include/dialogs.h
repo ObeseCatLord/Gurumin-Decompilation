@@ -59,11 +59,11 @@ extern "C" int g_overlayState[OVERLAY_STATE_INTS];           // EN 0x00a1d9e8 (J
 extern "C" int g_overlayFlag;                                // EN 0x00b91ea4 (JP DAT_104bfd78): cleared when the overlay closes
 extern "C" int g_overlayClosed;                              // EN 0x00a20c38 (JP DAT_104bf8d4): set to 1 when the overlay closes
 extern "C" Node *g_overlayModel;                             // EN 0x00920468 (JP DAT_104c03c8): the overlay's model
-extern "C" int g_overlayModelValueA;                         // EN 0x0092046c (JP DAT_104c03cc): cleared with the model
-extern "C" int g_overlayModelValueB;                         // EN 0x00920870 (JP DAT_104c03d0)
-extern "C" int g_overlayModelValueC;                         // EN 0x00920874 (JP DAT_104c03d4)
+extern "C" Node *g_overlayModelValueA;                         // EN 0x0092046c (JP DAT_104c03cc): cleared with the model
+extern "C" Node *g_overlayModelValueB;                         // EN 0x00920870 (JP DAT_104c03d0)
+extern "C" Node *g_overlayModelValueC;                         // EN 0x00920874 (JP DAT_104c03d4)
 extern "C" int g_overlayModelValueD;                         // EN 0x00920880 (JP DAT_104c03dc): cleared before the release
-extern "C" int g_overlayModelValueE;                         // EN 0x0092087c (JP DAT_104c03d8)
+extern "C" Node *g_overlayModelValueE;                         // EN 0x0092087c (JP DAT_104c03d8)
 extern "C" int g_overlayModelValueF;                         // EN 0x00920884 (JP DAT_104c03e0)
 extern "C" int g_overlayModelValueG;                         // EN 0x00920b18 (JP DAT_104c03e4)
 extern "C" int g_overlayPages[OVERLAY_TEXTURE_COUNT];        // EN 0x00920990 (JP DAT_1030c908): script flag of each page (0 = no page)

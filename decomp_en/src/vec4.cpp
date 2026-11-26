@@ -807,6 +807,26 @@ Matrix4 TranslationMatrix(float x, float y, float z)
     return translation;
 }
 
+// Width of the clip range an orthographic projection maps onto (-1 to 1), and the half used to centre the depth range.
+const float ORTHO_CLIP_SPAN = 2.0f;
+const float ORTHO_DEPTH_HALF = 0.5f;
+
+// OrthographicMatrix: orthographic projection of a view volume `width` x `height` wide and reaching from `nearPlane` to
+// `farPlane`, with depth mapped to 0..1. No direct caller.
+Matrix4 OrthographicMatrix(float width, float height, float nearPlane, float farPlane)
+{
+    Matrix4 projection;
+    projection.SetIdentity();
+    projection.m[MATRIX_TRANSLATION_X] = 0;
+    projection.m[MATRIX_TRANSLATION_Y] = 0;
+    projection.m[MATRIX_ELEMENT_COUNT - 1] = 1.0f;
+    projection.m[0] = ORTHO_CLIP_SPAN / width;
+    projection.m[5] = ORTHO_CLIP_SPAN / height;
+    projection.m[10] = 1.0f / (farPlane - nearPlane);
+    projection.m[MATRIX_TRANSLATION_Z] = ((nearPlane + farPlane) / (farPlane - nearPlane)) * ORTHO_DEPTH_HALF;
+    return projection;
+}
+
 // Transpose: the matrix with rows and columns swapped.
 Matrix4 Transpose(const Matrix4 &matrix)
 {
@@ -905,4 +925,18 @@ Vec4 Vec4::DividedByInt(const int &divisor)
     result.y = y / (float)divisor;
     result.z = z / (float)divisor;
     return result;
+}
+
+// Vec4::Normalize4: scales all four components (w included) so that the vector has length 1. A vector whose length is
+// not above zero is left as it is. No direct caller.
+void Vec4::Normalize4()
+{
+    float length = (float)sqrt(x * x + y * y + z * z + w * w);
+    if (0.0f < length)
+    {
+        x = x / length;
+        y = y / length;
+        z = z / length;
+        w = w / length;
+    }
 }

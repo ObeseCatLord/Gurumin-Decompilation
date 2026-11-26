@@ -67,4 +67,9 @@ extern "C" void jpeg_destroy_compress(jpeg_compress_struct *cinfo);             
 // or there are no pixels. EN 0x7be4f0. Called by nothing in the exe.
 extern "C" int Jpeg_SaveBgr(const char *path, const unsigned char *pixels, int width, int height, int quality, int progressive);
 
+// Writes the RGB image `pixels` (`width` x `height`, rows padded to four bytes, no channel swap) to the open file
+// `file` as a JPEG of `quality`, progressive when `progressive` is set. Returns 1, or 0 when `file` or `pixels` is 0.
+// EN 0x7be690. Called by Packs_SaveImageFile.
+extern "C" int Jpeg_WriteRgb(FILE *file, const unsigned char *pixels, int width, int height, int quality, int progressive);
+
 #endif

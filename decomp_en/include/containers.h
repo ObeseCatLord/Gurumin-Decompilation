@@ -40,8 +40,8 @@ struct Vertex
     float normal[4];                      // 0x10: normal x, y, z, 1
     float colour[4];                      // 0x20: colour red, green, blue, alpha (0..1)
     float uv[2];                          // 0x30: first texture coordinates u, v
-    int sourceMaterial;                   // 0x38: material the vertex was read with
-    int material;                         // 0x3c: material index
+    float sourceMaterial;                 // 0x38: material number the vertex was read with (a whole number held as a float)
+    float material;                       // 0x3c: material number as a float (Node::BuildMesh stores the whole number here)
     float emissive[4];                    // 0x40: emissive colour
     float m_0050[4];                      // 0x50: not recovered (cleared by Set)
     float m_0060;                         // 0x60: not recovered (1 after Set)

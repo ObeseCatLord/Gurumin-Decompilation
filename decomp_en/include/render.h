@@ -84,6 +84,9 @@ extern "C" int __stdcall Render_PresentToWindow(HWND window);
 // Composes the 2D overlay, ends the scene and presents the device back buffer into the client area of `window`. Returns 1.
 // EN 0x7a81a0 (render_present_window.cpp).
 extern "C" int __stdcall Render_PresentComposedToWindow(HWND window);
+// Ends the open scene and presents the device back buffer into the middle of the client area of `window` (the back buffer is
+// cropped when the window is smaller than it). Returns 1. EN 0x7a7ed0 (render_present_window.cpp, EN-only).
+extern "C" int __stdcall Render_PresentCentered(HWND window);
 // Unbinds texture stages 0-3. Returns 0. EN 0x7a57c0 (render_present_window.cpp).
 extern "C" int Render_UnbindAllTextures(void);
 extern "C" int g_swapTargetInUse;                                 // EN 0x021e8d4c (JP DAT_10f65490): swap target in use (0 or 1)

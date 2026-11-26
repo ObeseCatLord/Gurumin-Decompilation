@@ -87,3 +87,29 @@ int Node::TagRegionsInTree(const Box2 *boxes, const VisCell *cells)
         children[i]->TagRegionsInTree(boxes, cells);
     return 1;
 }
+
+// Node::StoreLinks: stores in the saved-state block of every chasing node of the subtree up to SAVED_CHASE_LINK_MAX
+// nodes of `list` (of its `*count` entries) that share the node's group, and counts them. Returns 1. Called by Rebuild
+// and by itself on the children.
+int Node::StoreLinks(Node **list, int *count)
+{
+    if ((flags & NODE_FLAG_CHASING) != 0 && saved != 0)
+    {
+        int linked = 0;
+        for (int i = 0; i < *count; i++)
+        {
+            if (i >= SAVED_CHASE_LINK_MAX)
+                break;
+            Node *other = list[i];
+            if (group == other->group)
+            {
+                saved->chaseLinks[linked] = other;
+                linked++;
+            }
+        }
+        saved->chaseLinkCount = linked;
+    }
+    for (int i = 0; i < childCount; i++)
+        children[i]->StoreLinks(list, count);
+    return 1;
+}

@@ -47,6 +47,7 @@ struct Vec4
     Vec4 operator*(const Vec4 &other) const;         // EN 0x76f680: component-wise
     Vec4 operator*(const float &scale) const;        // EN 0x76f630: x/y/z times `scale`, w = 0
     Vec4 Normalized3();                              // EN 0x777320 (JP 0x101af080): x/y/z scaled to length 1 in place and returned (w = 0); a zero vector stays and zero is returned
+    void Normalize4();                               // EN 0x777960 (EN-only, vec4.cpp): all four components scaled to length 1 in place; a vector of length 0 stays
     Vec4 Divided(const float &divisor);              // EN 0x76f7c0 (JP 0x101acb60)
     int Equals3(const Vec4 &other);                  // EN 0x76f1f0 (EN-only, vec4_equal.cpp): 1 when x, y and z are all equal to those of `other` (w ignored)
     Vec4 DividedByInt(const int &divisor);           // EN 0x76f770 (EN-only, vec4.cpp): x/y/z divided by the integer converted to float, w = 0
@@ -126,6 +127,8 @@ Matrix4 PerspectiveMatrix(float nearPlane, float farPlane, float fov, float aspe
 Vec4 Vec3_Normalized(Vec4 *v);
 // Translation matrix (EN 0x777220, JP 0x101b1360).
 Matrix4 TranslationMatrix(float x, float y, float z);
+// Orthographic projection of a view volume `width` x `height` wide from `nearPlane` to `farPlane` (EN 0x7774e0, EN-only).
+Matrix4 OrthographicMatrix(float width, float height, float nearPlane, float farPlane);
 
 // Matrix that turns the z axis into `direction` (a yaw about z, then a pitch about x; the w of `direction` is ignored)
 // (EN 0x77a760, JP 0x101b1f30).

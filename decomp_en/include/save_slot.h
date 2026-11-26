@@ -23,4 +23,10 @@ extern "C" int Save_ReadPreview(const char *name, unsigned char *pixels);
 // does nothing when it already is. Returns 0. EN 0x62e3c0 (see save_preview.cpp; no direct caller).
 extern "C" int SavePreview_Show(int slot);
 
+// Reads the summary of save file `name` that the load menu shows (from the Steam cloud, else the SaveData folder): *map
+// gets the map number, *playTime the play time, `playerName` the player's name ("Popon" in costume 6) and, when `mode`
+// is not 0, *mode the chapter (3 and 5 for the two extra modes, 4 once the map is 1000). Returns 1, or 0 when the file
+// is missing or does not descramble. C++ linkage (the GameFile local has an unwind table). EN 0x63e9f0 (JP 0x10010d10).
+int Save_ReadSlotInfo(const char *name, int *map, int *playTime, char *playerName, int *mode);
+
 #endif

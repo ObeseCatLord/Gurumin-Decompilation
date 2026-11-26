@@ -259,7 +259,6 @@ address	status	reason
 005f4b40	open	ListBank::FindVariable (listbank_find_variable.cpp): 183 bytes differ; first loop keeps count in esi and this in ebx (ours swapped), and the inline ReportError blocks of the array branch are laid out differently (dimension check jump polarity).
 006eb860	open	CKbDlg::IsStartRefused: all but the "unassigned list" flag matches (vectorised id array, loop, MessageBox call). The original keeps the bool result in a stack byte [ebp-1] for the normal exit and in bl for the declined path, and loads the stack frame 4 bytes larger; ours constant-folds the flag (xor al,al / mov al,1). Three spellings tried (result local set before the box and returned on both exits, constants on both exits, early return).
 006ed900	open	CPadDlg::IsStartRefused: same residue as CKbDlg::IsStartRefused 0x006eb860 (flag kept in [ebp-1] and bl, frame 0x34 vs ours 0x30); identical source shape, same three spellings tried.
-006ec4e0	open	COseDlg::OnReset: the board pack loop. The original unrolls the 16-cell inner loop by four with the shift held as esi = 4,12,20,28 (cmp esi,0x24) and keeps the running cell index in edi; ours does not unroll (word/cell and word/shift spellings tried, pointer and index forms). Probably a hand-unrolled body in the source; not written that way.
 006ea830	open	CCongigDlg::ShowPage: 9 diffs, only the load order of the final MoveWindow arguments (original loads top, bottom, left; ours bottom, top, left). The two RECT initialisations now match after declaring them at point of use; three spellings of the MoveWindow call (fields, &rect overload, locals x/y) compile to the same bytes.
 006ea9b0	library	CWnd::SendMessage(UINT, WPARAM, LPARAM) const, afxwin2.inl header inline (batch 17; byte-identical when emitted, rows in obj_symbols.tsv)
 006e6f50	library	CMenu::AppendMenu(UINT, UINT_PTR, LPCTSTR), afxwin1.inl header inline (batch 17)
@@ -282,8 +281,30 @@ address	status	reason
 006e6730	library	ATL::CStringT<char, StrTraitMFC>::~CStringT, header inline (batch 17)
 006e6770	library	CBrush implicit destructor (stores vtable, tail-jumps to CGdiObject::~CGdiObject) (batch 17)
 006e6760	library	CBitmap implicit destructor (stores vtable, tail-jumps to CGdiObject::~CGdiObject) (batch 17)
-006e64f0	open	GetMessageMap of the launcher application class (CWinApp-derived, owner of InitInstance 0x6e7470): the class is not reconstructed yet (batch 17)
 006e7010	open	6-byte-body thunk (push ebp; mov ebp,esp; pop ebp; jmp CDialog::Create(LPCTSTR,CWnd*) 0x40129c) in the vtable at 0x84f170 next to 0x6e9410: virtual override of an unreconstructed launcher dialog class; class not identified (batch 17)
+006e7020	library	CDC::CreateCompatibleDC(CDC*), afxwin1.inl header inline (batch 18; byte-identical in a forced copy)
+006e7060	library	CBrush::CreatePatternBrush(CBitmap*), afxwin1.inl header inline (batch 18)
+006e81a0	library	CBitmap::LoadBitmap(UINT), afxwin1.inl header inline (batch 18)
+006e7230	library	ATL::CStringT<char,StrTraitMFC>::FormatV, cstringt.h header inline (batch 18)
+006e67d0	library	CGdiObject::~CGdiObject (try/catch DeleteObject), afxwin1.inl header inline (batch 18)
+006e6d30	library	ATL::CSimpleStringT<char>::operator=(PCXSTR), atlsimpstr.h header inline (batch 18)
+006e6d70	library	ATL::CStringT<char,StrTraitMFC>::operator=(PCXSTR), cstringt.h header inline (batch 18)
+006ea7e0	library	ATL::CSimpleStringT<char>::ReleaseBufferSetLength, atlsimpstr.h header inline (batch 18)
+006eaa30	library	ATL::CSimpleStringT<char>::SetLength, atlsimpstr.h header inline (batch 18)
+006ea6e0	library	ATL::CSimpleStringT<char>::GetBuffer(int), atlsimpstr.h header inline (batch 18)
+006e72e0	library	ATL::CSimpleStringT<char>::PrepareWrite(int), atlsimpstr.h header inline (batch 18)
+006e6ee0	library	CGdiObject scalar deleting destructor (emitted where CBitmap/CBrush are constructed inline), header inline (batch 18)
+006e6e10	library	CBitmap scalar deleting destructor, header inline (batch 18)
+006e6e40	library	CBrush scalar deleting destructor, header inline (batch 18)
+006e6000	library	CButton scalar deleting destructor, header inline (batch 18; rows in obj_symbols.tsv match in launcher_title.obj)
+006e6030	library	CComboBox scalar deleting destructor, header inline (batch 18)
+006ed8d0	library	CSliderCtrl scalar deleting destructor, header inline (batch 18)
+006f03f0	library	CTabCtrl scalar deleting destructor, header inline (batch 18)
+006f0590	library	CProgressCtrl scalar deleting destructor, header inline (batch 18)
+006f0c90	library	CEdit scalar deleting destructor, header inline (batch 18)
+006f0140	open	CPadDlg::AssignPadButton (src/launcher_pad.cpp): ours inlines CPadDlg::ShowAssignments (505 vs 140 bytes); the original keeps it out of line (it has about 40 more callers in the unreconstructed "Set" button handlers 0x6edf80-0x6ef760, which are not written yet). Reordering the definitions does not change that.
+006f0230	open	CPadDlg::ShowAssignments (src/launcher_pad.cpp): 60 diffs, all in the row conversion: the original compares 0x14 then 0x18 separately and uses add esi,-2 / add esi,-0x10, ours folds the last test into lea/cmp 3/ja and uses sub. Nested ifs, += -2 and -= 2 spellings tried.
+006efb10	open	CPadDlg::OnTimer (src/launcher_pad.cpp): 2 bytes off, the final countdown step is sub eax,2 in the original and add eax,-2 in ours (local, direct, ternary and += spellings tried).
 00725f40	open	EffectManager::Draw: 932 bytes against 925; this is spilled at entry (frame 0x34 against 0x30) and the loop bookkeeping of the sprite loops and the record-list checks differs (batch 17)
 0075bb30	open	Node::ComputeBounds: vertex-loop register allocation and min/max chain order differ (batch 17)
 0074fcf0	open	Node::BuildCollisionSpheres: min/max sphere maths and loop bookkeeping differ (batch 17)
@@ -299,8 +320,35 @@ address	status	reason
 007a8e30	blocked	destructor-like release of a class with fields at +0x14,+0x3c,+0x450,+0x454 and SEH frame: owning class unknown (batch 17)
 007ab140	blocked	input-history/name-buffer step on globals 0x2226950..0x2228080: owning layout unknown (batch 17)
 00739000	blocked	method of a large game object (+0x298,+0x2a3,+0x22ec,+0x2494) with first call fread(0,1,1,0): owner layout unknown (batch 17)
+00733400	open	WorldRenderer::GetMessageField (world_message_fields.cpp): same size (159), register allocation differs: the original keeps the field counter in edi and the inlined strlen pointer in esi (ours swaps them); declaration order and a local line pointer tried (batch 18)
+00774250	open	unknown inlined helper: heading of the matrix's y axis (atan2 of m[4]/w, m[5]/w with w = m[7] + m[15]); the transform is open-coded with x*0 terms and no translation, sibling of Matrix4::Heading (EN 0x774300); no Matrix4 member or free function reproduces it (batch 18)
+007bb580	open	Packs_EncodeFlush (packs_encode_flush.cpp): same size (174), 25 bytes differ: the original schedules the byte/position/mask stores of the bit-writer tail differently (stores after the pending-count load) and keeps `1 - bit` in edi; five spellings of the inline bit writer tried (batch 18)
+007534b0	open	Node::FindByFlagsBelow (node_hierarchy.cpp): bytes off (182 vs 172): the original shares one `if (found != 0) return found` tail for both exits and keeps the child pointer and loop count in different registers; three spellings tried (batch 18)
+0073e270	open	WorldRenderer::ShiftKeyIdsClamped (world_message_edit.cpp): bytes off (180 vs 166): the original re-reads the id from memory after the compare (no CSE) and keeps the key's first line in the parameter slot [ebp+8], addressing the id table as (first + 0x27d38) * 2; five spellings tried (batch 18)
+007483d0	open	Bitmap_FlipRows24 (bitmap_flip.cpp): bytes off (176 vs 156): the original keeps the inner loop index-based (eax += 3, rows as base+2/base+1 pointers) where cl rewrites it as a counted pointer loop; five spellings tried (batch 18)
+007b0040	open	TextWindow::AddChoice (text_window_items.cpp): bytes off (165 vs 175): the original keeps `this` in a spilled local and reads choices[item] before choiceCount[item]; register allocation of item/value differs (batch 18)
 007af920	blocked	constructor-like reset of a ~0x1400-byte object (fields 0..0x4eb, memset at +0x49d*4): owning class unknown (batch 17)
 006d5a80	open	draft differs (batch 16/17); see the comment in its source file (npc_greet_near, npc_watch_player, listbank_assign or matrix_blend)
 006b37c0	open	draft differs (batch 16/17); see the comment in its source file (npc_greet_near, npc_watch_player, listbank_assign or matrix_blend)
 00646750	open	draft differs (batch 16/17); see the comment in its source file (npc_greet_near, npc_watch_player, listbank_assign or matrix_blend)
 00771830	open	draft differs (batch 16/17); see the comment in its source file (npc_greet_near, npc_watch_player, listbank_assign or matrix_blend)
+007bdee0	open	Packs_SaveImageFile: 197 diffs only in scheduling: the original subtracts (end - start of the JPEG stream) before loading ecx for the Seek call, ours after (after 5 spellings of the length expression); everything else matches (batch 18)
+007bd990	open	Packs_DecodeBlock: 268 diffs, all in the run-fill branch: the original defers the stack cleanup of Packs_ReadStreamBits(4) past the join and reads inputBytes inside each branch, ours cleans up inside the first branch and reads inputBytes after; rest (inlined bit reader, calls, length decode, copy loop) matches (batch 18)
+005c2c40	open	TutorialBook_Close (src/tutorial_book.cpp): the original expands the .iti/.bmp loader inline at the plain-page sites (book 0 or flag -1) with two strlen loops sharing one tail and calls Texture_Load for flagged pages; the inline helper is not inlined by plain inline here and with __forceinline the sites merge into one strlen loop (801 vs 934 bytes); structure otherwise equals the JP twin (batch 18)
+00602730	open	MapCursor_Step (src/map_cursor.cpp): 1018 bytes against 967; the original keeps the rider result and the held flag in stack slots with the index in ebx and the slot offset in a register, ours keeps them in registers (landed in ebx, index in edi) so every later compare/branch differs; tried pointer vs direct hold access and reference vs direct slot access (batch 18)
+007774e0	open	OrthographicMatrix: original inlines Matrix4() but keeps only the 8 stores SetIdentity does not overlap (stores to 0,10,12,14,15 elided across the SetIdentity call) and orders the divisions differently; ours zeroes all 13 elements and schedules the near/far arithmetic differently (152 byte diffs)
+0079ffa0	open	TextureObject::ReadBackRgb (src/texture_read_back.cpp): 188 bytes against 187, all instructions equal but the loop swaps eax and ecx (original keeps the output pointer in eax and the channel temporaries in ecx; ours the reverse)
+007ad250	blocked	IME candidate list drawn with Windows-font text through 0x7906d0 (11 args, four unrecovered ints), no signature yet; same blocker as 007b7d90
+007776b0	open	perspective-style matrix (tan call plus memset-of-0x40 inline, EN-only variant of PerspectiveMatrix 0x777540 area); sibling PerspectiveMatrix in vec4.cpp is itself not matched
+007a7ed0	open	Render_PresentCentered (src/render_present_window.cpp): 187 bytes against 160-ish, same arithmetic but ours keeps the back buffer height/width in registers (edi/ebx) where the original reloads both globals after each rect store and uses different temporaries; the cause of the reloads (what the compiler thinks the stores alias) is not found
+0076a7b0	blocked	resets 18 globals (0x217fb00 area, 0x908a24/28/2c, 0x218be64/68) of an unrecovered subsystem; owner and meaning of every global unknown, called only from 0x5a2dd0
+0072caa0	open	rotates a 2D vector by an angle taken from the difference of two global float pairs (0x1ee4900/04, 0x217b5b0/b4) through the x87/SSE trig wrappers 0x7e3c6a/0x7e5370/0x7e68b0; the globals and the trig call forms (cvtps2pd round trips) are not recovered
+0070a640	blocked	appends a rectangle record (0x200-byte entries at 0x1664fe8, count at 0x1664fe4 which camera.h names g_cameraState1664fe4) of an unrecovered 2D rectangle list; owner struct unknown
+00779960	blocked	method of an unrecovered owner (five 0x40-byte name strings at 0x00-0x100 plus fields 0x140-0x17c); no constructor or caller found to name the class
+0074f580	open	BuildMesh triangle copy loop: the original keeps the fill count in ebx and spills pack*0x74 to [ebp-8]; ours swaps those roles (146 byte diffs); swapping the declaration order of fill/pack moves the whole stack frame instead
+0067fcc0	open	Enemy_PlayVoice: the original keeps the reset block and the cooldown check as separate code (push edi after the reset, check re-reads kind: cmp ecx,ecx) and falls to the voice at one place; ours threads each reset branch straight into its check (1275 vs 1054 bytes); the switch tables and the Character_PlaySound inline match
+007b8af0	open	Packs_EncodeImage: the original computes the eight level sizes fully unrolled with spilled temporaries (frame 0x18c, level scale doubled in place); our loop compiles to a 0x188 frame and different spills (1073 vs 1068 bytes, 794 byte diffs); the rest of the body (planes, decompose loops, calls) lines up
+0078d8a0	open	TextureObject::FillRect: only SSE register numbering differs (129 byte diffs, size 1113 matches): the original holds the two screen scale factors in xmm5/xmm6 and the texture coordinate ratios in xmm3/xmm4; ours swaps them
+0063bc80	open	DigitCounter_Update: the original splits the shown count with idiv by a register-held 10 (count % 10 and count / 10 fused, then a second idiv) where our build uses the magic-number multiply (754 byte diffs, all after the first split of the count); the next count and count / 100 match. Chain, fused and literal spellings tried.
+0063e9f0	open	Save_ReadSlotInfo: source ported and structurally equal (1127 vs 1123 bytes, cloud/old-format/descramble paths line up) but the frame is 8 bytes smaller (0x4d0 vs 0x4d8): the original keeps the buffer, map and chapter in separate stack slots with the buffer reloaded from [ebp-0x1c] and the body base held in ebx (fields addressed from body+0x30000), ours packs map and buffer into one slot and addresses fields from esi; the Popon flag also compiles to cmove in the original and sete in ours.
+0076d770	open	Node::BindLinks: everything matches (1122 vs 1123 bytes, 230 byte diffs from relocations and one layout difference) except the block order of the flag tests at the end: the original lays the 0x400000 branch inline and puts the 0x1000 / 0x4000 branches after the return (they jump back to the child loop); ours puts the nested else-branches in front of the loop. Flat else-if chain, nested form and an inlined AllocSaved helper tried.

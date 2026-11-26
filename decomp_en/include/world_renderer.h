@@ -22,6 +22,13 @@ typedef int (*WorldCallback)(int code, int value);
 
 // Keys below this number have their lowest line id cached (WorldRenderer::lowestIdCache).
 const int MESSAGE_ID_CACHE_SIZE = 1000;
+// Value of an id cache entry that has not been worked out yet.
+const int MESSAGE_ID_CACHE_EMPTY = -9999;
+// FindMessageLine result for a key that has no lines.
+const int MESSAGE_LINE_NOT_FOUND = -1;
+// EffectLevelKeyKind results: the key has an effect-level key line of the "K" form (RFK/AFK) or the "Q" form (RFQ/AFQ).
+const int EFFECT_LEVEL_KEY_K = 1;
+const int EFFECT_LEVEL_KEY_Q = 2;
 
 // What a picture shows (WorldRenderer::pictureKind).
 enum PictureKind
@@ -61,8 +68,8 @@ struct WorldRenderer
     int fadeOnTop;                                   // 0x978: 1 = the fade is drawn below the cinema bars
     int effectLevel;                                 // 0x97c: 0..3, selected by GGQ (which level key bank applies)
     int lowestIdCache[MESSAGE_ID_CACHE_SIZE];       // 0x980: LowestMessageId of each key below the table size (-9999 = not worked out yet)
-    int m_01920[1000];
-    int m_028c0[1000];
+    int lineTagIdCache[MESSAGE_ID_CACHE_SIZE];      // 0x1920: cache of EN 0x72e6b0's per-key id result for keys below the table size (-9999 = not worked out yet)
+    int highestIdCache[MESSAGE_ID_CACHE_SIZE];      // 0x28c0: HighestMessageId of each key below the table size (-9999 = not worked out yet)
     int m_03860;
     int eventsMuted;                                 // 0x3864: non-zero = script events are not sent to the host
     int frameLimit;                                  // 0x3868: number of frames of the scene (LEG), 900 by default
@@ -232,7 +239,10 @@ struct WorldRenderer
     int FindKeyCommandAWithPosition(int key);   // EN 0x72e340 (EN-only, world_message_scan.cpp): the first line of key `key` for which ScanLineCommandA finds both a result and a position (-1 when none)
     int KeyHasRlkLine(int key);                 // EN 0x735470 (EN-only, world_message_scan.cpp): 1 when a line of key `key` starts with "RLK"
     int KeyHasRopLine(int key);                 // EN 0x735700 (EN-only, world_message_scan.cpp): 1 when a line of key `key` starts with "ROP"
-    int KeyHasRpkLine(int key);                 // EN 0x7354e0 (EN-only, world_message_keys.cpp): 1 when a line of key `key` starts with "RPK" or "RP2"
+    int ShiftKeyIdsClamped(int key, int shift);   // EN 0x73e270 (EN-only, world_message_edit.cpp): forgets the cached ids of key `key` and adds `shift` to the ids of its lines, less when that would take an id below 0
+    long GetKeyZimNumber(int key);              // EN 0x72ea40 (EN-only, world_message_edit.cpp): the number in the second field of the first "ZIM" line of key `key` that is not -1, -1 when there is none
+    int EffectLevelKeyKind(int key);           // EN 0x7355d0 (EN-only, world_message_keys.cpp): EFFECT_LEVEL_KEY_K when a line of key `key` starts with "RFK"/"AFK", EFFECT_LEVEL_KEY_Q for "RFQ"/"AFQ", else 0
+    int KeyHasRpkLine(int key);                // EN 0x7354e0 (EN-only, world_message_keys.cpp): 1 when a line of key `key` starts with "RPK" or "RP2"
     int ApplyKeyOffsetsA(int key, int firstId, float x, float y, float z);   // EN 0x747010 (not ported yet): edits the movement commands of key `key` (three floats)
     int ApplyKeyOffsetsB(int key, int firstId, float a, float b, float c, float d);   // EN 0x7472b0 (not ported yet): the same with the four-value form
     int OffsetKeysFromA(int firstId, float x, float y, float z);   // EN 0x73f770 (EN-only, world_message_keys.cpp): ApplyKeyOffsetsA on every key whose highest id is at least `firstId`
@@ -249,6 +259,7 @@ struct WorldRenderer
     int SetKeyedMessage(int key, int offset, int id, const char *text);   // EN 0x745a50 (EN-only, world_message_edit.cpp): stores id and text of line `offset` of key `key`
     int DeleteMessageKeysWithIds(int lowest, int highest);   // EN 0x71cc00 (EN-only, world_message_edit.cpp): deletes every key whose lowest id lies in lowest..highest
     int GetMessageIdOfKey(int key);          // EN 0x72ea20: id of the line FindMessageLine(key) finds
+    int CopyKeyLinesTo(WorldRenderer *target, int key);   // EN 0x71bfa0 (EN-only, world_message_copy.cpp): replaces target's message lines with the lines of key `key` (up to the next key); returns 0
     int RunScriptFrames(int silent);        // EN 0x70c120 (JP 0x1017cc90) (world_script.cpp): runs the scene script up to the current frame and animates the world
     int AdvanceFrame();
     int Release();

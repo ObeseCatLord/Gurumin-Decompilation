@@ -15,7 +15,7 @@ Format (APP.dll Texture_LoadIti 0x10174ce0):
   type 889    : u32 n, JPEG colour, u32 n2, JPEG alpha, then raw RGB and raw alpha
   type 666/667: u32 n, data packed with packs.dll BMPUnpack (667: + alpha block)
 """
-import glob, io, os, struct, subprocess, sys, tempfile
+import glob, io, os, shutil, struct, subprocess, sys, tempfile
 from collections import Counter
 from PIL import Image
 
@@ -33,13 +33,23 @@ def find_packs(path, explicit=None):
     return None
 
 
+def helper_command():
+    """iti_unpack.exe is a Windows program (it loads the game's 32-bit packs.dll); elsewhere it runs under Wine."""
+    if os.name == "nt":
+        return [HELPER]
+    wine = shutil.which("wine")
+    if not wine:
+        raise ValueError("type 666/667 needs native/iti_unpack.exe, a Windows program: install Wine to run it here")
+    return [wine, HELPER]
+
+
 def decode_packed(path, packs):
     if not packs or not os.path.exists(HELPER):
         raise ValueError("type 666/667 needs packs.dll (--packs) and native/iti_unpack.exe")
     fd, tmp = tempfile.mkstemp(suffix=".raw")
     os.close(fd)
     try:
-        subprocess.run([HELPER, packs, path, tmp], check=True, capture_output=True)
+        subprocess.run(helper_command() + [packs, path, tmp], check=True, capture_output=True)
         raw = open(tmp, "rb").read()
     finally:
         os.remove(tmp)

@@ -51,3 +51,57 @@ void *detour(DWORD va, int length, void *hook)
     FlushInstructionCache(GetCurrentProcess(), target, length);
     return trampoline;
 }
+
+void patch_code(void *address, const void *bytes, size_t size)
+{
+    DWORD old;
+    VirtualProtect(address, size, PAGE_EXECUTE_READWRITE, &old);
+    memcpy(address, bytes, size);
+    VirtualProtect(address, size, old, &old);
+    FlushInstructionCache(GetCurrentProcess(), address, size);
+}
+
+// Finds the `call rel32` instructions (E8) in the function at `function` (`size` bytes) whose target is `callee`;
+// stores up to `max` of their addresses (as APP.dll addresses) in `sites` and returns how many there are. An E8
+// counts only when its relative target lands exactly on `callee`, so a stray E8 byte inside another instruction is
+// not taken for a call unless it also happens to point there.
+int find_calls(DWORD function, DWORD size, DWORD callee, DWORD *sites, int max)
+{
+    BYTE *start = app_address(function);
+    BYTE *target = app_address(callee);
+    int found = 0;
+    for (BYTE *p = start; p + 5 <= start + size; p++)
+    {
+        if (*p != 0xe8 || p + 5 + *(INT32 *)(p + 1) != target)
+            continue;
+        if (found < max)
+            sites[found] = function + (DWORD)(p - start);
+        found++;
+        p += 4;
+    }
+    return found;
+}
+
+// Points the calls at `sites` (from find_calls) at `hook`. The original target stays reachable at its own address.
+void redirect_calls(const DWORD *sites, int count, void *hook)
+{
+    for (int i = 0; i < count; i++)
+    {
+        BYTE *call = app_address(sites[i]);
+        INT32 relative = (INT32)((BYTE *)hook - (call + 5));
+        patch_code(call + 1, &relative, 4);
+    }
+}
+
+// Replaces entry `index` of a COM vtable with `hook`; returns the original, or NULL when it is already hooked.
+void *vtable_hook(void **vtable, int index, void *hook)
+{
+    void *original = vtable[index];
+    if (original == hook)
+        return NULL;
+    DWORD old;
+    VirtualProtect(&vtable[index], sizeof(void *), PAGE_READWRITE, &old);
+    vtable[index] = hook;
+    VirtualProtect(&vtable[index], sizeof(void *), old, &old);
+    return original;
+}

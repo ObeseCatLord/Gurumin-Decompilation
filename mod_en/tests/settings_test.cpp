@@ -1,0 +1,220 @@
+#include "../src/settings.hpp"
+#include <cassert>
+#include <limits>
+using namespace gurumin;
+int main() {
+  auto modes = resolutionChoices({3440, 1440}, {3440, 1440});
+  assert(modes.size() == 15);
+  for (Resolution r : {Resolution{2560, 1080},
+                       {3440, 1440},
+                       {3840, 1600},
+                       {3840, 2160},
+                       {5120, 1440}})
+    assert(std::count(modes.begin(), modes.end(), r) == 1);
+  assert(resolutionChoices({3000, 2000}, {3000, 2000}).size() == 16);
+  assert(!validResolution({999999, 1440}) && !validResolution({3440, 0}));
+  assert(validFrameCap(-1) && validFrameCap(0) && validFrameCap(175));
+  assert(!validFrameCap(1) && !validFrameCap(-2) && !validFrameCap(1001));
+  FramePacer pacer;
+  double time = 1;
+  for (int i = 0; i < 1750; ++i) {
+    time = pacer.next(time, 175);
+    assert(std::abs(time - (1. + (i + 1) / 175.)) < 1e-10);
+  }
+  assert(std::abs(pacer.next(time + 10., 60) - (time + 10. + 1. / 60.)) <
+         1e-10);
+  assert(pacer.next(100., 0) == 100. && pacer.deadline == 0);
+  assert(pacer.next(100., -1) == 100.);
+  pacer.reset();
+  time = pacer.next(1., 175);
+  time += .010; // Rendering slower than the target period.
+  assert(pacer.next(time, 175) == time);
+  time += .010;
+  assert(pacer.next(time, 175) == time);
+  assert(std::abs(pacer.next(time + .001, 175) - (time + 1. / 175.)) < 1e-10);
+  float anchorEye[4]={10,0,5,7}, anchorTarget[4]={0,0,0,8};
+  float nativeAnchor[4]; std::copy(anchorEye,anchorEye+4,nativeAnchor);
+  assert(orbitFromAnchor(anchorEye,anchorTarget,0,0));
+  assert(std::equal(anchorEye,anchorEye+4,nativeAnchor));
+  float nativeRadius=std::hypot(10.f,5.f);
+  assert(orbitFromAnchor(anchorEye,anchorTarget,float(acos(-1.)/2),.2f));
+  assert(std::abs(anchorEye[0])<1e-5 && anchorEye[1]>0 && anchorEye[2]>5);
+  assert(std::abs(std::hypot(std::hypot(anchorEye[0],anchorEye[1]),anchorEye[2])-nativeRadius)<1e-5);
+  assert(anchorEye[3]==7 && anchorTarget[3]==8);
+  float limitedEye[4]={10,0,5,1}, limitedPitch=3;
+  assert(orbitFromAnchor(limitedEye,anchorTarget,0,3,&limitedPitch));
+  assert(std::abs(std::atan2(limitedEye[2],std::hypot(limitedEye[0],limitedEye[1]))-1.3962634f)<1e-5);
+  assert(limitedPitch<3);
+  float invalidEye[4]={0,0,0,1};
+  assert(!orbitFromAnchor(invalidEye,anchorTarget,1,.1f));
+  ModernSettings direction; direction.invertY=false;
+  assert(loweringOrbit({0,1},direction) && !loweringOrbit({0,-1},direction));
+  assert(!loweringOrbit({1,0},direction)); direction.invertY=true;
+  assert(loweringOrbit({0,-1},direction) && !loweringOrbit({0,1},direction));
+  assert(radialStick(100, -100, 8689).x == 0);
+  assert(radialStick(32767, 0, 8689).x == 1);
+  assert(radialStick(-32768, 0, 8689).x == -1);
+  auto diagonal = radialStick(32767, 32767, 8689);
+  assert(std::abs(std::hypot(diagonal.x, diagonal.y) - 1.f) < 1e-6);
+  assert(radialStick(0, 32767, 8689).y == 1);
+  float eye[4] = {11, 2, 30, 1}, target[4] = {1, 2, 3, 1};
+  assert(orbitYaw(eye, target, float(acos(-1.) / 2)));
+  assert(std::abs(eye[0] - 1) < 1e-5 && std::abs(eye[1] - 12) < 1e-5);
+  assert(eye[2] == 30 && eye[3] == 1 && target[0] == 1);
+  assert(!orbitYaw(eye, target, std::numeric_limits<float>::quiet_NaN()));
+  assert(cameraInterior(2,"mp_020",7));
+  assert(cameraInterior(3,"MP_030.IT3",11));
+  assert(cameraInterior(4,"mp_040",7));
+  assert(cameraInterior(5,"mp_050",7));
+  assert(!cameraInterior(2,"mp_030",7));
+  assert(!cameraInterior(12,"mp_0C0",7));
+  assert(!cameraInterior(102,"mp_102",7));
+  assert(!cameraInterior(2,"mp_020x",8));
+  assert(!cameraInterior(2,"mp_020",6));
+  assert(!cameraInterior(2,nullptr,0));
+  assert(cameraTown(12,"mp_0C0",7));
+  assert(cameraTown(12,"MP_0c0.IT3",11));
+  assert(!cameraTown(2,"mp_020",7));
+  assert(!cameraTown(102,"mp_102",7));
+  assert(!cameraTown(12,"mp_0C0b",8));
+  assert(!cameraTown(12,"mp_0C0",6));
+  assert(!cameraTown(12,nullptr,0));
+  assert(!cameraTown(13,"mp_0C0",7));
+  ModernSettings settings;
+  assert(!settings.freeCamera && settings.cameraOutOfTownOnly && settings.invertX);
+  // Ground movement follows the displayed view, with unchanged stick length.
+  for(float yaw:{0.f,.3f,1.570796327f,3.141592654f,-1.570796327f}) {
+    float eye[]={0,-100,40,1}, target[]={0,0,0,1};
+    assert(orbitFromAnchor(eye,target,yaw,0));
+    for(Stick input:{Stick{0,1},Stick{1,0},Stick{.6f,.8f},Stick{0,0}}) {
+      float x=99,y=99;
+      assert(cameraRelativeMovement(eye,target,input.x,input.y,x,y));
+      assert(std::abs(std::hypot(x,y)-std::hypot(input.x,input.y))<1e-5f);
+      assert(std::abs(x-(input.x*std::cos(yaw)-input.y*std::sin(yaw)))<1e-5f);
+      assert(std::abs(y-(input.x*std::sin(yaw)+input.y*std::cos(yaw)))<1e-5f);
+    }
+  }
+  float highEye[]={0,-1,10000,1}, origin[]={0,0,0,1}, moveX=9,moveY=8;
+  assert(cameraRelativeMovement(highEye,origin,.6f,.8f,moveX,moveY));
+  assert(moveX==.6f && moveY==.8f); // High pitch never slows horizontal input.
+  assert(!cameraRelativeMovement(origin,origin,1,0,moveX,moveY));
+  assert(moveX==.6f && moveY==.8f);
+  assert(!cameraRelativeMovement(highEye,origin,NAN,0,moveX,moveY));
+  settings.invertX=false; // Baseline rotation math is independent of defaults.
+  OrbitControls orbit;
+  assert(orbit.advance(10, {1, 1}, settings) == 0);
+  float yaw = orbit.advance(11, {1, 1}, settings), pitch = orbit.pitch;
+  for (int i = 0; i < 20; ++i) {
+    assert(orbit.advance(11, {1, 1}, settings) == 0);
+    assert(orbit.pitch == pitch);
+  }
+  assert(std::abs(yaw - float(acos(-1.) / 45.)) < 1e-6); // 120 deg/s at 30 Hz.
+  assert(pitch < 0);
+  assert(std::abs(orbit.advance(13, {1, 0}, settings) - 2 * yaw) < 1e-6);
+  assert(orbit.advance(10000, {1, 1}, settings) == 0);
+  orbit.suspend(false);
+  assert(orbit.advance(10001, {1, 1}, settings) == 0 && orbit.pitch == pitch);
+  orbit.suspend(true);
+  assert(orbit.pitch == 0);
+  settings.invertY = true;
+  orbit.advance(1, {0, 1}, settings);
+  orbit.advance(2, {0, 1}, settings);
+  assert(orbit.pitch > 0);
+  for (unsigned tick = 3; tick < 1000; ++tick)
+    orbit.advance(tick, {0, 1}, settings);
+  assert(orbit.pitch == 2.8f);
+  // Identical stick input rotates by the same total at every presentation rate.
+  for (int fps : {30, 60, 75, 120, 175, 360}) {
+    OrbitControls run;
+    float totalYaw = 0;
+    for (int frame = 0; frame <= fps * 3; ++frame) {
+      unsigned tick = unsigned(std::floor(frame * 30. / fps + 1e-9));
+      totalYaw += run.advance(tick, {1, 0}, settings);
+    }
+    assert(std::abs(totalYaw - float(2 * acos(-1.))) < 1e-4);
+  }
+  // Wider geometric range, consistent collision probes and immediate reversal.
+  float user = -3.f;
+  float angle = cameraPitchAngle(1050, -650, .1f, user, true);
+  float base = std::atan2(650.f,1050.f);
+  assert(std::abs(base + angle + 1.3962634f) < 1e-5);
+  assert(std::abs(cameraPitchAngle(1050,-650,.07f,user,false) + base) <= 1.396264f);
+  float limitUser = user;
+  user += .05f;
+  assert(cameraPitchAngle(1050,-650,.1f,user,true) > angle && user > limitUser);
+  // The final eye contracts towards an unchanged target; no minimum distance
+  // forces it through the floor. Homogeneous coordinates remain untouched.
+  float cameraEye[4]={100,0,-100,1}, cameraTarget[4]={0,0,100,1};
+  float floorHit[4]={50,0,0,1};
+  assert(contractCamera(cameraEye,cameraTarget,floorHit,30));
+  assert(cameraEye[2] > 0 && cameraEye[0] < 50 && cameraEye[3] == 1);
+  assert(cameraTarget[2] == 100);
+  float behind[4]={-10,0,120,1};
+  assert(!contractCamera(cameraEye,cameraTarget,behind,30));
+  settings.invertX = true;
+  OrbitControls inverted;
+  inverted.advance(1, {1, 0}, settings);
+  assert(std::abs(inverted.advance(2, {1, 0}, settings) + yaw) < 1e-6);
+  for (uintptr_t caller :
+       {0x314164u, 0x3141e7u, 0x3145bbu, 0x3149d1u, 0x314b80u})
+    assert(cameraPitchCall(caller));
+  assert(!cameraPitchCall(0x1a22fdu) && !cameraPitchCall(0x314163u));
+  for(int edge : {256,512,1024,2048}) assert(validShadowResolution(edge));
+  assert(!validShadowResolution(0) && !validShadowResolution(777));
+  assert(validAntiAliasing(0) && validAntiAliasing(2) && !validAntiAliasing(3));
+  ModernSettings defaults;
+  assert(!defaults.vrEnabled && defaults.vrScale == 0);
+  assert(validVrScale(0) && validVrScale(1) && !validVrScale(2));
+  assert(commandLineRequestsVr("game.exe -vr"));
+  assert(commandLineRequestsVr("\"C:\\Games\\Gurumin A\\game.exe\" -VR -foo"));
+  assert(commandLineRequestsVr("game.exe\t--vr"));
+  assert(!commandLineRequestsVr("\"C:\\x -vr\\game.exe\" -foo"));
+  assert(!commandLineRequestsVr("game.exe -vrx"));
+  assert(!commandLineRequestsVr(nullptr) && !commandLineRequestsVr(""));
+  // -novr / -flat play flat for one launch; -vr does not count as flat.
+  assert(commandLineRequestsFlat("game.exe -novr") && commandLineRequestsFlat("game.exe /SKIP -Flat"));
+  assert(!commandLineRequestsFlat("game.exe -vr") && !commandLineRequestsFlat("game.exe -flatter"));
+  assert(!commandLineRequestsFlat("\"C:\\x -novr\\game.exe\"") && !commandLineRequestsFlat(nullptr));
+  // VR default: explicit choice wins; absent, only a Steam Frame defaults on.
+  assert(vrEnabledByDefault(-1, true) && !vrEnabledByDefault(-1, false));
+  assert(!vrEnabledByDefault(0, true) && vrEnabledByDefault(1, false));
+  // Camera distance: defaults, bounds and eye scaling along target->eye.
+  assert(defaults.cameraDistance == 100 && !defaults.cameraStickZoom &&
+         defaults.cameraWheelZoom == 1 && defaults.cameraZoomInKey == 0x21 &&
+         defaults.cameraZoomOutKey == 0x22);
+  assert(clampCameraDistance(10) == MinCameraDistance &&
+         clampCameraDistance(999) == MaxCameraDistance && clampCameraDistance(150) == 150);
+  float zEye[4] = {10, 0, 5, 1}, zTarget[4] = {0, 0, 1, 1};
+  assert(zoomCamera(zEye, zTarget, 2));
+  assert(zEye[0] == 20 && zEye[1] == 0 && zEye[2] == 9 && zEye[3] == 1);
+  assert(!zoomCamera(zEye, zTarget, 0) && !zoomCamera(zEye, zTarget, NAN));
+  float badEye[4] = {NAN, 0, 0, 1};
+  assert(!zoomCamera(badEye, zTarget, 1.5f) && std::isnan(badEye[0]));
+  CameraZoom zoomer;
+  zoomer.reset(40);
+  assert(zoomer.current == MinCameraDistance && zoomer.target == MinCameraDistance);
+  zoomer.reset(100);
+  zoomer.step(-10.f * 3); // three wheel notches closer
+  assert(zoomer.target == 70.f && zoomer.current == 100.f);
+  bool easing = zoomer.ease(1);
+  assert(easing && zoomer.current < 100.f && zoomer.current > 70.f);
+  for (int i = 0; i < 60 && zoomer.ease(1); ++i) {}
+  assert(zoomer.current == 70.f && !zoomer.ease(1));
+  zoomer.step(1000);
+  assert(zoomer.target == MaxCameraDistance);
+  zoomer.step(NAN);
+  assert(zoomer.target == MaxCameraDistance);
+  assert(std::abs(CameraZoom{}.scale() - 1.f) < 1e-6f);
+  // Wheel: auto mode leaves the game's own wheel rotation alone unless Ctrl.
+  assert(!wheelZooms(0, false, true));
+  assert(wheelZooms(1, false, false) && !wheelZooms(1, true, false) && wheelZooms(1, true, true));
+  assert(wheelZooms(2, true, false));
+  // Stick zoom: up/down no longer tilts the camera, left/right still orbits.
+  ModernSettings stickZoom;
+  stickZoom.cameraStickZoom = true;
+  OrbitControls level;
+  level.advance(1, {1, 1}, stickZoom);
+  float levelYaw = level.advance(2, {1, 1}, stickZoom);
+  assert(level.pitch == 0 && levelYaw != 0);
+  assert(!loweringOrbit({0, 1}, stickZoom) && !loweringOrbit({0, -1}, stickZoom));
+}

@@ -10,6 +10,10 @@ along; the notes record what is already known so the work can start from there.
   fields in `decomp/include/`).
 - Keep `decomp/open.tsv` (functions that still differ, with the reason) and `decomp/QUEUE.md` (the work queue) current.
 - Progress is published on every push: `progress/jp/report.json` (ByteMatch) and `progress/jp/progress.svg` (README).
+- Native port scaffold: `port/` (see `port/README.md`) compiles matched decomp files that are also portable,
+  unchanged, into a static library for Linux x64 and arm64 (`.github/workflows/port.yml`), with native tests and
+  a small SDL2 shell. Not playable; a file joins when it is matched and portable (no 32-bit pointer layouts, game
+  globals, Win32 or Direct3D).
 
 ## Future goals
 

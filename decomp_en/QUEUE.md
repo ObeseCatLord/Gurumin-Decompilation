@@ -5,9 +5,10 @@ Re-run after each batch (finished items drop out). Per function: `python tools/p
 the JP twin's matched source, the EN callees with their JP names and the EN disassembly (`--brief` makes a
 subagent brief). Low-confidence map rows: check the twin before porting.
 
-## 1. Walls to retry (108)
+## 1. Walls to retry (125)
 
 - [ ] `005a1200` — CharRecord::operator= (implicit, 556 bytes): header ready (CharRecord fields 0x44..0xec made individual, ParamVector position); a throwaway copy function matched, but the standalone copy is only emitted in a TU with a real caller (Game_Reset 5a2dd0, Map_PlaceCharacters 637160, Game_LoadData 5f2cd0), so it has no honest source yet
+- [ ] `005a23e7` — starts mid-function (shared tail entered by jumps from the preceding function): not a function of its own, not ported
 - [ ] `005a5500` — Bgm_Play: 31 diffs, frame 0x15c vs 0x154; the original keeps the header check word in the dead parameter slot [ebp+8] (index lives only in esi after the first test) while ours gives index/track its own local; five spellings tried (param modified in place, separate track local, declaration orders)
 - [ ] `005a8320` — Lava_Update: not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
 - [ ] `005b4760` — Drops_Update: 565 vs 585 bytes; the original hoists the 0.02 drift constant into xmm1 for the whole loop (reloaded after the quad block clobbers it) and keeps screen.z in xmm5/xmm6 differently; ours loads constants per use; named constants, literals and a drop pointer local tried
@@ -21,12 +22,15 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `005cdf70` — Item_DrawCaption: not attempted; the EN version is a rewrite of the JP one (caption x re-centred from the text width, the draw scale chosen from a display-mode setting through eight constant branches, scroll text with a per-width limit) and needs six unnamed globals (0x908b0c, 0x908b20, 0xb493f3, 0xb79940, ability list builders)
 - [ ] `005ce240` — Debris_Draw: not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
 - [ ] `005d5190` — Characters_Draw (character_draw.cpp, C++ linkage for Matrix4): not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
+- [ ] `005d9640` — Message_DrawPanel: logic and prologue match (early return on g_messageOpen); the compiler tail-merges the last DrawOutlined call of the two-line arm of the flag-clear branch into the flag-set branch (jmp into push esi/call/pop esi), the original keeps a separate epilogue per arm (explicit returns, else/no-else tried)
 - [ ] `005e05b0` — Game::DrawDebugText (src/game_debug_text.cpp): constant hoisting differs from the original.
+- [ ] `005e2f00` — map label wrong: the function is Game::IsQueuedEventReady in src/game_script.cpp (not mine, currently DIFF)
 - [ ] `005e7b30` — Steam_CloudFileExists: 4 bytes; original calls the interface slot as mov eax,[edx+N]; call eax, ours call [edx+N]
 - [ ] `005ec1e0` — Steam_GetEnteredText: 6 bytes; same slot-call form
 - [ ] `005ec290` — ListBank::FirstIndexValue: EN inlines the argument reader (ReadArgument loop) into the function; not attempted past reading the disassembly
 - [ ] `005ec6d0` — ListBank::ReadToken: stack-slot assignment (original puts inQuotes in the parameter slot); 313 diffs
 - [ ] `005ecf70` — Char_RunScriptStep (src/char_script.cpp): 944 bytes, identical except the SHOW step: the original pushes the constant 1 and then stores the started-voice character (g_scriptVoiceStarted) before pushing the event; ours stores first
+- [ ] `005f4060` — Ground_BuildHeights: logic equal to the JP twin; the outer/inner loop counters and the cell pointer get swapped registers (eax/ecx) and the original has loop-entry jumps with alignment padding, the copy loop is laid out differently (declaration order, header increments, for-init forms tried)
 - [ ] `00607020` — ListBank::LoadText: only register numbering differs (ours c in dl and inQuotes in ecx, original c in cl and inQuotes in edx) and the second `cmp cl,0x22` is kept in the original; int/bool/declaration order tried (four spellings)
 - [ ] `00631480` — Map_FindRegionAt: only the xmm4/xmm5 choice for the margin constant vs point->x differs; tried comparison order, local order, for loop with continue, min/max macros
 - [ ] `00635010` — Regions_CollideRay: 715 diffs; EN reloads the box z values after storing depthLow in the min/max select
@@ -44,7 +48,9 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0064b210` — Shaga_Create: not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
 - [ ] `0064bb90` — Shaga_PushOut: only the esi/edi roles differ (original keeps index in esi, steps in edi); tried steps declaration spot, do-while vs for vs ++steps
 - [ ] `0064bd10` — Camera_ItemStand: 889 bytes, same length; store scheduling in the sparkle-matrix block (shot-point ints interleaved with matrix stores, z re-read); ~6 spellings
+- [ ] `00699dc0` — Npc_StandOnGround: 8 bytes off; the original reserves the 0x10 stack bytes for the SetTranslation argument and loads ecx before the ground x/y stores; two-call and merged single-call forms tried
 - [ ] `006ac8d0` — Watcher_Update (src/hover_watcher.cpp): 758 bytes vs 758, same instructions; only the 3.1415 constant differs in handling (ours loads it into xmm3 before the first use and keeps it for the loops, the original uses a memory operand at the first use and loads xmm4 later, so the register numbers of the rest shift)
+- [ ] `006adbd0` — Npc_RideMarker: all but 9 bytes match; in the no-marker reset the original emits xorps before the state store (xorps; mov state,0; mov wait,0), ours stores state first (store order state/wait swapped and the words-loop form tried)
 - [ ] `006af410` — Npc_Held: not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
 - [ ] `006b4220` — Npc_FaceAndTalk: matches except edi/esi swapped (original keeps index in edi and index<<6 in esi; ours the reverse), length 1007 vs 998
 - [ ] `006bc630` — Npc_SleepUntilWoken (src/npc_sleep.cpp): 885 vs 854 bytes (885 = ours); same calls, registers differ (ours takes ebx for the model offset and edi for the CharState offset), and the awake flag block order differs (original lays the true block first and keeps awake in ecx; ours with an else puts the false block first, with an initialiser spills awake to the stack)
@@ -65,9 +71,12 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `00739250` — WorldRenderer::SetModelState: the original reloads this->models after every limit store (ours keeps it in ecx); NodeSaved::limitMin/Max are floats, tried literal and named limits
 - [ ] `0073ede0` — EffectDefs_Allocate: 49 diffs, same length; all stores match but the scheduler places the first list-head vector store and the last recent-effect vector store differently around the m_0164 store (EN: recents, m_0164, list heads); loops and explicit stores, store order of the byte and struct fields all tried
 - [ ] `00740c40` — AnimModel::Unload: only the placement of mov ecx,esi vs the m_2418 store after the Matrix4 temp destructor differs; tried int/void ResetState, float field, store order, named temp matrix
+- [ ] `007413f0` — AnimModel::ResetState: not attempted; needs about 80 named AnimModel fields, which would restructure the shared header
 - [ ] `00741c50` — Camera_Reset (src/camera_reset.cpp): 927 bytes, same stores and calls in the same order; only scheduling differs (the original hoists xorps xmm0 and the store of 1 to g_cameraCounter9089ec above the next Fill call setup; ours emits them later). All stores are to globals declared in camera.h and not yet understood
+- [ ] `00747b50` — EffectManager::RemoveOwnedBy: 2 bytes short; the original loads record.id into eax before comparing with -1 (a compare against memory in ours); local id, swapped tests, record pointer and continue forms tried
 - [ ] `00748740` — Camera_LiftOverGround (src/camera_lift.cpp): 790 bytes, every instruction identical except where the 120.0f clamp constant is loaded into xmm6 (ours right after the CastRay call inside the loop, the original just before its use after the loop); tried separate constants for the hit lift and the clamp and a ternary in the loop
 - [ ] `0074a050` — Node::MoveToParent: 6 bytes off; operand order of the inline strcpy at the two insertion sites and the edi load order
+- [ ] `0074e640` — Node::Clone: only the inline strcpy loops differ, [ecx+edx-1] in the original vs [edx+ecx-1] (base/index operand order of the shared this-source offset; the plug copy loop shows the same swap), plus the epilogue order of mov eax,1
 - [ ] `00750450` — Node::RemoveChild: 1 diff, the inlined strcpy loop addresses [ecx + ebx - 1] in the original, [ebx + ecx - 1] in ours
 - [ ] `00752190` — Node::DrawShadow: 1453 vs 1456, casterSize register choice (movaps xmm0,xmm1 copy)
 - [ ] `00754e20` — Node::CylindersOverlap: 8 diffs, dx/dy temporaries live in swapped xmm2/xmm3 registers
@@ -75,6 +84,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0076a290` — Node::Init (src/node_init.cpp): same 790 bytes, same store set; only the schedule differs (original stores brightness/colourA right after the first Fill call and pushes the second Fill argument after the fogFar store; ours hoists the push and lea). Tried moving brightness/colourA, tint.Fill order, a shared const float local
 - [ ] `0076f810` — KeyTrack::Insert: shift loop matches with a local values pointer, but the original keeps the frame argument in ebx and count in edx (lea ebx,[edx-1]); tried member-wise, Vec4 copy, local count, while loop
 - [ ] `007703f0` — KeyBank::Sample (int frame): not attempted past reading; four Spline calls are inlined with the t factor shared and spilled, float schedule too fragile (JP Spline itself is unmatched)
+- [ ] `00771b60` — KeyInterpolator::Spline: 199 vs 203 bytes; the original keeps t2*3 and c-b shared and all eight xmm registers busy, ours spills t2 to a new local; single expression, shared locals and Ghidra order tried
 - [ ] `00774300` — Matrix4::Heading (src/matrix_heading.cpp): the original does not inline Project; ours does.
 - [ ] `00775320` — View_ContainsPoint: 6 bytes off, one subss placement in the behind-camera branch
 - [ ] `00777410` — Vec3_Normalized: 8 bytes off, xmm0/xmm2 numbering of x and y only
@@ -86,9 +96,13 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `0078ae20` — EN rewrite of JP DrawTinted (extra mode argument, widescreen globals); port from the EN bytes, not JP
 - [ ] `0078bc00` — EN rewrite of JP SwapTarget_DrawPreview (back-buffer RECT, device vtable +0x88); port from the EN bytes
 - [ ] `0078ce10` — TextureObject::DrawThroughShader: 1187 vs 1279; original recomputes u - 1/512 for every store
+- [ ] `007906d0` — FontRenderer_DrawTextClipped: not attempted; EN adds a Windows-font GDI path (flag 0x21e4814) that has no JP twin code
+- [ ] `00790e70` — TextureObject 3-texture screen quad (mislabelled DrawBlurred): not attempted; binds this and two argument textures to stages 0-2, 4 vertices of 0x38 bytes, cached sampler states, pixel shader at 0x21e47a8
+- [ ] `00791e30` — TextureObject::DrawFrameAlt: not attempted (time)
 - [ ] `00792370` — Render_DrawGradientQuad (stdcall, 8 args): 110 bytes off, only the scheduling of the x/y scale multiplies and stores; six orderings of the y/x statements and local-vs-chain spellings tried
 - [ ] `007955c0` — DrawFrame: EN differs from JP (stage alpha before colour, second pass, stage-1 tail); JP draft 2550 vs 2138 bytes
 - [ ] `007a2790` — FontRenderer::DrawStringToBuffer: 1559 vs 1224; original tail-merges the digit/punctuation branches, y kept in edx
+- [ ] `007a3980` — FontRenderer::GlyphWidth: 172 vs 163 bytes; the original loads the argument as a dword (no zero extension) and swaps the two code bytes in place from a register copy; param types short/unsigned short/int/unsigned int and raw copy types tried
 - [ ] `007a3be0` — FontSet::Release: scheduling (fonts[0] loaded before the DeleteObject pointer; ends with lea eax,[edi+1])
 - [ ] `007a4160` — Render_RestoreTarget (src/render_restore.cpp): the original keeps a dead memset of the viewport; ours drops it.
 - [ ] `007a4ef0` — Render_SetSamplerState: 104 vs 111; original has two cache stores and two rets, GetSamplerState writes into the parameter slot
@@ -97,7 +111,10 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007a8ec0` — MmvPlayer::DrawToTexture: 85 bytes off; the original keeps `this` in ebx and re-reads `frame` for the call, ours holds frame in ebx; ternary/if forms for the palette and the clamp tried (four spellings)
 - [ ] `007a9db0` — CreateShortcut: 14 diffs, the original splits the path into the parameter's own stack slot (drive buffer at [ebp+8]) so its frame is 4 bytes smaller; ours has a local drive buffer
 - [ ] `007aa3a0` — Obj::Update: not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
+- [ ] `007ad1a0` — ImeCandidates_Draw: right size, 11 bytes off; y and the line pointer swap registers (original keeps y in esi and the line pointer in edi); declaration order, indexed line and update order tried
 - [ ] `007ad3b0` — ImeCandidates_WidestWidth: 54 bytes off; VS2013 rotates the loop (test before the loop) in every spelling, the original tests at the top; five spellings tried (for, while, for(;;)+break, min four ways)
+- [ ] `007b95a0` — Packs_PackPlanes: 342 vs 339 bytes; register allocation differs (original keeps output in edi and the written count in edx, ours reloads output each pass); spellings tried: row index, row pointers, carry locals vs in-place shifts, unsigned short fields, loop counter forms
+- [ ] `007ba070` — Packs_PlanesToComponents: 8 bytes smaller than the original (301 vs 308-314); the original keeps one pointer into the middle plane and loop-invariant offsets to the other two with the clamps as cmov; about ten spellings tried (index forms, row pointers, short/int locals, helper clamp)
 - [ ] `007bed30` — OggReader::Decode: same code except the original hoists the gain into xmm2 and stores it back to the member in every channel pass (a store of the value just read); no honest spelling found
 - [ ] `007bf170` — MmioFile::Open: 183 bytes off; stack slot order of the path buffers and the tail layout differ
 - [ ] `007bf740` — OggReader::ReadHeaders: same calls and order; register allocation differs (original keeps this in esi, page in edi, stream in ebx and recomputes the member addresses in the loop; ours hoists the addresses into frame slots)
@@ -116,22 +133,9 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007c5a60` — SoundArc_PlayFile: EN keeps the queue index in a byte and recomputes slot*0x1c0 for the tick store; every spelling keeps one pointer
 - [ ] `007c5f80` — SoundEngine_SetOptions: store of the tens digit scheduled after the second division
 
-## 2. JP twin matched: port the JP source (66 functions, 164026 bytes)
+## 2. JP twin matched: port the JP source (53 functions, 148119 bytes)
 
 - [ ] `007a5ca0` 146 bytes <- APP.dll `1013e6f0` Names_Set [decomp/src/names_od.cpp] (high 0.61)
-- [ ] `005e2f00` 427 bytes <- APP.dll `10054a60` Game::RaiseGameOverEvents [decomp/src/app_0003.cpp] (medium 0.57)
-- [ ] `006aa070` 1177 bytes <- APP.dll `1001a990` Char_AttachWeapon [decomp/src/weapon_attach.cpp] (high 0.76)
-- [ ] `0064b6d0` 1204 bytes <- APP.dll `10042140` Shaga_BreakOff [decomp/src/shaga_spawn.cpp] (high 0.71)
-- [ ] `0074e180` 1212 bytes <- APP.dll `1019b890` Node::CopyAnimation [decomp/src/scene_node.cpp] (high 0.80)
-- [ ] `005d9640` 1216 bytes <- APP.dll `1000eed0` Message_DrawPanel [decomp/src/message_panel.cpp] (high 0.95)
-- [ ] `007906d0` 1232 bytes <- APP.dll `1014fdd0` FontRenderer_DrawTextClipped [decomp/src/font_metrics.cpp] (high 0.75)
-- [ ] `006d6a10` 1244 bytes <- APP.dll `10046f10` Enemy_AppearNearby [decomp/src/enemy_blink.cpp] (high 0.91)
-- [ ] `00790e70` 1307 bytes <- APP.dll `101446f0` TextureObject_DrawBlurred [decomp/src/texture_bind.cpp] (high 0.69)
-- [ ] `007413f0` 1342 bytes <- APP.dll `10161f80` AnimModel::ResetState [decomp/src/anim_reset.cpp] (high 0.86)
-- [ ] `00791e30` 1342 bytes <- APP.dll `1014e940` TextureObject::DrawFrameAlt [decomp/src/texture_bind.cpp] (medium 0.47)
-- [ ] `0074e640` 1376 bytes <- APP.dll `101a53b0` Node::Clone [decomp/src/scene_node.cpp] (high 0.86)
-- [ ] `005f4060` 1402 bytes <- APP.dll `100169c0` Ground_BuildHeights [decomp/src/ground_height.cpp] (high 0.88)
-- [ ] `006adbd0` 1426 bytes <- APP.dll `10043fc0` Npc_RideMarker [decomp/src/marker_rider.cpp] (high 0.88)
 - [ ] `007369a0` 1463 bytes <- APP.dll `10166950` WorldRenderer::LoadCharacter [decomp/src/world_ctor.cpp] (high 0.91)
 - [ ] `006975e0` 1474 bytes <- APP.dll `100a77f0` Enemy_CallBarrage [decomp/src/enemy_barrage.cpp] (high 0.79)
 - [ ] `005bef20` 1525 bytes <- APP.dll `10027da0` Enemy_KeepDistanceFromPlayer [decomp/src/enemy_flee.cpp] (high 0.97)
@@ -185,7 +189,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007ab210` 7222 bytes <- APP.dll `1015d520` Text_ToFullWidth [decomp/src/text_fullwidth.cpp] (high 0.65)
 - [ ] `005d3360` 7715 bytes <- APP.dll `10038c10` Scene_DrawFrame [decomp/src/scene_draw.cpp] (high 0.85)
 
-## 3. JP twin not matched yet (361 functions, 1454063 bytes)
+## 3. JP twin not matched yet (343 functions, 1449821 bytes)
 
 - [ ] `006eab60` 10 bytes <- sound3d.dll `1004be9d`  (medium 0.35)
 - [ ] `007af3b0` 23 bytes <- sound3d.dll `100595ec`  (low 0.19)
@@ -203,37 +207,19 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `007bd1e0` 89 bytes <- Packs.dll `10006e30`  (high 0.73)
 - [ ] `006eb540` 102 bytes <- sound3d.dll `10019267` _AtlGetStringResourceImage (high 0.85)
 - [ ] `0077bb90` 113 bytes <- sound3d.dll `10008790`  (high 0.60)
-- [ ] `007bb500` 124 bytes <- Packs.dll `10001950`  (medium 0.44)
-- [ ] `007bcf70` 126 bytes <- Packs.dll `100070e0` ExecUnpack (high 0.65)
 - [ ] `0077bcb0` 148 bytes <- sound3d.dll `10008610`  (high 0.73)
-- [ ] `007a8860` 151 bytes <- SoundArc.dll `00401280`  (medium 0.56)
 - [ ] `006eaaa0` 159 bytes <- sound3d.dll `10020bf0` _memset (medium 0.52)
 - [ ] `007aefd0` 159 bytes <- sound3d.dll `100522e0` ATL::operator+ (medium 0.54)
 - [ ] `006ea450` 160 bytes <- sound3d.dll `10053e99`  (medium 0.45)
-- [ ] `007a3980` 163 bytes <- APP.dll `10145380` Font_GlyphWidth (high 0.66)
-- [ ] `005a67f0` 171 bytes <- APP.dll `100157b0` Char_UpdateNearCells (high 0.80)
-- [ ] `007ad1a0` 172 bytes <- APP.dll `1015fb20` ImeCandidates_Draw (high 0.73)
 - [ ] `006ed3b0` 183 bytes <- sound3d.dll `10053f0d` CDialog (low 0.24)
 - [ ] `006e8d10` 189 bytes <- Packs.dll `1002fab1` _wctomb (low 0.32)
-- [ ] `00771b60` 203 bytes <- APP.dll `101ad920` Spline (high 0.60)
 - [ ] `007aa020` 206 bytes <- sound3d.dll `100537f8`  (medium 0.43)
-- [ ] `007bd790` 212 bytes <- Packs.dll `10006950`  (high 0.77)
 - [ ] `006efb10` 218 bytes <- sound3d.dll `1004ebdc`  (medium 0.49)
-- [ ] `005a23e7` 221 bytes <- APP.dll `10017c55`  (high 0.90)
-- [ ] `00747b50` 237 bytes <- APP.dll `101883b0` EffectManager::RemoveOwnedBy (high 0.61)
 - [ ] `0072c190` 243 bytes <- sound3d.dll `10002d60`  (high 0.69)
 - [ ] `007c3d30` 252 bytes <- sound3d.dll `10006700`  (high 0.85)
-- [ ] `0071c8d0` 257 bytes <- APP.dll `101614c0`  (high 0.72)
-- [ ] `007aa130` 282 bytes <- SoundArc.dll `00402640`  (medium 0.44)
-- [ ] `007bd870` 288 bytes <- Packs.dll `100066d0`  (high 0.78)
-- [ ] `007ba070` 301 bytes <- Packs.dll `10003490`  (high 0.86)
-- [ ] `00749790` 304 bytes <- APP.dll `10199880`  (high 0.73)
 - [ ] `007ae0a0` 316 bytes <- sound3d.dll `1005fdf1` QueryInterface (medium 0.37)
 - [ ] `007bfd30` 335 bytes <- sound3d.dll `1001faa0` __alldiv (medium 0.35)
-- [ ] `007b95a0` 339 bytes <- Packs.dll `10002bc0`  (high 0.87)
 - [ ] `006ec790` 341 bytes <- sound3d.dll `10054ce1`  (medium 0.49)
-- [ ] `00699dc0` 343 bytes <- APP.dll `10011dd0` Npc_StandOnGround (high 0.64)
-- [ ] `00602e10` 348 bytes <- APP.dll `1000b9f0`  (high 0.87)
 - [ ] `00719750` 348 bytes <- APP.dll `10188580` EffectManager::Update (high 0.65)
 - [ ] `006e5750` 355 bytes <- APP.dll `1002a340` Char_RunScript (high 0.91)
 - [ ] `006effd0` 359 bytes <- Packs.dll `10028559`  (low 0.19)
@@ -549,7 +535,7 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006883a0` 51470 bytes <- APP.dll `100d24a0` Bs006_Update (medium 0.60)
 - [ ] `0060cb10` 113582 bytes <- APP.dll `1011d810`  (high 0.72)
 
-## 4. EN-only (no JP twin found) (798 functions, 241792 bytes)
+## 4. EN-only (no JP twin found) (763 functions, 239993 bytes)
 
 - [ ] `006e6210` 6 bytes (launcher (EN-only config dialog))
 - [ ] `006e6220` 6 bytes (launcher (EN-only config dialog))
@@ -742,13 +728,8 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006ea7e0` 40 bytes (launcher (EN-only config dialog))
 - [ ] `006eaa30` 40 bytes (launcher (EN-only config dialog))
 - [ ] `006e81a0` 41 bytes (launcher (EN-only config dialog))
-- [ ] `0063d5a0` 43 bytes (unknown)
 - [ ] `006e05d0` 43 bytes (unknown)
-- [ ] `007a8830` 43 bytes (unknown)
-- [ ] `0071bf70` 44 bytes (unknown)
-- [ ] `005ec0d0` 45 bytes (unknown)
 - [ ] `006e68b0` 45 bytes (launcher (EN-only config dialog))
-- [ ] `007502d0` 45 bytes (unknown)
 - [ ] `007b84d0` 45 bytes (unknown)
 - [ ] `007b8660` 45 bytes (unknown)
 - [ ] `006e2170` 46 bytes (unknown)
@@ -757,48 +738,18 @@ subagent brief). Low-confidence map rows: check the twin before porting.
 - [ ] `006e5be0` 46 bytes (unknown)
 - [ ] `006e90a0` 46 bytes (launcher (EN-only config dialog))
 - [ ] `007af9b0` 46 bytes (unknown)
-- [ ] `007b8130` 46 bytes (unknown)
-- [ ] `005f4a90` 48 bytes (unknown)
-- [ ] `0063f660` 48 bytes (unknown)
-- [ ] `00646630` 48 bytes (unknown)
-- [ ] `005ac8d0` 49 bytes (unknown)
 - [ ] `006ea520` 49 bytes (launcher (EN-only config dialog))
-- [ ] `007c1680` 49 bytes (unknown)
-- [ ] `007c1820` 49 bytes (unknown)
-- [ ] `007c1860` 49 bytes (unknown)
-- [ ] `007c18a0` 49 bytes (unknown)
-- [ ] `007c18e0` 49 bytes (unknown)
-- [ ] `0077a260` 50 bytes (unknown)
-- [ ] `005c9480` 51 bytes (unknown)
 - [ ] `006ea620` 51 bytes (launcher (EN-only config dialog))
 - [ ] `006ec210` 51 bytes (launcher (EN-only config dialog))
 - [ ] `006ec2e0` 51 bytes (launcher (EN-only config dialog))
 - [ ] `006efbf0` 51 bytes (launcher (EN-only config dialog))
 - [ ] `00774c00` 51 bytes (unknown)
 - [ ] `006ec270` 52 bytes (launcher (EN-only config dialog))
-- [ ] `00745550` 52 bytes (unknown)
-- [ ] `007a8df0` 52 bytes (unknown)
 - [ ] `005a1040` 53 bytes (unknown)
-- [ ] `005f4b00` 53 bytes (unknown)
-- [ ] `006de920` 53 bytes (unknown)
-- [ ] `00745510` 53 bytes (unknown)
-- [ ] `00745c20` 54 bytes (unknown)
-- [ ] `007772e0` 54 bytes (unknown)
-- [ ] `005a9e00` 55 bytes (unknown)
 - [ ] `006ea780` 55 bytes (launcher (EN-only config dialog))
-- [ ] `007a24d0` 55 bytes (unknown)
-- [ ] `00777670` 56 bytes (unknown)
-- [ ] `007aab30` 56 bytes (unknown)
-- [ ] `005a24d0` 57 bytes (unknown)
-- [ ] `00644c50` 57 bytes (unknown)
 - [ ] `006e72e0` 57 bytes (launcher (EN-only config dialog))
 - [ ] `006ea6e0` 57 bytes (launcher (EN-only config dialog))
 - [ ] `006eaa60` 57 bytes (launcher (EN-only config dialog))
-- [ ] `00745460` 57 bytes (unknown)
-- [ ] `0076f170` 57 bytes (unknown)
-- [ ] `007aa0f0` 57 bytes (unknown)
-- [ ] `00645a10` 58 bytes (unknown)
-- [ ] `00735670` 58 bytes (unknown)
 - [ ] `0076ea50` 58 bytes (unknown)
 - [ ] `0077d3e0` 58 bytes (unknown)
 - [ ] `005ac910` 59 bytes (unknown)

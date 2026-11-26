@@ -35,5 +35,7 @@ extern "C" char *MakeDataPath(const char *name);                // EN 0x7a31a0 (
 extern "C" const char *Path_Data(const char *name, int folder); // EN 0x7a31f0 (JP 0x1013f8a0)
 extern "C" int FrameBlend_Start(int active, int target, int frames);  // EN 0x77c840 (JP 0x1013fb10)
 extern "C" int Random(void);                                    // EN 0x7a3a30 (JP 0x1013f880)
+// Loads the random table fontr.dat and stores `value` as the table position (C++ linkage). EN 0x7a4280 (JP 0x1014b1c0).
+int FontRandom_Load(short value);
 
 #endif

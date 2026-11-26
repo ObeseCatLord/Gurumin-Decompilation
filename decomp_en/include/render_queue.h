@@ -38,6 +38,11 @@ extern "C" Vec4 g_renderQueueColour[RENDER_QUEUE_CAPACITY];              // EN 0
 extern "C" Vec4 g_drawColour;   // EN 0x021ffd88 (JP DAT_10f66948)
 extern "C" float g_drawFade;    // EN 0x021a3534 (JP DAT_10f655c4)
 
+// Appends `node` to the queue with its pass `flags`, two parameter vectors, optional extra light data and matrix (copied
+// into their pools). Returns 0. EN 0x749790 (JP 0x10199880).
+extern "C" int RenderQueue_Push(Node *node, const void *extra, const Matrix4 *matrix, const Vec4 *paramsA,
+                                const Vec4 *paramsB, char flags);
+
 // Empties the queue and its pools. Returns 0. EN 0x74a4f0.
 extern "C" int RenderQueue_Clear();
 

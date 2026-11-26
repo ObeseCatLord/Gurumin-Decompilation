@@ -15,6 +15,7 @@ struct ImeContext
     int m_0008;               // 0x08: not yet named
     CANDIDATELIST *buffer;    // 0x0c: candidate list loaded by LoadCandidates (0 = none)
 
+    ~ImeContext();                                                      // EN 0x7aab30: releases the context like Release
     int Release();                                                      // EN 0x7aaf70 (JP 0x1015d0a0)
     int Attach(HWND target);                                            // EN 0x7aaff0 (JP 0x1015d0e0)
     int SetOpen(BOOL open);                                             // EN 0x7aafb0 (JP 0x1015d120)

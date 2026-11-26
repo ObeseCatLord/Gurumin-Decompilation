@@ -362,6 +362,8 @@ struct Node
     int ShadeWaveCopy(int phase);          // EN 0x74d5b0 (JP 0x10193d10): wave-shaped normals and lighting of a copy
     int Clone(Node *source, int a, int b); // EN 0x74e640 (JP 0x101a53b0): copies a loaded node tree into this node
     int CopyPlugData();                    // EN 0x749900 (JP 0x1019bd10)
+    int CopyAnimation(Node *source, int slot);  // EN 0x74e180 (JP 0x1019b890): gives this node the animation (plugs, tracks, matrices) of `source`
+    int ComputeBounds();                   // EN 0x75bb30 (JP 0x1019d8e0): recomputes the node's bounding sphere and box
     int SetMaterialValue(const char *material, int value);  // EN 0x74a400 (JP 0x1019e8c0)
     void ReleaseTexture();                 // EN 0x769e30 (JP 0x10191210)
     void ReleaseMesh();                    // EN 0x769eb0 (JP 0x101913f0)
@@ -381,6 +383,7 @@ struct Node
     // On-demand blocks.
     int AllocSaved();                      // EN 0x76b2f0 (JP 0x101947b0)
     int AllocExtra();                      // EN 0x76b530 (JP 0x101949d0)
+    void FreeExtra();                      // EN 0x7502d0: clears and frees the animation tracks block
     int FreeSaved();                       // EN 0x750100 (JP 0x10194980, with ClearState4000 inlined)
     int RestoreState1000();                // EN 0x750270 (JP 0x101947f0)
     int RestoreState2000();                // EN 0x7501a0 (JP 0x10194870)

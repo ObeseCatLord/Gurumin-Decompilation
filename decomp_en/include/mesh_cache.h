@@ -21,6 +21,17 @@ extern "C" char g_textureFileNames[TEXTURE_FILE_COUNT][FILE_NAME_SIZE];   // EN 
 // Bytes of video memory the engine counts for its textures (16 bit pixels with all mip levels). EN 0x0166d000 (JP DAT_1101d874).
 extern "C" int g_textureMemoryBytes;
 
+// The per-frame matrices of a node's animation are shared through three tables that follow the texture file names:
+// the texture reference, the matrices and their count of each entry (an entry is a node's file name plus node name).
+extern "C" TextureRef *g_motionCacheRef[TEXTURE_FILE_COUNT];      // EN 0x01637f68 (JP DAT_10fdf1d0)
+struct Matrix4;
+extern "C" Matrix4 *g_motionCacheMatrices[TEXTURE_FILE_COUNT];    // EN 0x01638f68 (JP DAT_1101c820)
+extern "C" int g_motionCacheCount[TEXTURE_FILE_COUNT];            // EN 0x01639f68 (JP DAT_11017600)
+// Looks up the cached motion of a node by its file name and node name. Returns its index, or -1 and the first free
+// index in *freeSlot. EN 0x72c540 (JP 0x10169ab0).
+extern "C" int MotionCache_Find(const char *file, const char *nodeName, int *freeSlot);
+// Stores the file name and node name of motion cache entry `slot`. EN 0x746230 (JP 0x101699f0).
+extern "C" int MotionCache_SetNames(int slot, const char *file, const char *nodeName);
 // Adds a reference to a shared texture file and returns the new count. EN 0x70b690.
 extern "C" int TextureFile_AddRef(const TextureRef *texture);
 // Returns 0 when a free entry exists in the texture file name table, -1 when it is full. EN 0x70bbe0.

@@ -61,6 +61,18 @@ extern "C" int Script_UnpackVar(int index, int *high, int *low)
     return 0;
 }
 
+// Bits the second field is shifted by inside the first-and-second field pair of a packed variable.
+const int PACKED_FIELD_BITS = 8;
+
+// Script_PackVar: stores the pair (`high`, `low`) packed into script variable `index` (the layout Script_UnpackVar
+// reads) when the variable is still 0 or `overwrite` is non-zero. Returns 0. Called through the script command table.
+extern "C" int Script_PackVar(int index, int high, int low, int overwrite)
+{
+    if (overwrite != 0 || g_scriptFlags[index] == 0)
+        g_scriptFlags[index] = (((high << PACKED_FIELD_BITS) | low) << PACKED_LOW_SHIFT) | PACKED_TYPE_PAIR;
+    return 0;
+}
+
 // Folder argument of Path_Data for the movie files.
 const int PATH_FOLDER_MOVIE = 0;
 

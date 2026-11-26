@@ -194,6 +194,7 @@ struct WorldRenderer
     int GetMessageField(int line, int field, char *out);  // 0x101672c0 (text_fields.cpp)
     int GetMessageId(int index);             // EN 0x7334a0: id of line `index` of the character's .itm file
     int SetMessageId(int index, int id);     // EN 0x746ba0: stores the id of line `index`
+    int SetMessage(int index, int id, const char *text);   // EN 0x745510: stores the id and the text of line `index`
     int FindMessageLine(int key);            // EN 0x72c8b0: line number for `key` (not recovered yet)
     int GetMessageIdOfKey(int key);          // EN 0x72ea20: id of the line FindMessageLine(key) finds
     int RunScriptFrames(int silent);        // EN 0x70c120 (JP 0x1017cc90) (world_script.cpp): runs the scene script up to the current frame and animates the world

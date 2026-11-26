@@ -160,6 +160,7 @@ struct CharState
             int behaviour;            // 0x3c: behaviour number the character switches to (set with state 2)
         };
         Shove shoves[SHOVE_COUNT];    // 0x00: the shoves of the slot
+        int words[CHAR_STATE_SIZE / sizeof(int)];   // 0x00: the whole state as raw words (clear loops)
     };
 };
 
@@ -181,6 +182,13 @@ extern "C" int g_charGroupTimer[CHAR_SLOT_COUNT];       // EN 0x0091f618 (JP DAT
 extern "C" int g_charToldToReact[CHAR_SLOT_COUNT];         // EN 0x00920260 (JP DAT_10210b30): non-zero = told to react
 extern "C" char g_charTalkPending[CHAR_SLOT_COUNT];        // EN 0x009e1890 (JP DAT_10255a88): cleared while an NPC idles
 extern "C" int g_charPhase[CHAR_SLOT_COUNT];               // EN 0x00915cb8 (JP DAT_10210d30): non-zero = busy; 2 = finished
+// Squared distance of each character slot to the camera target, filled before the draw order is sorted. EN 0x01664218.
+extern "C" float g_charCameraDistance[CHAR_SLOT_COUNT];
+// qsort comparator over slot numbers: orders them by g_charCameraDistance, nearest first (1 when `a` is at least as far as
+// `b`, else -1). EN 0x71bf70.
+extern "C" int CharSlot_CompareByDistance(const int *a, const int *b);
+// Marks character `index` defeated and switches it to behaviour 1 unless it is busy; returns 1 when busy. EN 0x6de920.
+extern "C" int Char_MarkDefeatedAndSwitch(int index);
 extern "C" char g_charKind[CHAR_SLOT_COUNT];               // EN 0x00a35bc8 (JP DAT_1021f3c0): kind of each slot (3 = enemy)
 extern "C" int g_charGroup[CHAR_GROUP_COUNT];              // EN 0x0091f818 (JP DAT_10255f10): group of each character, -1 = none
 extern "C" unsigned char g_charSpawnFlag[CHAR_SLOT_COUNT];   // EN 0x009e1bd0 (JP DAT_10315350): a per-character flag, cleared when a slot is reused

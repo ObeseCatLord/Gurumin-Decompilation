@@ -22,6 +22,7 @@ struct MovieFile
     void *handle;     // 0x00: file handle
     char name[0x20];  // 0x04: file name
 
+    MovieFile();      // EN 0x7a8900 (the same code as GameFile::GameFile): no file open; defined out of line, not here
     void Close();     // EN 0x7a8aa0 (JP 0x101b2330)
     size_t Read(void *buffer, size_t size, size_t count);   // EN 0x7a8b20: fread from the open file
 };
@@ -52,6 +53,7 @@ struct MmvPlayer
     void *frame;           // 0x454: decoded 8-bit frame (palette indexes)
     unsigned char *data;   // 0x458: start of the frame records inside `memory`
 
+    MmvPlayer();                         // EN 0x7a8df0: no movie held, nothing loaded
     void ReadFrame();                    // EN 0x7a9750: next frame of a looping movie
     void ReadFrameOnce();                // EN 0x7a9610: next frame of a movie that plays once
     void DecodeFrameRle(int firstRecord);   // EN 0x7a8f20 (JP 0x10160a20): decodes the first frame record

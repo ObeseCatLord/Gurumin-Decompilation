@@ -37,17 +37,16 @@ extern "C" int ImeCandidates_Draw(FontRenderer *renderer, int x, int y, int colo
         int i = 0;
         while (true)
         {
-            int visible = CANDIDATES_PER_PAGE;
             int remaining = g_candidateTotal - g_candidatePage * g_candidatePageSize - g_candidateFirstOffset;
-            if (remaining < visible)
+            int visible = CANDIDATES_PER_PAGE;
+            if (remaining < CANDIDATES_PER_PAGE)
                 visible = remaining;
             if (i >= visible)
                 break;
-            renderer->DrawText(x, y, line,
-                               (g_candidateFirstOffset + g_candidatePage * g_candidatePageSize + i == g_candidateSelected)
-                                   ? selectedColour
-                                   : colour,
-                               0, 1.0f, 1.0f);
+            if (g_candidateFirstOffset + g_candidatePage * g_candidatePageSize + i != g_candidateSelected)
+                renderer->DrawText(x, y, line, colour, 0, 1.0f, 1.0f);
+            else
+                renderer->DrawText(x, y, line, selectedColour, 0, 1.0f, 1.0f);
             i++;
             line += CANDIDATE_TEXT_SIZE;
             y += CANDIDATE_LINE_HEIGHT;

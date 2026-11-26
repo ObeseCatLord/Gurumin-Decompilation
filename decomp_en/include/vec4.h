@@ -19,6 +19,7 @@ struct Vec4
     void Set(float x, float y, float z, float w);    // EN 0x779af0 (JP 0x101ac9c0)
     void Copy(const Vec4 &source);                   // EN 0x76f1d0 (JP 0x101acc20)
     void Fill(const float &value);                   // EN 0x76f1b0 (JP 0x101acc40): sets all four components
+    void FillFromInt(const int &value);              // EN 0x76f170: sets all four components to the integer converted to float
     float LengthSquared3();                          // EN 0x773490 (JP 0x101ac6a0): squared length of x/y/z
     float Length();                                  // EN 0x7732d0 (JP 0x101ac4e0): length of x/y/z
     float Length2D();                                // EN 0x773660 (JP 0x101ac500): length of x/y
@@ -47,6 +48,12 @@ struct Vec4
 
 // Dot product of the x/y/z parts of two vectors (EN 0x773750, JP 0x101ac200).
 extern "C" float Vec3_Dot(const Vec4 *a, const Vec4 *b);
+
+// Squared length of the x/y/z part of `v` (EN 0x77a260, an out-of-line copy of the inline helper).
+float Vec3_LengthSquared(const Vec4 &v);
+
+// Length of the x/y/z part of `v` after its z is multiplied by `zScale` (EN 0x5ec0d0).
+extern "C" float Vec3_LengthZScaled(const Vec4 *v, float zScale);
 
 // Cross product a x b (EN 0x772250); the result's w stays 0.
 Vec4 Cross(const Vec4 &a, const Vec4 &b);

@@ -115,3 +115,9 @@ offsets); record such headers here. None so far: `Node` is declared again in EN 
   standalone copies appear once out-of-line callers exist (no forcing tables). The Ogg reader functions hit register
   allocation walls (open.tsv).
 - Map labels in the sound area name MFC/CRT FID functions for EN game code (DeleteValues, __strupr, ...): ignore them.
+
+## Open: CreateShortcut calling convention (batch 12)
+EN 0x7a9db0 matches only as a free `__stdcall` function (`src/shortcut.cpp`); as an `InstallerMenu` member it spills
+`this` (frame 0x618 instead of 0x614). Its caller 0x7aa130 (`InstallerMenu::CreateDesktopShortcut`) loads ecx with
+`this` before the call and matches only when the callee is declared as a thiscall member (`include/installer_menu.h`).
+So the function has two declarations for now; find one form both functions accept before treating either as final.

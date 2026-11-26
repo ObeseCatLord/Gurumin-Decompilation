@@ -30,6 +30,9 @@ struct FontRenderer
     int digitAdvance;                                // 0x2398: pen advance in pixels of a digit in proportional text
 
     int TextWidth(const char *text, float scale);    // EN 0x7a10e0 (JP 0x1014fd30): width of `text` in pixels
+    // EN 0x7a3980 (JP 0x10145380): advance in pixels of one Shift-JIS character `code` (bytes in memory order). The
+    // other arguments mirror DrawGlyph's list and are not used.
+    int GlyphWidth(int colour, int x, int y, unsigned short code, int unused, int unusedAgain);
     // EN 0x7a2790: lays out `text` like DrawString (EN 0x7a2c60) but also draws the glyphs into the 640-pixel wide
     // ARGB4444 text buffer `buffer`; returns the pen position after the last character.
     int DrawStringToBuffer(unsigned short *buffer, int x, int y, const char *text, int colour, int fixedAdvance);

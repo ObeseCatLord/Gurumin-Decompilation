@@ -23,6 +23,8 @@ struct KeyTrack
     int Set(int frame, float x, float y, float z, float w);  // EN 0x779540 (JP 0x101adcf0): sets or inserts the key at `frame`
     int CopyFrom(const KeyTrack *source);  // EN 0x771de0 (JP 0x101ade10): makes this track a copy of `source`
     void Free();                   // EN 0x778450 (JP 0x101ad7b0): frees the three arrays and empties the track
+    int NextFrame(int frame);      // EN 0x7772e0: frame of the first key after `frame` (the last key when none is later, 0 for an empty track)
+    int PreviousFrame(int frame);  // EN 0x777670: frame of the last key before `frame` (the first key when none is earlier, 0 for an empty track)
 };
 
 // Size of one mesh vertex in bytes.

@@ -16,4 +16,7 @@ int SeasonalEvent();
 // Unpacks script variable `index` when it holds a packed pair; see the definition. EN 0x5ee4d0 (JP 0x10017b10).
 extern "C" int Script_UnpackVar(int index, int *high, int *low);
 
+// Packs the pair (`high`, `low`) into script variable `index` when it is 0 or `overwrite` is set. Returns 0. EN 0x646630.
+extern "C" int Script_PackVar(int index, int high, int low, int overwrite);
+
 #endif

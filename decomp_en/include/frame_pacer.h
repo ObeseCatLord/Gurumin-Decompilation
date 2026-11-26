@@ -12,7 +12,7 @@ extern "C" float g_measuredFrameRate;         // EN 0x021e47d0 (JP DAT_10f654e8)
 
 // Ages the texture slots and the texture cache once per drawn frame. EN 0x77d3e0 (JP 0x10147a00), 0x7a24d0 (JP 0x101483f0).
 extern "C" void TextureSlots_Age(void);
-extern "C" void TextureCache_Age(void);
+extern "C" int TextureCache_Age(void);
 // Steps of the 60 Hz clock: waits for the deadline and runs the engine ticks that fell due. Returns 1.
 // EN 0x7a8460 (JP 0x1014ade0).
 extern "C" int Frame_Pace(void);

@@ -153,6 +153,8 @@ struct Playback
     int SetLayer(int layer, int a, int first, int last, int b, int c); // EN 0x7437e0 (JP 0x1016a100)
     int SetSlotOffset(int layer, int slot, int x, int y);              // EN 0x746490 (JP 0x1016a260)
     int Play(int layer, int a, int b, float speed);                    // EN 0x71add0 (JP 0x1016a2e0): starts a motion on a layer
+    int SetSlotSource(void *source, int slot, int layer);              // EN 0x745460: sets the motion source and layer of slot `slot`; 0 when a value is out of range
+    int SetFollowUp(int layer, int index, int value);                  // EN 0x745550: sets follow-up entry `index` of layer `layer`; 0 when out of range
 };
 
 struct AnimModel
@@ -160,7 +162,11 @@ struct AnimModel
     char m_0000[0x12];            // 0x000: not yet named
     char m_0012;                  // 0x012: set to 2 every frame by the hovering characters
     char m_0013[0x70 - 0x13];     // 0x013: not yet named
-    int collisionFilter;          // 0x070: collision filter of the model's world tests (g_collisionFilter while they run)
+    union
+    {
+        int collisionFilter;      // 0x070: collision filter of the model's world tests (g_collisionFilter while they run)
+        char *nearCells;          // 0x070: characters: row of g_charNearCells (map cells near the character), 0 = no visibility data
+    };
     char m_0074[0x76 - 0x74];     // 0x074: not yet named
     char uiAnimStarted;           // 0x076: set to 1 by UiAnim_Play (read on the first model only)
     char m_0077[0x84 - 0x77];     // 0x077: not yet named

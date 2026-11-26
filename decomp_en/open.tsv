@@ -109,3 +109,20 @@ address	status	reason
 0064b210	open	Shaga_Create: not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
 006d1b40	open	Char_RunBehaviour (444 asm lines): not attempted in this session (out of budget); EN needs ~10 undeclared globals first (JP source and EN disassembly read, nothing written)
 00640040	open	Save_Load: not attempted; EN is a save writer (SystemSav_WriteRecord, 0x4c38c block, checksum), not the JP loader, needs a new design
+0074e640	open	Node::Clone: only the inline strcpy loops differ, [ecx+edx-1] in the original vs [edx+ecx-1] (base/index operand order of the shared this-source offset; the plug copy loop shows the same swap), plus the epilogue order of mov eax,1
+005d9640	open	Message_DrawPanel: logic and prologue match (early return on g_messageOpen); the compiler tail-merges the last DrawOutlined call of the two-line arm of the flag-clear branch into the flag-set branch (jmp into push esi/call/pop esi), the original keeps a separate epilogue per arm (explicit returns, else/no-else tried)
+005f4060	open	Ground_BuildHeights: logic equal to the JP twin; the outer/inner loop counters and the cell pointer get swapped registers (eax/ecx) and the original has loop-entry jumps with alignment padding, the copy loop is laid out differently (declaration order, header increments, for-init forms tried)
+006adbd0	open	Npc_RideMarker: all but 9 bytes match; in the no-marker reset the original emits xorps before the state store (xorps; mov state,0; mov wait,0), ours stores state first (store order state/wait swapped and the words-loop form tried)
+00790e70	open	TextureObject 3-texture screen quad (mislabelled DrawBlurred): not attempted; binds this and two argument textures to stages 0-2, 4 vertices of 0x38 bytes, cached sampler states, pixel shader at 0x21e47a8
+00791e30	open	TextureObject::DrawFrameAlt: not attempted (time)
+007906d0	open	FontRenderer_DrawTextClipped: not attempted; EN adds a Windows-font GDI path (flag 0x21e4814) that has no JP twin code
+007413f0	open	AnimModel::ResetState: not attempted; needs about 80 named AnimModel fields, which would restructure the shared header
+005e2f00	open	map label wrong: the function is Game::IsQueuedEventReady in src/game_script.cpp (not mine, currently DIFF)
+007ba070	open	Packs_PlanesToComponents: 8 bytes smaller than the original (301 vs 308-314); the original keeps one pointer into the middle plane and loop-invariant offsets to the other two with the clamps as cmov; about ten spellings tried (index forms, row pointers, short/int locals, helper clamp)
+007b95a0	open	Packs_PackPlanes: 342 vs 339 bytes; register allocation differs (original keeps output in edi and the written count in edx, ours reloads output each pass); spellings tried: row index, row pointers, carry locals vs in-place shifts, unsigned short fields, loop counter forms
+007a3980	open	FontRenderer::GlyphWidth: 172 vs 163 bytes; the original loads the argument as a dword (no zero extension) and swaps the two code bytes in place from a register copy; param types short/unsigned short/int/unsigned int and raw copy types tried
+007ad1a0	open	ImeCandidates_Draw: right size, 11 bytes off; y and the line pointer swap registers (original keeps y in esi and the line pointer in edi); declaration order, indexed line and update order tried
+00771b60	open	KeyInterpolator::Spline: 199 vs 203 bytes; the original keeps t2*3 and c-b shared and all eight xmm registers busy, ours spills t2 to a new local; single expression, shared locals and Ghidra order tried
+00747b50	open	EffectManager::RemoveOwnedBy: 2 bytes short; the original loads record.id into eax before comparing with -1 (a compare against memory in ours); local id, swapped tests, record pointer and continue forms tried
+00699dc0	open	Npc_StandOnGround: 8 bytes off; the original reserves the 0x10 stack bytes for the SetTranslation argument and loads ecx before the ground x/y stores; two-call and merged single-call forms tried
+005a23e7	open	starts mid-function (shared tail entered by jumps from the preceding function): not a function of its own, not ported

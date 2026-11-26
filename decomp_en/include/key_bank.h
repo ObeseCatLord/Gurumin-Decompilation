@@ -6,6 +6,14 @@
 
 struct KeyTrack;
 
+// Data-less base of the key containers in the JP build (KeyTrack and KeyBank derive from it there); the EN callers load
+// ecx with their own container before calling Spline, which never reads `this`.
+struct KeyInterpolator
+{
+    // EN 0x771b60 (JP 0x101ad920): cubic Hermite interpolation between `b` (t = 0) and `c` (t = 1) with neighbours `a` and `d`.
+    float Spline(float t, float a, float b, float c, float d);
+};
+
 const int KEY_BANK_SIZE = 0x80;     // keys a bank holds
 const char KEY_FLAG_MOTION = 4;     // key flag: the key is a motion frame
 

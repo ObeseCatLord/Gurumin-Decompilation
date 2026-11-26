@@ -68,7 +68,11 @@ extern "C" InputEffect *g_forceFeedbackEffect;     // EN 0x022280ec: the DirectI
 extern "C" EffectDesc g_forceFeedbackDesc;         // EN 0x022280f0: the effect's description
 extern "C" PeriodicForce g_forceFeedbackPeriodic;  // EN 0x02228128: the effect's type-specific data
 
+extern "C" int g_vibrationEnabled;                 // EN 0x021f37cc: the config entry USEVB, non-zero = controller vibration is on
+
 // Starts the vibration for `milliseconds` ms at 1 / `divisor` of the full strength. EN 0x7aee30 (JP 0x10142700).
 extern "C" void Input_Rumble(float divisor, int milliseconds);
+// Calls Input_Rumble only when the USEVB option is on. Returns 1. EN 0x7a8830 (stdcall).
+extern "C" int __stdcall Rumble_StartIfEnabled(float divisor, int milliseconds);
 
 #endif

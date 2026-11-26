@@ -29,4 +29,8 @@ extern "C" char g_hudCounterFrames;                               // EN 0x009e33
 // Collects a pickup (see pickup_collect.cpp). EN 0x5a1c60 (JP 0x1003ab40).
 extern "C" void Pickup_Collect(int id, int quiet);
 
+// Starts the next slot of the pickup effect ring with effect kind `kind` and effect handle `handle` (frame count 0) and
+// advances the ring. Returns 0. EN 0x5a24d0.
+extern "C" int PickupRing_Push(int kind, int handle);
+
 #endif

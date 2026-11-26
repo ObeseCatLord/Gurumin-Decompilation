@@ -136,7 +136,7 @@ struct Game : Object
     int lastEntry[MENU_SLOT_COUNT];         // 0x0e0: index of the last entry added to the window
     char m_00ec[0x110 - 0xec];              // 0x0ec: not used by EN code yet
     int windowOpen[MENU_SLOT_COUNT];        // 0x110: 1 while the window slot is open
-    char m_011c[0x128 - 0x11c];             // 0x11c: not used by EN code yet
+    int windowLastRow[MENU_SLOT_COUNT];     // 0x11c: per window slot: number of rows minus one (SetWindowRows)
     int windowFlags[MENU_SLOT_COUNT];       // 0x128: per window slot: layout flags (0x18 when opened, the yes/no dialogs set 0x20)
     char m_0134[0x140 - 0x134];             // 0x134: not used by EN code yet
     int windowCursor[MENU_SLOT_COUNT];      // 0x140: cursor position in the window
@@ -220,6 +220,10 @@ struct Game : Object
     int RaiseDoorEvents(int argument, int on);      // EN 0x63c2c0
     int RaiseLeverEvents(int argument, int on);     // EN 0x63c4f0
     int RaiseFireEvents(int argument, int on);      // EN 0x63c610
+    int IsAnyWindowShown();                         // EN 0x5f4a90: 1 when a menu window is open or still fading out
+    int SetWindowFlags(int id, int flags);          // EN 0x644c50: sets the layout flags of open window `id`
+    int SetWindowRows(int id, int rows);            // EN 0x645a10: stores the row count of open window `id` (as rows - 1)
+    int ClearEventQueues();                         // EN 0x63f660: empties the running and the queued event lists
     int ReadWordInLine();                           // EN 0x63f0d0
     int ReadWord();                                 // EN 0x63f1f0
     int ForEachActiveTrigger(int (*callback)(GameTrigger *trigger));   // EN 0x5cb610

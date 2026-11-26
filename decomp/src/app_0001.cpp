@@ -74,27 +74,28 @@ int Obj::UpdateChanged()
 }
 typedef void (*CursorCallback)(int x, int y);
 
-// When the cursor moved: converts the screen cursor position into 640x480 game coordinates (scaled by the
-// client size, so it works in any window size) and passes it to the cursor callback. Not byte-identical yet
-// (see open.tsv).
+// 0x100014b0 (Obj::ReportCursor). When the cursor moved: converts the screen cursor position into 640x480 game coordinates (scaled by the
+// client size, so it works in any window size) and passes it to the cursor callback.
 int Obj::ReportCursor()
 {
     POINT cursor;
     POINT origin;
     RECT client;
-    if (changed == 0)
-        return 0;
-    GetCursorPos(&cursor);
-    origin.x = 0;
-    origin.y = 0;
-    ClientToScreen((HWND)m_001c, &origin);
-    GetClientRect((HWND)m_001c, &client);
-    if (client.right == 0 || client.bottom == 0)
-        return 0;
-    cursor.x = (cursor.x - origin.x) * 640 / client.right;
-    cursor.y = (cursor.y - origin.y) * 480 / client.bottom;
-    if (m_0038 != 0)
-        ((CursorCallback)m_0038)(cursor.x, cursor.y);
+    if (changed != 0)
+    {
+        GetCursorPos(&cursor);
+        origin.x = 0;
+        origin.y = 0;
+        ClientToScreen((HWND)m_001c, &origin);
+        GetClientRect((HWND)m_001c, &client);
+        if (client.right != 0 && client.bottom != 0)
+        {
+            cursor.x = (cursor.x - origin.x) * 640 / client.right;
+            cursor.y = (cursor.y - origin.y) * 480 / client.bottom;
+            if (m_0038 != 0)
+                ((CursorCallback)m_0038)(cursor.x, cursor.y);
+        }
+    }
     return 0;
 }
 typedef int (*WheelCallback)();

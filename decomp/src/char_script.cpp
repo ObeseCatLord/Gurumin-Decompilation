@@ -182,8 +182,8 @@ extern "C" int FUN_1002a340(int index)
     int nextStep;
     int result;
     position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
-    int value = DAT_1020b430[index].scriptValue;
     DAT_10db6ee8[index].mode = 0;
+    int value = DAT_1020b430[index].scriptValue;
     do
     {
         FUN_10029cf0(index, &a, DAT_1020b430[index].scriptStep, &nextStep, &position, &result, &value, &b);

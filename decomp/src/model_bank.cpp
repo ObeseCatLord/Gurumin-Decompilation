@@ -30,6 +30,45 @@ int ModelBank::Reset()
     return 1;
 }
 
+// 0x101649c0 (ModelBank::Init). Prepares the bank at start-up: empties the lit-model table and the light list and
+// fills the default light vectors m_c888 (entries 0, 1 and 3 and 5 are white-ish, entry 2 points down, entry 4 is
+// a half-bright ground light) before switching the bank on. Returns 1.
+int ModelBank::Init()
+{
+    m_313e8 = 0;
+    for (int i = 0; i < 0x80; i++)
+        litModels[i] = 0;
+    for (int i = 0; i < 0x20; i++)
+        lights[i] = 0;
+    m_c888[0].z = 1.0f;
+    m_c888[0].w = 1.0f;
+    m_c888[1].x = 1.0f;
+    m_c888[1].y = 1.0f;
+    m_c888[1].z = 1.0f;
+    m_c888[1].w = 1.0f;
+    m_c888[2].w = 1.0f;
+    m_c888[3].x = 1.0f;
+    m_c888[3].y = 1.0f;
+    m_c888[3].z = 1.0f;
+    m_c888[3].w = 1.0f;
+    m_c888[4].w = 1.0f;
+    m_c888[5].x = 1.0f;
+    m_c888[5].y = 1.0f;
+    m_c888[5].z = 1.0f;
+    m_c888[5].w = 1.0f;
+    m_1884 = 0;
+    m_c888[0].x = 0.0f;
+    m_c888[0].y = 0.0f;
+    m_c888[2].x = 0.0f;
+    m_c888[2].z = 0.0f;
+    m_c888[4].x = 0.0f;
+    m_c888[4].z = 0.0f;
+    m_c888[2].y = -1.0f;
+    m_c888[4].y = 0.5f;
+    enabled = 1;
+    return 1;
+}
+
 // Rebuilds the light list from the scene below `root`: up to 32 nodes whose names start with "Omn" (omni lights)
 // followed by up to 32 starting with "Spot" (spot lights); the leading '@' makes Node::Find a prefix search. Missing lights are skipped, so the list stays packed. Returns 0 when the bank
 // is not in use, else 1. (The list has 32 entries; with more than 32 lights in total it overruns into litModels.)
@@ -108,45 +147,45 @@ int ModelBank::AddLitModel(AnimModel *model)
 {
     if (enabled == 0)
         return 0;
-    if (model == 0 || model->loadedRoot == 0)
-        return 0;
-    int i;
-    for (i = 0; i < 0x80; i++)
+    if (model != 0 && model->loadedRoot != 0)
     {
-        if (litModels[i] == model)
-            return 0;
-    }
-    for (i = 0; i < 0x80; i++)
-    {
-        if (litModels[i] == 0)
+        int i;
+        for (i = 0; i < 0x80; i++)
         {
-            litModels[i] = model;
-            Vec4 *light = &lighting[i * 22];  // this model's 22 light vectors
-            light[0].x = 0;
-            light[0].y = 0;
-            light[0].z = 1.0f;
-            light[0].w = 1.0f;
-            light[1].x = 1.0f;
-            light[1].y = 1.0f;
-            light[1].z = 1.0f;
-            light[1].w = 1.0f;
-            light[2].x = 0;
-            light[2].y = -1.0f;
-            light[2].z = 0;
-            light[2].w = 1.0f;
-            light[3].x = 1.0f;
-            light[3].y = 1.0f;
-            light[3].z = 1.0f;
-            light[3].w = 1.0f;
-            light[4].x = 0;
-            light[4].y = 0.5f;
-            light[4].z = 0;
-            light[4].w = 1.0f;
-            light[5].x = 1.0f;
-            light[5].y = 1.0f;
-            light[5].z = 1.0f;
-            light[5].w = 1.0f;
-            return 1;
+            if (litModels[i] == model)
+                return 0;
+        }
+        for (i = 0; i < 0x80; i++)
+        {
+            if (litModels[i] == 0)
+            {
+                litModels[i] = model;
+                lighting[i * LIGHT_VECTORS + 0].x = 0;
+                lighting[i * LIGHT_VECTORS + 0].y = 0;
+                lighting[i * LIGHT_VECTORS + 0].z = 1.0f;
+                lighting[i * LIGHT_VECTORS + 0].w = 1.0f;
+                lighting[i * LIGHT_VECTORS + 1].x = 1.0f;
+                lighting[i * LIGHT_VECTORS + 1].y = 1.0f;
+                lighting[i * LIGHT_VECTORS + 1].z = 1.0f;
+                lighting[i * LIGHT_VECTORS + 1].w = 1.0f;
+                lighting[i * LIGHT_VECTORS + 2].x = 0;
+                lighting[i * LIGHT_VECTORS + 2].y = -1.0f;
+                lighting[i * LIGHT_VECTORS + 2].z = 0;
+                lighting[i * LIGHT_VECTORS + 2].w = 1.0f;
+                lighting[i * LIGHT_VECTORS + 3].x = 1.0f;
+                lighting[i * LIGHT_VECTORS + 3].y = 1.0f;
+                lighting[i * LIGHT_VECTORS + 3].z = 1.0f;
+                lighting[i * LIGHT_VECTORS + 3].w = 1.0f;
+                lighting[i * LIGHT_VECTORS + 4].x = 0;
+                lighting[i * LIGHT_VECTORS + 4].y = 0.5f;
+                lighting[i * LIGHT_VECTORS + 4].z = 0;
+                lighting[i * LIGHT_VECTORS + 4].w = 1.0f;
+                lighting[i * LIGHT_VECTORS + 5].x = 1.0f;
+                lighting[i * LIGHT_VECTORS + 5].y = 1.0f;
+                lighting[i * LIGHT_VECTORS + 5].z = 1.0f;
+                lighting[i * LIGHT_VECTORS + 5].w = 1.0f;
+                return 1;
+            }
         }
     }
     return 0;

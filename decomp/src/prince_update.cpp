@@ -74,6 +74,8 @@
 #define PRINCE_STATE_HIT_RECOVER 9               // knocked back, flies, then lands (motion 0x20)
 #define PRINCE_STATE_CHARGE_A 10                 // dash with a picked attack motion (0x22, 0x27..0x29)
 #define PRINCE_STATE_CHARGE_B 11                 // the same with the motions 0x1d..0x1f and 0x22
+#define PRINCE_MIN_SWING_LEAN 0.17453f           // smallest lean of a swing spark
+#define PRINCE_LEAP_SPEED 40.0f                  // units per frame of the leap
 #define PRINCE_STATE_LEAP 12                     // leaps at the player from afar, else a short charge
 #define PRINCE_STATE_BOMBARD 13                  // drops effects from the sky (motions 0x16, 0x18)
 #define PRINCE_STATE_SWAP_WEAPON 14              // puts a weapon away and takes another (O_101..O_103)
@@ -224,43 +226,48 @@ static __forceinline void StartWeaponGlow(int index, int effect, float scale)
     where.Fill(0.0f);
     pose.SetIdentity();
     SetUpOptions(index, options, scale, 1);
-    options.owner = index + PRINCE_EFFECT_OWNER_BASE;
     StartEffect(index, effect, where, EffectAnchor(index, PRINCE_NODE_ROOT_NULL, PRINCE_NODE_HAND_R), 0, 0, 0,
                 &options);
 }
 
-// An effect at the right hand of the prince: `offset` is the position in the hand's frame (turned by the lean and the
-// heading of the prince), `tilt` the lean of the body, `scale` the effect scale.
-static __forceinline void StartHandEffect(int index, int effect, const Vec4 &offset, float tilt, float scale)
+// The burst of the knock-back punch at the right hand: effect 0x7ca at the end of the offset (60 behind and 20 above
+// the hand), turned by `yaw` (and by the lean of the body when `tilted`), on an upright pose. Then a shot of the
+// character at the same place. Only for a prince that has its hand node.
+static __forceinline void StartPunchEffects(int index, int tilted, float tilt, float yaw)
+{
+    Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
+    if (hand != 0)
+    {
+        Matrix4 pose;
+        EffectOptions options;
+        Vec4 where;
+        where.y = -60.0f;
+        where.z = 20.0f;
+        if (tilted)
+            where.RotateX(-tilt);
+        where.RotateZ(yaw);
+        pose.SetIdentity();
+        pose.SetTranslation(where + hand->worldMatrix.GetTranslation());
+        where.Fill(0.0f);
+        SetUpOptions(index, options, 1.3f, 0);
+        StartEffect(index, 0x7ca, where, 0, 0, 0, &pose, &options);
+        Vec4 handPos = hand->worldMatrix.GetTranslation();
+        FUN_1001a680(index, &handPos, 0);
+    }
+}
+
+// A shot of the hand: effect `effect` at the right hand on a pose turned by the heading and the lean of the body.
+static __forceinline void StartTurnedHandEffect(int index, int effect, float tilt, float scale)
 {
     Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
     if (hand == 0)
         return;
-    Vec4 where = offset;
-    where.RotateX(-tilt);
-    where.RotateZ(-DAT_10db6ee8[index].heading);
     Matrix4 pose = RotationZ(DAT_10db6ee8[index].heading) * RotationX(-tilt);
-    pose.SetTranslation(hand->worldMatrix.GetTranslation() + where);
     EffectOptions options;
+    Vec4 where;
+    pose.SetTranslation(where + hand->worldMatrix.GetTranslation());
     SetUpOptions(index, options, scale, 0);
-    Vec4 start = pose.GetTranslation();
-    StartEffect(index, effect, start, 0, 0, 0, &pose, &options);
-}
-
-// The knock-back punch effects of the states 3 and 4: the burst at the hand, then a shot of the character.
-static __forceinline void StartPunchEffects(int index, float tilt)
-{
-    Vec4 offset;
-    offset.Fill(0.0f);
-    offset.y = -60.0f;
-    offset.z = 20.0f;
-    StartHandEffect(index, 0x7ca, offset, tilt, 1.3f);
-    Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
-    if (hand != 0)
-    {
-        Vec4 handPos = hand->worldMatrix.GetTranslation();
-        FUN_1001a680(index, &handPos, 0);
-    }
+    StartEffect(index, effect, where, 0, 0, 0, &pose, &options);
 }
 
 // Blends the movement vector of a punch: the stored step shrinks by `keep` every frame.
@@ -289,12 +296,17 @@ static __forceinline void SteerHeight(int index, const Vec4 &ownPos, Vec4 &move,
     }
 }
 
-// The gatling burst of the states 5 and 6: a shot of the hand effect 0x36b1 and the tracer 1999 every 4th frame.
-static __forceinline void FireGatling(int index, float tilt, float tracerSpread)
+// The gatling burst of the states 5 and 6: a shot of the hand effect 0x36b1 and the tracer 1999 every 4th frame,
+// both at 70 in front of the hand. `tilted` (state 6) leans them by `tilt` and rolls the tracer about y.
+static __forceinline void FireGatling(int index, int tilted, float tilt)
 {
-    Kind43State &st = DAT_1020b430[index].kind43;
     AnimModel &model = DAT_10db6ee8[index];
     Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
+    Matrix4 pose;
+    Vec4 where;
+    EffectOptions options;
+    SetUpOptions(index, options, 0.85f, 0);
+    pose.SetIdentity();
     if (hand == 0)
     {
         hand = model.root->Find("Bip01 R Hand", 0);
@@ -305,21 +317,42 @@ static __forceinline void FireGatling(int index, float tilt, float tracerSpread)
             return;
         }
     }
-    Vec4 offset;
-    offset.Fill(0.0f);
-    offset.y = -70.0f;
-    StartHandEffect(index, 0x36b1, offset, tilt, 0.85f);
-    Matrix4 pose = RotationZ(model.heading - 1.5708f + tracerSpread) * RotationX(-tilt);
-    EffectOptions options;
-    SetUpOptions(index, options, 0.85f, 0);
-    Vec4 start = pose.GetTranslation();
-    StartEffect(index, 1999, start, 0, 0, 0, &pose, &options);
+    where.y = -70.0f;
+    if (tilted)
+        where.RotateX(-tilt);
+    where.RotateZ(-model.heading);
+    where.Copy(where + hand->worldMatrix.GetTranslation());
+    if (tilted)
+        pose = RotationZ(model.heading) * RotationX(-tilt);
+    else
+        pose = RotationZ(model.heading);
+    pose.SetTranslation(where);
+    where.Fill(0.0f);
+    StartEffect(index, 0x36b1, where, 0, 0, 0, &pose, &options);
+    where.y = -70.0f;
+    if (tilted)
+        where.RotateX(-tilt);
+    where.RotateZ(-model.heading);
+    where.Copy(where + hand->worldMatrix.GetTranslation());
+    if (tilted)
+    {
+        float spread = ((float)(FUN_1013f880() % 0x1e - 0xf) * PRINCE_PI) / 180.0f;
+        float roll = ((float)(FUN_1013f880() % 0x1e - 0xf) * PRINCE_PI) / 180.0f + tilt;
+        pose = RotationZ(model.heading - 1.5708f + spread) * RotationY(roll);
+    }
+    else
+    {
+        pose = RotationZ(model.heading - 1.5708f + ((float)(FUN_1013f880() % 0x28 - 0x14) * PRINCE_PI) / 720.0f);
+    }
+    pose.SetTranslation(where);
+    where.Fill(0.0f);
+    StartEffect(index, 1999, where, 0, 0, 0, &pose, &options);
     FUN_10065b10(index, 0x143, 1, 0);
 }
 
-// Swings of the states 7 and 8: effect `effect` from the left hand with a pose turned by the heading plus `jitter`
-// radians (the sparks of the weapon).
-static __forceinline void StartLeftHandSwing(int index, int effect, float scale, float tilt, float jitter)
+// Swings of the states 7 and 8: effect `effect` from the left hand on a pose turned about z by `turn` and about x
+// by `rise` (the sparks of the weapon).
+static __forceinline void StartLeftHandSwing(int index, int effect, float scale, float turn, float rise)
 {
     Node *hand = PrinceNode(index, PRINCE_NODE_HAND_L);
     if (hand == 0)
@@ -329,11 +362,13 @@ static __forceinline void StartLeftHandSwing(int index, int effect, float scale,
         if (hand == 0)
             return;
     }
-    Matrix4 pose = RotationZ(DAT_10db6ee8[index].heading + jitter) * RotationX(-tilt);
+    Matrix4 pose;
     EffectOptions options;
+    Vec4 where;
+    pose = RotationZ(turn) * RotationX(rise);
+    pose.SetTranslation(hand->worldMatrix.GetTranslation());
     SetUpOptions(index, options, scale, 0);
-    Vec4 start = hand->worldMatrix.GetTranslation();
-    StartEffect(index, effect, start, 0, 0, 0, &pose, &options);
+    StartEffect(index, effect, where, 0, 0, 0, &pose, &options);
 }
 
 // The hand-and-root links of a weapon: the spark effect `spark` follows the right hand, and every 5th frame a link
@@ -930,7 +965,7 @@ int Prince_Update(int index)
                     DAT_10802bf8[index].step.RotateX(DAT_10255160[index][0]);
                     DAT_10802bf8[index].step.RotateZ(PRINCE_PI - DAT_10db6ee8[index].targetHeading);
                     moveMode = PRINCE_MOVE_PLACE;
-                    StartPunchEffects(index, DAT_10255160[index][0]);
+                    StartPunchEffects(index, 1, DAT_10255160[index][0], -DAT_10db6ee8[index].heading);
                     FUN_10065b10(index, 0x145, 1, 0);
                     SayRandomLine(index);
                 }
@@ -1006,7 +1041,7 @@ int Prince_Update(int index)
                     DAT_10802bf8[index].step.RotateZ(PRINCE_PI - DAT_10db6ee8[index].targetHeading);
                     moveMode = PRINCE_MOVE_PLACE;
                     DAT_10255160[index][0] = 0.0f;
-                    StartPunchEffects(index, 0.0f);
+                    StartPunchEffects(index, 0, 0.0f, -DAT_10db6ee8[index].heading);
                     FUN_10065b10(index, 0x145, 1, 0);
                     SayRandomLine(index);
                 }
@@ -1074,7 +1109,7 @@ int Prince_Update(int index)
                 SteerHeight(index, ownPos, move, moveMode, 25.0f, 65.0f, 20.0f);
                 if ((DAT_10db6ee8[index].motionFrame & 3) == 0)
                 {
-                    FireGatling(index, 0.0f, ((float)(FUN_1013f880() % 0x28 - 0x14) * PRINCE_PI) / 720.0f);
+                    FireGatling(index, 0, 0.0f);
                     DAT_1020b430[index].kind43.frames++;
                     break;
                 }
@@ -1155,7 +1190,7 @@ int Prince_Update(int index)
             wantMotion = 0xf;
             if (DAT_1020b430[index].kind43.frames % 4 == 0)
             {
-                FireGatling(index, DAT_10255160[index][0], ((float)(FUN_1013f880() % 0x1e - 0xf) * PRINCE_PI) / 180.0f);
+                FireGatling(index, 1, DAT_10255160[index][0]);
             }
             DAT_1020b430[index].kind43.counter++;
         }
@@ -1193,7 +1228,7 @@ int Prince_Update(int index)
             }
             if (DAT_10db6ee8[index].motionFrame == 0x245 || DAT_10db6ee8[index].motionFrame == 0x252)
             {
-                StartLeftHandSwing(index, 0x36b4, 0.7f, 0.0f, 0.0f);
+                StartLeftHandSwing(index, 0x36b4, 0.7f, DAT_10db6ee8[index].heading, 1.5708f);
                 FUN_10065b10(index, 0x14e, 1, 0);
                 if (FUN_1013f880() % 3 == 0)
                     FUN_100b9bb0(index, FUN_1013f880() % 3 + 0x47, 0, 1);
@@ -1254,8 +1289,13 @@ int Prince_Update(int index)
                 }
                 if (DAT_10db6ee8[index].motionFrame == 0x245 || DAT_10db6ee8[index].motionFrame == 0x252)
                 {
-                    float jitter = ((float)(FUN_1013f880() % 0x14 - 10) * PRINCE_PI) / 180.0f;
-                    StartLeftHandSwing(index, 0x36b6, 1.1f, DAT_10255160[index][0], jitter);
+                    float lean = ((float)(FUN_1013f880() % 0x14 - 10) * PRINCE_PI) / 180.0f + DAT_10255160[index][0];
+                    if (lean <= PRINCE_MIN_SWING_LEAN)
+                        lean = PRINCE_MIN_SWING_LEAN;
+                    else
+                        lean = ((float)(FUN_1013f880() % 0x14 - 10) * PRINCE_PI) / 180.0f + DAT_10255160[index][0];
+                    float turn = ((float)(FUN_1013f880() % 0x14 - 10) * PRINCE_PI) / 180.0f + DAT_10db6ee8[index].heading;
+                    StartLeftHandSwing(index, 0x36b6, 1.1f, turn, -lean);
                     FUN_10065b10(index, 0x142, 1, 0);
                     if (FUN_1013f880() % 3 == 0)
                         FUN_100b9bb0(index, FUN_1013f880() % 3 + 0x47, 0, 1);
@@ -1609,9 +1649,10 @@ int Prince_Update(int index)
             {
                 if (distance3D >= 500.0f)
                 {
-                    Vec4 toPlayer = playerPos - ownPos;
-                    DAT_10802bf8[index].step.Copy(toPlayer.Normalized3() * 40.0f);
-                    DAT_1020b430[index].kind43.counter = (int)(toPlayer.Length() / 40.0f);
+                    DAT_10802bf8[index].step.Copy(playerPos - ownPos);
+                    DAT_10802bf8[index].step.Normalized3();
+                    DAT_10802bf8[index].step.Copy(DAT_10802bf8[index].step * PRINCE_LEAP_SPEED);
+                    DAT_1020b430[index].kind43.counter = (int)(distance3D / DAT_10802bf8[index].step.Length());
                     DAT_1020b430[index].kind43.wobble = 1;
                     DAT_10db6ee8[index].mode = 0;
                     wantMotion = 9;
@@ -1641,7 +1682,7 @@ int Prince_Update(int index)
                     moveMode = PRINCE_MOVE_PLACE;
                     move.Copy(DAT_10802bf8[index].step);
                 }
-                if (layer == 1 || DAT_1020b430[index].kind43.counter < 0)
+                if (layer == 2 || DAT_1020b430[index].kind43.counter < 0)
                 {
                     wantMotion = 0xb;
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
@@ -1769,12 +1810,9 @@ int Prince_Update(int index)
                 if (DAT_10db6ee8[index].motionFrame == 0x1b8)
                 {
                     DAT_10255160[index][0] = (float)(FUN_1013f880() % 300 - 0x96) / 5000.0f - 0.87606f;
-                    Vec4 offset;
-                    offset.Fill(0.0f);
-                    offset.y = -60.0f;
-                    offset.z = 20.0f;
-                    StartHandEffect(index, 0x7ca, offset, DAT_10255160[index][0], 1.3f);
-                    StartHandEffect(index, 0x3713, offset, DAT_10255160[index][0], 1.3f);
+                    StartPunchEffects(index, 1, DAT_10255160[index][0],
+                                      (float)(FUN_1013f880() % 300 - 0x96) / 5000.0f - DAT_10db6ee8[index].targetHeading);
+                    StartTurnedHandEffect(index, 0x3713, DAT_10255160[index][0], 1.3f);
                     DAT_10255160[index][0] = 0.0f;
                     FUN_10065b10(index, 0x145, 1, 0);
                 }

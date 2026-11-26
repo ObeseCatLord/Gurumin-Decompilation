@@ -80,7 +80,8 @@ extern "C" int FUN_10015710(int index)
     return 0;
 }
 
-// Not byte-identical yet: register choice for the box pointer and the index differs (see open.tsv).
+// Not byte-identical yet: only the schedule of the row pointer differs (the original adds the table base with a lea
+// after copying the box pointer).
 // Marks the cell boxes within 75 units of character `index` in its row of DAT_1021d338 and points the character's
 // nearCells at that row. Returns 1 when the map has no visibility data (nearCells stays 0), else 0.
 extern "C" int FUN_100157b0(int index)
@@ -91,13 +92,14 @@ extern "C" int FUN_100157b0(int index)
     if (DAT_10255f08->visibilityCells == 0)
         return 1;
     pos.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
-    Box2 *box = DAT_10255f08->visibilityCells->boxes;
-    for (; i < 0x40; i++, box++)
+    Box2 *boxes = DAT_10255f08->visibilityCells->boxes;
+    char *row = DAT_1021d338[index];
+    for (; i < 0x40; i++)
     {
-        DAT_1021d338[index][i] = 0;
-        if (pos.InBoxMargin(box, 75.0f) != 0)
-            DAT_1021d338[index][i] = 1;
+        row[i] = 0;
+        if (pos.InBoxMargin(&boxes[i], 75.0f) != 0)
+            row[i] = 1;
     }
-    DAT_10db6ee8[index].nearCells = DAT_1021d338[index];
+    DAT_10db6ee8[index].nearCells = row;
     return 0;
 }

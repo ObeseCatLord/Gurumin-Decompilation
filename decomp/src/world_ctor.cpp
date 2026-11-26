@@ -307,8 +307,8 @@ int WorldRenderer::LoadCharacter(const char *path)
 int WorldRenderer::StartFade(int mode, int target, int frames)
 {
     float value = (float)target;
-    fadeMode = mode;
     fadeTarget = value;
+    fadeMode = mode;
     if (frames == 0)
     {
         fadeAmount = value;

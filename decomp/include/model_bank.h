@@ -61,6 +61,7 @@ struct ModelBank
     // 0x1017c5f0: LightDirection for the bank model with node tree `root`, else the default lights.
     Vec4 *LightForRoot(Node *root, Vec4 *position, Vec4 *target);
     int Reset();
+    int Init();  // 0x101649c0
     int CollectLights(Node *root);
     int Add(Node *root, const Vec4 *position);
     int AddLitModel(AnimModel *model);

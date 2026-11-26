@@ -27,19 +27,21 @@ extern "C" int FUN_10045b80(int index)
     return 0;
 }
 
-// Wakes the sleeping enemies (kind 0x62, state 0) within `radius` of character `index` by setting their state to 1.
-// With `count` != 0 only enemies whose group (m_0004[0]) is among the `count` group numbers that follow are woken.
-// Returns 0. Not byte-identical yet: the two vectors get each other's stack slots (see open.tsv).
+// 0x1001b670. Wakes the sleeping enemies (kind 0x62, slot kind 3, state 0) within `radius` of character `index` by
+// setting their state to 1 (the radius is forced to 300 while DAT_10c66710 is set). With `count` != 0 only enemies
+// whose group (m_0004[0]) is among the `count` group numbers that follow are woken. The radius is squared in place
+// (its parameter slot holds the squared radius afterwards). Returns 0.
 extern "C" int FUN_1001b670(int index, float radius, int count, ...)
 {
-    Vec4 other;
     Vec4 position;
+    Vec4 other;
     if (DAT_10c66710 != 0)
         radius = 300.0f;
-    radius = radius * radius;  // compared with squared distances from here on
+    radius *= radius;  // compared with squared distances from here on
     position.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     va_list groups;
     va_start(groups, count);
+    const int *groupList = (const int *)groups;
     for (int i = 0x3a; i < 0x5c; i++)
     {
         if (DAT_10daaae8[i].kind == 0x62 && DAT_1021f3c0[i] == 3 && DAT_10db6ee8[i].root != 0 &&
@@ -47,17 +49,21 @@ extern "C" int FUN_1001b670(int index, float radius, int count, ...)
         {
             if (count != 0)
             {
-                int g;
-                for (g = 0; g < count; g++)
+                int g = 0;
+                if (0 < count)
                 {
-                    if (DAT_1020b430[i].values[0] == ((int *)groups)[g])
-                        break;
+                    do
+                    {
+                        if (DAT_1020b430[i].values[0] == groupList[g])
+                            break;
+                        g++;
+                    } while (g < count);
                 }
                 if (g == count)
                     continue;
             }
             other.Copy(DAT_10db6ee8[i].matrix.GetTranslation());
-            if ((other - position).LengthSquared3() < radius)
+            if ((position - other).LengthSquared3() < radius)
                 DAT_1020b430[i].state = 1;
         }
     }

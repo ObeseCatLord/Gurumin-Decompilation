@@ -16,8 +16,8 @@ extern "C" int FUN_101614c0(unsigned char *data, int size, char *name, int *sum,
     for (int i = 0; i < size; i++)
     {
         unsigned char c = data[i];
-        mix ^= c;
         total += c;
+        mix ^= c;
         data[i] = ~((key[i % 15] + (i & 7)) * table[i & 0x3f] ^ c);
     }
     *sum = total;

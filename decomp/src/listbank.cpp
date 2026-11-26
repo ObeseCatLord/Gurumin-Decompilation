@@ -174,15 +174,14 @@ int ListBank::CompileText()
     return 1;
 }
 
-// Skips a `{ ... }` block whose opening brace was just read: nested blocks are recorded in `blocks` (and their
+// 0x10035a30. Skips a `{ ... }` block whose opening brace was just read: nested blocks are recorded in `blocks` (and their
 // ends), braces inside double quotes do not count. On the closing brace *text points past it, *level is lowered and
 // the end of block `block` is recorded; returns 1. Reaching the end of the text reports "}が足りない。"
-// ("missing }") and returns 0. Not byte-identical yet: the original gives inQuotes its own stack slot, ours
-// reuses the dead `text` parameter slot (see open.tsv).
+// ("missing }") and returns 0.
 int ListBank::SkipBlock(char **text, int *level, int block)
 {
-    char *p = *text;
     int inQuotes = 0;
+    char *p = *text;
     while (p < this->text + textLength)
     {
         if (failed != 0)
@@ -921,11 +920,17 @@ int ListBank::FirstIndexValue(const char *name, int *value)
 // 0x10004760. Declares variable `name` as the next entry of group `group` with storage of its own: types 0 and 1
 // (numbers) get a new int set to 0, type 2 (text) a new 256-byte string set to "NULL". The entry is marked as not
 // in use (m_e80c = 0) and keeps a pointer to the storage in m_440c. Returns 1.
+// The type 0 and type 1 branches are identical; cl merges them with a jump back (as in the original).
 int ListBank::DeclareVariable(const char *name, int group, char type)
 {
     borrowed[group][variableCounts[group]] = 0;
     strcpy(variableNames[group][variableCounts[group]], name);
-    if (type == 0 || type == 1)
+    if (type == 0)
+    {
+        values[group][variableCounts[group]].ints = new int;
+        *values[group][variableCounts[group]].ints = 0;
+    }
+    else if (type == 1)
     {
         values[group][variableCounts[group]].ints = new int;
         *values[group][variableCounts[group]].ints = 0;

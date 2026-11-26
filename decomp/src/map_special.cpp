@@ -44,9 +44,10 @@ int Map_UpdateSpecial()
         DAT_10c6505c = -1;
         DAT_10874848.RegisterEvent(0x1bc);
     }
-    if (DAT_10c6505c < 0)
+    int timer = DAT_10c6505c;
+    if (timer < 0)
     {
-        DAT_10c6505c--;
+        DAT_10c6505c = timer - 1;
         if (DAT_10c62ed0 == 0x18)
         {
             Vec4 position;

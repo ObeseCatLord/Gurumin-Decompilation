@@ -19,15 +19,15 @@ EffectModel::EffectModel()
 {
 }
 
-// Setup: loads the effect model `path` (folder 0 of FUN_1013f8a0) and plays frames start..end.
+// 0x1000b9f0 (EffectModel::Setup). Loads the effect model `path` (folder 0 of FUN_1013f8a0) and plays frames start..end.
 // A negative start counts back from the end (stored in frame, start becomes 0); a negative end means
 // "up to the model's last frame" (Node::M_10199340 returns the frame count). Releases any previous model first.
 int EffectModel::M_1000b9f0(const char *path, int value, int start, int end)
 {
     color.Set(1.0f, 1.0f, 1.0f, 1.0f);
-    this->end = end;
     visible = 0;
     this->start = start;
+    this->end = end;
     frame = 0;
     matrix = DAT_10db6ee8[PLAYER_SLOT].matrix;
     rotation.Set(0.0f, 0.0f, 0.0f, 0.0f);

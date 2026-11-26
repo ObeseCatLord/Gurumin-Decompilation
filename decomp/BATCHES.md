@@ -440,3 +440,4 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 376 | 38 | match | in-game frame call sites; Bs006 register hoist; 858 matched |
 | 377 | 38 | match | Prince_Update one body; in-game frame burst local; 858 matched |
 | 378 | 38 | match | Prince_Update locals split, arena test, charge states; in-game frame leap-start block and scene order; 858 matched |
+| 379 | 38 | match | wall retries (16 matched); Prince_Update leap/effect poses, frame parked; 874 matched |

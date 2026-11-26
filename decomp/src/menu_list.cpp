@@ -34,19 +34,21 @@ extern "C" int FUN_1015fac0(FontRenderer *renderer)
 }
 
 
-// Draws the visible candidates one below the other (16 pixels apart) at (x, y), the selected one in `selColour`
+// 0x1015fb20. Draws the visible candidates one below the other (16 pixels apart) at (x, y), the selected one in `selColour`
 // and the others in `colour`. Returns 0 when text input is not active, else 1.
-// Not byte-identical yet: the original keeps the counter on the stack and x/y in registers (see open.tsv).
 extern "C" int FUN_1015fb20(FontRenderer *renderer, int x, int y, int colour, int selColour)
 {
     if (DAT_10f67000 == 0)
         return 0;
     if (DAT_10f67008[0].text[0] != 0)
     {
-        for (int i = 0; i < VisibleLines(); i++, y += 16)
-            renderer->DrawText(x, y, DAT_10f67008[i].text,
-                                 DAT_10f66ab0 * DAT_10f66de8 + DAT_10f66dd0 + i == DAT_10f68114 ? selColour : colour, 0,
-                                 1.0f, 1.0f);
+        for (int i = 0; i < VisibleLines(); i++)
+        {
+            if (DAT_10f66ab0 * DAT_10f66de8 + DAT_10f66dd0 + i != DAT_10f68114)
+                renderer->DrawText(x, y + i * 16, DAT_10f67008[i].text, colour, 0, 1.0f, 1.0f);
+            else
+                renderer->DrawText(x, y + i * 16, DAT_10f67008[i].text, selColour, 0, 1.0f, 1.0f);
+        }
     }
     return 1;
 }

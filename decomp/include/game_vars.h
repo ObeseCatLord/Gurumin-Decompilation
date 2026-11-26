@@ -59,7 +59,7 @@ extern "C" int DAT_10210b28;
 extern "C" float DAT_10210b2c;
 extern "C" float DAT_102199b0;
 extern "C" char DAT_10219bc0[];                           // the message shown
-extern "C" char DAT_1021a360;
+extern "C" unsigned char DAT_1021a360;
 extern "C" Node *DAT_1021b548[0x20];                       // nodes attached to a parent (each removed from DAT_10467e20[i] on reset)
 extern "C" char DAT_1021b5c8[0x60];
 extern "C" int DAT_1021bbf0;

@@ -223,7 +223,7 @@ extern "C" Vec4 DAT_11b04518[0x40];
 extern "C" Vec4 DAT_11b04918[0x40];
 extern "C" char DAT_11b04d18[0x30][0x80];                // light sets (0x80 bytes each)
 extern "C" Matrix4 DAT_11b06518[0x30];                    // light matrix sets
-extern "C" char DAT_11b07118[];                           // default target object of saved-matrix state 0x400000
+extern "C" Vec4 DAT_11b07118;                             // default target object of saved-matrix state 0x400000
 extern "C" Vec4 DAT_11b07128[0x40];                       // colour of each queued node
 
 #endif

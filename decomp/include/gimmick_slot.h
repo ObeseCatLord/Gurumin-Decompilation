@@ -5,6 +5,7 @@
 
 #include "app_0004.h"
 #include "item_caption.h"
+#include "vec4.h"
 
 struct Node;
 struct AnimModel;   // anim_model.h
@@ -17,7 +18,7 @@ struct GimmickSlot : Latch
     char motionOn[0x20];          // 0x64: colour plug motion played when the gimmick is switched on
     char motionOff[0x20];         // 0x84: colour plug motion played when it is switched off
     char pad_00a4[0x40];
-    char pad_00e4[0x10];          // 0xe4: position
+    Vec4 position;                // 0xe4: position of the gimmick (a marker follows its owner)
     Node *node;                   // 0xf4: the gimmick's model (0 = none)
     union
     {
@@ -25,6 +26,8 @@ struct GimmickSlot : Latch
         AnimModel *owner;         // 0xf8: the character model of a lever or chest (map triggers)
     };
 };
+
+typedef char GimmickSlotSizeCheck[sizeof(GimmickSlot) == 0xfc ? 1 : -1];
 
 extern "C" GimmickSlot DAT_10860cec[0x41];
 #ifndef GURUMIN_ITEM_DICTIONARY_H   // item_dictionary.h declares the same table with its own record type

@@ -34,7 +34,7 @@ void Node::Init()
     m_187c = 0;
     m_187d = 0;
     m_187e = 0xff;
-    m_0098 = DAT_11b07118;
+    m_0098 = &DAT_11b07118;
     m_1858 = 0;
     lightConeInner = 0;
     m_1888 = 45.0f;

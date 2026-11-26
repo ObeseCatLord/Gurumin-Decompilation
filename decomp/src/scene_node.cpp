@@ -835,7 +835,7 @@ int Node::EnterTargetState(void *target)
         if (target != 0)
             m_0098 = target;
         else
-            m_0098 = DAT_11b07118;
+            m_0098 = &DAT_11b07118;
         if ((flags & 0x400000) != 0)
         {
             if (saved->state == SAVED_RETURNING)

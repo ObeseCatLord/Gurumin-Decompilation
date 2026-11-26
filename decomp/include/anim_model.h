@@ -376,6 +376,7 @@ struct AnimModel
     void PlayMotion(int motion, int a, int b, float speed);        // 0x1017b0e0 (texture_mgr.cpp)
     int M_1017b160();
     int M_1017b1c0();
+    int HitsSegment(Vec4 *from, Vec4 *to);                         // 0x10164090: 0 without a node tree, else root->SegmentHitsBox(from, to)
     int CloneModel(AnimModel *source, int unused);                 // 0x1017b210 (anim_clone.cpp)
     int LoadFile(const char *path);                                // 0x1017b9b0 (anim_clone.cpp)
     // 0x1017a010 (anim_model_step.cpp): the per-frame update of a model: advances its motion, fades the shadow,

@@ -34,6 +34,17 @@ extern "C" float DAT_10314eb8;               // strength of the scene shove (gro
 extern "C" Vec4 DAT_10868828;                // direction of the last scene shove
 extern "C" int DAT_1030c274;                 // index of the respawn point in DAT_10daa400
 extern "C" int FUN_1000f360(int index, int frame);       // 0x1000f360 (face_anim.cpp): face change of a character
+// One entry of the player's face cue table: at motion frame `frame` the face `face` is shown (frame -3000 ends the table).
+struct FaceCue
+{
+    short frame;
+    short face;
+};
+extern "C" FaceCue DAT_108dbf58[0x80];
+extern "C" int DAT_104c01d4;                         // counts down while the player is on the ground (next to DAT_104c01d0)
+extern "C" int FUN_100157b0(int index);                  // 0x100157b0 (visibility.cpp): marks a character as in view
+extern "C" int FUN_10015710(int index);                  // 0x10015710 (visibility.cpp): 0 = the character is out of view
+extern "C" float FUN_10016700(int x, int y);             // 0x10016700 (ground_height.cpp, Ground_HeightAt)
 extern "C" int FUN_10016500(int index, const char *path, int start, int end, int once);   // 0x10016500 (char_motion.cpp): plays a motion file
 extern "C" int FUN_10011aa0(int id, int value);          // 0x10011aa0 (event_slots.cpp)
 

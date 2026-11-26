@@ -17,3 +17,10 @@ extern "C" int Launcher_SettingToListRow(int setting)
 {
     return setting >= LAUNCHER_SKIPPED_LIST_FIRST ? setting - LAUNCHER_SKIPPED_LIST_COUNT : setting;
 }
+
+// Writes the launcher settings back to the configuration file. Stubbed out in the Steam build (the settings are
+// written elsewhere), so it only returns 0. Called by the main dialog's Start, Close, Cancel and close-box handlers.
+extern "C" int Launcher_SaveSettings()
+{
+    return 0;
+}

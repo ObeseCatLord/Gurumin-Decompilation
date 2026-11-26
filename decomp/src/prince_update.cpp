@@ -43,6 +43,9 @@
 #include "world.h"
 
 #define PRINCE_PI 3.1415f
+#define PRINCE_ARENA_HALF_WIDTH 2150.0f          // the arena triangle: base corners at +-this, y = PRINCE_ARENA_BACK_Y
+#define PRINCE_ARENA_BACK_Y -623.0f
+#define PRINCE_ARENA_APEX_Y 3112.0f              // third corner at x = 0
 #define PRINCE_TWO_PI 6.283f
 #define PRINCE_SCRIPT_FLAG_DIFFICULTY 0x1c7      // script flag holding the difficulty (0, 1 or 2)
 #define PRINCE_FLAG_DEFEAT_MODEL 0x1a4           // script flag holding the model that leaves with the defeat scene
@@ -105,9 +108,9 @@ static inline float Atan2(float y, float x)
 }
 
 // The heading that faces the player.
-static __forceinline float FacePlayer(const PrinceFrame &f)
+static __forceinline float FacePlayer(const Vec4 &playerPos, const Vec4 &ownPos)
 {
-    return FUN_10001f80(f.playerPos.x - f.ownPos.x, f.playerPos.y - f.ownPos.y) + PRINCE_PI;
+    return FUN_10001f80(playerPos.x - ownPos.x, playerPos.y - ownPos.y) + PRINCE_PI;
 }
 
 static __forceinline int DifficultyIsHard()
@@ -187,138 +190,155 @@ static __forceinline int ApproachValue(float &value, float goal, float step)
     return 0;
 }
 
-// The three corners of the arena and the test whether a position is outside the edge from `a` to `b`.
-static __forceinline int OutsideEdge(const Vec4 &position, float ax, float ay, float bx, float by)
+// Brings an angle into -PRINCE_PI..PRINCE_PI.
+static __forceinline void WrapAngle(float &angle)
 {
-    float cross = (bx - ax) * (position.y - ay) - (by - ay) * (position.x - ax);
-    return cross > 0.0f;
+    while (angle > PRINCE_PI)
+        angle -= PRINCE_TWO_PI;
+    while (angle < -PRINCE_PI)
+        angle += PRINCE_TWO_PI;
+}
+
+// One edge of the arena triangle: 1 when the position and the arena centre lie on different sides of the edge that
+// starts at `corner` and runs along `edge` (the angles from the edge to the position and to the centre have opposite
+// signs). `delta` is the scratch vector.
+static __forceinline int SeparatedByEdge(const Vec4 &position, const Vec4 &corner, const Vec4 &edge, Vec4 &delta)
+{
+    float edgeAngle = FUN_10001f80(edge.x, edge.y);
+    delta.Copy(position - corner);
+    float positionSide = FUN_10001f80(delta.x, delta.y) - edgeAngle;
+    delta.Copy(corner * -1.0f);
+    float centreSide = FUN_10001f80(delta.x, delta.y) - edgeAngle;
+    WrapAngle(positionSide);
+    WrapAngle(centreSide);
+    return (positionSide < 0.0f && centreSide >= 0.0f) || (positionSide >= 0.0f && centreSide < 0.0f);
 }
 
 // The glow rings of the weapon: effect `effect` at the end node of the weapon (or its hand, or the root) every
 // tenth frame of the state, scaled by `scale`.
-static __forceinline void StartWeaponGlow(PrinceFrame &f, int effect, float scale)
+static __forceinline void StartWeaponGlow(int index, int effect, float scale)
 {
     EffectOptions options;
     Matrix4 pose;
     Vec4 where;
     where.Fill(0.0f);
     pose.SetIdentity();
-    SetUpOptions(f.index, options, scale, 1);
-    options.owner = f.index + PRINCE_EFFECT_OWNER_BASE;
-    StartEffect(f.index, effect, where, EffectAnchor(f.index, PRINCE_NODE_ROOT_NULL, PRINCE_NODE_HAND_R), 0, 0, 0,
+    SetUpOptions(index, options, scale, 1);
+    options.owner = index + PRINCE_EFFECT_OWNER_BASE;
+    StartEffect(index, effect, where, EffectAnchor(index, PRINCE_NODE_ROOT_NULL, PRINCE_NODE_HAND_R), 0, 0, 0,
                 &options);
 }
 
 // An effect at the right hand of the prince: `offset` is the position in the hand's frame (turned by the lean and the
 // heading of the prince), `tilt` the lean of the body, `scale` the effect scale.
-static __forceinline void StartHandEffect(PrinceFrame &f, int effect, const Vec4 &offset, float tilt, float scale)
+static __forceinline void StartHandEffect(int index, int effect, const Vec4 &offset, float tilt, float scale)
 {
-    Node *hand = PrinceNode(f.index, PRINCE_NODE_HAND_R);
+    Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
     if (hand == 0)
         return;
     Vec4 where = offset;
     where.RotateX(-tilt);
-    where.RotateZ(-f.model->heading);
-    Matrix4 pose = RotationZ(f.model->heading) * RotationX(-tilt);
+    where.RotateZ(-DAT_10db6ee8[index].heading);
+    Matrix4 pose = RotationZ(DAT_10db6ee8[index].heading) * RotationX(-tilt);
     pose.SetTranslation(hand->worldMatrix.GetTranslation() + where);
     EffectOptions options;
-    SetUpOptions(f.index, options, scale, 0);
+    SetUpOptions(index, options, scale, 0);
     Vec4 start = pose.GetTranslation();
-    StartEffect(f.index, effect, start, 0, 0, 0, &pose, &options);
+    StartEffect(index, effect, start, 0, 0, 0, &pose, &options);
 }
 
 // The knock-back punch effects of the states 3 and 4: the burst at the hand, then a shot of the character.
-static __forceinline void StartPunchEffects(PrinceFrame &f, float tilt)
+static __forceinline void StartPunchEffects(int index, float tilt)
 {
     Vec4 offset;
     offset.Fill(0.0f);
     offset.y = -60.0f;
     offset.z = 20.0f;
-    StartHandEffect(f, 0x7ca, offset, tilt, 1.3f);
-    Node *hand = PrinceNode(f.index, PRINCE_NODE_HAND_R);
+    StartHandEffect(index, 0x7ca, offset, tilt, 1.3f);
+    Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
     if (hand != 0)
     {
         Vec4 handPos = hand->worldMatrix.GetTranslation();
-        FUN_1001a680(f.index, &handPos, 0);
+        FUN_1001a680(index, &handPos, 0);
     }
 }
 
 // Blends the movement vector of a punch: the stored step shrinks by `keep` every frame.
-static __forceinline void DampStep(PrinceFrame &f, float keep)
+static __forceinline void DampStep(int index, int &moveMode, Vec4 &move, float keep)
 {
-    f.moveMode = PRINCE_MOVE_PLACE;
-    f.move.Copy(DAT_10802bf8[f.index].step * keep);
-    DAT_10802bf8[f.index].step.Copy(f.move);
+    moveMode = PRINCE_MOVE_PLACE;
+    move.Copy(DAT_10802bf8[index].step * keep);
+    DAT_10802bf8[index].step.Copy(move);
 }
 
 // Starts the rise or fall of the body: a wobble step towards the height range of the state.
-static __forceinline void SteerHeight(PrinceFrame &f, float low, float high, float stepSize)
+static __forceinline void SteerHeight(int index, const Vec4 &ownPos, Vec4 &move, int &moveMode, float low, float high, float stepSize)
 {
-    Kind43State &st = *f.st;
-    if (f.ownPos.z > high)
+    Kind43State &st = DAT_1020b430[index].kind43;
+    if (ownPos.z > high)
     {
-        f.move.z = -stepSize;
+        move.z = -stepSize;
         st.heightPhase = 0x401;
-        f.moveMode = PRINCE_MOVE_WALK;
+        moveMode = PRINCE_MOVE_WALK;
     }
-    if (f.ownPos.z < low)
+    if (ownPos.z < low)
     {
-        f.move.z = stepSize;
+        move.z = stepSize;
         st.heightPhase = 0x19;
-        f.moveMode = PRINCE_MOVE_WALK;
+        moveMode = PRINCE_MOVE_WALK;
     }
 }
 
 // The gatling burst of the states 5 and 6: a shot of the hand effect 0x36b1 and the tracer 1999 every 4th frame.
-static __forceinline void FireGatling(PrinceFrame &f, float tilt, float tracerSpread)
+static __forceinline void FireGatling(int index, float tilt, float tracerSpread)
 {
-    Kind43State &st = *f.st;
-    AnimModel &model = *f.model;
-    Node *hand = PrinceNode(f.index, PRINCE_NODE_HAND_R);
+    Kind43State &st = DAT_1020b430[index].kind43;
+    AnimModel &model = DAT_10db6ee8[index];
+    Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
     if (hand == 0)
     {
         hand = model.root->Find("Bip01 R Hand", 0);
-        DAT_1021bdf8[f.index][PRINCE_NODE_HAND_R] = hand;
+        DAT_1021bdf8[index][PRINCE_NODE_HAND_R] = hand;
         if (hand == 0)
         {
-            SayRandomLine(f.index);
+            SayRandomLine(index);
             return;
         }
     }
     Vec4 offset;
     offset.Fill(0.0f);
     offset.y = -70.0f;
-    StartHandEffect(f, 0x36b1, offset, tilt, 0.85f);
+    StartHandEffect(index, 0x36b1, offset, tilt, 0.85f);
     Matrix4 pose = RotationZ(model.heading - 1.5708f + tracerSpread) * RotationX(-tilt);
     EffectOptions options;
-    SetUpOptions(f.index, options, 0.85f, 0);
+    SetUpOptions(index, options, 0.85f, 0);
     Vec4 start = pose.GetTranslation();
-    StartEffect(f.index, 1999, start, 0, 0, 0, &pose, &options);
-    FUN_10065b10(f.index, 0x143, 1, 0);
+    StartEffect(index, 1999, start, 0, 0, 0, &pose, &options);
+    FUN_10065b10(index, 0x143, 1, 0);
 }
 
 // Swings of the states 7 and 8: effect `effect` from the left hand with a pose turned by the heading plus `jitter`
 // radians (the sparks of the weapon).
-static __forceinline void StartLeftHandSwing(PrinceFrame &f, int effect, float scale, float tilt, float jitter)
+static __forceinline void StartLeftHandSwing(int index, int effect, float scale, float tilt, float jitter)
 {
-    Node *hand = PrinceNode(f.index, PRINCE_NODE_HAND_L);
+    Node *hand = PrinceNode(index, PRINCE_NODE_HAND_L);
     if (hand == 0)
     {
-        hand = f.model->root->Find("Bip01 L Hand", 0);
-        DAT_1021bdf8[f.index][PRINCE_NODE_HAND_L] = hand;
+        hand = DAT_10db6ee8[index].root->Find("Bip01 L Hand", 0);
+        DAT_1021bdf8[index][PRINCE_NODE_HAND_L] = hand;
         if (hand == 0)
             return;
     }
-    Matrix4 pose = RotationZ(f.model->heading + jitter) * RotationX(-tilt);
+    Matrix4 pose = RotationZ(DAT_10db6ee8[index].heading + jitter) * RotationX(-tilt);
     EffectOptions options;
-    SetUpOptions(f.index, options, scale, 0);
+    SetUpOptions(index, options, scale, 0);
     Vec4 start = hand->worldMatrix.GetTranslation();
-    StartEffect(f.index, effect, start, 0, 0, 0, &pose, &options);
+    StartEffect(index, effect, start, 0, 0, 0, &pose, &options);
 }
 
 // The hand-and-root links of a weapon: the spark effect `spark` follows the right hand, and every 5th frame a link
 // effect `link` is drawn between the two nodes.
-static __forceinline void StartLinkedSparks(PrinceFrame &f, int spark, int link)
+static __forceinline void StartLinkedSparks(int index, int spark, int link)
 {
     EffectOptions options;
     Matrix4 pose;
@@ -326,16 +346,16 @@ static __forceinline void StartLinkedSparks(PrinceFrame &f, int spark, int link)
     where.Fill(0.0f);
     pose.SetIdentity();
     options.flags |= 2;
-    Node *hand = PrinceNode(f.index, PRINCE_NODE_HAND_R);
-    Node *tip = PrinceNode(f.index, PRINCE_NODE_ROOT_NULL);
+    Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
+    Node *tip = PrinceNode(index, PRINCE_NODE_ROOT_NULL);
     if (hand == 0)
         return;
-    StartEffect(f.index, spark, where, 0, 0, 0, &hand->worldMatrix, &options);
+    StartEffect(index, spark, where, 0, 0, 0, &hand->worldMatrix, &options);
     // Every 5th frame of the prince's age a lightning beam links the two nodes.
-    if (tip != 0 && DAT_1020b430[f.index].kind43.age % 5 == 0)
+    if (tip != 0 && DAT_1020b430[index].kind43.age % 5 == 0)
     {
-        options.owner = f.index + PRINCE_EFFECT_OWNER_BASE;
-        FUN_1001d8b0(f.index, link, where, -1, -1, &hand->worldMatrix, (int)&tip->worldMatrix, 0, 0, &options);
+        options.owner = index + PRINCE_EFFECT_OWNER_BASE;
+        FUN_1001d8b0(index, link, where, -1, -1, &hand->worldMatrix, (int)&tip->worldMatrix, 0, 0, &options);
     }
 }
 
@@ -361,35 +381,33 @@ int Prince_Update(int index)
         return 0;
     if (DAT_104c0135 != 0)
         return 0;
-    PrinceFrame f;
-    f.index = index;
-    f.model = &DAT_10db6ee8[index];
-    f.slot = &DAT_10daaae8[index];
-    f.st = &DAT_1020b430[index].kind43;
-    f.moveMode = PRINCE_MOVE_NONE;
-    f.motion = PRINCE_MOTION_NONE;
-    f.motionLoop = 0;
-    f.motionBlend = PRINCE_MOTION_BLEND;
-    f.layer = DAT_10db6ee8[index].motion->layer;
-    f.nextLayer = DAT_10db6ee8[index].motion->nextLayer;
+    int moveMode = PRINCE_MOVE_NONE;
+    int wantMotion = PRINCE_MOTION_NONE;
+    int motionLoop = 0;
+    int motionBlend = PRINCE_MOTION_BLEND;
+    int layer = DAT_10db6ee8[index].motion->layer;
+    int nextLayer = DAT_10db6ee8[index].motion->nextLayer;
     if (DAT_1020b430[index].kind43.syncedFlag == 0 || DAT_10315350[index] < DAT_1020b430[index].kind43.syncedFlag)
         DAT_1020b430[index].kind43.syncedFlag = DAT_10315350[index];
     else if (DAT_1020b430[index].kind43.syncedFlag < DAT_10315350[index])
         DAT_10315350[index] = (unsigned char)DAT_1020b430[index].kind43.syncedFlag;
     DAT_104c0110 = index;
     DAT_1021f6c0[index] = 0;
-    f.playerPos.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
-    f.ownPos.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
+    Vec4 playerPos;
+    Vec4 ownPos;
+    Vec4 move;
+    playerPos.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+    ownPos.Copy(DAT_10db6ee8[index].matrix.GetTranslation());
     if (DAT_104c0380 % 0x1e == index % 0x1e)
     {
         DAT_10db6ee8[index].m_0012 = 2;
         if (DAT_102022b8 != 0)
             FUN_1001c090(index, 0);
     }
-    Vec4 offset = f.ownPos - f.playerPos;
-    f.distance2D = offset.Length2D();
-    offset = f.ownPos - f.playerPos;
-    f.distance3D = offset.Length();
+    Vec4 offset = ownPos - playerPos;
+    float distance2D = offset.Length2D();
+    offset = ownPos - playerPos;
+    float distance3D = offset.Length();
 
     if (DAT_10210d30[index] != 0)
     {
@@ -468,7 +486,7 @@ int Prince_Update(int index)
                     DAT_1020b430[index].kind43.age = PRINCE_ENDING_START;
                     endingA.m_0000.Copy(DAT_118e69e8);
                     endingB.m_0000.Copy(DAT_118e6cb8);
-                    DAT_10255160[index][0] = (f.ownPos - DAT_118e6cb8).Length();
+                    DAT_10255160[index][0] = (ownPos - DAT_118e6cb8).Length();
                     DAT_10db6ee8[index].root->M_101946b0(0, 0xffffffff);
                     endingA.root->M_101946b0(0, 0xffffffff);
                     endingB.root->M_101946b0(0, 0xffffffff);
@@ -703,7 +721,7 @@ int Prince_Update(int index)
     }
     else
     {
-        int height = (int)f.ownPos.z;
+        int height = (int)ownPos.z;
         if (height == DAT_1020b430[index].kind43.lastHeight)
             DAT_10db6ee8[index].m_238c = 1;
         DAT_1020b430[index].kind43.lastHeight = height;
@@ -727,14 +745,27 @@ int Prince_Update(int index)
     // A prince outside any edge of the arena triangle is sent back by the teleport state.
     if (DAT_1020b430[index].kind43.state != PRINCE_STATE_TELEPORT)
     {
-        int edgesOutside = 0;
-        if (OutsideEdge(f.ownPos, 2150.0f, -620.0f, -2150.0f, -620.0f))
-            edgesOutside++;
-        if (OutsideEdge(f.ownPos, -2150.0f, -620.0f, 0.0f, 3100.0f))
-            edgesOutside++;
-        if (OutsideEdge(f.ownPos, 0.0f, 3100.0f, 2150.0f, -620.0f))
-            edgesOutside++;
-        if (edgesOutside != 0)
+        Vec4 cornerA;
+        Vec4 cornerB;
+        Vec4 cornerC;
+        Vec4 delta;
+        Vec4 edgeAB;
+        Vec4 edgeBC;
+        Vec4 edgeCA;
+        int separated = 0;
+        cornerA.Set(PRINCE_ARENA_HALF_WIDTH, PRINCE_ARENA_BACK_Y, 0.0f, 0.0f);
+        cornerB.Set(-PRINCE_ARENA_HALF_WIDTH, PRINCE_ARENA_BACK_Y, 0.0f, 0.0f);
+        cornerC.Set(0.0f, PRINCE_ARENA_APEX_Y, 0.0f, 0.0f);
+        edgeAB.Copy(cornerB - cornerA);
+        edgeBC.Copy(cornerC - cornerB);
+        edgeCA.Copy(cornerA - cornerC);
+        if (SeparatedByEdge(ownPos, cornerA, edgeAB, delta))
+            separated = 1;
+        if (SeparatedByEdge(ownPos, cornerB, edgeBC, delta))
+            separated++;
+        if (SeparatedByEdge(ownPos, cornerC, edgeCA, delta))
+            separated++;
+        if (separated != 0)
         {
             DAT_1020b430[index].kind43.state = PRINCE_STATE_TELEPORT;
             DAT_1020b430[index].kind43.frames = 0;
@@ -777,14 +808,14 @@ int Prince_Update(int index)
     case PRINCE_STATE_STALK:
         {
             DAT_1020b430[index].kind43.frames++;
-            SteerHeight(f, 25.0f, 65.0f, 5.0f);
+            SteerHeight(index, ownPos, move, moveMode, 25.0f, 65.0f, 5.0f);
             if (DAT_1020b430[index].kind43.wobble == 0)
                 DAT_1020b430[index].kind43.wobble = 1;
-            f.motion = PRINCE_MOTION_IDLE;
-            DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+            wantMotion = PRINCE_MOTION_IDLE;
+            DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
             if (FUN_1013f880() % DAT_1020b430[index].kind43.frames < 0x97)
             {
-                Vec4 away = f.playerPos - f.ownPos;
+                Vec4 away = playerPos - ownPos;
                 if (away.Length() >= 500.0f)
                     break;
             }
@@ -795,44 +826,44 @@ int Prince_Update(int index)
         {
             if (DAT_1020b430[index].kind43.frames == 0)
             {
-                Vec4 away = f.ownPos - f.playerPos;
+                Vec4 away = ownPos - playerPos;
                 away.z = 0.0f;
                 Vec4 direction = away.Normalized3();
                 direction.RotateZ(((float)(FUN_1013f880() % 2000) - 1000.0f) / 3600.0f * PRINCE_PI);
                 DAT_10802bf8[index].step.Copy(direction * (float)(FUN_1013f880() % 1000 + 0x2ee));
-                DAT_10802bf8[index].step.z = PRINCE_FLOOR_HEIGHT - f.ownPos.z;
+                DAT_10802bf8[index].step.z = PRINCE_FLOOR_HEIGHT - ownPos.z;
                 direction = DAT_10802bf8[index].step.Normalized3();
                 DAT_10802bf8[index].step.Copy(direction * 80.0f);
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 FUN_10065b10(index, 0x140, 1, 0);
                 DAT_1020b430[index].kind43.frames++;
                 break;
             }
-            f.moveMode = PRINCE_MOVE_PLACE;
-            f.move.Copy(DAT_10802bf8[index].step);
-            f.move.Copy(f.move * 0.875f);
+            moveMode = PRINCE_MOVE_PLACE;
+            move.Copy(DAT_10802bf8[index].step);
+            move.Copy(move * 0.875f);
             // The angle between the heading and the movement, turned into -pi..pi.
-            float delta = DAT_10db6ee8[index].targetHeading - FUN_10001f80(f.move.x, f.move.y) + PRINCE_PI;
+            float delta = DAT_10db6ee8[index].targetHeading - FUN_10001f80(move.x, move.y) + PRINCE_PI;
             while (delta > PRINCE_PI)
                 delta -= PRINCE_TWO_PI;
             while (delta < -PRINCE_PI)
                 delta += PRINCE_TWO_PI;
             if (delta >= -0.785375f && delta < 0.785375f)
-                f.motion = 5;
+                wantMotion = 5;
             else if (delta >= 0.785375f && delta < 2.3561249f)
-                f.motion = 6;
+                wantMotion = 6;
             else if (delta >= -2.3561249f && delta < -0.785375f)
-                f.motion = 7;
+                wantMotion = 7;
             else
-                f.motion = 8;
-            float speed = f.move.Length();
+                wantMotion = 8;
+            float speed = move.Length();
             if (speed < 20.0f)
-                f.motion = PRINCE_MOTION_IDLE;
+                wantMotion = PRINCE_MOTION_IDLE;
             if (speed < 5.0f)
                 DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
             Matrix4 pose;
             pose.SetIdentity();
-            pose.SetTranslation(f.move + f.ownPos);
+            pose.SetTranslation(move + ownPos);
             Vec4 spot = pose.GetTranslation();
             StartEffect(index, 0x36c2, spot, 0, 0, 0, &pose, 0);
             DAT_1020b430[index].kind43.frames++;
@@ -843,14 +874,14 @@ int Prince_Update(int index)
             float elevation = 0.0f;
             int reached = 0;
             DAT_1020b430[index].kind43.engaged = 1;
-            DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+            DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
             // The lean of the body while it punches: the tilt (DAT_10255160[slot][0]) follows the
             // elevation of the player at 0.06 per frame. Sets `reached` once the tilt has reached it.
             if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_THREE)
             {
-                float rise = f.distance3D;
+                float rise = distance3D;
                 if (rise > 0.01f || rise < -0.01f)
-                    elevation = 2.0f * (float)atan(f.distance2D / rise);
+                    elevation = 2.0f * (float)atan(distance2D / rise);
                 else
                     elevation = 0.0f;
                 elevation -= 0.25f;
@@ -861,20 +892,20 @@ int Prince_Update(int index)
             }
             if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_TWO)
             {
-                f.motion = PRINCE_MOTION_IDLE;
+                wantMotion = PRINCE_MOTION_IDLE;
                 DAT_1020b430[index].kind43.wobble = 2;
-                if (f.ownPos.z < 200.0f)
+                if (ownPos.z < 200.0f)
                 {
-                    f.moveMode = PRINCE_MOVE_PLACE;
-                    f.move.z = 25.0f;
+                    moveMode = PRINCE_MOVE_PLACE;
+                    move.z = 25.0f;
                     DAT_1020b430[index].kind43.heightPhase = 0x19;
                     DAT_1020b430[index].kind43.frames++;
                     break;
                 }
-                if (f.ownPos.z > 250.0f)
+                if (ownPos.z > 250.0f)
                 {
-                    f.moveMode = PRINCE_MOVE_PLACE;
-                    f.move.z = -25.0f;
+                    moveMode = PRINCE_MOVE_PLACE;
+                    move.z = -25.0f;
                     DAT_1020b430[index].kind43.heightPhase = 0x401;
                     DAT_1020b430[index].kind43.frames++;
                     break;
@@ -882,31 +913,31 @@ int Prince_Update(int index)
                 if (reached)
                 {
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
-                    f.motion = 0x14;
+                    wantMotion = 0x14;
                     DAT_1020b430[index].kind43.frames++;
                     break;
                 }
             }
             else if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_THREE)
             {
-                f.motion = 0x14;
+                wantMotion = 0x14;
                 if (DAT_10db6ee8[index].motionFrame == 0x171)
                 {
                     DAT_1020b430[index].kind43.counter = 1;
-                    f.move.Fill(0.0f);
+                    move.Fill(0.0f);
                     DAT_10802bf8[index].step.Fill(0.0f);
                     DAT_10802bf8[index].step.y = -120.0f;
                     DAT_10802bf8[index].step.RotateX(DAT_10255160[index][0]);
                     DAT_10802bf8[index].step.RotateZ(PRINCE_PI - DAT_10db6ee8[index].targetHeading);
-                    f.moveMode = PRINCE_MOVE_PLACE;
-                    StartPunchEffects(f, DAT_10255160[index][0]);
+                    moveMode = PRINCE_MOVE_PLACE;
+                    StartPunchEffects(index, DAT_10255160[index][0]);
                     FUN_10065b10(index, 0x145, 1, 0);
                     SayRandomLine(index);
                 }
                 if (DAT_1020b430[index].kind43.counter != 0)
                 {
-                    DampStep(f, 0.8f);
-                    if (f.layer != 0x14)
+                    DampStep(index, moveMode, move, 0.8f);
+                    if (layer != 0x14)
                     {
                         DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_THREE;
                         DAT_1020b430[index].kind43.frames++;
@@ -916,7 +947,7 @@ int Prince_Update(int index)
             }
             else if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_FOUR)
             {
-                DampStep(f, 0.8f);
+                DampStep(index, moveMode, move, 0.8f);
                 if (DAT_10255160[index][0] <= 0.0f)
                 {
                     DAT_10255160[index][0] = 0.0f;
@@ -937,10 +968,10 @@ int Prince_Update(int index)
             }
             else if (DAT_1020b430[index].kind43.frames < 4000)
             {
-                DampStep(f, 0.8f);
+                DampStep(index, moveMode, move, 0.8f);
                 if (DAT_10802bf8[index].step.LengthSquared3() < 100.0f)
                 {
-                    f.motion = PRINCE_MOTION_IDLE;
+                    wantMotion = PRINCE_MOTION_IDLE;
                     DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
                 }
             }
@@ -950,39 +981,39 @@ int Prince_Update(int index)
     case PRINCE_STATE_PUNCH:
         {
             DAT_1020b430[index].kind43.engaged = 1;
-            DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+            DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
             DAT_10db6ee8[index].mode = 1;
             if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_TWO)
             {
-                f.motion = 2;
+                wantMotion = 2;
                 DAT_1020b430[index].kind43.wobble = 0;
                 if (DAT_10db6ee8[index].m_238c != 0)
                 {
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
-                    f.motion = 0x14;
+                    wantMotion = 0x14;
                     DAT_1020b430[index].kind43.frames++;
                     break;
                 }
             }
             else if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_THREE)
             {
-                f.motion = 0x14;
+                wantMotion = 0x14;
                 if (DAT_10db6ee8[index].motionFrame == 0x171)
                 {
                     DAT_1020b430[index].kind43.counter = 1;
                     DAT_10802bf8[index].step.Fill(0.0f);
                     DAT_10802bf8[index].step.y = -80.0f;
                     DAT_10802bf8[index].step.RotateZ(PRINCE_PI - DAT_10db6ee8[index].targetHeading);
-                    f.moveMode = PRINCE_MOVE_PLACE;
+                    moveMode = PRINCE_MOVE_PLACE;
                     DAT_10255160[index][0] = 0.0f;
-                    StartPunchEffects(f, 0.0f);
+                    StartPunchEffects(index, 0.0f);
                     FUN_10065b10(index, 0x145, 1, 0);
                     SayRandomLine(index);
                 }
                 if (DAT_1020b430[index].kind43.counter != 0)
                 {
-                    DampStep(f, 0.6f);
-                    if (f.layer != 0x14)
+                    DampStep(index, moveMode, move, 0.6f);
+                    if (layer != 0x14)
                     {
                         DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_THREE;
                         DAT_1020b430[index].kind43.frames++;
@@ -992,10 +1023,10 @@ int Prince_Update(int index)
             }
             else if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_FOUR)
             {
-                DampStep(f, 0.6f);
+                DampStep(index, moveMode, move, 0.6f);
                 if (DAT_10802bf8[index].step.LengthSquared3() < 100.0f)
                 {
-                    f.motion = 2;
+                    wantMotion = 2;
                     DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
                 }
             }
@@ -1005,7 +1036,7 @@ int Prince_Update(int index)
     case PRINCE_STATE_GATLING_SPRAY:
         {
             DAT_1020b430[index].kind43.engaged = 1;
-            f.motion = 0xf;
+            wantMotion = 0xf;
             if (DAT_1020b430[index].kind43.frames == 0)
             {
                 DAT_10802bf8[index].step.Fill(0.0f);
@@ -1023,7 +1054,7 @@ int Prince_Update(int index)
             if (DAT_1020b430[index].kind43.frames < 10000)
             {
                 DAT_1020b430[index].kind43.frames = DAT_1020b430[index].kind43.frames % 9 + 1;
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 if (DAT_10db6ee8[index].motionFrame == 0x13a)
                 {
                     DAT_1020b430[index].kind43.counter++;
@@ -1037,13 +1068,13 @@ int Prince_Update(int index)
                                            DAT_10db6ee8[index].targetHeading) + PRINCE_PI);
                     }
                 }
-                f.moveMode = PRINCE_MOVE_WALK;
+                moveMode = PRINCE_MOVE_WALK;
                 DAT_1020b430[index].kind43.wobble = 1;
-                f.move.Copy(DAT_10802bf8[index].step);
-                SteerHeight(f, 25.0f, 65.0f, 20.0f);
+                move.Copy(DAT_10802bf8[index].step);
+                SteerHeight(index, ownPos, move, moveMode, 25.0f, 65.0f, 20.0f);
                 if ((DAT_10db6ee8[index].motionFrame & 3) == 0)
                 {
-                    FireGatling(f, 0.0f, ((float)(FUN_1013f880() % 0x28 - 0x14) * PRINCE_PI) / 720.0f);
+                    FireGatling(index, 0.0f, ((float)(FUN_1013f880() % 0x28 - 0x14) * PRINCE_PI) / 720.0f);
                     DAT_1020b430[index].kind43.frames++;
                     break;
                 }
@@ -1081,29 +1112,29 @@ int Prince_Update(int index)
             LeanBody(index, DAT_10255160[index][0]);
             if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_TWO)
             {
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
-                if (f.ownPos.z >= 300.0f)
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
+                if (ownPos.z >= 300.0f)
                 {
-                    if (f.ownPos.z <= 350.0f)
+                    if (ownPos.z <= 350.0f)
                     {
-                        DAT_10802bf8[index].step.Copy(f.playerPos - f.ownPos);
+                        DAT_10802bf8[index].step.Copy(playerPos - ownPos);
                         DAT_10802bf8[index].step.z = 0.0f;
-                        if ((f.playerPos - f.ownPos).LengthSquared3() < 1.0f)
-                            DAT_10802bf8[index].step.y = f.ownPos.y <= f.playerPos.y ? 1.0f : -1.0f;
+                        if ((playerPos - ownPos).LengthSquared3() < 1.0f)
+                            DAT_10802bf8[index].step.y = ownPos.y <= playerPos.y ? 1.0f : -1.0f;
                         DAT_10802bf8[index].step.Copy(DAT_10802bf8[index].step.Normalized3() * 35.0f);
                         DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
                     }
                     else
                     {
-                        f.moveMode = PRINCE_MOVE_WALK;
-                        f.move.z = -30.0f;
+                        moveMode = PRINCE_MOVE_WALK;
+                        move.z = -30.0f;
                         DAT_1020b430[index].kind43.heightPhase = 0x401;
                     }
                 }
                 else
                 {
-                    f.moveMode = PRINCE_MOVE_WALK;
-                    f.move.z = 30.0f;
+                    moveMode = PRINCE_MOVE_WALK;
+                    move.z = 30.0f;
                     DAT_1020b430[index].kind43.heightPhase = 0x19;
                 }
             }
@@ -1112,19 +1143,19 @@ int Prince_Update(int index)
                 float blend = (float)(DAT_1020b430[index].kind43.frames - PRINCE_FRAMES_PART_TWO) / 30.0f;
                 if (blend >= 1.0f)
                     blend = 1.0f;
-                f.moveMode = PRINCE_MOVE_PLACE;
-                f.move.Copy(DAT_10802bf8[index].step * blend);
+                moveMode = PRINCE_MOVE_PLACE;
+                move.Copy(DAT_10802bf8[index].step * blend);
             }
             DAT_1020b430[index].kind43.frames++;
             if (DAT_1020b430[index].kind43.frames < 0x2e)
             {
-                f.motion = PRINCE_MOTION_IDLE;
+                wantMotion = PRINCE_MOTION_IDLE;
                 break;
             }
-            f.motion = 0xf;
+            wantMotion = 0xf;
             if (DAT_1020b430[index].kind43.frames % 4 == 0)
             {
-                FireGatling(f, DAT_10255160[index][0], ((float)(FUN_1013f880() % 0x1e - 0xf) * PRINCE_PI) / 180.0f);
+                FireGatling(index, DAT_10255160[index][0], ((float)(FUN_1013f880() % 0x1e - 0xf) * PRINCE_PI) / 180.0f);
             }
             DAT_1020b430[index].kind43.counter++;
         }
@@ -1137,32 +1168,32 @@ int Prince_Update(int index)
             DAT_1020b430[index].kind43.wobble = 0;
             if (frames < PRINCE_FRAMES_PART_TWO)
             {
-                f.motion = 2;
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                wantMotion = 2;
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 if (DAT_10db6ee8[index].m_238c != 0)
                 {
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
-                    f.motion = 0x1b;
+                    wantMotion = 0x1b;
                 }
                 break;
             }
             if (frames >= PRINCE_FRAMES_PART_THREE)
             {
-                f.motion = 2;
+                wantMotion = 2;
                 DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
                 break;
             }
-            f.motion = 0x1b;
+            wantMotion = 0x1b;
             if (DAT_10db6ee8[index].motionFrame == 0x248 || DAT_10db6ee8[index].motionFrame == 0x256)
             {
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 DAT_1020b430[index].kind43.counter++;
                 if (FUN_1013f880() % 1000 < DAT_1020b430[index].kind43.counter * 0x96)
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_THREE;
             }
             if (DAT_10db6ee8[index].motionFrame == 0x245 || DAT_10db6ee8[index].motionFrame == 0x252)
             {
-                StartLeftHandSwing(f, 0x36b4, 0.7f, 0.0f, 0.0f);
+                StartLeftHandSwing(index, 0x36b4, 0.7f, 0.0f, 0.0f);
                 FUN_10065b10(index, 0x14e, 1, 0);
                 if (FUN_1013f880() % 3 == 0)
                     FUN_100b9bb0(index, FUN_1013f880() % 3 + 0x47, 0, 1);
@@ -1175,11 +1206,11 @@ int Prince_Update(int index)
             float elevation = 0.0f;
             DAT_1020b430[index].kind43.engaged = 1;
             DAT_1020b430[index].kind43.wobble = 2;
-            if (DAT_1020b430[index].kind43.frames >= PRINCE_FRAMES_PART_THREE || (f.distance3D <= 0.01f && f.distance3D >= -0.01f))
+            if (DAT_1020b430[index].kind43.frames >= PRINCE_FRAMES_PART_THREE || (distance3D <= 0.01f && distance3D >= -0.01f))
                 elevation = 0.0f;
             else
             {
-                elevation = (float)atan(f.distance2D / f.distance3D);
+                elevation = (float)atan(distance2D / distance3D);
                 if (elevation >= 1.5708f)
                     elevation = 1.5708f;
             }
@@ -1187,36 +1218,36 @@ int Prince_Update(int index)
             if (DAT_1020b430[index].kind43.frames == 0)
             {
                 DAT_1020b430[index].kind43.counter = 0x3c;
-                f.motion = PRINCE_MOTION_IDLE;
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                wantMotion = PRINCE_MOTION_IDLE;
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 DAT_1020b430[index].kind43.frames++;
                 break;
             }
             if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_TWO)
             {
                 DAT_1020b430[index].kind43.counter -= 4;
-                f.motion = PRINCE_MOTION_IDLE;
+                wantMotion = PRINCE_MOTION_IDLE;
                 if (DAT_1020b430[index].kind43.counter < 0x14)
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
-                f.move.z = (float)DAT_1020b430[index].kind43.counter;
-                f.moveMode = PRINCE_MOVE_PLACE;
+                move.z = (float)DAT_1020b430[index].kind43.counter;
+                moveMode = PRINCE_MOVE_PLACE;
                 LeanBody(index, DAT_10255160[index][0]);
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 DAT_1020b430[index].kind43.frames++;
                 break;
             }
             if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_THREE)
             {
-                f.motion = 0x1b;
+                wantMotion = 0x1b;
                 if (DAT_1020b430[index].kind43.counter > 0)
                 {
                     DAT_1020b430[index].kind43.counter -= 4;
-                    f.move.z = (float)DAT_1020b430[index].kind43.counter;
-                    f.moveMode = PRINCE_MOVE_PLACE;
+                    move.z = (float)DAT_1020b430[index].kind43.counter;
+                    moveMode = PRINCE_MOVE_PLACE;
                 }
                 if (DAT_10db6ee8[index].motionFrame == 0x248 || DAT_10db6ee8[index].motionFrame == 0x256)
                 {
-                    DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                    DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                     DAT_1020b430[index].kind43.counter++;
                     if (FUN_1013f880() % 1000 < 700)
                         DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_THREE;
@@ -1224,7 +1255,7 @@ int Prince_Update(int index)
                 if (DAT_10db6ee8[index].motionFrame == 0x245 || DAT_10db6ee8[index].motionFrame == 0x252)
                 {
                     float jitter = ((float)(FUN_1013f880() % 0x14 - 10) * PRINCE_PI) / 180.0f;
-                    StartLeftHandSwing(f, 0x36b6, 1.1f, DAT_10255160[index][0], jitter);
+                    StartLeftHandSwing(index, 0x36b6, 1.1f, DAT_10255160[index][0], jitter);
                     FUN_10065b10(index, 0x142, 1, 0);
                     if (FUN_1013f880() % 3 == 0)
                         FUN_100b9bb0(index, FUN_1013f880() % 3 + 0x47, 0, 1);
@@ -1239,10 +1270,10 @@ int Prince_Update(int index)
                     DAT_1020b430[index].kind43.frames++;
                     break;
                 }
-                f.motion = PRINCE_MOTION_IDLE;
+                wantMotion = PRINCE_MOTION_IDLE;
                 DAT_1020b430[index].kind43.wobble = 0;
                 DAT_10db6ee8[index].mode = 1;
-                if (DAT_10db6ee8[index].m_238c != 0 || f.ownPos.z < 0.0f)
+                if (DAT_10db6ee8[index].m_238c != 0 || ownPos.z < 0.0f)
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_FOUR;
             }
             LeanBody(index, DAT_10255160[index][0]);
@@ -1255,51 +1286,51 @@ int Prince_Update(int index)
             DAT_1020b430[index].kind43.engaged = 1;
             if (frames == 0)
             {
-                f.motion = 2;
+                wantMotion = 2;
                 DAT_1020b430[index].kind43.wobble = 0;
                 DAT_10db6ee8[index].mode = 1;
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 DAT_10db6ee8[index].m_238c = 0;
                 FUN_100b9bb0(index, 0x4b, 0, 0);
             }
             else if (frames < PRINCE_FRAMES_PART_TWO)
             {
-                f.motion = 2;
+                wantMotion = 2;
                 DAT_1020b430[index].kind43.wobble = 0;
                 DAT_10db6ee8[index].mode = 1;
-                if (DAT_10db6ee8[index].m_238c != 0 || f.ownPos.z < 0.0f)
+                if (DAT_10db6ee8[index].m_238c != 0 || ownPos.z < 0.0f)
                 {
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
                     DAT_1020b430[index].kind43.wobble = 1;
                     FUN_10065b10(index, 0x147, 1, 0);
                 }
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
             }
             else if (frames < PRINCE_FRAMES_PART_THREE)
             {
-                f.motion = 0x20;
+                wantMotion = 0x20;
                 DAT_10db6ee8[index].holding = 1;
                 DAT_10db6ee8[index].motionFrame = (frames - PRINCE_FRAMES_PART_TWO) / 3 + 0x406;
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 if (DAT_10db6ee8[index].motionFrame == 0x410)
                 {
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_THREE;
-                    Vec4 toPlayer = f.playerPos - f.ownPos;
+                    Vec4 toPlayer = playerPos - ownPos;
                     toPlayer.z = 0.0f;
                     Vec4 direction = toPlayer.Normalized3();
-                    DAT_10802bf8[index].step.Copy(direction * (f.distance2D - 100.0f) * 0.1f);
+                    DAT_10802bf8[index].step.Copy(direction * (distance2D - 100.0f) * 0.1f);
                     DAT_10802bf8[index].step.z = 9.0f;
-                    f.move.Copy(DAT_10802bf8[index].step);
+                    move.Copy(DAT_10802bf8[index].step);
                 }
             }
             else if (frames < PRINCE_FRAMES_PART_FOUR)
             {
-                f.motion = 0x20;
+                wantMotion = 0x20;
                 if (DAT_10db6ee8[index].motionFrame < 0x415)
                 {
                     if ((frames & 1) == 1)
                         DAT_10db6ee8[index].motionFrame++;
-                    StartLinkedSparks(f, 0x7c6, 0x7cd);
+                    StartLinkedSparks(index, 0x7c6, 0x7cd);
                 }
                 else
                     DAT_10db6ee8[index].motionFrame = 0x415;
@@ -1307,16 +1338,16 @@ int Prince_Update(int index)
                 {
                     DAT_10db6ee8[index].holding = 0;
                     DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
-                    f.motion = 2;
+                    wantMotion = 2;
                 }
                 if (DAT_1020b430[index].kind43.frames < 0x7db)
                 {
-                    f.moveMode = PRINCE_MOVE_PLACE;
-                    DAT_10802bf8[index].step.Copy(f.move);
+                    moveMode = PRINCE_MOVE_PLACE;
+                    DAT_10802bf8[index].step.Copy(move);
                 }
                 else
                 {
-                    f.move.Copy(DAT_10802bf8[index].step * 0.5f);
+                    move.Copy(DAT_10802bf8[index].step * 0.5f);
                     DAT_1020b430[index].kind43.wobble = 0;
                 }
                 if (DAT_1020b430[index].kind43.frames == 0x7db)
@@ -1367,77 +1398,206 @@ int Prince_Update(int index)
         }
         break;
     case PRINCE_STATE_CHARGE_A:
-    case PRINCE_STATE_CHARGE_B:
-        // The charge states 10 (A) and 11 (B): the prince picks one of four attack motions, then dashes with it along the
-        // heading it faced. Both motions end the state when the motion layer changes or `lastFrame` is passed.
+        // The charge state A: the prince picks one of four attack motions, then dashes with it along the heading it faced.
+        // The state ends when the motion layer changes or the frame count passes 0x406.
         {
-            int isB = DAT_1020b430[index].kind43.state == PRINCE_STATE_CHARGE_B;
-            static const int motionsA[4] = {0x22, 0x27, 0x28, 0x29};
-            static const int motionsB[4] = {0x1d, 0x1e, 0x1f, 0x22};
             if (DAT_1020b430[index].kind43.frames == 0)
             {
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
-                if (f.distance2D <= (isB ? 500.0f : 600.0f))
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
+                if (distance2D <= 600.0f)
                 {
-                    DAT_1020b430[index].kind43.attackMotion = (isB ? motionsB : motionsA)[FUN_1013f880() & 3];
-                    f.motion = DAT_1020b430[index].kind43.attackMotion;
-                    f.motionLoop = 1;
+                    switch (FUN_1013f880() % 4)
+                    {
+                    case 0:
+                        DAT_1020b430[index].kind43.attackMotion = 0x22;
+                        break;
+                    case 1:
+                        DAT_1020b430[index].kind43.attackMotion = 0x27;
+                        break;
+                    case 2:
+                        DAT_1020b430[index].kind43.attackMotion = 0x28;
+                        break;
+                    case 3:
+                        DAT_1020b430[index].kind43.attackMotion = 0x29;
+                        break;
+                    }
+                    wantMotion = DAT_1020b430[index].kind43.attackMotion;
+                    motionLoop = 1;
                     DAT_10802bf8[index].step.Fill(0.0f);
                     DAT_10802bf8[index].step.y = -30.0f;
                     DAT_10802bf8[index].step.RotateZ(-DAT_10db6ee8[index].targetHeading);
-                    FUN_10065b10(index, isB ? 0x14d : 0x148, 1, 0);
-                    SayRandomLine(index);
+                    FUN_10065b10(index, 0x148, 1, 0);
+                    FUN_100b9bb0(index, FUN_1013f880() % 4 + 0x47, 0, 0);
                 }
                 else
                 {
                     DAT_1020b430[index].kind43.frames = -1;
-                    DAT_1020b430[index].kind43.state = isB ? PRINCE_STATE_LEAP : PRINCE_STATE_HIT_RECOVER;
+                    DAT_1020b430[index].kind43.state = PRINCE_STATE_HIT_RECOVER;
                     if (FUN_1013f880() % 100 < 0x3c && DAT_1020b430[index].kind43.engaged != 0)
                         DAT_1020b430[index].kind43.state = PRINCE_STATE_SWAP_WEAPON;
                 }
             }
             else
             {
-                f.motion = DAT_1020b430[index].kind43.attackMotion;
-                f.move.x = DAT_10802bf8[index].step.x;
-                f.move.y = DAT_10802bf8[index].step.y;
-                f.moveMode = PRINCE_MOVE_WALK;
-                f.move.Copy(f.move * (isB ? 0.92f : 0.9f));
-                if (isB)
-                    DAT_1020b430[index].kind43.wobble = 0;
-                if (!isB && DAT_1020b430[index].kind43.attackMotion == 0x27)
+                wantMotion = DAT_1020b430[index].kind43.attackMotion;
+                move.x = DAT_10802bf8[index].step.x;
+                move.y = DAT_10802bf8[index].step.y;
+                moveMode = PRINCE_MOVE_WALK;
+                move.Copy(move * 0.9f);
+                if (DAT_1020b430[index].kind43.attackMotion == 0x27)
                 {
-                    if (f.ownPos.z < 90.0f)
+                    if (ownPos.z < 90.0f)
                     {
-                        f.move.z = 20.0f;
-                        if (f.ownPos.z + 20.0f > 95.0f)
-                            f.move.z = 95.0f - f.ownPos.z;
+                        move.z = 20.0f;
+                        if (ownPos.z + 20.0f > 95.0f)
+                            move.z = 95.0f - ownPos.z;
                     }
-                    else if (f.ownPos.z > 100.0f)
+                    else if (ownPos.z > 100.0f)
                     {
-                        f.move.z = -20.0f;
-                        if (f.ownPos.z - 20.0f < 95.0f)
-                            f.move.z = 95.0f - f.ownPos.z;
+                        move.z = -20.0f;
+                        if (ownPos.z - 20.0f < 95.0f)
+                            move.z = 95.0f - ownPos.z;
                     }
                 }
-                else if (f.ownPos.z > 5.0f)
+                else if (ownPos.z > 5.0f)
                 {
-                    f.move.z = -20.0f;
-                    if (f.ownPos.z - 20.0f < 0.0f)
-                        f.move.z = -f.ownPos.z;
+                    move.z = -20.0f;
+                    if (ownPos.z - 20.0f < 0.0f)
+                        move.z = -ownPos.z;
                 }
-                StartLinkedSparks(f, isB ? 0x7c7 : 0x7c8, isB ? 0x7c7 : 0x7c8);
+                Vec4 where;
+                Matrix4 pose;
+                EffectOptions options;
+                pose.SetIdentity();
+                options.flags |= 2;
+                where.Fill(0.0f);
+                Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
+                Node *tip = PrinceNode(index, PRINCE_NODE_ROOT_NULL);
+                // Every 5th frame of the prince's age a lightning beam links the hand and the tip of the weapon.
+                if (hand != 0 && tip != 0)
+                {
+                    where.Fill(0.0f);
+                    if (DAT_1020b430[index].kind43.age % 5 == 0)
+                    {
+                        options.owner = index + PRINCE_EFFECT_OWNER_BASE;
+                        FUN_1001d8b0(index, 0x7c8, where, -1, -1, &hand->worldMatrix, (int)&tip->worldMatrix, 0, 0, &options);
+                    }
+                }
                 int mf = DAT_10db6ee8[index].motionFrame;
-                int glow = isB ? ((mf > 0x361 && mf < 0x366) || (mf > 0x386 && mf < 0x38c) || (mf > 0x39f && mf < 0x3aa) ||
-                                  (mf > 0x442 && mf < 0x448))
-                               : ((mf > 0x3a0 && mf < 0x3a5) || (mf > 0x386 && mf < 0x38c) || (mf > 0x413 && mf < 0x415) ||
-                                  (mf > 0x442 && mf < 0x448));
-                if (glow)
-                    StartWeaponGlow(f, isB ? 0x456 : 0x36c1, isB ? 1.4f : 1.1f);
+                if ((mf > 0x3a0 && mf < 0x3a5) || (mf > 0x386 && mf < 0x38c) || (mf > 0x413 && mf < 0x415) || (mf > 0x442 && mf < 0x448))
+                {
+                    // The glow sits at the middle of the weapon (the tip and its parent), else at the hand or the prince.
+                    if (tip != 0)
+                        where.Copy((tip->worldMatrix.GetTranslation() + tip->parent->worldMatrix.GetTranslation()) * 0.5f);
+                    else if (hand != 0)
+                        where.Copy(hand->worldMatrix.GetTranslation());
+                    else
+                        where.Copy(ownPos);
+                    pose = TranslationMatrix(where.x, where.y, where.z);
+                    where.Fill(0.0f);
+                    SetUpOptions(index, options, 1.1f, 1);
+                    StartEffect(index, 0x36c1, where, 0, 0, 0, &pose, &options);
+                }
             }
-            if ((DAT_1020b430[index].kind43.counter != 0 && f.layer != DAT_1020b430[index].kind43.attackMotion) || DAT_1020b430[index].kind43.frames > (isB ? 0x415 : 0x406))
+            if ((DAT_1020b430[index].kind43.counter != 0 && layer != DAT_1020b430[index].kind43.attackMotion) || DAT_1020b430[index].kind43.frames > 0x406)
                 DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
-            if (f.layer == DAT_1020b430[index].kind43.attackMotion)
+            if (layer == DAT_1020b430[index].kind43.attackMotion)
+                DAT_1020b430[index].kind43.counter = 1;
+            DAT_1020b430[index].kind43.frames++;
+            DAT_1020b430[index].kind43.engaged = 1;
+        }
+        break;
+    case PRINCE_STATE_CHARGE_B:
+        // The charge state B: the prince picks one of four attack motions, then dashes with it along the heading it faced.
+        // The state ends when the motion layer changes or the frame count passes 0x415.
+        {
+            if (DAT_1020b430[index].kind43.frames == 0)
+            {
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
+                if (distance2D <= 500.0f)
+                {
+                    switch (FUN_1013f880() % 4)
+                    {
+                    case 0:
+                        DAT_1020b430[index].kind43.attackMotion = 0x1d;
+                        break;
+                    case 1:
+                        DAT_1020b430[index].kind43.attackMotion = 0x1e;
+                        break;
+                    case 2:
+                        DAT_1020b430[index].kind43.attackMotion = 0x1f;
+                        break;
+                    case 3:
+                        DAT_1020b430[index].kind43.attackMotion = 0x22;
+                        break;
+                    }
+                    wantMotion = DAT_1020b430[index].kind43.attackMotion;
+                    motionLoop = 1;
+                    DAT_10802bf8[index].step.Fill(0.0f);
+                    DAT_10802bf8[index].step.y = -30.0f;
+                    DAT_10802bf8[index].step.RotateZ(-DAT_10db6ee8[index].targetHeading);
+                    FUN_10065b10(index, 0x14d, 1, 0);
+                    FUN_100b9bb0(index, FUN_1013f880() % 4 + 0x47, 0, 0);
+                }
+                else
+                {
+                    DAT_1020b430[index].kind43.frames = -1;
+                    DAT_1020b430[index].kind43.state = PRINCE_STATE_LEAP;
+                    if (FUN_1013f880() % 100 < 0x3c && DAT_1020b430[index].kind43.engaged != 0)
+                        DAT_1020b430[index].kind43.state = PRINCE_STATE_SWAP_WEAPON;
+                }
+            }
+            else
+            {
+                wantMotion = DAT_1020b430[index].kind43.attackMotion;
+                move.x = DAT_10802bf8[index].step.x;
+                move.y = DAT_10802bf8[index].step.y;
+                moveMode = PRINCE_MOVE_WALK;
+                move.Copy(move * 0.92f);
+                DAT_1020b430[index].kind43.wobble = 0;
+                if (ownPos.z > 5.0f)
+                {
+                    move.z = -20.0f;
+                    if (ownPos.z - 20.0f < 0.0f)
+                        move.z = -ownPos.z;
+                }
+                Vec4 where;
+                Matrix4 pose;
+                EffectOptions options;
+                pose.SetIdentity();
+                options.flags |= 2;
+                where.Fill(0.0f);
+                Node *hand = PrinceNode(index, PRINCE_NODE_HAND_R);
+                Node *tip = PrinceNode(index, PRINCE_NODE_ROOT_NULL);
+                // Every 5th frame of the prince's age a lightning beam links the hand and the tip of the weapon.
+                if (hand != 0 && tip != 0)
+                {
+                    where.Fill(0.0f);
+                    if (DAT_1020b430[index].kind43.age % 5 == 0)
+                    {
+                        options.owner = index + PRINCE_EFFECT_OWNER_BASE;
+                        FUN_1001d8b0(index, 0x7c7, where, -1, -1, &hand->worldMatrix, (int)&tip->worldMatrix, 0, 0, &options);
+                    }
+                }
+                int mf = DAT_10db6ee8[index].motionFrame;
+                if ((mf > 0x361 && mf < 0x366) || (mf > 0x386 && mf < 0x38c) || (mf > 0x39f && mf < 0x3aa) || (mf > 0x442 && mf < 0x448))
+                {
+                    // The glow sits at the middle of the weapon (the tip and its parent), else at the hand or the prince.
+                    if (tip != 0)
+                        where.Copy((tip->worldMatrix.GetTranslation() + tip->parent->worldMatrix.GetTranslation()) * 0.5f);
+                    else if (hand != 0)
+                        where.Copy(hand->worldMatrix.GetTranslation());
+                    else
+                        where.Copy(ownPos);
+                    pose = TranslationMatrix(where.x, where.y, where.z);
+                    where.Fill(0.0f);
+                    SetUpOptions(index, options, 1.4f, 1);
+                    StartEffect(index, 0x456, where, 0, 0, 0, &pose, &options);
+                }
+            }
+            if ((DAT_1020b430[index].kind43.counter != 0 && layer != DAT_1020b430[index].kind43.attackMotion) || DAT_1020b430[index].kind43.frames > 0x415)
+                DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
+            if (layer == DAT_1020b430[index].kind43.attackMotion)
                 DAT_1020b430[index].kind43.counter = 1;
             DAT_1020b430[index].kind43.frames++;
             DAT_1020b430[index].kind43.engaged = 1;
@@ -1447,15 +1607,15 @@ int Prince_Update(int index)
         {
             if (DAT_1020b430[index].kind43.frames == 0)
             {
-                if (f.distance3D >= 500.0f)
+                if (distance3D >= 500.0f)
                 {
-                    Vec4 toPlayer = f.playerPos - f.ownPos;
+                    Vec4 toPlayer = playerPos - ownPos;
                     DAT_10802bf8[index].step.Copy(toPlayer.Normalized3() * 40.0f);
                     DAT_1020b430[index].kind43.counter = (int)(toPlayer.Length() / 40.0f);
                     DAT_1020b430[index].kind43.wobble = 1;
                     DAT_10db6ee8[index].mode = 0;
-                    f.motion = 9;
-                    f.motionLoop = 1;
+                    wantMotion = 9;
+                    motionLoop = 1;
                     FUN_10065b10(index, 0x14b, 1, 0);
                     FUN_100b9bb0(index, 0x4b, 1, 0);
                 }
@@ -1465,36 +1625,36 @@ int Prince_Update(int index)
                     DAT_1020b430[index].kind43.wobble = 1;
                     DAT_10802bf8[index].step.Fill(0.0f);
                     DAT_10db6ee8[index].mode = 0;
-                    f.motion = 0xb;
-                    f.motionLoop = 1;
+                    wantMotion = 0xb;
+                    motionLoop = 1;
                 }
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 DAT_1020b430[index].kind43.frames++;
                 break;
             }
             if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_TWO)
             {
-                f.motion = 9;
+                wantMotion = 9;
                 if (DAT_10db6ee8[index].motionFrame > 0x9b)
                 {
                     DAT_1020b430[index].kind43.counter--;
-                    f.moveMode = PRINCE_MOVE_PLACE;
-                    f.move.Copy(DAT_10802bf8[index].step);
+                    moveMode = PRINCE_MOVE_PLACE;
+                    move.Copy(DAT_10802bf8[index].step);
                 }
-                if (f.layer == 1 || DAT_1020b430[index].kind43.counter < 0)
+                if (layer == 1 || DAT_1020b430[index].kind43.counter < 0)
                 {
-                    f.motion = 0xb;
+                    wantMotion = 0xb;
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
-                    DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                    DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                     DAT_10802bf8[index].step.Fill(0.0f);
                 }
-                StartLinkedSparks(f, 0x7c5, 0x7c7);
+                StartLinkedSparks(index, 0x7c5, 0x7c7);
                 if (DAT_1020b430[index].kind43.frames % 10 == 1)
-                    StartWeaponGlow(f, 0x3715, 1.75f);
+                    StartWeaponGlow(index, 0x3715, 1.75f);
                 DAT_1020b430[index].kind43.frames++;
                 break;
             }
-            f.motion = 0xb;
+            wantMotion = 0xb;
             if (DAT_10db6ee8[index].motionFrame == 0xac)
             {
                 DAT_10db6ee8[index].holding = 1;
@@ -1502,12 +1662,12 @@ int Prince_Update(int index)
             }
             int mf = DAT_10db6ee8[index].motionFrame;
             if ((mf > 0xae && mf < 0xca) || (mf > 0xd5 && mf < 0xf8))
-                StartLinkedSparks(f, 0x7c5, 0x7ce);
+                StartLinkedSparks(index, 0x7c5, 0x7ce);
             mf = DAT_10db6ee8[index].motionFrame;
             int arc = 0;
             if (mf == 0xaf)
             {
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 SayRandomLine(index);
             }
             else if (mf < 0xb0 || mf > 0xc5)
@@ -1517,15 +1677,15 @@ int Prince_Update(int index)
                     if (mf > 0xd9 && mf < 0xf3)
                     {
                         float rise = (float)((0xf3 - mf) * (mf - 0xbf));
-                        f.moveMode = PRINCE_MOVE_PLACE;
-                        f.move.y = (rise / 26.0f) * -1.2f;
-                        f.move.RotateZ(-DAT_10db6ee8[index].targetHeading);
+                        moveMode = PRINCE_MOVE_PLACE;
+                        move.y = (rise / 26.0f) * -1.2f;
+                        move.RotateZ(-DAT_10db6ee8[index].targetHeading);
                         arc = 1;
                     }
                 }
                 else
                 {
-                    DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                    DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                     if (DAT_10db6ee8[index].motionFrame == 0xd2)
                         SayRandomLine(index);
                 }
@@ -1533,40 +1693,40 @@ int Prince_Update(int index)
             else
             {
                 float rise = (float)((0xc6 - mf) * (mf - 0x98));
-                f.moveMode = PRINCE_MOVE_PLACE;
-                f.move.y = -(rise / 23.0f);
-                f.move.RotateZ(-DAT_10db6ee8[index].targetHeading);
+                moveMode = PRINCE_MOVE_PLACE;
+                move.y = -(rise / 23.0f);
+                move.RotateZ(-DAT_10db6ee8[index].targetHeading);
                 arc = 1;
             }
             if (arc)
             {
-                if (f.ownPos.z <= 20.0f)
+                if (ownPos.z <= 20.0f)
                 {
-                    if (f.ownPos.z < 20.0f)
+                    if (ownPos.z < 20.0f)
                     {
-                        f.move.z = 10.0f;
-                        if (f.ownPos.z + 10.0f > 20.0f)
-                            f.move.z = 20.0f - f.ownPos.z;
+                        move.z = 10.0f;
+                        if (ownPos.z + 10.0f > 20.0f)
+                            move.z = 20.0f - ownPos.z;
                     }
                 }
                 else
                 {
-                    f.move.z = -10.0f;
-                    if (f.ownPos.z - 10.0f < 20.0f)
-                        f.move.z = 20.0f - f.ownPos.z;
+                    move.z = -10.0f;
+                    if (ownPos.z - 10.0f < 20.0f)
+                        move.z = 20.0f - ownPos.z;
                 }
             }
             if (DAT_10db6ee8[index].motionFrame == 0x102)
             {
                 DAT_10db6ee8[index].holding = 0;
-                f.motion = PRINCE_MOTION_IDLE;
+                wantMotion = PRINCE_MOTION_IDLE;
                 DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
             }
             if (DAT_10db6ee8[index].holding != 0)
                 DAT_10db6ee8[index].motionFrame++;
             mf = DAT_10db6ee8[index].motionFrame;
             if ((mf > 0xaf && mf < 0xc5 && (mf - 0xaf) % 10 == 1) || (mf > 0xd4 && mf < 0xea && (mf - 0xd4) % 10 == 1))
-                StartWeaponGlow(f, 0x36b8, 1.9f);
+                StartWeaponGlow(index, 0x36b8, 1.9f);
             if (DAT_10db6ee8[index].motionFrame == 0xaf || DAT_10db6ee8[index].motionFrame == 0xd5)
                 FUN_10065b10(index, 0x14c, 1, 0);
             DAT_1020b430[index].kind43.frames++;
@@ -1581,7 +1741,7 @@ int Prince_Update(int index)
                 DAT_1020b430[index].kind43.counter = -3;
                 DAT_1020b430[index].kind43.wobble = 0;
                 DAT_10db6ee8[index].mode = 1;
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 DAT_1020b430[index].kind43.frames++;
                 break;
             }
@@ -1595,7 +1755,7 @@ int Prince_Update(int index)
                         DAT_1020b430[index].kind43.frames++;
                         break;
                     }
-                    f.motion = 0x18;
+                    wantMotion = 0x18;
                     if (DAT_10db6ee8[index].motionFrame == 0x1c2)
                     {
                         DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_FOUR + 1;
@@ -1604,8 +1764,8 @@ int Prince_Update(int index)
                     DAT_1020b430[index].kind43.frames++;
                     break;
                 }
-                f.motion = 0x16;
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                wantMotion = 0x16;
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 if (DAT_10db6ee8[index].motionFrame == 0x1b8)
                 {
                     DAT_10255160[index][0] = (float)(FUN_1013f880() % 300 - 0x96) / 5000.0f - 0.87606f;
@@ -1613,8 +1773,8 @@ int Prince_Update(int index)
                     offset.Fill(0.0f);
                     offset.y = -60.0f;
                     offset.z = 20.0f;
-                    StartHandEffect(f, 0x7ca, offset, DAT_10255160[index][0], 1.3f);
-                    StartHandEffect(f, 0x3713, offset, DAT_10255160[index][0], 1.3f);
+                    StartHandEffect(index, 0x7ca, offset, DAT_10255160[index][0], 1.3f);
+                    StartHandEffect(index, 0x3713, offset, DAT_10255160[index][0], 1.3f);
                     DAT_10255160[index][0] = 0.0f;
                     FUN_10065b10(index, 0x145, 1, 0);
                 }
@@ -1633,7 +1793,7 @@ int Prince_Update(int index)
                                 float x = (float)(FUN_1013f880() % 0x10ae) - 2135.0f;
                                 float limit = 3100.0f - (float)fabs(x) * 1.732051f;
                                 float y = (float)(FUN_1013f880() % (int)limit) - 650.0f;
-                                float z = f.ownPos.z + 900.0f;
+                                float z = ownPos.z + 900.0f;
                                 Matrix4 pose = TranslationMatrix(x, y, z) * RotationZ(-1.5708f);
                                 Vec4 where;
                                 where.Set(x, y, z, 0.0f);
@@ -1648,8 +1808,8 @@ int Prince_Update(int index)
             }
             DAT_1020b430[index].kind43.wobble = 0;
             DAT_10db6ee8[index].mode = 1;
-            f.motion = 2;
-            DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+            wantMotion = 2;
+            DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
             if (DAT_10db6ee8[index].m_238c != 0)
             {
                 DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
@@ -1666,14 +1826,14 @@ int Prince_Update(int index)
                 {
                     DAT_1021bdf8[index][PRINCE_NODE_ROOT_NULL] = 0;
                     if (DAT_1020b430[index].kind43.weapon == 1)
-                        f.motion = 0x15;
+                        wantMotion = 0x15;
                     else if (DAT_1020b430[index].kind43.weapon == 2)
                     {
                         DAT_1021bdf8[index][PRINCE_NODE_GATLING] = 0;
-                        f.motion = 0x10;
+                        wantMotion = 0x10;
                     }
                     else
-                        f.motion = 0x25;
+                        wantMotion = 0x25;
                     DAT_1020b430[index].kind43.engaged = 0;
                     DAT_1020b430[index].kind43.frames++;
                     break;
@@ -1688,17 +1848,17 @@ int Prince_Update(int index)
                 int oldWeapon = DAT_1020b430[index].kind43.weapon;
                 if (DAT_1020b430[index].kind43.weapon == 1)
                 {
-                    f.motion = 0x15;
+                    wantMotion = 0x15;
                     doneFrame = 0x18d;
                 }
                 else if (DAT_1020b430[index].kind43.weapon == 2)
                 {
-                    f.motion = 0x10;
+                    wantMotion = 0x10;
                     doneFrame = 0x14a;
                 }
                 else
                 {
-                    f.motion = 0x25;
+                    wantMotion = 0x25;
                     doneFrame = 0x107;
                 }
                 if (DAT_10db6ee8[index].motionFrame == doneFrame)
@@ -1715,17 +1875,17 @@ int Prince_Update(int index)
                     DAT_1020b430[index].kind43.weapon = picked;
                     if (picked == 1)
                     {
-                        f.motion = 0x13;
+                        wantMotion = 0x13;
                         FUN_10012450(index, 1, "O_101.it3");
                     }
                     else if (picked == 2)
                     {
-                        f.motion = 0xe;
+                        wantMotion = 0xe;
                         FUN_10012450(index, 1, "O_102.it3");
                     }
                     else
                     {
-                        f.motion = 0x26;
+                        wantMotion = 0x26;
                         FUN_10012450(index, 1, picked == 3 ? "O_103.it3" : "O_100.it3");
                         DAT_1021bdf8[index][PRINCE_NODE_ROOT_NULL] = DAT_10db6ee8[index].root->Find("@s_null", 0);
                     }
@@ -1736,10 +1896,10 @@ int Prince_Update(int index)
             else if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_THREE)
             {
                 if (DAT_1020b430[index].kind43.weapon == 1)
-                    f.motion = 0x13;
+                    wantMotion = 0x13;
                 else
-                    f.motion = DAT_1020b430[index].kind43.weapon == 2 ? 0xe : 0x26;
-                if (f.layer == 0x11 || f.layer == 0x12 || f.layer == 0xc || f.layer == 0xd || f.layer == 2 || f.layer == 4)
+                    wantMotion = DAT_1020b430[index].kind43.weapon == 2 ? 0xe : 0x26;
+                if (layer == 0x11 || layer == 0x12 || layer == 0xc || layer == 0xd || layer == 2 || layer == 4)
                 {
                     DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
                     DAT_1020b430[index].kind43.frames++;
@@ -1762,7 +1922,7 @@ int Prince_Update(int index)
             {
                 DAT_10daaa80.RemoveOwnedBy(index + PRINCE_EFFECT_OWNER_BASE);
                 DAT_10db6ee8[index].alpha = 0.0f;
-                Vec4 spot = f.playerPos;
+                Vec4 spot = playerPos;
                 spot.y -= 650.0f;
                 spot.z = 0.0f;
                 Vec4 direction = spot.Normalized3();
@@ -1777,12 +1937,12 @@ int Prince_Update(int index)
                     DAT_1021bdf8[index][PRINCE_NODE_GATLING]->RestartColourPlugs("stop", 0);
                     DAT_1021bdf8[index][PRINCE_NODE_GATLING]->frameSource = 0;
                 }
-                f.motion = PRINCE_MOTION_IDLE;
-                f.motionLoop = 1;
+                wantMotion = PRINCE_MOTION_IDLE;
+                motionLoop = 1;
                 DAT_10db6ee8[index].holding = 0;
                 LeanBody(index, 0.0f);
                 FUN_1001a760(index, 0, 0);
-                float heading = FUN_10001f80(f.playerPos.x - spot.x, f.playerPos.y - spot.y) + PRINCE_PI;
+                float heading = FUN_10001f80(playerPos.x - spot.x, playerPos.y - spot.y) + PRINCE_PI;
                 DAT_10db6ee8[index].targetHeading = heading;
                 DAT_10db6ee8[index].heading = heading;
                 DAT_10802bf8[index].step.Fill(0.0f);
@@ -1805,14 +1965,14 @@ int Prince_Update(int index)
             {
                 DAT_1020b430[index].kind43.wobble = 1;
                 DAT_1020b430[index].kind43.counter = -5;
-                DAT_10db6ee8[index].targetHeading = FacePlayer(f);
+                DAT_10db6ee8[index].targetHeading = FacePlayer(playerPos, ownPos);
                 FUN_10065b10(index, 0x14a, 1, 0);
                 DAT_1020b430[index].kind43.frames++;
                 break;
             }
             if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_TWO)
             {
-                f.motion = 0x19;
+                wantMotion = 0x19;
                 if (DAT_10db6ee8[index].motionFrame == 0x1e0)
                 {
                     FUN_1001a760(index, 1, "O_108.it3");
@@ -1825,7 +1985,7 @@ int Prince_Update(int index)
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_TWO;
                     FUN_100b9bb0(index, (FUN_1013f880() & 1) + 0x47, 0, 0);
                 }
-                if (f.layer == 0x2a)
+                if (layer == 0x2a)
                 {
                     if (DAT_1021bdf8[index][PRINCE_NODE_LOCK] == 0)
                     {
@@ -1840,44 +2000,93 @@ int Prince_Update(int index)
             }
             else if (DAT_1020b430[index].kind43.frames < PRINCE_FRAMES_PART_THREE)
             {
-                f.motion = 0x2a;
+                wantMotion = 0x2a;
                 if (DAT_10db6ee8[index].motionFrame == 0x210)
                 {
                     DAT_1020b430[index].kind43.counter++;
                     if (DAT_1020b430[index].kind43.counter > 0 && FUN_1013f880() % 1000 < DAT_1020b430[index].kind43.counter * 2)
                         DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_THREE;
                 }
-                f.moveMode = PRINCE_MOVE_WALK;
-                if (f.ownPos.x > f.playerPos.x)
+                moveMode = PRINCE_MOVE_WALK;
+                if (ownPos.x > playerPos.x)
                     DAT_10802bf8[index].step.x -= 2.0f;
-                else if (f.ownPos.x < f.playerPos.x)
+                else if (ownPos.x < playerPos.x)
                     DAT_10802bf8[index].step.x += 2.0f;
-                if (f.ownPos.y > f.playerPos.y)
+                if (ownPos.y > playerPos.y)
                     DAT_10802bf8[index].step.y -= 2.0f;
-                else if (f.ownPos.y < f.playerPos.y)
+                else if (ownPos.y < playerPos.y)
                     DAT_10802bf8[index].step.y += 2.0f;
-                if (f.playerPos.z + 25.0f > f.ownPos.z)
+                if (playerPos.z + 25.0f > ownPos.z)
                 {
-                    f.move.z = 15.0f;
+                    move.z = 15.0f;
                     DAT_1020b430[index].kind43.heightPhase = 0x19;
                 }
-                else if (f.playerPos.z + 65.0f < f.ownPos.z)
+                else if (playerPos.z + 65.0f < ownPos.z)
                 {
-                    f.move.z = -15.0f;
+                    move.z = -15.0f;
                     DAT_1020b430[index].kind43.heightPhase = 0x401;
                 }
                 if (DAT_10802bf8[index].step.Length2D() > 30.0f)
                     DAT_10802bf8[index].step.Copy(DAT_10802bf8[index].step.Normalized3() * 30.0f);
-                f.move.x = DAT_10802bf8[index].step.x;
-                f.move.y = DAT_10802bf8[index].step.y;
-                Node *hand = PrinceNode(index, PRINCE_NODE_HAND_L);
+                move.x = DAT_10802bf8[index].step.x;
+                move.y = DAT_10802bf8[index].step.y;
+                // The sparks of both hands: the right hand (to the root node) and the left hand (to the lock node, turned
+                // half a turn about x).
+                Vec4 where;
+                Matrix4 pose;
+                EffectOptions options;
+                pose.SetIdentity();
+                options.flags |= 2;
+                where.Fill(0.0f);
+                Node *handR = PrinceNode(index, PRINCE_NODE_HAND_R);
+                Node *tip = PrinceNode(index, PRINCE_NODE_ROOT_NULL);
+                if (handR != 0)
+                {
+                    StartEffect(index, 0x7c5, where, 0, 0, 0, &handR->worldMatrix, &options);
+                    if (tip != 0)
+                    {
+                        where.Fill(0.0f);
+                        if (DAT_1020b430[index].kind43.age % 5 == 0)
+                        {
+                            options.owner = index + PRINCE_EFFECT_OWNER_BASE;
+                            FUN_1001d8b0(index, 0x7c7, where, -1, -1, &handR->worldMatrix, (int)&tip->worldMatrix, 0, 0, &options);
+                        }
+                    }
+                }
+                options.owner = 0;
+                Node *handL = PrinceNode(index, PRINCE_NODE_HAND_L);
                 Node *lock = PrinceNode(index, PRINCE_NODE_LOCK);
-                if (hand != 0 && lock != 0)
-                    StartLinkedSparks(f, 0x7c5, 0x7c7);
+                if (handL != 0)
+                {
+                    pose = RotationX(PRINCE_PI) * handL->worldMatrix;
+                    StartEffect(index, 0x7c5, where, 0, 0, 0, &pose, &options);
+                    if (lock != 0)
+                    {
+                        where.Fill(0.0f);
+                        if (DAT_1020b430[index].kind43.age % 5 == 0)
+                        {
+                            options.owner = index + PRINCE_EFFECT_OWNER_BASE;
+                            FUN_1001d8b0(index, 0x7c7, where, -1, -1, &handL->worldMatrix, (int)&lock->worldMatrix, 0, 0, &options);
+                        }
+                    }
+                }
                 if (DAT_1020b430[index].kind43.frames % 0x14 == 1)
                     FUN_10065b10(index, 0x149, 1, 0);
                 if (DAT_1020b430[index].kind43.frames % 10 == 1)
-                    StartWeaponGlow(f, 0x36b8, 1.55f);
+                {
+                    // Two glow rings, one at each arm: the weapon tip (else the right hand) and the lock node (else the left hand).
+                    EffectOptions glow;
+                    Vec4 glowWhere;
+                    glow.flags |= 2;
+                    glow.m_0004 = DAT_10daaae8[index].stats[STAT_EFFECT_PARAM];
+                    glow.owner = index + PRINCE_EFFECT_OWNER_BASE;
+                    glow.m_0008 = 1.55f;
+                    glow.m_000e = 5;
+                    glowWhere.Fill(0.0f);
+                    StartEffect(index, 0x36b8, glowWhere, EffectAnchor(index, PRINCE_NODE_ROOT_NULL, PRINCE_NODE_HAND_R), 0, 0, 0, &glow);
+                    glowWhere.Fill(0.0f);
+                    StartEffect(index, 0x36b8, glowWhere, EffectAnchor(index, PRINCE_NODE_LOCK, PRINCE_NODE_HAND_L), 0, 0, 0, &glow);
+                }
                 DAT_1020b430[index].kind43.frames++;
                 break;
             }
@@ -1886,12 +2095,12 @@ int Prince_Update(int index)
                 if (DAT_1020b430[index].kind43.frames >= PRINCE_FRAMES_PART_FOUR)
                 {
                     DAT_1020b430[index].kind43.state = PRINCE_STATE_PICK;
-                    f.motion = PRINCE_MOTION_IDLE;
+                    wantMotion = PRINCE_MOTION_IDLE;
                     DAT_1020b430[index].kind43.frames++;
                     break;
                 }
                 DAT_10db6ee8[index].motionFrame++;
-                f.motion = 0x2b;
+                wantMotion = 0x2b;
                 DAT_10db6ee8[index].holding = 1;
                 DAT_10daaa80.RemoveOwnedBy(index + PRINCE_EFFECT_OWNER_BASE);
                 if (DAT_10db6ee8[index].motionFrame == 0x230)
@@ -1903,7 +2112,7 @@ int Prince_Update(int index)
                 {
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_FOUR;
                     DAT_10db6ee8[index].holding = 0;
-                    f.motion = PRINCE_MOTION_IDLE;
+                    wantMotion = PRINCE_MOTION_IDLE;
                     DAT_1020b430[index].kind43.frames = PRINCE_FRAMES_PART_FOUR + 1;
                     break;
                 }
@@ -1920,7 +2129,7 @@ int Prince_Update(int index)
                 weight[at] = 0;
             DAT_1020b430[index].kind43.counter = 0;
             DAT_1020b430[index].kind43.attackMotion = 0;
-            int closeBy = f.distance2D < 500.0f;
+            int closeBy = distance2D < 500.0f;
             int healthy = DAT_10daaae8[index].stats[STAT_MAX_HEALTH] / 2 < DAT_10daaae8[index].stats[STAT_HEALTH] || DAT_1020b430[index].kind43.healing != 0;
             // The odds of the moves (weights by state number) for the weapon in hand; `healthy` = more than half its health, or
             // healing; `swapped` = the last state was the weapon swap. `distant` = the player is more than 500 units away.
@@ -1934,7 +2143,7 @@ int Prince_Update(int index)
                         switch (DAT_1020b430[index].kind43.weapon)
                         {
                         case 0:
-                            if (!(f.distance3D > 500.0f))
+                            if (!(distance3D > 500.0f))
                             {
                                 weight[12] = 0x14;
                                 weight[11] = 0x50;
@@ -1965,7 +2174,7 @@ int Prince_Update(int index)
                         {
                         case 0:
                             weight[1] = 0;
-                            if (!(f.distance3D > 500.0f))
+                            if (!(distance3D > 500.0f))
                             {
                                 weight[12] = 10;
                                 weight[11] = 100;
@@ -2010,7 +2219,7 @@ int Prince_Update(int index)
                     switch (DAT_1020b430[index].kind43.weapon)
                     {
                     case 0:
-                        if (!(f.distance3D > 500.0f))
+                        if (!(distance3D > 500.0f))
                         {
                             weight[11] = 0x46;
                             weight[12] = 0x1e;
@@ -2047,7 +2256,7 @@ int Prince_Update(int index)
                     {
                     case 0:
                         weight[16] = 0x1e;
-                        if (!(f.distance3D > 500.0f))
+                        if (!(distance3D > 500.0f))
                         {
                             weight[11] = 100;
                             weight[12] = 0x14;
@@ -2130,27 +2339,27 @@ int Prince_Update(int index)
             DAT_1020b430[index].kind43.healing = 0;
         }
     }
-    if (f.ownPos.z < 0.0f)
+    if (ownPos.z < 0.0f)
     {
         DAT_1020b430[index].kind43.wobble = 0;
         DAT_10db6ee8[index].matrix.translation.z = 0.0f;
     }
     // What the game does with the movement vector at the end of the frame.
     {
-        if (f.moveMode == PRINCE_MOVE_WALK)
+        if (moveMode == PRINCE_MOVE_WALK)
         {
             if (DAT_1020b430[index].kind43.wobble != 0)
-                f.move.z += (float)(DAT_1020b430[index].kind43.heightPhase % 1000 - 0x19) / 12.5f;
-            f.move.Copy(DAT_10802bf8[index].position * 0.9f + f.move * 0.1f);
-            FUN_100241e0(index, f.move.x, f.move.y, f.move.z);
-            DAT_10802bf8[index].position.Copy(f.move);
+                move.z += (float)(DAT_1020b430[index].kind43.heightPhase % 1000 - 0x19) / 12.5f;
+            move.Copy(DAT_10802bf8[index].position * 0.9f + move * 0.1f);
+            FUN_100241e0(index, move.x, move.y, move.z);
+            DAT_10802bf8[index].position.Copy(move);
         }
-        else if (f.moveMode == PRINCE_MOVE_PLACE)
+        else if (moveMode == PRINCE_MOVE_PLACE)
         {
-            f.move.Copy(DAT_10802bf8[index].position * 0.65f + f.move * 0.35f);
-            DAT_10802bf8[index].position.Copy(f.move);
-            f.move.Copy(f.move + f.ownPos);
-            DAT_10db6ee8[index].SetPosition(f.move.x, f.move.y, f.move.z);
+            move.Copy(DAT_10802bf8[index].position * 0.65f + move * 0.35f);
+            DAT_10802bf8[index].position.Copy(move);
+            move.Copy(move + ownPos);
+            DAT_10db6ee8[index].SetPosition(move.x, move.y, move.z);
         }
         else if (DAT_1020b430[index].kind43.wobble != 0)
         {
@@ -2160,17 +2369,17 @@ int Prince_Update(int index)
             FUN_100241e0(index, DAT_10802bf8[index].position.x, DAT_10802bf8[index].position.y, DAT_10802bf8[index].position.z);
         }
     }
-    if (f.motion >= 0)
+    if (wantMotion >= 0)
     {
-        int motion = f.motion;
-        if (f.motion == 2 || f.motion == 4 || f.layer == 2 || f.layer == 4 || f.nextLayer == 2 || f.nextLayer == 4)
+        int motion = wantMotion;
+        if (wantMotion == 2 || wantMotion == 4 || layer == 2 || layer == 4 || nextLayer == 2 || nextLayer == 4)
         {
             if (DAT_1020b430[index].kind43.weapon == 1)
                 motion = 0x11;
             else if (DAT_1020b430[index].kind43.weapon == 2)
                 motion = 0xc;
         }
-        DAT_10db6ee8[index].PlayMotion(motion, f.motionLoop, f.motionBlend, 1.0f);
+        DAT_10db6ee8[index].PlayMotion(motion, motionLoop, motionBlend, 1.0f);
         if (DAT_10db6ee8[index].motion->blending != 0 && DAT_10db6ee8[index].motion->m_0004 > 0.0f)
             Sleep(0);
     }

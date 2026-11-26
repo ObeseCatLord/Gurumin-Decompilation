@@ -1127,6 +1127,8 @@ static __forceinline bool LeanEasesBack(float rate)
 #define EFFECT_SWING_DUST 0x2da
 #define SOUND_LEAP_LAND 0x377
 #define SOUND_GRUNT_BASE 0x85
+#define LEAP_START_STEPS 5              // steps against an obstacle before the leap starts
+#define LEAP_START_DISTANCE 120.0f      // the obstacle must be farther than this from the player
 #define LEAP_STAGE_LOOK 5               // DAT_104bfe40: the leap's stage counter (0 = not leaping)
 #define LEAP_STAGE_CLIMB_END 0x32
 #define LEAP_STAGE_RISE_END 0x46
@@ -2020,9 +2022,142 @@ int FUN_1011d810(void)
             DAT_104c00d0 = 0;
         else if (DAT_104c00d0 > 1)
         {
-            if (DAT_104c00d0 < SCENE_SWAN_WAIT)
+            if (DAT_104c00d0 >= SCENE_SWAN_WAIT)
             {
-                if (DAT_104c00d0 < SCENE_SHOVE_WAIT)
+                // From 30000: the swan ride. The player follows the swan node ("swanat") and turns with the swan.
+                CloseEventOverlay();
+                if (DAT_104c00d0 == SCENE_SWAN_WAIT)
+                {
+                    ResetPlayerTrail();
+                    DAT_10db6ee8[0].PlayMotion(0x68, 1, 8, 1.0f);
+                    DAT_104c00d0 = SCENE_SWAN;
+                    DAT_104c0260 = 0;
+                    if (DAT_104c025c == 1)
+                    {
+                        DAT_104c0268->RestartColourPlugs("A", DAT_104bf8a4);
+                        DAT_104c025c = 0;
+                    }
+                    else
+                    {
+                        DAT_104c0268->RestartColourPlugs("B", DAT_104bf8a4);
+                        DAT_104c025c = 1;
+                    }
+                }
+                DAT_10db6ee8[0].SetPosition(DAT_104c0264->worldMatrix._41, DAT_104c0264->worldMatrix._42,
+                                            DAT_104c0264->worldMatrix._43);
+                Matrix4 swanMatrix = DAT_104c0268->worldMatrix;
+                swanMatrix._41 = 0.0f;
+                swanMatrix._42 = 0.0f;
+                swanMatrix._43 = 0.0f;
+                float swanHeading = swanMatrix.M_101b0a80();
+                DAT_104c0260 = DAT_104c0260 + 1;
+                DAT_10db6ee8[0].targetHeading = swanHeading - SWAN_HEADING_OFFSET;
+                DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
+                if (DAT_104c0260 > SWAN_RIDE_FRAMES)
+                {
+                    DAT_104c025d = 0x1e;
+                    DAT_104c00d0 = 0;
+                    DAT_10db6ee8[0].PlayMotion(2, 1, 8, 1.0f);
+                }
+                if (DAT_104c0260 % SWAN_SOUND_PERIOD == 0)
+                    FUN_10065b10(0, 0x3b5, 0, 0);
+            }
+            else
+            {
+                if (DAT_104c00d0 >= SCENE_SHOVE_WAIT)
+                {
+                    // 20000..29999: the player is shoved aside: first wait until he stands still, then push him
+                    // along the first of four directions that is clear, with growing strength.
+                    if (DAT_104c00d0 == SCENE_SHOVE_WAIT)
+                    {
+                        if (DAT_10db6ee8[0].velocity.Length2D() >= 1.0f || DAT_10db9274 == 0)
+                            DAT_104c00d0 = 0;
+                        else
+                        {
+                            DAT_104c00d0 = SCENE_SHOVE;
+                            DAT_10314eb8 = 0.2f;
+                            DAT_10868828.Fill(0.0f);
+                            ResetPlayerTrail();
+                        }
+                    }
+                    if (DAT_104c00d0 == SCENE_SHOVE)
+                    {
+                        Vec4 shoveDirs[4];
+                        Vec4 shoveFrom;
+                        shoveDirs[0].Set(SHOVE_SIDE, 0.0f, SHOVE_DOWN, 0.0f);
+                        shoveDirs[1].Set(-SHOVE_SIDE, 0.0f, SHOVE_DOWN, 0.0f);
+                        shoveDirs[2].Set(0.0f, SHOVE_SIDE, SHOVE_DOWN, 0.0f);
+                        shoveDirs[3].Set(0.0f, -SHOVE_SIDE, SHOVE_DOWN, 0.0f);
+                        shoveFrom.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+                        for (i = 0; i < 4; i++)
+                        {
+                            Vec4 shoveDir;
+                            shoveDir.Copy(shoveDirs[i]);
+                            shoveDirs[i].Copy(shoveDirs[i] * DAT_10314eb8);
+                            if (DAT_10db6ee8[0].IsClearOfMapLimited(&shoveDirs[i]) != 0)
+                            {
+                                DAT_10db6ee8[0].important = 1;
+                                DAT_10db6ee8[0].PlayMotion(0x67, 1, 8, 1.0f);
+                                DAT_10314eb8 = DAT_10314eb8 + 0.05;
+                                if (DAT_10314eb8 >= 4.0f)
+                                    DAT_10314eb8 = 4.0f;
+                                DAT_10868828.Copy(shoveDir);
+                                DAT_10db6ee8[0].Push(shoveDirs[i].x, shoveDirs[i].y, 0.0f);
+                                shoveFrom.Copy(shoveFrom + shoveDirs[i]);
+                                DAT_10db6ee8[0].FaceAway(shoveFrom);
+                                if (DAT_104bfe1c != 0)
+                                {
+                                    DAT_1030c54c = 0;
+                                    DAT_104bfd78 = 0;
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_SAVE_MENU);
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+                                    DAT_1020e0f8[0] = 0;
+                                    FUN_1000cb30("");
+                                    FUN_1000cb90("");
+                                    DAT_104bf8d4 = 1;
+                                    if (DAT_104c03c8 != 0)
+                                    {
+                                        DAT_104c03dc = 0;
+                                        DAT_104c03c8->Release();
+                                        DAT_11b1ba40(DAT_104c03c8);
+                                        DAT_104c03c8 = 0;
+                                        DAT_104c03cc = 0;
+                                        DAT_104c03d0 = 0;
+                                        DAT_104c03d4 = 0;
+                                        DAT_104c03d8 = 0;
+                                        DAT_104c03e0 = 0;
+                                        DAT_104c03e4 = 0;
+                                        for (i = 0; i < OVERLAY_TEXTURE_SLOT_COUNT; i++)
+                                        {
+                                            if (DAT_1030b870[i] > -1)
+                                            {
+                                                FUN_10174c70(DAT_1030b870[i], 1);
+                                                DAT_1030b870[i] = -1;
+                                            }
+                                        }
+                                    }
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
+                                    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
+                                    DAT_1020e0f8[0] = 0;
+                                    DAT_104bfe1c = 0;
+                                    memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
+                                }
+                                goto sceneStateDone;
+                            }
+                        }
+                        DAT_10314eb8 = DAT_10314eb8 - 0.2f;
+                        Vec4 shove;
+                        shove.Copy(DAT_10868828 * DAT_10314eb8);
+                        DAT_10db6ee8[0].Push(shove.x, shove.y, 0.0f);
+                        if (DAT_10314eb8 < 1.05)
+                        {
+                            DAT_104c00d0 = 0;
+                            DAT_10db6ee8[0].PlayMotion(2, 1, 8, 1.0f);
+                        }
+                    }
+                }
+                else
                 {
                     if (DAT_104c00d0 < SCENE_DAMAGE_LIMIT)
                     {
@@ -2275,140 +2410,6 @@ int FUN_1011d810(void)
                         }
                     }
                 }
-                else
-                {
-                    // 20000..29999: the player is shoved aside: first wait until he stands still, then push him
-                    // along the first of four directions that is clear, with growing strength.
-                    if (DAT_104c00d0 == SCENE_SHOVE_WAIT)
-                    {
-                        if (DAT_10db6ee8[0].velocity.Length2D() >= 1.0f || DAT_10db9274 == 0)
-                            DAT_104c00d0 = 0;
-                        else
-                        {
-                            DAT_104c00d0 = SCENE_SHOVE;
-                            DAT_10314eb8 = 0.2f;
-                            DAT_10868828.Fill(0.0f);
-                            ResetPlayerTrail();
-                        }
-                    }
-                    if (DAT_104c00d0 == SCENE_SHOVE)
-                    {
-                        Vec4 shoveDirs[4];
-                        Vec4 shoveFrom;
-                        shoveDirs[0].Set(SHOVE_SIDE, 0.0f, SHOVE_DOWN, 0.0f);
-                        shoveDirs[1].Set(-SHOVE_SIDE, 0.0f, SHOVE_DOWN, 0.0f);
-                        shoveDirs[2].Set(0.0f, SHOVE_SIDE, SHOVE_DOWN, 0.0f);
-                        shoveDirs[3].Set(0.0f, -SHOVE_SIDE, SHOVE_DOWN, 0.0f);
-                        shoveFrom.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
-                        for (i = 0; i < 4; i++)
-                        {
-                            Vec4 shoveDir;
-                            shoveDir.Copy(shoveDirs[i]);
-                            shoveDirs[i].Copy(shoveDirs[i] * DAT_10314eb8);
-                            if (DAT_10db6ee8[0].IsClearOfMapLimited(&shoveDirs[i]) != 0)
-                            {
-                                DAT_10db6ee8[0].important = 1;
-                                DAT_10db6ee8[0].PlayMotion(0x67, 1, 8, 1.0f);
-                                DAT_10314eb8 = DAT_10314eb8 + 0.05;
-                                if (DAT_10314eb8 >= 4.0f)
-                                    DAT_10314eb8 = 4.0f;
-                                DAT_10868828.Copy(shoveDir);
-                                DAT_10db6ee8[0].Push(shoveDirs[i].x, shoveDirs[i].y, 0.0f);
-                                shoveFrom.Copy(shoveFrom + shoveDirs[i]);
-                                DAT_10db6ee8[0].FaceAway(shoveFrom);
-                                if (DAT_104bfe1c != 0)
-                                {
-                                    DAT_1030c54c = 0;
-                                    DAT_104bfd78 = 0;
-                                    DAT_104b7200.CloseWindow(WINDOW_ID_SAVE_MENU);
-                                    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
-                                    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
-                                    DAT_1020e0f8[0] = 0;
-                                    FUN_1000cb30("");
-                                    FUN_1000cb90("");
-                                    DAT_104bf8d4 = 1;
-                                    if (DAT_104c03c8 != 0)
-                                    {
-                                        DAT_104c03dc = 0;
-                                        DAT_104c03c8->Release();
-                                        DAT_11b1ba40(DAT_104c03c8);
-                                        DAT_104c03c8 = 0;
-                                        DAT_104c03cc = 0;
-                                        DAT_104c03d0 = 0;
-                                        DAT_104c03d4 = 0;
-                                        DAT_104c03d8 = 0;
-                                        DAT_104c03e0 = 0;
-                                        DAT_104c03e4 = 0;
-                                        for (i = 0; i < OVERLAY_TEXTURE_SLOT_COUNT; i++)
-                                        {
-                                            if (DAT_1030b870[i] > -1)
-                                            {
-                                                FUN_10174c70(DAT_1030b870[i], 1);
-                                                DAT_1030b870[i] = -1;
-                                            }
-                                        }
-                                    }
-                                    DAT_104b7200.CloseWindow(WINDOW_ID_CHOICE_MENU);
-                                    DAT_104b7200.CloseWindow(WINDOW_ID_YES_NO);
-                                    DAT_1020e0f8[0] = 0;
-                                    DAT_104bfe1c = 0;
-                                    memset(DAT_1030c500, 0, sizeof(DAT_1030c500));
-                                }
-                                goto sceneStateDone;
-                            }
-                        }
-                        DAT_10314eb8 = DAT_10314eb8 - 0.2f;
-                        Vec4 shove;
-                        shove.Copy(DAT_10868828 * DAT_10314eb8);
-                        DAT_10db6ee8[0].Push(shove.x, shove.y, 0.0f);
-                        if (DAT_10314eb8 < 1.05)
-                        {
-                            DAT_104c00d0 = 0;
-                            DAT_10db6ee8[0].PlayMotion(2, 1, 8, 1.0f);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // From 30000: the swan ride. The player follows the swan node ("swanat") and turns with the swan.
-                CloseEventOverlay();
-                if (DAT_104c00d0 == SCENE_SWAN_WAIT)
-                {
-                    ResetPlayerTrail();
-                    DAT_10db6ee8[0].PlayMotion(0x68, 1, 8, 1.0f);
-                    DAT_104c00d0 = SCENE_SWAN;
-                    DAT_104c0260 = 0;
-                    if (DAT_104c025c == 1)
-                    {
-                        DAT_104c0268->RestartColourPlugs("A", DAT_104bf8a4);
-                        DAT_104c025c = 0;
-                    }
-                    else
-                    {
-                        DAT_104c0268->RestartColourPlugs("B", DAT_104bf8a4);
-                        DAT_104c025c = 1;
-                    }
-                }
-                DAT_10db6ee8[0].SetPosition(DAT_104c0264->worldMatrix._41, DAT_104c0264->worldMatrix._42,
-                                            DAT_104c0264->worldMatrix._43);
-                Matrix4 swanMatrix;
-                swanMatrix = DAT_104c0268->worldMatrix;
-                swanMatrix._41 = 0.0f;
-                swanMatrix._42 = 0.0f;
-                swanMatrix._43 = 0.0f;
-                float swanHeading = swanMatrix.M_101b0a80();
-                DAT_104c0260 = DAT_104c0260 + 1;
-                DAT_10db6ee8[0].targetHeading = swanHeading - SWAN_HEADING_OFFSET;
-                DAT_10db6ee8[0].heading = DAT_10db6ee8[0].targetHeading;
-                if (DAT_104c0260 > SWAN_RIDE_FRAMES)
-                {
-                    DAT_104c025d = 0x1e;
-                    DAT_104c00d0 = 0;
-                    DAT_10db6ee8[0].PlayMotion(2, 1, 8, 1.0f);
-                }
-                if (DAT_104c0260 % SWAN_SOUND_PERIOD == 0)
-                    FUN_10065b10(0, 0x3b5, 0, 0);
             }
         }
 sceneStateDone:
@@ -4138,6 +4139,10 @@ lockTargetStored:
                 if (DAT_104bfdf0 == 0 && DAT_104c00e0 != 0)
                 {
                     DAT_10db6ee8[0].m_02a1 = 1;
+                    Vec4 playerPos;
+                    Vec4 shift;
+                    Vec4 probeNear;
+                    Vec4 probeFar;
                     int strongSwing = DAT_108a6a58[DAT_104c00e8].m_0040;
                     float drillScale = 1.0f;
                     if (DAT_10c64ad4 == 1)
@@ -4554,9 +4559,8 @@ attackSounds:
                             }
                         }
                         // The way the swing moves the player: shift (in the facing direction) and the two probe offsets.
-                        Vec4 playerPos = DAT_10db9210.GetTranslation();
+                        playerPos = DAT_10db9210.GetTranslation();
                         DAT_102199b0 = DAT_10db6ee8[0].targetHeading;
-                        Vec4 shift;
                         shift.Fill(0.0f);
                         shift.y = kickStart - kickEnd;
                         shift.RotateZ(-DAT_10db6ee8[0].heading);
@@ -4566,12 +4570,10 @@ attackSounds:
                             steerX = 0.0f;
                             steerY = 0.0f;
                         }
-                        Vec4 probeNear;
                         probeNear.Fill(0.0f);
                         probeNear.y = SWING_PROBE_NEAR_Y;
                         probeNear.z = SWING_PROBE_NEAR_Z;
                         probeNear.RotateZ(-DAT_10db6ee8[0].heading);
-                        Vec4 probeFar;
                         probeFar.Fill(0.0f);
                         probeFar.y = SWING_PROBE_FAR_Y;
                         probeFar.z = SWING_PROBE_FAR_Z;
@@ -5107,35 +5109,25 @@ releaseHold:
                 && ((DAT_104c00ac != 0 && DAT_104c00b7 == 0) || DAT_104bf888 != 0 || DAT_104c00bc != 0 || DAT_104bfdd0 != 0)
                 && mouseMiddle == 2)
             {
-                if (DAT_104bf888 < TALK_TARGET_KEEP)
-                {
-                    if (DAT_104bf888 < TALK_FIRST_OBJECT)
-                    {
-                        if (DAT_104bf888 == 0)
-                        {
-                            if (DAT_104c00bc != 0 && (DAT_104bfd64 = 0, DAT_104bfd60 == 0) && DAT_104bfe30 == 0
-                                && DAT_10db9274 != 0)
-                            {
-                                DAT_104bfd68 = 0.0f;
-                                DAT_10db9210.GetTranslation();
-                                DAT_10db6ee8[DAT_104bf8b4].PlayMotion(0xc, 0, 5, 1.0f);
-                                DAT_104bfd60 = 1;
-                            }
-                        }
-                        else
-                            FUN_1005ecb0(0);
-                    }
-                    else
-                    {
-                        DAT_10db6ee8[DAT_104bf8b4].PlayMotion(2, 0, 5, 1.0f);
-                        DAT_10874848.RegisterEvent(DAT_10860df0[DAT_104bf888 - TALK_FIRST_OBJECT].id);
-                    }
-                }
-                else
+                if (DAT_104bf888 >= TALK_TARGET_KEEP)
                 {
                     DAT_10db6ee8[DAT_104bf8b4].PlayMotion(2, 0, 5, 1.0f);
                     DAT_10874848.RaiseTalkEvents(DAT_104bf888 - TALK_TARGET_KEEP);
                     rand();
+                }
+                else if (DAT_104bf888 >= TALK_FIRST_OBJECT)
+                {
+                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(2, 0, 5, 1.0f);
+                    DAT_10874848.RegisterEvent(DAT_10860df0[DAT_104bf888 - TALK_FIRST_OBJECT].id);
+                }
+                else if (DAT_104bf888 != 0)
+                    FUN_1005ecb0(0);
+                else if (DAT_104c00bc != 0 && (DAT_104bfd64 = 0, DAT_104bfd60 == 0) && DAT_104bfe30 == 0 && DAT_10db9274 != 0)
+                {
+                    DAT_104bfd68 = 0.0f;
+                    DAT_10db9210.GetTranslation();
+                    DAT_10db6ee8[DAT_104bf8b4].PlayMotion(0xc, 0, 5, 1.0f);
+                    DAT_104bfd60 = 1;
                 }
             }
         }
@@ -5798,6 +5790,30 @@ trailDone:
             if (DAT_10db6ee8[DAT_104bf8b4].m_229c == 0 && DAT_10db6ee8[DAT_104bf8b4].mode == 1)
                 DAT_10db6ee8[DAT_104bf8b4].mode = 2;
             DAT_1021a360 = 0;
+        }
+        // Starting the leap: after LEAP_START_STEPS steps against an obstacle (DAT_104bfe3c) farther than
+        // LEAP_START_DISTANCE away, the leap begins and the player is put back where he stands.
+        if (DAT_104bfe3c == 0)
+        {
+        leapIdle:
+            DAT_104bfe38 = 0;
+            if (DAT_10db9274 != 0 && (steerX != 0.0f || steerY != 0.0f))
+                DAT_104bfe34 = DAT_104bfe34 + 1;
+        }
+        else if (DAT_104bfe38 == 0 && DAT_104bfe34 > LEAP_START_STEPS && DAT_104c00e0 == 0 && DAT_104bfdf0 == 0)
+        {
+            Vec4 playerAt;
+            Vec4 obstacleCentre;
+            playerAt.Copy(DAT_10db6ee8[0].matrix.GetTranslation());
+            obstacleCentre.Copy(DAT_104bfe44->children[0]->worldMatrix.GetTranslation());
+            if (playerAt.Distance(obstacleCentre) <= LEAP_START_DISTANCE)
+                goto leapIdle;
+            DAT_104bfe40 = 0;
+            DAT_104bfe30 = 1;
+            DAT_102027f4 = 1.0f;
+            DAT_10db6ee8[DAT_104bf8b4].mode = 0;
+            Vec4 standingAt = DAT_10db6ee8[0].matrix.GetTranslation();
+            DAT_10db6ee8[0].Teleport(standingAt.x, standingAt.y, standingAt.z);
         }
         // The camera swing: the camera node's animation frames (DAT_104c01dc) play forwards (DAT_104c01e0 > 0) or
         // backwards while the player model, and the truck node, ride its matrices
@@ -6533,7 +6549,6 @@ trailDone:
                 {
                     // Swinging: the model walks slowly while the swing runs, only if the step is clear.
                     Vec4 swingStep;
-                    Vec4 swingProbe;
                     if (moveInput == 1)
                     {
                         SteerLeanAndSpeed(moveX, moveY);
@@ -6546,8 +6561,10 @@ trailDone:
                         swingStep.Set(moveX * WALK_SCALE, moveY * WALK_SCALE, 0.0f, 0.0f);
                         RunSpeedFalloff();
                     }
-                    swingProbe.Set(swingStep.x * SWING_STEP_SCALE, swingStep.y * SWING_STEP_SCALE, swingStep.z + SWING_PROBE_LIFT,
-                                   swingStep.w);
+                    Vec4 swingProbe = swingStep;
+                    swingProbe.x = swingProbe.x * SWING_STEP_SCALE;
+                    swingProbe.y = swingProbe.y * SWING_STEP_SCALE;
+                    swingProbe.z = swingProbe.z + SWING_PROBE_LIFT;
                     if (DAT_104c00e0 == 0 && DAT_104bfe1c == 0 && DAT_104c00d0 == 0 && DAT_1032d69c == 1 && DAT_104bfe6c == 0)
                         DAT_10db6ee8[0].motion->m_0008 = DAT_102027ec / MOTION_SPEED_TOP;
                     if (DAT_10db6ee8[DAT_104bf8b4].IsClearAny(&swingProbe) != 0 && DAT_104c00e0 < SWING_MAX_BLOCKED_STEPS)
@@ -6783,7 +6800,6 @@ movementDone:;
                                 else if (DAT_104bf890 % ENEMY_SPARK_PERIOD == 0 && DAT_10db6ee8[modelIdx].spineNode != 0)
                                 {
                                     Vec4 smokeAt;
-                                    smokeAt.Fill(0.0f);
                                     smokeAt.Copy(DAT_10db6ee8[modelIdx].spineNode->worldMatrix.GetTranslation());
                                     DAT_10daaa80.Start(EFFECT_ENEMY_SMOKE, smokeAt, -1, -1, 0, 0, 0, 0, 0, 0);
                                 }
@@ -7377,8 +7393,8 @@ else if (slotKind == 'z')
         DAT_1021f3c0[modelIdx] = (char)POT_SMASH_KIND;
         Vec4 smashAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
         DAT_10874848.RegisterEvent(POT_SMASH_EVENT);
-        Vec4 colour;
-        colour.Set(DAT_10db6ee8[modelIdx].scale.x, DAT_10db6ee8[modelIdx].scale.y, DAT_10db6ee8[modelIdx].scale.z, 1.0f);
+        Vec4 colour = DAT_10db6ee8[modelIdx].scale;
+        colour.w = 1.0f;
         DAT_10c64ad8 = DAT_10c64ad8 + 1;
         FUN_1000e750();
                             Vec4 soundAt = DAT_10db6ee8[modelIdx].matrix.GetTranslation();
@@ -7660,8 +7676,7 @@ else
         DAT_104bf888 = DAT_10db6ee8[modelIdx].switchNode + 1;
         if (DAT_10860cec[DAT_104bf888].frame == MARKER_CLOSED_FRAME)
         {
-            Vec4 probe;
-            probe = here;
+            Vec4 probe = here;
             probe.Set(0, 0, 1.0f, 0);
             if (DAT_10db6ee8[modelIdx].IsClearAny(&probe))
             {

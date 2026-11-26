@@ -438,3 +438,5 @@ Each finished batch adds two new ones, taken from the medium-function section of
 | 374 | 38 | match | Game_LoadData C++ linkage; 858 matched |
 | 375 | 38 | match | direct table indexing in boss/character updates; in-game frame layout; 858 matched |
 | 376 | 38 | match | in-game frame call sites; Bs006 register hoist; 858 matched |
+| 377 | 38 | match | Prince_Update one body; in-game frame burst local; 858 matched |
+| 378 | 38 | match | Prince_Update locals split, arena test, charge states; in-game frame leap-start block and scene order; 858 matched |

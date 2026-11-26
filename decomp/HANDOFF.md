@@ -234,6 +234,13 @@ function) and node_world.cpp (0) still break rule 2.
   register hoist. Scratchpad helpers for the in-game frame (w1d810): tgt20.py/tgt20f.py call-sequence diff,
   slots20.py stack-slot counts, rep20.py exact-snippet CRLF replace.
 - Paused after batch 376 at the orchestrator's request (external PRs being merged outside decomp/).
+- Batch 377: Prince_Update is one function body again (state helpers folded; code the original repeats stays as
+  static __forceinline helpers, main callee counts equal the original's). In-game frame: second burst group has its
+  own direction local; shoveDirs[4] iterator still unexplained (open.tsv).
+- Batch 378: Prince_Update PrinceFrame struct split into locals, arena test as the original's angle comparison,
+  CHARGE_A/B separate, lock-on sparks/glow (31152 of 31560 bytes; frame now the gap: ours 0x6ac vs 0x27c). In-game
+  frame: recovered the missing leap-start block, scene dispatch order swan/shove/rest, talk-block Vec4 hoist (call
+  sites 1946 vs 1945, frame 0x48d4 vs 0x490c).
 - **enemy_barrage.cpp + barrage_enemy.h** (new, rule-clean, C++ linkage because the originals have EH frames):
   Enemy_CallBarrage 0x100a77f0 (behaviour 15), Enemy_SpinFire 0x100a7db0 (14) and Enemy_CallBursts 0x100a8370
   (16/17, variant argument) match. Enemy_SpinFire's lesson (NOTES): a node pointer with a fallback (`fire`, else the

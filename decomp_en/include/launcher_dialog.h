@@ -191,6 +191,15 @@ public:
 protected:
     virtual void DoDataExchange(CDataExchange *pDX);   // EN 0x006f0cf0
     afx_msg void OnAdvancedOption();                     // EN 0x006f1550 (IDC_ADVANCED button)
+    afx_msg HBRUSH OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor);   // EN 0x006e9350
+    afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);   // EN 0x006e93c0
+    afx_msg BOOL OnEraseBkgnd(CDC *pDC);                                  // EN 0x006e93e0
+    afx_msg void OnPaint();                                               // EN 0x006ea4f0 (paints nothing)
+    afx_msg void OnNcPaint();                                             // EN 0x006ea440 (draws nothing)
+    afx_msg void OnGammaSettings();                                       // EN 0x006f1280 (IDC_GAMMA_SETTINGS, does nothing)
+    afx_msg void OnUseBackBuffer();                                       // EN 0x006f1290
+    afx_msg void OnSelchangeCombo415();                                   // EN 0x006f1300
+    afx_msg void OnCombo401();                                            // EN 0x006f1540 (does nothing)
     DECLARE_MESSAGE_MAP()
 };
 
@@ -294,6 +303,149 @@ protected:
     afx_msg void OnSelchangeCameraLeft();     // EN 0x006ebaf0
     afx_msg void OnSelchangeCameraRight();    // EN 0x006ebb90
     afx_msg void OnSelchangeCameraEnemy();    // EN 0x006ebaa0
+    DECLARE_MESSAGE_MAP()
+};
+
+// ---- Control ids of the network page (RT_DIALOG 131) and the title page (RT_DIALOG 139) -------------------------------
+enum LauncherNetControlId {
+    IDC_NET_NO_PATCH = 0x3eb,           // check box: do not apply patches at start-up
+    IDC_NET_LOBBY_ADDRESS = 0x3f1       // edit box: address of the lobby server
+};
+enum LauncherTitleControlId {
+    IDC_TITLE_ONLINE_UPDATE = 0x3ff,    // "Online Update(&L)" push button
+    IDC_TITLE_PROGRESS_A = 0x415,       // first update progress bar
+    IDC_TITLE_PROGRESS_B = 0x419        // second update progress bar
+};
+
+// Network page (dialog template IDD_NET_DIALOG): the lobby server address and the "no patch at start-up" switch.
+class CNetDlg : public CDialog {
+public:
+    CNetDlg(CWnd *pParent = NULL);   // EN 0x006ec0f0
+                                     // (implicit destructor: releases m_lobbyAddress; scalar deleting form EN 0x006ec190)
+
+    enum { IDD = IDD_NET_DIALOG };
+
+    CString m_lobbyAddress;   // 0x094 IDC_NET_LOBBY_ADDRESS text
+    int m_noPatch;            // 0x098 IDC_NET_NO_PATCH check state
+
+protected:
+    virtual void DoDataExchange(CDataExchange *pDX);   // EN 0x006ec210
+    afx_msg HBRUSH OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor);   // EN 0x006e9290
+    DECLARE_MESSAGE_MAP()
+};
+
+// Title page (dialog template IDD_TITLE_DIALOG): the "Online Update" button and the two update progress bars.
+class CTitDlg : public CDialog {
+    DECLARE_DYNAMIC(CTitDlg)
+public:
+    CTitDlg(CWnd *pParent = NULL);   // EN 0x006f0470
+    virtual ~CTitDlg();              // EN 0x006f0510, scalar deleting form 0x006f05c0
+
+    enum { IDD = IDD_TITLE_DIALOG };
+
+    CButton m_onlineUpdateCtrl;     // 0x094 IDC_TITLE_ONLINE_UPDATE
+    CProgressCtrl m_progressACtrl;  // 0x108 IDC_TITLE_PROGRESS_A
+    CProgressCtrl m_progressBCtrl;  // 0x17c IDC_TITLE_PROGRESS_B
+
+protected:
+    virtual void DoDataExchange(CDataExchange *pDX);   // EN 0x006f0650
+    afx_msg HBRUSH OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor);   // EN 0x006e9320
+    DECLARE_MESSAGE_MAP()
+};
+
+// ---- "Osero" (Othello) mini game page (RT_DIALOG 132): a hidden game on the 128x128 client area --------------------
+enum LauncherOseControlId {
+    IDC_OSE_STARTED = 0x3eb,       // push-like check box: pressed once the setup phase is over
+    IDC_OSE_PLAYER_BLACK = 0x3ef,  // radio button: the player takes the black pieces (first of the colour group)
+    IDC_OSE_RESET = 0x3ff,         // "Reset" button: empties the board
+    IDC_OSE_PASS = 0x400           // pass button: hands the move to the computer
+};
+const int OSE_BOARD_SIZE = 8;               // cells per board side
+const int OSE_CELL_COUNT = 64;              // OSE_BOARD_SIZE * OSE_BOARD_SIZE
+const int OSE_BOARD_WORDS = 4;              // the packed board: 16 two-bit cells per 32-bit word
+const int OSE_CELL_PIXELS = 16;             // width and height of a board cell on screen
+const unsigned char OSE_CELL_EMPTY = 0;     // cell state: no piece
+const unsigned char OSE_CELL_BLACK = 1;     // cell state: black piece
+const unsigned char OSE_CELL_WHITE = 2;     // cell state: white piece
+
+extern unsigned int g_oseBoard[OSE_BOARD_WORDS];   // the board, 2 bits per cell, row major (EN 0x01614d60)
+extern int g_oseComputerTurnPending;               // non-zero while the computer owes a move (EN 0x01614d70)
+
+// Othello page (dialog template IDD_OSE_DIALOG): the player plays one colour against the computer. The timer
+// (every 10 ms) lets the computer move once the player has moved or passed.
+class COseDlg : public CDialog {
+public:
+    COseDlg(CWnd *pParent = NULL);   // EN 0x006ec270
+
+    enum { IDD = IDD_OSE_DIALOG };
+
+    int m_playerColor;   // 0x094 IDC_OSE_PLAYER_BLACK radio group index (0 black, 1 white; -1 none)
+    int m_started;       // 0x098 IDC_OSE_STARTED check state
+
+protected:
+    virtual void DoDataExchange(CDataExchange *pDX);   // EN 0x006ec2e0
+    virtual BOOL OnInitDialog();                        // EN 0x006ec590
+    afx_msg void OnReset();                             // EN 0x006ec4e0
+    afx_msg void OnPass();                              // EN 0x006ec580
+    DECLARE_MESSAGE_MAP()
+};
+
+// ---- Main launcher dialog (RT_DIALOG 102) and its tab control -------------------------------------------------------
+const int IDD_LAUNCHER_DIALOG = 0x66;   // "Gurumin Ver.1.4 (STEAM)" main dialog template (CCongigDlg)
+const int IDC_LAUNCHER_TAB = 0x3e8;     // tab control holding the Graphics, Network, Keyboard and Pad pages
+const int IDC_LAUNCHER_HELP = 0x400;    // "Help" button (opens manual.pdf)
+extern HBRUSH g_launcherPageBrush;      // brush the network page returns for its control colours (EN 0x0090897c, NULL)
+const int IDM_ABOUTBOX = 0x10;          // system-menu command that opens the About box (CAboutDlg)
+
+// Tab control of the main dialog: a plain CTabCtrl with a runtime class of its own.
+class CTabCtrl2 : public CTabCtrl {
+    DECLARE_DYNAMIC(CTabCtrl2)
+public:
+    CTabCtrl2();            // EN 0x006f0370 (MFC-style inline constructor)
+    virtual ~CTabCtrl2();   // EN 0x006f03b0, scalar deleting form 0x006f03c0
+
+protected:
+    afx_msg HBRUSH OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor);   // EN 0x006e92f0
+    afx_msg BOOL OnEraseBkgnd(CDC *pDC);                                  // EN 0x006e93d0
+    afx_msg void OnNcPaint();                                             // EN 0x006ea430 (draws nothing)
+    afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);   // EN 0x006e93b0
+    DECLARE_MESSAGE_MAP()
+};
+
+// About box (dialog template 100): the copyright line and the OK button. Only ever lives on the stack of
+// CCongigDlg::OnSysCommand, so its constructor and destructor are inlined there.
+class CAboutDlg : public CDialog {
+public:
+    CAboutDlg();
+
+    enum { IDD = 100 };
+
+protected:
+    virtual void DoDataExchange(CDataExchange *pDX);
+    DECLARE_MESSAGE_MAP()
+};
+
+// Main launcher dialog ("Gurumin Ver.1.4 (STEAM)"): hosts a tab control with the settings pages and the Start Game,
+// Close and Cancel buttons. Created by the launcher entry point (EN 0x006e7470).
+class CCongigDlg : public CDialog {
+    DECLARE_DYNAMIC(CCongigDlg)
+public:
+    CCongigDlg(CWnd *pParent = NULL);   // EN 0x006e6610
+                                        // (implicit destructor EN 0x006e6780, scalar deleting form 0x006e6e70)
+
+    enum { IDD = IDD_LAUNCHER_DIALOG };
+
+    CTabCtrl2 m_tab;    // 0x094 IDC_LAUNCHER_TAB
+    int m_0108;         // 0x108 not touched by the functions reconstructed so far
+    HICON m_hIcon;      // 0x10c dialog icon (resource 128)
+
+protected:
+    afx_msg HBRUSH OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor);   // EN 0x006e9260
+    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);                  // EN 0x006e9230
+    afx_msg void OnSysCommand(UINT nID, LPARAM lParam);                   // EN 0x006ea560
+    afx_msg void OnPaint();                                               // EN 0x006ea450
+    afx_msg HCURSOR OnQueryDragIcon();                                    // EN 0x006ea510
+    afx_msg void OnHelp();                                                // EN 0x006e9080 (Help button)
     DECLARE_MESSAGE_MAP()
 };
 

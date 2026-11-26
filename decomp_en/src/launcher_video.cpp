@@ -57,8 +57,96 @@ CVideoDlg::CVideoDlg(CWnd *pParent)
 }
 
 BEGIN_MESSAGE_MAP(CVideoDlg, CDialog)
+    ON_CBN_SELCHANGE(IDC_FOG_EFFECT, &CVideoDlg::OnCombo401)
+    ON_WM_ERASEBKGND()
+    ON_WM_PAINT()
+    ON_WM_NCPAINT()
+    ON_WM_DRAWITEM()
+    ON_WM_CTLCOLOR()
+    ON_BN_CLICKED(IDC_GAMMA_SETTINGS, &CVideoDlg::OnGammaSettings)
+    ON_CBN_SELCHANGE(IDC_COMBO_415, &CVideoDlg::OnSelchangeCombo415)
+    ON_BN_CLICKED(IDC_USE_BACKBUFFER, &CVideoDlg::OnUseBackBuffer)
     ON_BN_CLICKED(IDC_ADVANCED, &CVideoDlg::OnAdvancedOption)
 END_MESSAGE_MAP()
+
+// Draws the page's controls with a transparent background.
+HBRUSH CVideoDlg::OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor)
+{
+    HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+    pDC->SetBkMode(TRANSPARENT);
+    return hbr;
+}
+
+// Owner-draw items: the default processing.
+void CVideoDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+    CDialog::OnDrawItem(nIDCtl, lpDrawItemStruct);
+}
+
+// Background erase: the default processing.
+BOOL CVideoDlg::OnEraseBkgnd(CDC *pDC)
+{
+    return CDialog::OnEraseBkgnd(pDC);
+}
+
+// Paint: only creates (and releases) the paint context; the dialog bitmap is drawn by the main dialog.
+void CVideoDlg::OnPaint()
+{
+    CPaintDC dc(this);
+}
+
+// The non-client area is left undrawn.
+void CVideoDlg::OnNcPaint()
+{
+}
+
+// Gamma check box: nothing to do beyond the exchange the control already performs.
+void CVideoDlg::OnGammaSettings()
+{
+}
+
+// Handler of the 0x401 notification: nothing to do.
+void CVideoDlg::OnCombo401()
+{
+}
+
+// "Use BackBuffer" check box: Cross Fade and Blur Effect need the back buffer, so both are disabled and cleared while
+// it is off.
+void CVideoDlg::OnUseBackBuffer()
+{
+    UpdateData(TRUE);
+    if (m_useBackBuffer == 0) {
+        m_crossFadeCtrl.EnableWindow(FALSE);
+        m_blurEffectCtrl.EnableWindow(FALSE);
+        m_crossFadeCtrl.SendMessage(BM_SETCHECK, 0, 0);
+        m_blurEffectCtrl.SendMessage(BM_SETCHECK, 0, 0);
+    } else {
+        m_crossFadeCtrl.EnableWindow(TRUE);
+        m_blurEffectCtrl.EnableWindow(TRUE);
+    }
+}
+
+// Selecting row 1 of the list in IDC_COMBO_415 warns about DirectSound3D (the Japanese text says that with
+// DirectSound3D some sound cards make sound effects and voices hard to hear, and that volume differs between
+// devices); the list in IDC_COMBO_414 is enabled only then. The strings are Shift-JIS in the exe, kept as escapes.
+void CVideoDlg::OnSelchangeCombo415()
+{
+    if (m_combo415Ctrl.GetCurSel() == 1) {
+        MessageBox(
+        "DirextSound3D\x82\xf0\x8eg\x97p\x82\xb7\x82\xe9\x82\xc6\x81"
+        "A\x83T\x83"
+        "E\x83\x93\x83h\x83J\x81[\x83h\x82\xc9\x82\xe6\x82\xc1\x82\xc4\x82\xcd\x82r.\x82"
+        "d.\x82\xe2\x89\xb9\x90\xba\x82\xaa\x95\xb7\x82\xab\x8e\xe6\x82\xe8\x93\xef\x82\xad\x82\xc8\x82\xe9\x82\xb1\x82\xc6\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb7\x81"
+        "B\n\x89\xb9\x97\xca\x82\xc9\x82\xe0\x8c\xc2\x91\xcc\x8d\xb7\x82\xaa\x82\xa0\x82\xe8\x82\xdc\x82\xb7\x82\xcc\x82\xc5\x81"
+        "A\x82\xa0\x82\xe7\x82\xa9\x82\xb6\x82\xdf\x82\xb2\x97\xb9\x8f\xb3\x89\xba\x82\xb3\x82\xa2\x81"
+        "B",
+        "\x8am\x94"
+        "F", 0);
+        m_combo414Ctrl.EnableWindow(TRUE);
+    } else {
+        m_combo414Ctrl.EnableWindow(FALSE);
+    }
+}
 
 // Exchanges every setting with its control, then subclasses the controls that the page drives directly.
 void CVideoDlg::DoDataExchange(CDataExchange *pDX)
